@@ -162,8 +162,6 @@ window.Vue.onUnmounted(() => {
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
     />
-    <up-add-units />
-    <up-delete-unit />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
         <div class="small-12 island">
@@ -238,6 +236,8 @@ window.Vue.onUnmounted(() => {
             </div>
         </div>
     </div>
+    <up-add-units />
+    <up-delete-unit />
     <activities-list-delete-modal />
     <up-curriculum :parent-folder-id="props.folderId" />
 </template>
