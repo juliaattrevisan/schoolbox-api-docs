@@ -141,8 +141,14 @@ class MeetingTimesConcurrent
                         $content = $response['value']->getBody()->getContents();
 
                         try {
+                            /* Something went awry in this particular $response object
+                             * Continue onwards with the others
+                             *
+                             * TODO but what happens if this continually returns '' instead of something
+                             *  we expected? Maybe just delete this $response entirely somehow
+                             */
                             if ('' === $content) {
-                                return [];
+                                continue;
                             }
 
                             $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
