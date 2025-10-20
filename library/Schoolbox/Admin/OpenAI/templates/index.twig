@@ -160,7 +160,7 @@
                 });
 
                 /** submit text settings from all text forms **/
-                function submitTextSettings() {
+                async function submitTextSettings() {
                     //grab the text setting form, and post the data via fetch
                     const textForm = document.getElementById('textForm');
                     const formData = new FormData(textForm);
@@ -198,7 +198,7 @@
                     }
 
                     // send via javascript fetch to adminOpenAi.postTextOptions
-                    const response = fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
+                    const response = await fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -210,10 +210,17 @@
                         // success
                         window.location.reload()
                     } else {
+                        // check response code...
+                        // may be redirect
+                        if (response.status >= 300 && response.status < 400) {
+                            window.location.href = response.url;
+                            return;
+                        }
+                        //something else happened...
                         // error
                         console.log('Error saving text settings.');
-                    }    }
-
+                    }
+                }
             });
         </script>
         <style>
