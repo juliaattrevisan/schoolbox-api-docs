@@ -6575,3 +6575,28 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
