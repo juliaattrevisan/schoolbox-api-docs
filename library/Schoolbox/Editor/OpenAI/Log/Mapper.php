@@ -111,48 +111,6 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
-
-    /**
-     * Find by predicate and group by session id
-     *
-     * @param Builder $pb
-     * @param int $limit
-     * @param int $offset
-     * @param array $options
-     * @return (Model[]|GenericCollection)[] grouped by session id
-     */
-    public function findPredicateGrouped(Builder $pb, int $limit = 100, int $offset = 0, array $options = []): array
-    {
-        // TODO: this actually needs to GROUP BY session_id so that the limit/offset refers to sessions, not individual log entries
-        // although at that point it feels odd for it to be a method directly on this mapper perhaps... hmm
-        $results = $this->findByPredicates($pb, [
-            'limit' => $limit,
-            'offset' => $offset,
-            'order' => 'created_at DESC',
-        ]);
-
-        // group by session id
-        $grouped = [];
-        foreach ($results as $result) {
-            $sessionId = $result->getSessionId() ?? 'no-session-' . $result->getId();
-            if (!isset($grouped[$sessionId])) {
-                $grouped[$sessionId] = $this->createCollection();
-            }
-            $grouped[$sessionId]->add($result);
-        }
-
-        // sort by most recent created_at in each group
-        uasort($grouped, function ($a, $b) {
-            $aDate = $a[0]->getCreatedAt() ? $a[0]->getCreatedAt()->getUnixTimeStamp() : 0;
-            $bDate = $b[0]->getCreatedAt() ? $b[0]->getCreatedAt()->getUnixTimeStamp() : 0;
-            return $bDate <=> $aDate;
-        });
-
-
-        return $grouped;
-    }
-
-
     /**
      * Get grouped logs with offset and limit
      */
@@ -166,7 +124,6 @@ class Mapper extends BaseMapper
         int $offset = 0
     ): array {
         // base query
-//        $query = "Select session_id from {$this->table} where feature = :feature group by session_id order by max(created_at) desc limit :limit offset :offset";
         $query = "Select id, session_id, user_id, created_at, feature from {$this->table} WHERE 1 = 1 ";
         $where = "";
         $order = " group by session_id order by max(created_at) desc limit :limit offset :offset";
@@ -224,6 +181,16 @@ class Mapper extends BaseMapper
     }
 
 
+    /**
+     * Count grouped logs
+     *
+     * @param string|null $keyword
+     * @param string|null $feature
+     * @param User|null $user
+     * @param \Alaress_Date_Format|null $start
+     * @param \Alaress_Date_Format|null $end
+     * @return array
+     */
     public function countGroupedLogs(
         ?string $keyword,
         ?string $feature,
@@ -232,7 +199,6 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
     ): array {
         // base query
-//        $query = "Select session_id from {$this->table} where feature = :feature group by session_id order by max(created_at) desc limit :limit offset :offset";
         $query = "Select count(*) from {$this->table} WHERE 1 = 1 ";
         $where = " group by session_id";
         $params = [];

@@ -74,9 +74,6 @@ class Controller extends Base
         $page = $this->getRequestPost()->getInt('page', 1);
         $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE);
 
-        // Build predicate using system predicate builder
-        $predicate = $this->aiLogMapper->getPredicateBuilder();
-
         //ensure feature is one of the actual features...
         if ($feature) {
             if (!array_key_exists($feature, array_merge(AIConfig::ALL_MODULES, ['image']))) {
@@ -86,7 +83,6 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(404);
                 return;
             }
-            $predicate->equals('feature', $feature);
         }
 
         // ensue the user exists (allow deleted)
@@ -100,7 +96,6 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(404);
                 return;
             }
-            $predicate->equals('user_id', $user);
         }
 
         // dates (before/after)
@@ -114,7 +109,6 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(400);
                 return;
             }
-            $predicate->greaterThanOrEqualTo('created_at', $after);
         }
         if ($before) {
             try {
@@ -126,15 +120,6 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(400);
                 return;
             }
-            $predicate->lessThanOrEqualTo('created_at', $before);
-        }
-
-        if ($keyword) {
-            $predicate->any(
-                ($this->aiLogMapper->getPredicateBuilder())
-                    ->like('prompt', "%$keyword%")
-                    ->like('response', "%$keyword%")
-            );
         }
 
         // new db query space...
@@ -146,7 +131,7 @@ class Controller extends Base
             $before,
             $limit,
             ($page - 1) * $limit,
-    );
+        );
 
         // Find total counts
         $count = $this->aiLogMapper->countGroupedLogs(
@@ -168,23 +153,16 @@ class Controller extends Base
         $sessions = [];
 
         //translate each group of session ID's
-        foreach ($logGroups as $sessionId => $group) {
-            /**
-             * This route only needs to show overall information about the session,
-             * We can derive that from the first log in the group I suppose
-             * @var AILog $firstLog
-             */
-            $firstLog = $group;
-
+        foreach ($logGroups as $sessionId => $log) {
             // $sessionId could be some fake "no-session-{id}" that we created in the mapper
             // so figure out the real session ID which we need to generate the route for
             $actualSessionId = $sessionId ?? null;
 
             $sessions[$sessionId] = [
                 'id' => $sessionId,
-                'feature' => $firstLog['feature'],
-                'createdAt' => $firstLog['created_at'],
-                'createdBy' => $userTranslator->__invoke($firstLog['user']),
+                'feature' => $log['feature'],
+                'createdAt' => $log['created_at'],
+                'createdBy' => $userTranslator->__invoke($log['user']),
                 '_routes' => [
                     'getLog' => $actualSessionId !== null ? $this->getRouteIfAuthorized(
                         'openAIUsage.getLog',
