@@ -221,6 +221,7 @@ class Transactor
          * they don't exist and try to accommodate that edgeish-case
          */
         if ($this->assessment instanceof DialogAgent\Model) {
+            /** @var DialogAgent\Model $assessment */
             $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
             /* We need the dialog_agent.id for a schematic join. This follows a previous phenomenon where quiz
