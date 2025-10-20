@@ -235,7 +235,7 @@ window.Vue.onUnmounted(() => {
                             />
                         </template>
                     </div>
-                    <div class="fixed-left l-pad-s f-no-margins">
+                    <div class="fixed-left l-pad-s f-no-margins no-print">
                         <button
                             class="button icon-add"
                             data-test="unit-planner-create-units"
