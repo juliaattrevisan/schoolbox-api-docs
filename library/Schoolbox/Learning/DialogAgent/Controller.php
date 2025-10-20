@@ -71,7 +71,7 @@ class Controller extends Base
         $dialogAgent = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
 
         $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->indexByCallback(static function (FieldContextModel $instance) {
-            return $instance->getScenarioField()->getId();
+            return $instance->getField()->getId();
         });
 
         $data = [

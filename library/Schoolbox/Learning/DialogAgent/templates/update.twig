@@ -102,7 +102,7 @@
                  <fieldset class="content">
                      {% for fieldContext in fieldContexts %}
                      <div class="small-12 columns">
-                         <label for="field-{{ fieldContext.scenarioField.id }}" class="required">{{ fieldContext.scenarioField.title }}</label>
+                         <label for="field-{{ fieldContext.field.id }}" class="required">{{ fieldContext.field.title }}</label>
                          <textarea id="fieldcontext-{{ fieldContext.id }}" name="fieldContexts[{{ fieldContext.id }}]" style="width:100%;height:100px;" class="required">{{ fieldContext.body }}</textarea>
                      </div>
                      {% endfor %}

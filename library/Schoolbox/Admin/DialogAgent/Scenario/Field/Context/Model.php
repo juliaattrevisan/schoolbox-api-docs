@@ -29,7 +29,7 @@ class Model implements ISoftDeletable
     /**
      * @var ScenarioField|null
      */
-    private ?ScenarioField $scenarioField = null;
+    private ?ScenarioField $field = null;
 
 
     /**
@@ -47,19 +47,19 @@ class Model implements ISoftDeletable
     /**
      * @return ScenarioField|null
      */
-    public function getScenarioField(): ?ScenarioField
+    public function getField(): ?ScenarioField
     {
-        return $this->scenarioField;
+        return $this->field;
     }
 
 
     /**
-     * @param ScenarioField|null $scenarioField
+     * @param ScenarioField|null $field
      * @return $this
      */
-    public function setScenarioField(?ScenarioField $scenarioField): self
+    public function setField(?ScenarioField $field): self
     {
-        $this->scenarioField = $scenarioField;
+        $this->field = $field;
         return $this;
     }
 

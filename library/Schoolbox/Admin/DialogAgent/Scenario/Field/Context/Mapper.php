@@ -31,7 +31,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('dialog_agent_scenario_field_context');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('scenario_field_id', self::TYPE_INTEGER, null, 'scenarioField');
+        $this->uses('scenario_field_id', self::TYPE_INTEGER, null, 'field');
         $this->uses('dialog_agent_id', self::TYPE_INTEGER, null, 'dialogAgent');
         $this->uses('body', self::TYPE_STRING, null, 'body');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -44,8 +44,8 @@ class Mapper extends \Schoolbox\Mapper
             'id',
             null,
             null,
-            'scenarioField',
-            'scenarioField',
+            'field',
+            'field',
         );
 
         $this->joins(
@@ -70,7 +70,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('scenarioField', 'scenarioField')}
+                {$this->getJoinColumnString('field', 'field')}
         ";
     }
 
@@ -85,7 +85,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('scenarioField', '', 'scenarioField')}
+            LEFT JOIN {$this->getJoinSql('field', '', 'field')}
         ";
     }
 
@@ -99,7 +99,7 @@ class Mapper extends \Schoolbox\Mapper
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
         /** @var \Schoolbox\Admin\DialogAgent\Scenario\Field\Mapper $scenarioFieldMapper */
-        $scenarioFieldMapper = $this->getJoinMapper('scenarioField');
+        $scenarioFieldMapper = $this->getJoinMapper('field');
 
         /** @var Model[] $fieldContexts */
         $fieldContexts = [];
@@ -110,10 +110,10 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Stack up all the adjoining fields
              */
-            $field = $scenarioFieldMapper->hydrate($row, 'scenarioField');
+            $field = $scenarioFieldMapper->hydrate($row, 'field');
 
             if ($field instanceof \Schoolbox\Admin\DialogAgent\Scenario\Field\Model) {
-                $fieldContext->setScenarioField($field);
+                $fieldContext->setField($field);
             }
 
             $fieldContexts[] = $fieldContext;
