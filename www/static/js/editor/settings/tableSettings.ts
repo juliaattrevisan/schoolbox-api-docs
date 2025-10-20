@@ -23,7 +23,7 @@ export function getTableSettings(): { table: TableConfig } {
                 defaultProperties: {
                     alignment: "left",
                     borderColor: "#b3b3b3",
-                    borderStyle: "solid",
+                    borderStyle: "double",
                     borderWidth: "1px",
                     width: "100%",
                 },

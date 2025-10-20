@@ -140,6 +140,10 @@ article figure.table {
     border-width: 1px;
 }
 
+.sb-ck-table {
+    border-style: double; /* we apply double as border-collapse is set on tables */
+}
+
 /**
  *  Rule specific to showing CKEditor content when being printed
 **/
