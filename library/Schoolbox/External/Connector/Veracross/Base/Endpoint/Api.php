@@ -29,16 +29,14 @@ class Api implements IApi
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *
-     * Sometimes endpoints fail for no obvious reason and trying again seems
-     * to work - instead of doing it manually, try insisting programmatically
-     * waiting NAP_TIMEOUT seconds between each attempt
+     * Sometimes endpoints fail for no obvious reason and trying again seems to work - instead of doing it
+     * manually, try insisting programmatically waiting NAP_TIMEOUT seconds between each attempt
      */
     private const NAP_TIMEOUT = 3;
 
 
     /**
-     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
-     * finally giving up
+     * Number of times to retry after having NAP_TIMEOUT seconds rest before finally giving up
      */
     private const NUM_RETRY = 3;
 
@@ -50,8 +48,8 @@ class Api implements IApi
 
 
     /**
-     * Maximum number of pages to obtain from an endpoint
-     * to safeguard against infinite loops
+     * Maximum number of pages to obtain from an endpoint to safeguard against infinite loops
+     *
      */
     private const MAX_PAYLOADS = 100;
 
@@ -75,8 +73,7 @@ class Api implements IApi
 
 
     /**
-     * A Veracross Access Token generator, in case you needed to
-     * make a new one somewhere along the way
+     * A Veracross Access Token generator, in case you needed to make a new one somewhere along the way
      *
      * @var AccessTokenGenerator
      */
