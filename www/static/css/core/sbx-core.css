@@ -1,0 +1,22 @@
+/**
+* Core CSS
+*/
+/**
+* SBX Colour Variables
+* All colours used throughout Schoolbox are to be defined here.
+* Note that some of these colours can be configured via the Skin Config settings.
+*/
+:root {
+  --sbx-color-body-background: #e5eff7;
+  --sbx-color-foreground-primary: #fff;
+  --sbx-color-foreground-secondary: #f4f2f2;
+  --sbx-color-text-primary: #000;
+  --sbx-color-text-secondary: #525252;
+  --sbx-color-alert: #ea0a06;
+  --sbx-color-success: #3e843e;
+  --sbx-color-warning: #ff7d00;
+  --sbx-color-highlight: #ffd100;
+  --sbx-color-accent: #3679a6;
+  --sbx-color-accent-text: #fff;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvc2J4LWNvcmUuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvYmFzZS9fc2J4LWNvbG9ycy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOztDQUFBO0FDQUE7Ozs7Q0FBQTtBQUtBO0VBQ0ksb0NBQUE7RUFDQSxvQ0FBQTtFQUNBLHlDQUFBO0VBQ0EsOEJBQUE7RUFDQSxtQ0FBQTtFQUNBLDBCQUFBO0VBQ0EsNEJBQUE7RUFDQSw0QkFBQTtFQUNBLDhCQUFBO0VBQ0EsMkJBQUE7RUFDQSw2QkFBQTtBRElKIiwic291cmNlUm9vdCI6IiJ9 */
