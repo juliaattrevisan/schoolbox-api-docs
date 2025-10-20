@@ -3,6 +3,21 @@
 * Currently it's only loaded when the advanced UI is enabled
 */
 /**
+* SBX Border Design Tokens
+* All borders used throughout Schoolbox are to be defined here.
+*/
+:root {
+  --sbx-border-radius-none: 0;
+  --sbx-border-radius-small: 0.25rem;
+  --sbx-border-radius-normal: 0.5rem;
+  --sbx-border-radius-full: 50%;
+  --sbx-border-width-normal: 1px;
+  --sbx-border-width-thick: 2px;
+  --sbx-border-width-thicker: 4px;
+  --sbx-border-width-thickest: 8px;
+}
+
+/**
 * SBX Colour Design Tokens
 * All colours used throughout Schoolbox are to be defined here.
 * Note that some of these colours can be configured via the Skin Config settings.
@@ -22,21 +37,6 @@
 }
 
 /**
-* SBX Border Design Tokens
-* All borders used throughout Schoolbox are to be defined here.
-*/
-:root {
-  --sbx-border-radius-none: 0;
-  --sbx-border-radius-small: 0.25rem;
-  --sbx-border-radius-normal: 0.5rem;
-  --sbx-border-radius-full: 50%;
-  --sbx-border-width-normal: 1px;
-  --sbx-border-width-thick: 2px;
-  --sbx-border-width-thicker: 4px;
-  --sbx-border-width-thickest: 8px;
-}
-
-/**
 * SBX Shadows Design Tokens
 * All shadows used throughout Schoolbox are to be defined here.
 */
@@ -45,4 +45,35 @@
   --sbx-shadow-m: 0 4px 8px rgba(0, 0, 0, 0.15);
   --sbx-shadow-l: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
-/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvc2J4LWNvcmUuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvZGVzaWduVG9rZW5zL19zYngtY29sb3JzLnNjc3MiLCJ3ZWJwYWNrOi8vLi93d3cvc3RhdGljL2Nzcy9jb3JlL2Rlc2lnblRva2Vucy9fc2J4LWJvcmRlcnMuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvZGVzaWduVG9rZW5zL19zYngtc2hhZG93cy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Q0FBQTtBQ0FBOzs7O0NBQUE7QUFLQTtFQUNJLG9DQUFBO0VBQ0Esb0NBQUE7RUFDQSx5Q0FBQTtFQUNBLDhCQUFBO0VBQ0EsbUNBQUE7RUFDQSwwQkFBQTtFQUNBLDRCQUFBO0VBQ0EsNEJBQUE7RUFDQSw4QkFBQTtFQUNBLDJCQUFBO0VBQ0EsNkJBQUE7QURLSjs7QUVyQkE7OztDQUFBO0FBSUE7RUFDSSwyQkFBQTtFQUNBLGtDQUFBO0VBQ0Esa0NBQUE7RUFDQSw2QkFBQTtFQUVBLDhCQUFBO0VBQ0EsNkJBQUE7RUFDQSwrQkFBQTtFQUNBLGdDQUFBO0FGdUJKOztBR3BDQTs7O0NBQUE7QUFJQTtFQUNJLDRDQUFBO0VBQ0EsNkNBQUE7RUFDQSw2Q0FBQTtBSHVDSiIsInNvdXJjZVJvb3QiOiIifQ== */
+
+/**
+* SBX Sizes Design Tokens
+* All sizes used throughout Schoolbox are to be defined here.
+*/
+:root {
+  --sbx-font-size-xs: 0.25rem;
+  --sbx-font-size-s: 0.5rem;
+  --sbx-font-size-m: 1rem;
+  --sbx-font-size-l: 1.5rem;
+  --sbx-font-size-xl: 2rem;
+}
+
+/**
+* SBX Sizes Design Tokens
+* All sizes used throughout Schoolbox are to be defined here.
+*/
+:root {
+  --sbx-font-size-xs: 0.6875rem;
+  --sbx-font-size-s: 0.75rem;
+  --sbx-font-size-m: 1rem;
+  --sbx-font-size-l: 1.5rem;
+  --sbx-font-size-xl: 2.25rem;
+  --sbx-font-weight-normal: 400;
+  --sbx-font-weight-active: 500;
+  --sbx-font-weight-heading: 600;
+  --sbx-font-weight-strong: 700;
+  --sbx-line-height-tight: 1.2;
+  --sbx-line-height-normal: 1.5;
+  --sbx-line-height-large: 1.8;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvc2J4LWNvcmUuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvZGVzaWduVG9rZW5zL19zYngtYm9yZGVycy5zY3NzIiwid2VicGFjazovLy4vd3d3L3N0YXRpYy9jc3MvY29yZS9kZXNpZ25Ub2tlbnMvX3NieC1jb2xvcnMuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvZGVzaWduVG9rZW5zL19zYngtc2hhZG93cy5zY3NzIiwid2VicGFjazovLy4vd3d3L3N0YXRpYy9jc3MvY29yZS9kZXNpZ25Ub2tlbnMvX3NieC1zaXplcy5zY3NzIiwid2VicGFjazovLy4vd3d3L3N0YXRpYy9jc3MvY29yZS9kZXNpZ25Ub2tlbnMvX3NieC10eXBvZ3JhcGh5LnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7OztDQUFBO0FDQUE7OztDQUFBO0FBSUE7RUFDSSwyQkFBQTtFQUNBLGtDQUFBO0VBQ0Esa0NBQUE7RUFDQSw2QkFBQTtFQUVBLDhCQUFBO0VBQ0EsNkJBQUE7RUFDQSwrQkFBQTtFQUNBLGdDQUFBO0FESUo7O0FFakJBOzs7O0NBQUE7QUFLQTtFQUNJLG9DQUFBO0VBQ0Esb0NBQUE7RUFDQSx5Q0FBQTtFQUNBLDhCQUFBO0VBQ0EsbUNBQUE7RUFDQSwwQkFBQTtFQUNBLDRCQUFBO0VBQ0EsNEJBQUE7RUFDQSw4QkFBQTtFQUNBLDJCQUFBO0VBQ0EsNkJBQUE7QUZvQko7O0FHcENBOzs7Q0FBQTtBQUlBO0VBQ0ksNENBQUE7RUFDQSw2Q0FBQTtFQUNBLDZDQUFBO0FIdUNKOztBSTlDQTs7O0NBQUE7QUFJQTtFQUNJLDJCQUFBO0VBQ0EseUJBQUE7RUFDQSx1QkFBQTtFQUNBLHlCQUFBO0VBQ0Esd0JBQUE7QUppREo7O0FLMURBOzs7Q0FBQTtBQUlBO0VBQ0ksNkJBQUE7RUFDQSwwQkFBQTtFQUNBLHVCQUFBO0VBQ0EseUJBQUE7RUFDQSwyQkFBQTtFQUVBLDZCQUFBO0VBQ0EsNkJBQUE7RUFDQSw4QkFBQTtFQUNBLDZCQUFBO0VBRUEsNEJBQUE7RUFDQSw2QkFBQTtFQUNBLDRCQUFBO0FMMkRKIiwic291cmNlUm9vdCI6IiJ9 */
