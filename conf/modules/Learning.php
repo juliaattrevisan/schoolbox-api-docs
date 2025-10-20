@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\Timeline\Module as TimelineModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
 use Schoolbox\Learning\Badge\Module as BadgeModule;
 use Schoolbox\Learning\Badge\OpenBadge\Module as OpenBadgeModule;
+use Schoolbox\Learning\DialogAgent\Module as DialogAgentModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Learnosity\Module as LearnosityModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
@@ -70,6 +71,11 @@ class Learning extends ModuleLoader
             $this->loadModule($di, AssessmentExporterModule::class, "/{$namespace}/export");
             $this->loadModule($di, MarkScheme\Module::class, "/{$namespace}/markscheme");
             $this->loadModule($di, LessonPlanActivitiesModule::class, "/{$namespace}/lessonplan");
+            /* TODO Technical Uplift Candidate: rename Discussion to Commentary
+             *  The /discussion/* namespace is already occupied by Discussion Threads which would be better
+             *  served in the /commentary/* namespace instead, to disambiguate this new learning activity
+             */
+            $this->loadModule($di, DialogAgentModule::class, "/{$namespace}/discussion");
         }
 
         // Student toolkit component: not feature flagged
