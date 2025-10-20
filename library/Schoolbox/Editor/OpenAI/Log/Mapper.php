@@ -124,7 +124,7 @@ class Mapper extends BaseMapper
         int $offset = 0
     ): array {
         // base query
-        $query = "Select id, session_id, user_id, created_at, feature from {$this->table} WHERE 1 = 1 ";
+        $query = "Select id, session_id, user_id, created_at, feature from {$this->table} WHERE session_id is not NULL ";
         $where = "";
         $order = " group by session_id order by max(created_at) desc limit :limit offset :offset";
         $params = [
@@ -165,10 +165,6 @@ class Mapper extends BaseMapper
             if ($row['user_id']) {
                 $userMapper = $this->getJoinMapper('user');
                 $user = $userMapper->findById($row['user_id']);
-            }
-            // if no sessionId then create a fake one
-            if (!$row['session_id']) {
-                $row['session_id'] = Model::MISSING_SESSIONID . $row['id'];
             }
             $data[$row['session_id']] = [
                 'session_id' => $row['session_id'],

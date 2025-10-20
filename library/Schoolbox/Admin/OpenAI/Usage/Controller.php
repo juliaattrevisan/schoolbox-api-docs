@@ -155,20 +155,16 @@ class Controller extends Base
 
         //translate each group of session ID's
         foreach ($logGroups as $sessionId => $log) {
-            // $sessionId could be some fake "no-session-{id}" that we created in the mapper
-            // so figure out the real session ID which we need to generate the route for
-            $actualSessionId = $sessionId ?? null;
-
             $sessions[$sessionId] = [
                 'id' => $sessionId,
                 'feature' => $log['feature'],
                 'createdAt' => $log['created_at'],
                 'createdBy' => $userTranslator->__invoke($log['user']),
                 '_routes' => [
-                    'getLog' => $actualSessionId !== null ? $this->getRouteIfAuthorized(
+                    'getLog' => $this->getRouteIfAuthorized(
                         'openAIUsage.getLog',
-                        [ 'sessionId' => $actualSessionId ]
-                    ) : null,
+                        [ 'sessionId' => $sessionId ]
+                    ),
                 ],
             ];
         }
