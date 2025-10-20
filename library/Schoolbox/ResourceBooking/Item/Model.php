@@ -109,6 +109,11 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     protected $bookingIsAuthorized = false;
 
+    /**
+     * @var bool
+     */
+    protected bool $allowClashBookings = false;
+
     public function __construct()
     {
         $this->setImage(new Storage\Model());
@@ -420,6 +425,25 @@ class Model implements ISoftDeletable, JsonSerializable
     public function setBookingIsAuthorized(bool $authorized): self
     {
         $this->bookingIsAuthorized = $authorized;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowClashBookings(): bool
+    {
+        return $this->allowClashBookings;
+    }
+
+    /**
+     * @param bool $allow
+     * @return $this
+     */
+    public function setAllowClashBookings(bool $allow): self
+    {
+        $this->allowClashBookings = $allow;
 
         return $this;
     }

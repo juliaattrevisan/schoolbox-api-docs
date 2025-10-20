@@ -257,6 +257,22 @@
 
                 <fieldset class="content">
                     <legend>
+                        Allow Clash Bookings
+                        <span class="hint has-tip tip-top" data-tooltip title="If this is set, users can submit booking requests that clash with existing ones; however, the system will still allow only one request to be approved at any point in time.">?</span>
+                    </legend>
+                    <div class="small-12 columns">
+                        <div class="switch">
+                            <input type="checkbox" value="1" {% if item.allowClashBookings %}checked{% endif %} id="allow_clash_bookings" name="allow_clash_bookings">
+                            <label for="allow_clash_bookings">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>
                         Minimum Lead Time
                         <span class='hint has-tip tip-top' data-tooltip title="If this is set, somebody reserving this item must give this period of notice before their reservation.">?</span>
                     </legend>

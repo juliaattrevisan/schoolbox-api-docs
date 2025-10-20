@@ -60,6 +60,7 @@ class Mapper extends BaseMapper
         $this->uses('min_reservation_time', self::TYPE_TIMESPAN);
         $this->uses('max_reservation_time', self::TYPE_TIMESPAN);
         $this->uses('current_term_restriction', self::TYPE_BOOLEAN);
+        $this->uses('allow_clash_bookings', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('modified_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

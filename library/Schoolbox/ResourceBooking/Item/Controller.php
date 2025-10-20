@@ -294,7 +294,8 @@ class Controller extends Base
             ->setMinLeadTime($this->getDateIntervalFromForm($post['min_lead_time'] ?? []))
             ->setMinReservationTime($this->getDateIntervalFromForm($post['min_reservation_time'] ?? []))
             ->setMaxReservationTime($this->getDateIntervalFromForm($post['max_reservation_time'] ?? []))
-            ->setCurrentTermRestriction($post['current_term_restriction'] ?? null);
+            ->setCurrentTermRestriction((bool)($post['current_term_restriction'] ?? false))
+            ->setAllowClashBookings((bool)($post['allow_clash_bookings'] ?? false));
 
         // Rectumize the file that was uploaded
         if (is_array($post['attachment'] ?? null)) {
