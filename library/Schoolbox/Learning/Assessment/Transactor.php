@@ -14,9 +14,12 @@ use DomainException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Config\Loader;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\LessonPlan\Activities\Replicator as LessonPlanActivitiesReplicator;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -25,6 +28,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Turnitin;
+use Schoolbox\Learning\Turnitin\Group\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -52,16 +56,19 @@ class Transactor
     /**
      * Transactor constructor.
      *
-     * @param FolderMapper                   $folderMapper
-     * @param UnitImplementationMapper       $unitImplementationMapper
-     * @param UnitSpecificationMapper        $unitSpecificationMapper
-     * @param AssessmentMapperProxy          $assessmentMapperProxy
-     * @param Turnitin\Group\Mapper          $turnitinGroupMapper
-     * @param SubmissionBoxMapper            $submissionBoxMapper
-     * @param SingleFile\Mapper              $submissionFileMapper
-     * @param Generator                      $routeGenerator
-     * @param Replicator                     $replicator
+     * @param FolderMapper $folderMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Mapper $turnitinGroupMapper
+     * @param SubmissionBoxMapper $submissionBoxMapper
+     * @param SingleFile\Mapper $submissionFileMapper
+     * @param Generator $routeGenerator
+     * @param Replicator $replicator
      * @param LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator
+     * @param DialogAgentMapper $dialogAgentMapper
+     * @param ScenarioMapper $scenarioMapper
+     * @param FieldContextMapper $fieldContextMapper
      */
     public function __construct(
         private FolderMapper $folderMapper,
@@ -74,6 +81,9 @@ class Transactor
         private Generator $routeGenerator,
         private Replicator $replicator,
         private LessonPlanActivitiesReplicator $lessonPlanActivitiesReplicator,
+        private DialogAgentMapper $dialogAgentMapper,
+        private ScenarioMapper $scenarioMapper,
+        private FieldContextMapper $fieldContextMapper,
     ) {
     }
 
@@ -203,6 +213,35 @@ class Transactor
                     $this->turnitinGroupMapper->save($turnitinGroup);
                 }
             }
+        }
+
+        /* Dialog Agents get some Scenario Field Context instances set up and ready to use
+         *
+         * It's just way easier to set these up ready to use, rather than anticipate when
+         * they don't exist and try to accommodate that edgeish-case
+         */
+        if ($this->assessment instanceof DialogAgent\Model) {
+            $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
+            /* We need the dialog_agent.id for a schematic join. This follows a previous phenomenon where quiz
+             * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
+             * but sub-object's fields don't really surface through the domain model for a reason.
+             */
+            $dialogAgent = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
+
+            $fieldContexts = $this->fieldContextMapper->createCollection();
+
+            foreach ($scenario->getFields() as $field) {
+                $fieldContexts->add($this->fieldContextMapper->createModel()
+                    ->setScenarioField($field)
+                    ->setDialogAgent($dialogAgent)
+                );
+            }
+
+            /* I'll save them. I'll save them all.
+             *    --Jardani Jovonovich
+             */
+            $this->fieldContextMapper->save($fieldContexts);
         }
 
         /* The conclusion of how $returnUrl was derived

@@ -64,6 +64,14 @@ class Controller extends Base
             ])
             ->add(['Configure', null]);
 
+        /* We need the dialog_agent.id for a schematic join. This follows a previous phenomenon where quiz
+         * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
+         * but sub-object's fields don't really surface through the domain model for a reason.
+         */
+        $dialogAgent = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
+
+        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId());
+
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
@@ -107,41 +115,31 @@ class Controller extends Base
         $this->assessmentMapperProxy->save($assessment, $this->getUser());
 
         /* Persist scenario fields
+         *
+         * Find prototypical instances
          */
-        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
-
-        /* Find prototypical instances
-         */
-        $existingFields = $scenario->getFields()->indexBy('id');
+        $existingFields = $this->scenarioMapper->findById($assessment->getScenarioId())->getFields()->indexBy('id');
 
         /* We need the dialog_agent.id for a schematic join. This follows a previous phenomenon where quiz
          * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
          * but sub-object's fields don't really surface through the domain model for a reason.
          */
-        $dialogAgent = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
+        $dialogAgentId = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId())->getId();
 
         /* Each field in the scenario should be populated with the value provided in the ui
          *
          * First find out if scenario field contexts already exist; if so, update and reuse them
          * Otherwise spawn new instances upon first save
          */
-        $existingContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->indexByCallback(static function (FieldContextModel $instance) {
+        $existingContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId)->indexByCallback(static function (FieldContextModel $instance) {
             return $instance->getScenarioField()->getId();
         });
 
         foreach ($existingFields as $fieldId => $field) {
-            if (!isset($existingContexts[$fieldId])) {
-                $existingContexts[$fieldId] = $this->fieldContextMapper->createModel()
-                    ->setScenarioField($field)
-                    ->setDialogAgent($dialogAgent);
-            }
-
-            /* Update to the latest body val
-             */
             $existingContexts[$fieldId]->setBody($postArray['fields'][$fieldId]);
         }
 
-        /* Save them. Save them all.
+        /* I'll save them. I'll save them all.
          *    --Jardani Jovonovich
          */
         $this->fieldContextMapper->save($existingContexts);
