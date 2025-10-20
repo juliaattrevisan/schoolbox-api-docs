@@ -70,12 +70,15 @@ class Controller extends Base
          */
         $dialogAgent = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
 
-        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId());
+        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->indexByCallback(static function (FieldContextModel $instance) {
+            return $instance->getScenarioField()->getId();
+        });
 
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'scenario' => $this->scenarioMapper->findById($assessment->getScenarioId()),
+            'fieldContexts' => $fieldContexts,
             'helpfulness' => [
                 DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
                 DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
@@ -131,18 +134,16 @@ class Controller extends Base
          * First find out if scenario field contexts already exist; if so, update and reuse them
          * Otherwise spawn new instances upon first save
          */
-        $existingContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId)->indexByCallback(static function (FieldContextModel $instance) {
-            return $instance->getScenarioField()->getId();
-        });
+        $existingFieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId)->indexBy('id');
 
-        foreach ($existingFields as $fieldId => $field) {
-            $existingContexts[$fieldId]->setBody($postArray['fields'][$fieldId]);
+        foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
+            $existingFieldContexts[$fieldContextId]->setBody($postArray['fieldContexts'][$fieldContextId]);
         }
 
         /* I'll save them. I'll save them all.
          *    --Jardani Jovonovich
          */
-        $this->fieldContextMapper->save($existingContexts);
+        $this->fieldContextMapper->save($existingFieldContexts);
 
         /* Respond to synchronous POST with redirect
          */
