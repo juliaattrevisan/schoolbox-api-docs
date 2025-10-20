@@ -147,7 +147,9 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Access::class),
             ),
             $assessmentMapperProxy,
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class),
         );
     }
 

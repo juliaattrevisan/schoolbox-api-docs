@@ -12,7 +12,9 @@ namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
 use DebugBar\DebugBarException;
-use Schoolbox\Admin\DialogAgent\Scenario\Mapper;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -27,12 +29,16 @@ class Controller extends Base
      *
      * @param BreadcrumbFactory $bakery
      * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param Mapper $scenarioMapper
+     * @param DialogAgentMapper $dialogAgentMapper
+     * @param ScenarioMapper $scenarioMapper
+     * @param FieldContextMapper $fieldContextMapper
      */
     public function __construct(
         private BreadcrumbFactory $bakery,
         private AssessmentMapperProxy $assessmentMapperProxy,
-        private \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper
+        private DialogAgentMapper $dialogAgentMapper,
+        private ScenarioMapper $scenarioMapper,
+        private FieldContextMapper $fieldContextMapper,
     ) {
     }
 
@@ -97,6 +103,28 @@ class Controller extends Base
 
         $this->assessmentMapperProxy->save($assessment, $this->getUser());
 
-        new \Alaress_Probe($postArray);
+        /* Persist scenario fields
+         */
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
+        /* We need the dialog_agent.id for a schematic join. This follows a previous phenomenon where quiz
+         * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
+         * but sub-object's fields don't really surface through the domain model for a reason.
+         */
+        $dialogAgentId = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId())->getId();
+
+        /* Each field in the scenario should be populated with the value provided in the ui
+         *
+         * First find out if scenario field contexts already exist; if so, update and reuse them
+         * Otherwise spawn new instances upon first save
+         */
+        $existingContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId);
+
+
+
+
+
+
+        new \Alaress_Probe($postArray, $existingContexts);
     }
 }
