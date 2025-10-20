@@ -144,8 +144,9 @@ class Validation
      *                     // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
      *                     'invalid'
      *                 ],
-     *                 // Errors on valid dates are keyed by the valid date in Y-m-d H:i:s format.
-     *                 '2025-01-01 10:00:00' => [
+     *                 // Errors on valid dates are keyed by the valid date in YYYY-MM-DD format.
+     *                 // Since the smallest repeat period for series is 'daily', there will be at most one booking per day.
+     *                 '2025-01-01' => [
      *                     'conflict',
      *                     ...
      *                 ],
@@ -324,7 +325,7 @@ class Validation
         $errors = [];
 
         if ($startDate > $endDate) {
-            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_BEFORE_START;
         }
 
@@ -344,8 +345,8 @@ class Validation
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
-            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_IN_PAST;
+            $startDateTimeKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::START_DATETIME][$startDateTimeKey][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
@@ -365,7 +366,7 @@ class Validation
         $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
 
         if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
-            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_TOO_EARLY;
         }
 
@@ -389,7 +390,7 @@ class Validation
 
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
-            $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_TOO_SHORT;
         }
 
@@ -413,7 +414,7 @@ class Validation
             $latestEnd = clone $startDate;
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
-                $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+                $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
                 $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_TOO_LONG;
             }
         }
@@ -484,7 +485,7 @@ class Validation
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
-            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_CONFLICT;
         } elseif (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
@@ -495,7 +496,7 @@ class Validation
             );
 
             if (count($roomEvents)) {
-                $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+                $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
                 $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_TIMETABLED_CLASS;
             }
         }
@@ -516,7 +517,7 @@ class Validation
 
         $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
-            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_CURRENT_TERM;
         }
 
@@ -739,8 +740,8 @@ class Validation
         if (count($errorsByKey) === 0) {
             throw new InvalidArgumentException('No errors, so this function should not have been called.');
         }
-        foreach ($errorsByKey as $keyIgnored => $errorTypesByTimeString) {
-            foreach ($errorTypesByTimeString as $timeStringIgnored => $errorTypes) {
+        foreach ($errorsByKey as $keyIgnored => $errorTypesByDateString) {
+            foreach ($errorTypesByDateString as $dateStringIgnored => $errorTypes) {
                 if (array_any($errorTypes, static fn($errorType) => $errorType !== self::ERROR_CONFLICT)) {
                     return false;
                 }
