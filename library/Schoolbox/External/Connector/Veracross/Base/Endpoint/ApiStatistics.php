@@ -22,6 +22,12 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 class ApiStatistics implements IStrategy
 {
     /**
+     * Number of decimal places for logging purposes.
+     */
+    private const PRECISION = 2;
+
+
+    /**
      * ApiStatistics constructor.
      *
      * @param LoggerInterface $log
@@ -60,7 +66,7 @@ class ApiStatistics implements IStrategy
         foreach ($apiUsage as $endpoint => $data) {
             $maxEndpointLength = max($maxEndpointLength, strlen($endpoint));
             $maxAccessesLength = max($maxAccessesLength, strlen((string)$data['count']));
-            $maxDurationLength = max($maxDurationLength, strlen(number_format($data['duration'], 2)));
+            $maxDurationLength = max($maxDurationLength, strlen(number_format($data['duration'], self::PRECISION)));
         }
 
         /* Extra padding for aesthetic reasons only
@@ -82,7 +88,7 @@ class ApiStatistics implements IStrategy
                 '    %s%s%s',
                 str_pad($endpoint, $maxEndpointLength, ' ', STR_PAD_RIGHT),
                 str_pad((string)$data['count'], $maxAccessesLength, ' ', STR_PAD_LEFT),
-                str_pad(number_format($data['duration'], 2), $maxDurationLength, ' ', STR_PAD_LEFT),
+                str_pad(number_format($data['duration'], self::PRECISION), $maxDurationLength, ' ', STR_PAD_LEFT),
             ));
         }
 
