@@ -67,6 +67,13 @@ class Api implements IApi
 
 
     /**
+     * An extra amount of time to wait between Too Many Requests because veracros is still giving us
+     * 429 even after waiting the requisite amount of time.
+     */
+    private const RATE_LIMIT_OFFSET = 30;
+
+
+    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -217,8 +224,16 @@ class Api implements IApi
 
             /* Veracross lets us make more requests after this x-rate-limit-reset datetime
              * that is (in?)conveniently expressed as a unix timestamp
+             *
+             * Delays require an expression in milliseconds.
              */
             $resetAt = 1000 * ((int)$response->getHeaderLine('x-rate-limit-reset') - time());
+
+            /* TODO For some reason these are still returning 429. I think it's a bit too aggressive for
+             *  veracross to handle: add an arbitrary 30 seconds to see if that helps. I only started getting
+             *  this outcome recently, where in the main suds loop we're missing a few payloads.
+             */
+            $resetAt += 1000 * self::RATE_LIMIT_OFFSET;
 
             /* If (x-rate-limit-reset - time()) is somehow in the past, assume we're good to go.
              *
@@ -227,8 +242,6 @@ class Api implements IApi
              *
              * You can probably get away with a 0 second delay, but I'm not sure if that val does some weird
              * or wonderful thing in the guzzle middleware.
-             *
-             * Delays require an expression in milliseconds.
              */
             if ($resetAt < 0) {
                 return self::RESUME_RETRY_DELAY;

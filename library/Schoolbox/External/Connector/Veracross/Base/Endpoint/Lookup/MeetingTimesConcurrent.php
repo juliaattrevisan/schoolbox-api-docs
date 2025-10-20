@@ -127,7 +127,7 @@ class MeetingTimesConcurrent
                     if (IApi::CONCURRENCY_FULFILLED === $response['state']) {
                         /* There is a rate limit on requests which might leave some fulfilled but
                          * ultimately unsuccessful. The Veracross rate limit is discussed here:
-
+                         *
                          * Rate Limit is 300 per 3 minutes
                          * https://api-docs.veracross.com/docs/docs/87c4e0dc5e47b-rate-limiting
                          */
