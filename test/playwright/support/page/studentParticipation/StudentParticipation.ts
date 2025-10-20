@@ -189,7 +189,7 @@ export default class StudentParticipation {
         await this.page.getByLabel("Title").fill(newTitle);
 
         this.tester.isGoingTo(`Add '${description}' into the Description`);
-        await this.page.getByLabel("Description").fill(description);
+        await this.tester.fillCKEditorById("plan-desc", description);
 
         this.tester.isGoingTo(`Add '${dueDate.toISOString()}' as the Due Date`);
         await this.page.getByLabel("Due Date").fill(Common.formatDate(dueDate, true));
