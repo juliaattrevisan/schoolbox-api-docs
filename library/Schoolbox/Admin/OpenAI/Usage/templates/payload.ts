@@ -21,7 +21,6 @@ export type AiSession = {
     feature: string;
     createdAt: string;
     createdBy: UserAuthor;
-    totalLogs: number;
     _routes: {
         getLog?: string | null;
     };
