@@ -668,10 +668,8 @@ class Controller extends Base
             ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
             ->setName($this->requestPost['name'])
             ->setNotes($this->requestPost['notes'])
-            ->setRelatedBookingList(new GenericCollection(Model::class));
-
-        $status = $this->getStatusForNonClashBooking($booking);
-        $booking->setStatus($this->getStatusMapper()->createModel($status));
+            ->setRelatedBookingList(new GenericCollection(Model::class))
+            ->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)));
 
         return $booking;
     }
@@ -1041,9 +1039,9 @@ class Controller extends Base
      * Note bookings that clash with existing bookings should be given status 'pending'.
      *
      * @param Model $booking
-     * @return string
+     * @return int
      */
-    private function getStatusForNonClashBooking(Model $booking): string
+    private function getStatusForNonClashBooking(Model $booking): int
     {
         $resource = $booking->getResource();
         $event = $booking->getEvent();
