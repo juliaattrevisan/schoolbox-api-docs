@@ -40,8 +40,8 @@ class Mailer
 {
     private const MAX_RETRIES   = 4;
     private const RETRY_TIMEOUT = 1;
-    private const AMAZON_SES_ENDPOINT_FORMAT = 'email-smtp.%s.amazonaws.com';
-    private const AMAZON_SES_PORT = 587;
+    public const AMAZON_SES_ENDPOINT_FORMAT = 'email-smtp.%s.amazonaws.com';
+    public const AMAZON_SES_PORT = 587;
 
     /**
      * Instance of mail transporter.

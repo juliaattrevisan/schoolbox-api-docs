@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Mail\Mailer;
 use GuzzleHttp\Client;
 use Proxy\Server;
 use Schoolbox\Config\ConfigMapper;
@@ -153,11 +154,11 @@ switch ($_POST['module']) {
 
         if ($config->get('mail_enable') && $sesUsername && $sesPassword && $sesRegion) {
             // Amazon SES is configured - test SES connectivity
-            $sesEndpoint = sprintf('email-smtp.%s.amazonaws.com', $sesRegion);
+            $sesEndpoint = sprintf(Mailer::AMAZON_SES_ENDPOINT_FORMAT, $sesRegion);
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 3, 'usec' => 0));
 
-            if (@socket_connect($socket, $sesEndpoint, 587)) {
+            if (@socket_connect($socket, $sesEndpoint, Mailer::AMAZON_SES_PORT)) {
                 $email_light = 'success';
                 $email_status = 'Online (Amazon SES)';
                 $email_service = 'Amazon SES';
