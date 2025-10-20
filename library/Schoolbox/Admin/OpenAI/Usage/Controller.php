@@ -52,9 +52,6 @@ class Controller extends Base
             'title' => $item['title']
         ], $features);
 
-        // sort features alphabetically
-        usort($features, fn($a, $b) => strcmp($a['title'], $b['title']));
-
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
             'features' => $features,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),

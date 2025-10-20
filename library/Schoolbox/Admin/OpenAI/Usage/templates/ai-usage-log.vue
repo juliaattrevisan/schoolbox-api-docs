@@ -82,6 +82,20 @@ function formatSessionDate(session: AiSession): string {
 }
 
 /**
+ * Gets Features ordered by title
+ */
+function getFeatures(): Array<{ key: string; title: string }> {
+    const featuresArray = Object.entries(props.features).map(([key, value]) => ({
+        key,
+        title: value.title,
+    }));
+
+    featuresArray.sort((a, b) => a.title.localeCompare(b.title));
+
+    return featuresArray;
+}
+
+/**
  * Load the usage logs for the current filters
  */
 async function loadUsageLogs(): Promise<void> {
@@ -213,7 +227,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     <select v-model="featureFilter" name="feature" class="f-no-margins">
                                         <option :value="null">All</option>
                                         <option
-                                            v-for="(featureConf, feature) in props.features"
+                                            v-for="(featureConf, feature) in getFeatures()"
                                             :key="feature"
                                             :value="feature"
                                         >
