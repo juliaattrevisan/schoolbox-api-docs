@@ -45,8 +45,8 @@ class Config
     public const MODULE_CONFIG = [
         Helper::FEATURE_CHAT => ConfigMapper::NAME_OPENAI_TEXT_CHAT,
         Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_OPENAI_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_OPENAI_DIALOGAGENT,
-        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_OPENAI_DIFFERENTIATION,
+        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_OPENAI_DIFFERENTIATION,
+        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_OPENAI_DIALOGAGENT,
     ];
 
     // field name and types
