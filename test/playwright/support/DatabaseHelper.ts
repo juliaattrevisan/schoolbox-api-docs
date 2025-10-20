@@ -153,7 +153,11 @@ export default class DatabaseHelper {
      */
     async dontHaveInDatabase(table: string, criteria: CriteriaPairs | CriteriaPairs[] = {}): Promise<void> {
         const where = DatabaseHelper.buildWhereClause(criteria);
-        await this.pool.execute(`DELETE FROM ${table} ${where.clause}`, where.binding);
+        try {
+            await this.pool.execute(`DELETE FROM ${table} ${where.clause}`, where.binding);
+        } catch (error) {
+            console.error(`Error with: DELETE FROM ${table} ${where.clause}`, error);
+        }
     }
 
     /**

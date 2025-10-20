@@ -225,34 +225,26 @@ test.describe("Unit Planner Tests", () => {
 
             tester.isGoingTo("create both units using the modal and verify they are visible");
             await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
-
-            tester.isGoingTo("navigate to course list page to delete the course");
-            await page.goto("/course/list");
-
-            tester.isGoingTo("click the course dropdown button to open the actions menu");
-            await page.getByTestId(`sbx-pop-out-courseDropdown-${courseId}-button`).click();
-
-            tester.isGoingTo("click the Delete link from the dropdown menu");
-            await page.getByRole("link", { name: "Delete" }).click();
-
-            tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
-            await page.getByTestId("confirm-dialog-confirm-button").click();
-
-            tester.isGoingTo(`verify that ${courseName} is no longer visible on the page`);
-            await expect(page.getByText(courseName)).not.toBeVisible();
-        } catch (error) {
-            // in case the test fails halfway through, try to delete the course/units via the DB directly
-            tester.isGoingTo("remove the units created in the Create new units on empty course test");
-            await db.updateInDatabase(
-                "folder",
-                { deleted_at: "2022-01-15 11:22:34" },
-                { "name like": firstUnitName, deleted_at: null },
-            );
-            await db.updateInDatabase(
-                "folder",
-                { deleted_at: "2022-01-15 11:22:34" },
-                { "name like": secondUnitName, deleted_at: null },
-            );
+        } finally {
+            tester.isGoingTo("remove the units and course created");
+            const firstUnitFolderId = (await db.grabFromDatabase("folder", "id", {
+                name: firstUnitName,
+            })) as number | null;
+            if (firstUnitFolderId !== null) {
+                await db.dontHaveInDatabase("homepage_config", { cid: firstUnitFolderId });
+                await db.dontHaveInDatabase("perms", { cid: firstUnitFolderId });
+                await db.dontHaveInDatabase("course_unit_specification", { folder_id: firstUnitFolderId });
+                await db.dontHaveInDatabase("folder", { id: firstUnitFolderId });
+            }
+            const secondUnitFolderId = (await db.grabFromDatabase("folder", "id", {
+                name: secondUnitName,
+            })) as number | null;
+            if (secondUnitFolderId !== null) {
+                await db.dontHaveInDatabase("homepage_config", { cid: secondUnitFolderId });
+                await db.dontHaveInDatabase("perms", { cid: secondUnitFolderId });
+                await db.dontHaveInDatabase("course_unit_specification", { folder_id: secondUnitFolderId });
+                await db.dontHaveInDatabase("folder", { id: secondUnitFolderId });
+            }
             const courseFolderId = (await db.grabFromDatabase("folder", "id", { name: courseName })) as number | null;
             if (courseFolderId) {
                 await db.dontHaveInDatabase("course_specification", { folder_id: courseFolderId });
@@ -346,6 +338,7 @@ test.describe("Unit Planner Tests", () => {
             if (newUnitFolderId !== null) {
                 await db.dontHaveInDatabase("homepage_config", { cid: newUnitFolderId });
                 await db.dontHaveInDatabase("perms", { cid: newUnitFolderId });
+                await db.dontHaveInDatabase("course_unit_specification", { folder_id: newUnitFolderId });
                 await db.dontHaveInDatabase("folder", { id: newUnitFolderId });
             }
         }
