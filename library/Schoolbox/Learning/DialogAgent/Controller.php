@@ -97,7 +97,7 @@ class Controller extends Base
 
 
     /**
-     * Update the configuration of a dialog agent
+     * Update the configuration of a dialog agent and persist scenario field context bodies
      *
      * @param DialogAgent $assessment
      * @return void
@@ -116,12 +116,6 @@ class Controller extends Base
             ->setUseDifferentiationProfile((bool)($postArray['useDifferentiationProfile'] ?? false));
 
         $this->assessmentMapperProxy->save($assessment, $this->getUser());
-
-        /* Persist scenario fields
-         *
-         * Find prototypical instances
-         */
-        $existingFields = $this->scenarioMapper->findById($assessment->getScenarioId())->getFields()->indexBy('id');
 
         /* We need the dialog_agent.id for a schematic join. This follows a previous phenomenon where quiz
          * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
@@ -144,6 +138,9 @@ class Controller extends Base
          *    --Jardani Jovonovich
          */
         $this->fieldContextMapper->save($existingFieldContexts);
+
+        /* TODO Reset the chat here
+         */
 
         /* Respond to synchronous POST with redirect
          */
