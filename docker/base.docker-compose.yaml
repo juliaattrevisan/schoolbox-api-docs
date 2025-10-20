@@ -269,6 +269,52 @@ services:
       - path: ./schoolbox-taskd/default.env
         required: true
 
+  # This has the devkit mounted
+  devkit-lti1p3-nginx:
+    container_name: devkit-lti1p3-nginx
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    build:
+      context: ./devkit-lti1p3-nginx
+    ports:
+      - "${LTI_DEVKIT_PUBLISHED_PORT}:80"
+    volumes:
+      - ../../devkit-lti1p3:/var/www/html
+      - ./devkit-lti1p3-nginx/config/nginx.conf:/etc/nginx/conf.d/default.conf
+    # Make this host available across the network as devkit-lti1p3.localhost
+    networks:
+      default:
+        aliases:
+          - devkit-lti1p3.localhost
+    profiles:
+      - lti
+
+  devkit-lti1p3-phpfpm:
+    container_name: devkit-lti1p3-phpfpm
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    build:
+      context: ./devkit-lti1p3-phpfpm
+    env_file:
+      - path: ./devkit-lti1p3-phpfpm/default.env
+        required: true
+    volumes:
+      - ../../devkit-lti1p3:/var/www/html
+    working_dir: /var/www/html
+    profiles:
+      - lti
+    post_start:
+      # Install Composer dependencies:
+      # first without plugins to clear old dependencies, then standard install
+      - command: composer install --no-plugins --no-scripts;
+      - command: composer install -o
+    # Add host.docker.internal as an alias back to the host machine, so that
+    # the host can debug
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
     image: gotenberg/gotenberg:8
@@ -295,7 +341,7 @@ services:
     image: schickling/mailcatcher
     container_name: mailcatcher
     ports:
-      - "1080:1080" # Web UI
+      - "${MAILCATCHER_UI_PUBLISHED_PORT}:1080"
     restart: always
     networks:
       default:
