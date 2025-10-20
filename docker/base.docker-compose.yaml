@@ -151,6 +151,8 @@ services:
     post_start:
       - command: rabbitmqctl add_vhost docker
       - command: rabbitmqctl add_vhost docker2
+      - command: rabbitmqctl set_permissions -p docker guest ".*" ".*" ".*"
+      - command: rabbitmqctl set_permissions -p docker2 guest ".*" ".*" ".*"
 
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
