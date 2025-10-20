@@ -1,0 +1,63 @@
+{##
+ # Configure a Dialog Agent's settings
+ #
+ # @param Assessment\DialogAgent\Model                 An assessment instance
+ # @param \Schoolbox\Admin\DialogAgent\Scenario\Model  A Scenario instance
+ #}
+Breadcrumbs
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Configure {{ assessment.title }}</h1>
+    </div>
+</div>
+
+<div class="row">
+     <div class="small-12 large-6 island">
+         <h2 class="subheader">Settings</h2>
+         <form>
+             <section>
+                 <fieldset class="content">
+                     <div class="small-12 columns">
+                         <h3>{{ scenario.title }}</h3>
+
+                         <article>
+                             {{ scenario.description }}
+                         </article>
+                     </div>
+                 </fieldset>
+                 <fieldset class="content">
+                     <div class="small-12 large-6 columns">
+                         <label for="helpfulness">
+                             <span class="required-with-tip">Helpfulness</span>
+                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Helpfulness setting.">?</span>
+                         </label>
+                         <select id="helpfulness" name="helpfulness">
+                             {% for value, name in helpfulness %}
+                                 <option value="{{ value }}">{{ name }}</option>
+                             {% endfor %}
+                         </select>
+                     </div>
+                     <div class="small-12 large-6 columns">
+                         <label for="language">
+                             <span class="required-with-tip">Language</span>
+                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Langauge setting.">?</span>
+                         </label>
+
+                         <select id="language" name="language">
+                             {% for value, name in language %}
+                                 <option value="{{ value }}">{{ name }}</option>
+                             {% endfor %}
+                         </select>
+                     </div>
+                 </fieldset>
+             </section>
+         </form>
+    </div>
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Sandbox</h2>
+        <section class="content">
+            chat log thingo goes here
+        </section>
+    </div>
+</div>
