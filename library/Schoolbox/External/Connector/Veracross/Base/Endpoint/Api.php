@@ -316,7 +316,7 @@ class Api implements IApi
          * 2. If you're requesting your first payload
          * 3. The payload size == page size
          */
-        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
+        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === $pageSize)) {
             $this->log(sprintf(
                 " >> Retrieving %s @ page %s with %s max elements per page...\n",
                 $endpoint,
