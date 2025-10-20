@@ -19,7 +19,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct() {
+    public function __construct(private \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper) {
     }
 
 
@@ -32,11 +32,9 @@ class Controller extends Base
      */
     public function getUpdateForm(DialogAgent $assessment): void
     {
-        $scenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
-
         $data = [
             'assessment' => $assessment,
-            'scenario' => $scenarioMapper->findById($assessment->getScenarioId()),
+            'scenario' => $this->scenarioMapper->findById($assessment->getScenarioId()),
             'helpfulness' => [
                 DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
                 DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
