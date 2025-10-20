@@ -41,7 +41,7 @@ class ApiStatistics implements IStrategy
 
 
     /**
-     * @inheritDococ
+     * @inheritDoc
      */
     public function import(): void
     {
