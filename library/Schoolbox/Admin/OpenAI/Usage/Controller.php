@@ -137,20 +137,31 @@ class Controller extends Base
             );
         }
 
-        // Find total count of logs by predicate and set up the paginator
-        $count = $this->aiLogMapper->countByPredicates($predicate);
+        // new db query space...
+        $logGroups = $this->aiLogMapper->getGroupedLogs(
+            $keyword,
+            $feature,
+            $userObj ?? null,
+            $after,
+            $before,
+            $limit,
+            ($page - 1) * $limit,
+    );
+
+        // Find total counts
+        $count = $this->aiLogMapper->countGroupedLogs(
+            $keyword,
+            $feature,
+            $userObj ?? null,
+            $after,
+            $before,
+        )[0];
+
         $pageSize = min($limit, self::MAX_PAGE_SIZE);
 
         $paginator = (new Paginator\Paginator())
             ->setTotal($count)
             ->setPageSize($pageSize);
-
-        // Find logs for the current page by predicate using the system builder
-        $logGroups = $this->aiLogMapper->findPredicateGrouped(
-            $predicate,
-            limit: $paginator->getPageSize(),
-            offset: $paginator->getOffset($page),
-        );
 
         $userTranslator = new User\Translator\Author\ModelToArray();
 
@@ -163,18 +174,17 @@ class Controller extends Base
              * We can derive that from the first log in the group I suppose
              * @var AILog $firstLog
              */
-            $firstLog = $group->first();
+            $firstLog = $group;
 
             // $sessionId could be some fake "no-session-{id}" that we created in the mapper
             // so figure out the real session ID which we need to generate the route for
-            $actualSessionId = $firstLog->getSessionId() ?? null;
+            $actualSessionId = $sessionId ?? null;
 
             $sessions[$sessionId] = [
                 'id' => $sessionId,
-                'feature' => $firstLog->getFeature(),
-                'createdAt' => $firstLog->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-                'createdBy' => $userTranslator->__invoke($firstLog->getUser()),
-                'totalLogs' => $group->count(),
+                'feature' => $firstLog['feature'],
+                'createdAt' => $firstLog['created_at'],
+                'createdBy' => $userTranslator->__invoke($firstLog['user']),
                 '_routes' => [
                     'getLog' => $actualSessionId !== null ? $this->getRouteIfAuthorized(
                         'openAIUsage.getLog',

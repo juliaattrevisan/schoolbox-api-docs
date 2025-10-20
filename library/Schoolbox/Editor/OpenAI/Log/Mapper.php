@@ -12,6 +12,7 @@ namespace Schoolbox\Editor\OpenAI\Log;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\GenericCollection;
 
@@ -149,5 +150,119 @@ class Mapper extends BaseMapper
 
 
         return $grouped;
+    }
+
+
+    /**
+     * Get grouped logs with offset and limit
+     */
+    public function getGroupedLogs(
+        ?string $keyword,
+        ?string $feature,
+        ?User $user,
+        ?\Alaress_Date_Format $start,
+        ?\Alaress_Date_Format $end,
+        int $limit = 100,
+        int $offset = 0
+    ): array {
+        // base query
+//        $query = "Select session_id from {$this->table} where feature = :feature group by session_id order by max(created_at) desc limit :limit offset :offset";
+        $query = "Select id, session_id, user_id, created_at, feature from {$this->table} WHERE 1 = 1 ";
+        $where = "";
+        $order = " group by session_id order by max(created_at) desc limit :limit offset :offset";
+        $params = [
+            ':limit' => $limit,
+            ':offset' => $offset,
+        ];
+
+        // add filters
+        if ($feature !== null) {
+            $where .= " and feature = :feature ";
+            $params[':feature'] = $feature;
+        }
+        // dates
+        if ($start !== null) {
+            $where .= " and created_at >= :start ";
+            $params[':start'] = $start->getDatabase();
+        }
+        if ($end !== null) {
+            $where .= " and created_at <= :end ";
+            $params[':end'] = $end->getDatabase();
+        }
+        if ($user !== null) {
+            $where .= " and user_id = :user_id ";
+            $params[':user_id'] = $user->getId();
+        }
+        // keyword search
+        if ($keyword !== null) {
+            $where .= " and (prompt like :keyword or response like :keyword) ";
+            $params[':keyword'] = '%' . $keyword . '%';
+        }
+
+        $statement = $this->getDatabase()->prepareQuery($query . $where . $order, $params);
+        $statement->execute();
+        // hydrate user and create actual date
+        $data = [];
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $user = null;
+            if ($row['user_id']) {
+                $userMapper = $this->getJoinMapper('user');
+                $user = $userMapper->findById($row['user_id']);
+            }
+            // if no sessionId then create a fake one
+            if (!$row['session_id']) {
+                $row['session_id'] = Model::MISSING_SESSIONID . $row['id'];
+            }
+            $data[$row['session_id']] = [
+                'session_id' => $row['session_id'],
+                'user' => $user,
+                'created_at' => new \Alaress_Date_Format($row['created_at'], \Alaress_Date_Format::DATABASE_FORMAT),
+                'feature' => $row['feature'],
+            ];
+        }
+        return $data;
+    }
+
+
+    public function countGroupedLogs(
+        ?string $keyword,
+        ?string $feature,
+        ?User $user,
+        ?\Alaress_Date_Format $start,
+        ?\Alaress_Date_Format $end,
+    ): array {
+        // base query
+//        $query = "Select session_id from {$this->table} where feature = :feature group by session_id order by max(created_at) desc limit :limit offset :offset";
+        $query = "Select count(*) from {$this->table} WHERE 1 = 1 ";
+        $where = " group by session_id";
+        $params = [];
+
+        // add filters
+        if ($feature !== null) {
+            $where .= " and feature = :feature ";
+            $params[':feature'] = $feature;
+        }
+        // dates
+        if ($start !== null) {
+            $where .= " and created_at >= :start ";
+            $params[':start'] = $start->getDatabase();
+        }
+        if ($end !== null) {
+            $where .= " and created_at <= :end ";
+            $params[':end'] = $end->getDatabase();
+        }
+        if ($user !== null) {
+            $where .= " and user_id = :user_id ";
+            $params[':user_id'] = $user->getId();
+        }
+        // keyword search
+        if ($keyword !== null) {
+            $where .= " and (prompt like :keyword or response like :keyword) ";
+            $params[':keyword'] = '%' . $keyword . '%';
+        }
+
+        $statement = $this->getDatabase()->prepareQuery($query . $where, $params);
+        $statement->execute();
+        return $statement->fetchAll();
     }
 }
