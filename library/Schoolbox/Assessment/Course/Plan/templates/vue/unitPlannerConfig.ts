@@ -93,7 +93,7 @@ function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabCo
 // - The label of the column
 // - Whether the column should be fixed to the left of the table
 const columnConfig: Record<ColumnType, ColumnConfig> = {
-    [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
+    [ColumnType.UNIT]: { label: locale.unit.translate(false, true), fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
     [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
     [ColumnType.ACTIVITIES]: { label: null, fixedLeft: false }, // The label is set by the Course Builder component headings
