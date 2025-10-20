@@ -35,5 +35,9 @@ services:
     post_start:
       - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
         user: root
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker2/
+        user: root
       - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
+        user: root
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker2/ www-data
         user: root
