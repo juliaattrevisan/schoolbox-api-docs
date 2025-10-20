@@ -22,7 +22,7 @@ function onDeleteSelected(): void {
 </script>
 
 <template>
-    <basic-modal v-model:is-open="deleteUnitsStore.isOpen">
+    <basic-modal v-model:is-open="deleteUnitsStore.isOpen" size="s">
         <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onDeleteSelected">
             <h2 data-test="up-delete-units-title">Please Confirm</h2>
             <p>
