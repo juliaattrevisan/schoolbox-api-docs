@@ -11,9 +11,14 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
+use DebugBar\DebugBarException;
+use Schoolbox\Admin\DialogAgent\Scenario\Mapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class Controller extends Base
 {
@@ -21,10 +26,12 @@ class Controller extends Base
      * Constructor.
      *
      * @param BreadcrumbFactory $bakery
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Mapper $scenarioMapper
      */
     public function __construct(
         private BreadcrumbFactory $bakery,
+        private AssessmentMapperProxy $assessmentMapperProxy,
         private \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper
     ) {
     }
@@ -74,9 +81,22 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @return void
+     * @throws DebugBarException
+     * @throws Exception
+     * @throws Deleted
      */
     public function postUpdate(DialogAgent $assessment): void
     {
+        $postArray = $this->requestPost->getArrayCopy();
 
+        $assessment->setHelpfulness($postArray['helpfulness'])
+            ->setLanguage($postArray['language'])
+            ->setOpeningMessage($postArray['openingMessage'])
+            ->setRules($postArray['rules'])
+            ->setUseDifferentiationProfile((bool)($postArray['useDifferentiationProfile'] ?? false));
+
+        $this->assessmentMapperProxy->save($assessment, $this->getUser());
+
+        new \Alaress_Probe($postArray);
     }
 }

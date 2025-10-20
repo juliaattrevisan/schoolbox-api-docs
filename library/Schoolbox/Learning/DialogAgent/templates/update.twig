@@ -19,7 +19,9 @@
 <div class="row">
      <div class="small-12 large-6 island">
          <h2 class="subheader">Settings</h2>
-         <form>
+         {% set updateRoute = routeLookupIfAuthorized('learningDialogAgent.postUpdate', {assessmentId: assessment.id, assessment: assessment}) %}
+
+         <form method="post" action="{{ updateRoute }}">
              <section>
                  <fieldset class="content">
                      <div class="small-12 columns">
@@ -88,6 +90,8 @@
                      {% endfor %}
                  </fieldset>
              </section>
+
+             <input type="submit" value="Save" />
          </form>
     </div>
     <div class="small-12 large-6 island">

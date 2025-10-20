@@ -137,12 +137,16 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        /** @var AssessmentMapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
+
         return new Controller(
             new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
                 $this->getMapperFactory()->get(Access::class),
             ),
+            $assessmentMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
         );
     }
