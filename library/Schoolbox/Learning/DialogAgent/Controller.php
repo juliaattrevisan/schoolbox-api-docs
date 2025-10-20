@@ -65,7 +65,7 @@ class Controller extends Base
                 DialogAgentDataModel::HELPFULNESS_EXTREME => 'Extreme',
             ],
             'language' => [
-                'en-gb' => 'English (AU)',
+                'en-au' => 'English (AU)',
                 'en-us' => 'English (US)',
                 /* TODO what's the full list of languages here...?
                  */
