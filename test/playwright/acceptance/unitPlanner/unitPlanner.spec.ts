@@ -340,16 +340,14 @@ test.describe("Unit Planner Tests", () => {
             await unitPlanner.createUnitsInModal([firstUnitName]);
         } finally {
             tester.isGoingTo("remove the unit created");
-            const folderId = (await db.grabFromDatabase("folder", "id", {
+            const newUnitFolderId = (await db.grabFromDatabase("folder", "id", {
                 name: firstUnitName,
             })) as number | null;
-            if (folderId === null) {
-                tester.isGoingTo("skip deletion as the folder was not found");
-                return;
+            if (newUnitFolderId !== null) {
+                await db.dontHaveInDatabase("homepage_config", { cid: newUnitFolderId });
+                await db.dontHaveInDatabase("perms", { cid: newUnitFolderId });
+                await db.dontHaveInDatabase("folder", { id: newUnitFolderId });
             }
-            await db.dontHaveInDatabase("homepage_config", { cid: folderId });
-            await db.dontHaveInDatabase("perms", { cid: folderId });
-            await db.dontHaveInDatabase("folder", { id: folderId });
         }
     });
 
