@@ -1057,7 +1057,6 @@ class Controller extends Base
 
         // What about the resource? If it's an open resource, confirm the
         // booking immediately.
-        $moderationType = $resource->getModerationType();
         if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
             return Status\Model::STATUS_APPROVED;
         }
