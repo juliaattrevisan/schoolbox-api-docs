@@ -539,6 +539,10 @@ class Helper
              */
             die();
         } catch (GuzzleException $e) {
+            // if we have a log we should save (it may not have saved yet...)
+            if (null !== $log) {
+                $this->logMapper->save($log);
+            }
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
     }
