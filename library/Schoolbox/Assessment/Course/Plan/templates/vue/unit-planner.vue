@@ -236,7 +236,11 @@ window.Vue.onUnmounted(() => {
                         </template>
                     </div>
                     <div class="fixed-left l-pad-s f-no-margins">
-                        <button class="button icon-add" @click.prevent="addStore.prompt()">
+                        <button
+                            class="button icon-add"
+                            data-test="unit-planner-create-units"
+                            @click.prevent="addStore.prompt()"
+                        >
                             Create {{ locale.unit.translate(true, true) }}
                         </button>
                     </div>
