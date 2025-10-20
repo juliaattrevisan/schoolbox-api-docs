@@ -15,7 +15,7 @@
             <section id="textSettingsContainer">
                 {# module specific config #}
                 <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}">
-                    <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
+                    <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="">
                         {% for feature in features %}
                             {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models, fields:fields} only %}
                         {% endfor %}
@@ -45,53 +45,6 @@
             $(function() {
                 const PROVIDER_OPENAI = '{{ providersOld.openai }}';
                 const PROVIDER_AZURE = '{{ providersOld.azure }}';
-
-                /* Text credentials
-                 */
-                const textModuleContainer = $('#textModuleContainer');
-                const textProvider = $('#openai_text_endpoint-field');
-                const textSystemPrompt = $('#openai_text_generation_system_prompt-field').parent('div');
-
-                textProvider.on('change', function (event) {
-                    event.preventDefault();
-                    initText(textModuleContainer, textProvider);
-                });
-
-                // init load
-                initText(textModuleContainer, textProvider, true);
-
-                // when the text provider changes, we need to fetch the new html from adminOpenAi.getConfigStruct
-                function initText(textModuleContainer, textProvider, initLoad = false) {
-                    // get the provider
-                    const provider = textProvider.val();
-                    if ('Off' === provider || '' === provider) {
-                        textModuleContainer.hide();
-                        textSystemPrompt.hide();
-                        textProvider.show();
-                        return;
-                    }
-                    textModuleContainer.show();
-                    textSystemPrompt.show();
-
-                    // don't fetch, first load...
-                    if (initLoad) {
-                        return;
-                    }
-                    //replace the url with the provider
-                    const path = '{{ routeLookupIfAuthorized('adminOpenAi.getBlankConfig') }}'.replace('{provider}', provider);
-                    // fetch the new html
-                    $.ajax({
-                        url: path,
-                        type: 'GET',
-                        success: function (response) {
-                            // replace the html in the textModuleContainer
-                            textModuleContainer.html(response);
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Error fetching config struct:', error);
-                        }
-                    })
-                }
 
                 /* Image credentials
                  */
