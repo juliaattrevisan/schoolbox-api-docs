@@ -135,7 +135,7 @@
          # and let each feature decide when it's off and when it's on.
          #}
         window.sbProps.aiFeatures = {};
-        {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
+        {% if user.current.role.staff %}
         {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
             {% for feature, aiConfig in aiFeatures %}
             window.sbProps.aiFeatures["{{ feature }}"] = {
