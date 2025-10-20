@@ -13,7 +13,7 @@ INSERT INTO component_definition (
 ) VALUES (
     'Discussions',
     'Schoolbox\\Learning\\Assessment\\DialogAgent\\Component\\Homepage\\Controller',
-    '', -- TODO
+    'Output all discussion activities for this homepage. This allows students to see discussion activities via the homepage.',
     'homepage',
     3, -- Learning
     1,
