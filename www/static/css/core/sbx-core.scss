@@ -1,5 +1,7 @@
 /**
-* Core CSS
+* This CSS files in the beginning of a complete replacement of core.scss
+* Currently it's only loaded when the advanced UI is enabled
 */
 
 @use "base/sbx-colors";
+@use "base/sbx-borders";

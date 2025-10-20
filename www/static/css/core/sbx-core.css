@@ -1,5 +1,6 @@
 /**
-* Core CSS
+* This CSS files in the beginning of a complete replacement of core.scss
+* Currently it's only loaded when the advanced UI is enabled
 */
 /**
 * SBX Colour Variables
@@ -19,4 +20,19 @@
   --sbx-color-accent: #3679a6;
   --sbx-color-accent-text: #fff;
 }
-/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvc2J4LWNvcmUuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvYmFzZS9fc2J4LWNvbG9ycy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOztDQUFBO0FDQUE7Ozs7Q0FBQTtBQUtBO0VBQ0ksb0NBQUE7RUFDQSxvQ0FBQTtFQUNBLHlDQUFBO0VBQ0EsOEJBQUE7RUFDQSxtQ0FBQTtFQUNBLDBCQUFBO0VBQ0EsNEJBQUE7RUFDQSw0QkFBQTtFQUNBLDhCQUFBO0VBQ0EsMkJBQUE7RUFDQSw2QkFBQTtBRElKIiwic291cmNlUm9vdCI6IiJ9 */
+
+/**
+* SBX Border Variables
+* All borders used throughout Schoolbox are to be defined here.
+*/
+:root {
+  --sbx-border-radius-none: 0;
+  --sbx-border-radius-small: 0.25rem;
+  --sbx-border-radius-normal: 0.5rem;
+  --sbx-border-radius-full: 50%;
+  --sbx-border-width-normal: 1px;
+  --sbx-border-width-thick: 2px;
+  --sbx-border-width-thicker: 4px;
+  --sbx-border-width-thickest: 8px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvc2J4LWNvcmUuc2NzcyIsIndlYnBhY2s6Ly8uL3d3dy9zdGF0aWMvY3NzL2NvcmUvYmFzZS9fc2J4LWNvbG9ycy5zY3NzIiwid2VicGFjazovLy4vd3d3L3N0YXRpYy9jc3MvY29yZS9iYXNlL19zYngtYm9yZGVycy5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Q0FBQTtBQ0FBOzs7O0NBQUE7QUFLQTtFQUNJLG9DQUFBO0VBQ0Esb0NBQUE7RUFDQSx5Q0FBQTtFQUNBLDhCQUFBO0VBQ0EsbUNBQUE7RUFDQSwwQkFBQTtFQUNBLDRCQUFBO0VBQ0EsNEJBQUE7RUFDQSw4QkFBQTtFQUNBLDJCQUFBO0VBQ0EsNkJBQUE7QURLSjs7QUVyQkE7OztDQUFBO0FBSUE7RUFDSSwyQkFBQTtFQUNBLGtDQUFBO0VBQ0Esa0NBQUE7RUFDQSw2QkFBQTtFQUVBLDhCQUFBO0VBQ0EsNkJBQUE7RUFDQSwrQkFBQTtFQUNBLGdDQUFBO0FGdUJKIiwic291cmNlUm9vdCI6IiJ9 */

@@ -1,0 +1,15 @@
+/**
+* SBX Border Variables
+* All borders used throughout Schoolbox are to be defined here.
+*/
+:root {
+    --sbx-border-radius-none: 0;
+    --sbx-border-radius-small: 0.25rem;
+    --sbx-border-radius-normal: 0.5rem;
+    --sbx-border-radius-full: 50%;
+
+    --sbx-border-width-normal: 1px;
+    --sbx-border-width-thick: 2px;
+    --sbx-border-width-thicker: 4px;
+    --sbx-border-width-thickest: 8px;
+}
