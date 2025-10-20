@@ -52,7 +52,6 @@ class Controller extends ConfigController
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
             $this->routeGenerator->generate('adminOpenAi.postImageOptions'),
-            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
         );
 
         /* Make islands independent of each other for validation reasons

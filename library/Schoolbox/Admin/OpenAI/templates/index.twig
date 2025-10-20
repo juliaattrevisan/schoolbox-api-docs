@@ -21,14 +21,14 @@
                         {% endfor %}
                     </div>
                     {# manually create a save button for this section... #}
-                    <input id="textFormSubmit" type="submit" value="Save">
-{#                    <div id="save-admin-settings-container">#}
-{#                        <save-admin-settings#}
-{#                                form-id="textForm"#}
-{#                                :use-polling="'false'"#}
-{#                        />#}
-{#                    </div>#}
-{#                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>#}
+{#                    <input id="textFormSubmit" type="submit" value="Save">#}
+                    <div id="save-admin-settings-container">
+                        <save-admin-settings
+                                form-id="textForm"
+                                :use-polling="'false'"
+                        />
+                    </div>
+                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
                 </form>
             </section>
         </div>
@@ -95,7 +95,7 @@
                     container.show();
                 }
 
-                $('#textFormSubmit').on('click', function (event) {
+                $('#textForm input[type=submit]').on('click', function (event) {
                     event.preventDefault();
                     submitSettings();
                 });
