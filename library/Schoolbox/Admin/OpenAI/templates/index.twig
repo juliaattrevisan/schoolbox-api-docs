@@ -97,15 +97,23 @@
 
                 $('#textFormSubmit').on('click', function (event) {
                     event.preventDefault();
-                    submitTextSettings();
+                    submitSettings();
                 });
 
                 /** submit text settings from all text forms **/
-                async function submitTextSettings() {
+                async function submitSettings() {
                     //grab the text setting form, and post the data via fetch
                     const textForm = document.getElementById('textForm');
                     const formData = new FormData(textForm);
                     const data = Object.fromEntries(formData.entries());
+
+                    // imageForm
+                    const imageSettings = document.getElementById('imageSettings');
+                    const formDataImage = new FormData(imageSettings);
+                    const dataImage = Object.fromEntries(formDataImage.entries());
+
+                    // combine both data objects
+                    const combinedData = {...formArrayToNestedJson(data), ...dataImage};
 
                     /**
                      * Convert flat form array with bracketed keys to nested JSON (written by gpt-4.1)
@@ -145,7 +153,7 @@
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify(formArrayToNestedJson(data))
+                        body: JSON.stringify(combinedData)
                     });
                     if (response.ok) {
                         // success

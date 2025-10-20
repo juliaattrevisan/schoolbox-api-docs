@@ -104,6 +104,10 @@ class Controller extends ConfigController
             $this->getConfigMapper()->save($conf);
         }
 
+        /* Now save image config..
+         */
+        $this->updateConfig($postData, $this->buildImageConfigPredicate());
+
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
