@@ -40,7 +40,7 @@
                     {% if config.lti_assessments_enable %}
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">3rd Party Assessment</a></li>
                     {% endif %}
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan" data-test="course-outline-menu-add-lesson-plan">{{ locale.lessonPlan.proper }}</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dialogAgent&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-dialog-agent" data-test="course-outline-menu-add-dialog-agent">{{ locale.dialogAgent.proper }}</a></li>
                     {% endif %}
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
