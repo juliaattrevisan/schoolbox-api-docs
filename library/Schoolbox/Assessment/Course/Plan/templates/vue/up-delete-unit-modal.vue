@@ -27,7 +27,7 @@ function onDeleteSelected(): void {
             <h2 data-test="up-delete-units-title">Please Confirm</h2>
             <p>
                 Are you sure you wish to delete this {{ locale.unit.translate(false, false) }}? This will also delete
-                all activities in the {{ locale.unit.translate(false, false) }}.
+                all {{ locale.activity.translate(true, false) }} in the {{ locale.unit.translate(false, false) }}.
             </p>
             <request-error v-if="deleteUnitsStore.loadError" :further-info="deleteUnitsStore.loadError" />
             <div class="l-flex l-gap-xs f-no-margins">

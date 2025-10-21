@@ -121,9 +121,9 @@ function onBackgroundClick(): void {
     }
     &:has(.modal__container--s) {
         .modal__container--s {
-            width: 500px;
+            width: 600px;
         }
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             .modal__container--s {
                 width: 100%;
             }
