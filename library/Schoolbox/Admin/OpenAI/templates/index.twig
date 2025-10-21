@@ -154,6 +154,8 @@
                         return result;
                     }
 
+                    const toast = window.sbProps.toastActivate("Saving...");
+
                     // send via javascript fetch to adminOpenAi.postTextOptions
                     const response = await fetch('{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}', {
                         method: 'POST',
@@ -161,7 +163,7 @@
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify(combinedData)
+                        body: JSON.stringify(formArrayToNestedJson(data))
                     });
                     if (response.ok) {
                         // success
@@ -173,9 +175,8 @@
                             window.location.href = response.url;
                             return;
                         }
-                        //something else happened...
-                        // error
-                        console.log('Error saving text settings.');
+
+                        toast.timeout({ isSuccess: false, text: 'Unable to save settings' });
                     }
                 }
             });
