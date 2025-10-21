@@ -176,7 +176,7 @@
         <div class="small-12 column">
             <h1>Create
                 {% if assessment.defaultTypeName is defined %}
-                    {{ assessment.defaultTypeName }}
+                    {{ assessment.getTypeName }}
                 {% else %}
                     Activity
                 {% endif %}
