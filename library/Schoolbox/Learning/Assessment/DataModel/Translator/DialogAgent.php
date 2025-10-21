@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
+use Schoolbox\Learning\MarkScheme\None;
 
 /**
  * Sub-translator for Lesson Plan specific fields.
@@ -96,9 +97,8 @@ class DialogAgent implements IAssessmentTypeTranslator
         $domainObject->setPrompt($dataModel->getPrompt());
         $domainObject->setDuration($dataModel->getDuration());
 
-        /* TODO This *used* tobe needed at some point, but idk why
-         *  maybe can just delete this entirely since they're never marked anyway.
+        /* Used in the Grades page, even though this won't be marked
          */
-//        $domainObject->setMarkScheme(new None());
+        $domainObject->setMarkScheme(new None());
     }
 }
