@@ -6,7 +6,8 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
+        {% set formId = 'aiSettings' %}
+        <form id="{{ formId }}" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
             {% for feature in features %}
                 <div class="small-12 medium-6 xlarge-4 columns island">
                     <h2 class="subheader">{{ feature.title }}</h2>
@@ -25,22 +26,33 @@
                     </section>
                 </div>
             {% endfor %}
+            {# TODO: This really should just be possible to summon via the above config.twig
+             # However images are currently special, so leaving it alone
+             #}
+            <div id="imageSettingsContainer" style="display:none" class="small-12 medium-6 xlarge-4 columns island">
+                <h2 class="subheader">Image Generation</h2>
+                <section>
+                    <fieldset>
+                        {% for setting in imageConfigContext.settings %}
+                            {% if not setting.data.hidden %}
+                                {% include '@settings/fieldType/' ~ setting.template with setting.data only %}
+                            {% endif %}
+                        {% endfor %}
+                    </fieldset>
+                </section>
+            </div>
+
+            {# clearfix is needed so that save-admin-settings knows where the bottom of the page is correctly (the columns above break it) #}
+            <div class="clearfix"></div>
+            <div id="save-admin-settings-container">
+                <save-admin-settings
+                    form-id="{{ formId }}"
+                    :use-polling="false"
+                />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
         </form>
-        <div id="save-admin-settings-container">
-            <save-admin-settings
-                form-id="textForm"
-                :use-polling="false"
-            />
-        </div>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
 
-        <div class="small-12 columns">
-            <h2 class="subheader" style="display:none" data-subheader>Image Generation</h2>
-        </div>
-
-        <div id="imageSettingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with imageConfigContext only %}
-        </div>
 
         <script>
             $(function() {
@@ -92,11 +104,10 @@
                         systemPrompt.show();
                     }
 
-                    $('[data-subheader]').show();
                     container.show();
                 }
 
-                $('#textForm input[type=submit]').on('click', function (event) {
+                $('#{{ formId }}').on('submit', function (event) {
                     event.preventDefault();
                     submitSettings();
                 });
@@ -104,17 +115,9 @@
                 /** submit text settings from all text forms **/
                 async function submitSettings() {
                     //grab the text setting form, and post the data via fetch
-                    const textForm = document.getElementById('textForm');
+                    const textForm = document.getElementById('{{ formId }}');
                     const formData = new FormData(textForm);
                     const data = Object.fromEntries(formData.entries());
-
-                    // imageForm
-                    const imageSettings = document.getElementById('imageSettings');
-                    const formDataImage = new FormData(imageSettings);
-                    const dataImage = Object.fromEntries(formDataImage.entries());
-
-                    // combine both data objects
-                    const combinedData = {...formArrayToNestedJson(data), ...dataImage};
 
                     /**
                      * Convert flat form array with bracketed keys to nested JSON (written by gpt-4.1)
@@ -129,7 +132,11 @@
                             const keys = [];
                             flatKey.replace(/\[([^\]]+)\]/g, (_, k) => keys.push(k));
 
-                            if (keys.length === 0) return; // skip if no brackets
+                            if (keys.length === 0) {
+                                // just append as normal if no brackets
+                                result[flatKey] = value;
+                                return;
+                            }
 
                             let current = result;
                             keys.forEach((key, idx) => {
