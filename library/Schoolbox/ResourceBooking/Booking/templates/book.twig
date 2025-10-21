@@ -5,7 +5,7 @@
 
 $(function() {
     // A global variable
-    var dayjsFormat = dateDisplayFormats.dayjs;
+    let dayjsFormat = dateDisplayFormats.dayjs;
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
         detail: {
             targetElements: ['[data-notes]'],
@@ -14,9 +14,23 @@ $(function() {
 
     // remote validation rules
     // Have some sort of helper for creating remote validations.
-    var getValidatorRemoteMethod = function(code, key) {
+    let getValidatorRemoteMethod = function(code, key) {
         return function(value, element) {
-            return (errors[key || element.name] || []).indexOf(code) < 0;
+            let errorsByDate = (errors[key || element.name] || {}); // This will be an object containing dates as keys, arrays as values.
+            let errorsArrays = Object.values(errorsByDate);
+
+            // Search for code in all the errorStrings arrays.
+            // If the code is found, validation fails.
+            let codeFound = false;
+            for (let i = 0; i < errorsArrays.length; ++i) {
+                let errorStrings = errorsArrays[i];
+
+                if (errorStrings.indexOf(code) >= 0) {
+                    codeFound = true;
+                }
+            }
+
+            return !codeFound;
         }
     };
 
