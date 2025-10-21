@@ -1,7 +1,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CreateLessonPlanTemplate from "@schoolboxTest/playwright/support/page/admin/lms/LessonPlanTemplates/CreateLessonPlanTemplate";
 import LessonPlanTemplateList from "@schoolboxTest/playwright/support/page/admin/lms/LessonPlanTemplates/LessonPlanTemplateList";
-import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
+import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
 import ImportCourseIntoClass from "@schoolboxTest/playwright/support/page/courses/ImportCourseIntoClass";
 import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
@@ -20,7 +20,7 @@ import Resources from "@schoolboxTest/playwright/support/page/resources/Resource
  */
 
 /**
- * covenience function to create a homepage and a lesson plan template
+ * convenience function to create a homepage and a lesson plan template
  */
 
 /**
@@ -129,10 +129,11 @@ test.describe("Lesson Plan Activity", () => {
      * create  lesson plan using the lesson plan template above
      */
     test("Create Lesson Plan", async ({ tester, page, db }) => {
-        const courseModify = new CourseModify(page, tester);
+        const unitPlanner = new UnitPlanner(tester, page);
         const templateList = new TemplateList(tester, page);
         const createLessonPlan = new CreateLessonPlan(tester, page);
-        // const createLessonPlanTemplate = new CreateLessonPlanTemplate(page, tester);
+        const courseId = 6; // Year 9 English course id
+        const unitId = 15; // Romeo and Juliet unit id
         const templateName = "Automation Template to create a lesson plan";
         const lessonPlanName = "Lesson Plan Automation Test 1";
         const folderName = "Test Class Homepage Lesson Plan";
@@ -143,12 +144,12 @@ test.describe("Lesson Plan Activity", () => {
         tester.isGoingTo("create a homepage and a lesson plan template");
 
         await createLessonPlanTemplate(tester, page, db, templateName, folderName, teacher, student);
-        tester.isGoingTo("navigate to the  Year 9 English course modify page");
-        await courseModify.goto(6);
-        tester.isGoingTo("click the arrow down for Romeo and Juliet unit");
-        await courseModify.clickUnitArrow(15);
-        tester.isGoingTo("click New Lesson PLan button to create a lesson plan");
-        await courseModify.clickNewActivityButton("lesson-plan");
+        tester.isGoingTo("navigate to the Year 9 English unit planner page");
+        await unitPlanner.goto(courseId);
+
+        tester.isGoingTo("click New Lesson Plan button to create a lesson plan");
+        await unitPlanner.clickCreateActivityButton(unitId);
+        await unitPlanner.clickCreateActivityOption("lesson-plan", unitId);
         await page.waitForLoadState("domcontentloaded");
         const lessonPlanTemplateId = (await db.grabFromDatabase("lesson_plan_template", "id", {
             deleted_at: null,
@@ -170,7 +171,7 @@ test.describe("Lesson Plan Activity", () => {
      * check if the students cannot see the not visible to student fields
      */
 
-    test("Lesson Plan Fileds Visibility", async ({ tester, page, db }) => {
+    test("Lesson Plan Fields Visibility", async ({ tester, page, db }) => {
         const courseList = new CourseList(page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
         const lessonPlanName = "Lesson Plan Automation Test 1";
