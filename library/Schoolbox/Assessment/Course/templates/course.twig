@@ -18,15 +18,12 @@ Usage:
     $(function () {
 
         // Mage Buttons
-        var $mageNextButton = $('[data-mage-next="unit-info"]');
-        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
-        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
-
+        const $mageNextButton = $('[data-mage-next="unit-info"]');
+        const $mageSaveCourseButton = $('[data-mage-next="main-course"]');
 
         /**
          * Apply the javascript validator
-         *
-         * @param modifyValidation
+         * @param modifyValidation - validation rules and messages
          */
         function initValidator(modifyValidation) {
             $("#update-course-form").alaressValidate(modifyValidation);
@@ -36,7 +33,7 @@ Usage:
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
          */
-        var modifyValidation = {
+        const modifyValidation = {
             rules: {
                 name: "required",
                 parent: "required",
@@ -59,7 +56,7 @@ Usage:
             reenablePrevious: true,
             onXhrDone: function (data) {
                 if (data.id) {
-                    // Update the Browser URL - navigation to the Unit planner
+                    // Update the Browser URL, navigating to the new unit planner
                     const coursePlanUrl = `{{ routeLookup('coursePlan.getPlan') }}`;
                     window.location.href = `${coursePlanUrl.replace("{id}", data.id)}?isNewCourse=1`;
                 }
@@ -89,7 +86,7 @@ Usage:
         {# only alert on changing templates if we have changed the template #}
         {% if courseSpec %}
         // Template input: show a warning if changing the selected option
-        var templateInput = $('[data-template]');
+        const templateInput = $('[data-template]');
 
         templateInput.change(function() {
             $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id ?? null }}) === Number(templateInput.val()));
@@ -99,7 +96,7 @@ Usage:
 
         // Automatically expand the Unit specified in the URL hash
         if (window.location.hash) {
-            var unitSpecId = window.location.hash.slice(1);
+            const unitSpecId = window.location.hash.slice(1);
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
 
@@ -107,7 +104,7 @@ Usage:
         $('a[data-action="reapply-framework"]').on('click', function (event) {
             event.preventDefault();
 
-            var element = $(this);
+            const element = $(this);
 
             element.confirmDialog({
                 header: "Are you sure you wish to re-apply the framework?",
