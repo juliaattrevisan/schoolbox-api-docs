@@ -1715,6 +1715,11 @@ abstract class Kernel
                             'assessmentDataSource'    => $di->lazyGet('assessmentDataSource'),
                         ]
                     ),
+                    /* Dialog Agent, for saving scenario field contexts upon spawn
+                     */
+                    'dialogAgentMapper' => $mapperFactory->getLazy(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
+                    'scenarioMapper' => $mapperFactory->getLazy(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
+                    'fieldContextMapper' => $mapperFactory->getLazy(\Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class),
                 ]
             )
         );

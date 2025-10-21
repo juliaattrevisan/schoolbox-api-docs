@@ -1,1 +1,0 @@
-The url for configuring a scenario context will exist here in its own special controller+module.

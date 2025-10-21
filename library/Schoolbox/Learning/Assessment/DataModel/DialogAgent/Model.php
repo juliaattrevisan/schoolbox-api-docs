@@ -36,9 +36,9 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * Helpfulness enum values
      */
-    private const string HELPFULNESS_MINIMAL = 'minimal';
-    private const string HELPFULNESS_MODERATE = 'moderate';
-    private const string HELPFULNESS_EXTREME = 'extreme';
+    public const string HELPFULNESS_MINIMAL = 'minimal';
+    public const string HELPFULNESS_MODERATE = 'moderate';
+    public const string HELPFULNESS_EXTREME = 'extreme';
 
 
     /**
