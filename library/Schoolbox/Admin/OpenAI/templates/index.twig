@@ -6,30 +6,33 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 columns">
-            <h2 class="subheader" style="display:none" data-subheader>Text Generation</h2>
+        <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
+            {% for feature in features %}
+                <div class="small-12 medium-6 xlarge-4 columns island">
+                    <h2 class="subheader">{{ feature.title }}</h2>
+                    <section>
+                        <fieldset>
+                            <div class="columns">
+                                {# module specific config #}
+                                {% include '@adminOpenAi/config.twig' with {
+                                    feature: feature,
+                                    providers: providers,
+                                    models: models,
+                                    fields: fields
+                                } only %}
+                            </div>
+                        </fieldset>
+                    </section>
+                </div>
+            {% endfor %}
+        </form>
+        <div id="save-admin-settings-container">
+            <save-admin-settings
+                form-id="textForm"
+                :use-polling="'false'"
+            />
         </div>
-
-        {# main text config space, which provider. #}
-        <div class="small-12 columns island">
-            <section id="textSettingsContainer">
-                {# module specific config #}
-                <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
-                    <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="">
-                        {% for feature in features %}
-                            {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models, fields:fields} only %}
-                        {% endfor %}
-                    </div>
-                    <div id="save-admin-settings-container">
-                        <save-admin-settings
-                                form-id="textForm"
-                                :use-polling="'false'"
-                        />
-                    </div>
-                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
-                </form>
-            </section>
-        </div>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
 
         <div class="small-12 columns">
             <h2 class="subheader" style="display:none" data-subheader>Image Generation</h2>
