@@ -595,7 +595,7 @@ class Profile implements IStrategy
         $staffMember = $node[0];
 
         return [
-            'id' => trim((string)$staffMember->xpath('@Id')[0]->Id ?? $personId),
+            'id' => trim((string)($staffMember->xpath('@Id')[0]->Id ?? $personId)),
             'name' => trim((string)$staffMember->FullName),
         ];
     }
