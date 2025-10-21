@@ -391,15 +391,10 @@ class Controller extends Base
     /**
      * Post the same learning moment to multiple users at once.
      *
-     * @api   POST /learning/evidence/user/{userIds}/create
-     * @since 20.2
-     * @deprecated as an api, use the particular post endpoints for each state instead
-     * TODO: We still use this as an internal method, so it'll change to private the next release after 25.1
-     *
      * @param Collection|User[] $users
      * @throws MapperException
      */
-    public function postMomentForUsers(Collection $users, ?string $defaultState = null): void
+    private function postMomentForUsers(Collection $users, ?string $defaultState = null): void
     {
         /* Since this is a collection of users, each of whom might have a unique
          * configuration (e.g. some year levels require moderation, some don't)
