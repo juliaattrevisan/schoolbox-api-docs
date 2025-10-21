@@ -8,7 +8,8 @@
     <div class="admin-content">
         {% set formId = 'aiSettings' %}
         <form id="{{ formId }}" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
-            {% for feature in features %}
+            <div class="l-grid l-grid--12">
+                {% for feature in features %}
                 <div class="small-12 medium-6 xlarge-4 columns island">
                     <h2 class="subheader">{{ feature.title }}</h2>
                     <section>
@@ -25,7 +26,9 @@
                         </fieldset>
                     </section>
                 </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+
             {# TODO: This really should just be possible to summon via the above config.twig
              # However images are currently special, so leaving it alone
              #}
