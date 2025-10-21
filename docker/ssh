@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
         *)
             # Any other value: if it's not a flag, it's the container name
             if [[ $1 == "-"* ]]; then
-                error "Unrecognised option: '$1'"
+                log "Unrecognised option: '$1'"
                 errors="1"
             else
                 container=$1

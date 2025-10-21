@@ -19,7 +19,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            error "Unrecognised option: '$1'"
+            log "Unrecognised option: '$1'"
             shift # past argument
             errors="1"
             ;;
