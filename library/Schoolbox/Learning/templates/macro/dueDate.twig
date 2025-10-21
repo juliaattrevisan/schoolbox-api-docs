@@ -36,14 +36,42 @@
 
 
 {##
+ # Helper macro to determine whether to render the "Due"/"Scheduled"/"Closes" prefix
+ # depending on the activity type
+ #}
+{% macro duePrefix(assessable) %}
+{% apply spaceless %}
+    {% if assessable is lessonPlan %}
+        Scheduled
+    {% elseif assessable is dialogAgent %}
+        {# Despite saying "Close" this is different to the concept of "close date"
+         # specifically just for dialog agents (the close date is just the due date)
+         #}
+
+        {# This one is also dependent on past/future tense #}
+        {% if assessable.dueAt.isFuture %}
+            Closes
+        {% else %}
+            Closed
+        {% endif %}
+    {% else %}
+        Due
+    {% endif %}
+{% endapply %}
+{% endmacro %}
+
+
+{##
  # Helper macro to render due date for a participant's plan.
  #}
 {% macro forParticipant(participant) %}
 {% apply spaceless %}
     {# cache this for performance #}
     {% set participantDueDate = participant.dueDate %}
+    {% import _self as dueDate %}
     {% import '@learning/macro/urgency.twig' as urgency %}
-    <span class="{{ urgency.datetime(participant) }}" title="{{ participantDueDate.long }}">Due
+    <span class="{{ urgency.datetime(participant) }}" title="{{ participantDueDate.long }}">
+        {{ dueDate.duePrefix(participant.assessable) }}
         <time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeDayWithoutMidnight }}</time>
         {% if participantDueDate.isFuture and participantDueDate.diffInDays(NOW) < 7 %}
             (<time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeTime(null, true) }} remaining</time>)
@@ -60,7 +88,9 @@
 {% apply spaceless %}
     {% set dueAt = assessment.dueAt %}
     {% if dueAt %}
-        <span title="{{ dueAt.long }}">{% if assessment is lessonPlan %}Scheduled{% else %}Due{% endif %}
+        {% import _self as dueDate %}
+        <span title="{{ dueAt.long }}">
+            {{ dueDate.duePrefix(assessment) }}
             <time datetime="{{ dueAt }}">{{ dueAt.relativeDayWithoutMidnight }}</time>
             {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
                 (<time datetime="{{ dueAt }}">{{ dueAt.relativeTime(null, true) }} remaining</time>)

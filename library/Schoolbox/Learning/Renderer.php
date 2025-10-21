@@ -14,6 +14,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -61,6 +62,9 @@ class Renderer extends AbstractExtension
 
             new TwigTest('quiz', function ($assessable) {
                 return $assessable instanceof Quiz;
+            }),
+            new TwigTest('dialogAgent', function ($assessable) {
+                return $assessable instanceof DialogAgent;
             }),
             new TwigTest('dueWork', function ($assessable) {
                 return $assessable instanceof DueWork;

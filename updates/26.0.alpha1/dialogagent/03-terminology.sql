@@ -9,7 +9,7 @@ INSERT INTO
     )
 VALUES (
         'dialogAgent',
-        'Discussion',
+        'Dialog Agent',
         'discussion',
         'discussions',
         1,

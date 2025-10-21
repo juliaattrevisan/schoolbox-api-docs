@@ -286,6 +286,12 @@ export const Default: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
+                    <sbx-icon name="dialog-agent"></sbx-icon>
+                </div>
+                <p>dialog-agent</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
                     <sbx-icon name="due-work"></sbx-icon>
                 </div>
                 <p>due-work | import | submissions</p>

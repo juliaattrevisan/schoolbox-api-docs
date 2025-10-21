@@ -1,0 +1,21 @@
+{% extends '@learningAssessment/component.twig' %}
+
+{% set assessmentType = 'dialogAgent' %}
+{% set icon = 'icon-dialog-agent' %}
+
+{% block studentMessage %}
+    There are no {{ locale.dialogAgent.plural }} to complete at this time.
+{% endblock studentMessage %}
+
+{% block teacherMessage %}
+    <a href="{{ createRouteType }}" data-test="component-dialogAgent-empty-create-button">
+        Create {{ locale.dialogAgent.indefiniteArticle }} {{ locale.dialogAgent }}
+    </a>
+    that is not a part of your course to assess your students.
+{% endblock teacherMessage %}
+
+{% block createButton %}
+    <a href="{{ createRouteType }}" class="button" data-test="component-dialogAgent-create-button">
+        Create {{ locale.dialogAgent.proper }}
+    </a>
+{% endblock createButton %}
