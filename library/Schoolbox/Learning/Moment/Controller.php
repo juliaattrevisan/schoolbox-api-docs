@@ -414,11 +414,7 @@ class Controller extends Base
         /* This is a bit brutal and maybe you can mess around more with a diff,
          * but this is guaranteed to be correct without all the kerfuffle...for now
          */
-        $folders = (
-            array_key_exists('folders', $requestBody)
-            ? $this->folderMapper->findByColumn('id', $requestBody['folders'])
-            : new GenericCollection(Model::class)
-        );
+        $folders = $this->folderMapper->findByColumn('id', $requestBody['folders']);
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
