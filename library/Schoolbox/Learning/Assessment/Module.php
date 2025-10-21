@@ -1286,7 +1286,8 @@ class Module extends BaseModule
                 AssessmentType::TYPE_TASK,
                 AssessmentType::TYPE_QUIZ,
                 AssessmentType::TYPE_LTI_ASSESSMENT,
-                AssessmentType::TYPE_PROJECT
+                AssessmentType::TYPE_PROJECT,
+                AssessmentType::TYPE_DIALOG_AGENT,
             ]),
             /* The status pages of specifications of quizzes need to be viewable because specifications of quizzes are
              * previewable while under development.
