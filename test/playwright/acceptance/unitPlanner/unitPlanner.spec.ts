@@ -204,24 +204,14 @@ test.describe("Unit Planner Tests", () => {
             await page.getByRole("treeitem", { name: " English" }).click();
             await page.getByRole("button", { name: "Use this folder" }).click();
 
-            tester.isGoingTo("click Next to create the course");
+            tester.isGoingTo("click Next to create the course and go to unit planner");
             await page.getByRole("button", { name: "Next" }).click();
-
-            tester.isGoingTo("wait for the URL to change to course/modify/{courseId}");
-            await page.waitForURL("**/course/modify/*");
-
-            // grab the courseId from the URL after the navigation is complete
-            const courseId = page.url().split("/").pop();
-            console.warn(`Created course with ID ${courseId}`);
-
-            tester.isGoingTo("navigate to unit planner page to verify empty units message");
-            await page.goto(`/course/plan/${courseId}`);
 
             tester.isGoingTo("confirm the empty units message is visible");
             await expect(page.getByText("This course currently does not have any units")).toBeVisible();
 
-            tester.isGoingTo("click the 'creating a unit' button to open the modal");
-            await page.getByRole("button", { name: "creating a unit." }).click();
+            tester.isGoingTo("confirm the create units modal is immediatey visible");
+            await expect(page.getByTestId(`up-add-units-title`)).toBeVisible();
 
             tester.isGoingTo("create both units using the modal and verify they are visible");
             await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
