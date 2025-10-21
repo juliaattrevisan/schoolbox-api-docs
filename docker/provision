@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+declare SECOND_INSTANCE_ENABLE
+
+source "$(dirname "$0")/functions"
+
+load_config
+
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
@@ -32,15 +38,8 @@ docker exec -it -u root schoolbox-cli tools/docker-provision.sh $provision_args
 "$(dirname "$0")/compose" restart schoolbox-scheduled schoolbox-mobiled
 
 # Is the second env in action?
-# If so copy from the second to the first, or just re-run the provision script
-# for INSTANCE_ID=docker2
-# For now I think it's fine to share storage folders
-# Load config to find out
-declare SECOND_INSTANCE_ENABLE
-source ./docker.default.env
-if [ -f ./docker.env ]; then
-    source ./docker.env
-fi
+# If so, re-run the provision script for INSTANCE_ID=docker2, and also restart
+# containers which depend on its rabbitmq vhost
 case "${SECOND_INSTANCE_ENABLE}" in
     1 | true | yes | on)
         docker exec -it -e INSTANCE_ID=docker2 -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
