@@ -128,7 +128,7 @@ CREATE TABLE `dialog_agent_scenario_criteria` (
 );
 
 -- because for some reason this never had one
-create index openai_log_sesssion
+create index openai_log_session
     on openai_log (session_id);
 
 -- This is what the students said
