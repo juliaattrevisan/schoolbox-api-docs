@@ -38,12 +38,18 @@ if [[ $errors == "1" ]]; then
     exit 1
 fi
 
+user_flag=''
+if [[ $user != '' ]]; then
+    log "Logging in as user \"${user}\":"
+    user_flag="--user ${user}"
+fi
+
 # Open a shell in any container, or into schoolbox-cli if not specified
-"$(dirname "$0")/compose" exec --index "${index}" "${container}" which /bin/bash > /dev/null
+"$(dirname "$0")/compose" exec "${container}" which /bin/bash > /dev/null
 if [[ $? -eq 0 ]]; then
     log "Logging in to ${container}, using bash shell:"
-    "$(dirname "$0")/compose" exec --index "${index}" "${container}" /bin/bash --login
+    "$(dirname "$0")/compose" exec $user_flag --index "${index}" "${container}" /bin/bash --login
 else
     log "Logging in to ${container}, using sh shell (bash does not exist):"
-    "$(dirname "$0")/compose" exec --index "${index}" "${container}" /bin/sh --login
+    "$(dirname "$0")/compose" exec $user_flag --index "${index}" "${container}" /bin/sh --login
 fi
