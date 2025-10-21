@@ -66,6 +66,9 @@ up the Vagrant development environment.
 - `logs`: view logs for containers in the development environment
 - `clean`: cleans up the temporary and cache files which the Docker development
   environment may create
+- `compose`: a helper script which calls `docker compose` with the project's
+  `.env` files: presumes they were already built with `docker/up`
+  - this may be used to run other `docker compose` sub-commands
 
 `up`, `down` and `logs` also pass through any arguments to their equivalent
 `docker compose` calls. For example:
