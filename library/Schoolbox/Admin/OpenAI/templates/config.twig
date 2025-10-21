@@ -1,4 +1,4 @@
-<div data-feature={{ feature.feature }}>
+<div data-feature="{{ feature.feature }}">
     <h2 class="subheader">{{ feature.title }}</h2>
     <label id="{{ feature.feature }}-provider" for="{{ feature.feature }}-provider-value">
         <span>Provider</span>
@@ -46,41 +46,42 @@
     <textarea id="{{ feature.feature }}-system_prompt-value" name="[{{ feature.feature }}][OpenAI][system_prompt][value]" rows="5" data-feature-azure data-feature-openai style="display:none">{{ feature.config.OpenAI.system_prompt.value }}</textarea>
 
     <script type="application/javascript">
+    (() => {
         // use a const feature as the container selector
-        const feature{{ feature.feature }} = document.querySelector('[data-feature={{ feature.feature }}]');
+        const FEATURE = '{{ feature.feature }}';
+        const featureEl = document.querySelector(`[data-feature="${FEATURE}"]`);
 
         /**
          * reusable function to show/hide fields based on provider
          * @param provider
          */
-        function showHide(feature, provider) {
+        function showHide(provider) {
             // hide all fields
-            feature.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'none');
-            feature.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'none');
+            featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'none');
+            featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'none');
 
             if (provider === 'OpenAI') {
-                feature.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'block');
+                featureEl.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'block');
                 return;
             } else if (provider === 'Azure') {
-                feature.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
+                featureEl.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
                 return;
             }
         }
 
         // on page load, show the current selected provider fields
         document.addEventListener('DOMContentLoaded', () => {
-            const currentValue{{ feature.feature }} = feature{{ feature.feature }}.querySelector('#{{ feature.feature }}-provider-value').value;
-            showHide(feature{{ feature.feature }}, currentValue{{ feature.feature }});
-            }
-        );
+            const currentValue = featureEl.querySelector(`#${FEATURE}-provider-value`).value;
+            showHide(currentValue);
+        });
 
         // when changing the provider select, show/hide the relevant fields
-        feature{{ feature.feature }}.querySelector('#{{ feature.feature }}-provider-value').addEventListener('change', (event) => {
+        featureEl.querySelector(`#${FEATURE}-provider-value`).addEventListener('change', (event) => {
             const value = event.target.value;
 
             // show relevant fields
-            showHide(feature{{ feature.feature }}, value);
+            showHide(value);
         });
-
+    })();
     </script>
 </div>
