@@ -22,6 +22,16 @@ while [[ $# -gt 0 ]]; do
             shift # past argument
             shift # past value
             ;;
+        --help | -h )
+            echo "Usage:  docker/ssh [OPTIONS] CONTAINER
+
+Open a shell in a running container
+
+Options:
+      --index int     Index of the container if it has multiple replicas
+  -u, --user string   Log in as this user"
+            exit
+            ;;
         *)
             # Any other value: if it's not a flag, it's the container name
             if [[ $1 == "-"* ]]; then
