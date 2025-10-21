@@ -49,8 +49,6 @@ The task daemon can be configured to run from either an already built image,
 or from an image built from local code, depending on the
 `TASKD_BUILD_FROM_LOCAL` environment variable.
 
-> TODO finalise how to pull already built image: Dockerhub? ECR?
-
 However it's run: the config file [docker-taskd.env](../docker-taskd.env) can be
 used to configure it, as per https://github.com/alaress/taskd/blob/master/CONFIGURATION.md.
 
@@ -70,7 +68,8 @@ up the Vagrant development environment.
 
 `up` and `down` also pass through any arguments to their `docker compose up` and
 `docker compose down` calls, respectively. For example:
-- `up --build` builds images before starting containers
+- `up --build` builds images before starting containers:
+  useful for when an image definition has changed
 - `down -v` removes volumes (e.g. database data) when stopping containers:
   useful for when testing a new database version
 
@@ -81,3 +80,7 @@ See the documentation for the `docker compose` commands for more information:
 These scripts should all be run with `sudo`, unless your current user has been
 added to the Docker group: see
 https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user.
+
+## Troubleshooting
+
+Sometimes
