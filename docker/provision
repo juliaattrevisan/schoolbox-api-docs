@@ -34,8 +34,8 @@ fi
 # Run the provision script in the schoolbox-cli container
 docker exec -it -u root schoolbox-cli tools/docker-provision.sh $provision_args
 
-# Restart containers which may depend on the rabbitmq vhost
-"$(dirname "$0")/compose" restart schoolbox-scheduled schoolbox-mobiled
+## Restart containers which may depend on the rabbitmq vhost
+#"$(dirname "$0")/compose" restart schoolbox-scheduled schoolbox-mobiled
 
 # Is the second env in action?
 # If so, re-run the provision script for INSTANCE_ID=docker2, and also restart
@@ -43,7 +43,7 @@ docker exec -it -u root schoolbox-cli tools/docker-provision.sh $provision_args
 case "${SECOND_INSTANCE_ENABLE}" in
     1 | true | yes | on)
         docker exec -it -e INSTANCE_ID=docker2 -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
-        "$(dirname "$0")/compose" restart schoolbox2-scheduled schoolbox2-mobiled
+#        "$(dirname "$0")/compose" restart schoolbox2-scheduled schoolbox2-mobiled
         ;;
 esac
 
