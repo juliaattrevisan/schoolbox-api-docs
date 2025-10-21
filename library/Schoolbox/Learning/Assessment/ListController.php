@@ -607,7 +607,7 @@ class ListController extends Web\Controller\Base
             $data['types'][] = [
                 'id'    => 'dialog-agent',
                 'value' => AssessmentType::TYPE_DIALOG_AGENT,
-                'label' => DialogAgent::getDefaultTypeName(),
+                'label' => $this->rosettaStone->translate('dialogAgent', false, true),
                 'icon'  => 'dialog-agent',
                 /* TODO probably rename this tooltip
                  */
