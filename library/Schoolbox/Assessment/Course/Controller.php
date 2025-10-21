@@ -633,57 +633,6 @@ class Controller extends Base\Base
             }
         }
 
-        // Save each Unit's name
-        if (\is_array($post->get('unit'))) {
-            $courseSpec->setUnits($this->unitSpecificationMapper->findAllByCourseId($courseSpec->getId()));
-
-            /* Keep track of how many units were missing names
-             */
-            $emptyUnit     = 0;
-            $readOnlyUnits = [];
-
-            // save unit name changes
-            foreach ($courseSpec->getUnits() as $unitSpec) {
-                if (!isset($post->get('unit')[$unitSpec->getId()])) {
-                    // no change required
-                    continue;
-                }
-                $unitName = trim($post->get('unit')[$unitSpec->getId()]['name'] ?? '');
-                if ($unitName === $unitSpec->getFolder()->getName()) {
-                    // name is not changed.
-                    continue;
-                }
-                if ($this->access->getFolderAccess($this->getUser(), $unitSpec->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
-                    $readOnlyUnits[] = $unitSpec->getFolder()->getName();
-                    continue;
-                }
-
-                /* Don't try to save empty units
-                 */
-                if ('' !== $unitName) {
-                    // Re-hydrate unit folder to ensure curriculum codes etc are hydrated.
-                    $unitFolder = $this->folderMapper->findById($unitSpec->getFolder()->getId());
-                    $this->folderMapper->save($unitFolder->setName($unitName));
-                } else {
-                    $emptyUnit++;
-                }
-            }
-
-            /* Report problems with units
-             */
-            if ($emptyUnit) {
-                $this->sendError(new Base\Exception('At least one unit in this course has no name. ', ['Units must have names.']));
-                return;
-            }
-            if (count($readOnlyUnits) > 0) {
-                $this->sendError(new Base\Exception('Cannot update units. ', [sprintf("You don't have permission to update %s.", implode(',', $readOnlyUnits))]));
-                return;
-            }
-        } else {
-            $this->sendError(new Base\Exception('Cannot create a Course without Units. ', ['You need to create at least 1 unit.']));
-            return;
-        }
-
         $courseSpecFolder       = $this->folderMapper->findById($courseSpec->getFolder()->getId());
         $newCurriculumCodes     = array_filter(explode(',', $post['curriculumCodes'][0] ?? ''));
         $currentCurriculumCodes = $courseSpecFolder->getCurriculumNodes()->getPropertyValues('id');
