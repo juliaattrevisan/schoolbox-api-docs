@@ -28,6 +28,8 @@ window.Vue.onMounted(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("isNewCourse") === "1") {
         addUnitsStore.prompt();
+        urlParams.delete("isNewCourse");
+        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams.toString()}`);
     }
 });
 </script>
