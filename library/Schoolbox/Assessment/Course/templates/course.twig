@@ -60,7 +60,8 @@ Usage:
             onXhrDone: function (data) {
                 if (data.id) {
                     // Update the Browser URL - navigation to the Unit planner
-                    window.location.href = `/course/plan/${data.id}`;
+                    const coursePlanUrl = `{{ routeLookup('coursePlan.getPlan') }}`;
+                    window.location.href = `${coursePlanUrl.replace("{id}", data.id)}?isNewCourse=1`;
                 }
             },
 
