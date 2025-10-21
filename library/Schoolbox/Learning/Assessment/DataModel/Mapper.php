@@ -1102,10 +1102,6 @@ class Mapper extends BaseMapper
             /* Dialog Agents
              */
             if ($row['dialogAgent.id']) {
-                /* TOOD Maybe needed; can't remember
-                 */
-                $dialogAgentIds[] = $row['dialogAgent.id'];
-
                 $dialogAgent = $this->hydrateJoin($row, 'dialogAgent', 'dialogAgent');
 
                 $model->setDialogAgent($dialogAgent);
