@@ -206,8 +206,8 @@ class Client implements IClient
                 // If this can't be parsed: raise something but still log
                 $message = EventStream\Message::fromString($chunk);
 
-                // Filter fields out of the message as necessary?
-                yield $message->__toString() . "\n\n";
+                // Filter fields out of the message as necessary before sending?
+                yield $this->filterForOutput($message)->__toString();
                 $this->onMessage($message, $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
@@ -222,7 +222,7 @@ class Client implements IClient
         // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
             $message = EventStream\Message::fromString($chunkBuffer);
-            yield $message->__toString();
+            yield $this->filterForOutput($message)->__toString();
             $this->onMessage($message, $log);
         }
     }
@@ -370,5 +370,19 @@ class Client implements IClient
             ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
             ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
         $this->logMapper->save($log);
+    }
+
+    /**
+     * Filter unwanted fields out of `$message` before it's output.
+     *
+     * Currently this filters nothing, but there's scope for determining
+     * exactly what gets filtered out.
+     *
+     * @param EventStream\Message $message
+     * @return EventStream\Message
+     */
+    private function filterForOutput(EventStream\Message $message): EventStream\Message
+    {
+        return $message;
     }
 }

@@ -98,6 +98,6 @@ class Message
             $fields[] = sprintf('retry: %d', $this->retry);
         }
         $fields[] = sprintf('data: %s', $this->data);
-        return implode("\n", $fields);
+        return implode("\n", $fields) . "\n\n";
     }
 }
