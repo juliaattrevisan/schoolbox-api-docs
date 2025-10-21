@@ -338,7 +338,7 @@ function init_npm_dependencies() {
 function add_rabbitmq_vhost() {
   log "Adding RabbitMQ vhost and permissions";
   curl -u guest:guest -H "Accept: application/json" -X PUT "http://rabbitmq:15672/api/vhosts/${INSTANCE_ID}"
-  curl -u guest:guest -H "Accept: application/json" -X PUT -d '{"configure":".*","write":".*","read":".f"}' "http://rabbitmq:15672/api/permissions/${INSTANCE_ID}/guest"
+  curl -u guest:guest -H "Accept: application/json" -X PUT -d '{"configure":".*","write":".*","read":".*"}' "http://rabbitmq:15672/api/permissions/${INSTANCE_ID}/guest"
 }
 
 function create_data_dirs() {
