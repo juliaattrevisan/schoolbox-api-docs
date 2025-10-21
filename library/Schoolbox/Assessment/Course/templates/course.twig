@@ -53,51 +53,6 @@ Usage:
             }
         }
 
-
-        /**
-         *  Toggle button availability
-         *
-         *  @return void
-         */
-        function toggleSaveCourse() {
-            let invalidUnits = 0;
-            let hasUnits = $('[data-unit-spec]').length;
-
-            /* No units? No submit
-             */
-            if (!hasUnits) {
-                $mageSaveCourseButton.attr('disabled', true);
-                return;
-            }
-
-            /* Every unit must have a name
-             */
-            $.each($('[data-unit-name]'), function(index, element) {
-                if ($.trim($(element).val()) === '') {
-                    invalidUnits++;
-                }
-            });
-
-            if (invalidUnits) {
-                $mageSaveCourseButton.attr('disabled', true);
-            } else {
-                $mageSaveCourseButton.attr('disabled', false);
-            }
-        }
-
-
-        /* Disable save course button while editing is occurring
-         * Check that all the units have names
-         * This is built excessively because of various input methods like copy-paste
-         * and tabindexing
-         */
-        toggleSaveCourse();
-
-        $(document).on('keyup', '[data-unit-name]', function() {
-            toggleSaveCourse();
-        });
-
-
         /**
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
