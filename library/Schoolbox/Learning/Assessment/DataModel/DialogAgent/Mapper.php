@@ -45,9 +45,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->uses('deleted_by', self::TYPE_INTEGER, null, 'deletedBy');
 
-        // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
         $this->joins(
             'assessment_id',
             AssessmentMapper::class,
