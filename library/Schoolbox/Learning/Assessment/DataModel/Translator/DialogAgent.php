@@ -15,7 +15,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
 use Schoolbox\Learning\MarkScheme\None;
 
 /**
- * Sub-translator for Lesson Plan specific fields.
+ * Sub-translator for Dialog Agent specific fields.
  */
 class DialogAgent implements IAssessmentTypeTranslator
 {
@@ -64,8 +64,8 @@ class DialogAgent implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the domainObject to dataModel
      *
-     * @param IAssessable|DialogAgentObject $domainObject A LessonPlanObject instance
-     * @param IAssessableDataModel|DialogAgentModel $dataModel A LessonPlanModel instance
+     * @param IAssessable|DialogAgentObject $domainObject A DialogAgentObject instance
+     * @param IAssessableDataModel|DialogAgentModel $dataModel A DialogAgentModel instance
      */
     public function translateToDataModel(IAssessable|DialogAgentObject $domainObject, IAssessableDataModel|DialogAgentModel $dataModel): void
     {
