@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
+if [[ "$*" =~ '--help' ]] || [[ "$*" =~ '-h' ]] ; then
+    docker compose logs --help;
+    exit;
+fi
+
+# Show all docker-compose logs
+"$(dirname "$0")/compose" logs "$@"
