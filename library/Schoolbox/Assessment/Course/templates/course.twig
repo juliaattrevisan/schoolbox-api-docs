@@ -79,33 +79,6 @@ Usage:
          */
         initValidator(modifyValidation);
 
-
-        /**
-         * Deletion of Units
-         */
-        $(document).on('click', '[data-action="delete-unit"]', function (e) {
-            e.preventDefault();
-            var $button = $(this);
-
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this {{ locale.unit }}? This will also delete all {{ locale.activity.plural }} in the {{ locale.unit }}.',
-                confirmEvent: function () {
-                    $.post($button.attr('href'))
-                        .done(function () {
-                            var $listItem = $button.closest('[data-unit-spec]');
-
-                            $listItem.slideUp(400, function () {
-                                $listItem.detach();
-
-                                /* Toggle button availability
-                                 */
-                                toggleSaveCourse();
-                            });
-                        });
-                }
-            });
-        });
-
         var newUnitName = $('#new-unit-name');
 
         // 'Next' Button
