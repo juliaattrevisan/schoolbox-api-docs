@@ -4,14 +4,16 @@
  */
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
+import locale from "@js/terminology/rosettaStone";
 import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
-import UpAddUnits from "./up-add-units.vue";
-import UpDeleteUnit from "./up-delete-unit.vue";
+import UpAddUnitsModal from "./up-add-units-modal.vue";
+import UpDeleteUnitModal from "./up-delete-unit-modal.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpUnitCellTextboxContentPlaceholder from "./up-unit-cell-textbox-content-placeholder.vue";
@@ -32,6 +34,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
+const addStore = useAddUnitsStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
@@ -162,8 +165,6 @@ window.Vue.onUnmounted(() => {
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
     />
-    <up-add-units />
-    <up-delete-unit />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
         <div class="small-12 island">
@@ -234,10 +235,21 @@ window.Vue.onUnmounted(() => {
                             />
                         </template>
                     </div>
+                    <div class="fixed-left l-pad-s f-no-margins no-print">
+                        <button
+                            class="button icon-add"
+                            data-test="unit-planner-create-units"
+                            @click.prevent="addStore.prompt()"
+                        >
+                            Create {{ locale.unit.translate(true, true) }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <up-add-units-modal />
+    <up-delete-unit-modal />
     <activities-list-delete-modal />
     <up-curriculum :parent-folder-id="props.folderId" />
 </template>
