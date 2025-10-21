@@ -99,6 +99,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper
      * @param IdFinder|null $filtersAssessmentIdFinder
      * @param CompositeFactoryFactory|null $filtersFactoryFactory
      * @param Filter\Mapper|null $filterMapper
@@ -110,7 +111,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerKey
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
-     * @param RubricDataSource $rubricDataSource
+     * @param RubricDataSource|null $rubricDataSource
      * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
@@ -131,6 +132,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
         private ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
         private ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
         private ?Filter\Mapper $filterMapper = null,
@@ -373,7 +375,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setFileVar('worksheet')
                 ->getTwigContext();
         }
-        /* A list of lesson plans
+
+        /* Dialog Agents need scenarios pre-populated for selection and examination
+         * of its constituent fields in a modal
+         */
+        if (AssessmentType::TYPE_DIALOG_AGENT === $type) {
+            $data['dialogAgent']['instance'] = null;
+            $data['dialogAgent']['scenarios'] = $this->dialogAgentScenarioMapper->findAll();
+        }
+
+        /* TODO lol why is this outside the AssessmentType check?
+         *
+         * A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
         $data['lessonPlanTemplates'] = [
@@ -692,6 +705,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         }
 
+        /* Dialog Agents
+         * These need their chosen scenario supplied
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $dialogAgentMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::getInstance();
+            $dialogAgentScenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
+
+            $data['dialogAgent']['instance'] = $dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
+            $data['dialogAgent']['scenario'] = $dialogAgentScenarioMapper->findById($assessment->getScenarioId());
+        }
+
         $data['courseManaged'] = [
             'isVisible' => $courseManagedFields->isVisible(),
             'isMutable' => $courseManagedFields->isMutable(),
@@ -771,6 +795,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'worksheet',
                 'store:' . $existingWorksheetTemplate->getHash() . ':' . $existingWorksheetTemplate->getBasename()
             );
+        }
+
+        /* Enforce Close Date = Due Date for Dialog Agents
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $assessment->setCloseAt($assessment->getDueAt());
         }
 
         /* Regular update while you're creating the assessment, otherwise

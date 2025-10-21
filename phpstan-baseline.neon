@@ -6407,3 +6407,196 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/External/Connector/Veracross/Base/Endpoint/TimetableCalendar/Classes.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php

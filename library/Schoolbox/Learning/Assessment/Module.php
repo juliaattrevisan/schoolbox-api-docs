@@ -442,6 +442,7 @@ class Module extends BaseModule
             AssessmentType::TYPE_TASK           => Assessment\Task\Controller::class,
             AssessmentType::TYPE_LTI_ASSESSMENT => Assessment\Lti\Controller::class,
             AssessmentType::TYPE_LESSON_PLAN    => Assessment\LessonPlan\Controller::class,
+            AssessmentType::TYPE_DIALOG_AGENT   => Assessment\DialogAgent\Controller::class,
         ];
 
         // set the controller class for later
@@ -685,6 +686,7 @@ class Module extends BaseModule
         $projectResultCacheMapper  = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
         $lessonPlanTemplateMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
         $lessonPlanDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
+        $dialogAgentScenarioMapper = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
         $linkedAssessmentsMapper   = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
@@ -777,6 +779,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     MimetypeMapper::getInstance(),
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
@@ -816,6 +819,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,
@@ -852,6 +856,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
                     $stateMapper,
                     new \Schoolbox\Url\Factory($this->getConfig()),
@@ -896,6 +901,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,
@@ -934,6 +940,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,
@@ -966,9 +973,34 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     $linkedAssessmentsMapper,
+                );
+
+            case Assessment\DialogAgent\Controller::class:
+                return new Assessment\DialogAgent\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $this->injector->get('l10n'),
+                    $replicator,
+                    $viewLatestMapper,
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
                 );
 
             default:
@@ -1015,6 +1047,10 @@ class Module extends BaseModule
 
             case AssessmentType::TYPE_LESSON_PLAN:
                 $controller = $this->buildControllerForClass(Assessment\LessonPlan\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_DIALOG_AGENT:
+                $controller = $this->buildControllerForClass(Assessment\DialogAgent\Controller::class);
                 break;
 
             default:
@@ -1250,7 +1286,8 @@ class Module extends BaseModule
                 AssessmentType::TYPE_TASK,
                 AssessmentType::TYPE_QUIZ,
                 AssessmentType::TYPE_LTI_ASSESSMENT,
-                AssessmentType::TYPE_PROJECT
+                AssessmentType::TYPE_PROJECT,
+                AssessmentType::TYPE_DIALOG_AGENT,
             ]),
             /* The status pages of specifications of quizzes need to be viewable because specifications of quizzes are
              * previewable while under development.

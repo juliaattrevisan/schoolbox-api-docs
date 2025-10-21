@@ -1397,6 +1397,8 @@ class MapperProxy
                     $linkedAssessmentMapper->persistLink($subObject, $linkedAssessment);
                 }
             }
+        } elseif ($subObject instanceof DialogAgent\Model) {
+            DialogAgent\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }
@@ -1489,6 +1491,8 @@ class MapperProxy
                 $mapper = LtiAssessment\Mapper::getInstance();
             } elseif ($subObject instanceof LessonPlan\Model) {
                 $mapper = LessonPlan\Mapper::getInstance();
+            } elseif ($subObject instanceof DialogAgent\Model) {
+                $mapper = DialogAgent\Mapper::getInstance();
             } else {
                 return null;
             }
@@ -1539,6 +1543,10 @@ class MapperProxy
              */
 
             $lessonPlanMapper->delete($subModel);
+        } elseif ($subModel instanceof DialogAgent\Model) {
+            /* TODO I think this is how it was envisaged to work?
+             */
+            DialogAgent\Mapper::getInstance()->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
@@ -1570,20 +1578,30 @@ class MapperProxy
             if ($subModel instanceof Quiz) {
                 QuizMapper::getInstance()->restoreSoftDeleted($subModel);
             }
+
             if ($subModel instanceof Task) {
                 TaskMapper::getInstance()->restoreSoftDeleted($subModel);
             }
+
             if ($subModel instanceof LtiAssessment\Model) {
                 LtiAssessment\Mapper::getInstance()->restoreSoftDeleted($subModel);
             }
+
             if ($subModel instanceof Project) {
                 ProjectMapper::getInstance()->restoreSoftDeleted($subModel);
             }
+
             if ($subModel instanceof LessonPlan\Model) {
                 LessonPlan\Mapper::getInstance()->restoreSoftDeleted($subModel);
             }
+
+            if ($subModel instanceof DialogAgent\Model) {
+                DialogAgent\Mapper::getInstance()->restoreSoftDeleted($subModel);
+            }
+
             $this->baseMapper->restoreSoftDeleted($dataModel);
         }
+
         $assessable->setDeletedAt(null);
     }
 
@@ -1867,6 +1885,10 @@ class MapperProxy
 
                     case AssessmentType::TYPE_LESSON_PLAN:
                         $filterBuilder->notNull('lessonPlan.id');
+                        break;
+
+                    case AssessmentType::TYPE_DIALOG_AGENT:
+                        $filterBuilder->notNull('dialogAgent.id');
                         break;
 
                     default:

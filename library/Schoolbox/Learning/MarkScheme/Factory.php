@@ -14,6 +14,7 @@ use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
@@ -94,6 +95,14 @@ class Factory
      * @var string[]
      */
     private static array $markTypesLessonPlan = [];
+
+
+    /**
+     * Dialog Agent conversations are never marked.
+     *
+     * @var string[]
+     */
+    private static array $markTypesDialogAgent = [];
 
 
     /**
@@ -388,6 +397,10 @@ class Factory
 
         if ($assessable instanceof LessonPlan) {
             return self::$markTypesLessonPlan;
+        }
+
+        if ($assessable instanceof DialogAgent) {
+            return self::$markTypesDialogAgent;
         }
 
         throw new UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));

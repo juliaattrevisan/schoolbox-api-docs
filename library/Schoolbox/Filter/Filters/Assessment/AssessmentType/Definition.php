@@ -36,6 +36,7 @@ class Definition extends Filter\AbstractDefinition
     public const KEY_TASK = AssessmentType::TYPE_TASK;
     public const KEY_LTI_ASSESSMENT = AssessmentType::TYPE_LTI_ASSESSMENT;
     public const KEY_LESSON_PLAN = AssessmentType::TYPE_LESSON_PLAN;
+    public const KEY_DIALOG_AGENT = AssessmentType::TYPE_DIALOG_AGENT;
 
     /** @var Collection|string[] */
     private $assessmentTypes;

@@ -503,22 +503,24 @@ class Model extends AbstractAssessment
 
     /**
      * Check the dates set on this model are valid
+     *
      * @throws InvalidArgumentException if the dates are not validly set
      * @return void
      */
     public function assertValidDates(): void
     {
         /* Check publish date against everything else
-        /* Don't check dates if in course */
+         * Don't check dates if in course
+         */
         if ($this->getBaseContext() instanceof UnitSpecification) {
             return;
         }
 
         $this->assertDateSequence([
             'publish' => $this->getPublishAt(),
-            'open'    => $this->getOpenAt(),
-            'due'     => $this->getDueAt(),
-            'late'    => $this->getCloseAt()
+            'open' => $this->getOpenAt(),
+            'due' => $this->getDueAt(),
+            'late' => $this->getCloseAt()
         ]);
     }
 

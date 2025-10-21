@@ -157,6 +157,15 @@ class Factory
     /** @var IAssessable */
     private $original;
 
+
+    /**
+     * Dialog Agents have a scenario
+     *
+     * @var int|null
+     */
+    private ?int $scenarioId = null;
+
+
     /** @var Error\Mapper */
     private Error\Mapper $errorMapper;
 
@@ -360,6 +369,15 @@ class Factory
         $this->setLessonPlanVisibility('on' === ($post['lessonPlanVisibility'] ?? null) ? \Schoolbox\Role::STUDENT : \Schoolbox\Role::STAFF);
         $this->setLessonPlanDuration((string)($post['duration'] ?? null));
 
+        /* Dialog Agents
+         * Note that DurationHours and DurationMinutes is shared with Quiz implementation since it's no longer unique
+         * to quiz alone...we're going to run out of space to name things here eventually, unless you start namespacing
+         *
+            $this->setDurationHours((int)($post['durationHours'] ?? 0));
+            $this->setDurationMinutes((int)($post['durationMinutes'] ?? 0));
+         */
+        $this->setScenarioId((int)($post['scenarioId'] ?? null));
+
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
         if (isset($customFields)) {
@@ -540,14 +558,18 @@ class Factory
                 $this->getLineItemScoreMaximum()
             );
         } elseif ($assessment instanceof LessonPlan\Model) {
-            /* TODO Add other fields that are LessonPlan specific
-             */
             $decorator = new LessonPlan\Decorator\Decorator(
                 $this->getLessonPlanTemplateId(),
                 $this->getLessonPlanFields(),
                 $this->getLessonPlanVisibility(),
                 $this->getAttachedFiles(),
                 $this->getLessonPlanDuration(),
+            );
+        } elseif ($assessment instanceof DialogAgent\Model) {
+            $decorator = new DialogAgent\Decorator\Decorator(
+                $this->getScenarioId(),
+                $this->getDurationHours(),
+                $this->getDurationMinutes(),
             );
         } else {
             throw new DomainException('Please select an assessment type');
@@ -609,6 +631,12 @@ class Factory
 
                 $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
             }
+        }
+
+        /* Dialog Agents have a special treatment of dates where Close Date = Due Date
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $assessment->setCloseAt($assessment->getDueAt());
         }
 
         // find out if the dates are all g - if not, a mage-friendly exception will be thrown
@@ -965,6 +993,26 @@ class Factory
     public function setLessonPlanDuration(?string $duration): self
     {
         $this->duration = $duration;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getScenarioId(): ?int
+    {
+        return $this->scenarioId;
+    }
+
+
+    /**
+     * @param int|null $scenarioId
+     * @return $this
+     */
+    public function setScenarioId(?int $scenarioId): self
+    {
+        $this->scenarioId = $scenarioId;
         return $this;
     }
 }

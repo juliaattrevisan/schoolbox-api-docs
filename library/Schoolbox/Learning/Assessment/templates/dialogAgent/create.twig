@@ -1,0 +1,224 @@
+{##
+ # Create/update a Dialog Agent instance
+ #
+ # TODO fill in the rest of this mega set of params which are shared across all activities
+ #
+ # @param \Schoolbox\Resource\Folder\Model $context
+ # @param string $contextType                                            A string denoting the next closest context oft his assessment
+ # @param string $baseContextType                                        A string denoting the deepest context of this assessment
+ # @param Collection $breadcrumbs                                        A list of (name, url) tuples
+ # @param \Schoolbox\Learning\Assessment\DialogAgent\Model $assessment
+ # @param $assessmentType
+ # @param $markVisibility
+ # @param $availabeVisibilities
+ # @param $allWorkTypes
+ # @param $capabilitymarkTypes
+ # @param $capabilityGradingSchemes
+ # @param $parentFolderId
+ # @param $participants
+ # @param $curriculumNodes
+ # @param $returnUrl
+ # @param $cuestom_assessment_participation
+ # @param $selfAssessmentEnabled
+ # @param $defaultGradeGroup
+ # @param $canRelocate
+ # @param $courseManaged
+ # @param $lessonPlanTemplates
+ # @param bool $acceptingResponses                                   Whether this assessment can accept responses (see dates.twig)
+ # @param \Schoolbox\GenericCollection $scenarios                    A list of predefined scenarios users can choose
+ #}
+
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
+{# Basic Details #}
+<fieldset>
+    <label class="required" for="title">Title</label>
+
+    <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255"  />
+
+    <div class="row">
+        <div class="small-12 columns">
+            {# Work Type #}
+            {% include '@learningAssessment/fragments/workTypeSelectorWithLabel.twig'
+                with {
+                allWorkTypes: allWorkTypes,
+                assessment: assessment,
+                courseManaged: courseManaged
+            } only
+            %}
+        </div>
+    </div>
+
+    {# Curriculum #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: locale.dueWork.proper,
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+        parentFolderId: parentFolderId ?? null,
+    } %}
+
+    <label for="assessment-description">Description</label>
+    <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
+
+    {# Assessment Location #}
+    {# TODO I *think* we need this...? Relocating a spec Dialog Agent seems like a possibility #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
+
+    {# The Four Dates of the Apocalypse
+     # This is a unique implementation which doesn't have a due date plus it's horizontally
+     # arranged, unlike the other activities
+     #}
+    {% if context.baseContext is not unitSpecification %}
+        {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+
+        <div class="row">
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
+            </div>
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
+            </div>
+            {# In dialog agents, Due Date is known as Close Date.
+             #
+             # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
+             # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
+             # "Due Date" in the schema and business logic.
+             #
+             # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
+             # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
+             #}
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
+            </div>
+            {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
+            <div style="display:none">
+                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
+            </div>
+        </div>
+    {% endif %}
+
+    {# Allowed Time #}
+    <div class="row">
+        <div class="small-5 medium-2 columns">
+            <label for="hasDuration" class="inline-block">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting, students will have this much time to complete this activity. Switch off for no limit.">?</span></label>
+            <div class="switch">
+                <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration %}checked="checked"{% endif %} />
+                <label for="hasDuration">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+        <div class="small-7 medium-10 columns no-pad {% if not assessment.duration %}hide{% endif %}" id="durationPanel">
+            <div class="small-6 columns">
+                <label>Hours
+                    <input name='durationHours' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).hours ?? '' }}{% endif %}" />
+                </label>
+            </div>
+            <div class="small-6 columns">
+                <label>Minutes
+                    <input name='durationMinutes' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).minutes ?? '' }}{% endif %}" />
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+{# Scenario selection #}
+{% if not dialogAgent.instance %}
+    {# Create a new Dialog Agent #}
+    <fieldset>
+        <legend class="required">Select scenario</legend>
+        {# Scenarios #}
+        <div class="radiolist">
+            <ul class="option-list">
+                {% for scenario in dialogAgent.scenarios %}
+                    {# TODO Snake pls decorate this in a reptilian manner thx #}
+                    <li style="border:1px solid #f00;width:50%;min-height:200px;float:left;padding-right:2rem;">
+                        <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
+                        <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
+
+                        <article>
+                            {{ scenario.description }}
+                        </article>
+
+                        <ul>
+                            {% for field in scenario.fields %}
+                                <li>
+                                    {{ field.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </fieldset>
+{% else %}
+    {# Update a Dialog Agent: show the currently selected scenario #}
+    <fieldset>
+        <legend>Selected scenario</legend>
+        <input type="hidden" name="scenarioId" value="{{ dialogAgent.scenario.id }}">
+
+        <h5>{{ dialogAgent.scenario.title }}</h5>
+
+        <p>
+            {{ dialogAgent.scenario.description }}
+        </p>
+    </fieldset>
+{% endif %}
+
+{# Submit #}
+{{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+
+
+{# General Scripts #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function () {
+
+        // 'Description' TextArea only
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                targetElements: ['#assessment-description'],
+                fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
+            }
+        }));
+
+        setDurationPanels($('#hasDuration'), $('#durationPanel'));
+
+        /**
+         * Toggles duration settings.
+         *
+         * @param toggle
+         * @param durationPanel
+         */
+        function setDurationPanels(toggle, durationPanel) {
+            let durationInputs = durationPanel.find('input[type=text]');
+
+            toggle.on('click', function() {
+                let $checkbox = $(this);
+
+                if ($checkbox.is(':checked')) {
+                    durationPanel.stop().hide().removeClass('hide').fadeIn(400);
+                    durationInputs.prop('disabled', false);
+                }
+                else {
+                    /* Hide panel + disable inputs
+                     */
+                    durationPanel.stop().fadeOut(400);
+                    durationInputs.prop('disabled', true);
+                }
+            });
+        }
+    });
+</script>

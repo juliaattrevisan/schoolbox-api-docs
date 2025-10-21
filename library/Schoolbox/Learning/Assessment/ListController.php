@@ -35,6 +35,7 @@ use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Lti\Response\Model as LtiResponse;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -599,6 +600,18 @@ class ListController extends Web\Controller\Base
                 'label' => $this->rosettaStone->translate('lessonPlan', false, true),
                 'icon'  => 'lesson-plan',
                 'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
+            ];
+            /* Dialog Agents spawn directly onto homepages I suppose, without requiring a course
+             * context, just like a Due Work.
+             */
+            $data['types'][] = [
+                'id'    => 'dialog-agent',
+                'value' => AssessmentType::TYPE_DIALOG_AGENT,
+                'label' => DialogAgent::getDefaultTypeName(),
+                'icon'  => 'dialog-agent',
+                /* TODO probably rename this tooltip
+                 */
+                'title' => 'Converse with a scenario-based artificial intelligence',
             ];
 
             // TODO, 'types' should just be the 3 objects, and twig should do the rest
