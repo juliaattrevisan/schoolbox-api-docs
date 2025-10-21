@@ -51,7 +51,15 @@ docker restart caddy
 echo "Access the Schoolbox development instance via the following local URLs:"
 echo "This machine only:"
 echo "- https://docker.dev.schoolbox.cloud/"
-echo "Other machines on this network:"
+case "${SECOND_INSTANCE_ENABLE}" in
+    1 | true | yes | on)
+        echo "- https://docker2.dev.schoolbox.cloud/ (separate instance)"
+        echo "Other machines on this network (docker.dev.schoolbox.cloud only):"
+        ;;
+    * )
+        echo "Other machines on this network:"
+        ;;
+esac
 for device in $(ip -4 -o a | cut -d ' ' -f 2); do
     # Skip loopback device
     if [ "$device" = 'lo' ]; then
