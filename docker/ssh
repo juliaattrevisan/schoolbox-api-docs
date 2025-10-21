@@ -3,22 +3,34 @@
 source "$(dirname "$0")/functions"
 
 # Parse args for:
-# first arg, if not a flag: container to run, defaults to `schoolbox-cli`
-# -u or --user: the username to SSH as
+# -u or --user: the username to SSH as, defaults to container's default user
 # --index: if provided, the replica number of the container
+# last arg, if not a flag: container to run, defaults to `schoolbox-cli`
 container='schoolbox-cli'
+index=1
+user=''
 errors='0'
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --container | -c )
-            container=$2
+        --index )
+            index=$2
+            shift # past argument
+            shift # past value
+            ;;
+        --user | -u )
+            user=$2
             shift # past argument
             shift # past value
             ;;
         *)
-            error "Unrecognised option: '$1'"
-            errors="1"
-            shift # past argument
+            # Any other value: if it's not a flag, it's the container name
+            if [[ $1 == "-"* ]]; then
+                error "Unrecognised option: '$1'"
+                errors="1"
+            else
+                container=$1
+            fi;
+            break
             ;;
     esac
 done
@@ -27,11 +39,11 @@ if [[ $errors == "1" ]]; then
 fi
 
 # Open a shell in any container, or into schoolbox-cli if not specified
-"$(dirname "$0")/compose" exec "${container}" which /bin/bash > /dev/null
+"$(dirname "$0")/compose" exec --index "${index}" "${container}" which /bin/bash > /dev/null
 if [[ $? -eq 0 ]]; then
     log "Logging in to ${container}, using bash shell:"
-    "$(dirname "$0")/compose" exec "${container}" /bin/bash --login "$@"
+    "$(dirname "$0")/compose" exec --index "${index}" "${container}" /bin/bash --login
 else
     log "Logging in to ${container}, using sh shell (bash does not exist):"
-    "$(dirname "$0")/compose" exec "${container}" /bin/sh --login "$@"
+    "$(dirname "$0")/compose" exec --index "${index}" "${container}" /bin/sh --login
 fi
