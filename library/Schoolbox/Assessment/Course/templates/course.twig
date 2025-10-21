@@ -61,14 +61,10 @@ Usage:
             rules: {
                 name: "required",
                 parent: "required",
-                newUnitName: {
-                    requiredNotBlank: true
-                }
             },
             messages: {
                 name: "Please enter a name for this course.",
                 parent: "Please select a {{ locale.faculty }} or {{ locale.class }} for this course.",
-                newUnitName: 'Please create at least one {{ locale.unit }} for this course.'
             },
             onfocusout: false,
             onkeyup: false
@@ -78,8 +74,6 @@ Usage:
          * will end up re-initialising elsewhere
          */
         initValidator(modifyValidation);
-
-        var newUnitName = $('#new-unit-name');
 
         // 'Next' Button
         $mageNextButton.mage({
