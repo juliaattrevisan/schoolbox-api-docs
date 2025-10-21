@@ -191,11 +191,8 @@ class Client implements IClient
                 continue;
             }
 
-//            // Output the stream contents
-//            yield $data;
-
-            // Also buffer the stream contents into a set of message objects,
-            // for later processing and logging
+            // Buffer the stream contents into a set of message objects,
+            // for later output, processing and logging
             $data         = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
             $chunkBuffer .= $data;
 
@@ -211,7 +208,10 @@ class Client implements IClient
                 $this->onMessage($message, $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
-                // TODO does anything need to be done about this?
+                // TODO this should probably raise an exception, to be handled
+                //      by the controller?
+                // I think that after an error's raised then there's no point
+                // outputting any further?
 //                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
 //                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
 //                    echo "{$chunk}\n\n";
