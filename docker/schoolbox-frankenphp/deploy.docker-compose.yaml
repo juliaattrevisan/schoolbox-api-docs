@@ -26,6 +26,7 @@ services:
         retries: 5
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
     post_start:

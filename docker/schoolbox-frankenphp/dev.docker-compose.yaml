@@ -28,6 +28,7 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
