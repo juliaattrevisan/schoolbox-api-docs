@@ -568,60 +568,6 @@ class Controller extends Base
 
 
     /**
-     * Updates a single moment.
-     *
-     * TODO: delete the next release after 25.1
-     *
-     * @api   PUT /learning/evidence/{id}/modify
-     * @since 20.2
-     * @deprecated use the particular put endpoints for each state instead
-     * @param Model $evidence
-     */
-    public function putEvidence(Model $evidence): void
-    {
-        /* TODO rename
-         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
-         *  which is potentially going to affect api behaviour, do this gently for now. You'd
-         *  have to modify preloadEvidence otherwise, which would affect way more things
-         */
-        $moment = $evidence;
-
-        $requestBody  = $this->request->getParsedBody();
-
-        $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-        $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
-        $tokenReplacer  = new TokenReplacer\Student(new TokenReplacer\Simple());
-        $moment  = $requestTranslator($requestBody, $moment)
-            ->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
-
-        // if ($requestBody['draft'] ?? false) {
-        //     // autosave draft, save as draft
-        //     $moment->draft();
-        // }
-
-        /**
-         * Due to the new moderation rules, this now always gets shoved back to draft state as you
-         * should be using the other endpoints instead to change state
-         *
-         * This avoids students bypassing the moderation workflow and updating a published moment
-         * directly without them having permission to do so...
-         *
-         * TODO: potentially respect NextRoutes here and do it based on "can you progress back to the current state",
-         * and if not, go to draft instead
-         */
-        $moment->draft();
-
-        $this->mapper->save($moment);
-
-        /**
-         * use buildTranslatorWithComments as that contains the _links needed for draft.js
-         * where the other translator had excluded _links (for historic reasons)
-         */
-        $responseTranslator = $this->buildTranslatorWithComments(1);
-        $this->response     = $this->responseAsJson($responseTranslator($moment));
-    }
-
-    /**
      * Delete a single moment.
      *
      * @api   DELETE /learning/evidence/{id}
