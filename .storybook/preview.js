@@ -10,6 +10,7 @@
 import "!style-loader!css-loader!sass-loader!../www/static/css/core/core.scss"; //add in the base styles
 import "../stories/assets/skin.css"; //and then also the default Schoolbox skin
 import "!style-loader!css-loader!sass-loader!../stories/assets/styles/styles.scss"; // add in any other styles we want to use in storybook only
+import "!style-loader!css-loader!sass-loader!../www/static/css/core/sbx-core.scss"; //add in the new advanced UI styles
 import { themes } from "@storybook/theming";
 import DocumentationTemplate from "./DocumentationTemplate.mdx"; // so we can use our own custom documentation template
 import theme from "./theme";
