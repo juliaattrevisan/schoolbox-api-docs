@@ -69,7 +69,7 @@ class Model implements ISoftDeletable
      *
      * I eventually had to conclude that because session_id isn't the primary key, there must be
      * some special requirement to deal with this manually. The identifier column presumably has
-     * a special treatment, but in the openai log table, sesssion_id is not the primary identifier.
+     * a special treatment, but in the openai log table, session_id is not the primary identifier.
      *
      * For that reason you'll have to live with $session->getSessionId() usage instead, for now,
      * and manually obtain the session's contents separately.
