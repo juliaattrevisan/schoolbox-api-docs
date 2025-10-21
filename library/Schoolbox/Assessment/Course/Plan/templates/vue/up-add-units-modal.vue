@@ -29,7 +29,11 @@ window.Vue.onMounted(() => {
     if (urlParams.get("isNewCourse") === "1") {
         addUnitsStore.prompt();
         urlParams.delete("isNewCourse");
-        window.history.replaceState({}, "", `${window.location.pathname}?${urlParams.toString()}`);
+        window.history.replaceState(
+            {},
+            "",
+            `${window.location.pathname}${urlParams.toString().length > 0 ? `?${urlParams.toString()}` : ""}`,
+        ); // remove the param from the URL
     }
 });
 </script>
