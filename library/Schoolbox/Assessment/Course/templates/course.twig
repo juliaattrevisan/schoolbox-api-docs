@@ -59,24 +59,9 @@ Usage:
             reenablePrevious: true,
             onXhrDone: function (data) {
                 if (data.id) {
-                    // Update the Browser URL
-                    history.pushState(data, '', data['urlModifyCourse']);
-
-                    // Update the DOM
-                    $mageCreateUnitButton.attr('formaction', data['urlNewUnit']);
-                    $mageSaveCourseButton.parents('form').attr('action', data['urlModifyCourse']);
+                    // Update the Browser URL - navigation to the Unit planner
+                    window.location.href = `/course/plan/${data.id}`;
                 }
-                // Remove the submit row
-                $mageNextButton.closest('[data-mage-submitrow]').slideUp(400, function () {
-                    $(this).detach();
-                });
-                $mageNextButton.mage('enable');
-
-                // Show the 'New Unit' section
-                $mageCreateUnitButton.closest('[data-mage-collapsed]').slideDown();
-
-                // Display the 'Save Course' section
-                $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
             },
 
             // Reset validation always
