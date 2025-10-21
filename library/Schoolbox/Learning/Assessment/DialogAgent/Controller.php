@@ -13,6 +13,8 @@ namespace Schoolbox\Learning\Assessment\DialogAgent;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
@@ -22,6 +24,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -50,8 +53,8 @@ class Controller extends Assessment\Controller
      * @param Access $access
      * @param Transactor $transactor
      * @param BreadcrumbFactory $bakery
-     * @param Term\Mapper $termMapper
-     * @param Participant\DataSource $participantDataSource
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
      * @param CourseSpecification\Mapper $courseSpecificationMapper
      * @param UnitSpecification\Mapper $unitSpecificationMapper
      * @param RosettaStone $rosettaStone
@@ -60,9 +63,10 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper ,
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
+     * @param EditorTemplateHelper $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -85,6 +89,7 @@ class Controller extends Assessment\Controller
         protected \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
         parent::__construct(
             $userMapper,
@@ -105,6 +110,7 @@ class Controller extends Assessment\Controller
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
             $dialogAgentScenarioMapper,
+            editorTemplateHelper: $editorTemplateHelper
         );
     }
 
@@ -351,6 +357,7 @@ class Controller extends Assessment\Controller
             /* This is only used when creating assessments outside the Course Import workflow.
              */
             'acceptingResponses' => true,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
     }
 
