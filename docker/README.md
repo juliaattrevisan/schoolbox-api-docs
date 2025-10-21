@@ -83,4 +83,10 @@ https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non
 
 ## Troubleshooting
 
-Sometimes
+Sometimes the Docker environment may fail to build as expected. In that case,
+you may wish to clean up the entire environment:
+
+```bash
+docker/down
+docker system prune --all
+```
