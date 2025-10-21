@@ -540,65 +540,6 @@ Usage:
                         </div>
                     {% endif %}
                 </fieldset>
-                <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec %} disabled="disabled"{% endif %}>
-                    <legend>{{ locale.unit.properPlural }}</legend>
-                    {# Don't delete the inline style, it's needed -#}
-                    <div class="small-12 column no-pad"{% if not courseSpec %} style="display:none;"{% endif %} data-mage-collapsed>
-
-                        <ul
-                            {% if courseSpec %}
-                                class="information-list unit-list sortable-card ui-sortable"
-                                data-sortable
-                                data-unit-list
-                                data-action="{{ routeLookup('folder.postFolderSequence', {id: courseSpec.folder.id, folder: courseSpec.folder}) }}"
-                            {% else %}
-                                data-unit-list
-                                class="information-list unit-list"
-                            {% endif %}
-                        >
-                            {% if courseSpec %}
-                            {% for unitSpec in courseSpec.units|sort((a,b) => b.folder.sequence <=> a.folder.sequence) %}
-                                {% if folderAccess[unitSpec.folder.id] > 0 %}
-                                    {% include '@course/unit.twig' with {
-                                        unitSpec:         unitSpec,
-                                        encodedReturnUrl: encodedReturnUrls[unitSpec.id],
-                                        '_expanded':      false,
-                                        '_writable':      folderAccess[unitSpec.folder.id] > 1,
-                                        toastSelector:    '[data-relation="ajax-response"]'
-                                    } only %}
-                                {% endif %}
-                            {% endfor %}
-                            {% endif %}
-                        </ul>
-                        {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
-                        {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
-                            <div data-new-unit>
-                                <div class="list-item">
-                                    <div class="new-unit">
-                                        <label for="newUnitName">{{ locale.unit.proper }} name</label>
-                                        <div class="input-group">
-                                            <input type="text" value="" placeholder="New {{ locale.unit }} name" id="new-unit-name" data-test="course-new-unit-name" name="newUnitName" maxlength="255" />
-                                            <button name="spawn-unit"
-                                                    class="button icon-add"
-                                                    data-test="course-new-unit-add"
-                                                    data-mage-next="spawn-unit"
-                                                    data-mage-working="Working..."
-                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
-                                            >Create {{ locale.unit.proper }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small-12 column">
-                                        {# Don't delete the inline style, it's needed -#}
-                                        <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                    </div>
-                </fieldset>
             </section>
 
             {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
