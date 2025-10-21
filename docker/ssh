@@ -1,4 +1,37 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+
+source "$(dirname "$0")/functions"
+
+# Parse args for:
+# first arg, if not a flag: container to run, defaults to `schoolbox-cli`
+# -u or --user: the username to SSH as
+# --index: if provided, the replica number of the container
+container='schoolbox-cli'
+errors='0'
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --container | -c )
+            container=$2
+            shift # past argument
+            shift # past value
+            ;;
+        *)
+            error "Unrecognised option: '$1'"
+            errors="1"
+            shift # past argument
+            ;;
+    esac
+done
+if [[ $errors == "1" ]]; then
+    exit 1
+fi
 
 # Open a shell in any container, or into schoolbox-cli if not specified
-"$(dirname "$0")/compose" exec -it schoolbox-cli /bin/bash --login
+"$(dirname "$0")/compose" exec "${container}" which /bin/bash > /dev/null
+if [[ $? -eq 0 ]]; then
+    log "Logging in to ${container}, using bash shell:"
+    "$(dirname "$0")/compose" exec "${container}" /bin/bash --login "$@"
+else
+    log "Logging in to ${container}, using sh shell (bash does not exist):"
+    "$(dirname "$0")/compose" exec "${container}" /bin/sh --login "$@"
+fi
