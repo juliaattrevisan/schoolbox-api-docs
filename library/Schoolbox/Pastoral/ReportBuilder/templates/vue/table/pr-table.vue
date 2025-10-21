@@ -133,7 +133,7 @@ function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]):
 // #endregion
 
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, 700);
 
 /**
  * Reset the table load to ensure the correct endpoint is set
