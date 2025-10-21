@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Model;
 /**
  * Class Decorator
  *
- * @package Schoolbox\Learning\Assessment\LessonPlan\Decorator
+ * @package Schoolbox\Learning\Assessment\DialogAgent\Decorator
  */
 class Decorator implements DecoratorInterface
 {
