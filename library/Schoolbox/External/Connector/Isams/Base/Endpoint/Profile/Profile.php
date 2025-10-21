@@ -273,8 +273,8 @@ class Profile implements IStrategy
 
             $this->log->debug(sprintf(
                 'Housemaster %s (%s) discovered.',
-                $tutor['name'],
-                $tutor['id']
+                $housemaster['name'],
+                $housemaster['id']
             ));
 
             /* Find out a staff member via their user code
@@ -283,8 +283,8 @@ class Profile implements IStrategy
 
             $this->log->debug(sprintf(
                 'Form Teacher %s (%s) discovered.',
-                $tutor['name'],
-                $tutor['id']
+                $formTeacher['name'],
+                $formTeacher['id']
             ));
 
             /* Find out a staff member via their user code
@@ -293,8 +293,8 @@ class Profile implements IStrategy
 
             $this->log->debug(sprintf(
                 'Year Level Coordinator %s (%s) discovered.',
-                $tutor['name'],
-                $tutor['id']
+                $yearLevelCoordinator['name'],
+                $yearLevelCoordinator['id']
             ));
 
             /* Add their parents' profile data
@@ -591,7 +591,7 @@ class Profile implements IStrategy
         $staffMember = $node[0];
 
         return [
-            'id' => $id,
+            'id' => trim((string)$staffMember->attributes()[0] ?? $id),
             'name' => trim((string)$staffMember->FullName),
         ];
     }
