@@ -6,6 +6,8 @@ declare SECOND_INSTANCE_ENABLE
 
 source "$(dirname "$0")/functions"
 
+load_config
+
 # Which task daemon compose file is used?
 # A different one is used when using a locally built container, vs. using
 # one pulled from the private container registry.
