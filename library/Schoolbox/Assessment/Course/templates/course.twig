@@ -31,15 +31,6 @@ Usage:
         function initValidator(modifyValidation) {
             $("#update-course-form").alaressValidate(modifyValidation);
 
-            $('[data-unit-name]').each(function() {
-                $(this).rules('add', {
-                    requiredNotBlank: true,
-                    messages: {
-                        required: "Please enter a name for this {{ locale.unit }}."
-                    }
-                });
-            });
-
             {# This validation was triggering even though it was okay to be empty
              # That condition exists when you want to save the course without
              # creating a new unit; as usual, solve the problem by deleting the problem
