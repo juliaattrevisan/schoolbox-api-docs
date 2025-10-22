@@ -36,13 +36,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @var string
      */
-    private string $internalColumnName = 'box_id';
+    private string $internalColumnName = 'dialog_agent_id';
 
 
     /**
      * @var string
      */
-    private string $selectString = 'SELECT id FROM submission_box';
+    private string $selectString = 'SELECT id FROM dialog_agent_response';
 
 
     /**
