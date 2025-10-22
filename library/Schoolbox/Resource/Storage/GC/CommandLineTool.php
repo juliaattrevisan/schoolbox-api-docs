@@ -14,8 +14,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
 
 /**
  * Command-line tool for Schoolbox's garbage collector.
@@ -278,7 +276,7 @@ HELP;
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
-            ->addCheck(new Check\HashIndexedTextField($db, $logger, SQL_db, $mapper->getTable()))
+            ->addCheck(new Check\HashIndexedTextField($db, $logger, SQL_db, $mapper->getTable(), $lock, self::LOCK_TTL))
         ;
 
         // Purge, throwing a lock exception if not held
