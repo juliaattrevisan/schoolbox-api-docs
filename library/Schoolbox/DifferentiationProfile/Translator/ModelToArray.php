@@ -6,6 +6,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\DifferentiationProfile\Model;
+use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 
 class ModelToArray
 {
@@ -14,6 +15,7 @@ class ModelToArray
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
+        private UserTranslator $userTranslator,
     ) {
     }
 
@@ -21,10 +23,7 @@ class ModelToArray
     {
         return [
             'id'          => $model->getId(),
-            'student'     => [
-                'id' => $model->getStudent()->getId(),
-                'name' => $model->getStudent()->getFullName(),
-            ],
+            'student'     => call_user_func($this->userTranslator, $model->getStudent()),
             'adjustment_category'    => $model->getAdjustmentCategory(),
             'adjustment_level'       => $model->getAdjustmentLevel(),
             'overview'               => $model->getOverview(),

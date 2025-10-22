@@ -23,7 +23,7 @@
             <tbody>
             {% for profile in profiles %}
                 <tr>
-                    <td>{{ profile.student.name }}</td>
+                    <td>{{ profile.student.fullName }}</td>
                     {# This will need to follow the same order as the header #}
                     <td>
                         <label for="adjustment-categories">
