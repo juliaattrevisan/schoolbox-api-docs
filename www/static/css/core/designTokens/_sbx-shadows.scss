@@ -1,0 +1,9 @@
+/**
+* SBX Shadows Design Tokens
+* All shadows used throughout Schoolbox are to be defined here.
+*/
+:root {
+    --sbx-shadow-s: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sbx-shadow-m: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --sbx-shadow-l: 0 8px 16px rgba(0, 0, 0, 0.2);
+}

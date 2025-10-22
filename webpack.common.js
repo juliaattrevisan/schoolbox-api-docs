@@ -268,6 +268,7 @@ module.exports = {
 
         //Sass (leave at the bottom)
         core: "./www/static/css/core/core.scss",
+        "sbx-core": "./www/static/css/core/sbx-core.scss",
         schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
         learnosity: "./www/static/css/learnosity/learnosity.scss",
     },

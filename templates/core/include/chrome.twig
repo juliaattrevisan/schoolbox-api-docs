@@ -190,7 +190,7 @@
     {% endif %}
     {{ scripts.header | raw }}
 </head>
-<body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
+<body class="{{ ws.enabled ? '' : 'disableNotifications' }} {{ config.advanced_ui_enabled ? 'sbx-body' : '' }}">
 <div id="toast-container">
     <sbx-toast />
 </div>
