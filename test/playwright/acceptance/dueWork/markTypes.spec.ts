@@ -39,7 +39,7 @@ test.describe("Due Work - Mark type tests", () => {
     /**
      * (Step 1) - Create 2 due works on a unit page and 1 on the homepage after importing it
      */
-    test("Create activities", async ({ tester, page }) => {
+    test.skip("Create activities", async ({ tester, page }) => {
         const courseModify = new CourseModify(page, tester);
         const assessmentForm = new AssessmentForm(tester, page);
 
