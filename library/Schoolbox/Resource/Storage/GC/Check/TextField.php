@@ -32,7 +32,9 @@ class TextField extends Base
                c.COLUMN_NAME AS `column`,
                t.DATA_LENGTH AS `search_data_length`
         FROM information_schema.COLUMNS c
-        INNER JOIN information_schema.TABLES t ON c.TABLE_NAME = t.TABLE_NAME
+        INNER JOIN information_schema.TABLES t
+            ON  c.TABLE_SCHEMA = t.TABLE_SCHEMA
+            AND c.TABLE_NAME   = t.TABLE_NAME
         WHERE c.TABLE_SCHEMA = :schema
         AND   INSTR(c.DATA_TYPE, 'text')
         AND   t.TABLE_TYPE = 'BASE TABLE'
