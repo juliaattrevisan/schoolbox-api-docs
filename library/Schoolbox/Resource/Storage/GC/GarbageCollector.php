@@ -310,18 +310,23 @@ class GarbageCollector
      */
     private function removeFromStorage(string $hash): void
     {
-        $storageObject = $this->mapper->findByHash($hash);
+        $storageObject         = $this->mapper->findByHash($hash);
+        $storageTransformSizes = $this->transformMapper->findScalarByPredicates(
+            'size',
+            $this->transformMapper->getPredicateBuilder()->equals('hash', $hash)
+        );
         if ($this->perform) {
             $this->mapper->hardDelete($storageObject);
-            $message = "Deleted %s (size: %s)";
+            $message = "Deleted %s (size: %s, transforms: %s)";
         } else {
-            $message = "Would have deleted %s (size: %s)";
+            $message = "Would have deleted %s (size: %s, transforms: %s)";
         }
         $this->log->debug(
             sprintf(
                 $message,
                 $hash,
                 Alaress_Byte_Format::bytesToString($storageObject->getSize(), renderIec: true),
+                Alaress_Byte_Format::bytesToString(array_sum($storageTransformSizes), renderIec: true),
             )
         );
     }
