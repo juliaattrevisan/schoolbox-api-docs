@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\GC\Check;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress_Byte_Format;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -163,7 +164,16 @@ class PreComputedTextField implements Check
                 $this->logger->debug(sprintf('Skipping empty table: %s...', $table));
                 continue;
             }
-            $this->logger->debug(sprintf('Building hash index for %d rows in table: %s...', $count, $table));
+            $this->logger->debug(
+                sprintf(
+                    'Building hash index for %d rows in table: %s (size: %s)...',
+                    $count,
+                    $table,
+                    isset($columnData['extra']['search_data_length'])
+                        ? Alaress_Byte_Format::bytesToString($columnData['extra']['search_data_length'], renderIec: true)
+                        : 'unknown',
+                )
+            );
             $columns = [];
             foreach ($columnsData as $columnData) {
                 foreach ($columnData['columns'] as $column) {
