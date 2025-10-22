@@ -79,7 +79,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
             $this->getMapperFactory()->get(AdjustmentLevelsMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DifferentiationProfiles\Mapper::class),
-            new AdminConfigModelToArray (
+            new AdminConfigModelToArray(
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
             ),
