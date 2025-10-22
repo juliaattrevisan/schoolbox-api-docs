@@ -423,8 +423,8 @@ class Validation
     }
 
     /**
-     * Validates whether a booking for this resource conflicts with any
-     * bookings that already exist.
+     * Validates whether a booking for this resource clashes with any bookings that already exist.
+     * Note clashes include ERROR_CONFLICT and ERROR_TIMETABLED_CLASS errors.
      *
      * @param Item\Model $resource
      * @param DateTime   $startDate
