@@ -228,6 +228,10 @@ class HashIndexedTextField implements Check
                     FROM {$this->db->getQuoter()->quoteIdentifier($table)}
                     WHERE {$this->db->getQuoter()->quoteIdentifier($column)} IS NOT NULL
                 ");
+
+                // Refresh lock for an extended period before running the query:
+                // who knows how long it could take?
+                $this->lock->refresh($this->lockTtl * 10);
                 $query->execute();
                 $columnHashes = [];
                 foreach ($query as $row) {
