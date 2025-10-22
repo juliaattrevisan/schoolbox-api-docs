@@ -736,7 +736,7 @@ class Validation
      * @param array<string, array<string, array<string>>> $errorsByKey Assumed to come from this class.
      * @return bool
      */
-    public static function validationErrorsAreAllClashes(array $errorsByKey): bool
+    public function validationErrorsAreAllClashes(array $errorsByKey): bool
     {
         if (count($errorsByKey) === 0) {
             throw new InvalidArgumentException('No errors, so this function should not have been called.');
