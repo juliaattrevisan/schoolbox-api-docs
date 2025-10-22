@@ -258,7 +258,14 @@ class Controller extends Assessment\Controller
 
         /* Decide if this $student can create a response to this learning activity
          */
-        $assessment->assertCanRespond($participant);
+        $canRespond = false;
+
+        try {
+            $assessment->assertCanRespond($participant);
+            $canRespond = true;
+        } catch (\DomainException $e) {
+            // noop
+        }
 
         /* The total time spent in this learning activity must not exceed the total allowed duration,
          * if set; not sure how we're gonna calculate that atm
@@ -273,8 +280,10 @@ class Controller extends Assessment\Controller
             'assessment'        => $assessment,
             'student'           => $student,
             'returnUrl'         => $returnUrl,
+            'returnUrlEncoded'  => Redirect::encode($returnUrl),
             'courseAssessments' => $courseAssessments,
             'participant'       => $participant,
+            'canRespond'        => $canRespond,
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",

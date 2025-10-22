@@ -6,7 +6,8 @@
  # @param Participant $participant        A participant instance for $student, if extant
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param array $lastViews                A struct that tells you when people last viewed this screen
- # @param string $returnUrl               An encoded destination so you can go back there
+ # @param string $returnUrl               A redirect destination
+ # @param string $returnUrlEncoded        An encoded redirect destination so you can go back there
  # @param array $courseAssessments        A struct containing a set of assessments grouped by their units
  # @param bool $isInstructor              Whether the currently logged in guy is an instructor
  #}
@@ -62,5 +63,8 @@
 }) %}
 
 {% if submitRoute %}
-button
+    <a class="submit button"
+        href="{{ submitRoute }}{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}"
+        data-test="assessment-summary-create-button"
+    >Start {{ locale.dialogAgent }}</a>
 {% endif %}
