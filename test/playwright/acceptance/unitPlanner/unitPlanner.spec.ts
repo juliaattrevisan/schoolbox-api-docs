@@ -217,9 +217,9 @@ test.describe("Unit Planner Tests", () => {
             await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
         } finally {
             tester.isGoingTo("delete the units and course created");
-            await unitPlanner.dbDeleteUnit(db, firstUnitName);
-            await unitPlanner.dbDeleteUnit(db, secondUnitName);
-            await unitPlanner.dbDeleteCourse(db, courseName);
+            await UnitPlanner.dbDeleteUnit(db, firstUnitName);
+            await UnitPlanner.dbDeleteUnit(db, secondUnitName);
+            await UnitPlanner.dbDeleteCourse(db, courseName);
         }
     });
 
@@ -300,7 +300,7 @@ test.describe("Unit Planner Tests", () => {
             await unitPlanner.createUnitsInModal([firstUnitName]);
         } finally {
             tester.isGoingTo("delete the unit created");
-            await unitPlanner.dbDeleteUnit(db, firstUnitName);
+            await UnitPlanner.dbDeleteUnit(db, firstUnitName);
         }
     });
 

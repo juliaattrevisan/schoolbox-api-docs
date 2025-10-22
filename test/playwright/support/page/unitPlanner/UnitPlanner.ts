@@ -244,6 +244,7 @@ export default class UnitPlanner {
 
     /**
      * Click the confirm delete node button
+     * @param folderId - The ID of the folder
      */
     async clickConfirmDeleteNodeButton(folderId: number): Promise<void> {
         await this.page
@@ -254,7 +255,7 @@ export default class UnitPlanner {
 
     /**
      * Click the confirm delete node button
-     * @param folderId - The ID of the folder
+     * @param tabName - The name of the tab
      */
     async clickUnitPlannerTabs(tabName: string): Promise<void> {
         await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_TABS.replace("{tabName}", tabName)).click();
@@ -305,7 +306,7 @@ export default class UnitPlanner {
      * @param db - The database helper
      * @param unitName - The name of the unit to delete
      */
-    async dbDeleteUnit(db: DatabaseHelper, unitName: string): Promise<void> {
+    static async dbDeleteUnit(db: DatabaseHelper, unitName: string): Promise<void> {
         const folderId = (await db.grabFromDatabase("folder", "id", {
             name: unitName,
         })) as number | null;
@@ -322,7 +323,7 @@ export default class UnitPlanner {
      * @param db - The database helper
      * @param courseName - The name of the course to delete
      */
-    async dbDeleteCourse(db: DatabaseHelper, courseName: string): Promise<void> {
+    static async dbDeleteCourse(db: DatabaseHelper, courseName: string): Promise<void> {
         const folderId = (await db.grabFromDatabase("folder", "id", {
             name: courseName,
         })) as number | null;
