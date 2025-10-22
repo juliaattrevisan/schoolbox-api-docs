@@ -76,7 +76,8 @@ up the Vagrant development environment.
   useful for when an image definition has changed
 - `down -v` removes volumes (e.g. database data) when stopping containers:
   useful for when testing a new database version
-- `logs rabbitmq` shows logs for the RabbitMQ container only
+- `logs rabbitmq -f` shows logs for the RabbitMQ container only, and follows
+  log output
 
 See the documentation for the `docker compose` commands for more information:
 - [up](https://docs.docker.com/reference/cli/docker/compose/up/)
@@ -88,10 +89,18 @@ https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non
 
 ## Troubleshooting
 
-Sometimes the Docker environment may fail to build as expected. In that case,
-you may wish to clean up the entire environment:
+`docker/logs` will show the logs for all containers within the Docker
+environment: remember it's possible to filter logs to a single container by
+providing the container name.
 
+If the environment gets into a bad state, it can be rebuilt like so:
 ```bash
-docker/down
-docker system prune --all
+# -v removes volumes, including database data
+docker/down -v
+
+# remove all stopped containers
+docker system prune
+
+# restart and rebuild containers
+docker/up --build
 ```
