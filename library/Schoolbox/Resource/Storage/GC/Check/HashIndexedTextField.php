@@ -223,6 +223,7 @@ class HashIndexedTextField implements Check
             foreach ($columns as $column) {
                 $this->logger->debug(sprintf('. building hash index for column: %s...', $column));
                 $query = $this->db->prepareQuery("
+                    SET STATEMENT max_statement_time = 0 FOR
                     SELECT {$this->db->getQuoter()->quoteIdentifier($column)} c
                     FROM {$this->db->getQuoter()->quoteIdentifier($table)}
                     WHERE {$this->db->getQuoter()->quoteIdentifier($column)} IS NOT NULL
