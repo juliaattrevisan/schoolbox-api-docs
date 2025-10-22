@@ -211,7 +211,7 @@ class Controller extends Base
         );
         $errors = $validation->validateBookingFromPostData($item, $this->requestPost, null);
 
-        // If clashes are allowed on the booking, and the only validation errors are clash errors...
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
         $clashBookingStartDatesAsKeys = [];
         if (
             count($errors) > 0 && $item->getAllowClashBookings() &&
@@ -339,7 +339,7 @@ class Controller extends Base
         $itemResource = $item->getResource();
         $errors = $validation->validateBookingFromPostData($itemResource, $this->requestPost, $item);
 
-        // If clashes are allowed on the booking, and the only validation errors are clash errors...
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
         $clashBookingStartDatesAsKeys = [];
         if (
             count($errors) > 0 && $itemResource->getAllowClashBookings() &&
