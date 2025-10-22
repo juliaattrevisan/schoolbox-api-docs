@@ -123,7 +123,9 @@ class PreComputedTextField implements Check
             $this->logger->info('Reusing hash index from previous run');
         } else {
             $this->logger->info('Building hash index: this may take a while...');
+            $time = microtime(true);
             $this->hashIndex ??= $this->buildHashIndex();
+            $this->logger->info(sprintf('. hash index built in %0.3fs', microtime(true) - $time));
         }
 
         $staleCount = count($stale);
@@ -134,7 +136,7 @@ class PreComputedTextField implements Check
         $newStaleCount = count($newStale);
         $this->logger->info(
             sprintf(
-                '.. %d of %d non-stale hashes found: %d remaining',
+                '. %d of %d non-stale hashes found: %d remaining',
                 ($staleCount - $newStaleCount),
                 $staleCount,
                 $newStaleCount,
@@ -149,7 +151,7 @@ class PreComputedTextField implements Check
         $tableColumnList = $this->buildTableColumnList();
         foreach ($tableColumnList as $table => $columnsData) {
             if (str_starts_with($table, '_')) {
-                $this->logger->info(sprintf('Skipping deprecated table: %s', $table));
+                $this->logger->debug(sprintf('Skipping deprecated table: %s', $table));
                 continue;
             }
 
@@ -158,15 +160,15 @@ class PreComputedTextField implements Check
             );
             $count = (int)$countQuery->fetchColumn();
             if ($count <= 0) {
-                $this->logger->info(sprintf('Skipping empty table: %s...', $table));
+                $this->logger->debug(sprintf('Skipping empty table: %s...', $table));
                 continue;
             }
-            $this->logger->info(sprintf('Building hash index for %d rows in table: %s...', $count, $table));
+            $this->logger->debug(sprintf('Building hash index for %d rows in table: %s...', $count, $table));
             $columns = [];
             foreach ($columnsData as $columnData) {
                 foreach ($columnData['columns'] as $column) {
                     if (str_starts_with($column, '_')) {
-                        $this->logger->info(sprintf('. skipping deprecated column: %s', $column));
+                        $this->logger->debug(sprintf('. skipping deprecated column: %s', $column));
                         continue;
                     }
                     $columns[] = $column;
@@ -174,13 +176,13 @@ class PreComputedTextField implements Check
             }
 
             if (empty($columns)) {
-                $this->logger->info(sprintf('Skipping table with no text columns: %s...', $table));
+                $this->logger->debug(sprintf('. skipping table with no text columns: %s...', $table));
                 continue;
             }
 
             // Now, build the hash index for all columns
             foreach ($columns as $column) {
-                $this->logger->info(sprintf('.. building hash index for column: %s...', $column));
+                $this->logger->debug(sprintf('. building hash index for column: %s...', $column));
                 $query = $this->db->prepareQuery("
                     SELECT {$this->db->getQuoter()->quoteIdentifier($column)} c
                     FROM {$this->db->getQuoter()->quoteIdentifier($table)}
@@ -196,7 +198,7 @@ class PreComputedTextField implements Check
                         }
                     }
                 }
-                $this->logger->info(sprintf('.... %d hashes found', count($columnHashes)));
+                $this->logger->debug(sprintf('.. %d hashes found', count($columnHashes)));
                 $hashIndex += $columnHashes;
             }
         }
