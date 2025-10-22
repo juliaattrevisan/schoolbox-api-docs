@@ -27,6 +27,7 @@ use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -284,6 +285,10 @@ class Controller extends Assessment\Controller
             'courseAssessments' => $courseAssessments,
             'participant'       => $participant,
             'canRespond'        => $canRespond,
+            /* The full history of interactions for this dialog agent
+             * Note that we won't have feedbacks in this
+             */
+            'timeline' => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",

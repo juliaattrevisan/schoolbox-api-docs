@@ -1,0 +1,69 @@
+{##
+ # Dialog Agent History
+ #
+ # Provides a reverse-chronological list of interactions made by learners and instructors.
+ # Also provides the ability to decide an authoritative response via a deeper fragment.
+ #
+ # @param \Schoolbox\Collection $timeline  A potentially mixed stack of Responses and Feedbacks (but we don't use feedbacks in this learning activity)
+ #}
+{% if timeline and timeline|length %}
+    {% import '@learning/macro/urgency.twig' as urgency %}
+
+    <script type="text/javascript">
+        $(function() {
+            let $history = $('[data-discussion-history]');
+
+            $history.find('[data-collapser]').collapsable();
+
+            $history.on('click', '[data-delete]', function (e) {
+                e.preventDefault();
+
+                $(this).confirmDialog({
+                    header: 'Delete Interaction',
+                    format: 'html',
+                    text: 'Are you sure you want to delete this interaction? Anything attached to it will also be deleted.',
+                    confirmLabel: 'Delete',
+                    confirmEvent: function () {
+                        {# A toast #}
+                        let $toast = $('[data-alert]');
+                        $toast.toastActivate({text: 'Deleting interaction...'});
+
+                        $.ajax($(this).data('delete'), {
+                            dataType: 'json',
+                            type: 'DELETE'
+                        })
+                        .done(function () {
+                            {# successful: reload the page to show the changed content -#}
+                            window.location.reload();
+                        })
+                        .fail(function () {
+                            {# i'll drink to that! -#}
+                            $toast.toastTimeout({
+                                text: 'Could not delete this interaction',
+                                css: 'pop alert'
+                            });
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">{{ locale.dialogAgent.proper }} History</h2>
+                {% for currentInteraction in timeline %}
+                    <section class="discussion-history" data-discussion-history data-test="assessment-discussion-history">
+                        {# There aren't supposed to be any Feedbacks in this stack #}
+                        {% if currentInteraction is response %}
+                            {% include '@learningAssessment/dialogAgent/summary/interaction/response.twig' with {
+                                currentInteraction: currentInteraction,
+                                participant: participant,
+                            } %}
+                        {% endif %}
+                    </section>
+                {% endfor %}
+            <div class="toast" data-alert></div>
+        </div>
+    </div>
+{% endif %}
