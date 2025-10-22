@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @author    Andy Ryan <andy.ryan@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
