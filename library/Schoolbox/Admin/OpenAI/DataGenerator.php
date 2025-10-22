@@ -9,12 +9,10 @@ namespace Schoolbox\Admin\OpenAI;
 
 use Alaress\Web\Output\DataGenerator\IDataGenerator;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 
 class DataGenerator implements IDataGenerator
 {
     public function __construct(
-        private IConfigLoader $config,
         private ConfigMapper $configMapper
     ) {
     }
@@ -29,8 +27,6 @@ class DataGenerator implements IDataGenerator
     public function generate(?array $chromeData = []): array
     {
         // returns each feature / module for ai, its creds, and if its enabled
-        $textProvider = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
-        $aiConfig = new Config();
-        return $aiConfig->fetchFeatures($this->configMapper);
+        return new Config()->fetchFeatures($this->configMapper);
     }
 }
