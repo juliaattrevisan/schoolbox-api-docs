@@ -278,7 +278,7 @@ HELP;
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
-            ->addCheck(new Check\PreComputedTextField($db, $logger, SQL_db, $mapper->getTable()))
+            ->addCheck(new Check\HashIndexedTextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
         // Purge, throwing a lock exception if not held

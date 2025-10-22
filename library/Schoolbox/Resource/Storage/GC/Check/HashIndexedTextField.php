@@ -14,9 +14,25 @@ use Alaress_Byte_Format;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class PreComputedTextField
+ * Check for whether the storage hash is contained within any `TEXT`, `CHAR` or
+ * `VARCHAR` field, with sensible exclusions:
+ * * the `storage` and `storage_transform` tables themselves
+ * * fields which already have a foreign key relation to `storage`
+ *   (these are processed by `ForeignKeyRelation`)
+ * * ephemeral tables (e.g. `search_index`)
+ *
+ * This uses a new method for finding stale hashes:
+ * * on init, this searches through all text column field values, and extracts
+ *   hashes out of them: this then builds an index of hashes found
+ *   * this process is slow as it must process all data, but only needs to run
+ *     once during the whole process
+ * * the stale hash check then needs to only cross-reference its hashes against
+ *   the hashes in use
+ *
+ * This should work around the slow query issue in `TextField`: it ran a
+ * `SELECT` statement for every hash * every text column.
  */
-class PreComputedTextField implements Check
+class HashIndexedTextField implements Check
 {
     /**
      * Query for finding text fields to search through.
