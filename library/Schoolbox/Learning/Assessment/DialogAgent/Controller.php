@@ -255,6 +255,8 @@ class Controller extends Assessment\Controller
             }
         }
 
+        $participant = $assessment->getParticipantIfExtant($student);
+
         $twigData = [
             'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
@@ -262,6 +264,7 @@ class Controller extends Assessment\Controller
             'student'           => $student,
             'returnUrl'         => $returnUrl,
             'courseAssessments' => $courseAssessments,
+            'participant'       => $participant,
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
