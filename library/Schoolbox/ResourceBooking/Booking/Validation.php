@@ -255,7 +255,7 @@ class Validation
 
                 $errors = array_merge_recursive(
                     $errors,
-                    $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
+                    $this->validateForClashes($thisResource, $thisStart, $thisEnd)
                 );
             }
         } else {
@@ -282,7 +282,7 @@ class Validation
 
                 $errors = array_merge_recursive(
                     $errors,
-                    $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
+                    $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking)
                 );
             }
         }
@@ -302,7 +302,7 @@ class Validation
     {
         switch ($status) {
             case Status\Model::STATUS_APPROVED:
-                return $this->validateForConflicts(
+                return $this->validateForClashes(
                     $booking->getResource(),
                     $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
                     $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
@@ -434,12 +434,12 @@ class Validation
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function validateForConflicts(
+    public function validateForClashes(
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
         ?Model $existingBooking = null
-    ) {
+    ): array {
         $errors = [];
 
         // Only check approved bookings. Wow, the calendar population method
@@ -731,18 +731,22 @@ class Validation
 
 
     /**
-     * Return true if the given array is non-empty, and all values are Validation::ERROR_CONFLICT.
+     * Return true if the given array is non-empty, and all values are either ERROR_CONFLICT or ERROR_TIMETABLED_CLASS.
+     * @see validateForClashes()
      * @param array<string, array<string, array<string>>> $errorsByKey Assumed to come from this class.
      * @return bool
      */
-    public static function validationErrorsAreAllConflicts(array $errorsByKey): bool
+    public static function validationErrorsAreAllClashes(array $errorsByKey): bool
     {
         if (count($errorsByKey) === 0) {
             throw new InvalidArgumentException('No errors, so this function should not have been called.');
         }
         foreach ($errorsByKey as $keyIgnored => $errorTypesByDateString) {
             foreach ($errorTypesByDateString as $dateStringIgnored => $errorTypes) {
-                if (array_any($errorTypes, static fn($errorType) => $errorType !== self::ERROR_CONFLICT)) {
+                if (
+                    array_any($errorTypes, static fn ($errorType) =>
+                    !in_array($errorType, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true))
+                ) {
                     return false;
                 }
             }

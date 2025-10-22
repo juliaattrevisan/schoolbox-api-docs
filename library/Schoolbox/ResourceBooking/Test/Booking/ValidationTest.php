@@ -352,7 +352,7 @@ class ValidationTest extends TestCase
         $resource = new Item\Model();
         $resource->setId(123);
 
-        $errors = $validation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+        $errors = $validation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
         $this->assertCount($expected, $errors);
     }
 
@@ -494,7 +494,7 @@ class ValidationTest extends TestCase
         $resource->setRoomCode($roomCode);
 
         /** @var Validation $mockValidation */
-        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+        $errors = $mockValidation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
 
         $this->assertCount($expected, $errors);
     }
@@ -690,7 +690,7 @@ class ValidationTest extends TestCase
         $resource->setId(123);
 
         /** @var Validation $mockValidation */
-        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $existingBooking);
+        $errors = $mockValidation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate), $existingBooking);
 
         $this->assertCount($expected, $errors);
     }

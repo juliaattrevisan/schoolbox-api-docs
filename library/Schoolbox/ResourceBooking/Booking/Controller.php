@@ -215,7 +215,7 @@ class Controller extends Base
         $clashBookingStartDatesAsKeys = [];
         if (
             count($errors) > 0 && $item->getAllowClashBookings() &&
-            Validation::validationErrorsAreAllConflicts($errors)
+            Validation::validationErrorsAreAllClashes($errors)
         ) {
             // Remember the start dates of clash bookings.
             // Note clash errors always use the START_DATETIME key (see Validation->validateForConflicts()).
@@ -343,7 +343,7 @@ class Controller extends Base
         $clashBookingStartDatesAsKeys = [];
         if (
             count($errors) > 0 && $itemResource->getAllowClashBookings() &&
-            Validation::validationErrorsAreAllConflicts($errors)
+            Validation::validationErrorsAreAllClashes($errors)
         ) {
             // Remember the start dates of clash bookings.
             // Note clash errors always use the START_DATETIME key (see Validation->validateForConflicts()).
