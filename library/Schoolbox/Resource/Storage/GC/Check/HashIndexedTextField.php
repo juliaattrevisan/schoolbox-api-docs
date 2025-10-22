@@ -156,7 +156,7 @@ class HashIndexedTextField implements Check
         $staleCount = count($stale);
         $newStale   = array_filter(
             $stale,
-            fn ($hash) => !isset($this->hashIndex[$hash]),
+            fn ($hash) => !isset($this->hashIndex[strtolower($hash)]),
         );
         $newStaleCount = count($newStale);
         $this->logger->info(
@@ -239,7 +239,7 @@ class HashIndexedTextField implements Check
                     $value = $row['c'];
                     if (preg_match_all(self::HASH_REGEXP, $value, $matches)) {
                         foreach ($matches[0] as $match) {
-                            $columnHashes[$match] = true;
+                            $columnHashes[strtolower($match)] = true;
                         }
                     }
                 }
