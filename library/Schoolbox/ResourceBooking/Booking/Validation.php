@@ -345,8 +345,8 @@ class Validation
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-            $startDateTimeKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::START_DATETIME][$startDateTimeKey][] = self::ERROR_IN_PAST;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
