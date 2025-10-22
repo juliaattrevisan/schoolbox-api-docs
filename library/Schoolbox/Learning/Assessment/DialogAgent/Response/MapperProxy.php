@@ -102,16 +102,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function transformModels(Collection $mapperModels)
     {
-        $stack = new GenericCollection(DomainObject::class);
-
-        /* Endure this somewhat annoying process of converting a Collection into a GenericCollection
-         * Surely there's an easier way
-         */
-        foreach ($mapperModels as $item) {
-            $stack->add($item);
-        }
-
-        return $stack;
+        return new GenericCollection(DomainObject::class, $mapperModels->getAll());
     }
 
 
@@ -126,12 +117,6 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        $stack = $this->getMapper()->createCollection();
-
-        foreach ($domainObjects as $domainObject) {
-            $stack->add($domainObject);
-        }
-
-        return $stack;
+        return $this->getMapper()->createCollection($domainObjects->getAll());
     }
 }
