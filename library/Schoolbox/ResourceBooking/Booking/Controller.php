@@ -160,8 +160,8 @@ class Controller extends Base
                 'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                 'currentTerm'       => $this->getTermMapper()->findForToday(),
                 'validationData'    => [
-                                        'start' => Validation::START_DATETIME,
-                                        'end' => Validation::END_DATETIME,
+                                        'start' => Validation::START_PERIOD_ERRORS,
+                                        'end' => Validation::END_PERIOD_ERRORS,
                                         ],
                 'validationErrors'  => [
                                         'invalid' => Validation::ERROR_INVALID,
@@ -219,7 +219,7 @@ class Controller extends Base
         ) {
             // Remember the start dates of clash bookings.
             // Note clash errors always use the START_DATETIME key (see Validation->validateForConflicts()).
-            foreach ($errors[Validation::START_DATETIME] as $startDate => $errors) {
+            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
             // Ignore errors since all were clashes and clashes are allowed.
@@ -347,7 +347,7 @@ class Controller extends Base
         ) {
             // Remember the start dates of clash bookings.
             // Note clash errors always use the START_DATETIME key (see Validation->validateForConflicts()).
-            foreach ($errors[Validation::START_DATETIME] as $startDate => $errors) {
+            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
             // Ignore errors since all were clashes and clashes are allowed.
@@ -815,8 +815,8 @@ class Controller extends Base
                 'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                 'currentTerm'       => $this->getTermMapper()->findForToday(),
                 'validationData'    => [
-                    'start' => Validation::START_DATETIME,
-                    'end' => Validation::END_DATETIME,
+                    'start' => Validation::START_PERIOD_ERRORS,
+                    'end' => Validation::END_PERIOD_ERRORS,
                 ],
                 'validationErrors'  => [
                     'invalid' => Validation::ERROR_INVALID,

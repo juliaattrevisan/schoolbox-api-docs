@@ -39,8 +39,8 @@ use Calendar_Api_Config_Mapper;
  */
 class Validation
 {
-    const START_DATETIME = 'start_datetime';
-    const END_DATETIME = 'end_datetime';
+    const string START_PERIOD_ERRORS = 'start_period_errors'; // A key for errors pertaining to the start of the booking period.
+    const string END_PERIOD_ERRORS = 'end_period_errors'; // A key for errors pertaining to the end of the booking period.
     const ERROR_INVALID = 'invalid';
     const ERROR_BEFORE_START = 'before_start';
     const ERROR_IN_PAST = 'in_past';
@@ -180,13 +180,13 @@ class Validation
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors[self::START_DATETIME][self::ERROR_INVALID][] = self::ERROR_INVALID;
+            $errors[self::START_PERIOD_ERRORS][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
         try {
             $endDate = Alaress_Date_Format::newLocal($postData['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors[self::END_DATETIME][self::ERROR_INVALID][] = self::ERROR_INVALID;
+            $errors[self::END_PERIOD_ERRORS][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
         // Having a power to override doesn't make you a God. Start comes always before End.
@@ -326,7 +326,7 @@ class Validation
 
         if ($startDate > $endDate) {
             $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_BEFORE_START;
+            $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_BEFORE_START;
         }
 
         return $errors;
@@ -346,7 +346,7 @@ class Validation
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
             $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_IN_PAST;
+            $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
@@ -367,7 +367,7 @@ class Validation
 
         if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
             $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_TOO_EARLY;
+            $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_TOO_EARLY;
         }
 
         return $errors;
@@ -391,7 +391,7 @@ class Validation
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
             $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_TOO_SHORT;
+            $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_TOO_SHORT;
         }
 
         return $errors;
@@ -415,7 +415,7 @@ class Validation
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
                 $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_TOO_LONG;
+                $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_TOO_LONG;
             }
         }
 
@@ -486,7 +486,7 @@ class Validation
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
             $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_CONFLICT;
+            $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_CONFLICT;
         } elseif (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
@@ -497,7 +497,7 @@ class Validation
 
             if (count($roomEvents)) {
                 $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_TIMETABLED_CLASS;
+                $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_TIMETABLED_CLASS;
             }
         }
 
@@ -518,7 +518,7 @@ class Validation
         $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
             $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_CURRENT_TERM;
+            $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_CURRENT_TERM;
         }
 
         return $errors;
