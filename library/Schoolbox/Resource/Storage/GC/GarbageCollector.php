@@ -7,12 +7,14 @@
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use Alaress_Byte_Format;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException as FlysystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
@@ -42,23 +44,31 @@ class GarbageCollector
     private array $list;
 
     /**
+     * Running file size total of files which were cleaned up.
+     */
+    private int $fileSizeTotal = 0;
+
+    /**
      * Constructor
      *
-     * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
-     * @param LoggerInterface          $log           Logger
-     * @param bool                     $perform       If true, actually delete storage records and update the last
+     * @param StorageMapper          $mapper          Storage mapper: used for fetching and deleting records.
+     * @param StorageTransformMapper $transformMapper Storage transform mapper: used for fetching transforms, for
+     *                                                accurate size reporting.
+     * @param LoggerInterface        $log             Logger
+     * @param bool                   $perform         If true, actually delete storage records and update the last
      *                                                processed time: otherwise, only output what would've been deleted.
-     * @param int                      $batchSize     The maximum number of results to process per batch.
-     * @param LockInterface            $lock          Process lock: periodically refreshed during the garbage collection
+     * @param int                    $batchSize       The maximum number of results to process per batch.
+     * @param LockInterface          $lock            Process lock: periodically refreshed during the garbage collection
      *                                                process.
-     * @param int                      $lockTtl       Amount of time to refresh the lock for, each time it's refreshed.
-     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
-     * @param int|null                 $maxTime       Maximum amount of time to run for, in seconds: null if no limit.
-     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
+     * @param int                    $lockTtl         Amount of time to refresh the lock for, each time it's refreshed.
+     * @param int|null               $limit           Maximum number of storage records to process: null if no limit.
+     * @param int|null               $maxTime         Maximum amount of time to run for, in seconds: null if no limit.
+     * @param ?Alaress_Date_Format   $thresholdDate   Do not process any storage records which were last processed more
      *                                                recently than this date.
      */
     public function __construct(
         private StorageMapper $mapper,
+        private StorageTransformMapper $transformMapper,
         private LoggerInterface $log,
         private bool $perform,
         private int $batchSize,
@@ -300,11 +310,19 @@ class GarbageCollector
      */
     private function removeFromStorage(string $hash): void
     {
+        $storageObject = $this->mapper->findByHash($hash);
         if ($this->perform) {
-            $this->mapper->hardDelete($this->mapper->findByHash($hash));
-            $this->log->debug("Deleted $hash");
+            $this->mapper->hardDelete($storageObject);
+            $message = "Deleted %s (size: %s)";
         } else {
-            $this->log->debug("Would have deleted $hash");
+            $message = "Would have deleted %s (size: %s)";
         }
+        $this->log->debug(
+            sprintf(
+                $message,
+                $hash,
+                Alaress_Byte_Format::bytesToString($storageObject->getSize(), renderIec: true),
+            )
+        );
     }
 }

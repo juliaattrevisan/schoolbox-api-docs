@@ -14,6 +14,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
 
 /**
  * Command-line tool for Schoolbox's garbage collector.
@@ -264,6 +265,7 @@ HELP;
         $db            = $this->getDatabaseInternal();
         $gc = new GarbageCollector(
             $mapper,
+            StorageTransformMapper::getInstance(),
             $logger,
             $this->perform(),
             $batchSize,
