@@ -256,7 +256,7 @@ class GarbageCollector
             return 0;
         }
 
-        $this->log->error('Deleting ' . count($purge) . ' stale');
+        $this->log->notice('Deleting ' . count($purge) . ' stale hashes');
         foreach ($purge as $hash) {
             try {
                 $this->log->debug("Refreshing lock before deleting hash");
@@ -268,6 +268,15 @@ class GarbageCollector
                 $this->log->error("Could not delete storage hash '$hash' due to filesystem issue: " . $e->getMessage());
             }
         }
+        $this->log->notice(
+            sprintf(
+                $this->perform
+                    ? 'Deleted %d stale hashes (size: %s)'
+                    : 'Would have deleted %d stale hashes (size: %s)',
+                count($purge),
+                Alaress_Byte_Format::bytesToString($this->fileSizeTotal, renderIec: true),
+            ),
+        );
 
         return count($purge);
     }
@@ -315,6 +324,9 @@ class GarbageCollector
             'size',
             $this->transformMapper->getPredicateBuilder()->equals('hash', $hash)
         );
+        $storageSize          = $storageObject->getSize();
+        $storageTransformSize = array_sum($storageTransformSizes);
+        $this->fileSizeTotal  += ($storageSize + $storageTransformSize);
         if ($this->perform) {
             $this->mapper->hardDelete($storageObject);
             $message = "Deleted %s (size: %s, transforms: %s)";
@@ -325,8 +337,8 @@ class GarbageCollector
             sprintf(
                 $message,
                 $hash,
-                Alaress_Byte_Format::bytesToString($storageObject->getSize(), renderIec: true),
-                Alaress_Byte_Format::bytesToString(array_sum($storageTransformSizes), renderIec: true),
+                Alaress_Byte_Format::bytesToString($storageSize, renderIec: true),
+                Alaress_Byte_Format::bytesToString($storageTransformSize, renderIec: true),
             )
         );
     }
