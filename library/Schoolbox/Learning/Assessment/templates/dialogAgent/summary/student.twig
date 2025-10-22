@@ -47,3 +47,20 @@
         {% include '@learningAssessment/dialogAgent/summary/description.twig' with {assessment: assessment, participant: participant} only %}
     </div>
 </div>
+
+{# Decide if a student can create a response to this Dialog Agent.
+ # They need access to the route and the activity must:
+ #    - be past the open datetime
+ #    - not yet reached the due/close datetime (they should be the same for this activity)
+ #    - total time spent creating responses has not yet reached the Allowed Duration
+ #}
+{% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+    assessmentId: assessment.id,
+    assessment: assessment,
+    studentId: student.id,
+    student: student
+}) %}
+
+{% if submitRoute %}
+button
+{% endif %}

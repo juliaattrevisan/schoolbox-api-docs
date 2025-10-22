@@ -22,7 +22,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
@@ -256,6 +255,17 @@ class Controller extends Assessment\Controller
         }
 
         $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Decide if this $student can create a response to this learning activity
+         */
+        $assessment->assertCanRespond($participant);
+
+        /* The total time spent in this learning activity must not exceed the total allowed duration,
+         * if set; not sure how we're gonna calculate that atm
+         *
+         * TODO figure out how to aggregate total time spent in a chat
+         *  $assessment->assertDuration($participant); ...?
+         */
 
         $twigData = [
             'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
