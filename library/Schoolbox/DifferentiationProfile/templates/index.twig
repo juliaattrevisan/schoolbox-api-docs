@@ -9,5 +9,51 @@
         <div class="small-12 column">
             <h1>Manage {{ locale.differentiationProfile.plural }}</h1>
         </div>
+        {# Temporary table placeholder for checking data dump #}
+        <table>
+            <thead>
+            <tr>
+                <th>Student</th>
+                {% for col in header %}
+                    <th>{{ col.terminology ?: col.title }}</th>
+                {% endfor %}
+                <th>Last Updated</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for profile in profiles %}
+                <tr>
+                    <td>{{ profile.student.name }}</td>
+                    {# This will need to follow the same order as the header #}
+                    <td>
+                        <label for="adjustment-categories">
+                            <select name="adjustment-categories" id="adjustment-categories">
+                                {% for category in adjustmentCategories %}
+                                    <option value="{{ category.name }}" {% if profile.adjustment_category == category.name %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </td>
+                    <td>
+                        <label for="adjustment-levels">
+                            <select name="adjustment-levels" id="adjustment-levels">
+                                {% for level in adjustmentLevels %}
+                                    <option value="{{ level.name }}" {% if profile.adjustment_level == level.name %}selected{% endif %}>{{ level.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </td>
+                    <td>{{ profile.overview }}</td>
+                    <td>{{ profile.interests_strengths }}</td>
+                    <td>{{ profile.needs_challenges }}</td>
+                    <td>{{ profile.strategies_adjustments }}</td>
+                    <td>{{ profile.goals }}</td>
+                    <td>{{ profile.updated_at ?? '' }}</td>
+                    {# end #}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {# end of temporary table #}
     </div>
 </div>

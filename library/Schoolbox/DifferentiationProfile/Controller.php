@@ -10,66 +10,77 @@ declare(strict_types=1);
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
+use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelsMapper;
+use Schoolbox\DifferentiationProfile\AdjustmentCategories\Model as AdjustmentCategoriesModel;
+use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsModel;
+use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
+use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      *
-     * @param RosettaStone $rosettaStone
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param RosettaStone                 $rosettaStone
+     * @param DifferentiationProfileMapper $differentiationProfileMapper
+     * @param ModelToArray                 $profileTranslator
+     * @param AdjustmentCategoriesMapper   $adjustmentCategoriesMapper
+     * @param AdjustmentLevelsMapper       $adjustmentLevelsMapper
+     * @param AdminConfigMapper            $differentiationProifleConfigMapper
+     * @param AdminConfigModelToArray      $adminConfigModelToArray
      */
     public function __construct(
         private RosettaStone $rosettaStone,
-        private ErrorMapper $errorMapper,
-        private UserMapper $userMapper,
+        private DifferentiationProfileMapper $differentiationProfileMapper,
+        private ModelToArray $profileTranslator,
+        private AdjustmentCategoriesMapper $adjustmentCategoriesMapper,
+        private AdjustmentLevelsMapper $adjustmentLevelsMapper,
+        private AdminConfigMapper $differentiationProifleConfigMapper,
+        private AdminConfigModelToArray $adminConfigModelToArray,
     ) {
     }
 
-
     /**
-     * Provide form
-     *
+     * Differentiation Profiles management page
+     * @return void
+     * @throws Error
      */
     public function manageDifferentiationProfiles(): void
     {
-        $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
-        $this->response = $this->responseFromTemplate(
+        $profiles             = $this->differentiationProfileMapper->findStudentList();
+        $translation          = $this->rosettaStone->translate('differentiationProfile', true, true);
+        $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
+        $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
+        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
+        $this->response       = $this->responseFromTemplate(
             '@differentiationProfiles/index.twig',
             [
+                'adjustmentCategories' => $adjustmentCategories->map(
+                    fn(AdjustmentCategoriesModel $category) => [
+                        'id'   => $category->getId(),
+                        'name' => $category->getName(),
+                    ]
+                ),
+                'adjustmentLevels'     => $adjustmentLevels->map(
+                    fn(AdjustmentLevelsModel $level) => [
+                        'id'   => $level->getId(),
+                        'name' => $level->getName(),
+                    ]
+                ),
+                'header'               => $adminConfigs->map(
+                    fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
+                ),
+                'profiles'             => $profiles->map(
+                    fn(Model $profile) => call_user_func($this->profileTranslator, $profile)
+                ),
             ],
             "Manage $translation"
         );
     }
-
-//    public function
-
-
-    /**
-     * Process the form vars
-     */
-//    public function postExample(): void
-//    {
-//        try {
-//            $user = $this->userMapper->findById($this->requestPost['id']);
-//        } catch (MapperException $e) {
-//            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-//        }
-//
-//        $this->response = $this->responseFromTemplate(
-//            '@example/submit.twig',
-//            [
-//                'user' => $user,
-//                'var1' => $this->requestPost['var1'],
-//            ],
-//            'Example Form Output',
-//        );
-//    }
 }

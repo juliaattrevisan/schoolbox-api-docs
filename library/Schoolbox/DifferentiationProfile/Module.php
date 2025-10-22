@@ -21,6 +21,11 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
+use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
+use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelsMapper;
+use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
 
 class Module extends BaseModule
 {
@@ -65,8 +70,18 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('l10n'),
-            $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(UserMapper::class)
+            $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
+            new ModelToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+            ),
+            $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
+            $this->getMapperFactory()->get(AdjustmentLevelsMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\DifferentiationProfiles\Mapper::class),
+            new AdminConfigModelToArray (
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+            ),
         );
     }
 
