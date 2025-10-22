@@ -148,7 +148,7 @@ class HashIndexedTextField implements Check
         $staleCount = count($stale);
         $newStale   = array_filter(
             $stale,
-            fn ($hash) => isset($this->hashIndex[$hash]),
+            fn ($hash) => !isset($this->hashIndex[$hash]),
         );
         $newStaleCount = count($newStale);
         $this->logger->info(
