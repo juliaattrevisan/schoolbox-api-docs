@@ -21,6 +21,10 @@ use Psr\Log\LoggerInterface;
  * * fields which already have a foreign key relation to `storage`
  *   (these are processed by `ForeignKeyRelation`)
  * * ephemeral tables (e.g. `search_index`)
+ *
+ * @deprecated due to performance issues: this runs a `SELECT` for every hash
+ *             * every text column.
+ * @see HashIndexedTextField for an equivalent with fewer performance issues.
  */
 class TextField extends Base
 {
