@@ -384,7 +384,7 @@ async function onConfirmActionSelected(): Promise<void> {
             <em>Further support info: {{ loadError }}</em>
         </div>
     </div>
-    <div>
+    <div class="scrollable">
         <table>
             <thead>
                 <tr>
