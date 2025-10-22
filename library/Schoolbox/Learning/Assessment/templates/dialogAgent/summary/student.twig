@@ -1,0 +1,14 @@
+{##
+ # Summary screen for Dialog Agent (Discussion) learning actiities
+ #
+ # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
+ # @param \Schoolbox\User $student        The student who will be creating the response
+ # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
+ # @param array $lastViews                A struct that tells you when people last viewed this screen
+ # @param string $returnUrl               An encoded destination so you can go back there
+ # @param array $courseAssessments        A struct containing a set of assessments grouped by their units
+ # @param bool $isInstructor              Whether the currently logged in guy is an instructor
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
