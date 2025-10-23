@@ -61,9 +61,29 @@
             </div>
         {% endif %}
     </section>
-    <div class="toast" data-assessment-toast="{{ component_id }}"></div>
+    <div class="toast" data-assessment-toast="{{ component_id }}" data-alert></div>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-selector.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.assessment-component-tot.js?v={{ config.site_version }}"></script>
     <script type="text/javascript">
         $(function () {
+            var $component = $('#component{{ component_id }}');
+            $component.setupAssessmentComponentTot({
+                emptySelector: '.empty-state',
+                contentSelector: '[data-component-content]',
+            });
+
+            /* Attach Course Selector Modal listeners
+            */
+            $.fn.courseSelectorModal({
+                courseSelector: {
+                    query: {
+                        folder:           Number('{{ context.id }}'),
+                        hasAdd:           false,
+                        hasTot:           false,
+                        linkToUnits:      false,
+                    }
+                }
+            });
             $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
                 event.preventDefault();
                 var assessmentList = $('#assessment-list-{{ component_id }}'),

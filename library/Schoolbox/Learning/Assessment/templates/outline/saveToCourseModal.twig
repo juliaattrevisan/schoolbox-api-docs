@@ -1,4 +1,4 @@
-<div id="component{{ componentInstance.id }}-save-to-course-modal-{{ assessment.id }}"
+<div id="component{{ componentInstanceId }}-save-to-course-modal-{{ assessment.id }}"
      class="reveal-modal"
      data-reveal
      aria-hidden="true"
@@ -89,14 +89,14 @@
                class="button submit"
                data-test="confirm-dialog-yes-button{{ assessment.id }}"
                data-action="save-to-course"
-               data-related-component="component{{ componentInstance.id }}"
+               data-related-component="component{{ componentInstanceId }}"
             >Yes</a>
         </li>
         <li>
             <a href="#"
                class="button"
                data-action="save-to-course-cancel"
-               data-related-component="component{{ componentInstance.id }}"
+               data-related-component="component{{ componentInstanceId }}"
             >No</a>
         </li>
     </ul>
