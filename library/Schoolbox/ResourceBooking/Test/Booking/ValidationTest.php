@@ -694,4 +694,78 @@ class ValidationTest extends TestCase
 
         $this->assertCount($expected, $errors);
     }
+
+    /**
+     * @param array $errors
+     * @param bool  $allClashes
+     * @return void
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidationErrorsAreAllClashes')]
+    public function testValidationErrorsAreAllClashes(array $errors, bool $allClashes): void
+    {
+        $validation = $this->createValidation();
+
+        $this->assertSame(
+            $validation->validationErrorsAreAllClashes($errors),
+            $allClashes,
+        );
+    }
+
+    /**
+     * Return a variety of error collections for testValidationErrorsAreAllClashes().
+     * @return array<array<string, array<string, array<string>>>, bool>
+     */
+    public static function providerValidationErrorsAreAllClashes(): array
+    {
+        return [
+            [
+                // Errors array containing non-clash errors.
+                [
+                    Validation::START_PERIOD_ERRORS => [
+                        Validation::ERROR_INVALID => [
+                            Validation::ERROR_INVALID
+                        ],
+                        '2025-01-01' => [
+                            Validation::ERROR_TOO_LONG,
+                        ],
+                    ],
+                ],
+                false
+            ],
+            [
+                // Errors array containing mix of clash and non-clash errors.
+                [
+                    Validation::START_PERIOD_ERRORS => [
+                        '2025-01-01' => [
+                            Validation::ERROR_CONFLICT,
+                            Validation::ERROR_TIMETABLED_CLASS,
+                        ],
+                        '2025-01-03' => [
+                            Validation::ERROR_BEFORE_START,
+                        ],
+                    ],
+                    Validation::END_PERIOD_ERRORS => [
+                    ]
+                ],
+                false
+            ],
+            [
+                // Errors array containing only clash errors.
+                [
+                    Validation::START_PERIOD_ERRORS => [
+                        '2025-01-01' => [
+                            Validation::ERROR_CONFLICT,
+                            Validation::ERROR_TIMETABLED_CLASS,
+                        ],
+                        '2025-01-02' => [
+                            Validation::ERROR_CONFLICT,
+                        ],
+                    ],
+                    Validation::END_PERIOD_ERRORS => [
+                    ]
+                ],
+                true
+            ],
+        ];
+    }
 }
