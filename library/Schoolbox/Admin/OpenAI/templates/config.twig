@@ -19,8 +19,9 @@
         <span>OpenAI Model</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Select which model you wish to use for your OpenAI service.">?</span>
     </label>
+    <input type="hidden" name="[{{ feature.feature }}][OpenAI][model][value]" value="{{ feature.config.OpenAI.model.value }}">
     <select id="{{ feature.feature }}-model-value" type="text" name="[{{ feature.feature }}][OpenAI][model][value]" data-feature-openai style="display:none">
-        <option value="">-- select an option --</option>
+        <option value="" disabled {% if not feature.config.OpenAI.model.value %} selected {% endif %}>-- select an option --</option>
         {% for model in models %}
             <option value="{{ model }}"{% if feature.config.OpenAI.model.value ==  model %} selected {% endif %}>{{ model }}</option>
         {% endfor %}

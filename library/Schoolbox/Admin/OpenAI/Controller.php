@@ -100,7 +100,11 @@ class Controller extends ConfigController
             // get the config item
             $conf = $this->getConfigMapper()->findOneByColumn('name', $configName);
             // save the new config into that item
-            $conf->setValue($aiConf->encode($postData[$module]));
+            try {
+                $conf->setValue($aiConf->encode($postData[$module]));
+            } catch (Exception $e) {
+                throw new Exception("Failed to encode config for feature '$module': " . $e->getMessage(), 0, $e);
+            }
             $this->getConfigMapper()->save($conf);
         }
 
