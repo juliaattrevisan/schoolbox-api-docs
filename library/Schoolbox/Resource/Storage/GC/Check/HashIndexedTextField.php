@@ -187,13 +187,17 @@ class HashIndexedTextField implements Check
                 $this->logger->debug(sprintf('Skipping empty table: %s...', $table));
                 continue;
             }
+
+            // Extract data length from the first column:
+            // it will be the same for all columns
+            $dataLength = $columnsData[0]['extra']['search_data_length'] ?? null;
             $this->logger->debug(
                 sprintf(
                     'Building hash index for %d rows in table: %s (size: %s)...',
                     $count,
                     $table,
-                    isset($columnData['extra']['search_data_length'])
-                        ? Alaress_Byte_Format::bytesToString($columnData['extra']['search_data_length'], renderIec: true)
+                    isset($dataLength)
+                        ? Alaress_Byte_Format::bytesToString($dataLength, renderIec: true)
                         : 'unknown',
                 )
             );
