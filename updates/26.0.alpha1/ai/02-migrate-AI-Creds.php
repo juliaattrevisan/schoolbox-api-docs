@@ -55,7 +55,7 @@ $app = new class extends CliTool\App {
 
         $query = $this->getDatabaseInternal()->prepareQuery("UPDATE config SET value = :value WHERE name = :name;");
         // insert new config into DB
-        foreach (Config::MODULE_CONFIG as $module => $moduleKey) {
+        foreach (Config::ALL_MODULES as $module => $moduleKey) {
             $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey'");
             $this->getLogger()->debug("New config: " . json_encode($newConfig, JSON_THROW_ON_ERROR));
             $query->execute(
