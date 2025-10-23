@@ -18,7 +18,7 @@ use Tests\Support\Payload;
 /**
  * Tests:
  * * Approve a booking time slot request for a bookable resource.
- * * Cacnel an approved booking request.
+ * * Cancel an approved booking request.
  * * Create a booking request to be moderated.
  * * Create a category of booking resources.
  * * Create a booking resource
@@ -50,7 +50,7 @@ class ResourceBookingCest
     {
         #GIVEN
         $timestamp  = time();
-        $category_title = 'Testing Caregory Create at ' . $timestamp;
+        $category_title = 'Testing Category Create at ' . $timestamp;
 
         #WHEN
         $category->setCategoryTitle($category_title);
@@ -71,7 +71,7 @@ class ResourceBookingCest
     {
         #GIVEN
         $timestamp  = time();
-        $category_title = 'Testing Caregory Update at ' . $timestamp;
+        $category_title = 'Testing Category Update at ' . $timestamp;
 
         #WHEN
         $category->setCategoryTitle($category_title);
