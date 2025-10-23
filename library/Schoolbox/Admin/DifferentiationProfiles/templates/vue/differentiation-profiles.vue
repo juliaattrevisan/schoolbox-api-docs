@@ -72,52 +72,36 @@ const headersArray = window.Vue.computed(() => {
             <section v-for="(differentiationProfile, key) in data.modules" :key="key">
                 <fieldset class="content">
                     <template v-for="module in differentiationProfile.fields" :key="module.id">
-                        <div v-if="headersArray[0]" :class="`small-12 medium-${headersArray[0].colSpan} columns`">
-                            <div class="switch">
-                                <input
-                                    :id="`differentiation-profiles-adjustments-field-${module.id}`"
-                                    v-model="module.is_enabled"
-                                    type="checkbox"
-                                    :name="`modules[${key}][${module.name}][is_enabled]`"
-                                />
-                                <label :for="`differentiation-profiles-adjustments-field-${module.id}`">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
+                        <template v-for="header in headersArray" :key="header.headerKey">
+                            <div v-if="header" :class="`small-12 medium-${header.colSpan} columns`">
+                                <!-- Toggle column -->
+                                <div v-if="header.type === 'toggle'" class="switch">
+                                    <input
+                                        :id="`differentiation-profiles-adjustments-field-${module.id}`"
+                                        v-model="module.is_enabled"
+                                        type="checkbox"
+                                        :name="`modules[${key}][${module.name}][is_enabled]`"
+                                    />
+                                    <label :for="`differentiation-profiles-adjustments-field-${module.id}`">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
+                                <!-- Text columns -->
+                                <div v-else-if="header.type === 'text'">
+                                    <label :for="`module-${header.key}-${module.id}`" class="t-visually-hidden">
+                                        {{ header.title || header.key }}
+                                    </label>
+                                    <input
+                                        :id="`module-${header.key}-${module.id}`"
+                                        v-model="module[header.key]"
+                                        type="text"
+                                        :name="`modules[${key}][${module.name}][${header.key}]`"
+                                        :readonly="header.key === 'title'"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div v-if="headersArray[1]" :class="`small-12 medium-${headersArray[1].colSpan} columns`">
-                            <label :for="`module-title-${module.id}`" class="t-visually-hidden">Title</label>
-                            <input
-                                :id="`module-title-${module.id}`"
-                                v-model="module.title"
-                                type="text"
-                                :name="`modules[${key}][${module.name}][title]`"
-                                readonly
-                            />
-                        </div>
-                        <div v-if="headersArray[2]" :class="`small-12 medium-${headersArray[2].colSpan} columns`">
-                            <label :for="`module-terminology-${module.id}`" class="t-visually-hidden"
-                                >Terminology</label
-                            >
-                            <input
-                                :id="`module-terminology-${module.id}`"
-                                v-model="module.terminology"
-                                type="text"
-                                :name="`modules[${key}][${module.name}][terminology]`"
-                            />
-                        </div>
-                        <div v-if="headersArray[3]" :class="`small-12 medium-${headersArray[3].colSpan} columns`">
-                            <label :for="`module-description-${module.id}`" class="t-visually-hidden"
-                                >Description</label
-                            >
-                            <input
-                                :id="`module-description-${module.id}`"
-                                v-model="module.description"
-                                type="text"
-                                :name="`modules[${key}][${module.name}][description]`"
-                            />
-                        </div>
+                        </template>
                         <input type="hidden" :name="`modules[${key}][${module.name}][name]`" :value="module.name" />
                         <input type="hidden" :name="`modules[${key}][${module.name}][id]`" :value="module.id" />
                     </template>
