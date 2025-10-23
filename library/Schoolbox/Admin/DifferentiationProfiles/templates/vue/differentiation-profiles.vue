@@ -41,7 +41,7 @@ const headersArray = window.Vue.computed(() => {
                                 >?</span
                             >
                         </label>
-                        <div class="switch">
+                        <div class="switch f-no-margins">
                             <input
                                 id="differentiation-profiles-field"
                                 v-model="data.featureToggle.enabled"
@@ -73,7 +73,7 @@ const headersArray = window.Vue.computed(() => {
                         <template v-for="header in headersArray" :key="header.headerKey">
                             <div v-if="header" :class="`small-12 medium-${header.colSpan} columns`">
                                 <!-- Toggle column -->
-                                <div v-if="header.type === 'toggle'" class="switch">
+                                <div v-if="header.type === 'toggle'" class="switch f-no-margins">
                                     <input
                                         :id="`differentiation-profiles-adjustments-field-${module.id}`"
                                         v-model="module.is_enabled"
