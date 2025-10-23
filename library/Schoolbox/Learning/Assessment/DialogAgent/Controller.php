@@ -17,12 +17,15 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
@@ -315,7 +318,67 @@ class Controller extends Assessment\Controller
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        // noop
+        /** @var null|Participant $participant */
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+        $allResponses = $participant ? $participant->getAllResponses() : new GenericCollection(IResponse::class);
+
+        /* TODO If there's a response that has yet to be submitted officially,
+         *  presume that to be "a draft" and resume it upon next click. Maybe.
+         */
+        $latestResponse = null;
+
+        if ($allResponses->count()) {
+            foreach ($allResponses as $response) {
+                /* TODO Find the first non-submitted response and...probably resume that? Maybe?
+                 */
+                if (!$response->isSubmitted()) {
+                    $latestResponse = $response;
+                    break;
+                }
+            }
+        }
+
+        // Is the page being displayed in readonly mode?
+        /* TODO Are students allowed to visit this after the activity is closed?
+         */
+        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+
+        // For some reason I can't use get/setFlash?
+        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
+        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
+
+        /* Prepare a redirection url
+         */
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+
+        $data = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    sprintf('Create response for %s', $assessment->getTitle()),
+                ]
+            ),
+            'assessment' => $assessment,
+            'student' => $student,
+            'participant' => $participant,
+            'response' => $latestResponse,
+            'errorMessage' => $errorMessage,
+            'readonly' => $isInteractionLocked,
+            'returnUrl' => $returnUrl,
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/response/create.twig',
+            $data
+        );
     }
 
 
