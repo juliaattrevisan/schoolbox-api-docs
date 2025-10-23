@@ -43,16 +43,16 @@ class Factory
 
     /**
      * Get timetable classes occurring this far in the past
-     * Measured in months, defaults to -1 month
+     * Measured in weeks, defaults to -2 weeks
      */
     private const FROM = -1;
 
 
     /**
      * Get timetable classes up to this far into the future
-     * Measured in months, defaults to 6 months
+     * Measured in weeks, defaults to 12 weeks (3 months)
      */
-    private const TO = 6;
+    private const TO = 12;
 
 
     /**
@@ -111,13 +111,14 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws InvalidArgumentException
+     * @throws \DateInvalidTimeZoneException
      */
     public function produce(): GenericCollection
     {
         /* Schedule/SUDS Timetable: Date Range
          */
-        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
-        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
+        $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->startOfWeek();
+        $to = \Alaress_Date_Format::now()->addWeeks(self::TO)->endofWeek();
 
         /* Decide a timezone for all the UTC dates sis gives to us
          */
@@ -125,13 +126,15 @@ class Factory
 
         /* Spawn an Api instance
          */
-        $api = new Api($this->host, $this->key);
-
-        $bus = new GenericCollection(IStrategy::class);
+        $api = new Api(host: $this->host, apiKey: $this->key, logger: $this->log);
 
         /* A Watchlist instance that we'll reuse when diagnosing stuff
          */
         $watcher = new Watchlist();
+
+        /* Command bus
+         */
+        $bus = new GenericCollection(IStrategy::class);
 
         if ($this->validStrats->isProfileStratEnabled()) {
             $bus

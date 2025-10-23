@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\InvalidArgumentException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\RetryMiddleware;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
 use SensitiveParameter;
 
@@ -27,16 +29,14 @@ class Api implements IApi
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *
-     * Sometimes endpoints fail for no obvious reason and trying again seems
-     * to work - instead of doing it manually, try insisting programmatically
-     * waiting NAP_TIMEOUT seconds between each attempt
+     * Sometimes endpoints fail for no obvious reason and trying again seems to work - instead of doing it
+     * manually, try insisting programmatically waiting NAP_TIMEOUT seconds between each attempt
      */
     private const NAP_TIMEOUT = 3;
 
 
     /**
-     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
-     * finally giving up
+     * Number of times to retry after having NAP_TIMEOUT seconds rest before finally giving up
      */
     private const NUM_RETRY = 3;
 
@@ -48,19 +48,29 @@ class Api implements IApi
 
 
     /**
-     * Decide how pig each page size should be
-     * Veracross lets you have up to 1000 rows per return
+     * Maximum number of pages to obtain from an endpoint to safeguard against infinite loops
      *
-     * Lots of little pages is super slow for them
      */
-    private const PAGE_SIZE = 1000;
+    private const MAX_PAYLOADS = 100;
 
 
     /**
-     * Maximum number of pages to obtain from an endpoint
-     * to safeguard against infinite loops
+     * Try three times before dying
      */
-    private const MAX_PAYLOADS = 100;
+    private const MAX_CONCURRENCY_RETRIES = 3;
+
+
+    /**
+     * Veracross' 3-minute rate limit, expressed as seconds
+     */
+    private const RESUME_RETRY_DELAY = 1;
+
+
+    /**
+     * An extra amount of time to wait between Too Many Requests because veracros is still giving us
+     * 429 even after waiting the requisite amount of time.
+     */
+    private const RATE_LIMIT_OFFSET = 30;
 
 
     /**
@@ -76,8 +86,7 @@ class Api implements IApi
 
 
     /**
-     * A Veracross Access Token generator, in case you needed to
-     * make a new one somewhere along the way
+     * A Veracross Access Token generator, in case you needed to make a new one somewhere along the way
      *
      * @var AccessTokenGenerator
      */
@@ -105,18 +114,18 @@ class Api implements IApi
     /**
      * Constructor.
      *
-     * @param string       $host
-     * @param string       $apiKey
-     * @param int          $timeout
-     * @param Timecop|null $timecop
-     * @throws InvalidArgumentException
-     * @throws \DomainException
+     * @param string $host
+     * @param string $apiKey
+     * @param int $timeout
+     * @param bool $deepLog
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         private string $host,
         #[SensitiveParameter] private string $apiKey,
         private int $timeout = self::DEFAULT_TIMEOUT,
-        private ?Timecop $timecop = null
+        private bool $deepLog = false,
+        private ?LoggerInterface $logger = null,
     ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
@@ -132,16 +141,14 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
-     * @param int    $timeout
+     * @param int $timeout
      * @return Client
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         /* You need these parts when build attendance links
          */
-        $this->credentials = (new Codec\DSN())->decode($this->apiKey);
+        $this->credentials = (new Codec\DSN())->decode($dsn);
 
         /* Enforce slash in the endpoint prefix
          *
@@ -167,13 +174,118 @@ class Api implements IApi
             $this->credentials['schoolroute'],
             $this->credentials['clientid'],
             $this->credentials['clientsecret'],
-            $this->credentials['authhost']
+            $this->credentials['authhost'],
+            $this->deepLog
         );
+
+        /* TODO How to implement this? Our retrymiddleware doesn't have a factory() method lol
+         *
+         * Ended up stealing the ai-generated stuff, this guy's idea,
+         * https://gist.github.com/christeredvartsen/7776e40a0102a571c35a9fc892164a8c
+         * ...and some of my own ideas and smooshed it all together here, in a somewhat
+         * awkward casserole of ideas.
+         */
+        $maxRetries = self::MAX_CONCURRENCY_RETRIES;
+
+        /* Decide whether a request needs a retry or not
+         */
+        $decider = function (int $retries, $request, $response = null) use ($maxRetries): bool {
+            return
+                $retries < $maxRetries
+                && null !== $response
+                && 429 === $response->getStatusCode();
+        };
+
+        /* Decide how long to wait between retries
+         *
+         * Note that delay() accepts the number of retries and returns the number of milliseconds to delay.
+         * https://github.com/guzzle/guzzle/blob/7.5/src/RetryMiddleware.php
+         */
+        $delay = function (int $retries, $response): int {
+            if (!$response->hasHeader('x-rate-limit-reset')) {
+                return RetryMiddleware::exponentialDelay($retries);
+            }
+
+            /* Veracross lets us make more requests after this datetime
+             */
+            $resetAt = (int)$response->getHeaderLine('x-rate-limit-reset');
+
+            $retryAfter = $resetAt - time();
+
+            /* Craft a shifty log for now
+             */
+            $this->logger?->debug(sprintf(
+                "Retrying request after %s seconds napping (unblocks at %s) due to %s %s",
+                $retryAfter,
+                date(\Alaress_Date_Format::DATABASE_FORMAT, $resetAt),
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
+
+            /* Veracross lets us make more requests after this x-rate-limit-reset datetime
+             * that is (in?)conveniently expressed as a unix timestamp
+             *
+             * Delays require an expression in milliseconds.
+             */
+            $resetAt = 1000 * ((int)$response->getHeaderLine('x-rate-limit-reset') - time());
+
+            /* TODO For some reason these are still returning 429. I think it's a bit too aggressive for
+             *  veracross to handle: add an arbitrary 30 seconds to see if that helps. I only started getting
+             *  this outcome recently, where in the main suds loop we're missing a few payloads.
+             */
+            $resetAt += 1000 * self::RATE_LIMIT_OFFSET;
+
+            /* If (x-rate-limit-reset - time()) is somehow in the past, assume we're good to go.
+             *
+             * Resume retries after a 1 second delay as this seemingly is in accordance with x-rate-limit-reset
+             * being in the past since we've already reached the timestamp where the rate limit's been reset.
+             *
+             * You can probably get away with a 0 second delay, but I'm not sure if that val does some weird
+             * or wonderful thing in the guzzle middleware.
+             */
+            if ($resetAt < 0) {
+                return self::RESUME_RETRY_DELAY;
+            }
+
+            return $resetAt;
+        };
+
+        /* Use guzzle's Retry middleware
+         * https://github.com/caseyamcl/guzzle_retry_middleware
+         */
+        $stack = HandlerStack::create();
+        $stack->push(Middleware::retry($decider, $delay));
 
         return new Client([
             'base_uri' => $this->baseUri,
             'timeout' => $timeout,
             'http_errors' => false,
+            'max_retry_attempts' => 3,
+            'retry_on_timeout' => true,
+            /* Apparently guzzle can inspect a header request to infer how long to wait between retries...but veracross
+             * gives us a unix timestamp. This forces us to use retry_after_date_format ironically because veracross
+             * violates the http standards by giving us a unix timestamp
+             *
+                [x-rate-limit-reset] => Array
+                    (
+                        [0] => 1760313241
+                    )
+
+                [x-rate-limit-remaining] => Array
+                    (
+                        [0] => 0
+                    )
+
+                [x-rate-limit-limit] => Array
+                    (
+                        [0] => 300
+                    )
+             */
+            'retry_after_header' => 'x-rate-limit-reset',
+            'retry_after_date_format' => 'U',
+            /* This sort-of worked, mostly...
+             */
+            'handler' => $stack,
         ]);
     }
 
@@ -205,7 +317,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = IApi::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
         $payload = null;
@@ -217,15 +329,29 @@ class Api implements IApi
          * 2. If you're requesting your first payload
          * 3. The payload size == page size
          */
-        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
+        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === $pageSize)) {
+            $this->log(sprintf(
+                " >> Retrieving %s @ page %s with %s max elements per page...\n",
+                $endpoint,
+                $pageNum,
+                $pageSize
+            ));
+
+            $start = microtime(true);
             $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
+            $end = microtime(true);
+
+            $this->log(sprintf(
+                "    Obtained %s elements in this payload.\n",
+                count($payload['data']),
+            ));
 
             $pageNum++;
             $n++;
 
             /* Record endpoint usage
              */
-            $this->apiUsage->record($endpoint);
+            $this->apiUsage->record($endpoint, $end - $start);
 
             yield $payload;
         }
@@ -275,14 +401,17 @@ class Api implements IApi
 
                 /* Grab an Access Token
                  */
-                if ($this->timecop) {
-                    $this->timecop->regulate('** Access Token: about to obtain/reuse one');
-                }
-
+                $start = microtime(true);
                 $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+                $end = microtime(true);
 
-                if ($this->timecop) {
-                    $this->timecop->regulate('** Access Token: token obtained');
+                $duration = number_format($end - $start, 2);
+
+                if ($duration > 0) {
+                    $this->log(sprintf(
+                        " ** Access token generation took %s seconds.\n",
+                        $duration,
+                    ));
                 }
 
                 /* Slam in headers with the dynamic token
@@ -298,21 +427,14 @@ class Api implements IApi
                     'X-Page-Size' => $pageSize
                 ];
 
-                if ($this->timecop) {
-                    $this->timecop->regulate(sprintf(
-                        '++ API Request to endpoint: %s (started)',
-                        $endpoint
-                    ));
-                }
-
+                $start = microtime(true);
                 $response = $this->client->request($method, $endpoint, $options);
+                $end = microtime(true);
 
-                if ($this->timecop) {
-                    $this->timecop->regulate(sprintf(
-                        '++ API Request to endpoint: %s (finished)',
-                        $endpoint
-                    ));
-                }
+                $this->log(sprintf(
+                    " << Client request took %s seconds to obtain response.\n",
+                    number_format($end - $start, 2),
+                ));
 
                 /* Debugging:
                  * Find out what guzzle calculated as the endpoint + query string params
@@ -373,6 +495,74 @@ class Api implements IApi
          * was being requested, so I guess you ended up here
          */
         throw new \DomainException('Could not access server, or bad json payload returned.', 0, $e ?? null);
+    }
+
+
+    /**
+     * Experimental
+     *
+     * @param string $method
+     * @param array $endpoints
+     * @param string $scope
+     * @param array $params
+     * @param int $pageSize
+     * @return array
+     * @throws \Throwable
+     */
+    public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = IApi::PAGE_SIZE): array
+    {
+        $promises = [];
+
+        foreach ($endpoints as $endpoint) {
+            $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+
+            $options = [];
+
+            if (!empty($params)) {
+                $options[RequestOptions::QUERY] = $params;
+            }
+
+            $options['headers'] = [
+                'Authorization' => "Bearer {$accessToken}",
+                'Content-Type' => 'application/json',
+                'X-API-Value-Lists' => 'include',
+                /* Currently hardcoded to be one page for now
+                 */
+                'X-Page-Number' => 1,
+                'X-Page-Size' => $pageSize
+            ];
+
+            /* There's this jibberjabber about Guzzle Pools that might be useful at some point
+             * but I haven't really understood those yet.
+             *
+             * GuzzleHttp\Pool
+             * https://docs.guzzlephp.org/en/stable/quickstart.html
+             */
+
+            $start = microtime(true);
+            $promises[] = $this->client->requestAsync($method, $endpoint, $options);
+            $end = microtime(true);
+
+            /* Record endpoint usage
+             */
+            $this->apiUsage->record($endpoint, $end - $start);
+        }
+
+        return \GuzzleHttp\Promise\Utils::settle($promises)->wait();
+    }
+
+
+    /**
+     * Deeper diagnostics
+     *
+     * @param string $msg
+     * @return void
+     */
+    private function log(string $msg): void
+    {
+        if ($this->deepLog) {
+            echo $msg;
+        }
     }
 
 

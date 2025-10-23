@@ -52,7 +52,11 @@ class Builder
             'https://portals.veracross.com/%s/%s/class/%s/attendance',
             $credentials['schoolroute'],
             $credentials['portalaccessname'],
-            $class['id']
+            /* TODO These ids are too easy to mix up: this might be class_id, id, or internal_class_id
+             *
+             * TODO double check attendance links
+             */
+            $class['internal_class_id']
         );
     }
 }

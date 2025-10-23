@@ -486,7 +486,7 @@ class Classes implements IStrategy
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
-                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Reusing previous class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
@@ -507,7 +507,7 @@ class Classes implements IStrategy
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
             $this->log->debug(sprintf(
-                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Creating new class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),

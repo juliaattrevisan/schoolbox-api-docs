@@ -17,6 +17,9 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ClassIndex;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Enrolments;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\MeetingTimesConcurrent;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
@@ -105,67 +108,89 @@ class Classes implements IStrategy
      * @return void
      * @throws DebugBarException
      * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws \JsonException
+     * @throws \Throwable
      */
     public function import(): void
     {
+        $start = microtime(true);
+
         $this->log->info('Processing timetables.');
 
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Processing classes between %s and %s',
             $this->fromDate,
             $this->toDate
         ));
 
-        /* Precompiler
-         * Note this has a local cache that remembers an endpoint's outcome
-         */
-        $compiler = new PersonCompiler($this->api, self::SCOPE);
-
         /* Get a list of guys
          */
-        $userLookup = (new Users($this->eventMapper))->generate();
+        $userLookup = (new Users($this->watcher, $this->watchlist, $this->eventMapper))->generate();
 
+        /* Start with an enrolments-first philosophy.
+         * The list of enrolments informs us which internal_class_ids we care about.
+         *
+         * If a watchlist contains external ids, only obtain a list of enrolments
+         * for each of the external ids (person ids) provided. This limits the amount
+         * of classes and meeting times we need to prefetch and remember.
+         *
+         * Otherwise, don't apply a person_id limiter on the enrolments.
+         */
+        $enrolmentsLookup = (new Enrolments($this->api, $this->watchlist, $this->log))->generate();
+
+        /* Once you have all the enrolments, find all the internal_class_id values.
+         * Use these internal_class_id to prefilter classes:list to the ones we need.
+         *
+         * This results in a list of classes that are relevant to the enrolments we prefetched.
+         */
+        $classesLookup = (new ClassIndex($this->api, $this->watchlist, $enrolmentsLookup, $this->log))->generate();
+
+        /* Each class needs its meeting times which we can obtain with academics.classes.meeting_times:list
+         * and precompile that into each class.
+         *
+         * Only get meeting times between these two dates
+         */
         $startDate = $this->fromDate->getDatabaseDate();
         $endDate = $this->toDate->getDatabaseDate();
 
-        foreach ($userLookup as $externalId => $user) {
-            /* Only import for specific users
-             */
-            if (!$this->watcher->isOnWatchlist((string)$externalId, $this->watchlist)) {
-                continue;
-            }
+        $meetingTimesLookup = (new MeetingTimesConcurrent($this->api, array_keys($classesLookup), $this->log))->generate($startDate, $endDate);
 
-            $this->log->debug(sprintf(
-                'Fetching timetable data for %s %s (%s) - this might take a little while',
+        /* At the end of all this you should have a:
+         *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in
+         *   - a lookup of classes + their meeting times
+         *
+         * ...which should allow you to craft the entire timetable for every relevant person
+         * without needing api spam to veracross
+         */
+        $compiler = new Compiler($enrolmentsLookup, $classesLookup, $meetingTimesLookup);
+
+        /* TODO Chunk users to keep memory usage down; atm retaining the entire universe
+         */
+        foreach ($userLookup as $externalId => $user) {
+            $this->log->info(sprintf(
+                'Compiling timetable data for %s %s (%s) - this might take a little while',
                 $user['firstname'],
                 $user['lastname'],
                 $externalId
             ));
 
-            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
+            $timetable = $compiler->compile((string)$externalId);
 
             /* A student's timetable is a set of enrolments for their classes
              */
-            foreach ($timetable as $enrolment) {
-                /* You can use the class_id (this is the Veracross class code)
-                 * as a watchlist param to specifically import this one class.
-                 * Once we find it, we exit this loop - we don't expect it to
-                 * appear again in the classes index. You can use the numeric
-                 * class id instead if that helps
-                 */
-//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
-//                    continue;
-//                }
-//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
-//                    continue;
-//                }
-
-                $this->processClass((string)$externalId, $enrolment, $userLookup);
+            foreach ($timetable as $classEnrolment) {
+                $this->processClass((string)$externalId, $classEnrolment, $userLookup);
             }
         }
+
+        $end = microtime(true);
+
+        $this->log->info('');
+
+        $this->log->debug(sprintf(
+            'Timetable import duration: %s seconds.',
+            number_format($end - $start, 2)
+        ));
     }
 
 
@@ -174,7 +199,7 @@ class Classes implements IStrategy
      * Ignore lessons that occur outside the [$from, $to] window
      *
      * @param string $externalId
-     * @param array  $enrolment
+     * @param array  $classEnrolment
      * @param array  $userLookup
      * @return void
      * @throws DebugBarException
@@ -183,22 +208,32 @@ class Classes implements IStrategy
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function processClass(string $externalId, array $enrolment, array $userLookup): void
+    private function processClass(string $externalId, array $classEnrolment, array $userLookup): void
     {
-        foreach ($enrolment['schedule'] as $classInstance) {
-            $class = $enrolment['internal_class_id'];
+        foreach ($classEnrolment['schedule'] as $classInstance) {
+            /* Info about a class is actually a subset of $enrolment:
+             *
+                $class = array_intersect_key($enrolment, [
+                    'internal_class_id' => true,
+                    'name' => true,
+                    'code' => true,
+                ]);
+             *
+             * But to save this mundane step, there's a $classEnrolment['info'] node specifically
+             * for these data
+             */
 
             /* Save sis_event record
              */
-            $event = $this->createEvent($class, $classInstance);
+            $event = $this->createEvent($classEnrolment['info'], $classInstance);
 
             /* Save sis_class record
              */
-            $classEntry = $this->createClassEntry($class, $event);
+            $classEntry = $this->createClassEntry($classEnrolment['info'], $event);
 
             /* Save the involvements
              */
-            $this->createInvolvements($externalId, $class, $event, $classEntry, $userLookup);
+            $this->createInvolvements($externalId, $classEnrolment['info'], $event, $classEntry, $userLookup);
         }
     }
 
@@ -221,8 +256,8 @@ class Classes implements IStrategy
     ): Model {
         /* Fill in these vars as usual
          */
-        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['class_id']));
-        $day = trim((string)$classInstance['day']['name']);
+        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['code']));
+        $day = trim((string)$classInstance['day']['description']);
         $detail = null;
 
         /* Arbitrarily manufacture a guid for now, which represents
@@ -230,14 +265,25 @@ class Classes implements IStrategy
          */
         $guid = sprintf(
             '%s_%s_%s',
-            $class['class_id'],
-            $classInstance['start'],
-            $classInstance['end']
+            $class['internal_class_id'],
+            $classInstance['start']->getDatabase(),
+            $classInstance['end']->getDatabase()
         );
 
-        $period = null;
+        /* Put a Session Time in here, in accordance with Haines' feature request
+         * I *think* this might be the $classInstance['block'] but could be wrong.
+         */
+        $period = $classInstance['block']['description'] ?? '';
+
+        /* Decide where this class happens
+         */
         $room = null;
-        $title = trim((string)$class['description']);
+
+        if (is_array($classInstance['room'])) {
+            $room = $classInstance['room']['description'];
+        }
+
+        $title = trim((string)$class['name']);
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
@@ -245,58 +291,20 @@ class Classes implements IStrategy
          */
         $type = '';
 
-        /* Decide where this class happens
-         */
-        if (is_array($classInstance['room'])) {
-            $room = $classInstance['room']['name'];
-        }
-
         /* Convert strings to adf
          *
          * Apply timezone settings to these zulu-time dates
          */
         $this->log->debug(sprintf(
             'Original dates: %s - %s',
-            $classInstance['start'],
-            $classInstance['end']
+            $classInstance['start_time'],
+            $classInstance['end_time']
         ));
-
-        /* There is an omega bug in Veracross where they send us UTC timestamps
-         * but they aren't actually UTC values lol...for example, they send this:
-         *
-            [start] => 2025-09-02T14:30:00Z
-            [end] => 2025-09-02T15:25:00Z
-
-         * ...but that means it should display at 2:30pm-3:25pm in the timetable.
-         * We can glitch around this by simply str_replace T and Z out (?!!!?)
-         * until they figure out how to repair their api.
-         */
-//        $startAt = (new \Alaress_Date_Format(
-//            $classInstance['start'],
-//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-//            new \DateTimeZone('UTC')
-//        ))->setTimezone($this->timezone);
-//
-//        $finishAt = (new \Alaress_Date_Format(
-//            $classInstance['end'],
-//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-//            new \DateTimeZone('UTC')
-//        ))->setTimezone($this->timezone);
 
         /* Weird hacky version for now. Revert when veracross repairs their data.
          */
-        $tempStart = trim(str_replace(['T', 'Z'], ' ', $classInstance['start']));
-        $tempEnd = trim(str_replace(['T', 'Z'], ' ', $classInstance['end']));
-
-        $startAt = (new \Alaress_Date_Format(
-            $tempStart,
-            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
-        ));
-
-        $finishAt = (new \Alaress_Date_Format(
-            $tempEnd,
-            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
-        ));
+        $startAt = $classInstance['start'];
+        $finishAt = $classInstance['end'];
 
         /* Try to recycle based on guid
          */
@@ -344,7 +352,7 @@ class Classes implements IStrategy
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             '%s timetable event %s - %s, %s, %s-%s',
             $logPrefix,
             $event->getTitle(),
@@ -380,8 +388,8 @@ class Classes implements IStrategy
             $classEntry = $this->classEntries[$event->getCode()];
         } else {
             $classEntry = $this->classEntryMapper->createModel()
-                ->setName($class['description'])
-                ->setCode($class['class_id']);
+                ->setName($class['name'])
+                ->setCode($class['code']);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
@@ -415,9 +423,10 @@ class Classes implements IStrategy
         array $userLookup
     ): void {
         /* Save the teacher's involvement
+         * atm there's only one teacher per class, but it's possible there might be more somewhere
          */
-        $teacherExternalId = trim((string)$class['primary_teacher']['id']);
-        $name = trim((string)$class['primary_teacher']['name']);
+        $teacherExternalId = trim((string)$class['teachers'][0]['id']);
+        $name = trim((string)$class['teachers'][0]['name']);
 
         /* TODO Figure out overrides to put into saveStaffInvolvement
          *  So far, no distinction has yet been made for Overrides to exist
@@ -463,8 +472,9 @@ class Classes implements IStrategy
          * in a particular sis_event instance, rather than being associated with all
          */
         $this->log->debug(sprintf(
-            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
             $externalId,
+            $name,
             $event->getTitle(),
             $event->getDay(),
             $event->getPeriod(),
@@ -515,8 +525,8 @@ class Classes implements IStrategy
         string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
-            $this->log->debug(sprintf(
-                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+            $this->log->info(sprintf(
+                'Reusing previous class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
@@ -536,8 +546,8 @@ class Classes implements IStrategy
 
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
-            $this->log->debug(sprintf(
-                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+            $this->log->info(sprintf(
+                'Creating new class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
