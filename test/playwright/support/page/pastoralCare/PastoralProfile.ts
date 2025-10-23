@@ -31,6 +31,8 @@ export default class PastoralProfile {
 
     static readonly SELECTOR_PANEL_CONFIDENTIAL_LINK = "a#panel-confidential";
 
+    static readonly SELECTOR_DELETE_PASTORAL_RECORD_ICON = 'a[href="/pastoral/record/{studentId}/delete"]';
+
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
         this.tester = tester;
@@ -48,7 +50,7 @@ export default class PastoralProfile {
      * click Create Pastoral Record button
      */
     async clickCreatePastoralRecord(): Promise<void> {
-        await this.page.click(PastoralProfile.CREATE_PASTORAL_BUTTON);
+        await this.page.locator(PastoralProfile.CREATE_PASTORAL_BUTTON).click();
     }
 
     /**
@@ -57,12 +59,14 @@ export default class PastoralProfile {
      * @param recordId - The record id
      */
     async clickModifyIcon(studentId: number, recordId: number): Promise<void> {
-        await this.page.click(
-            PastoralProfile.PASTORAL_RECORD_UPDATE.replace("{studentId}", studentId.toString()).replace(
-                "{recordId}",
-                recordId.toString(),
-            ),
-        );
+        await this.page
+            .locator(
+                PastoralProfile.PASTORAL_RECORD_UPDATE.replace("{studentId}", studentId.toString()).replace(
+                    "{recordId}",
+                    recordId.toString(),
+                ),
+            )
+            .click();
     }
 
     /**
@@ -70,7 +74,7 @@ export default class PastoralProfile {
      * @param recordId - The record id
      */
     async clickDeleteIcon(recordId: number): Promise<void> {
-        await this.page.click(`a[id="${recordId}"]`);
+        await this.page.locator(`a[id="${recordId}"]`).click();
     }
 
     /**
@@ -79,26 +83,28 @@ export default class PastoralProfile {
      * @param recordId - The record id
      */
     async clickPastoralRecord(studentId: number, recordId: number): Promise<void> {
-        await this.page.click(
-            PastoralProfile.PASTORAL_RECORD.replace("{studentId}", studentId.toString()).replace(
-                "{recordId}",
-                recordId.toString(),
-            ),
-        );
+        await this.page
+            .locator(
+                PastoralProfile.PASTORAL_RECORD.replace("{studentId}", studentId.toString()).replace(
+                    "{recordId}",
+                    recordId.toString(),
+                ),
+            )
+            .click();
     }
 
     /**
      * click delete comment icon for learning moments, news, pastoral care records
      */
     async clickDeleteCommentIcon(): Promise<void> {
-        await this.page.click(PastoralProfile.DELETE_COMMENT_ICON);
+        await this.page.locator(PastoralProfile.DELETE_COMMENT_ICON).click();
     }
 
     /**
      * click post comment button
      */
     async clickPostComment(): Promise<void> {
-        await this.page.click(PastoralProfile.PASTORAL_POST_COMMENT);
+        await this.page.locator(PastoralProfile.PASTORAL_POST_COMMENT).click();
     }
 
     /**
@@ -136,7 +142,7 @@ export default class PastoralProfile {
      * click confidential panel link
      */
     async clickConfidentialPanelLink(): Promise<void> {
-        await this.page.click(PastoralProfile.SELECTOR_PANEL_CONFIDENTIAL_LINK);
+        await this.page.locator(PastoralProfile.SELECTOR_PANEL_CONFIDENTIAL_LINK).click();
     }
 
     /**
@@ -145,5 +151,18 @@ export default class PastoralProfile {
      */
     async seeInConfidentialPanel(text: string): Promise<void> {
         await expect(this.page.locator(PastoralProfile.SELECTOR_PANEL_CONFIDENTIAL)).toContainText(text);
+    }
+
+    /**
+     * delete the pastoral record delete by passing its record id
+     * @param recordId - The student id
+     */
+    async deletePastoralRecord(recordId: number): Promise<void> {
+        const deleteSelector = PastoralProfile.SELECTOR_DELETE_PASTORAL_RECORD_ICON.replace(
+            "{studentId}",
+            recordId.toString(),
+        );
+        await this.page.locator(deleteSelector).click();
+        await this.tester.common.clickConfirmButton();
     }
 }

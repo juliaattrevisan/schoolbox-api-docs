@@ -11,6 +11,7 @@ import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastora
 import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralProfile";
 import ClassReport from "@schoolboxTest/playwright/support/page/pastoralCare/ClassReport";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import ClassList from "@schoolboxTest/playwright/support/page/homepage/pages/ClassList";
 
 test.describe("Test the pastoral care modules expiry feature", () => {
     test.beforeEach(async ({ tester }) => {
@@ -221,6 +222,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     test("Confirm expired pastoral flags do not appear on student profile", async ({ tester, page, db }) => {
         const manageRecordSettings = new ManageRecordSettings(page, tester);
         const profilePage = new ProfilePage(tester, page);
+        const classList = new ClassList(page, tester);
 
         tester.isGoingTo("Visit the Award/Achievement page");
         await manageRecordSettings.gotoAwardAchievement();
@@ -257,6 +259,12 @@ test.describe("Test the pastoral care modules expiry feature", () => {
 
         tester.isGoingTo("Check that the Achievement flag is no longer visible");
         await expect(profilePage.getFlag(1, 1)).not.toBeVisible();
+
+        tester.isGoingTo("Visit the 9A English (9ENGA) class list");
+        await page.goto("/learning/class/83");
+
+        tester.isGoingTo("Check that the Achievement flag is not visible");
+        await expect(classList.getFlagLabel(29, 1, 1)).not.toBeVisible();
 
         await db.updateInDatabase(
             "lu_pastoral_subtype",
