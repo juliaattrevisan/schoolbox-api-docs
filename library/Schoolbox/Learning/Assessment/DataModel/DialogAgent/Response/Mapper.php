@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 
 /**
  * @method Model createModel($idValue = null)
@@ -96,5 +97,60 @@ class Mapper extends \Schoolbox\Mapper
             'submittedBy',
             'submittedBy',
         );
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
+                {$this->getJoinColumnString('learner', 'learner')},
+                {$this->getJoinColumnString('submittedBy', 'submittedBy')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
+            INNER JOIN {$this->getJoinSql('learner', '', 'learner', true)}
+            INNER JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
+        ";
+    }
+
+
+    /**
+     * @param \PDOStatement $statement
+     * @return GenericCollection
+     * @throws Exception
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $stack = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $response = $this->hydrate($row);
+
+            /* The dialog agent needs an assessmentModel's id to associate responses with an assessment.
+             * Eventually this gets hydrated into Participant, which gives you access to each student's
+             * IResponse collections in the business logic as a convenience.
+             */
+            /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessmentModel */
+            $assessmentModel = $this->createJoinModel('dialogAgent.assessmentModel', $row['dialogAgent.assessment_id']);
+
+            /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent */
+            $dialogAgent = $this->createJoinModel('dialogAgent', $row['dialogAgent.id']);
+            $dialogAgent->setAssessmentModel($assessmentModel);
+
+            $response->setDialogAgent($dialogAgent)
+                ->setLearner($this->hydrateJoin($row, 'learner', 'learner'))
+                ->setSubmittedBy($this->hydrateJoin($row, 'learner', 'learner'));
+
+            $stack->add($response);
+        }
+
+        return $stack;
     }
 }
