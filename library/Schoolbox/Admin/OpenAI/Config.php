@@ -26,9 +26,8 @@ class Config
         Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
-    public const NO_PROVIDER = "off";
+    public const NO_PROVIDER = "Off";
     public const PROVIDERS = [
-        self::NO_PROVIDER => self::NO_PROVIDER,
         Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
@@ -148,7 +147,7 @@ class Config
     private function getBlank()
     {
         // start with a blank config
-        $config = [self::FIELD_PROVIDER => self::NO_PROVIDER];
+        $config = [self::FIELD_PROVIDER => ['value' => self::NO_PROVIDER]];
         $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
@@ -198,7 +197,7 @@ class Config
     /**
      * @param string|null $config
      * @return array{
-     *    provider: string,
+     *    provider: array{value: string},
      *     general: array{
      *       ai_key: array{value: string},
      *       system_prompt: array{value: string}
@@ -224,24 +223,32 @@ class Config
     /**
      * Encode function for config array
      * @param array $config
-     * @return string
+     * @return false|string
      * @throws \JsonException
      * @throws SchoolboxException // invalid config
      */
-    public function encode(array $config): string
+    public function encode(array $config): false|string
     {
         // ensure the provider is one of the allowed one
-        if (!in_array($config[self::FIELD_PROVIDER] ?? null, self::PROVIDERS, true)) {
+        if (
+            self::NO_PROVIDER !== $config[self::FIELD_PROVIDER]['value'] &&
+            !in_array($config[self::FIELD_PROVIDER]['value'] ?? null, self::PROVIDERS, true)
+        ) {
             throw new SchoolboxException("Invalid provider specified in config");
         }
 
-        //array combine with blank config to ensure all fields are present
-        $fullConfig = array_merge($this->getBlank(), $config);
-        //if config doesn't match fullconfig structure, throw error
-        if (count(array_diff_key($fullConfig, $config)) > 0) {
-            throw new SchoolboxException("Invalid config structure");
+        $blank = $this->getBlank();
+        foreach (self::PROVIDERS as $module => $configName) {
+            //array combine with blank config to ensure all fields are present
+            $fullConfig = array_merge($blank[$module], $config[$module] ?? []);
+
+            // remove any extra fields that are not in the blank config
+            if (count(array_diff_key($fullConfig, $config[$module] ?? [])) > 0) {
+                throw new SchoolboxException("Invalid config structure for feature '$module'");
+            }
         }
 
-        return json_encode($fullConfig, JSON_THROW_ON_ERROR);
+        // config is valid, encode to json
+        return json_encode($config, JSON_THROW_ON_ERROR);
     }
 }

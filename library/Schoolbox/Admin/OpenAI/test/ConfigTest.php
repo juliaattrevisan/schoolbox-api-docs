@@ -217,4 +217,149 @@ class ConfigTest extends TestCase
         // invalid JSON
         $cfg->decode('{"invalid": }');
     }
+
+    /**
+     * Encode/Decode: round-trip for a valid OpenAI configuration
+     *
+     * This ensures that encode() produces valid JSON matching the expected
+     * full configuration structure and that decode() returns the same array.
+     */
+    public function testEncodeDecodeRoundTripOpenAI(): void
+    {
+        $cfg = new Config();
+
+        $input = [
+            Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI],
+            Helper::ENDPOINT_TYPE_GENERAL => [
+                Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
+                Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+            ],
+            Helper::ENDPOINT_TYPE_OPENAI => [
+                Config::FIELD_MODEL => ['value' => 'gpt-4o'],
+            ],
+            Helper::ENDPOINT_TYPE_AZURE => [
+                Config::FIELD_RESOURCE_NAME => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
+            ],
+        ];
+
+        // Should not throw
+        $json = $cfg->encode($input);
+        $this->assertIsString($json);
+
+        // decode should return the same structure as json_decode of the encoded string
+        $decoded = $cfg->decode($json);
+        $this->assertIsArray($decoded);
+
+        // The decoded structure should contain the provider and nested fields
+        $this->assertSame(Helper::ENDPOINT_TYPE_OPENAI, $decoded[Config::FIELD_PROVIDER]['value']);
+        $this->assertSame('openai-key-123', $decoded[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']);
+        $this->assertSame('gpt-4o', $decoded[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value']);
+    }
+
+    /**
+     * encode() should throw when provider is invalid
+     */
+    public function testEncodeWithInvalidProviderThrows(): void
+    {
+        $cfg = new Config();
+        $this->expectException(\Schoolbox\Mapper\Exception::class);
+        // only provider is necessary for provider validation to fail
+        $cfg->encode([Config::FIELD_PROVIDER => ['value' => 'INVALID_PROVIDER']]);
+    }
+
+    /**
+     * encode() should throw when required fields are missing from the config
+     */
+    public function testEncodeWithMissingFieldsThrows(): void
+    {
+        $cfg = new Config();
+        $this->expectException(\Schoolbox\Mapper\Exception::class);
+
+        // provider is valid but we're missing the nested sections/fields
+        $cfg->encode([Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI]]);
+    }
+
+    /**
+     * Valid encode/decode round-trip for Azure configuration
+     */
+    public function validReEncode(): void
+    {
+        $cfg = new Config();
+
+        $original = [
+            Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_AZURE],
+            Helper::ENDPOINT_TYPE_GENERAL => [
+                Config::FIELD_AIKEY => ['value' => 'shared-key-456'],
+                Config::FIELD_SYSTEM_PROMPT => ['value' => 'Azure prompt'],
+            ],
+            Helper::ENDPOINT_TYPE_OPENAI => [
+                Config::FIELD_MODEL => ['value' => ''],
+            ],
+            Helper::ENDPOINT_TYPE_AZURE => [
+                Config::FIELD_RESOURCE_NAME => ['value' => 'azure-resource'],
+                Config::FIELD_DEPLOYMENT_ID => ['value' => 'deployment-456'],
+            ],
+        ];
+
+        // Encode should not throw
+        $json = $cfg->encode($original);
+        $this->assertIsString($json);
+
+        // Decode should return the same structure
+        $decoded = $cfg->decode($json);
+        $this->assertEquals($original, $decoded);
+    }
+
+    /**
+     * Encode with missing OpenAI section should throw
+     */
+    public function testEncodeMissingOpenAI(): void
+    {
+        $cfg = new Config();
+
+        $input = [
+            Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI],
+            Helper::ENDPOINT_TYPE_GENERAL => [
+                Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
+                Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+            ],
+            Helper::ENDPOINT_TYPE_AZURE => [
+                Config::FIELD_RESOURCE_NAME => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
+            ],
+        ];
+
+        $this->expectException(\Schoolbox\Mapper\Exception::class);
+
+        // should throw due to missing config section
+        $cfg->encode($input);
+    }
+
+    /**
+     * Encode with missing Azure resource name should throw
+     */
+    public function testEncodeMissingAzureName(): void
+    {
+        $cfg = new Config();
+
+        $input = [
+            Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_AZURE],
+            Helper::ENDPOINT_TYPE_GENERAL => [
+                Config::FIELD_AIKEY => ['value' => 'shared-key-456'],
+                Config::FIELD_SYSTEM_PROMPT => ['value' => 'Azure prompt'],
+            ],
+            Helper::ENDPOINT_TYPE_OPENAI => [
+                Config::FIELD_MODEL => ['value' => ''],
+            ],
+            Helper::ENDPOINT_TYPE_AZURE => [
+                Config::FIELD_DEPLOYMENT_ID => ['value' => 'deployment-456'],
+            ],
+        ];
+
+        $this->expectException(\Schoolbox\Mapper\Exception::class);
+
+        // should throw due to missing config section
+        $cfg->encode($input);
+    }
 }

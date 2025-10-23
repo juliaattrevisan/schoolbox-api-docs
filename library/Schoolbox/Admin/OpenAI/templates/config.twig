@@ -3,9 +3,9 @@
         <span>Provider</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title='Select which provider you will use for conducting AI text queries; choose "Off" to disable this feature.'>?</span>
     </label>
-    <select id="{{ feature.feature }}-provider-value" type="text" name="[{{ feature.feature }}][{{ fields.provider }}]">
+    <select id="{{ feature.feature }}-provider-value" type="text" name="[{{ feature.feature }}][{{ fields.provider }}][value]">
         {% for provider in providers %}
-            <option value="{{ provider }}"{% if feature.config.provider ==  provider %} selected {% endif %}>{{ provider }}</option>
+            <option value="{{ provider }}"{% if feature.config.provider.value ==  provider %} selected {% endif %}>{{ provider }}</option>
         {% endfor %}
     </select>
 
