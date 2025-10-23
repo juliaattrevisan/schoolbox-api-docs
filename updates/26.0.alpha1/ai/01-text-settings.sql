@@ -125,9 +125,10 @@ VALUES (
        );
 
 -- Push down the 'openai-image' config following the text generation config
+-- Image configuration is the fifth "feature' you can set up
 UPDATE config
 SET
-    sequence = sequence + 4
+    sequence = sequence + 5
 WHERE
     module = 'openai-image';
 
