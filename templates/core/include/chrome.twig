@@ -141,7 +141,11 @@
             window.sbProps.aiFeatures["{{ feature }}"] = {
                 enabled: Boolean('{{ aiConfig.config.provider.value != 'Off' }}'),
                 {% if aiConfig.config.provider.value != 'Off' %}
-                    model: "{{ aiConfig.config.OpenAI.model.value ?? '' }}",
+                    {% if aiConfig.config.provider.value == 'Azure' %}
+                        model: "{{ aiConfig.config.Azure.deployment_id.value ?? '' }}",
+                    {% elseif aiConfig.config.provider.value == 'OpenAI' %}
+                        model: "{{ aiConfig.config.OpenAI.model.value ?? '' }}",
+                    {% endif %}
                 {% endif %}
             };
             {% endfor %}

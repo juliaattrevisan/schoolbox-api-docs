@@ -137,6 +137,32 @@ class Config
     }
 
     /**
+     * Get the model or deployment ID from the config
+     *
+     * @param array|null $config
+     * @return string|null
+     */
+    public function getModel(?array $config): ?string
+    {
+        if ($config === null) {
+            return null;
+        }
+        /**
+         * Retrieve the model to use in requests
+         * OpenAI lets us choose the model (from config),
+         * Azure has the model linked to the deployment ID when you set it up over there, so we can't choose it
+         */
+        if ($config[self::FIELD_PROVIDER] === Helper::ENDPOINT_TYPE_OPENAI) {
+            return $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_MODEL]['value'] ?? null;
+        }
+
+        if ($config[self::FIELD_PROVIDER] === Helper::ENDPOINT_TYPE_AZURE) {
+            return $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_DEPLOYMENT_ID]['value'] ?? null;
+        }
+        return null;
+    }
+
+    /**
      * Fetch all features and their config from the DB
      * @param ConfigMapper $configMapper
      * @return array
