@@ -10,10 +10,10 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentModel;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper as ResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as DataModel;
-use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentDomainObject;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as DomainObject;
 use Schoolbox\Mapper;
 
@@ -107,7 +107,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($mapperModels as $dataModel) {
             $domainObject = new DomainObject()
                 ->setId($dataModel->getId())
-                ->setAssessable((new DialogAgent\Model())->setId($dataModel->getDialogAgent()->getId()))
+                ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()->getAssessmentModel()->getId()))
                 ->setAuthoritative($dataModel->getAuthoritative())
                 ->setSubmittedAt($dataModel->getSubmittedAt())
                 ->setSubmittedBy($dataModel->getSubmittedBy())
@@ -141,7 +141,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = new DataModel()
                 ->setId($domainObject->getId())
-                ->setDialogAgent((new DialogAgentModel())->setId($domainObject->getDialogAgent()->getId()))
+                ->setDialogAgent((new DialogAgentDataModel())->setId($domainObject->getDialogAgent()->getId()))
                 ->setLearner($domainObject->getSubmittedOnBehalfOf())
                 ->setAuthoritative($domainObject->getAuthoritative())
                 ->setSubmittedAt($domainObject->getSubmittedAt())
