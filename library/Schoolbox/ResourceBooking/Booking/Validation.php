@@ -139,7 +139,7 @@ class Validation
      *                                      Leave it out of conflict checks.
      * @return array<string, array<string, array<string>>> Example:
      *         [
-     *             'start_datetime' => [
+     *             self::START_PERIOD_ERRORS => [
      *                 'invalid' => [
      *                     // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
      *                     'invalid'
@@ -152,7 +152,7 @@ class Validation
      *                 ],
      *                 ...
      *             ],
-     *             'end_datetime' => // Array with same structure as start_datetime.
+     *             self::END_PERIOD_ERRORS => // Array with same structure as start_datetime.
      *         ]
      *
      * @throws \PDOException
