@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
 
 use Schoolbox\Learning\Assessment\AbstractResponse;
 
-
 class Model extends AbstractResponse
 {
     /**
