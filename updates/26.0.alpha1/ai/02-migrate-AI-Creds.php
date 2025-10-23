@@ -46,7 +46,7 @@ $app = new class extends CliTool\App {
             $conf['openai_text_key'] ?? null,
             $conf['openai_text_azure_resource_name'] ?? null,
             $conf['openai_text_azure_deployment_id'] ?? null,
-            $conf['openai_text_model'] ?? null,
+            null,
             $conf['openai_text_generation_system_prompt'] ?? null
         );
 
@@ -89,7 +89,7 @@ $app = new class extends CliTool\App {
         $configHelper = new Config();
         // start with a blank config
         $config = [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initCommon();
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initGeneral();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure();
 
@@ -102,7 +102,9 @@ $app = new class extends CliTool\App {
             $config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
         } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
             $config[Config::FIELD_PROVIDER]['value'] = Helper::ENDPOINT_TYPE_OPENAI;
-            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] = $model ?? Config::NOT_ACTIVE;
+            // var the model, so we can set a default if missing (will grab the end of the array (newest model))
+            $systemModels = Config::AI_MODELS;
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] = $model ?? end($systemModels);
         }
         return $config;
     }

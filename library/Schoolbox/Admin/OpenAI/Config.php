@@ -32,11 +32,6 @@ class Config
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
 
-    /** Open AI models, and the 'OFF' option to be used in the same select box */
-    public const NOT_ACTIVE = "Not Active";
-
-
-
     public const AI_MODELS = [
         "gpt-4o",
         "gpt-4o-mini",
@@ -67,38 +62,11 @@ class Config
      */
     private ?array $features = null;
 
-    // new config struct
-    /**
-     *
-     * $aiChat = [
-     * 'provider' => 'off' // can be off openai or azure if OFF then feature is disabled
-     * 'openai' => [
-     * 'key' => [ // should this be in a common space?
-     * 'value' => 'aaaaaa',
-     * ],
-     * 'model' => [
-     * 'value' => 'gippity4.1-mini',
-     * ],
-     * 'systemprompt' => [ // should this be in a common space?
-     * 'value' => 'Talk like a pirate',
-     * ],
-     * 'azure' => [
-     * 'resource' => [
-     * 'value' => 'ccccccccc',
-     * ],
-     * 'deployment' => [
-     * 'value' => 'dddddd',
-     * ]
-     * ]
-     * ];
-     *
-     */
-
     /**
      * returns the common fields for all AI features
      * @return array
      */
-    public function initCommon()
+    public function initGeneral(): array
     {
         return [
             self::FIELD_AIKEY => [
@@ -114,7 +82,7 @@ class Config
      * returns the OpenAI specific fields
      * @return array[]
      */
-    public function initOpenAi()
+    public function initOpenAi(): array
     {
         return [
             self::FIELD_MODEL => [
@@ -127,9 +95,8 @@ class Config
      * returns the Azure specific fields
      * @return array[]
      */
-    public function initAzure()
+    public function initAzure(): array
     {
-
         return [
             self::FIELD_RESOURCE_NAME => [
                 'value' => '',
@@ -144,11 +111,11 @@ class Config
      * returns a blank config structure
      * @return array
      */
-    private function getBlank()
+    private function getBlank(): array
     {
         // start with a blank config
         $config = [self::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initGeneral();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
         return $config;
