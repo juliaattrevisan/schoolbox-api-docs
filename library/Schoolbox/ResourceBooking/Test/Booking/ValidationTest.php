@@ -47,7 +47,6 @@ class ValidationTest extends TestCase
         $campusMapper = null,
         $externalEventMapper = null
     ) {
-
         if (!$user) {
             $user = new User();
         }
@@ -147,7 +146,6 @@ class ValidationTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidatePastTime')]
     public function testValidatePastTime($startDate, $expected)
     {
-
         $validation = $this->createValidation();
         $errors = $validation->validatePastTime(new DateTime($startDate));
         $this->assertCount($expected, $errors);
@@ -299,7 +297,6 @@ class ValidationTest extends TestCase
      */
     public static function providerSimpleValidateForConflicts()
     {
-
         $conflictingBookings3 = (new Collection())
             ->add(
                 (new Booking\Model())
@@ -340,7 +337,6 @@ class ValidationTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSimpleValidateForConflicts')]
     public function testSimpleValidateForConflicts($startDate, $endDate, $conflictingBookings, $expected)
     {
-
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -363,7 +359,6 @@ class ValidationTest extends TestCase
      */
     public static function providerRoomValidateForConflicts()
     {
-
         $conflictingBookings3 = (new Collection())
             ->add(
                 (new Booking\Model())
@@ -506,7 +501,6 @@ class ValidationTest extends TestCase
      */
     public static function providerSeriesValidateForConflicts()
     {
-
         // Single booking
         $existingBooking = (new Booking\Model())
                     ->setId(1)
