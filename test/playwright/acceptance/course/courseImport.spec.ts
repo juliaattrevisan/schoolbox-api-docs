@@ -654,9 +654,7 @@ test.describe("Course import tests", () => {
         await expect(componentBottom.getByTestId(`course-outline-horizontal-${quizId}`)).toContainText(
             "Review horizontally",
         );
-        await expect(componentBottom.getByTestId(`course-outline-modify-settings-${quizId}`)).toContainText(
-            "Modify Settings",
-        );
+        await expect(componentBottom.getByTestId(`course-outline-modify-${quizId}`)).toContainText("Modify Settings");
         await expect(componentBottom.getByTestId(`course-outline-modify-contents-${quizId}`)).toContainText(
             "Modify Contents",
         );
