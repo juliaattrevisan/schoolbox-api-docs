@@ -35,7 +35,7 @@ export type Module = {
 export type Header = {
     title?: string;
     maxLength?: number;
-    type: "text" | "toggle";
+    type: "text" | "checkbox";
     colSpan: number;
     key: string;
 };

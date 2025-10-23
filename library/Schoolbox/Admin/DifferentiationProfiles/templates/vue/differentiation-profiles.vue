@@ -122,8 +122,8 @@ async function onSaveSelected(): Promise<void> {
                                     <div class="list-item">
                                         <template v-for="header in headersArray" :key="header.headerKey">
                                             <div v-if="header" :class="`small-12 medium-${header.colSpan} column`">
-                                                <!-- Toggle column -->
-                                                <div v-if="header.type === 'toggle'" class="switch f-no-margins">
+                                                <!-- Checkbox column -->
+                                                <template v-if="header.type === 'checkbox'">
                                                     <input
                                                         :id="`differentiation-profiles-adjustments-field-${module.id}`"
                                                         v-model="module.is_enabled"
@@ -132,13 +132,12 @@ async function onSaveSelected(): Promise<void> {
                                                     />
                                                     <label
                                                         :for="`differentiation-profiles-adjustments-field-${module.id}`"
+                                                        class="checkbox-label"
+                                                        >Enabled</label
                                                     >
-                                                        <span>On</span>
-                                                        <span>Off</span>
-                                                    </label>
-                                                </div>
+                                                </template>
                                                 <!-- Text columns -->
-                                                <div v-else-if="header.type === 'text'">
+                                                <template v-else-if="header.type === 'text'">
                                                     <label
                                                         :for="`module-${header.key}-${module.id}`"
                                                         class="t-visually-hidden"
@@ -152,7 +151,7 @@ async function onSaveSelected(): Promise<void> {
                                                         :name="`modules[${key}][${module.name}][${header.key}]`"
                                                         :readonly="header.key === 'title'"
                                                     />
-                                                </div>
+                                                </template>
                                             </div>
                                         </template>
                                     </div>
