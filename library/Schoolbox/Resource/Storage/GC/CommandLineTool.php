@@ -175,10 +175,11 @@ HELP;
         // Obey lock
         $logger->debug("Attempting to acquire process lock");
         try {
-            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+            $lock = $this->acquireLock(self::LOCK_NAME, null);
         } catch (\RuntimeException $e) {
             return;
         }
+        register_shutdown_function($lock->release(...));
 
         // Keep running or exit, depending on whether it's enabled in config.
         if (!$this->getConfig()->get(ConfigMapper::NAME_STORAGE_CLEANUP_ENABLED)) {
@@ -203,7 +204,6 @@ HELP;
                         self::OPT_LONG_FORCE_RUN_IF_DISABLED,
                     ),
                 );
-                $lock->release();
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
         }
@@ -231,13 +231,11 @@ HELP;
                             break;
                         }
                         if ($continue === 'q') {
-                            $lock->release();
                             exit(CliKernelAbstract::EXIT_STATUS_OK);
                         }
                     }
                 } else {
                     $logger->notice('Refusing to run in perform mode on a staging instance without the --force-run-on-staging flag.');
-                    $lock->release();
                     exit(CliKernelAbstract::EXIT_STATUS_OK);
                 }
             } else {
@@ -282,13 +280,7 @@ HELP;
         ;
 
         // Purge, throwing a lock exception if not held
-        try {
-            $gc->purge();
-        } finally {
-            if ($lock->isAcquired() && !$lock->isExpired()) {
-                $lock->release();
-            }
-        }
+        $gc->purge();
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
