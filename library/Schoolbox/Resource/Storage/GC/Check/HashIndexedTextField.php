@@ -143,7 +143,7 @@ class HashIndexedTextField implements Check
         } else {
             $this->logger->info('Building hash index: this may take a while...');
             $time = microtime(true);
-            $this->hashIndex ??= $this->buildHashIndex();
+            $this->hashIndex = $this->buildHashIndex();
             $this->logger->info(sprintf('. hash index built in %0.3fs', microtime(true) - $time));
         }
 

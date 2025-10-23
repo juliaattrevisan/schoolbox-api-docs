@@ -235,7 +235,7 @@ class GarbageCollector
             return 0;
         }
 
-        $this->log->notice('Deleting ' . count($purge) . ' stale hashes');
+        $this->log->notice(sprintf('Deleting %d stale hashes', count($purge)));
         foreach ($purge as $hash) {
             try {
                 $this->removeFromStorage($hash);
