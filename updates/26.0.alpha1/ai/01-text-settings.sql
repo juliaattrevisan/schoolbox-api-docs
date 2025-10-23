@@ -125,22 +125,27 @@ VALUES (
        );
 
 -- Push down the 'openai-image' config following the text generation config
--- Image configuration is the fifth "feature' you can set up
+-- Image configuration is the fifth "feature" you can set up
 UPDATE config
 SET
     sequence = sequence + 5
 WHERE
     module = 'openai-image';
 
+
 ### deprecate the old fields append (Deprecated) to the title for the following fields
+-- Note that these, while "deprecated", are actually going to still be used in the next update script
+-- 02-migrate-AI-Creds.php where we actually use their values
+
 UPDATE config
 SET
     title = CONCAT(title, ' (Deprecated)'),
     editable = 'false'
-WHERE
-    name IN (
-        'ai_text_key',
-        'ai_text_azure_resource_name',
-        'ai_text_azure_deployment_id',
-        'ai_text_model'
-    );
+WHERE name IN (
+    'openai_text_key',
+    'openai_text_azure_resource_name',
+    'openai_text_azure_deployment_id',
+    'openai_text_model',
+    'openai_text_endpoint',
+    'openai_text_generation_system_prompt'
+);
