@@ -994,6 +994,7 @@ class Module extends BaseModule
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
                     $dialogAgentScenarioMapper,
+                    $this->injector->get('dialogAgentResponseDataSource'),
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     editorTemplateHelper: new EditorTemplateHelper(

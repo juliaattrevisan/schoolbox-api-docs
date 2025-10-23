@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -50,6 +51,8 @@ use Twig\Error\Error;
 class Controller extends Assessment\Controller
 {
     /**
+     * Constructor.
+     *
      * @param UserMapper $userMapper
      * @param ErrorMapper $errorMapper
      * @param AssessmentMapperProxy $assessmentMapper
@@ -67,7 +70,8 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper,
+     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper ,
+     * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param EditorTemplateHelper $editorTemplateHelper
@@ -91,6 +95,7 @@ class Controller extends Assessment\Controller
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
+        private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
         private EditorTemplateHelper $editorTemplateHelper
@@ -120,7 +125,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Assessment Summary Screen for a Lesson Plan
+     * Assessment Summary Screen for a Dialog Agent
      *
      * @param Model|IAssessable $assessment
      * @param User              $student
@@ -310,11 +315,13 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * TODO I guess this is where students will create their conversation stuffs
+     * This is where students will create their dialog agent discussion stuffs
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
+     * @throws Error
+     * @throws RouteNotFound
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
@@ -384,6 +391,7 @@ class Controller extends Assessment\Controller
 
     /**
      * TODO This is when students hit the submit button to finalise their dialog agent discussion
+     *  Currently a placeholder to spawn data
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -391,7 +399,39 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
-        // noop
+        $requestPost = $this->requestPost;
+
+        /* If an existing responseId was provided, update that instance
+         * Otherwise spawn a new instance, configure that, and save it.
+         */
+        if ($requestPost->get('responseId')) {
+            $response = $this->dialogAgentResponseMapper->findById($requestPost->get('responseId'));
+        } else {
+            $response = $this->dialogAgentResponseMapper->createModel()
+                ->setCreatedAt(\Alaress_Date_Format::now())
+                ->setUpdatedAt(\Alaress_Date_Format::now());
+        }
+
+        $response->setAssessable($assessment);
+
+        $this->dialogAgentResponseMapper->save($response);
+
+        /* TODO this probably isn't tne nicest way to generate a redirected url
+         *  There *has* to be a cleaner way than this, esp. since returnUrl is a const in the Redirect
+         *  class itself, but is magically being written here.
+         */
+        $this->response = $this->redirectFound(
+            $this->routeGenerator->generate(
+                'learningAssessment.getSummary',
+                [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId'    => $student->getId()
+                ]
+            ) . (
+            ($requestPost->get('returnUrl') === null) ? '' :
+                '?returnUrl=' .  Redirect::encode($requestPost->get('returnUrl'))
+            )
+        );
     }
 
 

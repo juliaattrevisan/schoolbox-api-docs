@@ -10,9 +10,11 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper as ResponseMapper;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as DomainObject;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as DataObject;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as DataModel;
+use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as DomainObject;
 use Schoolbox\Mapper;
 
 /**
@@ -42,7 +44,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * @var string
      */
-    private string $selectString = 'SELECT id FROM dialog_agent_response';
+    private string $selectString = 'SELECT id FROM dialog_agent';
 
 
     /**
@@ -95,14 +97,31 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     /**
      * Transforms the db-friendly data model representations into their domain model representations.
      *
-     * Note: for dialog agent responses, data and domain representations are the same.
-     *
-     * @param Collection|DataObject[] $mapperModels
+     * @param Collection|DataModel[] $mapperModels
      * @return GenericCollection|DomainObject[]
      */
     protected function transformModels(Collection $mapperModels)
     {
-        return new GenericCollection(DomainObject::class, $mapperModels->getAll());
+        $stack = new GenericCollection(DomainObject::class);
+
+        foreach ($mapperModels as $dataModel) {
+            $domainObject = new DomainObject()
+                ->setId($dataModel->getId())
+                ->setAssessable((new DialogAgent\Model())->setId($dataModel->getDialogAgent()->getId()))
+                ->setAuthoritative($dataModel->getAuthoritative())
+                ->setSubmittedAt($dataModel->getSubmittedAt())
+                ->setSubmittedBy($dataModel->getSubmittedBy())
+                ->setSubmittedOnBehalfOf($dataModel->getLearner())
+                ->setSessionId($dataModel->getSessionId())
+                ->setAssistanceRequestedAt($dataModel->getAssistanceRequestedAt())
+                ->setCreatedAt($dataModel->getCreatedAt())
+                ->setUpdatedAt($dataModel->getUpdatedAt())
+                ->setDeletedAt($dataModel->getDeletedAt());
+
+            $stack->add($domainObject);
+        }
+
+        return $stack;
     }
 
 
@@ -112,11 +131,27 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      * Note: for dialog agent responses, data and domain representations are the same.
      *
      * @param Collection|DomainObject[] $domainObjects
-     * @return GenericCollection|DataObject[]
+     * @return GenericCollection|DataModel[]
      *
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
-        return $this->getMapper()->createCollection($domainObjects->getAll());
+        $stack = new GenericCollection(DataModel::class);
+
+        foreach ($domainObjects as $domainObject) {
+            $dataModel = new DataModel()
+                ->setId($domainObject->getId())
+                ->setDialogAgent((new DialogAgentModel())->setId($domainObject->getDialogAgent()->getId()))
+                ->setLearner($domainObject->getSubmittedOnBehalfOf())
+                ->setAuthoritative($domainObject->getAuthoritative())
+                ->setSubmittedAt($domainObject->getSubmittedAt())
+                ->setSubmittedBy($domainObject->getSubmittedBy())
+                ->setSessionId($domainObject->getSessionId())
+                ->setAssistanceRequestedAt($domainObject->getAssistanceRequestedAt());
+
+            $stack->add($dataModel);
+        }
+
+        return $stack;
     }
 }
