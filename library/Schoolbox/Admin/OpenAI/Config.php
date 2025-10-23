@@ -204,17 +204,15 @@ class Config
         }
 
         $blank = $this->getBlank();
-        foreach (self::PROVIDERS as $module => $configName) {
+        foreach (self::PROVIDERS as $provider => $configName) {
             // skip checking 'Off' provider
-            if (Helper::ENDPOINT_TYPE_OFF === $module) {
+            if (Helper::ENDPOINT_TYPE_OFF === $provider) {
                 continue;
             }
-            //array combine with blank config to ensure all fields are present
-            $fullConfig = array_merge($blank[$module], $config[$module] ?? []);
 
-            // remove any extra fields that are not in the blank config
-            if (count(array_diff_key($fullConfig, $config[$module] ?? [])) > 0) {
-                throw new SchoolboxException("Invalid config structure for feature '$module'");
+            // find any missing fields in the config for this module
+            if (count(array_diff_key($blank[$provider], $config[$provider] ?? [])) > 0) {
+                throw new SchoolboxException("Invalid config structure for provider '$provider', missing fields");
             }
         }
 

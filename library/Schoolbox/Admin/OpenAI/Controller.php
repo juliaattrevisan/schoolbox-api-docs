@@ -82,18 +82,18 @@ class Controller extends ConfigController
         $postData = $this->requestPost->getArrayCopy();
 
         $aiConf = new Config();
-        foreach (Config::ALL_MODULES as $module => $configName) {
+        foreach (Config::ALL_MODULES as $feature => $configName) {
             // only update config if there is data in the post for that module
-            if (!isset($postData[$module])) {
+            if (!isset($postData[$feature])) {
                 continue;
             }
             // get the config item
             $conf = $this->getConfigMapper()->findOneByColumn('name', $configName);
             // save the new config into that item
             try {
-                $conf->setValue($aiConf->encode($postData[$module]));
+                $conf->setValue($aiConf->encode($postData[$feature]));
             } catch (Exception $e) {
-                throw new Exception("Failed to encode config for feature '$module': " . $e->getMessage(), 0, $e);
+                throw new Exception("Failed to encode config for feature '$feature': " . $e->getMessage(), 0, $e);
             }
             $this->getConfigMapper()->save($conf);
         }
