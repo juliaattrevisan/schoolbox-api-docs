@@ -15,6 +15,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Command-line tool for Schoolbox's garbage collector.
@@ -190,11 +191,7 @@ HELP;
         } catch (\RuntimeException $e) {
             return;
         }
-        $callback = function () use ($lock, $logger) {
-            $logger->info('Cleanup complete: releasing process lock');
-            $lock->release();
-        };
-        register_shutdown_function($callback);
+        register_shutdown_function(fn () => $this->releaseLock($lock));
 
         // Keep running or exit, depending on whether it's enabled in config.
         if (!$this->getConfig()->get(ConfigMapper::NAME_STORAGE_CLEANUP_ENABLED)) {
@@ -302,5 +299,17 @@ HELP;
     public function getRequiredProcessUser(): ?string
     {
         return self::WEB_PROCESS_USER;
+    }
+
+    /**
+     * Release lock on shutdown.
+     *
+     * @param LockInterface $lock
+     * @return void
+     */
+    private function releaseLock(LockInterface $lock): void
+    {
+        $lock->release();
+        $this->getLogger()->info('Cleanup complete: released process lock');
     }
 }
