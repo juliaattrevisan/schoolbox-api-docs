@@ -32,7 +32,7 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
      */
     _links: Pick<
         NonNullable<Activity["_links"]>,
-        "status" | "summary" | "modify" | "modifyContent" | "studentParticipation"
+        "status" | "summary" | "modify" | "modifyContent" | "configureAgent" | "studentParticipation"
     > | null;
     _routes: {
         postFeedbacks: string | null;
