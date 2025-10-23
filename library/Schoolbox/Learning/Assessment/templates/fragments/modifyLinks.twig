@@ -1,0 +1,69 @@
+{##
+ # Used to render the "Modify" links for an activity in various dropdown menus
+ # Designed to be already inside a <ul> element (likely a <ul class="f-dropdown" ...>)
+ #
+ # The links shown varies depending on the type of assessment:
+ # - Quiz:            "Modify Settings" and "Modify Contents"
+ # - Dialog Agent:    "Modify Settings" and "Configure Agent"
+ # - All other types: "Modify"
+ #
+ # Links are only rendered if the user has permission to access them
+ #
+ # @param IAssessable $assessment
+ # @param string|null $modifyRoute     The route to use for the Modify link, null to hide it
+ # @param string|null $returnUrlName   (optional) The name of the return URL parameter, if including a return URL
+ # @param string|null $returnUrl       (optional) The return URL to use, if desired
+ # @param string|null $dataTestPrefix  (optional) To override the data-test attribute prefix, defaults to "assessment-"
+ #}
+
+{% set returnUrlParam = '' %}
+{% if returnUrlName and returnUrl %}
+    {% set returnUrlParam = '?' ~ returnUrlName ~ '=' ~ returnUrl %}
+{% endif %}
+
+{% set dataTestPrefix = dataTestPrefix ?? 'assessment-' %}
+
+{% if modifyRoute %}
+    <li>
+        <a
+            class="icon-modify"
+            data-test="{{ dataTestPrefix }}modify-{{ assessment.id }}"
+            href="{{ modifyRoute }}{{ returnUrlParam }}"
+            >Modify
+            {# Since Quiz/Dialog Agents have an extra button, distinguish what this "Modify" means #}
+            {% if assessment is quiz or assessment is dialogAgent %}
+                Settings
+            {% endif %}
+        </a>
+    </li>
+{% endif %}
+
+{% if assessment is quiz %}
+    {% set modifyContentsRoute = routeLookupIfAuthorized(
+        'learnosity.getContent',
+        { assessment: assessment, assessmentId: assessment.id }
+    ) %}
+
+    {% if modifyContentsRoute %}
+        <li>
+            <a
+                class="icon-modify"
+                data-test="{{ dataTestPrefix }}modify-contents-{{ assessment.id }}"
+                href="{{ modifyContentsRoute }}{{ returnUrlParam }}"
+            >Modify Contents</a>
+        </li>
+    {% endif %}
+{% endif %}
+
+{% if assessment is dialogAgent %}
+    {% set configureAgentRoute = routeLookupIfAuthorized('learningDialogAgent.getUpdateForm', {assessment: assessment, assessmentId: assessment.id}) %}
+    {% if configureAgentRoute %}
+        <li>
+            <a
+                class="icon-modify"
+                data-test="{{ dataTestPrefix }}configure-agent-{{ assessment.id }}"
+                href="{{ configureAgentRoute }}{{ returnUrlParam }}"
+            >Configure Agent</a>
+        </li>
+    {% endif %}
+{% endif %}

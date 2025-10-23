@@ -46,15 +46,12 @@ Usage:
         <ul class="f-dropdown" data-dropdown-content id="dropdown-{{ assessment.id }}">
             <li><a href="{{ routeLookup('learningAssessmentExporter.getExportFormForAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-export" title="Copy this task into classes">Export to Classes</a></li>
 
-            {% if assessment is quiz %}
-                {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
-                {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
-
-                {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>{% endif %}
-                {% if modifyContentsRoute %}<li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>{% endif %}
-            {% else %}
-                <li><a href="{{ routeLookup('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" class="icon-modify">Modify</a></li>
-            {% endif %}
+            {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+                assessment: assessment,
+                modifyRoute: routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}),
+                returnUrlName: RETURN_URL.name,
+                returnUrl: RETURN_URL.current,
+            } only %}
 
             <li><a href="{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id}) }}?{{ returnUrlName }}={{ returnUrl }}" data-action="delete-assessment" class="icon-delete">Delete</a></li>
         </ul>

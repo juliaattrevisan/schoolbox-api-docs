@@ -160,11 +160,15 @@
         {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
         {% if (deleteRoute or viewCustomParticipationRoute or assessment is quiz) %}
         <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
+            {# Exclude the base "Modify" link as we're already there #}
+            {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+                assessment: assessment,
+                returnUrlName: RETURN_URL.previous.encoded ? RETURN_URL.name : null,
+                returnUrl: RETURN_URL.previous.encoded ?? null,
+                modifyRoute: null,
+            } only %}
+
             {% if assessment is quiz %}
-                {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
-                <li>
-                    <a href="{{ modifyContentsRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Modify Contents">Modify Contents</a>
-                </li>
                 {% set exportRoute = routeLookupIfAuthorized('learnosity.getExportToJson', {assessment: assessment, assessmentId: assessment.id}) %}
                 <li>
                     <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-download" title="Download a file to reuse this quiz elsewhere">Export quiz as file</a>
