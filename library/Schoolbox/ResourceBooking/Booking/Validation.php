@@ -744,8 +744,11 @@ class Validation
         foreach ($errorsByKey as $keyIgnored => $errorTypesByDateString) {
             foreach ($errorTypesByDateString as $dateStringIgnored => $errorTypes) {
                 if (
-                    array_any($errorTypes, static fn ($errorType) =>
-                    !in_array($errorType, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true))
+                    array_any(
+                        $errorTypes,
+                        static fn ($errorType) =>
+                        !in_array($errorType, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)
+                    )
                 ) {
                     return false;
                 }
