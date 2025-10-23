@@ -750,7 +750,7 @@ class Validation
 
 
     /**
-     * @param array<string, array<string, array<string>> $errorsStruct
+     * @param array<string, array<string, array<string>>> $errorsStruct
      * @return array<string>
      */
     public function getAllErrorStringsAsFlatArray(array $errorsStruct): array

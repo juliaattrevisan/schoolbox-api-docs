@@ -630,7 +630,7 @@ class ValidationTest extends TestCase
 
     /**
      * Return a variety of error collections for testValidationErrorsAreAllClashes().
-     * @return array<array<string, array<string, array<string>>>, bool>
+     * @return array
      */
     public static function providerValidationErrorsAreAllClashes(): array
     {
