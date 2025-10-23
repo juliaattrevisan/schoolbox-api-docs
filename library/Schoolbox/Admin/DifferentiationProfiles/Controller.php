@@ -114,7 +114,7 @@ class Controller extends ConfigController
     public function postConfig(): void
     {
         $post = $this->requestPost;
-        $enabled = (null !== $post->get('enabled')) ? '1' : '0';
+        $enabled = $post->getBool('enabled', false) ? '1' : '0';
         $modules = $post->get('modules') ?? [];
         try {
             $this->differentiationProfilesMapper->getDatabase()->beginTransaction();
@@ -129,7 +129,7 @@ class Controller extends ConfigController
             if (!empty($modules)) {
                 foreach ($modules as $moduleName => $module) {
                     $index = 0;
-                    foreach ($module as $name => $fields) {
+                    foreach ($module['fields'] as $name => $fields) {
                         $moduleConfig = $this->differentiationProfilesMapper
                             ->createModel()
                             ->setId($fields['id'])
