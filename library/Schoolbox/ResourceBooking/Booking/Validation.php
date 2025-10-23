@@ -741,20 +741,30 @@ class Validation
         if (count($errorsByKey) === 0) {
             throw new InvalidArgumentException('No errors, so this function should not have been called.');
         }
-        foreach ($errorsByKey as $keyIgnored => $errorTypesByDateString) {
-            foreach ($errorTypesByDateString as $dateStringIgnored => $errorTypes) {
-                if (
-                    array_any(
-                        $errorTypes,
-                        static fn ($errorType) =>
-                        !in_array($errorType, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)
-                    )
-                ) {
-                    return false;
+
+        return array_all(
+            $this->getAllErrorStringsAsFlatArray($errorsByKey),
+            static fn ($error) => in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)
+        );
+    }
+
+
+    /**
+     * @param array<string, array<string, array<string>> $errorsStruct
+     * @return array<string>
+     */
+    public function getAllErrorStringsAsFlatArray(array $errorsStruct): array
+    {
+        $errorsFlattened = [];
+
+        foreach ($errorsStruct as $key => $errorsByDate) {
+            foreach ($errorsByDate as $dateIgnored => $errors) {
+                foreach ($errors as $error) {
+                    $errorsFlattened[] = $error;
                 }
             }
         }
 
-        return true;
+        return $errorsFlattened;
     }
 }
