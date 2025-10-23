@@ -69,39 +69,6 @@
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
 
-    {# The Four Dates of the Apocalypse
-     # This is a unique implementation which doesn't have a due date plus it's horizontally
-     # arranged, unlike the other activities
-     #}
-    {% if context.baseContext is not unitSpecification %}
-        {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
-
-        <div class="row">
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
-            </div>
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
-            </div>
-            {# In dialog agents, Due Date is known as Close Date.
-             #
-             # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
-             # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
-             # "Due Date" in the schema and business logic.
-             #
-             # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
-             # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
-             #}
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
-            </div>
-            {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
-            <div style="display:none">
-                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
-            </div>
-        </div>
-    {% endif %}
-
     {# Allowed Time #}
     <div class="row">
         <div class="small-5 medium-2 columns">
@@ -128,6 +95,41 @@
         </div>
     </div>
 </fieldset>
+
+{# The Four Dates of the Apocalypse
+ # This is a unique implementation which doesn't have a due date plus it's horizontally
+ # arranged, unlike the other activities
+ #}
+{% if context.baseContext is not unitSpecification %}
+    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+    <fieldset>
+        <legend>Submission Dates</legend>
+        <div class="row">
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
+            </div>
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
+            </div>
+            {# In dialog agents, Due Date is known as Close Date.
+            #
+            # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
+            # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
+            # "Due Date" in the schema and business logic.
+            #
+            # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
+            # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
+            #}
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
+            </div>
+            {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
+            <div style="display:none">
+                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
+            </div>
+        </div>
+    </fieldset>
+{% endif %}
 
 {# Scenario selection #}
 {% if not dialogAgent.instance %}
