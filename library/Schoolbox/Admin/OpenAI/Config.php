@@ -143,7 +143,7 @@ class Config
 
     /**
      * returns a blank config structure
-     * @return string[]
+     * @return array
      */
     private function getBlank()
     {
@@ -152,41 +152,6 @@ class Config
         $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
-        return $config;
-    }
-
-    /**
-     * migrate from the old config to the new config structure
-     *
-     * @param string|null $provider
-     * @param string|null $key
-     * @param string|null $resourceName
-     * @param string|null $deploymentId
-     * @param string|null $model
-     * @param string|null $systemPrompt
-     * @return array
-     */
-    public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model, ?string $systemPrompt): array
-    {
-        // start with a blank config
-        $config = [self::FIELD_PROVIDER => self::NO_PROVIDER];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
-        $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
-        $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
-
-        // set the fields we know about
-        if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
-            $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_AZURE;
-            $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
-            $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_AIKEY]['value'] = $key ?? '';
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
-        } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
-            $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_OPENAI;
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_AIKEY]['value'] = $key ?? '';
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_MODEL]['value'] = $model ?? self::NOT_ACTIVE;
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
-        }
         return $config;
     }
 
