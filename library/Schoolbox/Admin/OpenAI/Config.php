@@ -214,6 +214,11 @@ class Config
             if (count(array_diff_key($blank[$provider], $config[$provider] ?? [])) > 0) {
                 throw new SchoolboxException("Invalid config structure for provider '$provider', missing fields");
             }
+
+            // find any extra fields in the config for this module
+            if (count(array_diff_key($config[$provider] ?? [], $blank[$provider])) > 0) {
+                throw new SchoolboxException("Invalid config structure for provider '$provider', extra fields found");
+            }
         }
 
         // config is valid, encode to json

@@ -271,4 +271,35 @@ class ConfigTest extends TestCase
         // should throw due to missing config section
         $cfg->encode($input);
     }
+
+
+    /**
+     * Encode with extra Azure fields should throw
+     */
+    public function testEncodeExtraAzureFields(): void
+    {
+        $cfg = new Config();
+
+        $input = [
+            Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_AZURE],
+            Helper::ENDPOINT_TYPE_GENERAL => [
+                Config::FIELD_AIKEY => ['value' => 'shared-key-456'],
+                Config::FIELD_SYSTEM_PROMPT => ['value' => 'Azure prompt'],
+            ],
+            Helper::ENDPOINT_TYPE_OPENAI => [
+                Config::FIELD_MODEL => ['value' => ''],
+            ],
+            Helper::ENDPOINT_TYPE_AZURE => [
+                Config::FIELD_RESOURCE_NAME => ['value' => ''],
+                Config::FIELD_DEPLOYMENT_ID => ['value' => ''],
+                'extra_field' => ['value' => 'should not be here']
+            ],
+        ];
+
+        $this->expectException(\Schoolbox\Mapper\Exception::class);
+
+        // should throw due to missing config section
+        $resp = $cfg->encode($input);
+        $var = false;
+    }
 }
