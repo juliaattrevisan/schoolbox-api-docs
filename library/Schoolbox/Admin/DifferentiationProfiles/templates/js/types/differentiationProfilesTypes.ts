@@ -45,5 +45,5 @@ export type Header = {
 export type Data = {
     featureToggle: Toggle;
     modules: Module[];
-    headers: Header[];
+    headers: { [key: string]: Header };
 };

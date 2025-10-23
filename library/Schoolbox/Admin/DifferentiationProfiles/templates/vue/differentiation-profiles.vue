@@ -47,6 +47,19 @@ const data = window.Vue.ref<Data>(props.data);
                     </div>
                 </fieldset>
             </section>
+            <section v-if="data.headers && Object.keys(data.headers).length > 0">
+                <fieldset class="content">
+                    <div class="row">
+                        <div
+                            v-for="(header, headerKey) in data.headers"
+                            :key="headerKey"
+                            :class="`small-12 medium-${header.colSpan} columns`"
+                        >
+                            <h4>{{ header.title ? header.title : "" }}</h4>
+                        </div>
+                    </div>
+                </fieldset>
+            </section>
             <section v-for="(differentiationProfile, key) in data.modules" :key="key">
                 <fieldset class="content">
                     <template v-for="module in differentiationProfile.fields" :key="module.id">
