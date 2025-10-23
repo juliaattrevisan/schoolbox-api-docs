@@ -238,6 +238,9 @@ class Config
         foreach (self::PROVIDERS as $provider => $configName) {
             // skip checking 'Off' provider
             if (Helper::ENDPOINT_TYPE_OFF === $provider) {
+                /* TODO this ignores inspection of the payload if you'd set it to "off"
+                 *  it could be totally misshapen by the time you restore it, maybe
+                 */
                 continue;
             }
 
