@@ -26,18 +26,13 @@ class Model
     public const array CONFIGS_HEADER = [
         'is_enabled' => [
             'type' => 'checkbox',
-            'colSpan' => 1,
+            'colSpan' => 3,
             'key' => 'is_enabled',
-        ],
-        'title' => [
-            'type' => 'text',
-            'colSpan' => 2,
-            'key' => 'title',
         ],
         'terminology' => [
             'title' => 'Terminology',
             'type' => 'text',
-            'colSpan' => 2,
+            'colSpan' => 4,
             'key' => 'terminology',
             'maxLength' => 100,
         ],
