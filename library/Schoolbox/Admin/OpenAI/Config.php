@@ -46,7 +46,7 @@ class Config
 
     // field name and types
     public const FIELD_PROVIDER = 'provider';
-    public const FIELD_OPENAIKEY = 'open_ai_key';
+    public const FIELD_AIKEY = 'ai_key';
     public const FIELD_RESOURCE_NAME = 'resource_name';
     public const FIELD_DEPLOYMENT_ID = 'deployment_id';
     public const FIELD_MODEL = 'model';
@@ -54,7 +54,7 @@ class Config
 
     public const FIELDS = [
         self::FIELD_PROVIDER => self::FIELD_PROVIDER,
-        self::FIELD_OPENAIKEY => self::FIELD_OPENAIKEY,
+        self::FIELD_AIKEY => self::FIELD_AIKEY,
         self::FIELD_RESOURCE_NAME => self::FIELD_RESOURCE_NAME,
         self::FIELD_DEPLOYMENT_ID => self::FIELD_DEPLOYMENT_ID,
         self::FIELD_MODEL => self::FIELD_MODEL,
@@ -94,14 +94,15 @@ class Config
      *
      */
 
-    public function initOpenAi()
+    /**
+     * returns the common fields for all AI features
+     * @return array
+     */
+    public function initCommon()
     {
         return [
-            self::FIELD_OPENAIKEY => [
+            self::FIELD_AIKEY => [
                 'value' => '',
-            ],
-            self::FIELD_MODEL => [
-                'value' => '', // -- select an option --
             ],
             self::FIELD_SYSTEM_PROMPT => [
                 'value' => '',
@@ -109,6 +110,23 @@ class Config
         ];
     }
 
+    /**
+     * returns the OpenAI specific fields
+     * @return array[]
+     */
+    public function initOpenAi()
+    {
+        return [
+            self::FIELD_MODEL => [
+                'value' => '', // -- select an option --
+            ],
+        ];
+    }
+
+    /**
+     * returns the Azure specific fields
+     * @return array[]
+     */
     public function initAzure()
     {
 
@@ -137,6 +155,7 @@ class Config
     {
         // start with a blank config
         $config = [self::FIELD_PROVIDER => self::NO_PROVIDER];
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
 
@@ -145,11 +164,11 @@ class Config
             $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_AZURE;
             $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
             $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_AIKEY]['value'] = $key ?? '';
             $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
             $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_OPENAI;
-            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_AIKEY]['value'] = $key ?? '';
             $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_MODEL]['value'] = $model ?? self::NOT_ACTIVE;
             $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         }
@@ -202,10 +221,12 @@ class Config
      * @param string|null $config
      * @return array{
      *    provider: string,
+     *     general: array{
+     *       open_ai_key: array{value: string},
+     *       system_prompt: array{value: string}
+     *     },
      *    OpenAI: array{
-     *      open_ai_key: array{value: string},
      *      model: array{value: string},
-     *      system_prompt: array{value: string}
      *    },
      *    Azure: array{
      *      resource_name: array{value: string},

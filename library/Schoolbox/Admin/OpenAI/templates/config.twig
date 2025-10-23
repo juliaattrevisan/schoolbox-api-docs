@@ -9,11 +9,11 @@
         {% endfor %}
     </select>
 
-    <label id="{{ feature.feature }}-open_ai_key" for="{{ feature.feature }}-open_ai_key-value" data-feature-openai data-feature-azure style="display:none">
+    <label id="{{ feature.feature }}-ai_key" for="{{ feature.feature }}-ai_key-value" data-feature-openai data-feature-azure style="display:none">
         <span>OpenAI API Key</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.">?</span>
     </label>
-    <input id="{{ feature.feature }}-open_ai_key-value" type="text" name="[{{ feature.feature }}][OpenAI][open_ai_key][value]" value="{{ feature.config.OpenAI.open_ai_key.value }}" data-feature-openai data-feature-azure style="display:none">
+    <input id="{{ feature.feature }}-ai_key-value" type="text" name="[{{ feature.feature }}][general][ai_key][value]" value="{{ feature.config.general.ai_key.value }}" data-feature-openai data-feature-azure style="display:none">
 
     <label id="{{ feature.feature }}-model" for="{{ feature.feature }}-model-value" data-feature-openai style="display:none">
         <span>OpenAI Model</span>
@@ -42,7 +42,7 @@
         <span>{{ feature.title }} Generation System Prompt</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.">?</span>
     </label>
-    <textarea id="{{ feature.feature }}-system_prompt-value" name="[{{ feature.feature }}][OpenAI][system_prompt][value]" rows="5" data-feature-azure data-feature-openai style="display:none">{{ feature.config.OpenAI.system_prompt.value }}</textarea>
+    <textarea id="{{ feature.feature }}-system_prompt-value" name="[{{ feature.feature }}][general][system_prompt][value]" rows="5" data-feature-azure data-feature-openai style="display:none">{{ feature.config.general.system_prompt.value }}</textarea>
 
     <script type="application/javascript">
     (() => {

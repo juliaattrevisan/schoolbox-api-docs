@@ -79,7 +79,7 @@ class Controller extends Base
         try {
             $helper = new Helper(
                 trim($lpConfig[Config::FIELD_PROVIDER]),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
@@ -92,7 +92,7 @@ class Controller extends Base
                 trim($lpConfig[Config::FIELD_PROVIDER]),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
             ));
@@ -364,14 +364,14 @@ class Controller extends Base
         try {
             (new Helper(
                 trim($chatConfig[Config::FIELD_PROVIDER]),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
                 trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
                 trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
                 trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
+            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */

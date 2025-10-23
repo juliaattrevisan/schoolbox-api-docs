@@ -87,21 +87,20 @@ $app = new class extends CliTool\App {
         $configHelper = new Config();
         // start with a blank config
         $config = [Config::FIELD_PROVIDER => Config::NO_PROVIDER];
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initCommon();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure();
 
+        $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value'] = $key ?? '';
+        $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         // set the fields we know about
         if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
             $config[Config::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_AZURE;
             $config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
             $config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
-            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value'] = $key ?? '';
-            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
             $config[Config::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_OPENAI;
-            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value'] = $key ?? '';
             $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] = $model ?? Config::NOT_ACTIVE;
-            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         }
         return $config;
     }

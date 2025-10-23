@@ -40,7 +40,7 @@ class ConfigTest extends TestCase
                 [
                     'provider' => Helper::ENDPOINT_TYPE_OPENAI,
                     'openai' => [
-                        Config::FIELD_OPENAIKEY => ['value' => 'openai-key-123'],
+                        Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
                         Config::FIELD_MODEL => ['value' => 'gpt-4o'],
                         Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
                     ],
@@ -60,7 +60,7 @@ class ConfigTest extends TestCase
                 [
                     'provider' => Helper::ENDPOINT_TYPE_OPENAI,
                     'openai' => [
-                        Config::FIELD_OPENAIKEY => ['value' => 'openai-key-xyz'],
+                        Config::FIELD_AIKEY => ['value' => 'openai-key-xyz'],
                         Config::FIELD_MODEL => ['value' => Config::NOT_ACTIVE],
                         Config::FIELD_SYSTEM_PROMPT => ['value' => ''],
                     ],
@@ -80,7 +80,7 @@ class ConfigTest extends TestCase
                 [
                     'provider' => Helper::ENDPOINT_TYPE_AZURE,
                     'openai' => [
-                        Config::FIELD_OPENAIKEY => ['value' => 'shared-openai-key'],
+                        Config::FIELD_AIKEY => ['value' => 'shared-openai-key'],
                         Config::FIELD_MODEL => ['value' => ''],
                         Config::FIELD_SYSTEM_PROMPT => ['value' => 'Azure system prompt'],
                     ],
@@ -100,7 +100,7 @@ class ConfigTest extends TestCase
                 [
                     'provider' => Config::NO_PROVIDER,
                     'openai' => [
-                        Config::FIELD_OPENAIKEY => ['value' => ''],
+                        Config::FIELD_AIKEY => ['value' => ''],
                         Config::FIELD_MODEL => ['value' => ''],
                         Config::FIELD_SYSTEM_PROMPT => ['value' => ''],
                     ],
@@ -136,8 +136,8 @@ class ConfigTest extends TestCase
         // OpenAI block
         $this->assertArrayHasKey(Helper::ENDPOINT_TYPE_OPENAI, $result);
         $this->assertEquals(
-            $expected['openai'][Config::FIELD_OPENAIKEY]['value'],
-            $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']
+            $expected['openai'][Config::FIELD_AIKEY]['value'],
+            $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_AIKEY]['value']
         );
         $this->assertEquals(
             $expected['openai'][Config::FIELD_MODEL]['value'],
@@ -171,7 +171,7 @@ class ConfigTest extends TestCase
         $this->assertEquals(Config::NO_PROVIDER, $result[Config::FIELD_PROVIDER]);
 
         $this->assertArrayHasKey(Helper::ENDPOINT_TYPE_OPENAI, $result);
-        $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']);
+        $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_AIKEY]['value']);
         $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value']);
 
         $this->assertArrayHasKey(Helper::ENDPOINT_TYPE_AZURE, $result);
@@ -229,7 +229,7 @@ class ConfigTest extends TestCase
         $example = [
             Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI,
             Helper::ENDPOINT_TYPE_OPENAI => [
-                Config::FIELD_OPENAIKEY => ['value' => 'k'],
+                Config::FIELD_AIKEY => ['value' => 'k'],
                 Config::FIELD_MODEL => ['value' => 'gpt-4o'],
                 Config::FIELD_SYSTEM_PROMPT => ['value' => 'sp'],
             ],
