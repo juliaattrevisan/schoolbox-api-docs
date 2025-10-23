@@ -60,7 +60,7 @@ class Controller extends Base
 
         // ai Config
         $aiConfig = new Config();
-        $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_LESSONPLAN));
+        $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_LESSONPLAN));
 
         // if not enabled, 404
         if ($aiConfig->isEnabled($lpConfig) === false) {
@@ -340,7 +340,7 @@ class Controller extends Base
 
         // ai Config
         $aiConfig = new Config();
-        $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_CHAT));
+        $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
 
         // if not enabled, 404
         if ($aiConfig->isEnabled($chatConfig) === false) {

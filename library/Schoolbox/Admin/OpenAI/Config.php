@@ -43,10 +43,10 @@ class Config
 
     // map feature to config name
     public const MODULE_CONFIG = [
-        Helper::FEATURE_CHAT => ConfigMapper::NAME_OPENAI_TEXT_CHAT,
-        Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_OPENAI_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_OPENAI_DIFFERENTIATION,
-        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_OPENAI_DIALOGAGENT,
+        Helper::FEATURE_CHAT => ConfigMapper::NAME_AI_TEXT_CHAT,
+        Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_AI_LESSONPLAN,
+        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION,
+        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
     // field name and types

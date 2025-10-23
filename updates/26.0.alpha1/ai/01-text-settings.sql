@@ -16,7 +16,7 @@ INSERT INTO
     sequence
 )
 VALUES (
-           'openai_text_chat',
+           'ai_text_chat',
            'Text Chat',
            '',
            (
@@ -43,7 +43,7 @@ VALUES (
            )
        ),
        (
-           'openai_lessonplan',
+           'ai_lessonplan',
            'Lesson Plan',
            '',
            (
@@ -70,7 +70,7 @@ VALUES (
            )
        ),
        (
-           'openai_dialogagent',
+           'ai_dialogagent',
            'Discussion Learning Activity',
            '',
            (
@@ -97,7 +97,7 @@ VALUES (
            )
        ),
        (
-           'openai_differentiation',
+           'ai_differentiation',
            'Differentiation Profiles',
            '',
            (
@@ -138,8 +138,8 @@ SET
     editable = 'false'
 WHERE
     name IN (
-        'openai_text_key',
-        'openai_text_azure_resource_name',
-        'openai_text_azure_deployment_id',
-        'openai_text_model'
+        'ai_text_key',
+        'ai_text_azure_resource_name',
+        'ai_text_azure_deployment_id',
+        'ai_text_model'
     );

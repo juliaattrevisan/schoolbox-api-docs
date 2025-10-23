@@ -403,13 +403,14 @@ class ConfigMapper extends Mapper
     public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
     /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_SYSTEM_PROMPT = 'openai_text_generation_system_prompt';
 
     // Text Feature json config
-    public const NAME_OPENAI_TEXT_CHAT = 'openai_text_chat';
-    public const NAME_OPENAI_LESSONPLAN = 'openai_lessonplan';
-    public const NAME_OPENAI_DIALOGAGENT = 'openai_dialogagent';
-    public const NAME_OPENAI_DIFFERENTIATION = 'openai_differentiation';
+    public const NAME_AI_TEXT_CHAT = 'ai_text_chat';
+    public const NAME_AI_LESSONPLAN = 'ai_lessonplan';
+    public const NAME_AI_DIALOGAGENT = 'ai_dialogagent';
+    public const NAME_AI_DIFFERENTIATION = 'ai_differentiation';
 
     // image ai configs
     public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';
