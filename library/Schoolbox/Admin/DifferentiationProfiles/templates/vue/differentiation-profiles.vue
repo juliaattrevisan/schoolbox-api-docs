@@ -28,30 +28,26 @@ const headersArray = window.Vue.computed(() => {
 
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
-
-/**
- * Get the data to be posted to the server
- * @returns post data object
- */
-function getPostData(): Record<string, unknown> {
-    return {
-        enabled: data.value.featureToggle.enabled ? 1 : 0,
-        modules: data.value.modules,
-    };
-}
+const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
 
 /**
  * pass the new latest details to the backend
  */
 async function onSaveSelected(): Promise<void> {
+    if (isProcessing.value) {
+        return;
+    }
     const toast = window.sbProps.toastActivate("Saving...");
     try {
         isProcessing.value = true;
         loadError.value = null;
-        const response = await apiRequest<string, Record<string, unknown>>({
+        const response = await apiRequest({
             url: props.postRoute,
             method: "POST",
-            body: getPostData(),
+            body: {
+                enabled: data.value.featureToggle.enabled ? 1 : 0,
+                modules: data.value.modules,
+            },
         });
         if (!response.success) {
             throw new Error(response.message || "Failed to save");
@@ -163,7 +159,7 @@ async function onSaveSelected(): Promise<void> {
             </Transition>
             <div class="row">
                 <div class="small-12 column">
-                    <input type="submit" name="btnSubmit" value="Save" />
+                    <input type="submit" name="btnSubmit" :value="saveText" />
                 </div>
             </div>
         </form>

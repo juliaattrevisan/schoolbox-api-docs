@@ -146,7 +146,7 @@ class Controller extends ConfigController
                 }
             }
             $this->differentiationProfilesMapper->getDatabase()->commit();
-            $this->response = $this->responseEmpty(200);
+            $this->response = $this->responseAsJson(['success' => true]);
         } catch (MapperException $e) {
             $this->differentiationProfilesMapper->getDatabase()->rollBack();
             $status = Response::HTTP_INTERNAL_SERVER_ERROR;
