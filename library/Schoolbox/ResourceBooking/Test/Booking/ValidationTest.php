@@ -340,7 +340,9 @@ class ValidationTest extends TestCase
         $resource->setId(123);
 
         $errors = $validation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
-        $this->assertCount($expected, $errors);
+        $errorsToCount = $validation->getAllErrorStringsAsFlatArray($errors);
+
+        $this->assertCount($expected, $errorsToCount);
     }
 
     /**
@@ -423,7 +425,9 @@ class ValidationTest extends TestCase
     }
 
     /**
-     *
+     * Note this doesn't actually test the clash detection logic.
+     * It just checks that the number of errors returned is as expected,
+     * given that the provided set of clashing bookings and room events was found.
      *
      * @param string $startDate
      * @param string $endDate
@@ -434,13 +438,13 @@ class ValidationTest extends TestCase
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerRoomValidateForConflicts')]
     public function testRoomValidateForConflicts(
-        $startDate,
-        $endDate,
-        $conflictingBookings,
-        $roomCode,
-        $roomEvents,
-        $expected
-    ) {
+        string $startDate,
+        string $endDate,
+        Collection $conflictingBookings,
+        string $roomCode,
+        Collection $roomEvents,
+        int $expected
+    ): void {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -457,8 +461,9 @@ class ValidationTest extends TestCase
 
         /** @var Validation $mockValidation */
         $errors = $mockValidation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
+        $errorsToCount = $mockValidation->getAllErrorStringsAsFlatArray($errors);
 
-        $this->assertCount($expected, $errors);
+        $this->assertCount($expected, $errorsToCount);
     }
 
     /**
@@ -587,7 +592,10 @@ class ValidationTest extends TestCase
     }
 
     /**
-     *
+     * Note this doesn't actually test the clash detection logic.
+     * It just checks that the number of errors returned is as expected,
+     * given that the provided set of clashing bookings was found.
+     * It also tests that bookings from the series of bookings being updated are not counted as clashing bookings.
      *
      * @param string $startDate
      * @param string $endDate
@@ -597,11 +605,11 @@ class ValidationTest extends TestCase
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSeriesValidateForConflicts')]
     public function testSeriesValidateForConflicts(
-        $startDate,
-        $endDate,
-        $existingBooking,
-        $conflictingBookings,
-        $expected
+        string $startDate,
+        string $endDate,
+        Booking\Model $existingBooking,
+        Collection $conflictingBookings,
+        int $expected
     ) {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
@@ -615,8 +623,9 @@ class ValidationTest extends TestCase
 
         /** @var Validation $mockValidation */
         $errors = $mockValidation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate), $existingBooking);
+        $errorsToCount = $mockValidation->getAllErrorStringsAsFlatArray($errors);
 
-        $this->assertCount($expected, $errors);
+        $this->assertCount($expected, $errorsToCount);
     }
 
     /**
