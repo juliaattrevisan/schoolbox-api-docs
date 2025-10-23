@@ -1,4 +1,14 @@
 /**
+ * A switch toggle for enabling/disabling a feature
+ */
+export type Toggle = {
+    enabled: boolean;
+    required: boolean;
+    title: string;
+    description: string;
+};
+
+/**
  * A field in a differentiation profile module
  */
 export type Field = {
@@ -15,22 +25,12 @@ export type Field = {
  * A differentiation profile module
  */
 export type Module = {
-    fields: Field[];
+    fields: { [key: string]: Field };
     isSortable?: boolean;
 };
 
 /**
- * Whether the settings are enabled
- */
-export type Toggle = {
-    enabled: boolean;
-    required: boolean;
-    title: string;
-    description: string;
-};
-
-/**
- * To identify a column group
+ * To identify a column group and corresponding module structure
  */
 export type Header = {
     title?: string;
@@ -45,6 +45,6 @@ export type Header = {
  */
 export type Data = {
     featureToggle: Toggle;
-    modules: Module[];
+    modules: { [key: string]: Module };
     headers: { [key: string]: Header };
 };
