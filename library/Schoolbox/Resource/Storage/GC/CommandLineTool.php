@@ -27,10 +27,10 @@ class CommandLineTool extends CliTool\App
     public const LOCK_NAME = 'storageCleanup';
 
     /**
-     * The amount of time (in seconds) this lock is held for: note that this
-     * tool during processing may re-acquire the lock.
+     * By default, the lock will be held for `--max-time` seconds, plus this
+     * many seconds to allow the actual deletion of records to complete.
      */
-    private const LOCK_TTL = 60;
+    private const STORAGE_DELETION_ALLOWANCE = 60 * 60;
 
     /**
      * Print help
@@ -75,9 +75,9 @@ class CommandLineTool extends CliTool\App
     private const OPT_LONG_MAX_TIME = 'max-time:';
 
     /**
-     * Default max time: if not set or <= 0, no max time is set.
+     * Default max time: 6 hours.
      */
-    private const DEFAULT_MAX_TIME = null;
+    private const DEFAULT_MAX_TIME = 60 * 60 * 6;
 
     /**
      * --force-run-on-staging: unless this flag is provided, do not allow this
@@ -151,7 +151,7 @@ OPTIONS
     -n={limit}:              the maximum number of storage records to check.
                              Defaults to 1000: if <= 0, do not limit number of records.
     --max-time={max-time}:   process hashes in batches until the script has been running for this many seconds.
-                             Defaults to no max time: if <= 0, do not limit the time the script runs for.
+                             Defaults to 21600 (6 hours).
     --batch={batch-size}:    process this many hashes per batch: defaults to 10.
     -t={threshold}:          threshold: do not attempt to clean up storage records last checked more recently than this
                              date threshold, defaults to 2 months ago.
@@ -172,14 +172,29 @@ HELP;
 
         $logger = $this->getLogger();
 
-        // Obey lock
-        $logger->debug("Attempting to acquire process lock");
+        // Hold process lock for max-time,
+        // plus a little longer to finish actually deleting files
+        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
+        if ($maxTime <= 0) {
+            $maxTime = self::DEFAULT_MAX_TIME;
+        }
+        $logger->info(
+            sprintf(
+                "Attempting to acquire process lock for max-time (%ds) + allowance for deletion (%ds): will release at end",
+                $maxTime,
+                self::STORAGE_DELETION_ALLOWANCE,
+            ),
+        );
         try {
-            $lock = $this->acquireLock(self::LOCK_NAME, null);
+            $lock = $this->acquireLock(self::LOCK_NAME, $maxTime + self::STORAGE_DELETION_ALLOWANCE);
         } catch (\RuntimeException $e) {
             return;
         }
-        register_shutdown_function($lock->release(...));
+        $callback = function () use ($lock, $logger) {
+            $logger->info('Cleanup complete: releasing process lock');
+            $lock->release();
+        };
+        register_shutdown_function($callback);
 
         // Keep running or exit, depending on whether it's enabled in config.
         if (!$this->getConfig()->get(ConfigMapper::NAME_STORAGE_CLEANUP_ENABLED)) {
@@ -252,10 +267,6 @@ HELP;
         $limit = $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT);
         if ($limit <= 0) {
             $limit = null;
-        }
-        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
-        if ($maxTime <= 0) {
-            $maxTime = null;
         }
 
         $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
