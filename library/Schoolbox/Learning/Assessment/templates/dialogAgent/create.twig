@@ -140,22 +140,15 @@
         <div class="radiolist">
             <ul class="option-list">
                 {% for scenario in dialogAgent.scenarios %}
-                    {# TODO Snake pls decorate this in a reptilian manner thx #}
-                    <li style="border:1px solid #f00;width:50%;min-height:200px;float:left;padding-right:2rem;">
+                    <li>
                         <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
-                        <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
-
+                        <label for="scenario-{{ scenario.id }}"><strong>{{ scenario.title }}</strong></label>
+                        <button class="button f-no-bkg l-mar--0" type="button">
+                            <sbx-icon name="curriculum" size="m" color="currentColor"></sbx-icon>
+                        </button>
                         <article>
                             {{ scenario.description }}
                         </article>
-
-                        <ul>
-                            {% for field in scenario.fields %}
-                                <li>
-                                    {{ field.title }}
-                                </li>
-                            {% endfor %}
-                        </ul>
                     </li>
                 {% endfor %}
             </ul>
