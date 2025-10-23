@@ -88,7 +88,7 @@ $app = new class extends CliTool\App {
     {
         $configHelper = new Config();
         // start with a blank config
-        $config = [Config::FIELD_PROVIDER => ['value' => Config::NO_PROVIDER]];
+        $config = [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
         $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initCommon();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure();
