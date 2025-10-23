@@ -41,7 +41,7 @@ class Controller extends Base
         // count of all
         $count = $this->aiLogMapper->countAll();
 
-        $features = new AIConfig($this->configMapper)->getFeatures();
+        $features = new AIConfig()->fetchFeatures($this->configMapper);
 
         // add on image as a feature
         $features['image'] = [
@@ -75,7 +75,7 @@ class Controller extends Base
 
         //ensure feature is one of the actual features...
         if ($feature) {
-            if (!in_array($feature, array_merge(AIConfig::ALL_MODULES, ['image']), true)) {
+            if (!array_key_exists($feature, array_merge(AIConfig::ALL_MODULES, ['image']))) {
                 $problem = (new ApiProblem('Unknown Feature'))
                     ->setStatus(404)
                     ->asArray();
