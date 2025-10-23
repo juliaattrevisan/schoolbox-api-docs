@@ -124,13 +124,13 @@ VALUES (
            )
        );
 
--- Push down the 'openai-image' config following the text generation config
--- Image configuration is the fifth "feature" you can set up
-UPDATE config
-SET
-    sequence = sequence + 5
-WHERE
-    module = 'openai-image';
+# -- Push down the 'openai-image' config following the text generation config
+# -- Image configuration is the fifth "feature" you can set up
+# UPDATE config
+# SET
+#     sequence = sequence + 5
+# WHERE
+#     module = 'openai-image';
 
 
 ### deprecate the old fields append (Deprecated) to the title for the following fields
