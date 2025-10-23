@@ -56,8 +56,8 @@ const headersArray = window.Vue.computed(() => {
                     </div>
                 </fieldset>
             </section>
-            <section v-if="data.headers && Object.keys(data.headers).length > 0">
-                <fieldset class="content">
+            <section>
+                <fieldset v-if="data.headers && Object.keys(data.headers).length > 0" class="content">
                     <div class="row">
                         <div
                             v-for="(header, headerKey) in data.headers"
@@ -68,9 +68,7 @@ const headersArray = window.Vue.computed(() => {
                         </div>
                     </div>
                 </fieldset>
-            </section>
-            <section v-for="(differentiationProfile, key) in data.modules" :key="key">
-                <fieldset class="content">
+                <fieldset v-for="(differentiationProfile, key) in data.modules" :key="key" class="content">
                     <template v-for="module in differentiationProfile.fields" :key="module.id">
                         <template v-for="header in headersArray" :key="header.headerKey">
                             <div v-if="header" :class="`small-12 medium-${header.colSpan} columns`">
