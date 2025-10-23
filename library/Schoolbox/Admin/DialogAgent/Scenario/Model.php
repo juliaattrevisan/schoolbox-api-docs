@@ -67,6 +67,14 @@ class Model implements ISoftDeletable
     private ?\Schoolbox\GenericCollection $fields = null;
 
 
+    /**
+     * A set of scenario criteria gets put here
+     *
+     * @var \Schoolbox\GenericCollection|null
+     */
+    private ?\Schoolbox\GenericCollection $criteria = null;
+
+
     /* Modest conveniences
      */
 
@@ -206,6 +214,26 @@ class Model implements ISoftDeletable
     public function addField(Field\Model $field): self
     {
         $this->fields->add($field);
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\GenericCollection|null
+     */
+    public function getCriteria(): ?\Schoolbox\GenericCollection
+    {
+        return $this->criteria;
+    }
+
+
+    /**
+     * @param \Schoolbox\GenericCollection|null $criteria
+     * @return $this
+     */
+    public function setCriteria(?\Schoolbox\GenericCollection $criteria): self
+    {
+        $this->criteria = $criteria;
         return $this;
     }
 }
