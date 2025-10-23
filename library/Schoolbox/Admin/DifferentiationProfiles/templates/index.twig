@@ -72,7 +72,10 @@
             </form>
         </div>
         <div id="differentiation-profiles-container">
-            <differentiation-profiles />
+            <differentiation-profiles
+                post-route="{{ routeLookup('differentiationProfiles.postConfig') }}"
+                :data="{{ data.differentiationProfiles|json_encode }}"
+            />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/differentiationProfiles.js?v={{ config.site_version }}"></script>
     </div>
