@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Show all docker-compose logs
+"$(dirname "$0")/compose" logs "$@"

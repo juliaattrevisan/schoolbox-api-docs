@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+declare TASKD_BUILD_FROM_LOCAL
+declare LTI_DEVKIT_ENABLE
+declare SECOND_INSTANCE_ENABLE
+
+source "$(dirname "$0")/functions"
+
+load_config
+
+# Which task daemon compose file is used?
+# A different one is used when using a locally built container, vs. using
+# one pulled from the private container registry.
+taskd_compose_file=''
+case "${TASKD_BUILD_FROM_LOCAL}" in
+    1 | true | yes | on)
+        taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
+        ;;
+    *)
+        taskd_compose_file="docker/schoolbox-taskd/deploy.docker-compose.yaml"
+        ;;
+esac
+
+# For now this is hardcoded:
+# eventually, this may allow loading the deployable variant of the
+# FrankenPHP container.
+frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
+
+# Build profiles
+profiles=''
+case "${LTI_DEVKIT_ENABLE}" in
+    1 | true | yes | on)
+        profiles="$profiles --profile lti"
+        ;;
+esac
+case "${SECOND_INSTANCE_ENABLE}" in
+    1 | true | yes | on)
+        profiles="$profiles --profile second-instance"
+        ;;
+esac
+
+# Run docker compose with whatever the appropriate profiles are.
+docker compose --progress plain \
+    -f "docker/base.docker-compose.yaml" \
+    -f "${frankenphp_compose_file}" \
+    -f "${taskd_compose_file}" \
+    --env-file .docker-compose.env \
+    $profiles "$@"

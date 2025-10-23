@@ -49,8 +49,6 @@ The task daemon can be configured to run from either an already built image,
 or from an image built from local code, depending on the
 `TASKD_BUILD_FROM_LOCAL` environment variable.
 
-> TODO finalise how to pull already built image: Dockerhub? ECR?
-
 However it's run: the config file [docker-taskd.env](../docker-taskd.env) can be
 used to configure it, as per https://github.com/alaress/taskd/blob/master/CONFIGURATION.md.
 
@@ -65,14 +63,21 @@ up the Vagrant development environment.
   (`up` must be run first)
 - `ssh`: create a shell session in the `schoolbox-cli` container, for running
   commands
+- `logs`: view logs for containers in the development environment
 - `clean`: cleans up the temporary and cache files which the Docker development
   environment may create
+- `compose`: a helper script which calls `docker compose` with the project's
+  `.env` files: presumes they were already built with `docker/up`
+  - this may be used to run other `docker compose` sub-commands
 
-`up` and `down` also pass through any arguments to their `docker compose up` and
-`docker compose down` calls, respectively. For example:
-- `up --build` builds images before starting containers
+`up`, `down` and `logs` also pass through any arguments to their equivalent
+`docker compose` calls. For example:
+- `up --build` builds images before starting containers:
+  useful for when an image definition has changed
 - `down -v` removes volumes (e.g. database data) when stopping containers:
   useful for when testing a new database version
+- `logs rabbitmq -f` shows logs for the RabbitMQ container only, and follows
+  log output
 
 See the documentation for the `docker compose` commands for more information:
 - [up](https://docs.docker.com/reference/cli/docker/compose/up/)
@@ -81,3 +86,21 @@ See the documentation for the `docker compose` commands for more information:
 These scripts should all be run with `sudo`, unless your current user has been
 added to the Docker group: see
 https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user.
+
+## Troubleshooting
+
+`docker/logs` will show the logs for all containers within the Docker
+environment: remember it's possible to filter logs to a single container by
+providing the container name.
+
+If the environment gets into a bad state, it can be rebuilt like so:
+```bash
+# -v removes volumes, including database data
+docker/down -v
+
+# remove all stopped containers
+docker system prune
+
+# restart and rebuild containers
+docker/up --build
+```

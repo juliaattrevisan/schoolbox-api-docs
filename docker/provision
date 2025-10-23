@@ -1,21 +1,68 @@
 #!/usr/bin/env bash
 
+declare SECOND_INSTANCE_ENABLE
+
+source "$(dirname "$0")/functions"
+
+load_config
+
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
+
+# Parse args for --install-instance-only
+provision_args=''
+errors='0'
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --install-instance-only )
+            provision_args="--install-instance-only"
+            shift
+            ;;
+        *)
+            log "Unrecognised option: '$1'"
+            shift # past argument
+            errors="1"
+            ;;
+    esac
+done
+if [[ $errors == "1" ]]; then
+    exit 1
+fi
 
 # Add tests that containers are actually up, or just run docker-up
 
 # Run the provision script in the schoolbox-cli container
-docker exec -it -u root schoolbox-cli tools/docker-provision.sh
+docker exec -it -u root schoolbox-cli tools/docker-provision.sh $provision_args
+
+## Restart containers which may depend on the rabbitmq vhost
+#"$(dirname "$0")/compose" restart schoolbox-scheduled schoolbox-mobiled
+
+# Is the second env in action?
+# If so, re-run the provision script for INSTANCE_ID=docker2, and also restart
+# containers which depend on its rabbitmq vhost
+case "${SECOND_INSTANCE_ENABLE}" in
+    1 | true | yes | on)
+        docker exec -it -e INSTANCE_ID=docker2 -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
+#        "$(dirname "$0")/compose" restart schoolbox2-scheduled schoolbox2-mobiled
+        ;;
+esac
 
 # restart the caddy container to pick up any changes
-docker restart caddy
+"$(dirname "$0")/compose" restart caddy
 
 # Output the URLs/IPs which this instance may be accessed from:
 echo "Access the Schoolbox development instance via the following local URLs:"
 echo "This machine only:"
 echo "- https://docker.dev.schoolbox.cloud/"
-echo "Other machines on this network:"
+case "${SECOND_INSTANCE_ENABLE}" in
+    1 | true | yes | on)
+        echo "- https://docker2.dev.schoolbox.cloud/ (separate instance)"
+        echo "Other machines on this network (docker.dev.schoolbox.cloud only):"
+        ;;
+    * )
+        echo "Other machines on this network:"
+        ;;
+esac
 for device in $(ip -4 -o a | cut -d ' ' -f 2); do
     # Skip loopback device
     if [ "$device" = 'lo' ]; then

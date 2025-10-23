@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Helper functions used by all docker scripts
+
+# Log to stderr
+function log() {
+    echo "$@" >&2
+}
+
+# Load configuration from relevant sources
+function load_config() {
+    source ./docker.default.env
+    if [ -f ./docker.env ]; then
+        source ./docker.env
+    fi
+}

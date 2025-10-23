@@ -60,12 +60,18 @@ Ideally, only the Docker development environment will need to be set up.
     > TODO test Docker Desktop
   * the most recent [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
     for your operating system
+    * if using a recent Ubuntu release, the Snap store contains an up-to-date
+      AWS CLI:
+      ```
+      sudo snap install aws-cli
+      ```
   * recommended: a [Docker Credentials Store](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
     for secure storage of credentials
-* add this line to `/etc/hosts` or its Windows equivalent
+* add these lines to `/etc/hosts` or its Windows equivalent
   (usually `C:\Windows\System32\drivers\etc\hosts`)
   ```
   127.0.0.1 docker.dev.schoolbox.cloud
+  127.0.0.1 docker2.dev.schoolbox.cloud
   ```
 * create `docker.env`, and override any configuration in `docker.default.env`
   if needed:

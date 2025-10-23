@@ -1,7 +1,67 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-# Always run within root folder
-cd "$(dirname "$0")/.." || exit 1
+source "$(dirname "$0")/functions"
 
-# Open a shell in the schoolbox-cli container
-docker exec -it schoolbox-cli /bin/bash --login
+# Parse args for:
+# -u or --user: the username to SSH as, defaults to container's default user
+# --index: if provided, the replica number of the container
+# last arg, if not a flag: container to run, defaults to `schoolbox-cli`
+container='schoolbox-cli'
+index=1
+user=''
+errors='0'
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --index )
+            index=$2
+            shift # past argument
+            shift # past value
+            ;;
+        --user | -u )
+            user=$2
+            shift # past argument
+            shift # past value
+            ;;
+        --help | -h )
+            echo "Usage:  docker/ssh [OPTIONS] CONTAINER
+
+Open a shell in a running container.
+
+Containers may be listed with \`docker/compose ps\`.
+
+Options:
+      --index int     Index of the container if it has multiple replicas
+  -u, --user string   Log in as this user"
+            exit
+            ;;
+        *)
+            # Any other value: if it's not a flag, it's the container name
+            if [[ $1 == "-"* ]]; then
+                log "Unrecognised option: '$1'"
+                errors="1"
+            else
+                container=$1
+            fi;
+            break
+            ;;
+    esac
+done
+if [[ $errors == "1" ]]; then
+    exit 1
+fi
+
+user_flag=''
+if [[ $user != '' ]]; then
+    log "Logging in as user \"${user}\":"
+    user_flag="--user ${user}"
+fi
+
+# Open a shell in any container, or into schoolbox-cli if not specified
+"$(dirname "$0")/compose" exec "${container}" which /bin/bash > /dev/null
+if [[ $? -eq 0 ]]; then
+    log "Logging in to ${container}, using bash shell:"
+    "$(dirname "$0")/compose" exec $user_flag --index "${index}" "${container}" /bin/bash --login
+else
+    log "Logging in to ${container}, using sh shell (bash does not exist):"
+    "$(dirname "$0")/compose" exec $user_flag --index "${index}" "${container}" /bin/sh --login
+fi

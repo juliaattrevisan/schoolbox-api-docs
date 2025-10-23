@@ -5,6 +5,7 @@ declare SITE_ROOT
 declare CACHE_DIR
 declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 
+declare INSTANCE_ID
 declare DATA_SOURCE
 declare DATA_FILENAME
 declare CERTIFICATE_SOURCE
@@ -13,14 +14,12 @@ declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
 declare INSTANCE_REGISTRY_URL
 declare INSTANCE_REGISTRY_API_KEY
-declare DEFAULT_INSTANCE_ID
 declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
   INSTANCE_REGISTRY_URL INSTANCE_REGISTRY_API_KEY \
-  DEFAULT_INSTANCE_ID \
   ARTIFACT_SOURCE \
 )
 
@@ -336,6 +335,18 @@ function init_npm_dependencies() {
   chown -R schoolboxsuper:schoolboxsuper node_modules/ www/static/js/bundle/
 }
 
+function add_rabbitmq_vhost() {
+  log "Adding RabbitMQ vhost and permissions";
+  curl -u guest:guest -H "Accept: application/json" -X PUT "http://rabbitmq:15672/api/vhosts/${INSTANCE_ID}"
+  curl -u guest:guest -H "Accept: application/json" -X PUT -d '{"configure":".*","write":".*","read":".*"}' "http://rabbitmq:15672/api/permissions/${INSTANCE_ID}/guest"
+}
+
+function create_data_dirs() {
+  log "Creating data dirs for instance";
+  /usr/share/schoolbox/tools/create-data-dirs.sh "/var/lib/schoolbox/${INSTANCE_ID}/"
+  /usr/share/schoolbox/tools/set-data-dir-perms.sh "/var/lib/schoolbox/${INSTANCE_ID}/" www-data
+}
+
 function install_instance() {
   log "Installing instance via 'schoolbox-data-refresh.sh'";
 
@@ -344,55 +355,64 @@ function install_instance() {
   # execution (by making calls to site_down.sh/site_up.sh).
   # (The site_down.sh/site_up.sh scripts update the database, so site_down.sh cannot be run until the database has been
   #  created.)
-  if ! INSTANCE_ID="${DEFAULT_INSTANCE_ID}" schoolbox-data-refresh \
-  --data-source "$DATA_SOURCE" \
-  --dataset "$DATA_FILENAME" \
-  --skip-bucket-copy \
-  --sql-host 'mariadb' \
-  --sql-schema 'schoolbox' \
-  --sql-user 'schoolboxdocker' \
-  --sql-pass 'abc123' \
-  --cache-dir "${CACHE_DIR}" \
-  --config amqp_host "'rabbitmq'" \
-  --config amqp_user "'guest'" \
-  --config amqp_pass "'guest'" \
-  --config amqp_vhost "'/'" \
-  --config debug_show_stack_trace "'1'" \
-  --config debug_templates "'1'" \
-  --config eotc_enabled "'1'" \
-  --config etherpad_host "'http://schoolbox-etherpad:9001'" \
-  --config etherpad_api_token "'test'" \
-  --config external_type "'$EXTERNAL_DB'" \
-  --config external_db_db "'$EXTERNAL_DB_DB'" \
-  --config external_db_host "'$EXTERNAL_DB_HOST'" \
-  --config external_db_user "'schoolbox'" \
-  --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
-  --config fixtures_enabled "'1'" \
-  --config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
-  --config instance_registry_url "'$INSTANCE_REGISTRY_URL'" \
-  --config ldap_enable "'0'" \
-  --config mail_enable "'1'" \
-  --config mail_smtp_host "'mailcatcher'" \
-  --config mail_smtp_port "'1025'" \
-  --config office365_client "'85671866-2f6b-4ec3-9940-1f39ecc05e50'" \
-  --config office365_immersive_reader_name "'schoolbox-test'" \
-  --config office365_tenant "'alaressteam'" \
-  --config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
-  --config pastoral_enabled "'1'" \
-  --config qr_login_enabled "'1'" \
-  --config redis_url "'tcp://redis-storage:6379'" \
-  --config redis_ephemeral_url "'tcp://redis-cache:6379'" \
-  --config taskd_redis_url "'tcp://redis-storage:6379'" \
-  --config resource_booking_enabled "'1'" \
-  --config site_domain "'dev.schoolbox.cloud'" \
-  --config site_hostname "'docker'" \
-  --config site_school_code "'docker'" \
-  --config site_environment "'client-hosted'" \
-  --config site_type "'dev'" \
-  --config strict_templates "'1'" \
-  --config summative_report_enabled "'1'" \
-  --config title "'Schoolbox [docker]'" \
-  --config ups_groups_enabled "'1'"; then
+  if ! schoolbox-data-refresh \
+    --data-source "$DATA_SOURCE" \
+    --dataset "$DATA_FILENAME" \
+    --skip-bucket-copy \
+    --sql-host "$(schoolbox-read-instances --option SQL_host)" \
+    --sql-schema "$(schoolbox-read-instances --option SQL_db)"  \
+    --sql-user "$(schoolbox-read-instances --option SQL_user)"  \
+    --sql-pass "$(schoolbox-read-instances --option SQL_passwd)"  \
+    --cache-dir "${CACHE_DIR}" \
+    --config amqp_host "'rabbitmq'" \
+    --config amqp_user "'guest'" \
+    --config amqp_pass "'guest'" \
+    --config amqp_vhost "'${INSTANCE_ID}'" \
+    --config debug_show_stack_trace "'1'" \
+    --config debug_templates "'1'" \
+    --config eotc_enabled "'1'" \
+    --config etherpad_host "'http://schoolbox-etherpad:9001'" \
+    --config etherpad_api_token "'test'" \
+    --config external_type "'$EXTERNAL_DB'" \
+    --config external_db_db "'$EXTERNAL_DB_DB'" \
+    --config external_db_host "'$EXTERNAL_DB_HOST'" \
+    --config external_db_user "'schoolbox'" \
+    --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
+    --config fixtures_enabled "'1'" \
+    --config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
+    --config instance_registry_url "'$INSTANCE_REGISTRY_URL'" \
+    --config ldap_enable "'0'" \
+    --config mail_enable "'1'" \
+    --config mail_smtp_host "'mailcatcher'" \
+    --config mail_smtp_port "'1025'" \
+    --config office365_client "'85671866-2f6b-4ec3-9940-1f39ecc05e50'" \
+    --config office365_immersive_reader_name "'schoolbox-test'" \
+    --config office365_tenant "'alaressteam'" \
+    --config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
+    --config pastoral_enabled "'1'" \
+    --config qr_login_enabled "'1'" \
+    --config redis_url "'tcp://redis-storage:6379'" \
+    --config redis_ephemeral_url "'tcp://redis-cache:6379'" \
+    --config taskd_redis_url "'tcp://redis-storage:6379'" \
+    --config resource_booking_enabled "'1'" \
+    --config site_domain "'dev.schoolbox.cloud'" \
+    --config site_hostname "'${INSTANCE_ID}'" \
+    --config site_school_code "'${INSTANCE_ID}'" \
+    --config site_environment "'client-hosted'" \
+    --config site_type "'dev'" \
+    --config strict_templates "'1'" \
+    --config summative_report_enabled "'1'" \
+    --config title "'Schoolbox [${INSTANCE_ID}]'" \
+    --config ups_groups_enabled "'1'" \
+    --config zip_dir "'/var/lib/schoolbox/${INSTANCE_ID}/cache/zip'" \
+    --config portrait_dir "'/var/lib/schoolbox/${INSTANCE_ID}/cache/portrait'" \
+    --config stream_dir "'/var/lib/schoolbox/${INSTANCE_ID}/cache/stream'" \
+    --config storage_dir "'/var/lib/schoolbox/${INSTANCE_ID}/storage'" \
+    --config logs_dir "'/var/log/schoolbox/${INSTANCE_ID}'" \
+    --config purifier_cache_dir "'/var/lib/schoolbox/${INSTANCE_ID}/purifier'" \
+    --config twig_cache_dir "'/var/lib/schoolbox/${INSTANCE_ID}/twig'" \
+    --config backup_dir "'/var/lib/schoolbox/${INSTANCE_ID}/backups'";
+  then
     error "Unable to install instance. Exiting."
     exit 1
   fi
@@ -409,18 +429,18 @@ function create_cron_config_file() {
   local timezone;
   timezone=$("$SITE_ROOT"/tools/instance-mariadb.sh -NBe "select value from config where name = 'date_timezone'")
   # Hardcode UPS run time to 22:00 for now, I suppose?
-  echo "${DEFAULT_INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${DEFAULT_INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
+  echo "${INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
 }
 
 function create_crontab_files() {
   log "Creating crontab files";
-  cloud-rebuild-cronjobs --is-primary-host 1 --instance "${DEFAULT_INSTANCE_ID}"
+  cloud-rebuild-cronjobs --is-primary-host 1 --instance "${INSTANCE_ID}"
 }
 
 function post_install() {
   log "Removing system maintenance mode";
-  if INSTANCE_ID="${DEFAULT_INSTANCE_ID}" "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
-    log "Maintenance mode disabled on instance '${DEFAULT_INSTANCE_ID}'"
+  if "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
+    log "Maintenance mode disabled on instance '${INSTANCE_ID}'"
   else
     warn "Could not disable maintenance mode on instance 'docker': continuing"
   fi
@@ -443,17 +463,45 @@ function main() {
   load_consts
   load_config
   setup_aws_sso
-  create_ir_config_file
 
-  cleanup_cache_dir
-  download_secrets
-  download_certs
-  mark_safe_for_git
+  # Should the setup of everything be skipped?
+  install_instance_only='0'
+  errors='0'
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --install-instance-only )
+        install_instance_only='1'
+        shift
+        ;;
+      *)
+        error "Unrecognised option: '$1'"
+        shift # past argument
+        errors="1"
+        ;;
+    esac
+  done
+  if [[ $errors == "1" ]]; then
+    exit 1
+  fi
 
-  init_composer_dependencies
-  init_npm_dependencies
+  if [[ $install_instance_only == "0" ]]; then
+    create_ir_config_file
 
-  init_database
+    cleanup_cache_dir
+    download_secrets
+    download_certs
+    mark_safe_for_git
+
+    init_composer_dependencies
+    init_npm_dependencies
+
+    init_database
+  else
+    log "Skipping setup";
+  fi
+
+  add_rabbitmq_vhost
+  create_data_dirs
   install_instance
   create_cron_config_file
   create_crontab_files

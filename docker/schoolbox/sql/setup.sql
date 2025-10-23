@@ -1,6 +1,9 @@
 DROP DATABASE IF EXISTS schoolbox;
 CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 
+DROP DATABASE IF EXISTS schoolbox2;
+CREATE DATABASE schoolbox2 CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
+
 # for now need to create vagrant user
 DROP USER IF EXISTS 'schoolboxvagrant'@'localhost';
 CREATE USER IF NOT EXISTS 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123';
@@ -12,3 +15,5 @@ CREATE USER IF NOT EXISTS 'schoolboxdocker'@'%' IDENTIFIED BY 'abc123';
 # grant everything to all these users
 GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost';
 GRANT ALL ON schoolbox.* to 'schoolboxdocker'@'%';
+GRANT ALL ON schoolbox2.* to 'schoolboxvagrant'@'localhost';
+GRANT ALL ON schoolbox2.* to 'schoolboxdocker'@'%';

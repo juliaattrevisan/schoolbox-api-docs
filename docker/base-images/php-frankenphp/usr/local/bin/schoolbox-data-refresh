@@ -461,16 +461,8 @@ set_ownership_and_permissions(){
 
 # Drop all database views and tables
 function empty_schema(){
-  log "Dropping all database views..."
-  for db_view in $(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE LIKE "VIEW"'); do
-    if ! mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "SET MAX_STATEMENT_TIME=0; DROP view $db_view"; then
-      error "Unable to drop database view: $db_view"
-      error 1;
-    fi
-  done
-
-  log "Dropping all database tables..."
-  if ! mariadb-dump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
+  log "Dropping all database tables and views..."
+  if ! mariadb-dump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e 'DROP TABLE \| DROP VIEW \| FOREIGN_KEY_CHECKS' | mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
     error "Unable to drop database tables"
     exit 1;
   fi
