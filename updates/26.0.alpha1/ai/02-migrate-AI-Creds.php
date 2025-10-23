@@ -106,7 +106,6 @@ $app = new class extends CliTool\App {
         }
         return $config;
     }
-
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */

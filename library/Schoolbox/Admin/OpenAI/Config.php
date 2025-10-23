@@ -200,7 +200,7 @@ class Config
      * @return array{
      *    provider: string,
      *     general: array{
-     *       open_ai_key: array{value: string},
+     *       ai_key: array{value: string},
      *       system_prompt: array{value: string}
      *     },
      *    OpenAI: array{
