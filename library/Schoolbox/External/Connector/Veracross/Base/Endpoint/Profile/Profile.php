@@ -273,7 +273,7 @@ class Profile implements IStrategy
                     continue;
                 }
 
-                $academicHouse = '';
+                $academicHouse = $student['house']['name'] ?? '';
                 $boardingStatus = false;
 
                 /* Maybe the campus node exists...not sure if it ALWAYS exists, or just sometimes.
