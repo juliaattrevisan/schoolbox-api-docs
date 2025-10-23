@@ -116,38 +116,49 @@ async function onSaveSelected(): Promise<void> {
                         </div>
                     </fieldset>
                     <fieldset v-for="(differentiationProfile, key) in data.modules" :key="key" class="content">
-                        <template v-for="module in differentiationProfile.fields" :key="module.id">
-                            <template v-for="header in headersArray" :key="header.headerKey">
-                                <div v-if="header" :class="`small-12 medium-${header.colSpan} columns`">
-                                    <!-- Toggle column -->
-                                    <div v-if="header.type === 'toggle'" class="switch f-no-margins">
-                                        <input
-                                            :id="`differentiation-profiles-adjustments-field-${module.id}`"
-                                            v-model="module.is_enabled"
-                                            type="checkbox"
-                                            :name="`modules[${key}][${module.name}][is_enabled]`"
-                                        />
-                                        <label :for="`differentiation-profiles-adjustments-field-${module.id}`">
-                                            <span>On</span>
-                                            <span>Off</span>
-                                        </label>
+                        <ul class="information-list sortable ui-sortable">
+                            <template v-for="module in differentiationProfile.fields" :key="module.id">
+                                <li class="list-item-container">
+                                    <div class="list-item">
+                                        <template v-for="header in headersArray" :key="header.headerKey">
+                                            <div v-if="header" :class="`small-12 medium-${header.colSpan} column`">
+                                                <!-- Toggle column -->
+                                                <div v-if="header.type === 'toggle'" class="switch f-no-margins">
+                                                    <input
+                                                        :id="`differentiation-profiles-adjustments-field-${module.id}`"
+                                                        v-model="module.is_enabled"
+                                                        type="checkbox"
+                                                        :name="`modules[${key}][${module.name}][is_enabled]`"
+                                                    />
+                                                    <label
+                                                        :for="`differentiation-profiles-adjustments-field-${module.id}`"
+                                                    >
+                                                        <span>On</span>
+                                                        <span>Off</span>
+                                                    </label>
+                                                </div>
+                                                <!-- Text columns -->
+                                                <div v-else-if="header.type === 'text'">
+                                                    <label
+                                                        :for="`module-${header.key}-${module.id}`"
+                                                        class="t-visually-hidden"
+                                                    >
+                                                        {{ header.title || header.key }}
+                                                    </label>
+                                                    <input
+                                                        :id="`module-${header.key}-${module.id}`"
+                                                        v-model="module[header.key]"
+                                                        type="text"
+                                                        :name="`modules[${key}][${module.name}][${header.key}]`"
+                                                        :readonly="header.key === 'title'"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </template>
                                     </div>
-                                    <!-- Text columns -->
-                                    <div v-else-if="header.type === 'text'">
-                                        <label :for="`module-${header.key}-${module.id}`" class="t-visually-hidden">
-                                            {{ header.title || header.key }}
-                                        </label>
-                                        <input
-                                            :id="`module-${header.key}-${module.id}`"
-                                            v-model="module[header.key]"
-                                            type="text"
-                                            :name="`modules[${key}][${module.name}][${header.key}]`"
-                                            :readonly="header.key === 'title'"
-                                        />
-                                    </div>
-                                </div>
+                                </li>
                             </template>
-                        </template>
+                        </ul>
                     </fieldset>
                 </section>
             </Transition>
