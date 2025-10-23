@@ -65,35 +65,36 @@ const data = window.Vue.ref<Data>(props.data);
                             </div>
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <label :for="`module-title-${module.id}`">
-                                <input
-                                    :id="`module-title-${module.id}`"
-                                    v-model="module.title"
-                                    type="text"
-                                    :name="`modules[${key}][${module.name}][title]`"
-                                    readonly
-                                />
-                            </label>
+                            <label :for="`module-title-${module.id}`" class="t-visually-hidden">Title</label>
+                            <input
+                                :id="`module-title-${module.id}`"
+                                v-model="module.title"
+                                type="text"
+                                :name="`modules[${key}][${module.name}][title]`"
+                                readonly
+                            />
                         </div>
                         <div class="small-12 medium-3 columns">
-                            <label :for="`module-terminology-${module.id}`">
-                                <input
-                                    :id="`module-terminology-${module.id}`"
-                                    v-model="module.terminology"
-                                    type="text"
-                                    :name="`modules[${key}][${module.name}][terminology]`"
-                                />
-                            </label>
+                            <label :for="`module-terminology-${module.id}`" class="t-visually-hidden"
+                                >Terminology</label
+                            >
+                            <input
+                                :id="`module-terminology-${module.id}`"
+                                v-model="module.terminology"
+                                type="text"
+                                :name="`modules[${key}][${module.name}][terminology]`"
+                            />
                         </div>
                         <div class="small-12 medium-5 columns">
-                            <label :for="`module-description-${module.id}`">
-                                <input
-                                    :id="`module-description-${module.id}`"
-                                    v-model="module.description"
-                                    type="text"
-                                    :name="`modules[${key}][${module.name}][description]`"
-                                />
-                            </label>
+                            <label :for="`module-description-${module.id}`" class="t-visually-hidden"
+                                >Description</label
+                            >
+                            <input
+                                :id="`module-description-${module.id}`"
+                                v-model="module.description"
+                                type="text"
+                                :name="`modules[${key}][${module.name}][description]`"
+                            />
                         </div>
                         <input type="hidden" :name="`modules[${key}][${module.name}][name]`" :value="module.name" />
                         <input type="hidden" :name="`modules[${key}][${module.name}][id]`" :value="module.id" />
