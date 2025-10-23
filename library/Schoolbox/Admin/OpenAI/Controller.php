@@ -91,13 +91,13 @@ class Controller extends ConfigController
     {
         $postData = $this->requestPost->getArrayCopy();
 
-        foreach (Config::ALL_MODULES as $module) {
+        foreach (Config::ALL_MODULES as $module => $configName) {
             // only update config if there is data in the post for that module
             if (!isset($postData[$module])) {
                 continue;
             }
             // get the config item
-            $conf = $this->getConfigMapper()->findOneByColumn('name', Config::MODULE_CONFIG[$module]);
+            $conf = $this->getConfigMapper()->findOneByColumn('name', $configName);
             // save the new config into that item
             $conf->setValue(json_encode($postData[$module], JSON_THROW_ON_ERROR));
             $this->getConfigMapper()->save($conf);

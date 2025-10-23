@@ -16,12 +16,15 @@ use Schoolbox\Config\ConfigMapper;
 
 class Config
 {
-    // enabled AI features (to be configured as part of the text Gen settings)
+    /**
+     * enabled AI features (to be configured as part of the text Gen settings)
+     * feature name => config name
+     */
     public const ALL_MODULES = [
-        Helper::FEATURE_CHAT,
-        Helper::FEATURE_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION,
-        Helper::FEATURE_DIALOGAGENT,
+        Helper::FEATURE_CHAT => ConfigMapper::NAME_AI_TEXT_CHAT,
+        Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_AI_LESSONPLAN,
+        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION,
+        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
     public const PROVIDERS = [
@@ -39,14 +42,6 @@ class Config
         "gpt-4o-mini",
         "gpt-4.1",
         "gpt-4.1-mini",
-    ];
-
-    // map feature to config name
-    public const MODULE_CONFIG = [
-        Helper::FEATURE_CHAT => ConfigMapper::NAME_AI_TEXT_CHAT,
-        Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_AI_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION,
-        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
     // field name and types
@@ -188,9 +183,9 @@ class Config
     {
         if ($this->features === null) {
             // hit the db once, get all module configs for AI features, then build the array
-            $rows = $configMapper->findByColumn(ConfigMapper::COL_NAME, self::MODULE_CONFIG);
+            $rows = $configMapper->findByColumn(ConfigMapper::COL_NAME, self::ALL_MODULES);
             foreach ($rows as $row) {
-                $feature = array_search($row->getName(), self::MODULE_CONFIG, true);
+                $feature = array_search($row->getName(), self::ALL_MODULES, true);
                 $this->features[$feature] = [
                     'feature' => $feature,
                     'title' => $row->getTitle(),
