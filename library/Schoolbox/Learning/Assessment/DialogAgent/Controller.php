@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
@@ -63,7 +64,7 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper ,
+     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper,
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param EditorTemplateHelper $editorTemplateHelper
@@ -86,7 +87,7 @@ class Controller extends Assessment\Controller
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        protected \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
+        protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
         private EditorTemplateHelper $editorTemplateHelper
