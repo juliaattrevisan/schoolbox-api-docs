@@ -117,46 +117,46 @@ async function onSaveSelected(): Promise<void> {
                     </fieldset>
                     <fieldset v-for="(differentiationProfile, key) in data.modules" :key="key" class="content">
                         <ul class="information-list sortable ui-sortable">
-                            <template v-for="module in differentiationProfile.fields" :key="module.id">
-                                <li class="list-item-container">
-                                    <div class="list-item">
-                                        <template v-for="header in headersArray" :key="header.headerKey">
-                                            <div v-if="header" :class="`small-12 medium-${header.colSpan} column`">
-                                                <!-- Checkbox column -->
-                                                <template v-if="header.type === 'checkbox'">
-                                                    <input
-                                                        :id="`differentiation-profiles-adjustments-field-${module.id}`"
-                                                        v-model="module.is_enabled"
-                                                        type="checkbox"
-                                                        :name="`modules[${key}][${module.name}][is_enabled]`"
-                                                    />
-                                                    <label
-                                                        :for="`differentiation-profiles-adjustments-field-${module.id}`"
-                                                        class="checkbox-label"
-                                                        >Enabled</label
-                                                    >
-                                                </template>
-                                                <!-- Text columns -->
-                                                <template v-else-if="header.type === 'text'">
-                                                    <label
-                                                        :for="`module-${header.key}-${module.id}`"
-                                                        class="t-visually-hidden"
-                                                    >
-                                                        {{ header.title || header.key }}
-                                                    </label>
-                                                    <input
-                                                        :id="`module-${header.key}-${module.id}`"
-                                                        v-model="module[header.key]"
-                                                        type="text"
-                                                        :name="`modules[${key}][${module.name}][${header.key}]`"
-                                                        :readonly="header.key === 'title'"
-                                                    />
-                                                </template>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </li>
-                            </template>
+                            <li
+                                v-for="module in differentiationProfile.fields"
+                                :key="module.id"
+                                class="list-item-container"
+                            >
+                                <div class="list-item">
+                                    <template v-for="header in headersArray" :key="header.headerKey">
+                                        <div v-if="header" :class="`small-12 medium-${header.colSpan} column`">
+                                            <template v-if="header.type === 'checkbox'">
+                                                <input
+                                                    :id="`differentiation-profiles-adjustments-field-${module.id}`"
+                                                    v-model="module.is_enabled"
+                                                    type="checkbox"
+                                                    :name="`modules[${key}][${module.name}][is_enabled]`"
+                                                />
+                                                <label
+                                                    :for="`differentiation-profiles-adjustments-field-${module.id}`"
+                                                    class="checkbox-label"
+                                                    >Enabled</label
+                                                >
+                                            </template>
+                                            <template v-else-if="header.type === 'text'">
+                                                <label
+                                                    :for="`module-${header.key}-${module.id}`"
+                                                    class="t-visually-hidden"
+                                                >
+                                                    {{ header.title || header.key }}
+                                                </label>
+                                                <input
+                                                    :id="`module-${header.key}-${module.id}`"
+                                                    v-model="module[header.key]"
+                                                    type="text"
+                                                    :name="`modules[${key}][${module.name}][${header.key}]`"
+                                                    :readonly="header.key === 'title'"
+                                                />
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </li>
                         </ul>
                     </fieldset>
                 </section>
