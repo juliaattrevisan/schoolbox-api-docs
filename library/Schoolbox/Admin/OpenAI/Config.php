@@ -26,8 +26,8 @@ class Config
         Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
-    public const NO_PROVIDER = "Off";
     public const PROVIDERS = [
+        Helper::ENDPOINT_TYPE_OFF => Helper::ENDPOINT_TYPE_OFF,
         Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
@@ -147,7 +147,7 @@ class Config
     private function getBlank()
     {
         // start with a blank config
-        $config = [self::FIELD_PROVIDER => ['value' => self::NO_PROVIDER]];
+        $config = [self::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
         $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
         $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
         $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
@@ -166,7 +166,7 @@ class Config
         if ($config === null) {
             return false;
         }
-        return $config[self::FIELD_PROVIDER] !== self::NO_PROVIDER;
+        return $config[self::FIELD_PROVIDER] !== Helper::ENDPOINT_TYPE_OFF;
     }
 
     /**
@@ -231,7 +231,6 @@ class Config
     {
         // ensure the provider is one of the allowed one
         if (
-            self::NO_PROVIDER !== $config[self::FIELD_PROVIDER]['value'] &&
             !in_array($config[self::FIELD_PROVIDER]['value'] ?? null, self::PROVIDERS, true)
         ) {
             throw new SchoolboxException("Invalid provider specified in config");
@@ -239,6 +238,10 @@ class Config
 
         $blank = $this->getBlank();
         foreach (self::PROVIDERS as $module => $configName) {
+            // skip checking 'Off' provider
+            if (Helper::ENDPOINT_TYPE_OFF === $module) {
+                continue;
+            }
             //array combine with blank config to ensure all fields are present
             $fullConfig = array_merge($blank[$module], $config[$module] ?? []);
 

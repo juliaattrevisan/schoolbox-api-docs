@@ -98,7 +98,7 @@ class ConfigTest extends TestCase
                 null,
                 null,
                 [
-                    'provider' => Config::NO_PROVIDER,
+                    'provider' => helper::ENDPOINT_TYPE_OFF,
                     'openai' => [
                         Config::FIELD_AIKEY => ['value' => ''],
                         Config::FIELD_MODEL => ['value' => ''],
@@ -130,7 +130,7 @@ class ConfigTest extends TestCase
                 true,
             ],
             'Provider off' => [
-                [Config::FIELD_PROVIDER => Config::NO_PROVIDER],
+                [Config::FIELD_PROVIDER => helper::ENDPOINT_TYPE_OFF],
                 false,
             ],
         ];

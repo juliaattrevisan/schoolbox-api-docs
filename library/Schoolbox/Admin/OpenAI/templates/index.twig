@@ -59,8 +59,8 @@
 
         <script>
             $(function() {
-                const PROVIDER_OPENAI = '{{ providersOld.openai }}';
-                const PROVIDER_AZURE = '{{ providersOld.azure }}';
+                const PROVIDER_OPENAI = '{{ providers.OpenAI }}';
+                const PROVIDER_AZURE = '{{ providers.Azure }}';
 
                 /* Image credentials
                  */
@@ -84,7 +84,7 @@
                  *  Hide everything if you haven't chosen a provider yet
                  */
                 function init(container, provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt) {
-                    if ('{{ endpointTypeOff }}' === provider.val() || '' === provider.val()) {
+                    if ('{{ providers.Off }}' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
                         azureResourceName.hide();

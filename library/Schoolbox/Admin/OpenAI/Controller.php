@@ -62,19 +62,9 @@ class Controller extends ConfigController
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
             'imageConfigContext' => $imageConfigContext,
-            'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
             'features' => $textFeatures,
             'fields' => Config::FIELDS,
-            'providers' => [
-                Helper::ENDPOINT_TYPE_OFF,
-                Helper::ENDPOINT_TYPE_OPENAI,
-                Helper::ENDPOINT_TYPE_AZURE,
-            ],
-            'providersOld' => [
-                'off' => Helper::ENDPOINT_TYPE_OFF,
-                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
-                'azure' => Helper::ENDPOINT_TYPE_AZURE,
-            ],
+            'providers' => Config::PROVIDERS,
             'models' => Config::AI_MODELS,
         ], 'AI Services');
     }
