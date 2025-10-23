@@ -9,6 +9,8 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Admin\OpenAI\Config;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -39,7 +41,7 @@ $app = new class extends CliTool\App {
         }
 
         // migrate to new config format
-        $newConfig = new Schoolbox\Admin\OpenAI\Config()->migrate(
+        $newConfig = $this->migrate(
             $conf['openai_text_endpoint'] ?? null,
             $conf['openai_text_key'] ?? null,
             $conf['openai_text_azure_resource_name'] ?? null,
@@ -51,12 +53,12 @@ $app = new class extends CliTool\App {
         // log provider
         $this->getLogger()->notice("Migrated AI text config, provider: " . ($newConfig['provider'] ?? 'unknown'));
 
+        $query = $this->getDatabaseInternal()->prepareQuery("UPDATE config SET value = :value WHERE name = :name;");
         // insert new config into DB
-        foreach (['ai_text_chat', 'ai_lessonplan', 'ai_dialogagent', 'ai_differentiation'] as $moduleKey) {
-            $this->getLogger()->notice("Migrating AI config for module $moduleKey");
+        foreach (Config::MODULE_CONFIG as $module => $moduleKey) {
+            $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey'");
             $this->getLogger()->debug("New config: " . json_encode($newConfig, JSON_THROW_ON_ERROR));
-            $this->getDatabaseInternal()->executeQuery(
-                "UPDATE config SET value = :value WHERE name = :name;",
+            $query->execute(
                 [
                     'name' => $moduleKey,
                     'value' => json_encode($newConfig, JSON_THROW_ON_ERROR),
@@ -68,6 +70,42 @@ $app = new class extends CliTool\App {
     {
         return null;
     }
+
+    /**
+     * migrate from the old config to the new config structure (we won't need to reuse this, so its now in the upgrade script)
+     *
+     * @param string|null $provider
+     * @param string|null $key
+     * @param string|null $resourceName
+     * @param string|null $deploymentId
+     * @param string|null $model
+     * @param string|null $systemPrompt
+     * @return array
+     */
+    private function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model, ?string $systemPrompt): array
+    {
+        $configHelper = new Config();
+        // start with a blank config
+        $config = [Config::FIELD_PROVIDER => Config::NO_PROVIDER];
+        $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi();
+        $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure();
+
+        // set the fields we know about
+        if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
+            $config[Config::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_AZURE;
+            $config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
+            $config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
+        } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
+            $config[Config::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_OPENAI;
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] = $model ?? Config::NOT_ACTIVE;
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
+        }
+        return $config;
+    }
+
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
