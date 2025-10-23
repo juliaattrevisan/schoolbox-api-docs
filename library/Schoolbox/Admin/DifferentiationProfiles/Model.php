@@ -25,7 +25,7 @@ class Model
 
     public const array CONFIGS_HEADER = [
         'is_enabled' => [
-            'type' => 'toggle',
+            'type' => 'checkbox',
             'colSpan' => 1,
             'key' => 'is_enabled',
         ],
