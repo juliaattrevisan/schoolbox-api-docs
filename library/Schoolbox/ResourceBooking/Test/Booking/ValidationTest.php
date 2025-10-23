@@ -696,22 +696,6 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @param array $errors
-     * @param bool  $allClashes
-     * @return void
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidationErrorsAreAllClashes')]
-    public function testValidationErrorsAreAllClashes(array $errors, bool $allClashes): void
-    {
-        $validation = $this->createValidation();
-
-        $this->assertSame(
-            $validation->validationErrorsAreAllClashes($errors),
-            $allClashes,
-        );
-    }
-
-    /**
      * Return a variety of error collections for testValidationErrorsAreAllClashes().
      * @return array<array<string, array<string, array<string>>>, bool>
      */
@@ -767,5 +751,21 @@ class ValidationTest extends TestCase
                 true
             ],
         ];
+    }
+
+    /**
+     * @param array $errors
+     * @param bool  $allClashes
+     * @return void
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidationErrorsAreAllClashes')]
+    public function testValidationErrorsAreAllClashes(array $errors, bool $allClashes): void
+    {
+        $validation = $this->createValidation();
+
+        $this->assertSame(
+            $validation->validationErrorsAreAllClashes($errors),
+            $allClashes,
+        );
     }
 }
