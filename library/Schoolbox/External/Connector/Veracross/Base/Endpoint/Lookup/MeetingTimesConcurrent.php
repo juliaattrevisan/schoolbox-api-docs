@@ -29,7 +29,7 @@ class MeetingTimesConcurrent
      * while we're experimenting with limits in prod. If we wanted to push the veracross limits, we might
      * end up needing to fulfil plan B, which is make 300 requests then nap for 3 minutes.
      */
-    private const CLASS_CHUNK_SIZE = 100;
+    private const CLASS_CHUNK_SIZE = 30;
 
 
     /**
@@ -189,7 +189,7 @@ class MeetingTimesConcurrent
                         } catch (\JsonException $e) {
                             /* Couldn't decode json, or server refused something, or something else died
                              */
-                            $this->log->debug(sprintf('Could not decode json data: %s', $content));
+                            $this->log->warning(sprintf('Could not decode json data: %s', $content));
                         }
                     }
                 }

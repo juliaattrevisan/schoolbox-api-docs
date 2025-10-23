@@ -117,13 +117,11 @@ class Classes implements IStrategy
 
         $this->log->info('Processing timetables.');
 
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Processing classes between %s and %s',
             $this->fromDate,
             $this->toDate
         ));
-
-        $this->log->debug('');
 
         /* Get a list of guys
          */
@@ -169,7 +167,7 @@ class Classes implements IStrategy
         /* TODO Chunk users to keep memory usage down; atm retaining the entire universe
          */
         foreach ($userLookup as $externalId => $user) {
-            $this->log->debug(sprintf(
+            $this->log->info(sprintf(
                 'Compiling timetable data for %s %s (%s) - this might take a little while',
                 $user['firstname'],
                 $user['lastname'],
@@ -354,7 +352,7 @@ class Classes implements IStrategy
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             '%s timetable event %s - %s, %s, %s-%s',
             $logPrefix,
             $event->getTitle(),
@@ -527,7 +525,7 @@ class Classes implements IStrategy
         string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
-            $this->log->debug(sprintf(
+            $this->log->info(sprintf(
                 'Reusing previous class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
@@ -548,7 +546,7 @@ class Classes implements IStrategy
 
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
-            $this->log->debug(sprintf(
+            $this->log->info(sprintf(
                 'Creating new class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,

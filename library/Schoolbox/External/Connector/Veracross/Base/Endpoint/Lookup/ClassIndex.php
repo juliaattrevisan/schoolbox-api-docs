@@ -50,7 +50,7 @@ class ClassIndex
      */
     public function generate(): array
     {
-        $this->log->debug('Prefetching classes...');
+        $this->log->info('Prefetching classes...');
 
         $start = microtime(true);
 
@@ -111,12 +111,10 @@ class ClassIndex
 
         $end = microtime(true);
 
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Prefetching classes took %s seconds',
             number_format($end - $start, 2)
         ));
-
-        $this->log->debug('');
 
         return $this->lookup;
     }

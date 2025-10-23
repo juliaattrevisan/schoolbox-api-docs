@@ -67,7 +67,7 @@ class Enrolments
      */
     public function generate(): array
     {
-        $this->log->debug('Prefetching enrolments...');
+        $this->log->info('Prefetching enrolments...');
 
         $start = microtime(true);
 
@@ -123,7 +123,7 @@ class Enrolments
 
         $end = microtime(true);
 
-        $this->log->debug(sprintf(
+        $this->log->info(sprintf(
             'Prefetching enrolments took %s seconds',
             number_format($end - $start, 2)
         ));

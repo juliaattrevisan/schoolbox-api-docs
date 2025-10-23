@@ -81,7 +81,7 @@ class Users
         ");
 
         foreach ($userStatement as $row) {
-            $externalId = trim((string)$row['external_id']);
+            $externalId = $row['external_id'];
 
             /* Only import for specific users
              */
