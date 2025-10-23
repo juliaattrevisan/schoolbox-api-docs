@@ -78,7 +78,7 @@ class Controller extends Base
 
         try {
             $helper = new Helper(
-                trim($lpConfig[Config::FIELD_PROVIDER]),
+                trim($lpConfig[Config::FIELD_PROVIDER]['value']),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
@@ -89,7 +89,7 @@ class Controller extends Base
             );
 
             $payloadGenerator = (new Payload\LessonPlan(
-                trim($lpConfig[Config::FIELD_PROVIDER]),
+                trim($lpConfig[Config::FIELD_PROVIDER]['value']),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
@@ -363,7 +363,7 @@ class Controller extends Base
 
         try {
             (new Helper(
-                trim($chatConfig[Config::FIELD_PROVIDER]),
+                trim($chatConfig[Config::FIELD_PROVIDER]['value']),
                 trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
                 trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
                 trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),

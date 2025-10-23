@@ -139,8 +139,8 @@
         {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
             {% for feature, aiConfig in aiFeatures %}
             window.sbProps.aiFeatures["{{ feature }}"] = {
-                enabled: Boolean('{{ aiConfig.config.provider != 'Off' }}'),
-                {% if aiConfig.config.provider != 'Off' %}
+                enabled: Boolean('{{ aiConfig.config.provider.value != 'Off' }}'),
+                {% if aiConfig.config.provider.value != 'Off' %}
                     model: "{{ aiConfig.config.OpenAI.model.value ?? '' }}",
                 {% endif %}
             };
