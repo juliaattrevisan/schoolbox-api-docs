@@ -73,7 +73,8 @@ class IndexBuilder extends BaseBuilder
                         IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
                         IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
                         IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
-                        IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
+                        IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL),
+                        IF(dialog_agent.id, '" . AssessmentType::TYPE_DIALOG_AGENT . "', NULL)
                     )
                 ) AS type,
                 COALESCE(assessment.due_date, assessment.updated_at) AS date,
@@ -106,6 +107,9 @@ class IndexBuilder extends BaseBuilder
             )
             LEFT JOIN lesson_plan ON (
                 lesson_plan.assessment_id = assessment.id
+            )
+            LEFT JOIN dialog_agent ON (
+                dialog_agent.assessment_id = assessment.id
             )
             WHERE assessment.deleted_at IS NULL
         ";
