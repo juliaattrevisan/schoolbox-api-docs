@@ -316,15 +316,17 @@ class ValidationTest extends TestCase
     }
 
     /**
+     * Note this doesn't actually test the clash detection logic.
+     * It just checks that the number of errors returned is as expected,
+     * given that the provided set of clashing bookings was found.
      *
-     *
-     * @param string $startDate
-     * @param string $endDate
-     * @param Collection  $conflictingBookings
-     * @param int    $expected
+     * @param string     $startDate
+     * @param string     $endDate
+     * @param Collection $conflictingBookings
+     * @param int        $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSimpleValidateForConflicts')]
-    public function testSimpleValidateForConflicts($startDate, $endDate, $conflictingBookings, $expected)
+    public function testSimpleValidateForConflicts(string $startDate, string $endDate, Collection $conflictingBookings, int $expected): void
     {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
