@@ -54,14 +54,16 @@ $app = new class extends CliTool\App {
         $this->getLogger()->notice("Migrated AI text config, provider: " . ($newConfig['provider'] ?? 'unknown'));
 
         $query = $this->getDatabaseInternal()->prepareQuery("UPDATE config SET value = :value WHERE name = :name;");
+        $config = new Config();
+
         // insert new config into DB
         foreach (Config::ALL_MODULES as $module => $moduleKey) {
             $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey'");
-            $this->getLogger()->debug("New config: " . json_encode($newConfig, JSON_THROW_ON_ERROR));
+            $this->getLogger()->debug("New config: " . $config->encode($newConfig));
             $query->execute(
                 [
                     'name' => $moduleKey,
-                    'value' => json_encode($newConfig, JSON_THROW_ON_ERROR),
+                    'value' => $config->encode($newConfig),
                 ]
             );
         }

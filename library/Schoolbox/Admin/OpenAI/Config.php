@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI;
 
-use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception as SchoolboxException;
 
 class Config
 {
@@ -27,7 +26,9 @@ class Config
         Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
+    public const NO_PROVIDER = "off";
     public const PROVIDERS = [
+        self::NO_PROVIDER => self::NO_PROVIDER,
         Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
@@ -35,7 +36,7 @@ class Config
     /** Open AI models, and the 'OFF' option to be used in the same select box */
     public const NOT_ACTIVE = "Not Active";
 
-    public const NO_PROVIDER = "off";
+
 
     public const AI_MODELS = [
         "gpt-4o",
@@ -141,6 +142,20 @@ class Config
     }
 
     /**
+     * returns a blank config structure
+     * @return string[]
+     */
+    private function getBlank()
+    {
+        // start with a blank config
+        $config = [self::FIELD_PROVIDER => self::NO_PROVIDER];
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initCommon();
+        $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
+        $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
+        return $config;
+    }
+
+    /**
      * migrate from the old config to the new config structure
      *
      * @param string|null $provider
@@ -195,8 +210,6 @@ class Config
      * @param ConfigMapper $configMapper
      * @return array
      * @throws \JsonException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function fetchFeatures(ConfigMapper $configMapper): array
     {
@@ -241,5 +254,29 @@ class Config
             return null;
         }
         return json_decode($config, true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Encode function for config array
+     * @param array $config
+     * @return string
+     * @throws \JsonException
+     * @throws SchoolboxException // invalid config
+     */
+    public function encode(array $config): string
+    {
+        // ensure the provider is one of the allowed one
+        if (!in_array($config[self::FIELD_PROVIDER] ?? null, self::PROVIDERS, true)) {
+            throw new SchoolboxException("Invalid provider specified in config");
+        }
+
+        //array combine with blank config to ensure all fields are present
+        $fullConfig = array_merge($this->getBlank(), $config);
+        //if config doesn't match fullconfig structure, throw error
+        if (count(array_diff_key($fullConfig, $config)) > 0) {
+            throw new SchoolboxException("Invalid config structure");
+        }
+
+        return json_encode($fullConfig, JSON_THROW_ON_ERROR);
     }
 }
