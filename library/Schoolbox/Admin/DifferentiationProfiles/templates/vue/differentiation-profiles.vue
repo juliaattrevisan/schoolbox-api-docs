@@ -3,6 +3,7 @@
  * To configure differentiation profiles
  */
 
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { Data } from "../js/types/differentiationProfilesTypes";
 
 const props = defineProps<{
@@ -21,11 +22,51 @@ const headersArray = window.Vue.computed(() => {
         ...header,
     }));
 });
+
+const isProcessing = window.Vue.ref(false);
+const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
+
+/**
+ * Get the data to be posted to the server
+ * @returns post data object
+ */
+function getPostData(): Record<string, unknown> {
+    return {
+        enabled: data.value.featureToggle.enabled ? 1 : 0,
+        modules: data.value.modules,
+    };
+}
+
+/**
+ * pass the new latest details to the backend
+ */
+async function onSaveSelected(): Promise<void> {
+    const toast = window.sbProps.toastActivate("Saving...");
+    try {
+        isProcessing.value = true;
+        loadError.value = null;
+        const response = await apiRequest<string, Record<string, unknown>>({
+            url: props.postRoute,
+            method: "POST",
+            body: getPostData(),
+        });
+        if (!response.success) {
+            throw new Error(response.message || "Failed to save");
+        }
+        toast.timeout({ text: "Differentiation profiles successfully updated" });
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+        loadError.value = errorMessage;
+        toast.timeout({ text: errorMessage, isSuccess: false });
+    } finally {
+        isProcessing.value = false;
+    }
+}
 </script>
 
 <template>
     <div class="small-12 island">
-        <form method="post" :action="postRoute">
+        <form method="post" @submit.prevent="onSaveSelected">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -100,14 +141,11 @@ const headersArray = window.Vue.computed(() => {
                                 </div>
                             </div>
                         </template>
-                        <input type="hidden" :name="`modules[${key}][${module.name}][name]`" :value="module.name" />
-                        <input type="hidden" :name="`modules[${key}][${module.name}][id]`" :value="module.id" />
                     </template>
                 </fieldset>
             </section>
             <div class="row">
                 <div class="small-12 column">
-                    <input type="hidden" name="returnUrl" :value="props.returnUrl" />
                     <input type="submit" name="btnSubmit" value="Save" />
                 </div>
             </div>
