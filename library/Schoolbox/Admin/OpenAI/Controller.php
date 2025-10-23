@@ -47,33 +47,25 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $textConfigContext = $this->buildConfigContext(
-            $this->buildTextConfigPredicate(),
-            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
-        );
+        $textFeatures = new Config()->fetchFeatures($this->getConfigMapper());
 
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
-            $this->routeGenerator->generate('adminOpenAi.postImageOptions'),
-            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+            $this->routeGenerator->generate('adminOpenAi.postOptions'),
         );
 
         /* Make islands independent of each other for validation reasons
          */
-        $textConfigContext['formId'] = 'textSettings';
         $imageConfigContext['formId'] = 'imageSettings';
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
-            'textConfigContext' => $textConfigContext,
             'imageConfigContext' => $imageConfigContext,
-            'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
-            'models' => [
-                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
-                'azure' => Helper::ENDPOINT_TYPE_AZURE,
-            ]
+            'features' => $textFeatures,
+            'fields' => Config::FIELDS,
+            'providers' => Config::PROVIDERS,
+            'models' => Config::AI_MODELS,
         ], 'AI Services');
     }
 
@@ -83,34 +75,30 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws RouteNotFound
-     * @throws Exception
+     * @throws Exception|\JsonException
      */
-    public function postTextOptions(): void
+    public function postOptions(): void
     {
         $postData = $this->requestPost->getArrayCopy();
 
-        /* Save it
-         */
-        $this->updateConfig($postData, $this->buildTextConfigPredicate());
+        $aiConf = new Config();
+        foreach (Config::ALL_MODULES as $feature => $configName) {
+            // only update config if there is data in the post for that module
+            if (!isset($postData[$feature])) {
+                continue;
+            }
+            // get the config item
+            $conf = $this->getConfigMapper()->findOneByColumn('name', $configName);
+            // save the new config into that item
+            try {
+                $conf->setValue($aiConf->encode($postData[$feature]));
+            } catch (Exception $e) {
+                throw new Exception("Failed to encode config for feature '$feature': " . $e->getMessage(), 0, $e);
+            }
+            $this->getConfigMapper()->save($conf);
+        }
 
-        /* Go back to the place from whence you came
-         */
-        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
-    }
-
-
-    /**
-     * Save the configuration for AI Services
-     *
-     * @return void
-     * @throws RouteNotFound
-     * @throws Exception
-     */
-    public function postImageOptions(): void
-    {
-        $postData = $this->requestPost->getArrayCopy();
-
-        /* Save it
+        /* Now save image config..
          */
         $this->updateConfig($postData, $this->buildImageConfigPredicate());
 
@@ -118,20 +106,6 @@ class Controller extends ConfigController
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
     }
-
-
-    /**
-     *
-     * Returns a predicate builder for finding all custom config for this module
-     *
-     * @return Builder
-     * @throws InvalidColumnException
-     */
-    private function buildTextConfigPredicate(): Builder
-    {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT);
-    }
-
 
     /**
      *

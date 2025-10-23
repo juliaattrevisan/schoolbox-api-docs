@@ -35,6 +35,10 @@ class Helper
     private const ENDPOINT_HOST_AZURE_CHAT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
     private const ENDPOINT_HOST_AZURE_REQUEST = 'https://%s.openai.azure.com/openai/responses?api-version=2025-03-01-preview';
 
+
+    // Common ai config values
+    public const ENDPOINT_TYPE_GENERAL = 'general';
+
     /**
      * This is the value of text and image endpoint providers if a school
      * turned off these features.
@@ -47,6 +51,10 @@ class Helper
     public const FEATURE_CHAT = 'chat';
     public const FEATURE_LESSONPLAN = 'lessonplan';
     public const FEATURE_IMAGE = 'image';
+    // Discussion Learning Activity
+    public const FEATURE_DIALOGAGENT = 'dialogagent';
+    // Differentiation Profiles
+    public const FEATURE_DIFFERENTIATION = 'differentiation';
 
 
     /**
@@ -535,6 +543,10 @@ class Helper
              */
             die();
         } catch (GuzzleException $e) {
+            // if we have a log we should save (it may not have saved yet...)
+            if (null !== $log) {
+                $this->logMapper->save($log);
+            }
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
     }

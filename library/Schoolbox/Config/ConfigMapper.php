@@ -79,6 +79,7 @@ class ConfigMapper extends Mapper
     public const FIELD_SELECT_DATE   = 18;
     public const FIELD_URI           = 19;
     public const FIELD_RANGE         = 20;
+    public const FIELD_JSON          = 21;
 
     // Type enum
     public const TYPE_SITE          =  1;
@@ -101,6 +102,7 @@ class ConfigMapper extends Mapper
     public const TYPE_PASTORAL_CARE = 19;
     public const TYPE_DOC_MANAGE    = 20;
     public const TYPE_SAML          = 21;
+    public const TYPE_AI            = 22;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const _GLOBAL_MODERATION              = 'global_moderation';
@@ -393,12 +395,24 @@ class ConfigMapper extends Mapper
     /* OpenAI
      */
     public const NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_KEY = 'openai_text_key';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_SYSTEM_PROMPT = 'openai_text_generation_system_prompt';
 
+    // Text Feature json config
+    public const NAME_AI_TEXT_CHAT = 'ai_text_chat';
+    public const NAME_AI_LESSONPLAN = 'ai_lessonplan';
+    public const NAME_AI_DIALOGAGENT = 'ai_dialogagent';
+    public const NAME_AI_DIFFERENTIATION = 'ai_differentiation';
+
+    // image ai configs
     public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';
     public const NAME_OPENAI_IMAGE_KEY = 'openai_image_key';
     public const NAME_OPENAI_IMAGE_RESOURCE_NAME = 'openai_image_azure_resource_name';

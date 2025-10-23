@@ -6,43 +6,61 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 columns">
-            <h2 class="subheader" style="display:none" data-subheader>Text Generation</h2>
-        </div>
+        {% set formId = 'aiSettings' %}
+        <form id="{{ formId }}" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
+            <div class="l-grid l-grid--12">
+                {% for feature in features %}
+                <div class="small-12 medium-6 xlarge-4 columns island">
+                    <h2 class="subheader">{{ feature.title }}</h2>
+                    <section>
+                        <fieldset>
+                            <div class="columns">
+                                {# module specific config #}
+                                {% include '@adminOpenAi/config.twig' with {
+                                    feature: feature,
+                                    providers: providers,
+                                    models: models,
+                                    fields: fields
+                                } only %}
+                            </div>
+                        </fieldset>
+                    </section>
+                </div>
+                {% endfor %}
 
-        <div id="textSettingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
-        </div>
+                {# TODO: This really should just be possible to summon via the above config.twig
+                # However images are currently special, so leaving it alone
+                #}
+                <div id="imageSettingsContainer" style="display:none" class="small-12 medium-6 xlarge-4 columns island">
+                    <h2 class="subheader">Image Generation</h2>
+                    <section>
+                        <fieldset>
+                            {% for setting in imageConfigContext.settings %}
+                                {% if not setting.data.hidden %}
+                                    {% include '@settings/fieldType/' ~ setting.template with setting.data only %}
+                                {% endif %}
+                            {% endfor %}
+                        </fieldset>
+                    </section>
+                </div>
+            </div>
 
-        <div class="small-12 columns">
-            <h2 class="subheader" style="display:none" data-subheader>Image Generation</h2>
-        </div>
+            {# clearfix is needed so that save-admin-settings knows where the bottom of the page is correctly (the columns above break it) #}
+            <div class="clearfix"></div>
+            <div id="save-admin-settings-container">
+                <save-admin-settings
+                    form-id="{{ formId }}"
+                    :use-polling="false"
+                />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>
+        </form>
 
-        <div id="imageSettingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with imageConfigContext only %}
-        </div>
 
         <script>
             $(function() {
-                const PROVIDER_OPENAI = '{{ models.openai }}';
-                const PROVIDER_AZURE = '{{ models.azure }}';
-
-                /* Text credentials
-                 */
-                const textContainer = $('#textSettingsContainer');
-                const textProvider = $('#openai_text_endpoint-field');
-                const textKey = $('#openai_text_key-field').parent('div');
-                const textModel = $('#openai_text_model-field').parent('div');
-                const textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
-                const textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
-                const textSystemPrompt = $('#openai_text_generation_system_prompt-field').parent('div');
-
-                textProvider.on('change', function(event) {
-                    event.preventDefault();
-                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
-                });
-
-                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
+                const PROVIDER_OPENAI = '{{ providers.OpenAI }}';
+                const PROVIDER_AZURE = '{{ providers.Azure }}';
 
                 /* Image credentials
                  */
@@ -55,7 +73,7 @@
                 const imageOutputQuality = $('#openai_image_output_quality-field').parent('div');
                 const imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
 
-                imageProvider.on('change', function(event) {
+                imageProvider.on('change', function (event) {
                     event.preventDefault();
                     init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageOutputQuality, imageSystemPrompt);
                 });
@@ -65,47 +83,111 @@
                 /**
                  *  Hide everything if you haven't chosen a provider yet
                  */
-                function init(container,provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt)
-                {
-                    if ('{{ endpointTypeOff }}' === provider.val() || '' === provider.val()) {
+                function init(container, provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt) {
+                    if ('{{ providers.Off }}' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
-
-                        if (null !== outputQuality) {
-                            outputQuality.hide();
-                        }
-
+                        outputQuality.hide();
                         systemPrompt.hide();
                     } else if (PROVIDER_OPENAI === provider.val()) {
                         key.show();
                         model.show();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
-
-                        if (null !== outputQuality) {
-                            outputQuality.show();
-                        }
-
+                        outputQuality.show();
                         systemPrompt.show();
                     } else if (PROVIDER_AZURE === provider.val()) {
                         key.show();
                         model.hide();
                         azureResourceName.show();
                         azureDeploymentId.show();
-
-                        if (null !== outputQuality) {
-                            outputQuality.show();
-                        }
-
+                        outputQuality.show();
                         systemPrompt.show();
                     }
 
-                    $('[data-subheader]').show();
                     container.show();
+                }
+
+                $('#{{ formId }}').on('submit', function (event) {
+                    event.preventDefault();
+                    submitSettings();
+                });
+
+                /** submit text settings from all text forms **/
+                async function submitSettings() {
+                    //grab the text setting form, and post the data via fetch
+                    const textForm = document.getElementById('{{ formId }}');
+                    const formData = new FormData(textForm);
+                    const data = Object.fromEntries(formData.entries());
+
+                    /**
+                     * Convert flat form array with bracketed keys to nested JSON (written by gpt-4.1)
+                     * @param flatObj
+                     * @returns {}
+                     */
+                    function formArrayToNestedJson(flatObj) {
+                        const result = {};
+
+                        Object.entries(flatObj).forEach(([flatKey, value]) => {
+                            // Match all bracketed keys, e.g. [chat][openai][key]
+                            const keys = [];
+                            flatKey.replace(/\[([^\]]+)\]/g, (_, k) => keys.push(k));
+
+                            if (keys.length === 0) {
+                                // just append as normal if no brackets
+                                result[flatKey] = value;
+                                return;
+                            }
+
+                            let current = result;
+                            keys.forEach((key, idx) => {
+                                if (idx === keys.length - 1) {
+                                    current[key] = value;
+                                } else {
+                                    if (!current[key] || typeof current[key] !== 'object') {
+                                        current[key] = {};
+                                    }
+                                    current = current[key];
+                                }
+                            });
+                        });
+
+                        return result;
+                    }
+
+                    const toast = window.sbProps.toastActivate("Saving...");
+
+                    // send via javascript fetch to adminOpenAi.postTextOptions
+                    const response = await fetch('{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(formArrayToNestedJson(data))
+                    });
+                    if (response.ok) {
+                        // success
+                        window.location.reload()
+                    } else {
+                        // check response code...
+                        // may be redirect
+                        if (response.status >= 300 && response.status < 400) {
+                            window.location.href = response.url;
+                            return;
+                        }
+
+                        toast.timeout({ isSuccess: false, text: 'Unable to save settings' });
+                    }
                 }
             });
         </script>
+        <style>
+            [id$=";provider-field"], [id$=";provider"] {
+                display: none !important;
+            }
+        </style>
     </div>
 </div>

@@ -13,6 +13,7 @@ use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
@@ -57,23 +58,41 @@ class Controller extends Base
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
 
+        // ai Config
+        $aiConfig = new Config();
+        $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_LESSONPLAN));
+
+        // if not enabled, 404
+        if ($aiConfig->isEnabled($lpConfig) === false) {
+            $returnCode = 404;
+
+            $problem = new ApiProblem("Lesson Plan AI is not enabled.")
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
         try {
             $helper = new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim($lpConfig[Config::FIELD_PROVIDER]['value']),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
             );
 
             $payloadGenerator = (new Payload\LessonPlan(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)),
+                trim($lpConfig[Config::FIELD_PROVIDER]['value']),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
             ));
@@ -319,6 +338,24 @@ class Controller extends Base
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
 
+        // ai Config
+        $aiConfig = new Config();
+        $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
+
+        // if not enabled, 404
+        if ($aiConfig->isEnabled($chatConfig) === false) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem("AI Assistant is not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
         /** gen a sessionID guid for keeping track of what is happening
          * for ckeditor chat each ai request is a new session
          */
@@ -326,15 +363,15 @@ class Controller extends Base
 
         try {
             (new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim($chatConfig[Config::FIELD_PROVIDER]['value']),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)), $aiSessionId);
+            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */

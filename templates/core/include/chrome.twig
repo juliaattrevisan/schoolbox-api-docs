@@ -134,10 +134,21 @@
          # To avoid dealing with this Off const we can just pass the provider(s) values
          # and let each feature decide when it's off and when it's on.
          #}
-        {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
-        // to display the AI features around the site
-        window.sbProps.hasAIFeatures = true;
-        window.sbProps.openAIModel = "{{ config.openai_text_model }}";
+        window.sbProps.aiFeatures = {};
+        {% if user.current.role.staff %}
+        {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
+            {% for feature, aiConfig in aiFeatures %}
+            window.sbProps.aiFeatures["{{ feature }}"] = {
+                enabled: Boolean('{{ aiConfig.config.provider.value != 'Off' }}'),
+                {% if aiConfig.config.provider.value != 'Off' %}
+                    {% if aiConfig.config.provider.value == 'Azure' %}
+                        model: "{{ aiConfig.config.Azure.deployment_id.value ?? '' }}",
+                    {% elseif aiConfig.config.provider.value == 'OpenAI' %}
+                        model: "{{ aiConfig.config.OpenAI.model.value ?? '' }}",
+                    {% endif %}
+                {% endif %}
+            };
+            {% endfor %}
         {% endif %}
 
         window.sbProps.firebaseApps = [];
