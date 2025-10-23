@@ -1,15 +1,20 @@
 /**
- *
+ * A field in a differentiation profile module
  */
-export type Field = { [key: string]: string | boolean };
+export type Field = {
+    id: string | number;
+    name: string;
+    title: string;
+    terminology: string;
+    description: string;
+    is_enabled: boolean;
+};
 
 /**
- *
+ * A differentiation profile module
  */
 export type Module = {
-    fields: {
-        [key: string]: Field[];
-    };
+    fields: Field[];
     isSortable?: boolean;
 };
 

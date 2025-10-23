@@ -8,6 +8,7 @@ import type { Data } from "../js/types/differentiationProfilesTypes";
 const props = defineProps<{
     postRoute: string;
     data: Data;
+    returnUrl?: string;
 }>();
 
 const data = window.Vue.ref<Data>(props.data);
@@ -36,6 +37,7 @@ const data = window.Vue.ref<Data>(props.data);
                                 id="differentiation-profiles-field"
                                 v-model="data.featureToggle.enabled"
                                 type="checkbox"
+                                name="enabled"
                             />
                             <label for="differentiation-profiles-field">
                                 <span>On</span>
@@ -45,9 +47,63 @@ const data = window.Vue.ref<Data>(props.data);
                     </div>
                 </fieldset>
             </section>
+            <section v-for="(differentiationProfile, key) in data.modules" :key="key">
+                <fieldset class="content">
+                    <template v-for="module in differentiationProfile.fields" :key="module.id">
+                        <div class="small-12 medium-1 columns">
+                            <div class="switch">
+                                <input
+                                    :id="`differentiation-profiles-adjustments-field-${module.id}`"
+                                    v-model="module.is_enabled"
+                                    type="checkbox"
+                                    :name="`modules[${key}][${module.name}][is_enabled]`"
+                                />
+                                <label :for="`differentiation-profiles-adjustments-field-${module.id}`">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <label :for="`module-title-${module.id}`">
+                                <input
+                                    :id="`module-title-${module.id}`"
+                                    v-model="module.title"
+                                    type="text"
+                                    :name="`modules[${key}][${module.name}][title]`"
+                                    readonly
+                                />
+                            </label>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <label :for="`module-terminology-${module.id}`">
+                                <input
+                                    :id="`module-terminology-${module.id}`"
+                                    v-model="module.terminology"
+                                    type="text"
+                                    :name="`modules[${key}][${module.name}][terminology]`"
+                                />
+                            </label>
+                        </div>
+                        <div class="small-12 medium-5 columns">
+                            <label :for="`module-description-${module.id}`">
+                                <input
+                                    :id="`module-description-${module.id}`"
+                                    v-model="module.description"
+                                    type="text"
+                                    :name="`modules[${key}][${module.name}][description]`"
+                                />
+                            </label>
+                        </div>
+                        <input type="hidden" :name="`modules[${key}][${module.name}][name]`" :value="module.name" />
+                        <input type="hidden" :name="`modules[${key}][${module.name}][id]`" :value="module.id" />
+                    </template>
+                </fieldset>
+            </section>
             <div class="row">
                 <div class="small-12 column">
-                    <input type="submit" value="Save" />
+                    <input type="hidden" name="returnUrl" :value="props.returnUrl" />
+                    <input type="submit" name="btnSubmit" value="Save" />
                 </div>
             </div>
         </form>
