@@ -11,6 +11,7 @@ const props = defineProps<{
     headers: TableHeader[];
     sortBy: string;
     order: "ASC" | "DESC";
+    isFirstColumnSticky: boolean;
     isTotalSticky: boolean;
     isTrendSticky: boolean;
 }>();
@@ -125,7 +126,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     'u-border-right': true,
                     'title-header': true,
                     'u-sticky-left':
-                        index === 0 ||
+                        (index === 0 && props.isFirstColumnSticky) ||
                         (header.key === 'total' && props.isTotalSticky) ||
                         (header.key === 'trend' && props.isTrendSticky),
                     'first-header': index === 0,

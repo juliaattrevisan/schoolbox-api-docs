@@ -22,6 +22,7 @@ import PrTableModal from "./pr-table-modal.vue";
 
 const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
 const { width: containerWidth } = useElementSize(containerEl);
+const isFirstColumnSticky = window.Vue.computed(() => containerWidth.value > 700);
 const isTotalSticky = window.Vue.computed(() => containerWidth.value > 1000);
 const isTrendSticky = window.Vue.computed(() => containerWidth.value > 1500);
 
@@ -132,7 +133,7 @@ function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]):
 // #endregion
 
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, 700);
 
 /**
  * Reset the table load to ensure the correct endpoint is set
@@ -151,7 +152,7 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
-        <div ref="containerRef">
+        <div ref="containerRef" class="pr-table-container">
             <div
                 ref="scrollableRef"
                 class="table-container scrollable"
@@ -164,6 +165,7 @@ window.Vue.onMounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :sort-by="sortBy"
                         :order="order"
+                        :is-first-column-sticky="isFirstColumnSticky"
                         :is-total-sticky="isTotalSticky"
                         :is-trend-sticky="isTrendSticky"
                         @sort="onSort"
@@ -176,6 +178,7 @@ window.Vue.onMounted(() => {
                             :headers="(payload as TablePayload).data.tableHeaders"
                             :row-data="(payload as TablePayload).data.totalRow"
                             :records-or-points="recordsOrPoints"
+                            :is-first-column-sticky="isFirstColumnSticky"
                             :is-total-sticky="isTotalSticky"
                             :is-trend-sticky="isTrendSticky"
                             @cell-select="onTotalCellSelect"
@@ -187,6 +190,7 @@ window.Vue.onMounted(() => {
                             :headers="(payload as TablePayload).data.tableHeaders"
                             :row-data="row"
                             :records-or-points="recordsOrPoints"
+                            :is-first-column-sticky="isFirstColumnSticky"
                             :is-total-sticky="isTotalSticky"
                             :is-trend-sticky="isTrendSticky"
                             @cell-select="onRowCellSelect"
@@ -210,6 +214,9 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+.pr-table-container {
+    container-type: inline-size;
+}
 .pr-table {
     width: 100%;
     /* fix the head to stay at the top when scrolling */
@@ -225,5 +232,18 @@ window.Vue.onMounted(() => {
 <style lang="scss">
 .highcharts-tooltip-container {
     z-index: var(--sbx-depth-pop-over) !important;
+}
+
+/* on small containers (<=700px), remove ALL sticky behavior */
+@container (max-width: 700px) {
+    .pr-table thead {
+        position: static;
+        top: auto;
+    }
+    .u-sticky-left--row {
+        position: static;
+        left: auto;
+        right: auto;
+    }
 }
 </style>
