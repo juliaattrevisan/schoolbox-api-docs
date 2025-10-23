@@ -15,9 +15,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockInterface;
 
 /**
  * Garbage collector: uses a set of checks to determine if a storage record is
@@ -58,9 +55,6 @@ class GarbageCollector
      * @param bool                   $perform         If true, actually delete storage records and update the last
      *                                                processed time: otherwise, only output what would've been deleted.
      * @param int                    $batchSize       The maximum number of results to process per batch.
-     * @param LockInterface          $lock            Process lock: periodically refreshed during the garbage collection
-     *                                                process.
-     * @param int                    $lockTtl         Amount of time to refresh the lock for, each time it's refreshed.
      * @param int|null               $limit           Maximum number of storage records to process: null if no limit.
      * @param int|null               $maxTime         Maximum amount of time to run for, in seconds: null if no limit.
      * @param ?Alaress_Date_Format   $thresholdDate   Do not process any storage records which were last processed more
@@ -72,8 +66,6 @@ class GarbageCollector
         private LoggerInterface $log,
         private bool $perform,
         private int $batchSize,
-        private LockInterface $lock,
-        private int $lockTtl,
         private ?int $limit = null,
         private ?int $maxTime = null,
         private ?Alaress_Date_Format $thresholdDate = null,
@@ -98,12 +90,10 @@ class GarbageCollector
      * Returns a list of hashes that are considered stale.
      *
      * This will find every eligible hash, then process them in batch sizes of
-     * `$this->batchSize`: before each batch, the lock will be refreshed.
+     * `$this->batchSize`.
      *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return array<string>
-     * @throws LockConflictedException if the lock refresh failed because another process has the lock
-     * @throws LockAcquiringException if the lock can't be acquired when refreshing
      */
     public function getStale(?string $hash = null): array
     {
@@ -159,8 +149,6 @@ class GarbageCollector
         $startTime      = microtime(true);
         $totalProcessed = 0;
         foreach ($batches as $batch) {
-            $this->log->debug("Refreshing lock before processing batch");
-            $this->lock->refresh($this->lockTtl);
             $batchStartTime = microtime(true);
             $this->log->notice(
                 sprintf(
@@ -231,24 +219,15 @@ class GarbageCollector
      *   (so they're not re-processed before a certain time)
      * * removing any hashes which are stale
      *
-     * The lock is refreshed between all of these steps, and before every hash
-     * is removed.
-     *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return int
-     * @throws LockConflictedException if the lock refresh failed because another process has the lock
-     * @throws LockAcquiringException if the lock can't be acquired when refreshing
      */
     public function purge(?string $hash = null): int
     {
         $this->log->debug("Starting GC");
 
-        $this->log->debug("Refreshing lock before finding hashes");
-        $this->lock->refresh($this->lockTtl);
         $purge = $this->getStale($hash);
 
-        $this->log->debug("Refreshing lock before preserving fresh hashes");
-        $this->lock->refresh($this->lockTtl);
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
@@ -259,8 +238,6 @@ class GarbageCollector
         $this->log->notice('Deleting ' . count($purge) . ' stale hashes');
         foreach ($purge as $hash) {
             try {
-                $this->log->debug("Refreshing lock before deleting hash");
-                $this->lock->refresh($this->lockTtl);
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
                 $this->log->error("Could not delete storage hash '$hash' due to a database issue: " . $e->getMessage());

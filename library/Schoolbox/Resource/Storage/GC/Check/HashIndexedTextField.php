@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\Storage\GC\Check;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Byte_Format;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Lock\LockInterface;
 
 /**
  * Check for whether the storage hash is contained within any `TEXT`, `CHAR` or
@@ -118,21 +117,16 @@ class HashIndexedTextField implements Check
     /**
      * Constructor
      *
-     * @param IConnector      $db      Database connection
-     * @param LoggerInterface $logger  Logger
-     * @param string          $schema  The database schema which `$db` uses: required for building list of foreign keys.
-     * @param string          $table   The table which stores storage records.
-     * @param LockInterface   $lock    Process lock: required because this process may run for quite some time when
-     *                                 building `$this->hashIndex`.
-     * @param int             $lockTtl How long should the lock be held when it's refreshed?
+     * @param IConnector      $db     Database connection
+     * @param LoggerInterface $logger Logger
+     * @param string          $schema The database schema which `$db` uses: required for building list of foreign keys.
+     * @param string          $table  The table which stores storage records.
      */
     public function __construct(
         private IConnector $db,
         private LoggerInterface $logger,
         private string $schema,
         private string $table,
-        private LockInterface $lock,
-        private int $lockTtl,
     ) {
     }
 
@@ -229,13 +223,9 @@ class HashIndexedTextField implements Check
                     WHERE {$this->db->getQuoter()->quoteIdentifier($column)} IS NOT NULL
                 ");
 
-                // Refresh lock for an extended period before running the query:
-                // who knows how long it could take?
-                $this->lock->refresh($this->lockTtl * 10);
                 $query->execute();
                 $columnHashes = [];
                 foreach ($query as $row) {
-                    $this->lock->refresh($this->lockTtl);
                     $value = $row['c'];
                     if (preg_match_all(self::HASH_REGEXP, $value, $matches)) {
                         foreach ($matches[0] as $match) {
