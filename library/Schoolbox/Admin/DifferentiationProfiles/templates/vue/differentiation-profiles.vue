@@ -12,6 +12,15 @@ const props = defineProps<{
 }>();
 
 const data = window.Vue.ref<Data>(props.data);
+
+// Get headers as an ordered array for consistent column sizing
+const headersArray = window.Vue.computed(() => {
+    if (!data.value.headers) return [];
+    return Object.entries(data.value.headers).map(([headerKey, header]) => ({
+        headerKey,
+        ...header,
+    }));
+});
 </script>
 
 <template>
@@ -63,7 +72,7 @@ const data = window.Vue.ref<Data>(props.data);
             <section v-for="(differentiationProfile, key) in data.modules" :key="key">
                 <fieldset class="content">
                     <template v-for="module in differentiationProfile.fields" :key="module.id">
-                        <div class="small-12 medium-1 columns">
+                        <div v-if="headersArray[0]" :class="`small-12 medium-${headersArray[0].colSpan} columns`">
                             <div class="switch">
                                 <input
                                     :id="`differentiation-profiles-adjustments-field-${module.id}`"
@@ -77,7 +86,7 @@ const data = window.Vue.ref<Data>(props.data);
                                 </label>
                             </div>
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div v-if="headersArray[1]" :class="`small-12 medium-${headersArray[1].colSpan} columns`">
                             <label :for="`module-title-${module.id}`" class="t-visually-hidden">Title</label>
                             <input
                                 :id="`module-title-${module.id}`"
@@ -87,7 +96,7 @@ const data = window.Vue.ref<Data>(props.data);
                                 readonly
                             />
                         </div>
-                        <div class="small-12 medium-3 columns">
+                        <div v-if="headersArray[2]" :class="`small-12 medium-${headersArray[2].colSpan} columns`">
                             <label :for="`module-terminology-${module.id}`" class="t-visually-hidden"
                                 >Terminology</label
                             >
@@ -98,7 +107,7 @@ const data = window.Vue.ref<Data>(props.data);
                                 :name="`modules[${key}][${module.name}][terminology]`"
                             />
                         </div>
-                        <div class="small-12 medium-5 columns">
+                        <div v-if="headersArray[3]" :class="`small-12 medium-${headersArray[3].colSpan} columns`">
                             <label :for="`module-description-${module.id}`" class="t-visually-hidden"
                                 >Description</label
                             >
