@@ -172,7 +172,12 @@ class Config
     {
         if ($this->features === null) {
             // hit the db once, get all module configs for AI features, then build the array
-            $rows = $configMapper->findByColumn(ConfigMapper::COL_NAME, self::ALL_MODULES);
+            $rows = $configMapper->findByColumn(ConfigMapper::COL_NAME, self::ALL_MODULES, [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
+            ]);
+
             foreach ($rows as $row) {
                 $feature = array_search($row->getName(), self::ALL_MODULES, true);
                 $this->features[$feature] = [
