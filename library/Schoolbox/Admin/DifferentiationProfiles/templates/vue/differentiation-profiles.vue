@@ -135,7 +135,7 @@ async function onSaveSelected(): Promise<void> {
                                                 <label
                                                     :for="`differentiation-profiles-adjustments-field-${module.id}`"
                                                     class="checkbox-label"
-                                                    >Enabled</label
+                                                    >{{ module.title }}</label
                                                 >
                                             </template>
                                             <template v-else-if="header.type === 'text'">
