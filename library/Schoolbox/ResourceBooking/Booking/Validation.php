@@ -140,14 +140,14 @@ class Validation
      * @return array<string, array<string, array<string>>> Example:
      *         [
      *             self::START_PERIOD_ERRORS => [
-     *                 'invalid' => [
+     *                 self::ERROR_INVALID => [
      *                     // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
-     *                     'invalid'
+     *                     self::ERROR_INVALID
      *                 ],
      *                 // Errors on valid dates are keyed by the valid date in YYYY-MM-DD format.
      *                 // Since the smallest repeat period for series is 'daily', there will be at most one booking per day.
      *                 '2025-01-01' => [
-     *                     'conflict',
+     *                     self::ERROR_CONFLICT,
      *                     ...
      *                 ],
      *                 ...
