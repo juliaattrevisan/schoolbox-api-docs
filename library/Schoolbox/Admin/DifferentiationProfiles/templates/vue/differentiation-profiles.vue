@@ -7,6 +7,7 @@ import type Sortable from "sortablejs";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { convertObjectToArray } from "@js/util/jsUtils";
 import type { Data } from "../js/types/differentiationProfilesTypes";
 
 const props = defineProps<{
@@ -26,13 +27,19 @@ const headersArray = window.Vue.computed(() => {
     }));
 });
 
+/**
+ * When the user resequences the fields
+ * @param event The event that triggered the resequence
+ */
+async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
+    if (event.oldIndex === event.newIndex) return;
+    if (event.oldIndex === undefined || event.newIndex === undefined) return;
+    console.warn(event);
+}
+
+// #region resequence
+
 const sortableOptions = window.Vue.computed(() => ({
-    // Link the selected fields sortable to the available fields sortable so that we can drag between them
-    group: {
-        name: `content`,
-        pull: false, // can't drag out of the selected fields
-        put: true, // can drag into the selected fields
-    },
     // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
     forceFallback: true,
     // The class to apply to the clone when dragging
@@ -42,6 +49,8 @@ const sortableOptions = window.Vue.computed(() => ({
     // The handle to use to drag the field around
     handle: "[data-dp-drag-handle]",
 }));
+
+// #endregion resequence
 
 // #region save
 
@@ -60,6 +69,7 @@ async function onSaveSelected(): Promise<void> {
     try {
         isProcessing.value = true;
         loadError.value = null;
+        console.warn(data.value.modules);
         const response = await apiRequest({
             url: props.postRoute,
             method: "POST",
@@ -131,43 +141,54 @@ async function onSaveSelected(): Promise<void> {
                         </div>
                     </fieldset>
                     <fieldset v-for="(module, key) in data.modules" :key="key" class="content">
-                        <ul class="information-list sortable ui-sortable">
-                            <li v-for="field in module.fields" :key="field.id" class="list-item-container">
-                                <div class="list-item">
-                                    <div v-if="module.isSortable" class="grip compact" data-drag-handle />
-                                    <template v-for="header in headersArray" :key="header.headerKey">
-                                        <div :class="`small-12 medium-${header.colSpan} column`">
-                                            <template v-if="header.type === 'checkbox'">
-                                                <input
-                                                    :id="`differentiation-profiles-adjustments-field-${field.id}`"
-                                                    v-model="field.is_enabled"
-                                                    type="checkbox"
-                                                />
-                                                <label
-                                                    :for="`differentiation-profiles-adjustments-field-${field.id}`"
-                                                    class="checkbox-label"
-                                                    >{{ field.title }}</label
-                                                >
-                                            </template>
-                                            <template v-else-if="header.type === 'text'">
-                                                <label
-                                                    :for="`field-${header.key}-${field.id}`"
-                                                    class="t-visually-hidden"
-                                                >
-                                                    {{ header.title || header.key }}
-                                                </label>
-                                                <input
-                                                    :id="`field-${header.key}-${field.id}`"
-                                                    v-model="field[header.key]"
-                                                    type="text"
-                                                    :readonly="header.key === 'title'"
-                                                />
-                                            </template>
-                                        </div>
-                                    </template>
-                                </div>
-                            </li>
-                        </ul>
+                        <sortable-wrapper
+                            tag="ul"
+                            class="information-list sortable ui-sortable"
+                            :list="convertObjectToArray(module.fields)"
+                            :item-key="(item) => item.id"
+                            :options="sortableOptions"
+                            :transition-enter="slideDownOnEnter"
+                            :transition-leave="slideUpOnLeave"
+                            @end="onResequenceField"
+                        >
+                            <template #item="item">
+                                <li class="list-item-container">
+                                    <div class="list-item">
+                                        <div v-if="module.isSortable" class="grip compact" data-dp-drag-handle />
+                                        <template v-for="header in headersArray" :key="header.headerKey">
+                                            <div :class="`small-12 medium-${header.colSpan} column`">
+                                                <template v-if="header.type === 'checkbox'">
+                                                    <input
+                                                        :id="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                        v-model="item.element.is_enabled"
+                                                        type="checkbox"
+                                                    />
+                                                    <label
+                                                        :for="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                        class="checkbox-label"
+                                                        >{{ item.element.title }}</label
+                                                    >
+                                                </template>
+                                                <template v-else-if="header.type === 'text'">
+                                                    <label
+                                                        :for="`field-${header.key}-${item.element.id}`"
+                                                        class="t-visually-hidden"
+                                                    >
+                                                        {{ header.title || header.key }}
+                                                    </label>
+                                                    <input
+                                                        :id="`field-${header.key}-${item.element.id}`"
+                                                        v-model="item.element[header.key]"
+                                                        type="text"
+                                                        :readonly="header.key === 'title'"
+                                                    />
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </li>
+                            </template>
+                        </sortable-wrapper>
                     </fieldset>
                 </section>
             </Transition>
