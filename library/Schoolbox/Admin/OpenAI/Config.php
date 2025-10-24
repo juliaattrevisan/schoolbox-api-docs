@@ -40,6 +40,13 @@ class Config
         "gpt-4.1-mini",
     ];
 
+    public const OUTPUT_QUALITY_OPTIONS = [
+        'high',
+        'medium',
+        'low',
+        'auto',
+    ];
+
     // field name and types
     public const string FIELD_PROVIDER = 'provider';
     public const string FIELD_AIKEY = 'ai_key';
@@ -101,6 +108,18 @@ class Config
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
 
+
+    /**
+     * Which form inputs exist for each AI provider?
+     */
+    public const DEFAULT_FORM_INPUTS = [
+        self::FIELD_PROVIDER      => ['field' => ConfigMapper::FIELD_SELECT_KEY, 'options' => self::PROVIDERS,],
+        self::FIELD_AIKEY         => ['field' => ConfigMapper::FIELD_INPUT,],
+        self::FIELD_RESOURCE_NAME => ['field' => ConfigMapper::FIELD_INPUT,],
+        self::FIELD_DEPLOYMENT_ID => ['field' => ConfigMapper::FIELD_INPUT,],
+        self::FIELD_MODEL         => ['field' => ConfigMapper::FIELD_SELECT, 'options' => self::AI_MODELS,],
+        self::FIELD_SYSTEM_PROMPT => ['field' => ConfigMapper::FIELD_INPUT,],
+    ];
 
     /**
      * array of AI features and their config
@@ -200,13 +219,14 @@ class Config
                 ]
             ]);
 
+            // TODO set which options are allowed: e.g. provider options, fields
             foreach ($rows as $row) {
                 $feature = array_search($row->getName(), self::ALL_MODULES, true);
                 $this->features[$feature] = [
                     'feature' => $feature,
                     'title' => $row->getTitle(),
-                    'config' => $this->decode($row->getValue())
-
+                    'config' => $this->decode($row->getValue()),
+                    'formInputs' => $this->buildFormInputs($feature),
                 ];
             }
         }
@@ -220,7 +240,8 @@ class Config
      *    provider: array{value: string},
      *     general: array{
      *       ai_key: array{value: string},
-     *       system_prompt: array{value: string}
+     *       system_prompt: array{value: string},
+     *       output_quality?: array{value: string},
      *     },
      *    OpenAI: array{
      *      model: array{value: string},
@@ -279,5 +300,24 @@ class Config
 
         // config is valid, encode to json
         return json_encode($config, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Build form inputs for this feature.
+     *
+     * @param string $feature
+     * @return array[]
+     */
+    private function buildFormInputs(string $feature): array
+    {
+        $formInputs = self::DEFAULT_FORM_INPUTS;
+        if ($feature === Helper::FEATURE_IMAGE) {
+            // Image feature:
+            // * add output quality
+            // * remove Azure option
+            $formInputs[self::FIELD_OUTPUT_QUALITY] = ['field' => ConfigMapper::FIELD_SELECT, 'options' => self::OUTPUT_QUALITY_OPTIONS];
+            unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
+        }
+        return $formInputs;
     }
 }
