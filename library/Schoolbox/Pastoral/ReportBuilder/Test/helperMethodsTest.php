@@ -8,11 +8,14 @@ namespace Schoolbox\Pastoral\ReportBuilder\Test;
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Config\ArrayLoader;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByMonth;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByWeek;
+use Schoolbox\Pastoral\Type\Model as Type;
+use Schoolbox\Pastoral\SubType\Model as Subtype;
 use Schoolbox\User;
 use DateTimeZone;
 
@@ -414,6 +417,142 @@ class helperMethodsTest extends TestCase
                 11, // From Jan 1 to Mar 15, 2025
                 ['key' => 'week_0'],
                 ['key' => 'week_10'],
+            ],
+        ];
+    }
+
+    /**
+     * Test the getType method of the Helper class.
+     *
+     * @param array                   $report
+     * @param GenericCollection<Type> $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetType')]
+    public function testGetType(array $report, GenericCollection $expected)
+    {
+        $helper = new Helper(
+            $report,
+            $this->createMock(PastoralMapper::class),
+            $this->configLoader,
+            new User(),
+            $this->createMock(AccessLevelCensor::class),
+        );
+
+        $this->assertEquals($expected, $helper->getType());
+    }
+
+    public static function providerGetType(): array
+    {
+        return [
+            'Case 1: Empty types and subtypes' => [
+                [
+                    'types' => new GenericCollection(Type::class),
+                    'subtypes' => new GenericCollection(Subtype::class),
+                ],
+                new GenericCollection(Type::class)
+            ],
+            'Case 2: Empty subtypes' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add($typeB = new Type()->setName('Type B')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                ],
+                new GenericCollection(Type::class, [
+                    $typeA,
+                    $typeB,
+                ])
+            ],
+            'Case 3: One type with subtypes, one without' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add($typeB = new Type()->setName('Type B')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype B'))
+                ],
+                new GenericCollection(Type::class, [
+                    $typeB,
+                ])
+            ],
+            'Case 4: All types have subtypes' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add($typeB = new Type()->setName('Type B')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
+                        ->add(new Subtype()->setPastoralType($typeB)->setName('Subtype B1'))
+                ],
+                new GenericCollection(Type::class)
+            ],
+            'Case 5: Multiple types with mixed subtypes' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add($typeB = new Type()->setName('Type B'))
+                        ->add($typeC = new Type()->setName('Type C'))
+                        ->add($typeD = new Type()->setName('Type D')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A2'))
+                        ->add(new Subtype()->setPastoralType($typeC)->setName('Subtype C1'))
+                ],
+                new GenericCollection(Type::class, [
+                    $typeB,
+                    $typeD,
+                ])
+            ],
+            'Case 6: Single type without subtype' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                ],
+                new GenericCollection(Type::class, [
+                    $typeA,
+                ])
+            ],
+            'Case 7: Single type with single subtype' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
+                ],
+                new GenericCollection(Type::class)
+            ],
+            'Case 8: Three types, two with subtypes' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add($typeB = new Type()->setName('Type B'))
+                        ->add($typeC = new Type()->setName('Type C')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
+                        ->add(new Subtype()->setPastoralType($typeB)->setName('Subtype B1'))
+                        ->add(new Subtype()->setPastoralType($typeB)->setName('Subtype B2'))
+                ],
+                new GenericCollection(Type::class, [
+                    $typeC,
+                ])
+            ],
+            'Case 9: Many subtypes for one type' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add($typeB = new Type()->setName('Type B')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A2'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A3'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A4'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A5'))
+                ],
+                new GenericCollection(Type::class, [
+                    $typeB,
+                ])
             ],
         ];
     }
