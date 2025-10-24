@@ -440,7 +440,7 @@ async function onConfirmActionSelected(): Promise<void> {
                                     {{ participant.user.preferredName || participant.user.firstname }}
                                     {{ participant.user.pronoun || "" }}
                                 </template>
-                                <div class="l-flex l-gap-xs">
+                                <div class="l-flex-row l-gap-xs">
                                     <sbx-label
                                         v-for="studentBadge in studentPastoralCounts[participant.user.id]"
                                         :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
