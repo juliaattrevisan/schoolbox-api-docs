@@ -11,7 +11,7 @@
         {% endif %}
 
         {# Output depends on formInput.field #}
-        {% set inputField = formInput.field %}
+        {% set type = formInput.type %}
 
         {% set dataAttrs = "" %}
         {% if section == 'general'%}
@@ -24,15 +24,32 @@
 
         <label id="{{ name }}-label" for="{{ name }}-value" {{ dataAttrs }}>
             <span>{{ formInput.title }}</span>
-            <span data-tooltip class="has-tip tip-top hint" title='{{ formInput.description }}'>?</span>
+            <span data-tooltip class="has-tip tip-top hint" data-allow-html='true' title='{{ formInput.description }}'>?</span>
         </label>
 
-        <input id="{{ name }}-value"
-               type="text"
-               name="{{ inputName }}"
-               value="{{ inputValue }}"
-               {{ dataAttrs }}
-        />
+        {% if type == 'textarea' %}
+            <textarea id="{{ name }}-value"
+                      name="{{ inputName }}"
+                      rows="5"
+                      {{ dataAttrs }}
+            >{{ inputValue }}</textarea>
+        {% elseif type == 'select' %}
+            <select id="{{ name }}-value"
+                    name="{{ inputName }}"
+            >
+                <option value="" disabled>-- select an option --</option>
+                {% for option in formInput.options %}
+                    <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input id="{{ name }}-value"
+                   type="text"
+                   name="{{ inputName }}"
+                   value="{{ inputValue }}"
+                   {{ dataAttrs }}
+            />
+        {% endif %}
     {% endfor %}
 
 
