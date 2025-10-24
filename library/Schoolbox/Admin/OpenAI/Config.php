@@ -108,6 +108,9 @@ class Config
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
 
+    public const SECTION_GENERAL = 'general';
+    public const SECTION_OPENAI = 'OpenAI';
+    public const SECTION_AZURE = 'Azure';
 
     /**
      * Which form inputs exist for each AI provider?
@@ -118,38 +121,44 @@ class Config
             'title'       => 'Provider',
             'description' => 'Select which provider you will use for this AI service; choose "Off" to disable this feature.',
             'options'     => self::PROVIDERS,
-            'providers  ' => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE, Helper::ENDPOINT_TYPE_OFF,],
+//            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE, Helper::ENDPOINT_TYPE_OFF,],
+            'section'     => null,
         ],
         self::FIELD_AIKEY         => [
             'field'       => ConfigMapper::FIELD_INPUT,
             'title'       => 'OpenAI API Key',
             'description' => 'This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.',
-            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
+//            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
+            'section'     => self::SECTION_GENERAL,
         ],
         self::FIELD_MODEL         => [
             'field'       => ConfigMapper::FIELD_SELECT,
             'title'       => 'OpenAI Model',
             'description' => 'Select which model you wish to use for your OpenAI service.',
             'options'     => self::AI_MODELS,
-            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI,]
+            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI,],
+            'section'     => self::SECTION_OPENAI,
         ],
         self::FIELD_RESOURCE_NAME => [
             'field'       => ConfigMapper::FIELD_INPUT,
             'title'       => 'Azure OpenAI Resource Name',
             'description' => 'The name of your Azure OpenAI Resource.',
-            'providers'   => [Helper::ENDPOINT_TYPE_AZURE,],
+//            'providers'   => [Helper::ENDPOINT_TYPE_AZURE,],
+            'section'     => self::SECTION_AZURE,
         ],
         self::FIELD_DEPLOYMENT_ID => [
             'field'       => ConfigMapper::FIELD_INPUT,
             'title'       => 'Azure OpenAI Deployment ID',
             'description' => 'The deployment name you chose when you deployed the model in Azure.',
-            'providers'   => [Helper::ENDPOINT_TYPE_AZURE,],
+//            'providers'   => [Helper::ENDPOINT_TYPE_AZURE,],
+            'section'     => self::SECTION_AZURE,
         ],
         self::FIELD_SYSTEM_PROMPT => [
             'field'       => ConfigMapper::FIELD_INPUT,
             'title'       => 'System Prompt',
             'description' => 'Provide some additional instructions to shape what the AI service generates.',
-            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
+//            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
+            'section'     => self::SECTION_GENERAL,
         ],
     ];
 
@@ -352,7 +361,8 @@ class Config
                 'title'       => 'Output Quality',
                 'description' => 'Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.',
                 'options'     => self::OUTPUT_QUALITY_OPTIONS,
-                'providers'   => [Helper::ENDPOINT_TYPE_OPENAI,],
+//                'providers'   => [Helper::ENDPOINT_TYPE_OPENAI,],
+                'section'     => self::SECTION_OPENAI,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
