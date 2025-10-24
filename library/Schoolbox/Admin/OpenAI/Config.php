@@ -154,7 +154,7 @@ class Config
             'section'     => self::SECTION_AZURE,
         ],
         self::FIELD_SYSTEM_PROMPT => [
-            'field'       => ConfigMapper::FIELD_INPUT,
+            'field'       => ConfigMapper::FIELD_TEXT_AREA,
             'title'       => 'System Prompt',
             'description' => 'Provide some additional instructions to shape what the AI service generates.',
 //            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
