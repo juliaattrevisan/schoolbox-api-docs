@@ -7,6 +7,7 @@ namespace Schoolbox\Pastoral\ReportBuilder\Test;
 
 use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Collection;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\AccessLevelCensor;
@@ -422,13 +423,14 @@ class helperMethodsTest extends TestCase
     }
 
     /**
-     * Test the getType method of the Helper class.
+     * Test the getType method to ensure it returns types that don't have subtypes.
      *
-     * @param array                   $report
-     * @param GenericCollection<Type> $expected
+     * @param array $report
+     * @param int   $expectedCount
+     * @param array $expectedTypeNames
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerGetType')]
-    public function testGetType(array $report, GenericCollection $expected)
+    public function testGetType(array $report, int $expectedCount, array $expectedTypeNames = [])
     {
         $helper = new Helper(
             $report,
@@ -438,9 +440,35 @@ class helperMethodsTest extends TestCase
             $this->createMock(AccessLevelCensor::class),
         );
 
-        $this->assertEquals($expected, $helper->getType());
+        $result = $helper->getType();
+
+        // Validate the count of types returned
+        $this->assertEquals(
+            $expectedCount,
+            $result->count(),
+            "Expected {$expectedCount} types without subtypes, but got {$result->count()}"
+        );
+
+        // Validate it returns a Collection
+        $this->assertInstanceOf(Collection::class, $result);
+
+        // Validate the specific type names if provided
+        if (!empty($expectedTypeNames)) {
+            $actualTypeNames = $result->map(fn($type) => $type->getName())->getAll();
+            $this->assertEquals(
+                $expectedTypeNames,
+                $actualTypeNames,
+                "Expected types: [" . implode(', ', $expectedTypeNames) . "], " .
+                "but got: [" . implode(', ', $actualTypeNames) . "]"
+            );
+        }
     }
 
+    /**
+     * Data provider for testGetType.
+     *
+     * @return array[]
+     */
     public static function providerGetType(): array
     {
         return [
@@ -449,32 +477,30 @@ class helperMethodsTest extends TestCase
                     'types' => new GenericCollection(Type::class),
                     'subtypes' => new GenericCollection(Subtype::class),
                 ],
-                new GenericCollection(Type::class)
+                0, // Expected count
+                [], // Expected type names
             ],
             'Case 2: Empty subtypes' => [
                 [
                     'types' => new GenericCollection(Type::class)
-                        ->add($typeA = new Type()->setName('Type A'))
-                        ->add($typeB = new Type()->setName('Type B')),
+                        ->add(new Type()->setName('Type A'))
+                        ->add(new Type()->setName('Type B')),
                     'subtypes' => new GenericCollection(Subtype::class)
                 ],
-                new GenericCollection(Type::class, [
-                    $typeA,
-                    $typeB,
-                ])
+                2, // Expected count
+                ['Type A', 'Type B'], // Expected type names
             ],
             'Case 3: One type with subtypes, one without' => [
                 [
                     'types' => new GenericCollection(Type::class)
                         ->add($typeA = new Type()->setName('Type A'))
-                        ->add($typeB = new Type()->setName('Type B')),
+                        ->add(new Type()->setName('Type B')),
                     'subtypes' => new GenericCollection(Subtype::class)
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A'))
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype B'))
                 ],
-                new GenericCollection(Type::class, [
-                    $typeB,
-                ])
+                1, // Expected count
+                ['Type B'], // Expected type names
             ],
             'Case 4: All types have subtypes' => [
                 [
@@ -485,34 +511,32 @@ class helperMethodsTest extends TestCase
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
                         ->add(new Subtype()->setPastoralType($typeB)->setName('Subtype B1'))
                 ],
-                new GenericCollection(Type::class)
+                0, // Expected count
+                [], // Expected type names
             ],
             'Case 5: Multiple types with mixed subtypes' => [
                 [
                     'types' => new GenericCollection(Type::class)
                         ->add($typeA = new Type()->setName('Type A'))
-                        ->add($typeB = new Type()->setName('Type B'))
+                        ->add(new Type()->setName('Type B'))
                         ->add($typeC = new Type()->setName('Type C'))
-                        ->add($typeD = new Type()->setName('Type D')),
+                        ->add(new Type()->setName('Type D')),
                     'subtypes' => new GenericCollection(Subtype::class)
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A2'))
                         ->add(new Subtype()->setPastoralType($typeC)->setName('Subtype C1'))
                 ],
-                new GenericCollection(Type::class, [
-                    $typeB,
-                    $typeD,
-                ])
+                2, // Expected count
+                ['Type B', 'Type D'], // Expected type names
             ],
             'Case 6: Single type without subtype' => [
                 [
                     'types' => new GenericCollection(Type::class)
-                        ->add($typeA = new Type()->setName('Type A')),
+                        ->add(new Type()->setName('Type A')),
                     'subtypes' => new GenericCollection(Subtype::class)
                 ],
-                new GenericCollection(Type::class, [
-                    $typeA,
-                ])
+                1, // Expected count
+                ['Type A'], // Expected type names
             ],
             'Case 7: Single type with single subtype' => [
                 [
@@ -521,28 +545,28 @@ class helperMethodsTest extends TestCase
                     'subtypes' => new GenericCollection(Subtype::class)
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
                 ],
-                new GenericCollection(Type::class)
+                0, // Expected count
+                [], // Expected type names
             ],
             'Case 8: Three types, two with subtypes' => [
                 [
                     'types' => new GenericCollection(Type::class)
                         ->add($typeA = new Type()->setName('Type A'))
                         ->add($typeB = new Type()->setName('Type B'))
-                        ->add($typeC = new Type()->setName('Type C')),
+                        ->add(new Type()->setName('Type C')),
                     'subtypes' => new GenericCollection(Subtype::class)
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
                         ->add(new Subtype()->setPastoralType($typeB)->setName('Subtype B1'))
                         ->add(new Subtype()->setPastoralType($typeB)->setName('Subtype B2'))
                 ],
-                new GenericCollection(Type::class, [
-                    $typeC,
-                ])
+                1, // Expected count
+                ['Type C'], // Expected type names
             ],
             'Case 9: Many subtypes for one type' => [
                 [
                     'types' => new GenericCollection(Type::class)
                         ->add($typeA = new Type()->setName('Type A'))
-                        ->add($typeB = new Type()->setName('Type B')),
+                        ->add(new Type()->setName('Type B')),
                     'subtypes' => new GenericCollection(Subtype::class)
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A2'))
@@ -550,9 +574,39 @@ class helperMethodsTest extends TestCase
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A4'))
                         ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A5'))
                 ],
-                new GenericCollection(Type::class, [
-                    $typeB,
-                ])
+                1, // Expected count
+                ['Type B'], // Expected type names
+            ],
+            'Case 10: Duplicate type references in subtypes' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Type A'))
+                        ->add(new Type()->setName('Type B'))
+                        ->add(new Type()->setName('Type C')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A1'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A2'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Subtype A3'))
+                ],
+                2, // Expected count
+                ['Type B', 'Type C'], // Expected type names
+            ],
+            'Case 11: Real-world pastoral types' => [
+                [
+                    'types' => new GenericCollection(Type::class)
+                        ->add($typeA = new Type()->setName('Attendance'))
+                        ->add(new Type()->setName('Behaviour'))
+                        ->add($typeC = new Type()->setName('Academic'))
+                        ->add(new Type()->setName('Wellbeing'))
+                        ->add(new Type()->setName('Achievement')),
+                    'subtypes' => new GenericCollection(Subtype::class)
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Late'))
+                        ->add(new Subtype()->setPastoralType($typeA)->setName('Absent'))
+                        ->add(new Subtype()->setPastoralType($typeC)->setName('Homework Not Completed'))
+                        ->add(new Subtype()->setPastoralType($typeC)->setName('Excellent Work'))
+                ],
+                3, // Expected count
+                ['Behaviour', 'Wellbeing', 'Achievement'], // Expected type names
             ],
         ];
     }
