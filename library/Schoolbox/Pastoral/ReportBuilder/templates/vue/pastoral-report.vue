@@ -22,6 +22,7 @@ const props = defineProps<{
 const selectedTab = window.Vue.ref<Tab | null>(null);
 const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
+const minWidth = 700; // Minimum width for the report components
 
 // Provide the state and props to child components
 window.Vue.provide("selectedTab", selectedTab);
@@ -93,8 +94,8 @@ window.Vue.onMounted((): void => {
                 </dd>
             </dl>
             <template v-if="selectedTab">
-                <pr-list v-if="selectedTab.type === TabType.LIST" />
-                <pr-table v-else v-model:records-or-points="recordsOrPoints" />
+                <pr-list v-if="selectedTab.type === TabType.LIST" :min-width="minWidth" />
+                <pr-table v-else v-model:records-or-points="recordsOrPoints" :min-width="minWidth" />
             </template>
         </div>
     </div>
