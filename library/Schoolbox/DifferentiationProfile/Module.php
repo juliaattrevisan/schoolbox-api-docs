@@ -74,7 +74,6 @@ class Module extends BaseModule
             new ModelToArray(
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
-                new \Schoolbox\User\Translator\ModelToArray()
             ),
             $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
             $this->getMapperFactory()->get(AdjustmentLevelsMapper::class),

@@ -15,15 +15,22 @@ class ModelToArray
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
-        private UserTranslator $userTranslator,
     ) {
     }
 
     public function __invoke(Model $model): array
     {
+        $student = $model->getStudent();
         return [
             'id'          => $model->getId(),
-            'student'     => call_user_func($this->userTranslator, $model->getStudent()),
+            'student' => [
+                'id' => $student->getId(),
+                'fullName' => $student->getFullName(),
+                'yearLevel' => $student->getYear() ? [
+                    'id' => $student->getYear()->getId(),
+                    'name' => $student->getYear()->getName(),
+                ] : null,
+            ],
             'adjustment_category'    => $model->getAdjustmentCategory(),
             'adjustment_level'       => $model->getAdjustmentLevel(),
             'overview'               => $model->getOverview(),
