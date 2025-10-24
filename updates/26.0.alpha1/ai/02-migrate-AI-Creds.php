@@ -71,7 +71,7 @@ $app = new class extends CliTool\App {
             $query->execute(
                 [
                     'name' => $moduleKey,
-                    'value' => $config->encode($newConfig),
+                    'value' => $config->encode($newConfig, $module),
                 ]
             );
         }

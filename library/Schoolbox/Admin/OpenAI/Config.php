@@ -300,21 +300,34 @@ class Config
     /**
      * Encode function for config array
      * @param array  $config
-     * @param string $feature
+     * @param string $feature The feature whose config is being encoded
      * @return false|string
      * @throws \JsonException
      * @throws SchoolboxException // invalid config
      */
     public function encode(array $config, string $feature): false|string
     {
+        $formInputs     = $this->buildFormInputs($feature);
+        $validProviders = $formInputs[self::FIELD_PROVIDER]['options'];
+
         // ensure the provider is one of the allowed one
         if (
-            !in_array($config[self::FIELD_PROVIDER]['value'] ?? null, self::PROVIDERS, true)
+            !in_array($config[self::FIELD_PROVIDER]['value'] ?? null, $validProviders, true)
         ) {
             throw new SchoolboxException("Invalid provider specified in config");
         }
 
-        $blank = $this->getBlank();
+        // Build a blank out of the form inputs
+        $blank = [];
+        foreach ($formInputs as $name => $formInput) {
+            $section = $formInput['section'];
+            match ($section) {
+                self::SECTION_GENERAL,  self::SECTION_OPENAI, self::SECTION_AZURE => $blank[$section][$name]['value'] = '',
+                default => $blank[$name]['value'] = '',
+            };
+        }
+
+//        $blank = $this->getBlank();
         foreach (self::PROVIDERS as $provider => $configName) {
             // skip checking 'Off' provider
             if (Helper::ENDPOINT_TYPE_OFF === $provider) {
