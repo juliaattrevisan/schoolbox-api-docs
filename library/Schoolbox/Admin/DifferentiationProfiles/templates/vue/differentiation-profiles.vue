@@ -27,17 +27,6 @@ const headersArray = window.Vue.computed(() => {
     }));
 });
 
-/**
- * When the user resequences the fields
- * @param event The event that triggered the resequence
- */
-async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
-    if (event.oldIndex === event.newIndex) return;
-    if (event.oldIndex === undefined || event.newIndex === undefined || event.item === undefined) return;
-    const moduleKey = event.item.getAttribute("data-module-key");
-    const fieldKey = event.item.getAttribute("data-field-key");
-}
-
 // #region resequence
 
 const sortableOptions = window.Vue.computed(() => ({
@@ -50,6 +39,43 @@ const sortableOptions = window.Vue.computed(() => ({
     // The handle to use to drag the field around
     handle: "[data-dp-drag-handle]",
 }));
+
+/**
+ * When the user resequences the fields
+ * @param event The event that triggered the resequence
+ */
+async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
+    if (event.oldIndex === event.newIndex) return;
+    if (event.oldIndex === undefined || event.newIndex === undefined || event.item === undefined) return;
+    const moduleKey = event.item.getAttribute("data-module-key");
+    const fieldKey = event.item.getAttribute("data-field-key");
+    if (!moduleKey || !fieldKey) return;
+    const module = data.value.modules[moduleKey];
+    // Get the field that was moved and set its sequence to the newIndex
+    const field = module.fields[fieldKey];
+    if (!field) return;
+    const newSequence = event.newIndex;
+    field.sequence = newSequence;
+    // Update sequences for all other fields in the module
+    Object.values(module.fields).forEach((field) => {
+        if (field.name !== fieldKey && field.sequence !== undefined) {
+            // If another field's sequence is at or after the new position, increment it
+            if (field.sequence >= newSequence) {
+                field.sequence += 1;
+            }
+        }
+    });
+    // Normalize sequences to ensure they're consecutive (0, 1, 2, etc.)
+    const sortedFields = Object.values(module.fields).sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+    sortedFields.forEach((field, index) => {
+        field.sequence = index;
+    });
+    // update the data
+    data.value.modules[moduleKey] = {
+        ...module,
+        fields: Object.fromEntries(sortedFields.map((field) => [field.name, field])),
+    };
+}
 
 // #endregion resequence
 

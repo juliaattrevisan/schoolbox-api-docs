@@ -18,6 +18,7 @@ export type Field = {
     terminology: string;
     description: string;
     is_enabled: boolean;
+    sequence: number; // The position/order of the field within its module
     [key: string]: any; // Allow dynamic property access
 };
 
