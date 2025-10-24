@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Admin\OpenAI\Config;
 
@@ -56,8 +57,15 @@ $app = new class extends CliTool\App {
         $query = $this->getDatabaseInternal()->prepareQuery("UPDATE config SET value = :value WHERE name = :name;");
         $config = new Config();
 
-        // insert new config into DB
-        foreach (Config::ALL_MODULES as $module => $moduleKey) {
+        // insert new config into DB: but only for a particular set of modules
+        // (image generation is migrated in the next step)
+        $modulesToMigrate = [
+            Helper::FEATURE_CHAT            => ConfigMapper::NAME_AI_TEXT_CHAT,
+            Helper::FEATURE_LESSONPLAN      => ConfigMapper::NAME_AI_LESSONPLAN,
+            Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION,
+            Helper::FEATURE_DIALOGAGENT     => ConfigMapper::NAME_AI_DIALOGAGENT,
+        ];
+        foreach ($modulesToMigrate as $module => $moduleKey) {
             $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey'");
             $this->getLogger()->debug("New config: " . $config->encode($newConfig));
             $query->execute(
