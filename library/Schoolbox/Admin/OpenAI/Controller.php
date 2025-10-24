@@ -70,7 +70,7 @@ class Controller extends ConfigController
             $conf = $this->getConfigMapper()->findOneByColumn('name', $configName);
             // save the new config into that item
             try {
-                $conf->setValue($aiConf->encode($postData[$feature]));
+                $conf->setValue($aiConf->encode($postData[$feature], $feature));
             } catch (Exception $e) {
                 throw new Exception("Failed to encode config for feature '$feature': " . $e->getMessage(), 0, $e);
             }
@@ -79,7 +79,7 @@ class Controller extends ConfigController
 
         /* Now save image config
          */
-        $this->updateConfig($postData, $this->buildImageConfigPredicate());
+//        $this->updateConfig($postData, $this->buildImageConfigPredicate());
 
         /* Go back to the place from whence you came
          */

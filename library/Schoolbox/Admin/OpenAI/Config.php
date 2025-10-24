@@ -299,12 +299,13 @@ class Config
 
     /**
      * Encode function for config array
-     * @param array $config
+     * @param array  $config
+     * @param string $feature
      * @return false|string
      * @throws \JsonException
      * @throws SchoolboxException // invalid config
      */
-    public function encode(array $config): false|string
+    public function encode(array $config, string $feature): false|string
     {
         // ensure the provider is one of the allowed one
         if (

@@ -67,7 +67,7 @@ $app = new class extends CliTool\App {
         ];
         foreach ($modulesToMigrate as $module => $moduleKey) {
             $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey'");
-            $this->getLogger()->debug("New config: " . $config->encode($newConfig));
+            $this->getLogger()->debug("New config: " . $config->encode($newConfig, $module));
             $query->execute(
                 [
                     'name' => $moduleKey,

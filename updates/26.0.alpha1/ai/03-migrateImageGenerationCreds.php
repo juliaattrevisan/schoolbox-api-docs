@@ -67,7 +67,7 @@ $app = new class extends CliTool\App {
                 ConfigMapper::NAME_AI_IMAGE_GENERATION,
             )
         );
-        $this->getLogger()->debug("New config: " . $config->encode($newConfig));
+        $this->getLogger()->debug("New config: " . $config->encode($newConfig, Helper::FEATURE_IMAGE));
         $query->execute(
             [
                 'name'  => ConfigMapper::NAME_AI_IMAGE_GENERATION,
