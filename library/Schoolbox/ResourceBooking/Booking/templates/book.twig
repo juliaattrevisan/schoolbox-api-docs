@@ -164,7 +164,8 @@ $(function() {
                 } catch (e) {
                     // noop
                 }
-                window.location.href = $('#resource-booking-back').attr('href')+dateQuery;
+console.info('Would have redirected to ' + $('#resource-booking-back').attr('href')+dateQuery);
+//                window.location.href = $('#resource-booking-back').attr('href')+dateQuery;
             }
         };
         var ajaxFail = function(jqXHR) {
