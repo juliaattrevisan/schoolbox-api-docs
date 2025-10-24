@@ -22,7 +22,7 @@ const props = defineProps<{
 const selectedTab = window.Vue.ref<Tab | null>(null);
 const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
-const minWidth = 700; // Minimum width for the report components
+const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
 
 // Provide the state and props to child components
 window.Vue.provide("selectedTab", selectedTab);
