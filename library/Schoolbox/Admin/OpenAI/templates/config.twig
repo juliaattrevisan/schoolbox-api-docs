@@ -1,4 +1,41 @@
 <div data-feature="{{ feature.feature }}">
+
+    {% for name, formInput in feature.formInputs %}
+        {% set section = formInput.section ?? null %}
+        {% if section is null %}
+            {% set inputName %}[{{ feature.feature }}][{{ name }}][value]{% endset %}
+            {% set inputValue %}{{ feature.config[name].value ?? '' }}{% endset %}
+        {% else %}
+            {% set inputName %}[{{ feature.feature }}][{{ section }}][{{ name }}][value]{% endset %}
+            {% set inputValue %}{{ feature.config[section][name].value ?? '' }}{% endset %}
+        {% endif %}
+
+        {# Output depends on formInput.field #}
+        {% set inputField = formInput.field %}
+
+        {% set dataAttrs = "" %}
+        {% if section == 'general'%}
+            {% set dataAttrs = "data-feature-openai data-feature-azure" %}
+        {% elseif section == 'OpenAI'%}
+            {% set dataAttrs = "data-feature-openai" %}
+        {% elseif section == 'Azure'%}
+            {% set dataAttrs = "data-feature-azure" %}
+        {% endif %}
+
+        <label id="{{ name }}-label" for="{{ name }}-value" {{ dataAttrs }}>
+            <span>{{ formInput.title }}</span>
+            <span data-tooltip class="has-tip tip-top hint" title='{{ formInput.description }}'>?</span>
+        </label>
+
+        <input id="{{ name }}-value"
+               type="text"
+               name="{{ inputName }}"
+               value="{{ inputValue }}"
+               {{ dataAttrs }}
+        />
+    {% endfor %}
+
+
     <label id="{{ feature.feature }}-provider" for="{{ feature.feature }}-provider-value">
         <span>Provider</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title='Select which provider you will use for conducting AI text queries; choose "Off" to disable this feature.'>?</span>
