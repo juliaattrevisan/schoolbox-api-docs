@@ -111,41 +111,36 @@ async function onSaveSelected(): Promise<void> {
                             </div>
                         </div>
                     </fieldset>
-                    <fieldset v-for="(differentiationProfile, key) in data.modules" :key="key" class="content">
+                    <fieldset v-for="(module, key) in data.modules" :key="key" class="content">
                         <ul class="information-list sortable ui-sortable">
-                            <li
-                                v-for="module in differentiationProfile.fields"
-                                :key="module.id"
-                                class="list-item-container"
-                            >
+                            <li v-for="field in module.fields" :key="field.id" class="list-item-container">
                                 <div class="list-item">
+                                    <div v-if="module.isSortable" class="grip compact" data-drag-handle />
                                     <template v-for="header in headersArray" :key="header.headerKey">
-                                        <div v-if="header" :class="`small-12 medium-${header.colSpan} column`">
+                                        <div :class="`small-12 medium-${header.colSpan} column`">
                                             <template v-if="header.type === 'checkbox'">
                                                 <input
-                                                    :id="`differentiation-profiles-adjustments-field-${module.id}`"
-                                                    v-model="module.is_enabled"
+                                                    :id="`differentiation-profiles-adjustments-field-${field.id}`"
+                                                    v-model="field.is_enabled"
                                                     type="checkbox"
-                                                    :name="`modules[${key}][${module.name}][is_enabled]`"
                                                 />
                                                 <label
-                                                    :for="`differentiation-profiles-adjustments-field-${module.id}`"
+                                                    :for="`differentiation-profiles-adjustments-field-${field.id}`"
                                                     class="checkbox-label"
-                                                    >{{ module.title }}</label
+                                                    >{{ field.title }}</label
                                                 >
                                             </template>
                                             <template v-else-if="header.type === 'text'">
                                                 <label
-                                                    :for="`module-${header.key}-${module.id}`"
+                                                    :for="`field-${header.key}-${field.id}`"
                                                     class="t-visually-hidden"
                                                 >
                                                     {{ header.title || header.key }}
                                                 </label>
                                                 <input
-                                                    :id="`module-${header.key}-${module.id}`"
-                                                    v-model="module[header.key]"
+                                                    :id="`field-${header.key}-${field.id}`"
+                                                    v-model="field[header.key]"
                                                     type="text"
-                                                    :name="`modules[${key}][${module.name}][${header.key}]`"
                                                     :readonly="header.key === 'title'"
                                                 />
                                             </template>
