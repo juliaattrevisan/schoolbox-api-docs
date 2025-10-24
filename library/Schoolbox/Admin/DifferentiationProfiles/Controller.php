@@ -12,13 +12,16 @@ namespace Schoolbox\Admin\DifferentiationProfiles;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Symfony\Component\HttpFoundation\Response;
 
 class Controller extends ConfigController
 {
@@ -28,6 +31,7 @@ class Controller extends ConfigController
      * @param Rebuilder            $rebuilder
      * @param CacheInterface       $oidcCache
      * @param Mapper               $differentiationProfilesMapper
+     * @param ModelToArray         $modelToArray
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -35,6 +39,7 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private Mapper $differentiationProfilesMapper,
+        private ModelToArray $modelToArray,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -44,7 +49,7 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws Deleted
-     * @throws Exception
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Twig\Error\Error
      * @api GET /adminv2/pastoral/differentiation-profiles
@@ -52,6 +57,24 @@ class Controller extends ConfigController
     public function getIndex(): void
     {
         $pageCurrent = $this->routeGenerator->generate('differentiationProfiles.getIndex');
+
+        /* Get all the configs and sort it by sequence, so it will always be in the sequence order
+         */
+        $differentiationProfilesConfigs = $this->differentiationProfilesMapper->findAll()->sortBy('sequence', 'ASC');
+
+        $differentiationProfilesConfigsArray = $differentiationProfilesConfigs->reduce(function ($carry, Model $item) {
+            $carry[$item->getModule()]['fields'][$item->getName()] = call_user_func($this->modelToArray, $item);
+            $carry[$item->getModule()]['isSortable'] = true;
+            return $carry;
+        }, []);
+
+        $differentiationProfilesEnabled =
+            $this->getConfigMapper()
+                 ->findOneByColumn(
+                     'name',
+                     ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
+                 );
+
         $this->response = $this->responseFromTemplate(
             '@differentiationProfiles/index.twig',
             [
@@ -61,13 +84,21 @@ class Controller extends ConfigController
                     $this->getUser()
                 )->generateBreadcrumbs($this->routeGenerator->generate('differentiationProfiles.getIndex')),
                 'returnUrl' => Redirect::encode($pageCurrent),
-                'differentiationProfilesEnabled' =>
-                    $this->getConfigMapper()
-                         ->findOneByColumn(
-                             'name',
-                             ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
-                         ),
-                'differentiationProfilesConfig' => $this->differentiationProfilesMapper->findAll()
+                'data' => [
+                    'differentiationProfiles' => [
+                        'featureToggle' => [
+                            'enabled' => (bool)$differentiationProfilesEnabled->getValue(),
+                            'required' => $differentiationProfilesEnabled->getRequired() ?? false,
+                            'title' => $differentiationProfilesEnabled->getTitle() ?? '',
+                            'description' => $differentiationProfilesEnabled->getDescription() ?? '',
+                        ],
+                        'modules' => $differentiationProfilesConfigsArray,
+                        'headers' => Model::CONFIGS_HEADER
+                    ]
+                ],
+                '_routes' => [
+                    'update' => $this->getRouteIfAuthorized('differentiationProfiles.postConfig')
+                ],
             ],
             'Differentiation Profiles'
         );
@@ -76,22 +107,58 @@ class Controller extends ConfigController
     /**
      * Updating the differentiation profiles configs
      *
-     * @throws Exception
-     * @throws Deleted
+     * @throws \Exception
+     * @throws MapperException
      * @api POST /adminv2/pastoral/differentiation-profiles
      */
     public function postConfig(): void
     {
         $post = $this->requestPost;
-        $enabled = (null !== $post->get('enabled')) ? '1' : '0';
-        $returnUrl = $post->get(Redirect::RETURN_URL);
-        $differentiationProfilesEnabledConfig =
-            $this->getConfigMapper()
-                 ->findOneByColumn(
-                     'name',
-                     ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
-                 );
-        $this->getConfigMapper()->save($differentiationProfilesEnabledConfig->setValue($enabled));
-        $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+        $enabled = $post->getBool('enabled', false) ? '1' : '0';
+        $modules = $post->get('modules') ?? [];
+        try {
+            $this->differentiationProfilesMapper->getDatabase()->beginTransaction();
+            $differentiationProfilesEnabledConfig =
+                $this->getConfigMapper()
+                     ->findOneByColumn(
+                         'name',
+                         ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
+                     );
+            $this->getConfigMapper()->save($differentiationProfilesEnabledConfig->setValue($enabled));
+
+            if (!empty($modules)) {
+                foreach ($modules as $moduleName => $module) {
+                    $index = 0;
+                    foreach ($module['fields'] as $name => $fields) {
+                        $moduleConfig = $this->differentiationProfilesMapper
+                            ->createModel()
+                            ->setId($fields['id'])
+                            ->setName($name)
+                            ->setTitle($fields['title'])
+                            ->setTerminology(trim($fields['terminology']) ?: null)
+                            ->setDescription(trim($fields['description']) ?: null)
+                            ->setIsEnabled((bool)($fields['is_enabled'] ?? false))
+                            ->setModule($moduleName)
+                            ->setSequence($index);
+                        $this->differentiationProfilesMapper->save($moduleConfig);
+                        $index++;
+                    }
+                }
+            }
+            $this->differentiationProfilesMapper->getDatabase()->commit();
+            $this->response = $this->responseEmpty(200);
+        } catch (MapperException $e) {
+            $this->differentiationProfilesMapper->getDatabase()->rollBack();
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($status);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
+        } catch (\Exception $e) {
+            $this->differentiationProfilesMapper->getDatabase()->rollBack();
+            $status = Response::HTTP_BAD_REQUEST;
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($status);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
+        }
     }
 }
