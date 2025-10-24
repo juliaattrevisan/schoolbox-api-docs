@@ -33,8 +33,9 @@ const headersArray = window.Vue.computed(() => {
  */
 async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
     if (event.oldIndex === event.newIndex) return;
-    if (event.oldIndex === undefined || event.newIndex === undefined) return;
-    console.warn(event);
+    if (event.oldIndex === undefined || event.newIndex === undefined || event.item === undefined) return;
+    const moduleKey = event.item.getAttribute("data-module-key");
+    const fieldKey = event.item.getAttribute("data-field-key");
 }
 
 // #region resequence
@@ -152,7 +153,11 @@ async function onSaveSelected(): Promise<void> {
                             @end="onResequenceField"
                         >
                             <template #item="item">
-                                <li class="list-item-container">
+                                <li
+                                    class="list-item-container"
+                                    :data-module-key="key"
+                                    :data-field-key="item.element.name"
+                                >
                                     <div class="list-item">
                                         <div v-if="module.isSortable" class="grip compact" data-dp-drag-handle />
                                         <template v-for="header in headersArray" :key="header.headerKey">
