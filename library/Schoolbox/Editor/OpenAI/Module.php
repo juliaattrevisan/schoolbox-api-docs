@@ -47,8 +47,7 @@ class Module extends BaseModule
             $this->injector->get('httpClient'),
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
-            $this->getMapperFactory()->get(ConfigMapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class)
         );
     }
 }
