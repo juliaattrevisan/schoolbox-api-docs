@@ -12,13 +12,17 @@ import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
 import { useLoadRecords } from "./composable/useLoadRecords";
 import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
 
+const props = defineProps<{
+    minWidth: number;
+}>();
+
 const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 
 /**
  * Keep the container below the height of the viewport
  */
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, props.minWidth);
 
 /**
  * Load the initial records

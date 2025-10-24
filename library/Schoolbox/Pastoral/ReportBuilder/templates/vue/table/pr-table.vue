@@ -18,6 +18,10 @@ import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
 
+const props = defineProps<{
+    minWidth: number;
+}>();
+
 // #region sticky total/trend table columns for bigger screens
 
 const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
@@ -133,7 +137,7 @@ function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]):
 // #endregion
 
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, 700);
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, props.minWidth);
 
 /**
  * Reset the table load to ensure the correct endpoint is set
