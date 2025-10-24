@@ -155,12 +155,12 @@ export default class PastoralProfile {
 
     /**
      * delete the pastoral record delete by passing its record id
-     * @param recordId - The student id
+     * @param studentId - The student id
      */
-    async deletePastoralRecord(recordId: number): Promise<void> {
+    async deletePastoralRecord(studentId: number): Promise<void> {
         const deleteSelector = PastoralProfile.SELECTOR_DELETE_PASTORAL_RECORD_ICON.replace(
             "{studentId}",
-            recordId.toString(),
+            studentId.toString(),
         );
         await this.page.locator(deleteSelector).click();
         await this.tester.common.clickConfirmButton();

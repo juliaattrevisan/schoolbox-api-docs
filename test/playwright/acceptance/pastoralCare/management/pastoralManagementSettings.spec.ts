@@ -236,7 +236,6 @@ test.describe("Pastoral Care - Management Settings", () => {
         await profilePage.goto(studentId);
         await expect(profilePage.getFlag(1, 1)).toBeVisible();
         await expect(profilePage.getFlag(1, 1)).toContainText("1");
-        await expect(profilePage.getFlag(1, 1)).toBeVisible();
         await page.goto(`/learning/class/55`);
         await expect(classList.getFlagLabel(6, 1, 1)).toBeVisible();
         await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
