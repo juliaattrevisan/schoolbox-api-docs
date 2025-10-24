@@ -122,6 +122,33 @@ VALUES (
                WHERE
                    c.module = "openai-text"
            )
+       ),
+       (
+           'ai_image_generation',
+           'Image Generation',
+           '',
+           (
+               SELECT id
+               FROM lu_config_field
+               WHERE
+                   field = 'json'
+           ),
+           (
+               SELECT id
+               FROM lu_config_type
+               WHERE
+                   type = 'AI'
+           ),
+           'true',
+           'false',
+           'false',
+           'openai-text',
+           (
+               SELECT MAX(sequence) + 5
+               FROM config c
+               WHERE
+                   c.module = "openai-text"
+           )
        );
 
 # -- Push down the 'openai-image' config following the text generation config
@@ -147,5 +174,12 @@ WHERE name IN (
     'openai_text_azure_deployment_id',
     'openai_text_model',
     'openai_text_endpoint',
-    'openai_text_generation_system_prompt'
-);
+    'openai_text_generation_system_prompt',
+    'openai_image_endpoint',
+    'openai_image_key',
+    'openai_image_azure_resource_name',
+    'openai_image_azure_deployment_id',
+    'openai_image_model',
+    'openai_image_system_prompt',
+    'openai_image_output_quality'
+    );
