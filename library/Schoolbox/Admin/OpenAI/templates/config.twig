@@ -13,29 +13,41 @@
         {# Output depends on formInput.field #}
         {% set type = formInput.type %}
 
-        {% set dataAttrs = "" %}
         {% if section == 'general'%}
             {% set dataAttrs = "data-feature-openai data-feature-azure" %}
+            {% set style = 'display:none' %}
         {% elseif section == 'OpenAI'%}
             {% set dataAttrs = "data-feature-openai" %}
+            {% set style = 'display:none' %}
         {% elseif section == 'Azure'%}
             {% set dataAttrs = "data-feature-azure" %}
+            {% set style = 'display:none' %}
+        {% else %}
+            {% set dataAttrs = '' %}
+            {% set style = '' %}
         {% endif %}
 
-        <label id="{{ name }}-label" for="{{ name }}-value" {{ dataAttrs }}>
+        <label id="{{ feature.feature }}-{{ name }}-label"
+               for="{{ feature.feature }}-{{ name }}-value"
+               {{ dataAttrs }}
+               {{ style }}
+        >
             <span>{{ formInput.title }}</span>
             <span data-tooltip class="has-tip tip-top hint" data-allow-html='true' title='{{ formInput.description }}'>?</span>
         </label>
 
         {% if type == 'textarea' %}
-            <textarea id="{{ name }}-value"
+            <textarea id="{{ feature.feature }}-{{ name }}-value"
                       name="{{ inputName }}"
                       rows="5"
                       {{ dataAttrs }}
+                      {{ style }}
             >{{ inputValue }}</textarea>
         {% elseif type == 'select' %}
-            <select id="{{ name }}-value"
+            <select id="{{ feature.feature }}-{{ name }}-value"
                     name="{{ inputName }}"
+                    {{ dataAttrs }}
+                    {{ style }}
             >
                 <option value="" disabled>-- select an option --</option>
                 {% for option in formInput.options %}
@@ -43,16 +55,17 @@
                 {% endfor %}
             </select>
         {% else %}
-            <input id="{{ name }}-value"
+            <input id="{{ feature.feature }}-{{ name }}-value"
                    type="text"
                    name="{{ inputName }}"
                    value="{{ inputValue }}"
                    {{ dataAttrs }}
+                   style="display:none"
             />
         {% endif %}
     {% endfor %}
 
-
+    {#
     <label id="{{ feature.feature }}-provider" for="{{ feature.feature }}-provider-value">
         <span>Provider</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title='Select which provider you will use for conducting AI text queries; choose "Off" to disable this feature.'>?</span>
@@ -98,6 +111,7 @@
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.">?</span>
     </label>
     <textarea id="{{ feature.feature }}-system_prompt-value" name="[{{ feature.feature }}][general][system_prompt][value]" rows="5" data-feature-azure data-feature-openai style="display:none">{{ feature.config.general.system_prompt.value }}</textarea>
+    #}
 
     <script type="application/javascript">
     (() => {
