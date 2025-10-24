@@ -46,7 +46,8 @@ class Config
     public const string FIELD_RESOURCE_NAME = 'resource_name';
     public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
     public const string FIELD_MODEL = 'model';
-    public const string FIELD_SYSTEM_PROMPT = 'system_prompt';
+    public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
+    public const string FIELD_OUTPUT_QUALITY = 'output_quality';
 
 
     /* Predefined config structs: as you add more providers, don't forget to pile them in here
