@@ -113,12 +113,38 @@ class Config
      * Which form inputs exist for each AI provider?
      */
     public const DEFAULT_FORM_INPUTS = [
-        self::FIELD_PROVIDER      => ['field' => ConfigMapper::FIELD_SELECT_KEY, 'options' => self::PROVIDERS,],
-        self::FIELD_AIKEY         => ['field' => ConfigMapper::FIELD_INPUT,],
-        self::FIELD_RESOURCE_NAME => ['field' => ConfigMapper::FIELD_INPUT,],
-        self::FIELD_DEPLOYMENT_ID => ['field' => ConfigMapper::FIELD_INPUT,],
-        self::FIELD_MODEL         => ['field' => ConfigMapper::FIELD_SELECT, 'options' => self::AI_MODELS,],
-        self::FIELD_SYSTEM_PROMPT => ['field' => ConfigMapper::FIELD_INPUT,],
+        self::FIELD_PROVIDER      => [
+            'field'     => ConfigMapper::FIELD_SELECT_KEY,
+            'label'     => 'Provider',
+            'options'   => self::PROVIDERS,
+            'providers' => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE, Helper::ENDPOINT_TYPE_OFF,],
+        ],
+        self::FIELD_AIKEY         => [
+            'field'     => ConfigMapper::FIELD_INPUT,
+            'label'     => 'OpenAI API Key',
+            'providers' => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
+        ],
+        self::FIELD_MODEL         => [
+            'field'     => ConfigMapper::FIELD_SELECT,
+            'label'     => 'OpenAI Model',
+            'options'   => self::AI_MODELS,
+            'providers' => [Helper::ENDPOINT_TYPE_OPENAI,]
+        ],
+        self::FIELD_RESOURCE_NAME => [
+            'field'     => ConfigMapper::FIELD_INPUT,
+            'label'     => 'Azure OpenAI Resource Name',
+            'providers' => [Helper::ENDPOINT_TYPE_AZURE,],
+        ],
+        self::FIELD_DEPLOYMENT_ID => [
+            'field'     => ConfigMapper::FIELD_INPUT,
+            'label'     => 'Azure OpenAI Deployment ID',
+            'providers' => [Helper::ENDPOINT_TYPE_AZURE,],
+        ],
+        self::FIELD_SYSTEM_PROMPT => [
+            'field'     => ConfigMapper::FIELD_INPUT,
+            'label'     => 'System Prompt',
+            'providers' => [Helper::ENDPOINT_TYPE_OPENAI, Helper::ENDPOINT_TYPE_AZURE,],
+        ],
     ];
 
     /**
@@ -315,7 +341,12 @@ class Config
             // Image feature:
             // * add output quality
             // * remove Azure option
-            $formInputs[self::FIELD_OUTPUT_QUALITY] = ['field' => ConfigMapper::FIELD_SELECT, 'options' => self::OUTPUT_QUALITY_OPTIONS];
+            $formInputs[self::FIELD_OUTPUT_QUALITY] = [
+                'field'     => ConfigMapper::FIELD_SELECT,
+                'label'     => 'Output Quality',
+                'options'   => self::OUTPUT_QUALITY_OPTIONS,
+                'providers' => [Helper::ENDPOINT_TYPE_OPENAI,],
+            ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
         return $formInputs;
