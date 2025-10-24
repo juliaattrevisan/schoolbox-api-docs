@@ -411,6 +411,7 @@ class ConfigMapper extends Mapper
     public const NAME_AI_LESSONPLAN = 'ai_lessonplan';
     public const NAME_AI_DIALOGAGENT = 'ai_dialogagent';
     public const NAME_AI_DIFFERENTIATION = 'ai_differentiation';
+    public const NAME_AI_IMAGE_GENERATION = 'ai_image_generation';
 
     // image ai configs
     public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';

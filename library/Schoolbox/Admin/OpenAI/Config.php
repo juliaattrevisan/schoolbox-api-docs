@@ -20,10 +20,11 @@ class Config
      * feature name => config name
      */
     public const array ALL_MODULES = [
-        Helper::FEATURE_CHAT => ConfigMapper::NAME_AI_TEXT_CHAT,
-        Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_AI_LESSONPLAN,
+        Helper::FEATURE_CHAT            => ConfigMapper::NAME_AI_TEXT_CHAT,
+        Helper::FEATURE_LESSONPLAN      => ConfigMapper::NAME_AI_LESSONPLAN,
         Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION,
-        Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
+        Helper::FEATURE_DIALOGAGENT     => ConfigMapper::NAME_AI_DIALOGAGENT,
+        Helper::FEATURE_IMAGE           => ConfigMapper::NAME_AI_IMAGE_GENERATION,
     ];
 
     public const array PROVIDERS = [
