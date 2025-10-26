@@ -632,14 +632,14 @@ class ResourceBookingCest
     // Clash booking tests -------------------------------------------------------------------------------------------//
     //
     // Clash bookings are defined as bookings that clash with existing approved bookings.
-    // Note bookings that clash with existing pending bookings are always allowed. (TODO: Confirm this)
+    // Note bookings (both pending and approved) that clash with existing pending bookings are always allowed.
     //
     // Info on moderation types:
     // * Moderation type 'open' means:
-    //      All staff can book the resource, and the booking is automatically approved (*)
+    //      All staff can book the resource, and the booking is automatically approved.
     //      (if clash bookings are allowed, they are saved as 'pending', otherwise they are refused)
     // * Moderation type 'managed' means:
-    //      Only moderators can book the resource.  All bookings are automatically approved (*)
+    //      Only moderators can book the resource.  All bookings are automatically approved.
     //      (if clash bookings are allowed, they are saved as 'pending', otherwise they are refused)
     // * Moderation type 'moderated' means:
     //      All staff can request to book the resource. Booking then needs to be approved by a moderator.
@@ -651,36 +651,36 @@ class ResourceBookingCest
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsOpenVariant1(IntegrationTester $i): void
+    public function attemptClashBookingsVariant1(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i,ModerationType\Model::TYPE_OPEN, false,false);
+        $this->attemptToBookClashBookings($i,false,false);
     }
 
     /**
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsOpenVariant2(IntegrationTester $i): void
+    public function attemptClashBookingsVariant2(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i, ModerationType\Model::TYPE_OPEN, false, true);
+        $this->attemptToBookClashBookings($i, false, true);
     }
 
     /**
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsOpenVariant3(IntegrationTester $i): void
+    public function attemptClashBookingsVariant3(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i, ModerationType\Model::TYPE_OPEN, true, false);
+        $this->attemptToBookClashBookings($i, true, false);
     }
 
     /**
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsOpenVariant4(IntegrationTester $i): void
+    public function attemptClashBookingsVariant4(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i, ModerationType\Model::TYPE_OPEN, true, true);
+        $this->attemptToBookClashBookings($i, true, true);
     }
 
     /**
@@ -689,7 +689,6 @@ class ResourceBookingCest
      * Get $resourceId from the test output (look for text "The new resource has id...").
      *
      * @param IntegrationTester $i
-     * @param int               $moderationTypeId
      * @param bool              $allowClashBookings Whether new bookings are allowed to clash with pre-existing approved bookings.
      *                                              Note new bookings are always allowed to clash with pre-existing pending bookings.
      * @param bool              $clashOnFirstEvent The first event is created separately to the repeat events, so it is good to test it independently.
@@ -700,7 +699,6 @@ class ResourceBookingCest
      */
     private function attemptToBookClashBookings(
         IntegrationTester $i,
-        int $moderationTypeId,
         bool $allowClashBookings,
         bool $clashOnFirstEvent,
     ): void
@@ -709,17 +707,21 @@ class ResourceBookingCest
         $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
 
-        $expectedClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_PENDING;
-        $expectedNonClashBookingStatusId = null;
-        switch ($moderationTypeId) {
-            case ModerationType\Model::TYPE_OPEN:
-                $expectedNonClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_APPROVED;
-                break;
-            case ModerationType\Model::TYPE_MODERATED:
-            case ModerationType\Model::TYPE_MANAGED:
-                $expectedNonClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_PENDING;
-                break;
-        }
+        // Note regarding choice of moderation type for this test
+        // ------------------------------------------------------
+        // We need a moderation type for which non-clash bookings will be saved as 'approved', so we can confirm that
+        // clash bookings are detected and handled differently (they should be saved with status 'pending').
+        // Both 'open' and 'managed' moderation types meet this criteria.  'Open' was chosen so that the user who
+        // creates the clash booking does not have to be a moderator.
+        //    We don't need to test other moderation types, because the behaviour of clash bookings does not depend on
+        // the moderation type of the resource to be booked.  Regardless of the moderation type of the resource to be
+        // booked, any booking that clashes with existing 'approved' bookings will be:
+        //  * refused if allow_clash_bookings is false.
+        //  * booked with status 'pending' if allow_clash_bookings is true.
+        // Note bookings that clash with existing 'pending' bookings are covered by another test (TODO write test).
+        $moderationTypeId = ModerationType\Model::TYPE_OPEN; // Moderation type 'open' is used so that non-clash bookings will have status 'approved'.
+        $expectedClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_PENDING; // This is true for any moderation type.
+        $expectedNonClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_APPROVED; // This is true for moderation type 'open'.
 
         // Create a resource -----------------------------------------------------------------------------------------//
 
