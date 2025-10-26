@@ -163,6 +163,7 @@ async function onSaveSelected(): Promise<void> {
                                     class="list-item-container"
                                     :data-module-key="key"
                                     :data-field-key="item.element.name"
+                                    :class="{ dragging: item.isDragging }"
                                 >
                                     <div class="list-item">
                                         <div v-if="module.isSortable" class="grip compact" data-dp-drag-handle />
@@ -212,4 +213,15 @@ async function onSaveSelected(): Promise<void> {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Hide the contents of the field placeholder while it is being dragged (shows as a white box) */
+li.dragging {
+    opacity: 0;
+}
+
+/* The item held by the mouse when dragging */
+.dragged-item {
+    background-color: var(--content-ui-hover);
+    height: auto !important;
+}
+</style>

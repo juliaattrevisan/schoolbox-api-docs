@@ -128,7 +128,6 @@ class Controller extends ConfigController
 
             if (!empty($modules)) {
                 foreach ($modules as $moduleName => $module) {
-                    $index = 0;
                     foreach ($module['fields'] as $name => $fields) {
                         $moduleConfig = $this->differentiationProfilesMapper
                             ->createModel()
@@ -139,9 +138,8 @@ class Controller extends ConfigController
                             ->setDescription(trim($fields['description']) ?: null)
                             ->setIsEnabled((bool)($fields['is_enabled'] ?? false))
                             ->setModule($moduleName)
-                            ->setSequence($index);
+                            ->setSequence($fields['sequence']);
                         $this->differentiationProfilesMapper->save($moduleConfig);
-                        $index++;
                     }
                 }
             }
