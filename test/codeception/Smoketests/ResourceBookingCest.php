@@ -653,7 +653,7 @@ class ResourceBookingCest
      */
     public function attemptClashBookingsVariant1(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i,false,false);
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, false, false);
     }
 
     /**
@@ -662,7 +662,7 @@ class ResourceBookingCest
      */
     public function attemptClashBookingsVariant2(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i, false, true);
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, false, true);
     }
 
     /**
@@ -671,7 +671,7 @@ class ResourceBookingCest
      */
     public function attemptClashBookingsVariant3(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i, true, false);
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, true, false);
     }
 
     /**
@@ -680,7 +680,7 @@ class ResourceBookingCest
      */
     public function attemptClashBookingsVariant4(IntegrationTester $i): void
     {
-        $this->attemptToBookClashBookings($i, true, true);
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, true, true);
     }
 
     /**
@@ -697,7 +697,7 @@ class ResourceBookingCest
      * @throws Exception
      * @throws \JsonException
      */
-    private function attemptToBookClashBookings(
+    private function createBookingsThatClashWithExistingApprovedBookings(
         IntegrationTester $i,
         bool $allowClashBookings,
         bool $clashOnFirstEvent,
@@ -713,9 +713,10 @@ class ResourceBookingCest
         // clash bookings are detected and handled differently (they should be saved with status 'pending').
         // Both 'open' and 'managed' moderation types meet this criteria.  'Open' was chosen so that the user who
         // creates the clash booking does not have to be a moderator.
-        //    We don't need to test other moderation types, because the behaviour of clash bookings does not depend on
-        // the moderation type of the resource to be booked.  Regardless of the moderation type of the resource to be
-        // booked, any booking that clashes with existing 'approved' bookings will be:
+        //    We don't need to test other moderation types, because the behaviour of new bookings that clash with
+        // existing 'approved' bookings does not depend on the moderation type of the moderation type of the new
+        // booking.  Regardless of the moderation type of the new bookings, any booking that clashes with existing
+        // 'approved' bookings will be:
         //  * refused if allow_clash_bookings is false.
         //  * booked with status 'pending' if allow_clash_bookings is true.
         // Note bookings that clash with existing 'pending' bookings are covered by another test (TODO write test).
