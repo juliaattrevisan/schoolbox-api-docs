@@ -163,6 +163,56 @@ class Config
      */
     private ?array $features = null;
 
+    /**
+     * Returns the general fields for an AI feature.
+     *
+     * @param string $feature The feature to fetch for
+     * @return array
+     */
+    public function initGeneral(string $feature): array
+    {
+        return [
+            self::FIELD_AIKEY => [
+                'value' => '',
+            ],
+            self::FIELD_SYSTEM_PROMPT => [
+                'value' => '',
+            ],
+        ];
+    }
+
+    /**
+     * Returns the OpenAI-specific fields for an AI feature.
+     *
+     * @param string $feature The feature to fetch for
+     * @return array[]
+     */
+    public function initOpenAi(string $feature): array
+    {
+        return [
+            self::FIELD_MODEL => [
+                'value' => '', // -- select an option --
+            ],
+        ];
+    }
+
+    /**
+     * Returns the Azure-specific fields for an AI feature.
+     *
+     * @param string $feature The feature to fetch for
+     * @return array[]
+     */
+    public function initAzure(string $feature): array
+    {
+        return [
+            self::FIELD_RESOURCE_NAME => [
+                'value' => '',
+            ],
+            self::FIELD_DEPLOYMENT_ID => [
+                'value' => '',
+            ],
+        ];
+    }
 
     /**
      * Decide if $feature is one of the ai modules we support

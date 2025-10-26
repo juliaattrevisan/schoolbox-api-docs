@@ -41,19 +41,6 @@ $app = new class extends CliTool\App {
             $conf[$row['name']] = $row['value'];
         }
 
-        // migrate to new config format
-        $newConfig = $this->migrate(
-            $conf['openai_text_endpoint'] ?? null,
-            $conf['openai_text_key'] ?? null,
-            $conf['openai_text_azure_resource_name'] ?? null,
-            $conf['openai_text_azure_deployment_id'] ?? null,
-            null,
-            $conf['openai_text_generation_system_prompt'] ?? null
-        );
-
-        // log provider
-        $this->getLogger()->notice("Migrated AI text config, provider: " . ($newConfig['provider']['value'] ?? 'unknown'));
-
         $query = $this->getDatabaseInternal()->prepareQuery("UPDATE config SET value = :value WHERE name = :name;");
         $config = new Config();
 
@@ -66,7 +53,16 @@ $app = new class extends CliTool\App {
             Helper::FEATURE_DIALOGAGENT     => ConfigMapper::NAME_AI_DIALOGAGENT,
         ];
         foreach ($modulesToMigrate as $module => $moduleKey) {
-            $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey'");
+            $newConfig = $this->migrate(
+                $module,
+                $conf['openai_text_endpoint'] ?? null,
+                $conf['openai_text_key'] ?? null,
+                $conf['openai_text_azure_resource_name'] ?? null,
+                $conf['openai_text_azure_deployment_id'] ?? null,
+                null,
+                $conf['openai_text_generation_system_prompt'] ?? null
+            );
+            $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey', provider: " . ($newConfig['provider']['value'] ?? 'unknown'));
             $this->getLogger()->debug("New config: " . $config->encode($newConfig, $module));
             $query->execute(
                 [
@@ -84,6 +80,7 @@ $app = new class extends CliTool\App {
     /**
      * migrate from the old config to the new config structure (we won't need to reuse this, so its now in the upgrade script)
      *
+     * @param string      $feature
      * @param string|null $provider
      * @param string|null $key
      * @param string|null $resourceName
@@ -92,7 +89,7 @@ $app = new class extends CliTool\App {
      * @param string|null $systemPrompt
      * @return array
      */
-    private function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model, ?string $systemPrompt): array
+    private function migrate(string $feature, ?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model, ?string $systemPrompt): array
     {
         $configHelper = new Config();
         // start with a blank config

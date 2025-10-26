@@ -62,9 +62,10 @@ $app = new class extends CliTool\App {
         // insert new config into DB
         $this->getLogger()->notice(
             sprintf(
-                "Migrating AI config for module '%s' into '%s'",
+                "Migrating AI config for module '%s' into '%s', provider: %s",
                 Helper::FEATURE_IMAGE,
                 ConfigMapper::NAME_AI_IMAGE_GENERATION,
+                $newConfig['provider']['value'] ?? 'unknown',
             )
         );
         $this->getLogger()->debug("New config: " . $config->encode($newConfig, Helper::FEATURE_IMAGE));
@@ -104,13 +105,12 @@ $app = new class extends CliTool\App {
         $configHelper = new Config();
         // start with a blank config
         $config = [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initGeneral();
-        $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi();
-        $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure();
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = $configHelper->initGeneral(Helper::FEATURE_IMAGE);
+        $config[Helper::ENDPOINT_TYPE_OPENAI] = $configHelper->initOpenAi(Helper::FEATURE_IMAGE);
+        $config[Helper::ENDPOINT_TYPE_AZURE] = $configHelper->initAzure(Helper::FEATURE_IMAGE);
 
         $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value'] = $key ?? '';
         $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value']  = $systemPrompt ?? '';
-        $config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_OUTPUT_QUALITY]['value'] = $outputQuality ?? '';
         // set the fields we know about
         if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
             // Should never be Azure for image generation, as that's not enabled:
@@ -123,6 +123,7 @@ $app = new class extends CliTool\App {
             // var the model, so we can set a default if missing (will grab the end of the array (newest model))
             $systemModels = Config::AI_MODELS;
             $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] = $model ?? end($systemModels);
+            $config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OUTPUT_QUALITY]['value'] = $outputQuality ?? '';
         }
         return $config;
     }
