@@ -183,21 +183,6 @@ class Config
         return array_key_exists($feature, array_merge(self::ALL_MODULES, ['image']));
     }
 
-
-    /**
-     * returns a blank config structure
-     * @return array
-     */
-    private function getBlank(): array
-    {
-        // start with a blank config
-        $config = [self::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = self::STRUCT_GENERAL;
-        $config[Helper::ENDPOINT_TYPE_OPENAI] = self::STRUCT_OPENAI;
-        $config[Helper::ENDPOINT_TYPE_AZURE] = self::STRUCT_AZURE;
-        return $config;
-    }
-
     /**
      * Check if the config is enabled
      *
@@ -327,7 +312,6 @@ class Config
             };
         }
 
-//        $blank = $this->getBlank();
         foreach (self::PROVIDERS as $provider => $configName) {
             // skip checking 'Off' provider
             if (Helper::ENDPOINT_TYPE_OFF === $provider) {

@@ -182,4 +182,4 @@ WHERE name IN (
     'openai_image_model',
     'openai_image_system_prompt',
     'openai_image_output_quality'
-    );
+);

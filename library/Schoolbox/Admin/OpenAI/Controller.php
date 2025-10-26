@@ -28,19 +28,9 @@ class Controller extends ConfigController
     {
         $textFeatures = new Config()->fetchFeatures($this->getConfigMapper());
 
-//        $imageConfigContext = $this->buildConfigContext(
-//            $this->buildImageConfigPredicate(),
-//            $this->routeGenerator->generate('adminOpenAi.postOptions'),
-//        );
-//
-//        /* Make islands independent of each other for validation reasons
-//         */
-//        $imageConfigContext['formId'] = 'imageSettings';
-
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
-//            'imageConfigContext' => $imageConfigContext,
             'features' => $textFeatures,
             'fields' => Config::FIELDS,
             'providers' => Config::PROVIDERS,
@@ -76,10 +66,6 @@ class Controller extends ConfigController
             }
             $this->getConfigMapper()->save($conf);
         }
-
-        /* Now save image config
-         */
-//        $this->updateConfig($postData, $this->buildImageConfigPredicate());
 
         /* Go back to the place from whence you came
          */
