@@ -10,12 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI;
 
-use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends ConfigController
@@ -70,17 +67,5 @@ class Controller extends ConfigController
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
-    }
-
-    /**
-     *
-     * Returns a predicate builder for finding all custom config for this module
-     *
-     * @return Builder
-     * @throws InvalidColumnException
-     */
-    private function buildImageConfigPredicate(): Builder
-    {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_IMAGE);
     }
 }
