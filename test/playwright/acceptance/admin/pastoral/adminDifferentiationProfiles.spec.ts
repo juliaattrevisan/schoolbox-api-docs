@@ -1,6 +1,5 @@
 /**
  * Tests for the differentiation profiles admin settings functionality
- *
  * @summary Tests the differentiation profiles toggle functionality and persistence
  *
  * Prerequisites:
