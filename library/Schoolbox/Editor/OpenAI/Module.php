@@ -11,10 +11,7 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use GuzzleHttp\Client;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
-use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -22,7 +19,7 @@ class Module extends BaseModule
     /** @var string */
     protected $basename = 'openai';
 
-  
+
     protected function registerRoutes(): void
     {
         $isStaff = new Rule\All(
@@ -44,7 +41,7 @@ class Module extends BaseModule
         $this->register('POST', '/image', 'postImage', $isStaff);
     }
 
-  
+
     public function buildController(): Base
     {
         return new Controller(

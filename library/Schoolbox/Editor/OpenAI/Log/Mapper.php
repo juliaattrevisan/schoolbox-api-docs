@@ -136,8 +136,7 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
         ?int $limit = 100,
         ?int $offset = 0
-    ): GenericCollection
-    {
+    ): GenericCollection {
         $pb = $this->getPredicateBuilder();
 
         /* Only search for meaningful keywords
