@@ -137,4 +137,22 @@ export default class CreatePastoralRecord {
         await expect(this.page.locator(CreatePastoralRecord.SELECTOR_ENTRY_TIP)).toBeVisible();
         await expect(this.page.locator(CreatePastoralRecord.SELECTOR_ENTRY_TIP)).toContainText(tip);
     }
+
+    /**
+     * go to the pastoral create page and creates a pastoral record with minimum required fields
+     * subtype is optional
+     * @param userId - The id of the user to add the pastoral record to
+     * @param title - The title of the pastoral record
+     * @param type - The type of the pastoral record
+     * @param subType - The sub type of the pastoral record
+     */
+    async createPastoralRecord(userId: number, title: string, type: string, subType?: string): Promise<void> {
+        await this.goto(userId);
+        await this.typeTitle(title);
+        await this.selectType(type);
+        if (subType) {
+            await this.selectSubType(subType);
+        }
+        await this.clickSave();
+    }
 }
