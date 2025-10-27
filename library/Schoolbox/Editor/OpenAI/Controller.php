@@ -11,7 +11,6 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
@@ -256,11 +255,14 @@ class Controller extends Base
                 return;
             }
 
+            $imageGenerationConfig = new Config()->decode(
+                (string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_IMAGE_GENERATION)
+            );
             $agent = new ImageGeneration(
                 $this->clientFactory->buildForFeature(Helper::FEATURE_IMAGE),
-                $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL),
-                $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low',
-                $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT),
+                $imageGenerationConfig[Config::FIELD_MODEL]['value'] ?? '',
+                $imageGenerationConfig[Config::FIELD_OUTPUT_QUALITY]['value'] ?? Config::OUTPUT_QUALITY_DEFAULT,
+                $imageGenerationConfig[Config::FIELD_SYSTEM_PROMPT]['value'] ?? '',
             );
             try {
                 // Size and style need to be converted
