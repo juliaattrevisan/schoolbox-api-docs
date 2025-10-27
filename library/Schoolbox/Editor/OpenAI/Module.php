@@ -11,7 +11,10 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Client;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
+use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -35,7 +38,7 @@ class Module extends BaseModule
          */
         $this->register('POST', '/lesson-plan', 'postLessonPlan', $isStaff);
 
-        /* Image generation
+        /* Image generation: for OpenAI only
          */
         $this->register('POST', '/image', 'postImage', $isStaff);
     }
@@ -47,6 +50,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+            $this->injector->get('ai.clientFactory'),
         );
     }
 }

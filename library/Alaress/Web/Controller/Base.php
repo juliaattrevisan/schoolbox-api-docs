@@ -25,6 +25,7 @@ use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
 use Closure;
 use Crell\ApiProblem\ApiProblem;
+use GuzzleHttp\Psr7\Utils;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
@@ -773,6 +774,23 @@ abstract class Base
     protected function responseFromStream(StreamInterface $stream, ?string $filename = null, ?string $mimetype = null): ResponseInterface
     {
         return $this->responseFactory->buildFromStream($stream, $filename, $mimetype);
+    }
+
+    /**
+     * Shortcut method for building a `text/event-stream` response.
+     *
+     * @param StreamInterface|string|iterable|callable $stream The stream to create from.
+     *                                                         May be anything that `Utils::streamFor` can create a
+     *                                                         stream from, but must output `text/event-stream` data.
+     * @return ResponseInterface
+     */
+    protected function responseAsEventStream(StreamInterface|string|iterable|callable $stream): ResponseInterface
+    {
+        return $this->responseFactory->buildFromStream(Utils::streamFor($stream))
+            ->withHeader('Content-Type', 'text/event-stream')
+            ->withHeader('Cache-Control', 'no-cache')
+            ->withHeader('Connection', 'keep-alive')
+            ->withHeader('Content-Encoding', 'none');
     }
 
     /**
