@@ -39,7 +39,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
+        /* Only supers can get here
          */
         $isAdmin = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -50,11 +50,17 @@ class Module extends BaseModule
             return $this->preloadLog($params);
         };
 
+        /* Allow users the opportunity to get a set of results using filter criteria
+         */
         $this->register('GET', '', 'getIndex', $isAdmin);
 
-        // load next group of logs by cursor
+        /* Find a set of results by filter criteria
+         */
         $this->register('POST', '', 'postSearch', $isAdmin);
 
+        /* Load the details of a particular session_identifier which can consist of multiple rows in the
+         * openai_log table due to people resuming their ai session etc.
+         */
         $this->register('GET', '/log/{sessionId}', 'getLog', $isAdmin, $preload);
     }
 
