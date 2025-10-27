@@ -168,12 +168,6 @@ class TracedPdoStatement extends PDOStatement
 
     public function getIterator(): Iterator
     {
-        /**
-         * @phpstan-ignore-next-line
-         *
-         * PDOStatement::getIterator returns Iterator, not a Traversable as
-         * PHPStan is reporting
-         */
         return $this->statement->getIterator();
     }
 }

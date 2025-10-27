@@ -28,7 +28,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Url\Uri;
 use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
 
