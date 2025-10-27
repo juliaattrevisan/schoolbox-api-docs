@@ -30,16 +30,15 @@
                 <fieldset class="content">
                     <legend>Register a User</legend>
                     <div class="small-12 columns">
-                        <label>Server
-                            <input type="text" value="192.168.36.10" name="host" />
-                        </label>
-                        <label>School Code
-                            <input type="text" name="schoolCode" value="" />
-                        </label>
+                        <label for="host">Server</label>
+                        <input type="text" value="192.168.36.10" name="host" />
+
+                        <label for="schoolCode">School Code</label>
+                        <input type="text" name="schoolCode" value="" />
+
                         {% for field in fields %}
-                            <label>{{ field | capitalize }}
-                                <input type="text" name="user[0][{{ field }}]" value="" />
-                            </label>
+                            <label for="{{ field_id }}">{{ field | capitalize }}</label>
+                            <input type="text" name="user[0][{{ field }}]" value="" />
                         {% endfor %}
                     </div>
                 </fieldset>
@@ -52,9 +51,9 @@
                     <legend>Enrol or Unenrol Users</legend>
                     <div class="small-12 columns">
                         <fieldset id="host">
-                            <label>Server
-                                <input id="enrolment-host-name" type="text" value="192.168.36.10" name="host" />
-                            </label>
+                            <label for="enrolment-host-name">Server Hostname or IP</label>
+                            <input id="enrolment-host-name" type="text" value="192.168.36.10" name="host" />
+
                             <div class="long switch">
                                 <input id="enrolment-host-https" type="checkbox" value="1" />
                                 <label for="enrolment-host-https">
