@@ -19,6 +19,7 @@ export type AiSessionLog = {
 export type AiSession = {
     id: AiSessionId;
     feature: string;
+    sessionId: AiSessionId;
     createdAt: string;
     createdBy: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
