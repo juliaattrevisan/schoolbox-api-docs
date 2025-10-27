@@ -113,7 +113,7 @@ async function onSaveSelected(): Promise<void> {
                                 type="checkbox"
                                 name="enabled"
                             />
-                            <label for="differentiation-profiles-field">
+                            <label for="differentiation-profiles-field" data-test="differentiation-profiles-toggle">
                                 <span>On</span>
                                 <span>Off</span>
                             </label>
@@ -127,13 +127,16 @@ async function onSaveSelected(): Promise<void> {
                         <div class="sortable">
                             <header class="list-header">
                                 <div class="list-item">
-                                    <div class="grip compact" data-dp-drag-handle />
                                     <div
                                         v-for="(header, headerKey) in data.headers"
                                         :key="headerKey"
                                         :class="`small-12 medium-${header.colSpan} column`"
                                     >
-                                        <label class="f-no-margins">{{ header.title ? header.title : "&nbsp;" }}</label>
+                                        <label
+                                            class="f-no-margins"
+                                            :data-test="`differentiation-profiles-header-${header.title}`"
+                                            >{{ header.title ? header.title : "&nbsp;" }}</label
+                                        >
                                     </div>
                                 </div>
                             </header>
