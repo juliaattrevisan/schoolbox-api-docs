@@ -191,7 +191,7 @@ async function onSaveSelected(): Promise<void> {
                                                             :id="`field-${header.key}-${item.element.id}`"
                                                             v-model="item.element[header.key]"
                                                             type="text"
-                                                            :readonly="header.key === 'title'"
+                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
                                                         />
                                                     </template>
                                                 </div>
