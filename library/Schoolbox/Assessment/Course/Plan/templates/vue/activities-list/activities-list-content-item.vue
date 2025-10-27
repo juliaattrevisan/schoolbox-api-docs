@@ -10,6 +10,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { kebabCase, startCase } from "lodash";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import { ACTIVITY_TYPE_DIALOG_AGENT, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
@@ -160,11 +161,21 @@ window.Vue.onUnmounted(() => {
                         :href="getReturnUrl(props.activity._links.modify)"
                         class="icon-modify"
                         :data-test="`unit-planner-modify-activity-${props.activity.id}`"
-                        >{{ props.activity.assessmentType === "quiz" ? "Modify Settings" : "Modify" }}</a
+                        >{{
+                            props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
+                            props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
+                                ? "Modify Settings"
+                                : "Modify"
+                        }}</a
                     >
                 </li>
                 <li v-if="props.activity._links.modifyContent">
                     <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Contents</a>
+                </li>
+                <li v-if="props.activity._links.configureAgent">
+                    <a :href="getReturnUrl(props.activity._links.configureAgent)" class="icon-modify"
+                        >Configure Agent
+                    </a>
                 </li>
                 <li v-if="props.activity._links.delete">
                     <a

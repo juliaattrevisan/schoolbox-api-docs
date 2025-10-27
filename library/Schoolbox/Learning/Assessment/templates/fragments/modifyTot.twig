@@ -91,18 +91,12 @@
             <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
         {% endif %}
 
-        {% if assessment is quiz %}
-            {# modifyRoute was already passed into this fragment #}
-            {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
-
-            {# Learnosity Quiz has two parts: Modify Settings and Modify Contents #}
-            {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>{% endif %}
-            {% if modifyContentsRoute %}<li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>{% endif %}
-        {% else %}
-            {% if modifyRoute %}
-                <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
-            {% endif %}
-        {% endif %}
+        {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+            assessment: assessment,
+            modifyRoute: modifyRoute,
+            returnUrlName: RETURN_URL.name,
+            returnUrl: RETURN_URL.current,
+        } only %}
 
         {# Lesson Plan lets you swap divs
          # This lets you see student-visible versions of an LPT

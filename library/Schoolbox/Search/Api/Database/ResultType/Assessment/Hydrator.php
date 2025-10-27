@@ -349,10 +349,18 @@ class Hydrator extends BaseHydrator
         $route = 'learningAssessment.getUpdateAssessmentForm';
         $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
         if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            // For quizzes and dialog agents, differentiate from 'Modify Contents'/'Configure Agent'.
+            $modifyTitle = 'Modify';
+            if ($assessment instanceof Assessment\Quiz\Model) {
+                $modifyTitle = 'Modify Settings';
+            } elseif ($assessment instanceof Assessment\DialogAgent\Model) {
+                $modifyTitle = 'Modify Settings';
+            }
+
             $links[] = [
                 // All assessment types use the same URL for their 'Modify' page.
                 'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
-                'title' => 'Modify' . ($assessment instanceof Assessment\Quiz\Model ? ' Settings' : ''), // For quizzes, differentiate from 'Modify Contents'.
+                'title' => $modifyTitle,
                 'icon' => 'icon-modify',
             ];
         }
@@ -365,6 +373,19 @@ class Hydrator extends BaseHydrator
                     // All assessment types use the same URL for their 'Modify' page.
                     'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
                     'title' => 'Modify Contents',
+                    'icon' => 'icon-modify',
+                ];
+            }
+        }
+
+        if ($assessment instanceof Assessment\DialogAgent\Model) {
+            $route = 'learningDialogAgent.getUpdateForm';
+            $params = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
+            if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                $links[] = [
+                    // All assessment types use the same URL for their 'Modify' page.
+                    'url' => $this->routeGenerator->generate($route, $params) . '?returnUrl=' . Redirect::encode($returnUrl),
+                    'title' => 'Configure Agent',
                     'icon' => 'icon-modify',
                 ];
             }

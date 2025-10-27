@@ -65,7 +65,6 @@
                 {% endif %}
                 {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
 
-                {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                 {% if modifyRoute %}
                     {# configForm.php will use itself as RETURN_URL.current since it parses twig as part of
                      # its component building process. The current url is a form processor in this circumstance
@@ -75,13 +74,15 @@
                     {% set preferredReturnUrl = returnUrl ?? RETURN_URL.current %}
 
                     {% if assessable is quiz %}
-                        {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
                         <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) }}">Review horizontally</a></li>
-                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ preferredReturnUrl }}">Modify Settings</a></li>
-                        <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ preferredReturnUrl }}">Modify Contents</a></li>
-                    {% else %}
-                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ preferredReturnUrl }}">Modify</a></li>
                     {% endif %}
+
+                    {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+                        assessment: assessable,
+                        returnUrlName: RETURN_URL.name,
+                        returnUrl: preferredReturnUrl,
+                        modifyRoute: modifyRoute,
+                    } only %}
                 {% endif %}
 
                 {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}" data-test="component-assessment-actions-delete-{{ assessable.id }}">Delete</a></li>{% endif %}

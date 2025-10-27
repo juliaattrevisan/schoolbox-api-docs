@@ -180,6 +180,7 @@ class UnitAssessments
                     'assessment' => $assessment,
                 ]],
                 'modifyContent' => null,
+                'configureAgent' => null,
                 'export' => null,
             ];
             // if quiz we have special links
@@ -187,6 +188,13 @@ class UnitAssessments
                 $availableLinks['modifyContent'] = ["route" => "learnosity.getContent", "params" => [
                     'assessmentId' => $assessment->getId(),
                     'assessment' => $assessment,
+                ]];
+            }
+            // if dialog agent we have special links
+            if ($assessment instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
+                $availableLinks['configureAgent'] = ["route" => "learningDialogAgent.getUpdateForm", "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment'   => $assessment,
                 ]];
             }
             // spec assessments can be exported

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
+import {
+    ACTIVITY_TYPE_DIALOG_AGENT,
+    ACTIVITY_TYPE_DUE_WORK,
+    ACTIVITY_TYPE_QUIZ,
+} from "@schoolboxAssessment/Types/assessmentTypes";
 import type { MarkbookActivity } from "./types/payload";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbTableHeadActivityPublish from "./mb-table-head-activity-publish.vue";
@@ -42,15 +46,24 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         <a :href="viewStudentParticipationLink" class="icon-group">Student Participation</a>
     </li>
     <li v-if="props.activity._links?.modify" :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify`">
-        <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">
-            {{ props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ? "Modify Settings" : "Modify" }}
-        </a>
+        <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">{{
+            props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ||
+            props.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT
+                ? "Modify Settings"
+                : "Modify"
+        }}</a>
     </li>
     <li
         v-if="props.activity._links?.modifyContent"
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify-content`"
     >
         <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
+    </li>
+    <li
+        v-if="props.activity._links?.configureAgent"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-configure-agent`"
+    >
+        <a :href="getReturnUrl(props.activity._links.configureAgent)" class="icon-modify">Configure Agent</a>
     </li>
     <li
         v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"

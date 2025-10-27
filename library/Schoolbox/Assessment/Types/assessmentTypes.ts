@@ -1,5 +1,6 @@
 // All assessment types, as per library/Schoolbox/Learning/Assessment/AssessmentType.php
 export const ACTIVITY_TYPE_PROJECT = "project";
+export const ACTIVITY_TYPE_DIALOG_AGENT = "dialogAgent";
 export const ACTIVITY_TYPE_DUE_WORK = "dueWork";
 export const ACTIVITY_TYPE_TASK = "task";
 export const ACTIVITY_TYPE_QUIZ = "quiz";
@@ -7,6 +8,7 @@ export const ACTIVITY_TYPE_LTI_ASSESSMENT = "lti";
 export const ACTIVITY_TYPE_LESSON_PLAN = "lessonPlan";
 export type ActivityType =
     | typeof ACTIVITY_TYPE_PROJECT
+    | typeof ACTIVITY_TYPE_DIALOG_AGENT
     | typeof ACTIVITY_TYPE_DUE_WORK
     | typeof ACTIVITY_TYPE_TASK
     | typeof ACTIVITY_TYPE_QUIZ
@@ -33,6 +35,7 @@ export type Activity = {
         summary: string | null;
         modify: string | null;
         modifyContent: string | null; // learnosity modify contents
+        configureAgent: string | null; // dialog agent configure agent
         delete: string | null;
         export: string | null; // Spec assessments can be exported
         studentParticipation: string | null;
