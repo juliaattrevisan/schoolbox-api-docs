@@ -691,9 +691,9 @@ class ResourceBookingCest
      * Get $resourceId from the test output (look for text "The new resource has id...").
      *
      * @param IntegrationTester $i
-     * @param bool              $allowClashBookings Whether new bookings are allowed to clash with pre-existing approved bookings.
-     *                                              Note new bookings are always allowed to clash with pre-existing pending bookings.
-     * @param bool              $clashOnFirstEvent The first event is created separately to the repeat events, so it is good to test it independently.
+     * @param bool $allowClashBookings Whether new bookings are allowed to clash with pre-existing approved bookings.
+     *                                 Note new bookings are always allowed to clash with pre-existing pending bookings.
+     * @param bool $clashOnFirstEvent The first event is created separately to the repeat events, so it is good to test it independently.
      * @return void
      * @throws Deleted
      * @throws Exception
@@ -893,7 +893,7 @@ class ResourceBookingCest
      * * Get $resourceId from the test output (look for text "The new resource has id...").
      * *
      * @param IntegrationTester $i
-     * @param bool              $allowClashBookings
+     * @param bool $allowClashBookings
      * @return void
      * @throws Deleted
      * @throws Exception
