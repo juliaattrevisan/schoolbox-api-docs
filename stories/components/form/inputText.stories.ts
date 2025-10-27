@@ -37,7 +37,7 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-            <input id="news_default_expiry-field" class="c-input-text" type="text" required />
+            <input id="news_default_expiry-field" class="sbx-input-text" type="text" required />
             `,
     }),
     parameters: {
@@ -51,7 +51,7 @@ export const Default: Story = {
 export const Disabled: Story = {
     render: () => ({
         template: `
-            <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm disabled" disabled />
+            <input id="news_default_expiry-field" class="sbx-input-text" type="text" value="I'm disabled" disabled />
             `,
     }),
     parameters: {
@@ -65,7 +65,7 @@ export const Disabled: Story = {
 export const ReadOnly: Story = {
     render: () => ({
         template: `
-            <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm read only" readonly />
+            <input id="news_default_expiry-field" class="sbx-input-text" type="text" value="I'm read only" readonly />
             `,
     }),
 };
@@ -73,7 +73,7 @@ export const ReadOnly: Story = {
 export const HasError: Story = {
     render: () => ({
         template: `
-            <input id="news_default_expiry-field" class="c-input-text c-input-text--error" type="text" value="I'm invalid" />
+            <input id="news_default_expiry-field" class="sbx-input-text c-input-text--error" type="text" value="I'm invalid" />
             `,
     }),
 };
@@ -86,7 +86,7 @@ export const WithButton: Story = {
     render: () => ({
         template: `
 <div class="c-form-element l-gap--0 inline-input-container">
-    <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
+    <input id="news_default_expiry-field" class="sbx-input-text sbx-input-text--with-button" type="text" />
     <button class="c-button c-button--with-input">
         <sbx-icon name="folder"></sbx-icon>
         <span>Browse Resources</span>
@@ -101,7 +101,7 @@ export const WithLabel: Story = {
         template: `
 <div class="c-form-element">
     <label for="input1" class="c-label">Default News Archiving Period</label>
-    <input id="input1" class="c-input-text" type="text" />
+    <input id="input1" class="sbx-input-text" type="text" />
 </div>
             `,
     }),
@@ -113,7 +113,7 @@ export const WithHint: Story = {
 <div class="c-form-element">
     <label for="input2" class="c-label">Default News Archiving Period</label>
     <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
-    <input id="input2" class="c-input-text" type="text" />
+    <input id="input2" class="sbx-input-text" type="text" />
 </div>
             `,
     }),
@@ -125,7 +125,7 @@ export const WithError: Story = {
 <div class="c-form-element">
     <label for="input3" class="c-label c-label--required">Default News Archiving Period</label>
     <div class="c-hint">Insert the default length of time from when news is published to when it is archived.</div>
-    <input id="input3" class="c-input-text c-input-text--error" type="text" required />
+    <input id="input3" class="sbx-input-text sbx-input-text--error" type="text" required />
     <label id="news-title-error" class="error" for="news-title">This field is required.</label>
 </div>
             `,

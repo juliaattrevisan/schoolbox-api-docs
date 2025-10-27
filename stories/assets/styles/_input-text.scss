@@ -1,7 +1,7 @@
 /**
  *   The <input type="text"> element is used to create a text input field that can be used to input data.
  */
-.c-input-text[type="text"] {
+.sbx-input-text[type="text"] {
     background-color: var(--color-foreground-primary);
     border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -38,11 +38,11 @@
     }
 }
 
-.c-input-text--error[type="text"] {
+.sbx-input-text--error[type="text"] {
     border: 1px solid var(--color-alert);
 }
 
-.c-input-text--with-button[type="text"] {
+.sbx-input-text--with-button[type="text"] {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 .inline-input-container {
