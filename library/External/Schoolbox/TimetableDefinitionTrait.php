@@ -15,14 +15,14 @@ trait External_Schoolbox_TimetableDefinitionTrait
      * @param IConnector $database
      * @param Campus     $campus
      * @param int        $date
-     * @return bool|int
+     * @return int
      * @throws InvalidArgumentException
      * @throws \Alaress\Database\Exception
      */
     public function getDayNumberFromDatabase(IConnector $database, Campus $campus, $date = 0)
     {
         if (!$definition = $this->getTimetableDefinitionFromDatabase($database, $campus)) {
-            return false;
+            return 0;
         }
 
         if (empty($date)) {
