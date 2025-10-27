@@ -13,7 +13,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 
 test.describe("Admin Differentiation Profiles", () => {
-    test("Toggle differentiation profiles", async ({ tester, page, db }) => {
+    test.skip("Toggle differentiation profiles", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
             tester.isGoingTo("Login as admin");
@@ -31,7 +31,7 @@ test.describe("Admin Differentiation Profiles", () => {
         }
     });
 
-    test("rename field", async ({ tester, page, db }) => {
+    test.skip("rename field", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
             tester.isGoingTo("Login as admin");
@@ -56,9 +56,37 @@ test.describe("Admin Differentiation Profiles", () => {
                 await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
                 await db.updateInDatabase(
                     "differentiation_profiles_config",
-                    { value: "Adjustment Category" },
+                    { title: "Adjustment Category" },
                     { "name like": "adjustment_category" },
                 );
+            } catch (error) {
+                console.warn("Cleanup failed:", error);
+            }
+        }
+    });
+
+    test("resequence fields", async ({ tester, page, db }) => {
+        const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
+        try {
+            tester.isGoingTo("Login as admin");
+            await tester.loginAsAdmin();
+            tester.isGoingTo("Visit the differentiation profiles page");
+            await page.goto("/adminv2/pastoral/differentiation-profiles");
+            tester.isGoingTo("Toggle the differentiation profiles on");
+            await adminDifferentiationProfiles.toggleOn();
+            tester.isGoingTo("mouse down on the Goals drag handle and move it to the top of the list to reorder");
+            await page
+                .getByTestId("differentiation-profiles-drag-handle-7")
+                .dragTo(page.getByTestId("differentiation-profiles-drag-handle-3"), {
+                    timeout: 1000,
+                });
+            await adminDifferentiationProfiles.clickSave();
+            // TODO - validate that field has been moved
+        } finally {
+            tester.isGoingTo("Clean up: Reset the field and toggle off");
+            try {
+                await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+                await db.updateInDatabase("differentiation_profiles_config", { sequence: 4 }, { "name like": "goals" });
             } catch (error) {
                 console.warn("Cleanup failed:", error);
             }

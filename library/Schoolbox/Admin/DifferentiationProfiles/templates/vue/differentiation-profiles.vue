@@ -89,7 +89,7 @@ async function onSaveSelected(): Promise<void> {
 </script>
 
 <template>
-    <div class="small-12 island">
+    <div class="small-12 island" data-test="differentiation-profiles-container">
         <form method="post" @submit.prevent="onSaveSelected">
             <section>
                 <fieldset class="content">
@@ -161,7 +161,12 @@ async function onSaveSelected(): Promise<void> {
                                     :class="{ dragging: item.isDragging }"
                                 >
                                     <div class="l-flex">
-                                        <div v-if="module.isSortable" class="grip compact" data-dp-drag-handle />
+                                        <div
+                                            v-if="module.isSortable"
+                                            class="grip compact"
+                                            data-dp-drag-handle
+                                            :data-test="`differentiation-profiles-drag-handle-${item.element.id}`"
+                                        />
                                         <div class="list-item">
                                             <template
                                                 v-for="header in (convertObjectToArray(data.headers) as Header[]) || []"
