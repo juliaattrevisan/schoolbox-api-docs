@@ -8,7 +8,7 @@ import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { convertObjectToArray } from "@js/util/jsUtils";
-import type { Data } from "../js/types/differentiationProfilesTypes";
+import type { Data, Header } from "../js/types/differentiationProfilesTypes";
 
 const props = defineProps<{
     postRoute: string;
@@ -18,26 +18,13 @@ const props = defineProps<{
 
 const data = window.Vue.ref<Data>(props.data);
 
-// Get headers as an ordered array for consistent column sizing
-const headersArray = window.Vue.computed(() => {
-    if (!data.value.headers) return [];
-    return Object.entries(data.value.headers).map(([headerKey, header]) => ({
-        headerKey,
-        ...header,
-    }));
-});
-
 // #region resequence
 
 const sortableOptions = window.Vue.computed(() => ({
-    // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
-    forceFallback: true,
-    // The class to apply to the clone when dragging
-    fallbackClass: "dragged-item",
-    // How long the animation should take when items shift
-    animation: 200,
-    // The handle to use to drag the field around
-    handle: "[data-dp-drag-handle]",
+    forceFallback: true, // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
+    fallbackClass: "dragged-item", // The class to apply to the clone when dragging
+    animation: 200, // How long the animation should take when items shift
+    handle: "[data-dp-drag-handle]", // The handle to use to drag the field around
 }));
 
 /**
@@ -167,7 +154,10 @@ async function onSaveSelected(): Promise<void> {
                                 >
                                     <div class="list-item">
                                         <div v-if="module.isSortable" class="grip compact" data-dp-drag-handle />
-                                        <template v-for="header in headersArray" :key="header.headerKey">
+                                        <template
+                                            v-for="header in (convertObjectToArray(data.headers) as Header[]) || []"
+                                            :key="header.headerKey"
+                                        >
                                             <div :class="`small-12 medium-${header.colSpan} column`">
                                                 <template v-if="header.type === 'checkbox'">
                                                     <input
