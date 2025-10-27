@@ -31,8 +31,8 @@ export type AiUsageLogApiRequest = {
     keyword: string | null;
     feature: string | null;
     user: number | null;
-    after: string | null;
-    before: string | null;
+    startDate: string | null;
+    endDate: string | null;
     page?: number;
     limit?: number;
 };

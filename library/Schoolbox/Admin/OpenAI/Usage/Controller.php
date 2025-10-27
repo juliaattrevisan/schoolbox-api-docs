@@ -100,8 +100,8 @@ class Controller extends Base
         $keyword = $this->getRequestPost()->get('keyword');
         $userId = $this->getRequestPost()->get('user');
         $feature = $this->getRequestPost()->get('feature');
-        $after = $this->getRequestPost()->get('after');
-        $before = $this->getRequestPost()->get('before');
+        $startDate = $this->getRequestPost()->get('startDate');
+        $endDate = $this->getRequestPost()->get('endDate');
 
         $page = $this->getRequestPost()->getInt('page', 1);
         $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE);
@@ -155,17 +155,17 @@ class Controller extends Base
          */
 
         /* Start Date
-         * $after from the POST request is in RFC 3339 format: 2025-10-01T00:00:00+10:00
+         * $startAt from the POST request is in RFC 3339 format: 2025-10-01T00:00:00+10:00
          */
-        $afterADF = null;
+        $startAt = null;
 
-        if ($after) {
+        if ($startDate) {
             try {
-                $afterADF = new \Alaress_Date_Format($after, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
+                $startAt = new \Alaress_Date_Format($startDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
             } catch (\InvalidArgumentException $e) {
                 $message = sprintf(
                     '%s is an invalid start date or in the incorrect format.',
-                    $after
+                    $startDate
                 );
 
                 $problem = (new ApiProblem($message))
@@ -179,15 +179,15 @@ class Controller extends Base
         /* End Date
          * $before from the POST request is in RFC 3339 format: 2025-10-01T00:00:00+10:00
          */
-        $beforeADF = null;
+        $endAt = null;
 
-        if ($before) {
+        if ($endDate) {
             try {
-                $beforeADF = new \Alaress_Date_Format($before, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
+                $endAt = new \Alaress_Date_Format($endDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
             } catch (\InvalidArgumentException $e) {
                 $message = sprintf(
                     '%s is an invalid end date or in the incorrect format.',
-                    $before
+                    $endDate
                 );
 
                 $problem = (new ApiProblem($message))
@@ -203,8 +203,8 @@ class Controller extends Base
             $keyword,
             $feature,
             $user,
-            $afterADF,
-            $beforeADF,
+            $startAt,
+            $endAt,
             $limit,
             ($page - 1) * $limit,
         );
@@ -214,8 +214,8 @@ class Controller extends Base
             $keyword,
             $feature,
             $user,
-            $afterADF,
-            $beforeADF,
+            $startAt,
+            $endAt,
         );
 
         $paginator = (new Paginator\Paginator())
