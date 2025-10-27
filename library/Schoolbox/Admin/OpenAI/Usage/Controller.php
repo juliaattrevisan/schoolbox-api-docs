@@ -106,6 +106,12 @@ class Controller extends Base
         $page = $this->getRequestPost()->getInt('page', 1);
         $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE);
 
+        /* Ensure that in all cases:
+         *   - limit is greater than zero
+         *   - less than MAX_PAGE_SIZE
+         */
+        $limit = min(max(0, $limit), self::MAX_PAGE_SIZE);
+
         //ensure feature is one of the actual features...
         if ($feature) {
             if (!array_key_exists($feature, array_merge(AIConfig::ALL_MODULES, ['image']))) {
@@ -212,11 +218,9 @@ class Controller extends Base
             $beforeADF,
         );
 
-        $pageSize = min($limit, self::MAX_PAGE_SIZE);
-
         $paginator = (new Paginator\Paginator())
             ->setTotal($count)
-            ->setPageSize($pageSize);
+            ->setPageSize($limit);
 
         /* Compile a stack of unique session ids rather than each individual log instance because you'll
          * have a lot of records -per session id- for those who are resuming chats etc. where you probably
