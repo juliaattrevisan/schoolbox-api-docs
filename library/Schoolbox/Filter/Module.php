@@ -42,6 +42,14 @@ class Module extends AlaressModule
             )
         );
 
+        $ruleDifferentiationProfile = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $ruleLms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -70,6 +78,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_BADGE_LIST:
                 case Page\Model::PAGE_AWARD_LIST:
                 case Page\Model::PAGE_CLASS_PASTORAL:
+                case Page\Model::PAGE_DIFFERENTIATION_PROFILE:
                     return ['factoryFactory' => $this->injector->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }
@@ -80,6 +89,11 @@ class Module extends AlaressModule
         $this->register('GET', '/pastoral/{page:classPastoral}', 'getPageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
         $this->register('POST', '/pastoral/{page:classPastoral}', 'postSavePageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
         $this->register('POST', '/pastoral/{page:classPastoral}/pushDefaultSelections', 'postPushDefaultSelectionsPastoral', $rulePastoral, $loadFactoryFactory);
+
+        // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
+        $this->register('GET', '/differentiation-profiles/{page:differentiationProfile}', 'getPageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
+        $this->register('POST', '/differentiation-profiles/{page:differentiationProfile}', 'postSavePageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
+        $this->register('POST', '/differentiation-profiles/{page:differentiationProfile}/pushDefaultSelections', 'postPushDefaultSelectionsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
         $pagesRegex = '(assessmentCal|classMarkbook|courseMarkbook|dueWorkCal|grades|pending|rubricMarkbook)';

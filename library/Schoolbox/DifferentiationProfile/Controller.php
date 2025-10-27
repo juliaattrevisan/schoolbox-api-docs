@@ -21,6 +21,7 @@ use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConf
 use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
 use Twig\Error\Error;
+use Schoolbox\Filter\IFactoryFactory;
 
 class Controller extends Base
 {
@@ -41,6 +42,7 @@ class Controller extends Base
         private AdjustmentLevelsMapper $adjustmentLevelsMapper,
         private AdminConfigMapper $differentiationProifleConfigMapper,
         private AdminConfigModelToArray $adminConfigModelToArray,
+        private IFactoryFactory $filterFactoryFactory,
     ) {
     }
 
@@ -61,6 +63,16 @@ class Controller extends Base
             $this->getAuthorizer(),
             $adminConfigs,
         );
+
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
+            null,
+            $this->getUser(),
+            [],
+            $this->requestQuery->getArrayCopy(),
+        );
+
         $payload              = [
             'profiles'             => $profiles->map(
                 fn(Model $profile) => call_user_func($profileTranslator, $profile)

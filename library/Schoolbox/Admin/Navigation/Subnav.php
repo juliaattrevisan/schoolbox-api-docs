@@ -596,6 +596,13 @@ class Subnav
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
                         'description' => 'Configure the default and available filter options on the class pastoral report.',
                     ],
+                    '/adminv2/filters/differentiation-profiles/differentiationProfile' => [
+                        'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_DIFFERENTIATION_PROFILE),
+                        'visible'     => (
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_DIFFERENTIATION_PROFILE)
+                        ),
+                        'description' => 'Configure the default and available filter options on the class rubric markbook.',
+                    ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
                         'visible'     => $userHasServicePermissionPastoral, // This page is only available to Pastoral Moderators

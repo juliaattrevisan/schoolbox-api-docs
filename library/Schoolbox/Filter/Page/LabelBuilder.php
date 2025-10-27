@@ -62,6 +62,9 @@ class LabelBuilder
             case Model::PAGE_CLASS_PASTORAL:
                 return 'Class Pastoral';
 
+            case Model::PAGE_DIFFERENTIATION_PROFILE:
+                return 'Differentiation Profiles';
+
             default:
                 return '';
         }

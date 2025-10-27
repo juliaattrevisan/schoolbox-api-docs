@@ -22,17 +22,18 @@ class Model
 
     // Pages with configurable filters
     // These are enums in DB, you will need to update column definition if you add to this list
-    public const PAGE_PENDING_ASSESSMENTS = 'pending';
-    public const PAGE_GRADES              = 'grades';
-    public const PAGE_CLASS_MARK_BOOK     = 'classMarkbook';          // AKA 'teacher markbook'
-    public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
-    public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
-    public const PAGE_LEARNING_ANALYTICS  = 'analytics';
-    public const PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
-    public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
-    public const PAGE_BADGE_LIST          = 'badgeList';
-    public const PAGE_AWARD_LIST          = 'awardList';
-    public const PAGE_CLASS_PASTORAL      = 'classPastoral';
+    public const string PAGE_PENDING_ASSESSMENTS = 'pending';
+    public const string PAGE_GRADES              = 'grades';
+    public const string PAGE_CLASS_MARK_BOOK     = 'classMarkbook';          // AKA 'teacher markbook'
+    public const string PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
+    public const string PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
+    public const string PAGE_LEARNING_ANALYTICS  = 'analytics';
+    public const string PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
+    public const string PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
+    public const string PAGE_BADGE_LIST          = 'badgeList';
+    public const string PAGE_AWARD_LIST          = 'awardList';
+    public const string PAGE_CLASS_PASTORAL      = 'classPastoral';
+    public const string PAGE_DIFFERENTIATION_PROFILE = 'differentiationProfile';
 
 
     /**
@@ -120,6 +121,9 @@ class Model
                 Role::STAFF,
             ],
             self::PAGE_CLASS_PASTORAL => [
+                Role::STAFF,
+            ],
+            self::PAGE_DIFFERENTIATION_PROFILE => [
                 Role::STAFF,
             ],
         ];

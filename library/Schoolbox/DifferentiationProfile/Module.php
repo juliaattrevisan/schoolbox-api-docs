@@ -78,6 +78,7 @@ class Module extends BaseModule
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
             ),
+            $this->injector->get('filters.factoryFactory'),
         );
     }
 

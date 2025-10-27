@@ -2042,6 +2042,7 @@ abstract class Kernel
                         new Filter\Filters\Badge\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\Award\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\Pastoral\FactoryFactory($mapperFactory, $config),
+                        new Filter\Filters\DifferentiationProfile\FactoryFactory($mapperFactory, $config),
                     );
                 }
             )
