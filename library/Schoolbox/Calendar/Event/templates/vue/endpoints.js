@@ -31,6 +31,8 @@ export const ENDPOINTS = Object.freeze({
      */
     URL_SELECTIZE: "/ajax/user.php",
 
+    URL_BOOKING_SELECTIZE: "/resource-booking/item/search",
+
     /**
      * Generate a path via const
      *

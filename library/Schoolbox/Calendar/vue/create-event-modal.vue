@@ -23,6 +23,7 @@ export default {
     props: [
         "userId",
         "canInvite",
+        "canBookResources",
         "eventTypes",
         "eventCreateUrl",
         "eventCreateFormUrl",
@@ -40,6 +41,7 @@ export default {
             event: {},
             isProcessing: false, //to disable on form submission to prevent rapid fire
             selected: [],
+            resources: [],
         };
     },
 
@@ -89,6 +91,19 @@ export default {
 
             return stack.join(",");
         },
+
+        /**
+         * Compile object ids into csv
+         */
+        compileResourceIds() {
+          let stack = [];
+
+          for (let i = 0; i < this.resources.length; i++) {
+            stack.push(this.resources[i].id);
+          }
+
+          return stack.join(",");
+        },
     },
 
     created() {
@@ -102,6 +117,12 @@ export default {
          */
         getEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_SELECTIZE, window.location.href).toString();
+            const searchParams = new URLSearchParams({ groupID: 0 }).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
+
+        getBookingEndpoint() {
+            const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
             const searchParams = new URLSearchParams({ groupID: 0 }).toString();
             return `${searchUrl}?${searchParams}&`;
         },
@@ -120,6 +141,8 @@ export default {
             /* Clear selectize contents
              */
             this.selected = [];
+
+            this.resources = [];
         },
 
         /**
@@ -249,6 +272,20 @@ export default {
                                 </option>
                             </select>
                         </label>
+
+                      <template v-if="canBookResources">
+                        <search-select
+                            class="l-pad-m--bottom"
+                            v-model:selected="resources"
+                            :endpoint="getBookingEndpoint()"
+                            label="Resources"
+                            label-id="resources"
+                            placeholder=""
+                        >
+                          </search-select
+                        >
+                        <input type="hidden" name="resources" :value="compileResourceIds" />
+                      </template>
 
                         <template v-if="canInvite">
                             <search-select

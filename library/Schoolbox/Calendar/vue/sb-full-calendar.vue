@@ -820,6 +820,7 @@ export default {
             ref="createEvent"
             :user-id="config.userId"
             :can-invite="config.canInvite"
+            :can-book-resources="config.canBookResources"
             :event-types="config.eventTypes"
             :event-create-url="urls.create"
             :event-create-form-url="urls.createForm"

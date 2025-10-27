@@ -33,6 +33,7 @@
         schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
         userId:             Number('{{ user.id }}'),
         canInvite:          Boolean('{{ canInvite }}'),
+        canBookResources:   Boolean('{{ canBookResources }}'),
         token:              '{{ user.key }}',
         sources:            {{ sources | json_encode | raw }},
         eventTypes:         {{ eventTypes | json_encode | raw }},

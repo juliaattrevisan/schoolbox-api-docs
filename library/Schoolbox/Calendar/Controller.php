@@ -184,6 +184,7 @@ class Controller extends Base
             [
                 'user'         => $user->getId() === null ? $this->getUser() : $user,
                 'canInvite'    => (new ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite')),
+                'canBookResources' => $this->getConfigLoader()->get('resource_booking_enabled'),
                 'groups'       => $groups,
                 'sources'      => $sourceList,
                 'campuses'     => $campus,
