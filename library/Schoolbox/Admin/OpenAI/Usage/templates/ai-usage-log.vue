@@ -287,7 +287,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     <tbody>
                         <tr v-for="session in usageSessions" :key="session.id">
                             <td>
-                                <div class="selector" v-if="session.sessionId">
+                                <div v-if="session.sessionId" class="selector">
                                     <input
                                         :id="`chk-${session.id}`"
                                         type="radio"
