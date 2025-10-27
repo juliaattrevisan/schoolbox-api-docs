@@ -47,6 +47,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     protected $warnings = array();
 
+
+    /**
+     * RFC 3339 is the preferred format for api representations
+     * It is also used in some frontend features inside schoolbox itself which is a bit unique
+     * (most datepickers use the FORMAT_DATE_PICKER format)
+     *
+     * In AI Usage Log:
+     * DateTimeInterface's W3C const is the closest pre-existing format that represents what we saw
+     * in our app's response payloads: 2025-10-01T00:00:00+10:00
+     */
+    public const string FORMAT_RFC3339_W3C = DateTimeInterface::W3C;
+
     const DATABASE_FORMAT = 'Y-m-d H:i:s';
     const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';  // microseconds
     const DATABASE_FORMAT_MLS = 'Y-m-d H:i:s.v'; // milliseconds
@@ -61,6 +73,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public const FORMAT_DATE_PICKER = 'd/m/Y h:ia';    // Used by JS DatePicker, eg '29/07/2014 11:59pm'
 
     public const FORMAT_DATE_ALT = 'd/m/Y'; // alt date format to DATABASE_DATE_FORMAT eg '29/07/2014'
+
     const SUNDAY = 0;
     const MONDAY = 1;
     const TUESDAY = 2;

@@ -98,7 +98,12 @@ class Controller extends Base
         //ensure feature is one of the actual features...
         if ($feature) {
             if (!array_key_exists($feature, array_merge(AIConfig::ALL_MODULES, ['image']))) {
-                $problem = (new ApiProblem('Unknown Feature'))
+                $message = sprintf(
+                    '%s is an unknown AI feature.',
+                    $feature
+                );
+
+                $problem = (new ApiProblem($message))
                     ->setStatus(404)
                     ->asArray();
                 $this->response = $this->responseAsJson($problem)->withStatus(404);
@@ -109,6 +114,7 @@ class Controller extends Base
         // ensue the user exists (allow deleted)
         if ($user) {
             $userObj = $this->userMapper->findByIdWithFallback($user);
+
             if (null === $userObj->getId()) {
                 $problem = (new ApiProblem('Unknown User'))
                     ->setStatus(404)
@@ -118,23 +124,48 @@ class Controller extends Base
             }
         }
 
-        // dates (before/after)
+        /* Note that date sequence is enforced only by frontend javascript:
+         * having start date after end date will simply return an empty set if you somehow construct that
+         * scenario in the frontend.
+         */
+
+        /* Start Date
+         * $after from the POST request is in RFC 3339 format: 2025-10-01T00:00:00+10:00
+         */
+        $afterADF = null;
+
         if ($after) {
             try {
-                $after  = new \Alaress_Date_Format($after, \Alaress_Date_Format::FORMAT_DATE_ALT);
+                $afterADF = new \Alaress_Date_Format($after, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
             } catch (\InvalidArgumentException $e) {
-                $problem = (new ApiProblem('Invalid After Date'))
+                $message = sprintf(
+                    '%s is an invalid start date or in the incorrect format.',
+                    $after
+                );
+
+                $problem = (new ApiProblem($message))
                     ->setStatus(400)
                     ->asArray();
                 $this->response = $this->responseAsJson($problem)->withStatus(400);
                 return;
             }
         }
+
+        /* End Date
+         * $before from the POST request is in RFC 3339 format: 2025-10-01T00:00:00+10:00
+         */
+        $beforeADF = null;
+
         if ($before) {
             try {
-                $before  = new \Alaress_Date_Format($before, \Alaress_Date_Format::FORMAT_DATE_ALT);
+                $beforeADF = new \Alaress_Date_Format($before, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
             } catch (\InvalidArgumentException $e) {
-                $problem = (new ApiProblem('Invalid Before Date'))
+                $message = sprintf(
+                    '%s is an invalid end date or in the incorrect format.',
+                    $before
+                );
+
+                $problem = (new ApiProblem($message))
                     ->setStatus(400)
                     ->asArray();
                 $this->response = $this->responseAsJson($problem)->withStatus(400);
@@ -147,8 +178,8 @@ class Controller extends Base
             $keyword,
             $feature,
             $userObj ?? null,
-            $after,
-            $before,
+            $afterADF,
+            $beforeADF,
             $limit,
             ($page - 1) * $limit,
         );
@@ -158,8 +189,8 @@ class Controller extends Base
             $keyword,
             $feature,
             $userObj ?? null,
-            $after,
-            $before,
+            $afterADF,
+            $beforeADF,
         )[0];
 
         $pageSize = min($limit, self::MAX_PAGE_SIZE);
