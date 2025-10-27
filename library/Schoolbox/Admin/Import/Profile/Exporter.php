@@ -170,7 +170,6 @@ class Exporter
      * @param array  $columnSpec
      * @param Mapper $mapper    One of student/staff/parent/relationship mappers
      * @return false|string
-     * @phpstan-ignore-next-line - stream_get_contents can return false
      */
     private function exportProfile(string $type, array $columnSpec, Mapper $mapper)
     {
