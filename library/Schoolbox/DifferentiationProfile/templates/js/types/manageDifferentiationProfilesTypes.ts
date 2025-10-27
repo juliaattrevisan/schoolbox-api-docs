@@ -3,7 +3,7 @@ import type { User } from "@schoolboxLibrary/types/User";
 /**
  * Differentiation Profile header configuration
  */
-export type Header = {
+export type MDPHeader = {
     id: number;
     name: string;
     module: string;
@@ -12,6 +12,13 @@ export type Header = {
     description: string;
     is_enabled: boolean;
     sequence: number;
+};
+
+export type Header = {
+    id: number;
+    title: string;
+    width: number;
+    isFixed: boolean;
 };
 
 /**
