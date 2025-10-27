@@ -79,7 +79,7 @@ class ClientFactory
                 $aiConfig = new OpenAI\Config()->decode(
                     (string)$this->config->get(ConfigMapper::NAME_AI_IMAGE_GENERATION),
                 );
-                $apiKey   = $aiConfig[OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
+                $apiKey   = $aiConfig[OpenAi\Config::SECTION_GENERAL][OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
                 $provider = $aiConfig[OpenAI\Config::FIELD_PROVIDER]['value'] ?? '';
                 break;
             default:
