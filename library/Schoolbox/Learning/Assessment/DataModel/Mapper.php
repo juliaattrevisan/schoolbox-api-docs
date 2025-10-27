@@ -492,54 +492,66 @@ class Mapper extends BaseMapper
             return [];
         }
 
-        // Then, find the interactions within those assessments
-        $pb    = $this->getPredicateBuilder()
-                      ->in('a.id', $assessmentIds)
-                      ->putParam('userId', $student->getId());
-        $where = implode(' AND ', $pb->getWhere());
-        $query = "
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('task', 'a', 't', true)}
-            JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
-            WHERE {$where}
+        // Then, find the interactions within those assessments:
+        // search by chunks to avoid issues with large numbers of IN parameters
+        $finalAssessmentIds = [];
+        foreach (array_chunk($assessmentIds, 100) as $chunk) {
+            $pb    = $this->getPredicateBuilder()
+                          ->in('a.id', $chunk)
+                          ->putParam('userId', $student->getId());
+            $where = implode(' AND ', $pb->getWhere());
+            $query = "
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('task', 'a', 't', true)}
+                JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
+                WHERE {$where}
 
-            UNION
+                UNION
 
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
-            JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
-            WHERE {$where}
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
+                JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
+                WHERE {$where}
 
-            UNION
+                UNION
 
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
-            JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
-            WHERE {$where}
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
+                JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
+                WHERE {$where}
 
-            UNION
+                UNION
 
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
-            JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
-            WHERE {$where}
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
+                JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
+                WHERE {$where}
 
-            UNION
+                UNION
 
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
-            JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
-            WHERE {$where}
-        ";
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
+                JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
+                WHERE {$where}
+            ";
 
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute($pb->getParams());
-        return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute($pb->getParams());
+            $finalAssessmentIds = array_merge(
+                $finalAssessmentIds,
+                array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id'),
+            );
+        }
+
+        // Preserve uniqueness and ordering of IDs
+        $finalAssessmentIds = array_unique($finalAssessmentIds);
+        sort($finalAssessmentIds);
+        return $finalAssessmentIds;
     }
 
     /**
