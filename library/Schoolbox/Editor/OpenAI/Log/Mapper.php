@@ -172,7 +172,17 @@ class Mapper extends BaseMapper
             $pb->lessThanOrEqualTo('created_at', $end);
         }
 
-        $where = implode("\nAND ", $pb->getWhere());
+        /* WHERE clause is actually optional, if you never filled in any of the Filter fields
+         * all you'd get is limit and offset.
+         */
+        $where = '';
+
+        if (\count($pb->getWhere())) {
+            $where = sprintf(
+                'WHERE %s',
+                implode("\nAND ", $pb->getWhere())
+            );
+        }
 
         /* Don't need to get the openai_log.response column for what we're doing here
          * That column could contain A LOT of text esp. for image streaming
@@ -188,7 +198,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('user', 'u')}
             FROM {$this->table}
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
-            WHERE {$where}
+            {$where}
             GROUP BY session_id
             LIMIT :limit
             OFFSET :offset

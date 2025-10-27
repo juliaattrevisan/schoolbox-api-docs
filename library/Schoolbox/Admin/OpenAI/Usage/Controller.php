@@ -194,16 +194,17 @@ class Controller extends Base
             $limit,
             ($page - 1) * $limit,
         );
-
-        // Find total counts
-        $count = $this->aiLogMapper->countGroupedLogs(
-            $keyword,
-            $feature,
-            $userObj ?? null,
-            $afterADF,
-            $beforeADF,
-        )[0];
-
+//
+//        // Find total counts
+//        $count = $this->aiLogMapper->countGroupedLogs(
+//            $keyword,
+//            $feature,
+//            $userObj ?? null,
+//            $afterADF,
+//            $beforeADF,
+//        )[0];
+//
+        $count = 0;
         $pageSize = min($limit, self::MAX_PAGE_SIZE);
 
         $paginator = (new Paginator\Paginator())
