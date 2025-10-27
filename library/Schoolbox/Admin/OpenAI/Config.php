@@ -62,6 +62,27 @@ class Config
      */
     private ?array $features = null;
 
+
+    /**
+     * Decide if $feature is one of the ai modules we support
+     *
+     * Note that atm the Image Generator is treated specially which we need to repair at next opportunity.
+     *
+     * @param null|string $feature
+     * @return bool
+     */
+    public function hasFeature(?string $feature): bool
+    {
+        /* Exit early, skipping all that postprocessing if we're doomed to failure
+         */
+        if (null === $feature) {
+            return false;
+        }
+
+        return array_key_exists($feature, array_merge(self::ALL_MODULES, ['image']));
+    }
+
+
     /**
      * returns the common fields for all AI features
      * @return array

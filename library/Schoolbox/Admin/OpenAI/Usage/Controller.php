@@ -114,7 +114,7 @@ class Controller extends Base
 
         //ensure feature is one of the actual features...
         if ($feature) {
-            if (!array_key_exists($feature, array_merge(AIConfig::ALL_MODULES, ['image']))) {
+            if (!(new AIConfig())->hasFeature($feature)) {
                 $message = sprintf(
                     '%s is an unknown AI feature.',
                     $feature
