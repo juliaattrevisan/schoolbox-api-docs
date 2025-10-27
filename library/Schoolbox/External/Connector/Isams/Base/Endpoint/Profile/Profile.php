@@ -273,8 +273,8 @@ class Profile implements IStrategy
 
             $this->log->debug(sprintf(
                 'Housemaster %s (%s) discovered.',
-                $tutor['name'],
-                $tutor['id']
+                $housemaster['name'],
+                $housemaster['id']
             ));
 
             /* Find out a staff member via their user code
@@ -283,8 +283,8 @@ class Profile implements IStrategy
 
             $this->log->debug(sprintf(
                 'Form Teacher %s (%s) discovered.',
-                $tutor['name'],
-                $tutor['id']
+                $formTeacher['name'],
+                $formTeacher['id']
             ));
 
             /* Find out a staff member via their user code
@@ -293,8 +293,8 @@ class Profile implements IStrategy
 
             $this->log->debug(sprintf(
                 'Year Level Coordinator %s (%s) discovered.',
-                $tutor['name'],
-                $tutor['id']
+                $yearLevelCoordinator['name'],
+                $yearLevelCoordinator['id']
             ));
 
             /* Add their parents' profile data
@@ -558,29 +558,33 @@ class Profile implements IStrategy
 
 
     /**
-     * Find a staff member's node based on identifier $id
+     * Find a staff member's node based on identifier $personId
      *
-     * @param string $id
+     * self::importStaff()
+     * $externalId = @PersonId // iSAMS ID
+     * $internalId = @Id // SUDS External ID
+     *
+     * @param string $personId
      * @return array
      * @throws RuntimeException
      */
-    private function findStaffMemberById(string $id): array
+    private function findStaffMemberById(string $personId): array
     {
         $defaultStaff = [
-            'id' => $id,
+            'id' => $personId,
             'name' => ''
         ];
 
-        /* $id is empty; there wasn't a specified Staff;
+        /* $personId is empty; there wasn't a specified Staff;
          * return Unknown Staff as default case
          */
-        if ('' === $id) {
+        if ('' === $personId) {
             return $defaultStaff;
         }
 
         /* Otherwise, go hunting for them
          */
-        $node =  $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$id}']]");
+        $node =  $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[UserCode[text()='{$personId}']]");
 
         /* Unknown staff: can't find it via its UserCode
          */
@@ -591,7 +595,7 @@ class Profile implements IStrategy
         $staffMember = $node[0];
 
         return [
-            'id' => $id,
+            'id' => trim((string)($staffMember->xpath('@Id')[0]->Id ?? $personId)),
             'name' => trim((string)$staffMember->FullName),
         ];
     }

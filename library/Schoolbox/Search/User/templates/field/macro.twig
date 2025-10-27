@@ -19,13 +19,18 @@
 
 {##
  # Renders a mailto: hyperlink
+ # if there is no email, just returns the text
  #
  # @param array $session  A $_SESSION superglobal, sadly
  # @param string $email  An email address
  #}
 {% macro email(session, email, text) %}
 {% apply spaceless %}
-<a href="{{ session.mailhandle }}{{ email }}">{{ text }}</a>
+    {% if email is not empty %}
+    <a href="{{ session.mailhandle }}{{ email }}">{{ text }}</a>
+    {% else %}
+        {{ text }}
+    {% endif %}
 {% endapply %}
 {% endmacro %}
 
