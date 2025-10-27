@@ -3,11 +3,13 @@
  * Manage Differentiation Profiles page
  */
 
+import type { Header, AdjustmentType, Profile } from "../js/types/manageDifferentiationProfilesTypes";
+
 const props = defineProps<{
-    header: object;
-    adjustmentCategories: object;
-    adjustmentLevels: object;
-    profiles: object;
+    header: Header[];
+    adjustmentCategories: AdjustmentType[];
+    adjustmentLevels: AdjustmentType[];
+    profiles: Profile[];
 }>();
 </script>
 
