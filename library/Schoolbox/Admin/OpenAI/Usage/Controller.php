@@ -33,6 +33,14 @@ class Controller extends Base
 
 
     /**
+     * This converts $log instances to their array representation
+     *
+     * @var ModelToArray
+     */
+    private ModelToArray $sessionTranslator;
+
+
+    /**
      * Controller constructor.
      *
      * @param AILogMapper $aiLogMapper
@@ -44,6 +52,9 @@ class Controller extends Base
         private ConfigMapper $configMapper,
         private UserMapper $userMapper,
     ) {
+        $this->sessionTranslator = new ModelToArray(
+            new User\Translator\Author\ModelToArray()
+        );
     }
 
 
@@ -199,25 +210,26 @@ class Controller extends Base
             ->setTotal($count)
             ->setPageSize($pageSize);
 
-        $userTranslator = new User\Translator\Author\ModelToArray();
-
+        /* Compile a stack of unique session ids rather than each individual log instance because you'll
+         * have a lot of records -per session id- for those who are resuming chats etc. where you probably
+         * only want to see one $log instance to represent that entire conversation. Probably.
+         */
         $sessions = [];
 
-        //translate each group of session ID's
         foreach ($logGroups as $sessionId => $log) {
-            $sessions[$sessionId] = [
-                'id' => $sessionId,
-                'feature' => $log['feature'],
-                'createdAt' => $log['created_at'],
-                'createdBy' => $userTranslator->__invoke($log['user']),
-                'returnCode' => $log['return_code'],
-                '_routes' => [
-                    'getLog' => $this->getRouteIfAuthorized(
-                        'openAIUsage.getLog',
-                        [ 'sessionId' => $sessionId ]
-                    ),
-                ],
+            /* Make an array representation of each $log instance
+             */
+            $translated = $this->sessionTranslator->__invoke($log);
+
+            /* Bolt on this random _routes node
+             */
+            $translated['_routes'] = [
+                'getLog' => $this->getRouteIfAuthorized('openAIUsage.getLog', [
+                    'sessionId' => $sessionId
+                ]),
             ];
+
+            $sessions[$sessionId] = $translated;
         }
 
         $this->response = $this->responseAsJson([
@@ -242,10 +254,8 @@ class Controller extends Base
     {
         $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), ['order' => 'created_at ASC']);
 
-        $translator = new ModelToArray(
-            new User\Translator\Author\ModelToArray()
-        );
-        $logEntriesArray = $logEntries->map($translator);
+        $logEntriesArray = $logEntries->map($this->sessionTranslator);
+
         $this->response = $this->responseAsJson($logEntriesArray);
     }
 }
