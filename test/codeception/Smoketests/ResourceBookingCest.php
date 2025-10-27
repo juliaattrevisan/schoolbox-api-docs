@@ -899,7 +899,7 @@ class ResourceBookingCest
      * @throws Exception
      * @throws \JsonException
      */
-    public function createBookingThatClashesWithExistingPendingBooking(IntegrationTester $i, bool $allowClashBookings): void
+    private function createBookingThatClashesWithExistingPendingBooking(IntegrationTester $i, bool $allowClashBookings): void
     {
         $resourceMapper = ResourceBooking\Item\Mapper::getInstance();
         $bookingMapper = ResourceBooking\Booking\Mapper::getInstance();
