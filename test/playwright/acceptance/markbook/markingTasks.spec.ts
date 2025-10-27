@@ -4,7 +4,7 @@ import TaskStatusPage from "@schoolboxTest/playwright/support/page/task/TaskStat
 
 /**
  * mark a task via class markbook - check it reflects in the course markbook
- * mark a task via course markboook - check it reflects in the class markbook
+ * mark a task via course markbook - check it reflects in the class markbook
  * uncheck a task via task status page - check it reflects in the markbook pages
  */
 
