@@ -7,15 +7,14 @@
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use Alaress_Byte_Format;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException as FlysystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
-use Symfony\Component\Lock\LockInterface;
+use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
 
 /**
  * Garbage collector: uses a set of checks to determine if a storage record is
@@ -42,28 +41,31 @@ class GarbageCollector
     private array $list;
 
     /**
+     * Running file size total of files which were cleaned up.
+     */
+    private int $fileSizeTotal = 0;
+
+    /**
      * Constructor
      *
-     * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
-     * @param LoggerInterface          $log           Logger
-     * @param bool                     $perform       If true, actually delete storage records and update the last
+     * @param StorageMapper          $mapper          Storage mapper: used for fetching and deleting records.
+     * @param StorageTransformMapper $transformMapper Storage transform mapper: used for fetching transforms, for
+     *                                                accurate size reporting.
+     * @param LoggerInterface        $log             Logger
+     * @param bool                   $perform         If true, actually delete storage records and update the last
      *                                                processed time: otherwise, only output what would've been deleted.
-     * @param int                      $batchSize     The maximum number of results to process per batch.
-     * @param LockInterface            $lock          Process lock: periodically refreshed during the garbage collection
-     *                                                process.
-     * @param int                      $lockTtl       Amount of time to refresh the lock for, each time it's refreshed.
-     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
-     * @param int|null                 $maxTime       Maximum amount of time to run for, in seconds: null if no limit.
-     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
+     * @param int                    $batchSize       The maximum number of results to process per batch.
+     * @param int|null               $limit           Maximum number of storage records to process: null if no limit.
+     * @param int|null               $maxTime         Maximum amount of time to run for, in seconds: null if no limit.
+     * @param ?Alaress_Date_Format   $thresholdDate   Do not process any storage records which were last processed more
      *                                                recently than this date.
      */
     public function __construct(
         private StorageMapper $mapper,
+        private StorageTransformMapper $transformMapper,
         private LoggerInterface $log,
         private bool $perform,
         private int $batchSize,
-        private LockInterface $lock,
-        private int $lockTtl,
         private ?int $limit = null,
         private ?int $maxTime = null,
         private ?Alaress_Date_Format $thresholdDate = null,
@@ -88,12 +90,10 @@ class GarbageCollector
      * Returns a list of hashes that are considered stale.
      *
      * This will find every eligible hash, then process them in batch sizes of
-     * `$this->batchSize`: before each batch, the lock will be refreshed.
+     * `$this->batchSize`.
      *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return array<string>
-     * @throws LockConflictedException if the lock refresh failed because another process has the lock
-     * @throws LockAcquiringException if the lock can't be acquired when refreshing
      */
     public function getStale(?string $hash = null): array
     {
@@ -149,8 +149,6 @@ class GarbageCollector
         $startTime      = microtime(true);
         $totalProcessed = 0;
         foreach ($batches as $batch) {
-            $this->log->debug("Refreshing lock before processing batch");
-            $this->lock->refresh($this->lockTtl);
             $batchStartTime = microtime(true);
             $this->log->notice(
                 sprintf(
@@ -221,24 +219,15 @@ class GarbageCollector
      *   (so they're not re-processed before a certain time)
      * * removing any hashes which are stale
      *
-     * The lock is refreshed between all of these steps, and before every hash
-     * is removed.
-     *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return int
-     * @throws LockConflictedException if the lock refresh failed because another process has the lock
-     * @throws LockAcquiringException if the lock can't be acquired when refreshing
      */
     public function purge(?string $hash = null): int
     {
         $this->log->debug("Starting GC");
 
-        $this->log->debug("Refreshing lock before finding hashes");
-        $this->lock->refresh($this->lockTtl);
         $purge = $this->getStale($hash);
 
-        $this->log->debug("Refreshing lock before preserving fresh hashes");
-        $this->lock->refresh($this->lockTtl);
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
@@ -246,11 +235,9 @@ class GarbageCollector
             return 0;
         }
 
-        $this->log->error('Deleting ' . count($purge) . ' stale');
+        $this->log->notice(sprintf('Deleting %d stale hashes', count($purge)));
         foreach ($purge as $hash) {
             try {
-                $this->log->debug("Refreshing lock before deleting hash");
-                $this->lock->refresh($this->lockTtl);
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
                 $this->log->error("Could not delete storage hash '$hash' due to a database issue: " . $e->getMessage());
@@ -258,6 +245,15 @@ class GarbageCollector
                 $this->log->error("Could not delete storage hash '$hash' due to filesystem issue: " . $e->getMessage());
             }
         }
+        $this->log->notice(
+            sprintf(
+                $this->perform
+                    ? 'Deleted %d stale hashes (size: %s)'
+                    : 'Would have deleted %d stale hashes (size: %s)',
+                count($purge),
+                Alaress_Byte_Format::bytesToString($this->fileSizeTotal, renderIec: true),
+            ),
+        );
 
         return count($purge);
     }
@@ -300,11 +296,27 @@ class GarbageCollector
      */
     private function removeFromStorage(string $hash): void
     {
+        $storageObject         = $this->mapper->findByHash($hash);
+        $storageTransformSizes = $this->transformMapper->findScalarByPredicates(
+            'size',
+            $this->transformMapper->getPredicateBuilder()->equals('hash', $hash)
+        );
+        $storageSize          = $storageObject->getSize();
+        $storageTransformSize = array_sum($storageTransformSizes);
+        $totalSize            = $storageSize + $storageTransformSize;
+        $this->fileSizeTotal  += $totalSize;
+        $sizeSummary          = sprintf(
+            'size: %s, transforms: %s, total: %s',
+            Alaress_Byte_Format::bytesToString($storageSize, renderIec: true),
+            Alaress_Byte_Format::bytesToString($storageTransformSize, renderIec: true),
+            Alaress_Byte_Format::bytesToString($totalSize, renderIec: true),
+        );
         if ($this->perform) {
-            $this->mapper->hardDelete($this->mapper->findByHash($hash));
-            $this->log->debug("Deleted $hash");
+            $this->mapper->hardDelete($storageObject);
+            $message = "Deleted %s (%s)";
         } else {
-            $this->log->debug("Would have deleted $hash");
+            $message = "Would have deleted %s (%s)";
         }
+        $this->log->info(sprintf($message, $hash, $sizeSummary));
     }
 }

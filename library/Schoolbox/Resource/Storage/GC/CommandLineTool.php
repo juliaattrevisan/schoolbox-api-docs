@@ -14,8 +14,8 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
-use Symfony\Component\Lock\Exception\LockConflictedException;
+use Schoolbox\Resource\Storage\Transform\Mapper as StorageTransformMapper;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Command-line tool for Schoolbox's garbage collector.
@@ -28,10 +28,10 @@ class CommandLineTool extends CliTool\App
     public const LOCK_NAME = 'storageCleanup';
 
     /**
-     * The amount of time (in seconds) this lock is held for: note that this
-     * tool during processing may re-acquire the lock.
+     * By default, the lock will be held for `--max-time` seconds, plus this
+     * many seconds to allow the actual deletion of records to complete.
      */
-    private const LOCK_TTL = 60;
+    private const STORAGE_DELETION_ALLOWANCE = 60 * 60;
 
     /**
      * Print help
@@ -76,9 +76,9 @@ class CommandLineTool extends CliTool\App
     private const OPT_LONG_MAX_TIME = 'max-time:';
 
     /**
-     * Default max time: if not set or <= 0, no max time is set.
+     * Default max time: 6 hours.
      */
-    private const DEFAULT_MAX_TIME = null;
+    private const DEFAULT_MAX_TIME = 60 * 60 * 6;
 
     /**
      * --force-run-on-staging: unless this flag is provided, do not allow this
@@ -152,7 +152,7 @@ OPTIONS
     -n={limit}:              the maximum number of storage records to check.
                              Defaults to 1000: if <= 0, do not limit number of records.
     --max-time={max-time}:   process hashes in batches until the script has been running for this many seconds.
-                             Defaults to no max time: if <= 0, do not limit the time the script runs for.
+                             Defaults to 21600 (6 hours).
     --batch={batch-size}:    process this many hashes per batch: defaults to 10.
     -t={threshold}:          threshold: do not attempt to clean up storage records last checked more recently than this
                              date threshold, defaults to 2 months ago.
@@ -173,13 +173,25 @@ HELP;
 
         $logger = $this->getLogger();
 
-        // Obey lock
-        $logger->debug("Attempting to acquire process lock");
+        // Hold process lock for max-time,
+        // plus a little longer to finish actually deleting files
+        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
+        if ($maxTime <= 0) {
+            $maxTime = self::DEFAULT_MAX_TIME;
+        }
+        $logger->info(
+            sprintf(
+                "Attempting to acquire process lock for max-time (%ds) + allowance for deletion (%ds): will release at end",
+                $maxTime,
+                self::STORAGE_DELETION_ALLOWANCE,
+            ),
+        );
         try {
-            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+            $lock = $this->acquireLock(self::LOCK_NAME, $maxTime + self::STORAGE_DELETION_ALLOWANCE);
         } catch (\RuntimeException $e) {
             return;
         }
+        register_shutdown_function(fn () => $this->releaseLock($lock));
 
         // Keep running or exit, depending on whether it's enabled in config.
         if (!$this->getConfig()->get(ConfigMapper::NAME_STORAGE_CLEANUP_ENABLED)) {
@@ -204,7 +216,6 @@ HELP;
                         self::OPT_LONG_FORCE_RUN_IF_DISABLED,
                     ),
                 );
-                $lock->release();
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
         }
@@ -232,13 +243,11 @@ HELP;
                             break;
                         }
                         if ($continue === 'q') {
-                            $lock->release();
                             exit(CliKernelAbstract::EXIT_STATUS_OK);
                         }
                     }
                 } else {
                     $logger->notice('Refusing to run in perform mode on a staging instance without the --force-run-on-staging flag.');
-                    $lock->release();
                     exit(CliKernelAbstract::EXIT_STATUS_OK);
                 }
             } else {
@@ -256,21 +265,16 @@ HELP;
         if ($limit <= 0) {
             $limit = null;
         }
-        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
-        if ($maxTime <= 0) {
-            $maxTime = null;
-        }
 
         $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
         $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
         $db            = $this->getDatabaseInternal();
         $gc = new GarbageCollector(
             $mapper,
+            StorageTransformMapper::getInstance(),
             $logger,
             $this->perform(),
             $batchSize,
-            $lock,
-            self::LOCK_TTL,
             limit: $limit,
             maxTime: $maxTime,
             thresholdDate: $thresholdDate,
@@ -278,17 +282,11 @@ HELP;
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
             ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
-            ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
+            ->addCheck(new Check\HashIndexedTextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
         // Purge, throwing a lock exception if not held
-        try {
-            $gc->purge();
-        } finally {
-            if ($lock->isAcquired() && !$lock->isExpired()) {
-                $lock->release();
-            }
-        }
+        $gc->purge();
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
@@ -301,5 +299,17 @@ HELP;
     public function getRequiredProcessUser(): ?string
     {
         return self::WEB_PROCESS_USER;
+    }
+
+    /**
+     * Release lock on shutdown.
+     *
+     * @param LockInterface $lock
+     * @return void
+     */
+    private function releaseLock(LockInterface $lock): void
+    {
+        $lock->release();
+        $this->getLogger()->info('Cleanup complete: released process lock');
     }
 }

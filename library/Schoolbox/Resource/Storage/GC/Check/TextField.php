@@ -21,6 +21,10 @@ use Psr\Log\LoggerInterface;
  * * fields which already have a foreign key relation to `storage`
  *   (these are processed by `ForeignKeyRelation`)
  * * ephemeral tables (e.g. `search_index`)
+ *
+ * @deprecated due to performance issues: this runs a `SELECT` for every hash
+ *             * every text column.
+ * @see HashIndexedTextField for an equivalent with fewer performance issues.
  */
 class TextField extends Base
 {
@@ -32,7 +36,9 @@ class TextField extends Base
                c.COLUMN_NAME AS `column`,
                t.DATA_LENGTH AS `search_data_length`
         FROM information_schema.COLUMNS c
-        INNER JOIN information_schema.TABLES t ON c.TABLE_NAME = t.TABLE_NAME
+        INNER JOIN information_schema.TABLES t
+            ON  c.TABLE_SCHEMA = t.TABLE_SCHEMA
+            AND c.TABLE_NAME   = t.TABLE_NAME
         WHERE c.TABLE_SCHEMA = :schema
         AND   INSTR(c.DATA_TYPE, 'text')
         AND   t.TABLE_TYPE = 'BASE TABLE'
