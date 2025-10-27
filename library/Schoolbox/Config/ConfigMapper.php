@@ -394,6 +394,7 @@ class ConfigMapper extends Mapper
 
     /* OpenAI
      */
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
     /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_KEY = 'openai_text_key';
