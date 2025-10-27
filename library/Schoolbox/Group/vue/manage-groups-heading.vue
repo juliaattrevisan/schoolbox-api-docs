@@ -157,6 +157,7 @@ export default {
         </div>
         <div class="row">
             <div class="column small-12 medium-4">
+                <label for="group-selection">Show:</label>
                 <select @change="onSelectionChange($event)" ref="select">
                     <option :value="selectionTypes.ALL_GROUPS">All groups</option>
                     <option :value="selectionTypes.MY_FAVOURITE_GROUPS">My favourite groups</option>
@@ -166,6 +167,7 @@ export default {
                 </select>
             </div>
             <div class="column small-12 medium-8">
+                <label for="group-search">Search groups:</label>
                 <input
                     v-model="query"
                     :placeholder="inputPlaceholder"
