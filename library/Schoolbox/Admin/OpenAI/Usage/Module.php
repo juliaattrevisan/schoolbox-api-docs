@@ -15,11 +15,8 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\UserMapper;
@@ -113,10 +110,10 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|AILogMapper
+     * @return AILogMapper
      * @throws \InvalidArgumentException If cannot find mapper class
      */
-    protected function getAILogMapper()
+    protected function getAILogMapper(): AILogMapper
     {
         return $this->getMapperFactory()->get(AILogMapper::class);
     }
