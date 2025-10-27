@@ -310,7 +310,7 @@ class GarbageCollector
         } else {
             $message = "Would have deleted %s (size: %s, transforms: %s)";
         }
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 $message,
                 $hash,
