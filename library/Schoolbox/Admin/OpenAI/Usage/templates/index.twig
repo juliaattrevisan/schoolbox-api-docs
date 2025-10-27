@@ -1,0 +1,20 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <div id="ai-usage-log-container">
+                <ai-usage-log
+                    :route-search="'{{ routeLookupIfAuthorized('openAIUsage.postSearch') }}'"
+                    :features='{{ features|json_encode|raw }}'
+                />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/aiUsageLog.js?v={{ config.site_version }}"></script>
+        </div>
+    </div>
+</div>

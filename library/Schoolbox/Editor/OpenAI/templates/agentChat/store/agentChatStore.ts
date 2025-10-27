@@ -3,17 +3,17 @@ import type { GalleryItem } from "lightgallery/lg-utils";
 import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
 import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiFeedMessage, ImageResponseInProgress } from "../imageGeneratorTypes";
-import { generateImage } from "./imageGeneratorPayload";
-import type { ImageGeneratorApiPayload } from "./imageGeneratorPayload";
+import type { AgentChatFeedMessage, AgentChatResponseInProgress } from "../agentChatTypes";
+import { generateImage } from "./agentChatPayload";
+import type { ImageGeneratorApiPayload } from "./agentChatPayload";
 
-export const useImageGeneratorStore = defineStore("imageGenerator", () => {
-    const feed = window.Vue.ref<AiFeedMessage[]>([]);
+export const useAgentChatStore = defineStore("agentChat", () => {
+    const feed = window.Vue.ref<AgentChatFeedMessage[]>([]);
     const generateRoute = window.Vue.ref<string | null>(null);
 
-    const activeGeneration = window.Vue.ref<ImageResponseInProgress | null>(null);
+    const activeGeneration = window.Vue.ref<AgentChatResponseInProgress | null>(null);
 
-    const selectedFeedEntry = window.Vue.ref<AiFeedMessage["entryKey"] | null>(null);
+    const selectedFeedEntry = window.Vue.ref<AgentChatFeedMessage["entryKey"] | null>(null);
 
     // State to keep track of the final upload process
     const uploadLoading = window.Vue.ref(false);
@@ -26,6 +26,17 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     function init($generateRoute: string): void {
         generateRoute.value = $generateRoute;
     }
+
+    /**
+     * @returns The full feed of messages (includes the partial entry at the end if currently generating)
+     */
+    const fullFeed = window.Vue.computed((): AgentChatFeedMessage[] => {
+        if (activeGeneration.value === null) {
+            return feed.value;
+        }
+
+        return [...feed.value, activeGeneration.value];
+    });
 
     /**
      * @returns The previous response ID from the feed if it exists
@@ -68,7 +79,14 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         feed.value.push({
             type: "request",
             entryKey: getNextEntryKey(),
-            user: window.schoolboxUser,
+            user: {
+                id: window.schoolboxUser.id,
+                fullName: window.schoolboxUser.name,
+                _links: {
+                    profile: `/search/user/${window.schoolboxUser.id}`,
+                    avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
+                },
+            },
             payload,
             file,
         });
@@ -187,7 +205,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
      * Show a lightbox with all the images in the feed
      * @param entryKey - The entry key that should be selected initially
      */
-    function spawnLightbox(entryKey: AiFeedMessage["entryKey"]): void {
+    function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): void {
         const slides = feed.value
             .map((item) => {
                 // only show final images
@@ -205,7 +223,7 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         document.dispatchEvent(
             new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
                 detail: {
-                    targetKey: `ig-feed-lightbox`,
+                    targetKey: `ac-feed-lightbox`,
                     options: {
                         dynamic: true,
                         dynamicEl: slides.map((item): GalleryItem => ({ src: item.src })),
@@ -220,7 +238,9 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     return {
         init,
         feed,
+        fullFeed,
         activeGeneration,
+        getNextEntryKey,
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,

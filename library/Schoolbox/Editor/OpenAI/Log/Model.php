@@ -18,7 +18,7 @@ class Model
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
 
-    private User $user;
+    private ?User $user = null;
     private string $prompt;
     private ?int $inputTokens = null;
     private ?int $outputTokens = null;
@@ -36,21 +36,23 @@ class Model
     // MEDIUM TEXT max length, to trim the response, rather than die.
     private const RESPONSE_MAX_LENGTH = 16777215;
 
+    public const MISSING_SESSIONID = 'no-session-';
+
 
     /**
-     * @return User
+     * @return null|User
      */
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
 
     /**
-     * @param User $user
+     * @param ?User $user
      * @return $this
      */
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
         return $this;

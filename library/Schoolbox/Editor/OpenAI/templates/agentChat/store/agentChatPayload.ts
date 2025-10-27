@@ -1,6 +1,7 @@
 import type { ResponseStreamEvent, ResponseCompletedEvent } from "openai/resources/responses/responses";
 import { sseApiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 
 /** The final event that we should recieve in the SSE stream to indicate that the request finished */
 const finalEventName: ResponseCompletedEvent["type"] = "response.completed";
@@ -16,7 +17,7 @@ export type ImageGeneratorApiPayload = {
      *
      * This should be unique for a new unique conversation
      */
-    aiSessionId: string;
+    aiSessionId: AiSession["id"];
 };
 
 /**

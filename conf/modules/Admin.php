@@ -151,6 +151,7 @@ class Admin extends ModuleLoader
         /* OpenAI
          */
         $this->loadModule($di, \Schoolbox\Admin\OpenAI\Module::class, '/adminv2/ai-services');
+        $this->loadModule($di, \Schoolbox\Admin\OpenAI\Usage\Module::class, '/adminv2/aiLog');
 
         /* Editor Templates
          */

@@ -4,9 +4,9 @@
  */
 
 import { uploadFileToStorage } from "@js/resource/resourceUtils";
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
+import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 
-const igStore = useImageGeneratorStore();
+const acStore = useAgentChatStore();
 
 /**
  * When the cancel button is clicked
@@ -29,7 +29,7 @@ async function uploadImage(): Promise<void> {
         throw new Error("window.top is not available");
     }
 
-    const selectedFeedItem = igStore.feed.find((item) => item.entryKey === igStore.selectedFeedEntry);
+    const selectedFeedItem = acStore.feed.find((item) => item.entryKey === acStore.selectedFeedEntry);
     if (!selectedFeedItem) {
         throw new Error("Unable to find selected feed item");
     }
@@ -38,8 +38,8 @@ async function uploadImage(): Promise<void> {
         throw new Error("Selected feed item does not have a valid image");
     }
 
-    igStore.uploadLoading = true;
-    igStore.uploadError = null;
+    acStore.uploadLoading = true;
+    acStore.uploadError = null;
 
     const bstr = atob(selectedFeedItem.image.b64);
     const bytes = new Uint8Array(bstr.length);
@@ -50,9 +50,9 @@ async function uploadImage(): Promise<void> {
     const file = new File([bytes], selectedFeedItem.image.name, { type: selectedFeedItem.image.mime });
     const resource = await uploadFileToStorage(file);
 
-    igStore.uploadLoading = false;
+    acStore.uploadLoading = false;
     if (resource.success === false) {
-        igStore.uploadError = resource.message;
+        acStore.uploadError = resource.message;
         return;
     }
 
@@ -71,7 +71,7 @@ async function uploadImage(): Promise<void> {
         <section>
             <button
                 class="button"
-                :disabled="igStore.selectedFeedEntry === null || igStore.uploadLoading"
+                :disabled="acStore.selectedFeedEntry === null || acStore.uploadLoading"
                 @click="uploadImage"
             >
                 Upload

@@ -12,35 +12,14 @@ namespace Schoolbox\Admin\OpenAI;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
-use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
-use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends ConfigController
 {
-    /**
-     * @param ConfigMapper $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
-     * @param Rebuilder $rebuilder
-     * @param CacheInterface $oidcCache
-     */
-    public function __construct(
-        ConfigMapper $configMapper,
-        FieldStrategyFactory $fieldStrategyFactory,
-        Rebuilder $rebuilder,
-        CacheInterface $oidcCache,
-    ) {
-        parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
-    }
-
-
     /**
      * Basically the same appearance as the usual system settings pages, but with special behaviours
      * because microsoft azure does its own thing.
@@ -98,7 +77,7 @@ class Controller extends ConfigController
             $this->getConfigMapper()->save($conf);
         }
 
-        /* Now save image config..
+        /* Now save image config
          */
         $this->updateConfig($postData, $this->buildImageConfigPredicate());
 

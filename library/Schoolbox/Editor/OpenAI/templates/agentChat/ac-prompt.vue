@@ -2,25 +2,26 @@
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
-import type { ImagePromptAttribute } from "./imageGeneratorTypes";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { useAgentChatStore } from "./store/agentChatStore";
+import type { AgentChatPromptAttribute } from "./agentChatTypes";
 
 interface Props {
     /**
      * The extra attributes to show in the prompt (dropdowns)
      */
-    promptAttributes: ImagePromptAttribute[];
+    promptAttributes: AgentChatPromptAttribute[];
     /**
      * to keep track of the current ai conversation thread
      * on each load of the tab (in the dropzone modal) this will regen from the backend
      *
      * This should be unique for a new unique conversation
      */
-    aiSessionId: string;
+    aiSessionId: AiSession["id"];
 }
 
 const props = defineProps<Props>();
-const igStore = useImageGeneratorStore();
+const acStore = useAgentChatStore();
 
 const currentFile = window.Vue.ref<FileDropFile | null>(null);
 const prompt = window.Vue.ref<string>("");
@@ -67,12 +68,12 @@ async function sendRequest(): Promise<void> {
         return; // some attributes are required and not set yet, can't send the request
     }
 
-    const isSuccess = await igStore.sendRequest(
+    const isSuccess = await acStore.sendRequest(
         {
             userPrompt: prompt.value.trim(),
             attributes: attributes.value,
             imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
-            previousResponseId: igStore.getPreviousResponseId(),
+            previousResponseId: acStore.getPreviousResponseId(),
             aiSessionId: props.aiSessionId,
         },
         currentFile.value,
@@ -91,7 +92,7 @@ async function sendRequest(): Promise<void> {
  * - an invalid image was uploaded (the user must remove it first)
  */
 const isFormDisabled = window.Vue.computed(() => {
-    if (igStore.activeGeneration !== null) {
+    if (acStore.activeGeneration !== null) {
         return true;
     }
 
@@ -106,8 +107,8 @@ const isFormDisabled = window.Vue.computed(() => {
 <template>
     <!-- file context is only available for the first message -->
     <file-drop
-        v-if="igStore.feed.length === 0"
-        id="ig-prompt-file-drop"
+        v-if="acStore.feed.length === 0"
+        id="ac-prompt-file-drop"
         v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
         accept="image/jpeg,image/png,image/gif,image/webp"
@@ -126,7 +127,7 @@ const isFormDisabled = window.Vue.computed(() => {
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
     </label>
-    <div class="ig-prompt-actions actions-small-1 l-mar-m--bottom">
+    <div class="ac-prompt-actions actions-small-1 l-mar-m--bottom">
         <div class="list-item">
             <select
                 v-for="(attr, index) in props.promptAttributes"
@@ -163,7 +164,7 @@ const isFormDisabled = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
-.ig-prompt-actions {
+.ac-prompt-actions {
     /* mimic the style if this were an input */
     border-style: solid;
     border-width: 0.0625rem;

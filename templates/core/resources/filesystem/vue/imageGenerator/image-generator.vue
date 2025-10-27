@@ -4,10 +4,11 @@
  * This could easily be expanded to be used in other places when we inevitably need that
  */
 
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
-import type { ImagePromptAttribute } from "./imageGeneratorTypes";
-import IgPrompt from "./ig-prompt.vue";
-import igFeed from "./ig-feed.vue";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import type { AgentChatPromptAttribute } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
+import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import IgActions from "./ig-actions.vue";
 
 interface Props {
@@ -15,26 +16,26 @@ interface Props {
     /**
      * The extra attributes to show in the prompt (dropdowns)
      */
-    promptAttributes: ImagePromptAttribute[];
+    promptAttributes: AgentChatPromptAttribute[];
     /**
      * to keep track of the current ai conversation thread
      * on each load of the tab (in the dropzone modal) this will regen from the backend
      *
      * This should be unique for a new unique conversation
      */
-    aiSessionId: string;
+    aiSessionId: AiSession["id"];
 }
 
 const props = defineProps<Props>();
-const igStore = useImageGeneratorStore();
+const acStore = useAgentChatStore();
 
 window.Vue.onMounted(() => {
-    igStore.init(props.generateRoute);
+    acStore.init(props.generateRoute);
 });
 </script>
 
 <template>
-    <div v-if="igStore.uploadLoading" class="ab-pane">
+    <div v-if="acStore.uploadLoading" class="ab-pane">
         <h2>Uploading Image</h2>
         <div class="loader"></div>
     </div>
@@ -45,11 +46,11 @@ window.Vue.onMounted(() => {
             and framing. See more information on these on
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
-        <ig-feed />
-        <ig-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
-        <div v-if="igStore.uploadError !== null" class="alert-box alert l-mar--0">
+        <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 35vh" allow-selection />
+        <ac-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
+        <div v-if="acStore.uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
-            {{ igStore.uploadError }}
+            {{ acStore.uploadError }}
         </div>
         <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
