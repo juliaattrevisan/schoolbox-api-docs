@@ -58,29 +58,34 @@ class Controller extends Base
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
         $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
-        $this->response       = $this->responseFromTemplate(
-            '@differentiationProfiles/index.twig',
-            [
-                'adjustmentCategories' => $adjustmentCategories->map(
-                    fn(AdjustmentCategoriesModel $category) => [
-                        'id'   => $category->getId(),
-                        'name' => $category->getName(),
-                    ]
-                ),
-                'adjustmentLevels'     => $adjustmentLevels->map(
-                    fn(AdjustmentLevelsModel $level) => [
-                        'id'   => $level->getId(),
-                        'name' => $level->getName(),
-                    ]
-                ),
-                'header'               => $adminConfigs->map(
-                    fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
-                ),
-                'profiles'             => $profiles->map(
-                    fn(Model $profile) => call_user_func($this->profileTranslator, $profile)
-                ),
-            ],
-            "Manage $translation"
-        );
+        $payload              = [
+            'profiles'             => $profiles->map(
+                fn(Model $profile) => call_user_func($this->profileTranslator, $profile)
+            ),
+            'adjustmentCategories' => $adjustmentCategories->map(
+                fn(AdjustmentCategoriesModel $category) => [
+                    'id'   => $category->getId(),
+                    'name' => $category->getName(),
+                ]
+            ),
+            'adjustmentLevels'     => $adjustmentLevels->map(
+                fn(AdjustmentLevelsModel $level) => [
+                    'id'   => $level->getId(),
+                    'name' => $level->getName(),
+                ]
+            ),
+            'header'               => $adminConfigs->map(
+                fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
+            ),
+        ];
+        if ($this->isJsonRequest()) {
+            $this->response = $this->responseAsJson($payload);
+        } else {
+            $this->response = $this->responseFromTemplate(
+                '@differentiationProfiles/index.twig',
+                $payload,
+                "Manage $translation"
+            );
+        }
     }
 }
