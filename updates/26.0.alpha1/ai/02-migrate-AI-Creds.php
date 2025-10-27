@@ -59,7 +59,7 @@ $app = new class extends CliTool\App {
                 $conf['openai_text_key'] ?? null,
                 $conf['openai_text_azure_resource_name'] ?? null,
                 $conf['openai_text_azure_deployment_id'] ?? null,
-                null,
+                $conf['openai_text_model'] ?? null,
                 $conf['openai_text_generation_system_prompt'] ?? null
             );
             $this->getLogger()->notice("Migrating AI config for module '$module' into '$moduleKey', provider: " . ($newConfig['provider']['value'] ?? 'unknown'));
