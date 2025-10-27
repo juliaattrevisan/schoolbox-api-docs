@@ -48,7 +48,7 @@ export default class MarkbookPage {
 
     /**
      * navigates to the class markbook page url
-     * @param classId - The course id
+     * @param classId - The class id
      */
     async gotoClassMarkbook(classId: string): Promise<void> {
         await this.page.goto(MarkbookPage.URL_CLASS_MARKBOOK.replace("{class_id}", classId));
