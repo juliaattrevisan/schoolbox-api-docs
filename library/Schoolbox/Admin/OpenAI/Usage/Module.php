@@ -86,10 +86,6 @@ class Module extends BaseModule
 
         $log = $this->getAILogMapper()->findOneByColumn('session_id', $params['sessionId']);
 
-        if (empty($log)) {
-            throw new NotFound('Log entry not found.');
-        }
-
         return ['log' => $log];
     }
 
