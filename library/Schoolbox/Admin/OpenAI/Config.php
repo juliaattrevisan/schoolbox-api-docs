@@ -171,14 +171,7 @@ class Config
      */
     public function initGeneral(string $feature): array
     {
-        return [
-            self::FIELD_AIKEY => [
-                'value' => '',
-            ],
-            self::FIELD_SYSTEM_PROMPT => [
-                'value' => '',
-            ],
-        ];
+        return $this->initFields($feature, self::SECTION_GENERAL);
     }
 
     /**
@@ -189,11 +182,7 @@ class Config
      */
     public function initOpenAi(string $feature): array
     {
-        return [
-            self::FIELD_MODEL => [
-                'value' => '', // -- select an option --
-            ],
-        ];
+        return $this->initFields($feature, self::SECTION_OPENAI);
     }
 
     /**
@@ -204,14 +193,28 @@ class Config
      */
     public function initAzure(string $feature): array
     {
-        return [
-            self::FIELD_RESOURCE_NAME => [
-                'value' => '',
-            ],
-            self::FIELD_DEPLOYMENT_ID => [
-                'value' => '',
-            ],
-        ];
+        return $this->initFields($feature, self::SECTION_AZURE);
+    }
+
+    /**
+     * Returns the fields for a particular section of a feature.
+     *
+     * @param string $feature The feature to fetch for
+     * @param string $section The section whose fields to fetch
+     * @return array
+     */
+    private function initFields(string $feature, string $section): array
+    {
+        $fields = [];
+        foreach ($this->buildFormInputs($feature) as $name => $formInput) {
+            if (!isset($formInput['section'])) {
+                continue;
+            }
+            if ($formInput['section'] === $section) {
+                $fields[$name] = ['value' => ''];
+            }
+        }
+        return $fields;
     }
 
     /**

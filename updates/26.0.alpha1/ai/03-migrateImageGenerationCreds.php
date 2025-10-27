@@ -72,7 +72,7 @@ $app = new class extends CliTool\App {
         $query->execute(
             [
                 'name'  => ConfigMapper::NAME_AI_IMAGE_GENERATION,
-                'value' => $config->encode($newConfig),
+                'value' => $config->encode($newConfig, Helper::FEATURE_IMAGE),
             ]
         );
     }
