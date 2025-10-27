@@ -984,7 +984,7 @@ class ResourceBookingCest
         $i->assertEquals(
             $resource->getModerationType()->getId(),
             ModerationType\Model::TYPE_OPEN,
-            "The clash booking now has moderation type 'open' as expected"
+            "The resource now has moderation type 'open' as expected"
         );
         $i->amGoingTo('Create a booking that clashes with the pre-existing booking');
         $i->comment('The booking will be on 2050-01-01, from 12pm to 4pm');
