@@ -214,6 +214,7 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
             {$where}
             GROUP BY session_id
+            ORDER BY created_at DESC
             {$limitSql}
             {$offsetSql}
         ";

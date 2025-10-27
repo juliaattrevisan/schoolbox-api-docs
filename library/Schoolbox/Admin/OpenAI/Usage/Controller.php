@@ -264,7 +264,11 @@ class Controller extends Base
      */
     public function getLog(AILog $log): void
     {
-        $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), ['order' => 'created_at ASC']);
+        $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), [
+            'order' => [
+                'created_at' => 'ASC'
+            ]
+        ]);
 
         $logEntriesArray = $logEntries->map($this->sessionTranslator);
 
