@@ -729,13 +729,13 @@ class ResourceBookingCest
         // Create a resource -----------------------------------------------------------------------------------------//
 
         $i->amGoingTo('create a resource with allow_clash_bookings=' . ($allowClashBookings ? 'true' : 'false'));
-        $testResource = new Payload\ResourceBooking\Resource\Create();
+        $payload = new Payload\ResourceBooking\Resource\Create();
         $resourceTitle = 'Test resource created at ' . microtime(true);
-        $testResource->setResourceName($resourceTitle);
-        $testResource->setResourceCat('3'); // Support Services
-        $testResource->setAllowClashBookings($allowClashBookings);
-        $testResource->setModerationTypeId((string)$moderationTypeId);
-        $i->sendRequest($testResource);
+        $payload->setResourceName($resourceTitle);
+        $payload->setResourceCat('3'); // Support Services
+        $payload->setAllowClashBookings($allowClashBookings);
+        $payload->setModerationTypeId((string)$moderationTypeId);
+        $i->sendRequest($payload);
 
         $i->amGoingTo('Check that the resource has been created');
         $i->seeResponseCodeIs(303);
