@@ -653,7 +653,7 @@ class ResourceBookingCest
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsVariant1(IntegrationTester $i): void
+    public function createBookingsThatClashWithApprovedBookingsVariant1(IntegrationTester $i): void
     {
         $this->createBookingsThatClashWithExistingApprovedBookings($i, false, false);
     }
@@ -662,7 +662,7 @@ class ResourceBookingCest
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsVariant2(IntegrationTester $i): void
+    public function createBookingsThatClashWithApprovedBookingsVariant2(IntegrationTester $i): void
     {
         $this->createBookingsThatClashWithExistingApprovedBookings($i, false, true);
     }
@@ -671,7 +671,7 @@ class ResourceBookingCest
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsVariant3(IntegrationTester $i): void
+    public function createBookingsThatClashWithApprovedBookingsVariant3(IntegrationTester $i): void
     {
         $this->createBookingsThatClashWithExistingApprovedBookings($i, true, false);
     }
@@ -680,7 +680,7 @@ class ResourceBookingCest
      * @param IntegrationTester $i
      * @return void
      */
-    public function attemptClashBookingsVariant4(IntegrationTester $i): void
+    public function createBookingsThatClashWithApprovedBookingsVariant4(IntegrationTester $i): void
     {
         $this->createBookingsThatClashWithExistingApprovedBookings($i, true, true);
     }
@@ -809,12 +809,11 @@ class ResourceBookingCest
 
         if ($allowClashBookings) {
             $i->seeResponseCodeIs(200);
-
-            // TODO: Check the value of bookedPendingBecauseOfClashes - should be true.
-
             $i->amGoingTo('confirm that the clash bookings have been created since they are allowed');
             $clashBookings = $bookingMapper->findByColumn('name', $clashBookingsName);
             $i->comment('Found ' . count($clashBookings) . ' clash bookings');
+            $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is true");
+            $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => true]);
 
             foreach ($clashBookings as $clashBooking) {
                 $event = $eventMapper->findOneByColumn('id', $clashBooking->getEvent()->getId());
@@ -960,8 +959,8 @@ class ResourceBookingCest
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
         $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $i->sendRequest($payload);
-
-        // TODO: Check the value of bookedPendingBecauseOfClashes - should be false.
+        $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
+        $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
 
         $i->amGoingTo('confirm that the clash booking has been created');
         $clashBooking = $bookingMapper->findOneByColumn('name', $clashBookingsName);
@@ -994,8 +993,8 @@ class ResourceBookingCest
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
         $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $i->sendRequest($payload);
-
-        // TODO: Check the value of bookedPendingBecauseOfClashes - should be false.
+        $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
+        $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
 
         $i->amGoingTo('confirm that the clash booking has been created');
         $clashBooking = $bookingMapper->findOneByColumn('name', $clashBookingsName);
