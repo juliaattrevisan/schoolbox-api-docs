@@ -295,12 +295,6 @@ parameters:
 			path: library/Alaress/Lumberjack/TtyFormatter.php
 
 		-
-			message: '#^Method Alaress\\Module\\Module\:\:initTemplatePaths\(\) has Twig\\Error\\LoaderError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Alaress/Module/Module.php
-
-		-
 			message: '#^Method Alaress\\OAuth2\\Client\\Provider\\Office365\:\:createResourceOwner\(\) should return League\\OAuth2\\Client\\Provider\\ResourceOwnerInterface but return statement is missing\.$#'
 			identifier: return.missing
 			count: 1
@@ -405,12 +399,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Aura\\Session\\Phpfunc\:\:session_id\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: library/Alaress/Session/Session.php
-
-		-
-			message: '#^Comparison operation "\<" between \(array\|float\|int\) and int results in an error\.$#'
-			identifier: smaller.invalid
 			count: 1
 			path: library/Alaress/Session/Session.php
 
@@ -581,6 +569,12 @@ parameters:
 			identifier: phpDoc.parseError
 			count: 1
 			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
+
+		-
+			message: '#^Variable \$categoryList might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: library/Calendar/Api/EventType/Timetable/Room.php
 
 		-
 			message: '#^Call to function is_object\(\) with Alaress_Date_Format will always evaluate to true\.$#'
@@ -907,6 +901,18 @@ parameters:
 			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
 
 		-
+			message: '#^Offset ''letters'' on array\{fileYear\: mixed, enteredGrades\: int\<1, max\>, letters\: array\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: library/Custom/Dsfg/AchievementReport/SchoolGrades/GradeSummary.php
+
+		-
+			message: '#^Offset ''availableGrades'' on non\-empty\-array\<''achievedGrades''\|''availableGrades''\|''enteredGrades''\|''letters'', mixed\> on left side of \?\?\= always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: library/Custom/Dsfg/AchievementReport/SchoolGrades/YearlyBreakdown.php
+
+		-
 			message: '#^Property Custom\\Dsfg\\AchievementReport\\StandardisedTest\\PAT\\ValidPAT\:\:\$year \(string\) does not accept default value of type int\.$#'
 			identifier: property.defaultValue
 			count: 1
@@ -953,12 +959,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: library/Custom/Help/CourseParticipation/Controller.php
-
-		-
-			message: '#^Method Custom\\Help\\CourseParticipation\\Handler\:\:__construct\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
 			message: '#^Method Custom\\Help\\CourseParticipation\\Handler\:\:getCampusMapper\(\) should return Schoolbox\\CampusMapper but returns Schoolbox\\Mapper\.$#'
@@ -1567,12 +1567,6 @@ parameters:
 			path: library/External/Doublefirst/Timetable.php
 
 		-
-			message: '#^Method External_Doublefirst_Timetable\:\:getDayNumber\(\) should return bool\|string but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
 			message: '#^Method External_Doublefirst_Timetable\:\:setDatabase\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -1581,12 +1575,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: '#^Return type \(bool\|string\) of method External_Doublefirst_Timetable\:\:getDayNumber\(\) should be compatible with return type \(int\) of method External_TimetableInterface\:\:getDayNumber\(\)$#'
-			identifier: method.childReturnType
 			count: 1
 			path: library/External/Doublefirst/Timetable.php
 
@@ -1657,12 +1645,6 @@ parameters:
 			path: library/External/Pcschools/User.php
 
 		-
-			message: '#^Return type \(bool\) of method External_Schoolpro_Timetable\:\:getDayNumber\(\) should be compatible with return type \(int\) of method External_TimetableInterface\:\:getDayNumber\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/External/Schoolpro/Timetable.php
-
-		-
 			message: '#^Method External_Synergetic_Class\:\:setDatabase\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -1719,12 +1701,6 @@ parameters:
 		-
 			message: '#^Call to function is_array\(\) with list\<string\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/External/Synergetic/User.php
-
-		-
-			message: '#^Method External_Synergetic_User\:\:determineBoarderType\(\) has Alaress\\Database\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
 			count: 1
 			path: library/External/Synergetic/User.php
 
@@ -1975,6 +1951,12 @@ parameters:
 			path: library/Schoolbox/API/Translator/ArrayToModel/Base.php
 
 		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Admin/BulkFeedbackImport/Processor.php
+
+		-
 			message: '#^Binary operation "\*" between string and 1024 results in an error\.$#'
 			identifier: binaryOp.invalid
 			count: 1
@@ -2093,18 +2075,6 @@ parameters:
 			identifier: parameter.phpDocType
 			count: 1
 			path: library/Schoolbox/Application/CliTool/Kernel.php
-
-		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\PdfGenerator\\App\:\:authorizeUser\(\) has Alaress\\Authorizer\\Failure\\Unauthenticated in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Application/CliTool/PdfGenerator/App.php
-
-		-
-			message: '#^Method Schoolbox\\Application\\CliTool\\PdfGenerator\\App\:\:authorizeUser\(\) has Alaress\\Authorizer\\Failure\\Unauthorized in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Application/CliTool/PdfGenerator/App.php
 
 		-
 			message: '#^Instanceof between Aura\\Di\\Container and Aura\\Di\\Container will always evaluate to true\.$#'
@@ -2587,12 +2557,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Relation/RoleMapper.php
 
 		-
-			message: '#^Property Schoolbox\\Campus\:\:\$cycleIdentifier is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: library/Schoolbox/Campus.php
-
-		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
 			count: 1
@@ -2785,18 +2749,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Statistics/Test/Obama.php
 
 		-
-			message: '#^Method Schoolbox\\Comms\\News\\Topic\\Model\:\:setName\(\) has DomainException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Comms/News/Topic/Model.php
-
-		-
-			message: '#^Method Schoolbox\\Comms\\News\\Topic\\Model\:\:setName\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Comms/News/Topic/Model.php
-
-		-
 			message: '#^Parameter \#3 \$previous \(null\) of method Schoolbox\\Config\\ConfigMapper\:\:raiseNotification\(\) should be compatible with parameter \$previous \(object\) of method Schoolbox\\Mapper\:\:raiseNotification\(\)$#'
 			identifier: method.childParameterType
 			count: 1
@@ -2965,12 +2917,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Pcschools/Base/Sync.php
 
 		-
-			message: '#^Method Schoolbox\\External\\Connector\\Pcschools\\QueryHelper\\Factory\:\:__construct\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Factory.php
-
-		-
 			message: '#^Constant Schoolbox\\External\\Connector\\Pcschools\\QueryHelper\\Freedom\:\:CONTACT_LEVEL_NONE is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
@@ -3085,18 +3031,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Profile/Profile.php
 
 		-
-			message: '#^Method Schoolbox\\External\\Connector\\Sentral\\Base\\Endpoint\\Status\:\:__construct\(\) has DomainException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Status.php
-
-		-
-			message: '#^Method Schoolbox\\External\\Connector\\Sentral\\Base\\Endpoint\\Status\:\:__construct\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Status.php
-
-		-
 			message: '#^Method Schoolbox\\External\\Connector\\Synergetic\\Base\\CommunityPortal\:\:changePassword\(\) should return bool but returns Alaress\\Database\\Statement\\Query\\Base\|Alaress\\Database\\Statement\\Query\\IQuery\.$#'
 			identifier: return.type
 			count: 1
@@ -3199,6 +3133,12 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Status.php
 
 		-
+			message: '#^Property Schoolbox\\External\\Connector\\Veracross\\Base\\Endpoint\\TimetableCalendar\\Classes\:\:\$timezone is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: library/Schoolbox/External/Connector/Veracross/Base/Endpoint/TimetableCalendar/Classes.php
+
+		-
 			message: '#^Strict comparison using \!\=\= between '''' and non\-falsy\-string will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -3299,12 +3239,6 @@ parameters:
 			identifier: new.static
 			count: 1
 			path: library/Schoolbox/Filter/AbstractIdFinder.php
-
-		-
-			message: '#^Method Schoolbox\\Filter\\BaseComponent\:\:__construct\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Filter/BaseComponent.php
 
 		-
 			message: '#^Method Schoolbox\\Filter\\BaseComponent\:\:toContext\(\) should return array\<Schoolbox\\Filter\\Selection\\Model\> but returns array\<string, array\|bool\|\(iterable\<Schoolbox\\Filter\\Selection\\Model\>&Schoolbox\\GenericCollection\)\|Schoolbox\\Filter\\IDefinition\>\.$#'
@@ -3571,6 +3505,12 @@ parameters:
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
+			message: '#^Offset ''response'' on array\{mark\: mixed, normalisedMark\: float\|null, comment\: mixed, date\: mixed, instructor\: array\{id\: int, title\: mixed, firstName\: mixed, preferredName\: mixed, lastName\: mixed, externalId\: mixed\}\|null, rubric\: array\|null, learner\: array\{id\: int, title\: mixed, firstName\: mixed, preferredName\: mixed, lastName\: mixed, externalId\: mixed\}, feedback\: array\{mark\: mixed, normalisedMark\: float\|null, comment\: mixed, date\: mixed, instructor\: array\{id\: int, title\: mixed, firstName\: mixed, preferredName\: mixed, lastName\: mixed, externalId\: mixed\}\|null, rubric\: array\|null, id\: int\}, \.\.\.\} on left side of \?\?\= always exists and is always null\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/API/Helper.php
+
+		-
 			message: '#^PHPDoc tag @var with type Alaress_Date_Format is not subtype of native type null\.$#'
 			identifier: varTag.nativeType
 			count: 1
@@ -3625,36 +3565,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\DataModel\\MapperProxy\:\:findByDueWorkId\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\DataModel\\MapperProxy\:\:findById\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\DataModel\\MapperProxy\:\:findByIdForReview\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\DataModel\\MapperProxy\:\:findByQuizId\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\DataModel\\MapperProxy\:\:findByTaskId\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\DataModel\\Model\:\:getWeight\(\) should return int but returns float\.$#'
 			identifier: return.type
 			count: 1
@@ -3671,6 +3581,198 @@ parameters:
 			identifier: varTag.nativeType
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setHelpfulness\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setLanguage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setOpeningMessage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setPrompt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setRules\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setScenarioId\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setUseDifferentiationProfile\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:addAttachment\(\)\.$#'
@@ -4261,6 +4363,12 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
 
 		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLessonPlanDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLessonPlanTemplate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4298,6 +4406,12 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setFields\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setLessonPlanDuration\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
@@ -4345,6 +4459,12 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
 
 		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLessonPlanDuration\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLessonPlanTemplate\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -4382,6 +4502,12 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setFields\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setLessonPlanDuration\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
@@ -4517,6 +4643,12 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php
+
+		-
+			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Rescore.php
 
 		-
 			message: '#^Method Schoolbox\\Learning\\Assessment\\DueWork\\Response\\ValidSelfAssessable\:\:getDueWork\(\) should return Schoolbox\\Learning\\Assessment\\DueWork\\Model but returns Schoolbox\\Learning\\Assessment\\IAssessable\.$#'
@@ -4837,12 +4969,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/VisibilityTest.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\Assessment\\Transplantor\:\:moveToNewContext\(\) has Schoolbox\\Mapper\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Transplantor.php
-
-		-
 			message: '#^Negated boolean expression is always false\.$#'
 			identifier: booleanNot.alwaysFalse
 			count: 1
@@ -4909,24 +5035,6 @@ parameters:
 			path: library/Schoolbox/Learning/Course/DataModel/Specification/Unit/Model.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\Grades\\Controller\:\:getGrades\(\) has LogicException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Grades\\Controller\:\:getGrades\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Grades\\Controller\:\:getGrades\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
 			message: '#^Call to function is_object\(\) with stdClass will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -4979,12 +5087,6 @@ parameters:
 			identifier: property.unusedType
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/TotalMarkAbstract.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\MarkScheme\\TotalMarkFractional\:\:validateNormalisedMark\(\) has RangeException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/TotalMarkFractional.php
 
 		-
 			message: '#^Property Schoolbox\\Learning\\Markbook\\Markbook\:\:\$students \(Schoolbox\\Collection\) in isset\(\) is not nullable\.$#'
@@ -5053,36 +5155,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Notifier.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\Quiz\\Controller\:\:createEntity\(\) has Alaress\\Web\\Controller\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Quiz\\Controller\:\:deleteEntity\(\) has Alaress\\Web\\Controller\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Quiz\\Controller\:\:getEntity\(\) has Alaress\\Web\\Controller\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Quiz\\Controller\:\:getList\(\) has Alaress\\Web\\Controller\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Learning\\Quiz\\Controller\:\:updateEntity\(\) has Alaress\\Web\\Controller\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
 			message: '#^Property Schoolbox\\Learning\\Quiz\\Controller\:\:\$quizAnswerMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -5149,30 +5221,6 @@ parameters:
 			path: library/Schoolbox/Learning/Upcoming/Module.php
 
 		-
-			message: '#^Method Schoolbox\\LearningAnalytics\\Controller\:\:courseWithSubmissionTypeAndTerm\(\) has Schoolbox\\Application\\Exception\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\LearningAnalytics\\Controller\:\:courseWithTerm\(\) has Schoolbox\\Application\\Exception\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\LearningAnalytics\\Controller\:\:folderWithSubmissionTypeAndTerm\(\) has Schoolbox\\Application\\Exception\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\LearningAnalytics\\Controller\:\:folderWithTerm\(\) has Schoolbox\\Application\\Exception\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Controller.php
-
-		-
 			message: '#^Property Schoolbox\\LearningAnalytics\\Controller\:\:\$folderMapper is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -5193,12 +5241,6 @@ parameters:
 		-
 			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: '#^Method Schoolbox\\Mapper\:\:getJoinMapper\(\) has Schoolbox\\Mapper\\DefinitionException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -5413,24 +5455,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/RoleAccessMapper.php
 
 		-
-			message: '#^Method Schoolbox\\Permission\\Access\\Test\\AccessTest\:\:providerGetFolderAccessForRole\(\) has PHPUnit\\Framework\\Exception in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^Method Schoolbox\\Permission\\Access\\Test\\AccessTest\:\:providerGetFolderAccessForRole\(\) has ReflectionException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
-			message: '#^Method Schoolbox\\Permission\\Access\\Test\\AccessTest\:\:providerGetFolderAccessForRole\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
-
-		-
 			message: '#^PHPDoc tag @param for parameter \$roles with type array\<Schoolbox\\Role\>\|\(iterable\<Schoolbox\\Role\>&Schoolbox\\GenericCollection\) is not subtype of native type Schoolbox\\GenericCollection\.$#'
 			identifier: parameter.phpDocType
 			count: 1
@@ -5567,12 +5591,6 @@ parameters:
 			identifier: if.alwaysTrue
 			count: 1
 			path: library/Schoolbox/Realtime/Message/RoutePermissionMapper.php
-
-		-
-			message: '#^Method Schoolbox\\Realtime\\Pipe\\Pipe\:\:extractWebSocketRequest\(\) has TypeError in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Realtime/Pipe/Pipe.php
 
 		-
 			message: '#^Cannot cast callable\(\)\: mixed to string\.$#'
@@ -5989,12 +6007,6 @@ parameters:
 			path: library/Schoolbox/Statistics/DataSource.php
 
 		-
-			message: '#^Method Schoolbox\\Submenu\\Module\:\:registerRoutes\(\) has InvalidArgumentException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Submenu/Module.php
-
-		-
 			message: '#^Method Schoolbox\\Sync\\Effect\\Fragment\\Factory\:\:produce\(\) invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -6365,238 +6377,3 @@ parameters:
 			identifier: greaterOrEqual.alwaysTrue
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Admin/BulkFeedbackImport/Processor.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLessonPlanDuration\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setLessonPlanDuration\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLessonPlanDuration\(\).$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setLessonPlanDuration\(\).$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getInstructorMarkScheme\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Rescore.php
-
-		-
-			message: '#^Property Schoolbox\\External\\Connector\\Veracross\\Base\\Endpoint\\TimetableCalendar\\Classes\:\:\$timezone is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: library/Schoolbox/External/Connector/Veracross/Base/Endpoint/TimetableCalendar/Classes.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setScenarioId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getScenarioId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setLanguage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getLanguage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setHelpfulness\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getHelpfulness\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setOpeningMessage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getOpeningMessage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setRules\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getRules\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setPrompt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getPrompt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setDuration\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getDuration\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getScenarioId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setScenarioId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getLanguage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setLanguage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getHelpfulness\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setHelpfulness\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getOpeningMessage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setOpeningMessage\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getRules\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setRules\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getPrompt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setPrompt\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getDuration\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setDuration\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getUseDifferentiationProfile\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setUseDifferentiationProfile\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:setUseDifferentiationProfile\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
-
-		-
-			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getUseDifferentiationProfile\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php

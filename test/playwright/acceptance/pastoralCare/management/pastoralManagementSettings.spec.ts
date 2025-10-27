@@ -3,6 +3,8 @@ import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
 import PastoralExpiry from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import ClassList from "@schoolboxTest/playwright/support/page/homepage/pages/ClassList";
 
 /**
  * navigate to pastoral care management settings
@@ -19,6 +21,8 @@ test.describe("Pastoral Care - Management Settings", () => {
     let createPastoralRecord: CreatePastoralRecord;
     let pastoralRecordSettings: PastoralExpiry;
     let common: Common;
+    let profilePage: ProfilePage;
+    let classList: ClassList;
 
     test.beforeEach(async ({ page, tester }) => {
         pastoralProfile = new PastoralProfile(page, tester);
@@ -192,6 +196,92 @@ test.describe("Pastoral Care - Management Settings", () => {
         await pastoralProfile.seeInConfidentialPanel(confidentialTemplateAcademic);
     });
 
+    // checks if the flags set in the management settings are presented in the pastoral profile and class list pages
+    test("set and check pastoral care management settings: flag tests", async ({ page, tester, db }) => {
+        pastoralRecordSettings = new PastoralExpiry(page, tester);
+        common = new Common(page);
+        createPastoralRecord = new CreatePastoralRecord(page);
+        profilePage = new ProfilePage(tester, page);
+        classList = new ClassList(page, tester);
+        const studentId = 6;
+        const pastoralTitle = "Automation Test Pastoral Record Flag and colour";
+        const pastoralTitle2 = "Automation Test Pastoral Record Flag without colour";
+        const pastoralTitle3 = "Automation Test Pastoral Record no flag";
+        const pastoralTitle4 = "Automation Test Pastoral Record to increment flag count";
+        // navigate to pastoral care management settings as a pastoral moderator
+        tester.isGoingTo("navigate to pastoral care management settings as a pastoral moderator");
+        await tester.impersonate("Jack Coles");
+        // set up flag settings
+        tester.isGoingTo("set up flag settings");
+        // selects a flag and colour for award achievement
+        await pastoralRecordSettings.gotoAwardAchievement();
+        await pastoralRecordSettings.selectFlag("Achievement");
+        await pastoralRecordSettings.fillFlagColor();
+        await pastoralRecordSettings.clickSave();
+        // selects a flag for learning difficulties
+        await pastoralRecordSettings.gotoLearningDifficulties();
+        await pastoralRecordSettings.selectFlag("Achievement");
+        await pastoralRecordSettings.clickSave();
+        // selects a colour for attendance
+        await pastoralRecordSettings.gotoBullying();
+        await pastoralRecordSettings.fillFlagColor();
+        await pastoralRecordSettings.clickSave();
+        // create a pastoral record and check the flags are available
+        tester.isGoingTo("create a pastoral record and check the flags are available");
+        await createPastoralRecord.createPastoralRecord(studentId, pastoralTitle, "1", "1");
+        await createPastoralRecord.createPastoralRecord(studentId, pastoralTitle2, "1", "2");
+        await createPastoralRecord.createPastoralRecord(studentId, pastoralTitle3, "4");
+        // check the flags in the profile page, class list and participation plan
+        tester.isGoingTo("check the flags in the profile page and class list");
+        await profilePage.goto(studentId);
+        await expect(profilePage.getFlag(1, 1)).toBeVisible();
+        await expect(profilePage.getFlag(1, 1)).toContainText("1");
+        await page.goto(`/learning/class/55`);
+        await expect(classList.getFlagLabel(6, 1, 1)).toBeVisible();
+        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
+        tester.isGoingTo("Visit the student participation page for an activity to check the flag is visible");
+        await page.goto("/learning/assessments/550/participation");
+        await expect(classList.getFlagLabel(6, 1, 1)).toBeVisible();
+        // create another record to check the flag count increments
+        await createPastoralRecord.createPastoralRecord(studentId, pastoralTitle4, "1", "1");
+        await profilePage.goto(studentId);
+        await expect(profilePage.getFlag(1, 1)).toBeVisible();
+        await expect(profilePage.getFlag(1, 1)).toContainText("2");
+        await page.goto(`/learning/class/55`);
+        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("2");
+        await page.goto("/learning/assessments/550/participation");
+        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("2");
+        // delete a record and check if the flag count decrements
+        tester.isGoingTo("delete a record and check if the flag count decrements");
+        await pastoralProfile.goto(studentId);
+        const recordId = (await db.grabFromDatabase("pastoral", "id", {
+            deleted_at: null,
+            "heading like": pastoralTitle4,
+        })) as number;
+        await pastoralProfile.deletePastoralRecord(recordId);
+        await profilePage.goto(studentId);
+        await expect(profilePage.getFlag(1, 1)).toContainText("1");
+        await page.goto(`/learning/class/55`);
+        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
+        await page.goto("/learning/assessments/550/participation");
+        await expect(classList.getFlagLabel(6, 1, 1)).toContainText("1");
+        // via pastoral management settings remove the flag and save - check the flag is no longer presented
+        tester.isGoingTo(
+            "via pastoral management settings remove the flag and save - check the flag is no longer presented",
+        );
+        await tester.impersonate("Jack Coles");
+        await pastoralRecordSettings.gotoAwardAchievement();
+        await page.getByTestId("audiences-modify-pastoral-flag-select").click();
+        await page.keyboard.press("ArrowUp");
+        await pastoralRecordSettings.clickSave();
+        await profilePage.goto(studentId);
+        await expect(profilePage.getFlag(1, 1)).not.toBeVisible();
+        await page.goto(`/learning/class/55`);
+        await expect(classList.getFlagLabel(6, 1, 1)).not.toBeVisible();
+        await page.goto("/learning/assessments/550/participation");
+        await expect(classList.getFlagLabel(6, 1, 1)).not.toBeVisible();
+    });
+
     /**
      * Soft deleting data to not impact the tests
      */
@@ -205,12 +295,13 @@ test.describe("Pastoral Care - Management Settings", () => {
             { "heading like": "Automation Test%", deleted_at: null },
         );
         await db.updateInDatabase("pastoral_audience", { deleted_at: "2022-01-15 11:22:34" }, { deleted_at: null });
-        await db.updateInDatabase("lu_pastoral_type", { visibility_locked: 0 }, { name: "Bullying" });
+        await db.updateInDatabase("lu_pastoral_type", { visibility_locked: 0, color: null }, { name: "Bullying" });
         await db.updateInDatabase(
             "lu_pastoral_subtype",
-            { sentiment: "neutral", template: null, template_private: null, entry_tip: null },
+            { sentiment: "neutral", template: null, template_private: null, entry_tip: null, icon: null, color: null },
             { name: "Award/Achievement" },
         );
+        await db.updateInDatabase("lu_pastoral_subtype", { icon: null }, { name: "Learning Difficulties" });
         await db.updateInDatabase(
             "lu_pastoral_type",
             { template: null, template_private: null, entry_tip: null },

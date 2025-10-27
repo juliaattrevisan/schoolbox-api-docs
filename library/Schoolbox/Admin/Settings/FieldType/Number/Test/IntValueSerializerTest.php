@@ -23,7 +23,7 @@ class IntValueSerializerTest extends TestCase
      * @param mixed $input
      * @param int   $expected
      */
-    #[DataProvider('testData')]
+    #[DataProvider('serializeDataProvider')]
     public function testIntValueSerializer($input, $expected)
     {
         $intValueSerializer = new \Schoolbox\Admin\Settings\FieldType\Number\IntValueSerializer();
@@ -39,11 +39,11 @@ class IntValueSerializerTest extends TestCase
     }
 
     /**
-     * Data provider for testValidExample
+     * Data provider for testIntValueSerializer
      *
      * @return array
      */
-    public static function testData(): array
+    public static function serializeDataProvider(): array
     {
         return [
 

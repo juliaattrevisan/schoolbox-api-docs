@@ -193,7 +193,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      * @param Campus     $campus
      * @param int|string $date
      *
-     * @return bool|int
+     * @return int
      * @throws InvalidArgumentException
      * @throws \Alaress\Database\Exception
      */

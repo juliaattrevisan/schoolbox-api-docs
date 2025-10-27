@@ -1,0 +1,229 @@
+<?php
+
+/**
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\OpenAi\Agent;
+
+use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\OpenAi\IClient;
+use Schoolbox\User;
+
+/**
+ * Agent for generating images via OpenAI.
+ */
+class ImageGeneration
+{
+    /**
+     * These three params control wildness and output length
+     */
+    private const TEMPERATURE = 0.7;
+    private const TOP_P = 0.9;
+    private const MAX_OUTPUT_TOKENS = 20000;
+
+    /**
+     * We always use this model for image generation, it's not configurable
+     */
+    public const OPENAI_IMAGE_MODEL = 'gpt-image-1';
+
+    private const PARTIAL_IMAGE_QTY = 3;
+    private const IMAGE_OUTPUT_FORMAT = 'png';
+    private const IMAGE_INPUT_DETAIL = 'auto';
+
+    /**
+     * Hardcoded system prompt for the image style to be embedded to PROMPT_SYSTEM_PERSONA via [IMAGE_STYLE]
+     * Use %s as the placeholder for the style name
+     */
+    private const PROMPT_SYSTEM_IMAGE_STYLE = "The image must be in the style of '%s'.";
+
+    /**
+     * Hardcoded system prompt to set the behaviour of the AI, possible placeholders are:
+     * [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
+     * [IMAGE_STYLE] - replaced with the selected image style, if any
+     */
+    private const PROMPT_SYSTEM_PERSONA = "
+        You are an AI image generation tool.
+        Your only purpose is to create images based on the user's provided description.
+        You will not engage in conversation, answer questions, or perform any tasks other than image generation.
+        The user does not need to specifically request an image
+            - however they cannot request a different type of asset/media or task
+            - i.e. if they specifically request you create a video/audio recording/slideshow/word document or for you to do deep research.
+        If a user's request is not for a non-image response or task, you will respond with the following message:
+            'I am sorry, but I can only generate images. Please describe the image you would like me to create.'
+        [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]
+        [IMAGE_STYLE]
+        You will not deviate from these instructions under any circumstances. The user request will occur from now -
+    ";
+
+    /**
+     * Constructor
+     *
+     * @param IClient $client       An AI provider client: needs to point to the Responses endpoint of the client
+     *                              (e.g. https://platform.openai.com/docs/api-reference/responses/create).
+     * @param string  $model        The model to use to generate the image.
+     * @param string  $quality      The quality of image to generate.
+     * @param string  $systemPrompt Any additional system-wide prompt to apply to all image generation.
+     */
+    public function __construct(
+        private IClient $client,
+        private string $model,
+        private string $quality,
+        private string $systemPrompt,
+    ) {
+    }
+
+    /**
+     * Streams an image generation payload.
+     *
+     * @param User        $user               The user making the request.
+     * @param string      $prompt             The user's input prompt.
+     * @param string      $feature            The feature which this request should be logged against.
+     * @param string      $sessionId          The session ID against which this request should be logged.
+     * @param string|null $size               If provided: a size for the image.
+     *                                        Should match a value of `ImageSize`.
+     * @param string|null $style              If provided: a style for the image.
+     *                                        Should match a value of `ImageStyle`.
+     * @param string|null $imageUrl           If provided: a URL to use as an example for the image.
+     * @param string|null $previousResponseId If provided: the ID of a previous request made to OpenAI.
+     * @return iterable
+     * @throws ClientExceptionInterface
+     */
+    public function requestStream(
+        User $user,
+        string $prompt,
+        string $feature,
+        string $sessionId,
+        ?string $size = null,
+        ?string $style = null,
+        ?string $imageUrl = null,
+        ?string $previousResponseId = null,
+    ): iterable {
+        return $this->client->createResponseStream(
+            $this->buildPayload(
+                $prompt,
+                true,
+                $size,
+                $style,
+                $imageUrl,
+                $previousResponseId,
+            ),
+            $user,
+            $feature,
+            $sessionId,
+            8192,
+        );
+    }
+
+    /**
+     * Build a payload for the AI provider.
+     *
+     * @param string      $prompt              The user's input prompt.
+     * @param bool        $stream              Whether or not to request a stream.
+     * @param string|null $size                If provided: a size for the image.
+     *                                         Should match a value of `ImageSize`.
+     * @param string|null $style               If provided: a style for the image.
+     *                                         Should match a value of `ImageStyle`.
+     * @param string|null $imageUrl            If provided: a URL to use as an example for the image.
+     * @param string|null $previousResponseId  If provided: the ID of a previous request made to OpenAI.
+     * @return array
+     */
+    private function buildPayload(
+        string $prompt,
+        bool $stream,
+        ?string $size = null,
+        ?string $style = null,
+        ?string $imageUrl = null,
+        ?string $previousResponseId = null,
+    ): array {
+        /* See https://platform.openai.com/docs/api-reference/responses/create */
+        $payload = [
+            /* An ordered list of instructions for OpenAi
+             */
+            'input' => [],
+            /* Which variant of OpenAI to use (text model)
+             * This is different to the image model, since we also need a text model to do responses
+             */
+            'model' => $this->model,
+            /* Make the image generation tool available and force it to be used
+             * since we're asking the AI to reject non-image requests, sometimes it shouldn't be forced - hence this is removed for now
+             */
+            // 'tool_choice' => [
+            //     'type' => 'image_generation',
+            // ],
+            'tools' => [
+                [
+                    'type'           => 'image_generation',
+                    'model'          => self::OPENAI_IMAGE_MODEL,
+                    'output_format'  => self::IMAGE_OUTPUT_FORMAT,
+                    'background'     => 'auto',
+                    'partial_images' => $stream ? self::PARTIAL_IMAGE_QTY : 0,
+                    'quality'        => $this->quality,
+                    'size'           => (ImageSize::tryFrom($size) ?? ImageSize::Auto)->value,
+                ],
+            ],
+            /* A kind of OpenAI currency to use in this request
+             */
+            "max_output_tokens" => self::MAX_OUTPUT_TOKENS,
+            /* How "creative" the OpenAI response will be
+             * The bigger the number, the more creative it gets
+             * Goes between 0 and 2
+             */
+            "temperature" => self::TEMPERATURE,
+            "top_p" => self::TOP_P,
+            "stream" => $stream,
+            'text' => [
+                'format' => [
+                    'type' => 'text',
+                ],
+            ],
+        ];
+
+        /** add prompt inputs if they are meaningful */
+        $imageStyle   = ImageStyle::tryFrom($style)?->value;
+        $systemPrompt = strtr(
+            self::PROMPT_SYSTEM_PERSONA,
+            [
+                '[CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]' => trim($this->systemPrompt),
+                '[IMAGE_STYLE]' => $imageStyle !== null ? sprintf(self::PROMPT_SYSTEM_IMAGE_STYLE, $imageStyle) : '',
+            ],
+        );
+
+        $payload['input'][] = [
+            'role' => 'system',
+            'content' => $systemPrompt,
+        ];
+
+        $userPrompt = [
+            ['type' => 'input_text', 'text' => trim($prompt), ],
+        ];
+
+        /* Did the user include an image as additional context? Add it to the prompt
+         * See https://platform.openai.com/docs/guides/images-vision#image-input-requirements
+         */
+        if (trim((string)$imageUrl) !== '') {
+            $userPrompt[] = [
+                'type' => 'input_image',
+                'image_url' => $imageUrl,
+                'detail' => self::IMAGE_INPUT_DETAIL,
+            ];
+        }
+
+        $payload['input'][] = [
+            'role' => 'user',
+            'content' => $userPrompt,
+        ];
+
+        /* If there is a previous response ID, add it to the payload
+         * This is used to continue a conversation
+         */
+        if (null !== $previousResponseId) {
+            $payload['previous_response_id'] = $previousResponseId;
+        }
+
+        return $payload;
+    }
+}

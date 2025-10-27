@@ -124,7 +124,7 @@ class External_Tass_Timetable implements External_TimetableInterface
      * @param Campus $campus
      * @param int    $date
      *
-     * @return int|string
+     * @return int
      * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)
@@ -246,7 +246,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                     if (
                         $desc['prd_code'] == $timetablePeriod['periodNumber']
                         // Prevent $timetablePeriod['class'][$code] from being overwritten if a $code is repeated.
-                        // @phpstan-ignore-next-line (Offset non-falsy-string on array{} in isset() does not exist).
                         && !isset($timetablePeriod['class'][$code])
                     ) {
                         $timetable[$x]['class'][$code] = array(

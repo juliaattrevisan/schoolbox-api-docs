@@ -95,11 +95,11 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int    $categoryID
      * @param string $orderBy
      * @param string $sortDir
-     * @param bool   $limit
+     * @param int   $limit
      * @return array
      *@deprecated use \Schoolbox\Wiki\WikiMapper::findByColumn('categoryID')
           */
-    public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false): array
+    public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = 10): array
     {
         /* Adjust the table in which to sort -_-
          */

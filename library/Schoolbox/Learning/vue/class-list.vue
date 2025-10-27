@@ -667,7 +667,7 @@ export default {
                                 <span class="meta">({{ student.synergy_id }})</span>
                                 <span class="show-for-print"><br />{{ student.email }}</span>
                                 <br />
-                                <div class="l-flex l-gap-xs l-pad-s--vert">
+                                <div class="l-flex-row l-gap-xs l-pad-s--vert">
                                     <sbx-label
                                         v-for="studentBadge in studentPastoralCounts[student.id]"
                                         :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"

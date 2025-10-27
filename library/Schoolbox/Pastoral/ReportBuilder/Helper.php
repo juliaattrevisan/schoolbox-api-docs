@@ -56,10 +56,10 @@ class Helper
     {
         /** @param Collection $types */
         $types = $this->report['types'];
-        /** @param Collection|null $subtypes */
-        $subtypes = $this->report['subtypes'];
+        /** @param Collection $subtypes */
+        $subtypes = $this->getSubTypes();
         return $types->diff(
-            $subtypes?->map(
+            $subtypes->map(
                 fn(SubType $subType) => $subType->getPastoralType()
             )
         );
