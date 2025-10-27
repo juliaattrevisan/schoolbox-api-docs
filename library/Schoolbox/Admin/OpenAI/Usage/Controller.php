@@ -161,7 +161,9 @@ class Controller extends Base
 
         if ($startDate) {
             try {
-                $startAt = new \Alaress_Date_Format($startDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
+                /* Go from the start of day (this lets you get things that happened on $startDate)
+                 */
+                $startAt = (new \Alaress_Date_Format($startDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C))->startOfDay();
             } catch (\InvalidArgumentException $e) {
                 $message = sprintf(
                     '%s is an invalid start date or in the incorrect format.',
@@ -183,7 +185,9 @@ class Controller extends Base
 
         if ($endDate) {
             try {
-                $endAt = new \Alaress_Date_Format($endDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C);
+                /* Go to the end of day (this lets you get things that happened on $endDate)
+                 */
+                $endAt = (new \Alaress_Date_Format($endDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C))->endOfDay();
             } catch (\InvalidArgumentException $e) {
                 $message = sprintf(
                     '%s is an invalid end date or in the incorrect format.',
