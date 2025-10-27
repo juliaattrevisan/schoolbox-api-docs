@@ -10,6 +10,10 @@ export default class MarkbookPage {
 
     static readonly URL = "/homepage/{class_id}";
 
+    static readonly URL_COURSE_MARKBOOK = "/learning/courseMarkbook/{course_id}";
+
+    static readonly URL_CLASS_MARKBOOK = "/learning/markbook/class/{class_id}";
+
     static readonly DATA_TEST_MARKBOOK_SHOW_DISPLAY_MARKS = "markbook-show-display-marks";
 
     static readonly DATA_TEST_MARKBOOK_ASSESSMENT = "markbook-assessment-[ASSESSMENT_ID]"; // Replace [ASSESSMENT_ID] with the actual ID
@@ -24,6 +28,30 @@ export default class MarkbookPage {
 
     constructor(page: Page) {
         this.page = page;
+    }
+
+    /**
+     * navigates to the class markbook page url
+     * @param classId - The class id
+     */
+    async goto(classId: string): Promise<void> {
+        await this.page.goto(MarkbookPage.URL.replace("{class_id}", classId));
+    }
+
+    /**
+     * navigates to the course markbook page url
+     * @param courseId - The course id
+     */
+    async gotoCourseMarkbook(courseId: string): Promise<void> {
+        await this.page.goto(MarkbookPage.URL_COURSE_MARKBOOK.replace("{course_id}", courseId));
+    }
+
+    /**
+     * navigates to the class markbook page url
+     * @param classId - The course id
+     */
+    async gotoClassMarkbook(classId: string): Promise<void> {
+        await this.page.goto(MarkbookPage.URL_CLASS_MARKBOOK.replace("{class_id}", classId));
     }
 
     /**
@@ -164,6 +192,41 @@ export default class MarkbookPage {
                 assessmentId.toString(),
             ),
         );
+    }
+
+    /**
+     * Clicks a cell for a given student and assessment in the markbook
+     * @param assessmentId - The ID of the assessment
+     * @param studentId - The ID of the student
+     */
+    async markTask(assessmentId: string | number, studentId: string | number): Promise<void> {
+        const markTask = this.page.getByTestId(
+            MarkbookPage.DATA_TEST_MARKBOOK_CELL.replace("[STUDENT_ID]", studentId.toString()).replace(
+                "[ASSESSMENT_ID]",
+                assessmentId.toString(),
+            ),
+        );
+        await markTask.click();
+    }
+
+    /**
+     * Checks the task status is complete or incomplete
+     * @param assessmentId - The ID of the assessment
+     * @param studentId - The ID of the student
+     * @param status - The status to check: 'Completed' or 'Incomplete'
+     */
+    async checkTaskStatus(
+        assessmentId: string | number,
+        studentId: string | number,
+        status: "Completed" | "Incomplete",
+    ): Promise<void> {
+        const taskMarkTick = this.page.getByTestId(
+            MarkbookPage.DATA_TEST_MARKBOOK_CELL.replace("[STUDENT_ID]", studentId.toString()).replace(
+                "[ASSESSMENT_ID]",
+                assessmentId.toString(),
+            ),
+        );
+        await expect(taskMarkTick.locator("a")).toHaveAttribute("title", new RegExp(status));
     }
 
     /**
