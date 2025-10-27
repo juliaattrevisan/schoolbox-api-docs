@@ -21,6 +21,7 @@ use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -69,10 +70,16 @@ class Module extends BaseModule
         );
     }
 
+
     /**
      * Preload the first log entry on the {sessionId} param
+     *
+     * @param array $params
+     * @return array
+     * @throws MapperException
+     * @throws Deleted
      */
-    private function preloadLog(array $params)
+    private function preloadLog(array $params): array
     {
         // if preloaded, then return
         if ($params['log'] ?? null) {
@@ -81,7 +88,7 @@ class Module extends BaseModule
 
         // fetch the first log entry for this sessionId
         if (!isset($params['sessionId'])) {
-            throw new InvalidArgumentException('UUID parameter is missing.');
+            throw new InvalidArgumentException('AI session identifier parameter is missing.');
         }
 
         $log = $this->getAILogMapper()->findOneByColumn('session_id', $params['sessionId']);
