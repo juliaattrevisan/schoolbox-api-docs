@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Calendar;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access;
 use Schoolbox\Calendar\Event\Attendance;
@@ -15,6 +16,10 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
+use Schoolbox\GenericCollection;
+use Schoolbox\ResourceBooking\Booking\Model;
+use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\UserMapper;
 use Calendar\Event\Type\Day\Renderer\Javascript;
 use Schoolbox\Permission\Access\Access as FolderAccess;
@@ -51,6 +56,12 @@ $guests = [];
 
 if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calendar_student_can_invite'))) {
     $guests = (!isset($_POST['guests']) || '' === (string)$_POST['guests']) ? [] : explode(',', $_POST['guests']);
+}
+
+/* as of 26.0 you can now book resources via the calendar modal */
+$resources = [];
+if ($this->config->get('resource_booking_enabled')) {
+    $resources = (!isset($_POST['resources']) || '' === (string)$_POST['resources']) ? [] : explode(',', $_POST['resources']);
 }
 
 $event
@@ -94,7 +105,27 @@ if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner)
     error(35);
 }
 
+// now create the related resource bookings
+$bookingList = new Collection();
+if (!empty($resources)) {
+    // spawn a Resource Booking object here and link it to the event
+    foreach ($resources as $resourceId) {
+        /** @var Item\Model $item */
+        $item = Item\Mapper::getInstance()->findById((int)$resourceId);
+
+        // Build the booking
+        $booking = getBookingFromEvent($item, $event, $user);
+            $booking
+                ->setName($_POST['title'] ?? '')
+                ->setNotes($_POST['detail'] ?? '');
+        $bookingList->add($booking);
+    }
+}
+
 $affectedIds = EventMapper::getInstance()->save($event);
+
+$bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+$bookingMapper->save($bookingList);
 
 /* Save a Personal Relation
  */
@@ -129,3 +160,44 @@ if (count($affectedIds) == 1) {
     }
 }
 exit(1);
+
+function getStatusMapper()
+{
+    return \Schoolbox\ResourceBooking\Booking\Status\Mapper::getInstance();
+}
+
+/**
+ * Helper for getting a booking from an event.
+ *
+ * @param  Item\Model     $resource
+ * @param  Calendar\Event $event
+ *
+ * @return Model
+ * @throws \Schoolbox\Mapper\Exception
+ */
+function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user)
+{
+    $booking = new Model();
+    $booking
+        ->setEvent($event)
+        ->setResource($resource)
+        ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
+        ->setName($_POST['title'] ?? '')
+        ->setNotes($_POST['detail'] ?? '')
+        ->setRelatedBookingList(new GenericCollection(Model::class));
+    // What about the resource? If it's an open resource, confirm the
+    // booking immediately.
+    if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+        $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+    } elseif (
+        $resource->isUserModerator($user)
+        && (int)$event->getAuthor()->getId() === (int)$user->getId()
+    ) {
+        /* If you're a Moderator and can moderate this request,
+         * and you created the booking in the first place,
+         * set it to Approved - otherwise you'll end up approving your own request anyway
+         */
+        $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+    }
+    return $booking;
+}
