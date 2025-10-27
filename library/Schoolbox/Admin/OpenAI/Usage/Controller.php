@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\OpenAI\Usage;
 
 use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
@@ -19,12 +20,17 @@ use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\OpenAI\Log\Model as AILog;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Editor\OpenAI\Log\ModelToArray;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
 class Controller extends Base
 {
-    private const MAX_PAGE_SIZE = 100;
+    /**
+     * Maximum number of logs per page
+     */
+    private const int MAX_PAGE_SIZE = 100;
+
 
     /**
      * Controller constructor.
@@ -40,6 +46,16 @@ class Controller extends Base
     ) {
     }
 
+
+    /**
+     * Show users a short form that lets them configure the filters for AI Sessions that we logged.
+     * This lets them interrogate our openai_session table for log instances.
+     *
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \JsonException
+     * @throws \Twig\Error\Error
+     */
     public function getIndex(): void
     {
         $features = new AIConfig()->fetchFeatures($this->configMapper);
@@ -62,16 +78,19 @@ class Controller extends Base
     }
 
     /**
-     * returns the next chunk of logs based on the cursor provided
+     * Returns the next chunk of logs based on the cursor provided
+     *
      * @return void
+     * @throws RouteNotFound
+     * @throws Exception
      */
     public function postSearch(): void
     {
-        $keyword = $this->getRequestPost()->get('keyword', null);
-        $user = $this->getRequestPost()->get('user', null);
-        $feature = $this->getRequestPost()->get('feature', null);
-        $after = $this->getRequestPost()->get('after', null);
-        $before = $this->getRequestPost()->get('before', null);
+        $keyword = $this->getRequestPost()->get('keyword');
+        $user = $this->getRequestPost()->get('user');
+        $feature = $this->getRequestPost()->get('feature');
+        $after = $this->getRequestPost()->get('after');
+        $before = $this->getRequestPost()->get('before');
 
         $page = $this->getRequestPost()->getInt('page', 1);
         $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE);
@@ -183,10 +202,10 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * @param AILog $log // first in the tree
      * @return void
-     * @throws \Twig\Error\Error
      */
     public function getLog(AILog $log): void
     {
