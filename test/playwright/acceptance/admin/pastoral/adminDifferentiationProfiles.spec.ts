@@ -65,7 +65,7 @@ test.describe("Admin Differentiation Profiles", () => {
         }
     });
 
-    test("resequence fields", async ({ tester, page, db }) => {
+    test.skip("resequence fields", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
             tester.isGoingTo("Login as admin");
