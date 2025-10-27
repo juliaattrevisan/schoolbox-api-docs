@@ -1,4 +1,4 @@
-import ManageDifferentiationProfiles from "./manage-differentiation-profiles.vue.vue";
+import ManageDifferentiationProfiles from "./manage-differentiation-profiles.vue";
 
 window.Vue.createApp({
     components: {
