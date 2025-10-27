@@ -74,32 +74,28 @@ class ClientFactory
      */
     public function buildForFeature(string $feature): IClient
     {
-        switch ($feature) {
-            case Helper::FEATURE_IMAGE:
-                $aiConfig = new OpenAI\Config()->decode(
-                    (string)$this->config->get(ConfigMapper::NAME_AI_IMAGE_GENERATION),
-                );
-                $apiKey   = $aiConfig[OpenAi\Config::SECTION_GENERAL][OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
-                $provider = $aiConfig[OpenAI\Config::FIELD_PROVIDER]['value'] ?? '';
-                break;
-            default:
-                $apiKey   = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_KEY);
-                $provider = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
-                break;
+        // Each feature maps to a config which holds the API key and provider
+        $configKey = OpenAI\Config::ALL_MODULES[$feature] ?? null;
+        if ($configKey === null) {
+            throw new UnexpectedValueException(sprintf('AI feature "%s" is not implemented', $feature));
         }
+        $aiConfig = new OpenAI\Config()->decode((string)$this->config->get($configKey));
+        $apiKey   = $aiConfig[OpenAi\Config::SECTION_GENERAL][OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
+        $provider = $aiConfig[OpenAI\Config::FIELD_PROVIDER]['value'] ?? '';
 
         $providerEnum = Provider::tryFrom($provider) ?? Provider::Off;
 
-        // OpenAI: build something standard
+        // OpenAI: build standard client
         if ($providerEnum === Provider::OpenAi) {
             return $this->buildOpenAi($apiKey);
         }
 
-        // Azure: depends on feature
+        // Azure: build client depending on feature
         if ($providerEnum === Provider::Azure) {
             switch ($feature) {
                 case Helper::FEATURE_CHAT:
                     // Chat does use deployment ID
+                    // TODO remove deprecated configs when more features are migrated to this factory
                     return $this->buildAzure(
                         $apiKey,
                         $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME),
@@ -109,6 +105,8 @@ class ClientFactory
                 case Helper::FEATURE_IMAGE:
                     throw new UnexpectedValueException('Image feature for Azure is not implemented');
                 default:
+                    // Default does not use deployment ID
+                    // TODO remove deprecated configs when more features are migrated to this factory
                     return $this->buildAzure(
                         $apiKey,
                         $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME),
