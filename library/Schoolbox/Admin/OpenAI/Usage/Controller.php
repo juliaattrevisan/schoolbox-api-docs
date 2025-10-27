@@ -228,24 +228,24 @@ class Controller extends Base
          */
         $sessions = [];
 
-        foreach ($logGroups as $sessionId => $log) {
+        foreach ($logGroups as $logGroup) {
             /* Make an array representation of each $log instance
              */
-            $translated = $this->sessionTranslator->__invoke($log);
+            $translated = $this->sessionTranslator->__invoke($logGroup);
 
             /* Bolt on this random _routes node
              */
             $translated['_routes'] = [
                 'getLog' => $this->getRouteIfAuthorized('openAIUsage.getLog', [
-                    'sessionId' => $sessionId
+                    'sessionId' => $logGroup->getSessionId()
                 ]),
             ];
 
-            $sessions[$sessionId] = $translated;
+            $sessions[] = $translated;
         }
 
         $this->response = $this->responseAsJson([
-            'data' => array_values($sessions),
+            'data' => $sessions,
             'metadata' => [
                 'count' => $count,
                 'pagination' => [
