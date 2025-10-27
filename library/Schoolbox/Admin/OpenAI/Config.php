@@ -19,20 +19,20 @@ class Config
      * enabled AI features (to be configured as part of the text Gen settings)
      * feature name => config name
      */
-    public const ALL_MODULES = [
+    public const array ALL_MODULES = [
         Helper::FEATURE_CHAT => ConfigMapper::NAME_AI_TEXT_CHAT,
         Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_AI_LESSONPLAN,
         Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_AI_DIFFERENTIATION,
         Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_AI_DIALOGAGENT,
     ];
 
-    public const PROVIDERS = [
+    public const array PROVIDERS = [
         Helper::ENDPOINT_TYPE_OFF => Helper::ENDPOINT_TYPE_OFF,
         Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
         Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
     ];
 
-    public const AI_MODELS = [
+    public const array AI_MODELS = [
         "gpt-4o",
         "gpt-4o-mini",
         "gpt-4.1",
@@ -40,14 +40,57 @@ class Config
     ];
 
     // field name and types
-    public const FIELD_PROVIDER = 'provider';
-    public const FIELD_AIKEY = 'ai_key';
-    public const FIELD_RESOURCE_NAME = 'resource_name';
-    public const FIELD_DEPLOYMENT_ID = 'deployment_id';
-    public const FIELD_MODEL = 'model';
-    public const FIELD_SYSTEM_PROMPT = 'system_prompt';
+    public const string FIELD_PROVIDER = 'provider';
+    public const string FIELD_AIKEY = 'ai_key';
+    public const string FIELD_RESOURCE_NAME = 'resource_name';
+    public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
+    public const string FIELD_MODEL = 'model';
+    public const string FIELD_SYSTEM_PROMPT = 'system_prompt';
 
-    public const FIELDS = [
+
+    /* Predefined config structs: as you add more providers, don't forget to pile them in here
+     */
+
+    /**
+     * Common fields across all providers
+     */
+    public const array STRUCT_GENERAL = [
+        self::FIELD_AIKEY => [
+            'value' => '',
+        ],
+        self::FIELD_SYSTEM_PROMPT => [
+            'value' => '',
+        ],
+    ];
+
+
+    /**
+     * OpenAI-specific fields
+     */
+    public const array STRUCT_OPENAI = [
+        self::FIELD_MODEL => [
+            'value' => '', // -- select an option --
+        ],
+    ];
+
+
+    /**
+     * Azure-specific fields
+     */
+    public const array STRUCT_AZURE = [
+        self::FIELD_RESOURCE_NAME => [
+            'value' => '',
+        ],
+        self::FIELD_DEPLOYMENT_ID => [
+            'value' => '',
+        ],
+    ];
+
+
+    /**
+     * A set of all available fields to show in the ui
+     */
+    public const array FIELDS = [
         self::FIELD_PROVIDER => self::FIELD_PROVIDER,
         self::FIELD_AIKEY => self::FIELD_AIKEY,
         self::FIELD_RESOURCE_NAME => self::FIELD_RESOURCE_NAME,
@@ -55,6 +98,7 @@ class Config
         self::FIELD_MODEL => self::FIELD_MODEL,
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
+
 
     /**
      * array of AI features and their config
@@ -84,51 +128,6 @@ class Config
 
 
     /**
-     * returns the common fields for all AI features
-     * @return array
-     */
-    public function initGeneral(): array
-    {
-        return [
-            self::FIELD_AIKEY => [
-                'value' => '',
-            ],
-            self::FIELD_SYSTEM_PROMPT => [
-                'value' => '',
-            ],
-        ];
-    }
-
-    /**
-     * returns the OpenAI specific fields
-     * @return array[]
-     */
-    public function initOpenAi(): array
-    {
-        return [
-            self::FIELD_MODEL => [
-                'value' => '', // -- select an option --
-            ],
-        ];
-    }
-
-    /**
-     * returns the Azure specific fields
-     * @return array[]
-     */
-    public function initAzure(): array
-    {
-        return [
-            self::FIELD_RESOURCE_NAME => [
-                'value' => '',
-            ],
-            self::FIELD_DEPLOYMENT_ID => [
-                'value' => '',
-            ],
-        ];
-    }
-
-    /**
      * returns a blank config structure
      * @return array
      */
@@ -136,9 +135,9 @@ class Config
     {
         // start with a blank config
         $config = [self::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]];
-        $config[Helper::ENDPOINT_TYPE_GENERAL] = $this->initGeneral();
-        $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
-        $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
+        $config[Helper::ENDPOINT_TYPE_GENERAL] = self::STRUCT_GENERAL;
+        $config[Helper::ENDPOINT_TYPE_OPENAI] = self::STRUCT_OPENAI;
+        $config[Helper::ENDPOINT_TYPE_AZURE] = self::STRUCT_AZURE;
         return $config;
     }
 
