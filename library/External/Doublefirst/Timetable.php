@@ -219,7 +219,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      *
      * @param CampusModel $campus Campus of the date we are looking at
      * @param int $date UNIX timestamp of the date we are looking at
-     * @return bool|string              Day number
+     * @return int      Day number
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {

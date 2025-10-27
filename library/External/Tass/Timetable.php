@@ -124,7 +124,7 @@ class External_Tass_Timetable implements External_TimetableInterface
      * @param Campus $campus
      * @param int    $date
      *
-     * @return int|string
+     * @return int
      * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)

@@ -81,7 +81,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * @param Campus $campus
      * @param int    $date
      *
-     * @return bool
+     * @return int
      * @throws InvalidArgumentException
      * @throws \Alaress\Database\Exception
      */
@@ -114,7 +114,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
             }
         }
 
-        return false;
+        return 0;
     }
 
 

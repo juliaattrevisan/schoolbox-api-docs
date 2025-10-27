@@ -1567,12 +1567,6 @@ parameters:
 			path: library/External/Doublefirst/Timetable.php
 
 		-
-			message: '#^Method External_Doublefirst_Timetable\:\:getDayNumber\(\) should return bool\|string but returns int\.$#'
-			identifier: return.type
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
 			message: '#^Method External_Doublefirst_Timetable\:\:setDatabase\(\) is unused\.$#'
 			identifier: method.unused
 			count: 1
@@ -1581,12 +1575,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
-			count: 1
-			path: library/External/Doublefirst/Timetable.php
-
-		-
-			message: '#^Return type \(bool\|string\) of method External_Doublefirst_Timetable\:\:getDayNumber\(\) should be compatible with return type \(int\) of method External_TimetableInterface\:\:getDayNumber\(\)$#'
-			identifier: method.childReturnType
 			count: 1
 			path: library/External/Doublefirst/Timetable.php
 
@@ -1655,12 +1643,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/External/Pcschools/User.php
-
-		-
-			message: '#^Return type \(bool\) of method External_Schoolpro_Timetable\:\:getDayNumber\(\) should be compatible with return type \(int\) of method External_TimetableInterface\:\:getDayNumber\(\)$#'
-			identifier: method.childReturnType
-			count: 1
-			path: library/External/Schoolpro/Timetable.php
 
 		-
 			message: '#^Method External_Synergetic_Class\:\:setDatabase\(\) is unused\.$#'

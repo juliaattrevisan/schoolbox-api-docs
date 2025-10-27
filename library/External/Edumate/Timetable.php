@@ -142,7 +142,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * @param Campus $campus
      * @param int               $date
-     * @return bool|int
+     * @return int
      * @throws \Alaress\Database\Exception
      */
     public function getDayNumber(Campus $campus, $date = 0)
@@ -216,7 +216,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return $currentDay;
         }
 
-        return false;
+        return 0;
     }
 
 
