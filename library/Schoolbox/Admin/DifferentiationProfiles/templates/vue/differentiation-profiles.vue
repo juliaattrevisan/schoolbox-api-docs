@@ -124,14 +124,19 @@ async function onSaveSelected(): Promise<void> {
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <section v-if="data.featureToggle.enabled">
                     <fieldset v-if="data.headers && Object.keys(data.headers).length > 0" class="content">
-                        <div class="row">
-                            <div
-                                v-for="(header, headerKey) in data.headers"
-                                :key="headerKey"
-                                :class="`small-12 medium-${header.colSpan} columns`"
-                            >
-                                <h4>{{ header.title ? header.title : "" }}</h4>
-                            </div>
+                        <div class="sortable">
+                            <header class="list-header">
+                                <div class="list-item">
+                                    <div class="grip compact" data-dp-drag-handle />
+                                    <div
+                                        v-for="(header, headerKey) in data.headers"
+                                        :key="headerKey"
+                                        :class="`small-12 medium-${header.colSpan} column`"
+                                    >
+                                        <label class="f-no-margins">{{ header.title ? header.title : "&nbsp;" }}</label>
+                                    </div>
+                                </div>
+                            </header>
                         </div>
                     </fieldset>
                     <fieldset v-for="(module, key) in data.modules" :key="key" class="content">
@@ -152,41 +157,43 @@ async function onSaveSelected(): Promise<void> {
                                     :data-field-key="item.element.name"
                                     :class="{ dragging: item.isDragging }"
                                 >
-                                    <div class="list-item">
+                                    <div class="l-flex">
                                         <div v-if="module.isSortable" class="grip compact" data-dp-drag-handle />
-                                        <template
-                                            v-for="header in (convertObjectToArray(data.headers) as Header[]) || []"
-                                            :key="header.headerKey"
-                                        >
-                                            <div :class="`small-12 medium-${header.colSpan} column`">
-                                                <template v-if="header.type === 'checkbox'">
-                                                    <input
-                                                        :id="`differentiation-profiles-adjustments-field-${item.element.id}`"
-                                                        v-model="item.element.is_enabled"
-                                                        type="checkbox"
-                                                    />
-                                                    <label
-                                                        :for="`differentiation-profiles-adjustments-field-${item.element.id}`"
-                                                        class="checkbox-label"
-                                                        >{{ item.element.title }}</label
-                                                    >
-                                                </template>
-                                                <template v-else-if="header.type === 'text'">
-                                                    <label
-                                                        :for="`field-${header.key}-${item.element.id}`"
-                                                        class="t-visually-hidden"
-                                                    >
-                                                        {{ header.title || header.key }}
-                                                    </label>
-                                                    <input
-                                                        :id="`field-${header.key}-${item.element.id}`"
-                                                        v-model="item.element[header.key]"
-                                                        type="text"
-                                                        :readonly="header.key === 'title'"
-                                                    />
-                                                </template>
-                                            </div>
-                                        </template>
+                                        <div class="list-item">
+                                            <template
+                                                v-for="header in (convertObjectToArray(data.headers) as Header[]) || []"
+                                                :key="header.headerKey"
+                                            >
+                                                <div :class="`small-12 medium-${header.colSpan} column`">
+                                                    <template v-if="header.type === 'checkbox'">
+                                                        <input
+                                                            :id="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                            v-model="item.element.is_enabled"
+                                                            type="checkbox"
+                                                        />
+                                                        <label
+                                                            :for="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                            class="checkbox-label"
+                                                            >{{ item.element.title }}</label
+                                                        >
+                                                    </template>
+                                                    <template v-else-if="header.type === 'text'">
+                                                        <label
+                                                            :for="`field-${header.key}-${item.element.id}`"
+                                                            class="t-visually-hidden"
+                                                        >
+                                                            {{ header.title || header.key }}
+                                                        </label>
+                                                        <input
+                                                            :id="`field-${header.key}-${item.element.id}`"
+                                                            v-model="item.element[header.key]"
+                                                            type="text"
+                                                            :readonly="header.key === 'title'"
+                                                        />
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
                                     </div>
                                 </li>
                             </template>
