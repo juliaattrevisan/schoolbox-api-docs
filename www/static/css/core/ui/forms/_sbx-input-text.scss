@@ -1,0 +1,98 @@
+/**
+ * text input
+ * Scope: UI Uplift
+ */
+
+:root {
+    --animation-form-input-change: 100ms;
+    --color-form-disabled-background: #edecec;
+    --size-form-element-border-width: 1px;
+}
+
+/* Shared form input focus styles */
+@mixin form-input-focus {
+    background: var(--color-foreground-primary);
+    border-color: var(--sbx-color-accent);
+    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--sbx-color-accent);
+    outline-offset: calc(var(--size-form-el-border-width) + 1px);
+}
+
+/* So the focus is not active on mouse click */
+@mixin form-input-focus-not-visible {
+    outline: 0;
+}
+
+/* Shared form input disabled styles */
+@mixin form-input-disabled {
+    background-color: var(--color-foreground-secondary);
+    color: var(--color-text-secondary) !important;
+    cursor: not-allowed;
+    pointer-events: auto;
+    & + label {
+        opacity: 1 !important;
+    }
+}
+
+/* Base */
+.sbx-input-text[type="text"] {
+    background-color: var(--color-foreground-primary);
+    border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
+    border-radius: var(--sbx-border-radius-normal);
+    color: var(--color-text-primary);
+    font-size: max(16px, 1rem);
+    font-family: inherit;
+    height: 2.25rem;
+    line-height: 1;
+    margin: 0; // foundation fix until old _forms.scss is removed
+    padding: var(--spacing-s);
+    transition: none; // foundation fix until old _forms.scss is removed
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+
+    &:focus {
+        @include form-input-focus;
+    }
+    &:focus:not(:focus-visible) {
+        @include form-input-focus-not-visible;
+    }
+    &:disabled {
+        @include form-input-disabled;
+    }
+
+    &[readonly] {
+        border: none;
+        padding: 0;
+        &:hover {
+            background-color: inherit; // foundation fix
+            border-color: none; // foundation fix
+            color: inherit; // foundation fix
+        }
+        &:focus {
+            @include form-input-focus-not-visible;
+        }
+    }
+}
+
+/* States */
+.sbx-input-text--error[type="text"] {
+    border: 1px solid var(--color-alert);
+}
+
+.sbx-input-text--with-button[type="text"] {
+    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
+}
+
+/* Inline container used in the story (kept minimal, no structural changes) */
+.inline-input-container {
+    display: inline-flex;
+    align-items: stretch;
+    gap: var(--spacing-xs);
+    flex-direction: row !important;
+    justify-content: flex-end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --animation-form-input-change: 0ms;
+    }
+}
