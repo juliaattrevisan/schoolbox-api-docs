@@ -12,6 +12,7 @@ namespace Schoolbox\Editor\OpenAI\Log;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\GenericCollection;
@@ -111,10 +112,19 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
+
     /**
      * Get grouped logs with offset and limit
      *
+     * @param string|null $keyword
+     * @param string|null $feature
+     * @param User|null $user
+     * @param \Alaress_Date_Format|null $start
+     * @param \Alaress_Date_Format|null $end
+     * @param int $limit
+     * @param int $offset
      * @return GenericCollection
+     * @throws Exception
      */
     public function getGroupedLogs(
         ?string $keyword,
@@ -178,10 +188,24 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
             WHERE {$where}
             GROUP BY session_id
+            LIMIT :limit
+            OFFSET :offset
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute($pb->getParams());
+
+        /* Cram in all the params...
+         */
+        foreach ($pb->getParams() as $name => $value) {
+            $statement->bindValue($name, $value);
+        }
+
+        /* ...along with these special ints with special treatment
+         */
+        $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
+
+        $statement->execute();
 
         $stack = $this->createCollection();
 
