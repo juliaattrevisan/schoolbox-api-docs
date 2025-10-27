@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi;
 
-use Config\Modules\OpenAI;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
+use Schoolbox\Admin\OpenAI;
 use UnexpectedValueException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
@@ -76,8 +76,11 @@ class ClientFactory
     {
         switch ($feature) {
             case Helper::FEATURE_IMAGE:
-                $apiKey   = $this->config->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY);
-                $provider = $this->config->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT);
+                $aiConfig = new OpenAI\Config()->decode(
+                    (string)$this->config->get(ConfigMapper::NAME_AI_IMAGE_GENERATION),
+                );
+                $apiKey   = $aiConfig[OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
+                $provider = $aiConfig[OpenAI\Config::FIELD_PROVIDER]['value'] ?? '';
                 break;
             default:
                 $apiKey   = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_KEY);
