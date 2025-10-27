@@ -631,8 +631,10 @@ class ResourceBookingCest
 
     // Clash booking tests -------------------------------------------------------------------------------------------//
     //
-    // Clash bookings are defined as bookings that clash with existing approved bookings.
-    // Note bookings (both pending and approved) that clash with existing pending bookings are always allowed.
+    // Bookings (both pending and approved) that clash with existing pending bookings are always allowed.
+    // Bookings that clash with existing approved bookings are only allowed if resource.allow_clash_bookings is true,
+    // and are always saved as pending.  A pending booking cannot be approved while it clashes with other approved
+    // bookings.
     //
     // Info on moderation types:
     // * Moderation type 'open' means:
@@ -645,7 +647,7 @@ class ResourceBookingCest
     //      All staff can request to book the resource. Booking then needs to be approved by a moderator.
     //      (if clash bookings are allowed, they are saved as 'pending', otherwise they are refused)
     //
-    // Note for all moderation types, either approved or pending bookings may exist (since moderation type can change).
+    // Note for all moderation types, approved and pending bookings may both exist (since moderation type can change).
 
     /**
      * @param IntegrationTester $i
