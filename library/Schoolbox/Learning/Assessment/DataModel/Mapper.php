@@ -538,6 +538,16 @@ class Mapper extends BaseMapper
                 JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
                 JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
                 WHERE {$where}
+
+                UNION
+
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('dialogAgent', 'a', 'da', true)}
+                JOIN  {$this->getJoinSql('dialogAgent.responses', 'da', 'dr')} AND dr.learner_id = :userId
+                WHERE {$where}
+
+                ORDER BY id ASC
             ";
 
             $statement = $this->getDatabase()->prepare($query);
