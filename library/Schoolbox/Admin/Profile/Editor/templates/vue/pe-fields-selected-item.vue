@@ -184,11 +184,6 @@ const isSaving = window.Vue.computed(() => {
 </template>
 
 <style scoped>
-/* Hide the contents of the field placeholder while it is being dragged (shows as a white box) */
-li.dragging {
-    opacity: 0;
-}
-
 /* To ensure the height of the title matches the card.compact height */
 h3 {
     min-height: 2.5rem;
@@ -197,12 +192,6 @@ h3 {
 /* To remove the hover background on the icons since they rotate */
 nav > a[class^="icon-"]:hover {
     background-color: transparent;
-}
-
-/* The item held by the mouse when dragging */
-.dragged-item {
-    background-color: var(--content-ui-hover);
-    height: auto !important;
 }
 
 /*

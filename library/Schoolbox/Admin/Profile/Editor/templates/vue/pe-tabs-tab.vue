@@ -124,9 +124,6 @@ $pe-tabs-width: 18rem; /* Prevent the tab from being too narrow */
 
     /* The item held by the mouse when dragging */
     &.dragged-item {
-        background-color: var(--content-ui-hover);
-        height: auto !important;
-
         /*
          * Hide any component panel when this is the item held by the mouse.
          * This must be a style since the element handling the drag will not react to changes here
