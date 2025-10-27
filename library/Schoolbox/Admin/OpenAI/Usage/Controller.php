@@ -98,7 +98,7 @@ class Controller extends Base
     public function postSearch(): void
     {
         $keyword = $this->getRequestPost()->get('keyword');
-        $user = $this->getRequestPost()->get('user');
+        $userId = $this->getRequestPost()->get('user');
         $feature = $this->getRequestPost()->get('feature');
         $after = $this->getRequestPost()->get('after');
         $before = $this->getRequestPost()->get('before');
@@ -122,14 +122,22 @@ class Controller extends Base
             }
         }
 
-        // ensue the user exists (allow deleted)
-        if ($user) {
-            $userObj = $this->userMapper->findByIdWithFallback($user);
+        // ensure the user exists (allow deleted)
+        $user = null;
 
-            if (null === $userObj->getId()) {
-                $problem = (new ApiProblem('Unknown User'))
+        if ($userId) {
+            $user = $this->userMapper->findByIdWithFallback($userId);
+
+            if (null === $user->getId()) {
+                $message = sprintf(
+                    '%s is an unknown user identifier.',
+                    $userId
+                );
+
+                $problem = (new ApiProblem($message))
                     ->setStatus(404)
                     ->asArray();
+
                 $this->response = $this->responseAsJson($problem)->withStatus(404);
                 return;
             }
@@ -188,23 +196,22 @@ class Controller extends Base
         $logGroups = $this->aiLogMapper->getGroupedLogs(
             $keyword,
             $feature,
-            $userObj ?? null,
+            $user,
             $afterADF,
             $beforeADF,
             $limit,
             ($page - 1) * $limit,
         );
-//
-//        // Find total counts
-//        $count = $this->aiLogMapper->countGroupedLogs(
-//            $keyword,
-//            $feature,
-//            $userObj ?? null,
-//            $afterADF,
-//            $beforeADF,
-//        )[0];
-//
-        $count = 0;
+
+        // Find total counts
+        $count = $this->aiLogMapper->countGroupedLogs(
+            $keyword,
+            $feature,
+            $user,
+            $afterADF,
+            $beforeADF,
+        );
+
         $pageSize = min($limit, self::MAX_PAGE_SIZE);
 
         $paginator = (new Paginator\Paginator())
