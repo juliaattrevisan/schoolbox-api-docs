@@ -415,12 +415,19 @@ class ConfigMapper extends Mapper
     public const NAME_AI_IMAGE_GENERATION = 'ai_image_generation';
 
     // image ai configs
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_KEY = 'openai_image_key';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_RESOURCE_NAME = 'openai_image_azure_resource_name';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_DEPLOYMENT_ID = 'openai_image_azure_deployment_id';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_MODEL = 'openai_image_model';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_SYSTEM_PROMPT = 'openai_image_system_prompt';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
     public const NAME_OPENAI_IMAGE_OUTPUT_QUALITY = 'openai_image_output_quality';
 
 
