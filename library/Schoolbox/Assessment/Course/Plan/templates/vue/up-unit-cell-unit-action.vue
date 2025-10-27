@@ -18,6 +18,16 @@ const props = defineProps<{
 function onDeleteUnit(): void {
     useDeleteUnitsStore().prompt(props.unit);
 }
+
+/**
+ * Navigate to the modify unit page
+ * We use a function here instead of a href as the
+ * 'isNewCourse=1' param may be present when the component is mounted
+ * And we want to ensure it's removed from the URL when navigating
+ */
+function onModifyUnit(): void {
+    window.location.href = getReturnUrl(props.unit._routes.modify!);
+}
 </script>
 
 <template>
@@ -35,7 +45,7 @@ function onDeleteUnit(): void {
                     <a
                         class="icon-modify"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
-                        :href="getReturnUrl(props.unit._routes.modify)"
+                        @click.prevent="onModifyUnit"
                         >Modify</a
                     >
                 </li>
