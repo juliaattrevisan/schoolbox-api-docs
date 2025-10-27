@@ -48,13 +48,6 @@ class Campus implements ValueLabelInterface, IModel, Sequential, ISoftDeletable
      */
     private $timetableDay;
 
-
-    /**
-     * @var string|null
-     */
-    private $cycleIdentifier;
-
-
     /**
      * @param int $id
      * @return self
