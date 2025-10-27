@@ -134,8 +134,8 @@ class Mapper extends BaseMapper
         ?User $user,
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
-        int $limit = 100,
-        int $offset = 0
+        ?int $limit = 100,
+        ?int $offset = 0
     ): GenericCollection
     {
         $pb = $this->getPredicateBuilder();
@@ -184,6 +184,20 @@ class Mapper extends BaseMapper
             );
         }
 
+        /* Optional pieces
+         */
+        $limitSql = '';
+
+        if (null !== $limit) {
+            $limitSql = 'LIMIT :limit';
+        }
+
+        $offsetSql = '';
+
+        if (null !== $offset) {
+            $offsetSql = 'OFFSET :offset';
+        }
+
         /* Don't need to get the openai_log.response column for what we're doing here
          * That column could contain A LOT of text esp. for image streaming
          */
@@ -200,8 +214,8 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
             {$where}
             GROUP BY session_id
-            LIMIT :limit
-            OFFSET :offset
+            {$limitSql}
+            {$offsetSql}
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -212,10 +226,15 @@ class Mapper extends BaseMapper
             $statement->bindValue($name, $value);
         }
 
-        /* ...along with these special ints with special treatment
+        /* ...along with these optional special ints with special treatment
          */
-        $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
+        if (null !== $limit) {
+            $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+        }
+
+        if (null !== $offset) {
+            $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
+        }
 
         $statement->execute();
 
@@ -239,14 +258,15 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Count grouped logs
+     * Find the total quantity of grouped logs that fulfil the filter criteria but without any limits/offsets
      *
      * @param string|null $keyword
      * @param string|null $feature
      * @param User|null $user
      * @param \Alaress_Date_Format|null $start
      * @param \Alaress_Date_Format|null $end
-     * @return array
+     * @return int
+     * @throws Exception
      */
     public function countGroupedLogs(
         ?string $keyword,
@@ -254,38 +274,7 @@ class Mapper extends BaseMapper
         ?User $user,
         ?\Alaress_Date_Format $start,
         ?\Alaress_Date_Format $end,
-    ): array {
-        // base query
-        $query = "Select count(*) from {$this->table} WHERE 1 = 1 ";
-        $where = " group by session_id";
-        $params = [];
-
-        // add filters
-        if ($feature !== null) {
-            $where .= " and feature = :feature ";
-            $params[':feature'] = $feature;
-        }
-        // dates
-        if ($start !== null) {
-            $where .= " and created_at >= :start ";
-            $params[':start'] = $start->getDatabase();
-        }
-        if ($end !== null) {
-            $where .= " and created_at <= :end ";
-            $params[':end'] = $end->getDatabase();
-        }
-        if ($user !== null) {
-            $where .= " and user_id = :user_id ";
-            $params[':user_id'] = $user->getId();
-        }
-        // keyword search
-        if ($keyword !== null) {
-            $where .= " and (prompt like :keyword or response like :keyword) ";
-            $params[':keyword'] = '%' . $keyword . '%';
-        }
-
-        $statement = $this->getDatabase()->prepareQuery($query . $where, $params);
-        $statement->execute();
-        return $statement->fetchAll();
+    ): int {
+        return $this->getGroupedLogs($keyword, $feature, $user, $start, $end, null, null)->count();
     }
 }
