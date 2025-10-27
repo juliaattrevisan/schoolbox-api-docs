@@ -38,6 +38,7 @@ taskd_dir = default["taskd_dir"]
 taskd_sync_type = default["taskd_sync_type"]
 taskd_build_from_local = default["taskd_build_from_local"]
 api_dir = default["api_dir"]
+vm_disk_size = default["vm_disk_size"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -136,9 +137,17 @@ if File.file?('vagrant.yaml')
   if !conf["api_dir"].nil?
     api_dir = conf["api_dir"]
   end
+  if !conf["vm_disk_size"].nil?
+    vm_disk_size = conf["vm_disk_size"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  if !vm_disk_size.nil?
+    config.vm.define "hashicorp" do |h|
+      h.vm.disk :disk, size: vm_disk_size, primary: true
+    end
+  end
 
   if puppet_sync_type != 'none'
     config.trigger.before :provision do |sync|
