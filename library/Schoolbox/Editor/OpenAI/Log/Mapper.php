@@ -113,6 +113,8 @@ class Mapper extends BaseMapper
 
     /**
      * Get grouped logs with offset and limit
+     *
+     * @return GenericCollection
      */
     public function getGroupedLogs(
         ?string $keyword,
@@ -122,59 +124,81 @@ class Mapper extends BaseMapper
         ?\Alaress_Date_Format $end,
         int $limit = 100,
         int $offset = 0
-    ): array {
-        // base query
-        $query = "Select id, session_id, user_id, created_at, feature, return_code from {$this->table} WHERE session_id is not NULL ";
-        $where = "";
-        $order = " group by session_id order by max(created_at) desc limit :limit offset :offset";
-        $params = [
-            ':limit' => $limit,
-            ':offset' => $offset,
-        ];
+    ): GenericCollection
+    {
+        $pb = $this->getPredicateBuilder();
 
-        // add filters
-        if ($feature !== null) {
-            $where .= " and feature = :feature ";
-            $params[':feature'] = $feature;
-        }
-        // dates
-        if ($start !== null) {
-            $where .= " and created_at >= :start ";
-            $params[':start'] = $start->getDatabase();
-        }
-        if ($end !== null) {
-            $where .= " and created_at <= :end ";
-            $params[':end'] = $end->getDatabase();
-        }
-        if ($user !== null) {
-            $where .= " and user_id = :user_id ";
-            $params[':user_id'] = $user->getId();
-        }
-        // keyword search
-        if ($keyword !== null) {
-            $where .= " and (prompt like :keyword or response like :keyword) ";
-            $params[':keyword'] = '%' . $keyword . '%';
+        /* Only search for meaningful keywords
+         */
+        if ('' !== trim((string)$keyword)) {
+            $keywordPb = $this->getPredicateBuilder()
+                ->like('prompt', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%")
+                ->like('response', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%");
+
+            $pb->any($keywordPb);
         }
 
-        $statement = $this->getDatabase()->prepareQuery($query . $where . $order, $params);
-        $statement->execute();
-        // hydrate user and create actual date
-        $data = [];
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $user = null;
-            if ($row['user_id']) {
-                $userMapper = $this->getJoinMapper('user');
-                $user = $userMapper->findById($row['user_id']);
+        /* Only search for a meaningful feature
+         */
+        if ('' !== trim((string)$feature)) {
+            $pb->equals('feature', $feature);
+        }
+
+        /* Only search for a meaningful user
+         */
+        if (null !== $user) {
+            $pb->equals('user_id', $user->getId());
+        }
+
+        /* Only enforce a date range if specified
+         */
+        if (null !== $start) {
+            $pb->greaterThanOrEqualTo('created_at', $start);
+        }
+
+        if (null !== $end) {
+            $pb->lessThanOrEqualTo('created_at', $end);
+        }
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        /* Don't need to get the openai_log.response column for what we're doing here
+         * That column could contain A LOT of text esp. for image streaming
+         */
+        $query = "
+            SELECT 
+                {$this->getTable()}.id AS id, 
+                session_id, 
+                feature,
+                prompt, 
+                return_code, 
+                {$this->getTable()}.created_at,
+                {$this->getJoinColumnString('user', 'u')}
+            FROM {$this->table}
+            INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
+            WHERE {$where}
+            GROUP BY session_id
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
+
+        $stack = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $log = $this->hydrate($row);
+
+            /** @var \Schoolbox\User $user */
+            $user = $this->getJoinMapper('user')->hydrate($row, 'u');
+
+            if ($user) {
+                $log->setUser($user);
             }
-            $data[$row['session_id']] = [
-                'session_id' => $row['session_id'],
-                'user' => $user,
-                'created_at' => new \Alaress_Date_Format($row['created_at'], \Alaress_Date_Format::DATABASE_FORMAT),
-                'feature' => $row['feature'],
-                'return_code' => $row['return_code'],
-            ];
+
+            $stack->add($log);
         }
-        return $data;
+
+        return $stack;
     }
 
 
