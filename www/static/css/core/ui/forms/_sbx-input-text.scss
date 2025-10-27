@@ -39,13 +39,10 @@
     border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
     color: var(--color-text-primary);
-    font-size: max(16px, 1rem);
     font-family: inherit;
     height: 2.25rem;
     line-height: 1;
-    margin: 0; // foundation fix until old _forms.scss is removed
     padding: var(--spacing-s);
-    transition: none; // foundation fix until old _forms.scss is removed
     width: 100%;
     -webkit-font-smoothing: antialiased;
 
@@ -71,6 +68,10 @@
             @include form-input-focus-not-visible;
         }
     }
+}
+
+.input-group input[type="text"] {
+    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
 /* States */
