@@ -34,7 +34,7 @@
 }
 
 /* Base */
-.sbx-input-text[type="text"] {
+.sbx-body input[type="text"] {
     background-color: var(--color-foreground-primary);
     border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
