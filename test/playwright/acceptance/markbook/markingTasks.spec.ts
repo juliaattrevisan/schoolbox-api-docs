@@ -51,7 +51,7 @@ test.describe("Marking tasks sync between markbooks and task status page", () =>
 
             tester.isGoingTo("unmark the task as completed via the task status page");
             await taskStatusPage.clickTaskMarkCell("Post to Forum: Prologue", "Mario Izzo");
-            await taskStatusPage.checkTaskMarkStatus(assessmentId, studentId, "Completed");
+            await taskStatusPage.checkTaskMarkStatus(assessmentId, studentId, "Incomplete");
 
             tester.isGoingTo("navigate to the class markbook and see the task is marked as incomplete");
             await markbookPage.gotoClassMarkbook(classId.toString());
