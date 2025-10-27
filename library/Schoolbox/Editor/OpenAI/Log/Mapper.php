@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Editor\OpenAI\Log;
 
-use Alaress\Database\Predicate\Builder;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -97,13 +96,16 @@ class Mapper extends BaseMapper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             try {
-                $pd = $this->hydrate($row);
+                $log = $this->hydrate($row);
 
-                if ($pd) {
-                    $pd->setUser($userMapper->hydrate($row, 'u'));
+                /** @var \Schoolbox\User $user */
+                $user = $userMapper->hydrate($row, 'u');
+
+                if ($user) {
+                    $log->setUser($user);
                 }
 
-                $collection->add($pd);
+                $collection->add($log);
             } catch (BaseMapper\Exception $e) {
                 // noop, couldn't hydrate for some reason
             }
