@@ -121,7 +121,7 @@ class Reader implements Iterator
      * A stack of expected column names e.g.
      * ['ID', 'Firstname', 'Lastname' ...]
      *
-     * @var array|null
+     * @var array
      */
     private $expectedColumns = [];
 

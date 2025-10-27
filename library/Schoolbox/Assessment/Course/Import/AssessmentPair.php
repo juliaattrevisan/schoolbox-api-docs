@@ -73,7 +73,7 @@ class AssessmentPair
         $this->implementation = $impl;
         $this->assessmentPairs = $subPairs ?: new GenericCollection(AssessmentPair::class);
         foreach ($this->assessmentPairs as $subPair) {
-            $subPair->parentPair = $this;
+            $subPair->setParentPair($this);
         }
     }
 
@@ -85,6 +85,14 @@ class AssessmentPair
     public function getParentPair()
     {
         return $this->parentPair;
+    }
+
+    /**
+     * If this pair is a sub-pair of a Project-pair, return the Project-pair.
+     */
+    public function setParentPair(AssessmentPair $parentPair): void
+    {
+        $this->parentPair = $parentPair;
     }
 
     /**
