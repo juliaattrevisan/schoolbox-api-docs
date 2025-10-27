@@ -303,20 +303,20 @@ class GarbageCollector
         );
         $storageSize          = $storageObject->getSize();
         $storageTransformSize = array_sum($storageTransformSizes);
-        $this->fileSizeTotal  += ($storageSize + $storageTransformSize);
+        $totalSize            = $storageSize + $storageTransformSize;
+        $this->fileSizeTotal  += $totalSize;
+        $sizeSummary          = sprintf(
+            'size: %s, transforms: %s, total: %s',
+            Alaress_Byte_Format::bytesToString($storageSize, renderIec: true),
+            Alaress_Byte_Format::bytesToString($storageTransformSize, renderIec: true),
+            Alaress_Byte_Format::bytesToString($totalSize, renderIec: true),
+        );
         if ($this->perform) {
             $this->mapper->hardDelete($storageObject);
-            $message = "Deleted %s (size: %s, transforms: %s)";
+            $message = "Deleted %s (%s)";
         } else {
-            $message = "Would have deleted %s (size: %s, transforms: %s)";
+            $message = "Would have deleted %s (%s)";
         }
-        $this->log->info(
-            sprintf(
-                $message,
-                $hash,
-                Alaress_Byte_Format::bytesToString($storageSize, renderIec: true),
-                Alaress_Byte_Format::bytesToString($storageTransformSize, renderIec: true),
-            )
-        );
+        $this->log->info(sprintf($message, $hash, $sizeSummary));
     }
 }
