@@ -229,7 +229,10 @@ class Controller extends Base
         $sessions = [];
 
         foreach ($logGroups as $logGroup) {
-            /* Make an array representation of each $log instance
+            /* Make an array representation of each $logGroup instance
+             *
+             * Note that a $logGroup is actually the same semantics as an individual $log, it's just that
+             * it's one row that represents multiple
              */
             $translated = $this->sessionTranslator->__invoke($logGroup);
 
