@@ -19,6 +19,7 @@ export type Header = {
     title: string;
     width: number;
     isFixed: boolean;
+    isSortable: boolean;
 };
 
 /**

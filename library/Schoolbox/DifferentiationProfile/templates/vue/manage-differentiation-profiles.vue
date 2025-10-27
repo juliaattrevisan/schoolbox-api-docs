@@ -14,14 +14,21 @@ const props = defineProps<{
 }>();
 
 const header = window.Vue.ref<Header[]>([
-    { id: 0, title: "Student", width: 300, isFixed: true },
+    { id: 0, title: "Student", width: 300, isFixed: true, isSortable: true },
     ...props.header.map((h) => ({
         id: h.id,
         title: h.terminology,
         width: 400,
         isFixed: false,
+        isSortable: false,
     })),
-    { id: Math.max(0, ...props.header.map((h) => h.id)) + 1, title: "Last updated", width: 200, isFixed: false },
+    {
+        id: Math.max(0, ...props.header.map((h) => h.id)) + 1,
+        title: "Last updated",
+        width: 200,
+        isFixed: false,
+        isSortable: true,
+    },
 ]);
 </script>
 
