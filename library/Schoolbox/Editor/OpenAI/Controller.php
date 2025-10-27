@@ -260,9 +260,7 @@ class Controller extends Base
             );
             $agent = new ImageGeneration(
                 $this->clientFactory->buildForFeature(Helper::FEATURE_IMAGE),
-                $imageGenerationConfig[Config::FIELD_MODEL]['value'] ?? '',
-                $imageGenerationConfig[Config::FIELD_OUTPUT_QUALITY]['value'] ?? Config::OUTPUT_QUALITY_DEFAULT,
-                $imageGenerationConfig[Config::FIELD_SYSTEM_PROMPT]['value'] ?? '',
+                $imageGenerationConfig,
             );
             try {
                 // Size and style need to be converted
