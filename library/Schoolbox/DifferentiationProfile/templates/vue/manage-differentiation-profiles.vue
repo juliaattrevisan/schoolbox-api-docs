@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const header = window.Vue.ref<Header[]>([
-    { id: 0, title: "Student", width: 250, isFixed: true, isSortable: true, key: "user", type: HeaderType.USER },
+    { id: 0, title: "Student", width: 250, isFixed: true, isSortable: true, key: "student", type: HeaderType.USER },
     ...props.header.map((h) => ({
         id: h.id,
         key: h.name,
@@ -28,7 +28,7 @@ const header = window.Vue.ref<Header[]>([
     })),
     {
         id: Math.max(0, ...props.header.map((h) => h.id)) + 1,
-        key: "last_updated",
+        key: "updated_at",
         type: HeaderType.DATE,
         title: "Last updated",
         width: 200,
