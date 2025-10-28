@@ -185,6 +185,7 @@ class Controller extends Base
             'header'               => $adminConfigs->map(
                 fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
             ),
+            'filterPanel' => $filterPanel,
         ];
         $this->response = $this->responseAsJson([
             'data' => $payload,
