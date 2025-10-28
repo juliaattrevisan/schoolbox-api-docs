@@ -50,7 +50,7 @@ class Button
         $button = [
             'label' => null,
             'responseId' => null,
-            'state' => null,
+            'enabled' => true,
             'url' => null,  // hurmmm needs a Router, but do we want that here...
         ];
 
