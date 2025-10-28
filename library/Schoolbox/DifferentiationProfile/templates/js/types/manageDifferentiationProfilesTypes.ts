@@ -5,6 +5,8 @@ import type { User } from "@schoolboxLibrary/types/User";
  */
 export type MDPHeader = {
     id: number;
+    key: string;
+    type: string;
     name: string;
     module: string;
     title: string;
@@ -14,8 +16,24 @@ export type MDPHeader = {
     sequence: number;
 };
 
+/**
+ * Defines the type of  headers used,
+ * which defines what will be displayed in each column.
+ */
+export enum HeaderType {
+    USER = "User",
+    ADJUSTMENT = "Adjustment",
+    TEXT = "Text",
+    DATE = "Date",
+}
+
+/**
+ * To define the structure of each column
+ */
 export type Header = {
     id: number;
+    key: string;
+    type: HeaderType;
     title: string;
     width: number;
     isFixed: boolean;
