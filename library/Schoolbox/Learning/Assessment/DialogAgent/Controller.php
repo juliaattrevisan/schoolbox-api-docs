@@ -69,7 +69,7 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param DialogAgentDataModelMapper $dialogAgentMapper
+     * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
