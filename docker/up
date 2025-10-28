@@ -33,6 +33,7 @@ declare SECOND_INSTANCE_ENABLE
 
 declare private_container_registry
 declare base_php_image
+declare base_branch
 declare docker_compose_args
 
 function verify_executables() {
@@ -147,10 +148,24 @@ function login_to_container_registry() {
     # Also determine base image
     case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
+            base_branch="master"
             base_php_image="php-frankenphp"
             ;;
         *)
-            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
+            # Determine base image tag from current branch:
+            # assume master if nothing better known.
+            # Possibly, if the current branch is very old then the current
+            # master-tagged image won't work: in that case, must use
+            # BASE_PHP_IMAGE_BUILD_FROM_LOCAL=1.
+
+            # Anyway, what's the branch name?
+            branch_name=$(git rev-parse --abbrev-ref HEAD 2> /dev/null) || exit
+            base_branch="master"
+            if [[ $branch_name =~ develop ]]; then
+                base_branch="develop"
+            fi
+
+            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
             ;;
     esac
 }
@@ -173,6 +188,7 @@ function build_docker_compose_env() {
     USER_ID=\"${SUDO_UID:-$(id -u)}\"
     GROUP_ID=\"${SUDO_GID:-$(id -g)}\"
     BASE_PHP_IMAGE=\"${base_php_image}\"
+    BASE_BRANCH=\"${base_branch}\"
     LTI_DEVKIT_PUBLISHED_PORT=\"${LTI_DEVKIT_PUBLISHED_PORT}\"
     MAILCATCHER_UI_PUBLISHED_PORT=\"${MAILCATCHER_UI_PUBLISHED_PORT}\"
     ${aws_credentials}" | sed -e 's/^[ \t]*//' > .docker-compose.env
