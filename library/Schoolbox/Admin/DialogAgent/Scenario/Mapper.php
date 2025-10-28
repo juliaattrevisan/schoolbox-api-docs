@@ -113,17 +113,23 @@ class Mapper extends \Schoolbox\Mapper
         $scenarios = [];
 
         foreach ($statement as $row) {
-            /** @var Model $scenario */
-            $scenario = $this->hydrate($row);
-
             /* Initialise pieces for this scenario we've never seen
              */
             if (!isset($scenarios[$row['id']])) {
+                /** @var Model $scenario */
+                $scenario = $this->hydrate($row);
+
                 $scenario->setFields($scenarioFieldMapper->createCollection())
                     ->setCriteria($scenarioCriteriaMapper->createCollection());
 
+                /* Add it to the pile
+                 */
                 $scenarios[$row['id']] = $scenario;
             }
+
+            /* Reuse the scenario we already initialised at some point
+             */
+            $scenario = $scenarios[$row['id']];
 
             /* Stack up all the adjoining fields
              */
