@@ -150,7 +150,7 @@ $alert-transition-ease: ease-out;
     CUSTOM OVERRIDES
 -------------------------------------------------------------------------------------*/
 
-$alert-tint-amount: 90%;
+$alert-tint-amount: 85%;
 
 // DONE use CSS darken
 $alert-default-background: css-darken($body-bg, 10%);
@@ -184,13 +184,25 @@ $alert-default-background: css-darken($body-bg, 10%);
         background-color: $success-color;
         color: $white;
     }
+    &.success-tint {
+        background-color: tint($success-color, $alert-tint-amount);
+        color: $success-color;
+    }
     &.warning {
         background-color: $warning-color;
         color: $white;
     }
+    &.warning-tint {
+        background-color: tint($warning-color, $alert-tint-amount);
+        color: $warning-color;
+    }
     &.alert {
         background-color: $alert-color;
         color: $white;
+    }
+    &.alert-tint {
+        background-color: tint($alert-color, $alert-tint-amount);
+        color: $alert-color;
     }
 }
 
