@@ -25,44 +25,44 @@
     {# This wrapper exists solely to get around a bug in Mage where the form can't be used as the submittable. #}
     <div data-mage-wrapper>
         <div class="small-6 columns">
-            <label>
+            <label for="term-title">
                 Title
-                <input type="text"
-                       name="title"
-                       value="{{ term.title ?? '' }}"
-                       required
-                       maxlength="100" />
             </label>
+            <input id="term-title" type="text"
+                   name="title"
+                   value="{{ term.title ?? '' }}"
+                   required
+                   maxlength="100" />
         </div>
         <div class="small-6 columns">
-            <label>
+            <label for="term-code">
                 Code
-                <input type="text"
-                       name="code"
-                       value="{{ term.code ?? '' }}"
-                       required
-                       maxlength="16" />
             </label>
+            <input id="term-code" type="text"
+                   name="code"
+                   value="{{ term.code ?? '' }}"
+                   required
+                   maxlength="16" />
         </div>
         <div class="small-6 columns">
-            <label>
+            <label for="term-start">
                 Start
-                <input type="text"
-                       name="start"
-                       value="{{ term.start.localShort ?? '' }}"
-                       required
-                       data-datepicker />
             </label>
+            <input id="term-start" type="text"
+                   name="start"
+                   value="{{ term.start.localShort ?? '' }}"
+                   required
+                   data-datepicker />
         </div>
         <div class="small-6 columns">
-            <label>
+            <label for="term-finish">
                 Finish
-                <input type="text"
-                       name="finish"
-                       value="{{ term.displayFinish.localShort ?? '' }}"
-                       required
-                       data-datepicker />
             </label>
+            <input id="term-finish" type="text"
+                   name="finish"
+                   value="{{ term.displayFinish.localShort ?? '' }}"
+                   required
+                   data-datepicker />
         </div>
 
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>

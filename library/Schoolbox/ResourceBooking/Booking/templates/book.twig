@@ -391,10 +391,10 @@ $(function() {
                 <fieldset class="content">
                     <legend>Overview</legend>
                     <div class="small-12 columns">
-                        <label>
+                        <label for="booking-name">
                             Purpose
-                            <input name="name" type="text" value="{{ item.name }}" />
                         </label>
+                        <input id="booking-name" name="name" type="text" value="{{ item.name }}" />
                     </div>
                     <div class="small-6 columns">
                         <label for="startDate" class="required">
