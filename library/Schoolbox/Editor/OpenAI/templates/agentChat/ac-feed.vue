@@ -17,7 +17,7 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 </script>
 
 <template>
-    <div v-if="reversedFeed.length > 0" class="l-pad-s ac-feed">
+    <div class="l-pad-s ac-feed">
         <template v-for="(message, index) in reversedFeed" :key="message.entryKey">
             <br v-if="index > 0" />
 

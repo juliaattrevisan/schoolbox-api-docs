@@ -46,7 +46,13 @@ window.Vue.onMounted(() => {
             and framing. See more information on these on
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
-        <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 35vh" allow-selection />
+        <ac-feed
+            v-if="acStore.feed.length > 0"
+            :feed="acStore.fullFeed"
+            class="l-mar-m--bottom"
+            style="max-height: 35vh"
+            allow-selection
+        />
         <!-- file context is only available for the first message for now -->
         <ac-prompt
             prompt-placeholder="Describe or refine the image you want to generate"
