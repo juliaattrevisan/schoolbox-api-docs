@@ -21,6 +21,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
@@ -70,7 +71,8 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper ,
+     * @param DialogAgentDataModelMapper $dialogAgentMapper
+     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
@@ -94,6 +96,7 @@ class Controller extends Assessment\Controller
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
@@ -277,6 +280,23 @@ class Controller extends Assessment\Controller
             // noop
         }
 
+        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
+         * button which goes to that particular response so students can continue it.
+         *
+         * Otherwise create a new response.
+         */
+        $existingResponse = null;
+
+        if ($participant) {
+            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+                ->equals('learner_id', $participant->getUser()->getId())
+                ->isNull('submitted_by')
+                ->isNull('submitted_at');
+
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb);
+        }
+
         /* The total time spent in this learning activity must not exceed the total allowed duration,
          * if set; not sure how we're gonna calculate that atm
          *
@@ -294,6 +314,9 @@ class Controller extends Assessment\Controller
             'courseAssessments' => $courseAssessments,
             'participant'       => $participant,
             'canRespond'        => $canRespond,
+            /* An unsubmitted response that can be resumed
+             */
+            'existingResponse' => $existingResponse,
             /* The full history of interactions for this dialog agent
              * Note that we won't have feedbacks in this
              */

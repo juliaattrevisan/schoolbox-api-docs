@@ -674,22 +674,23 @@ class Module extends BaseModule
     public function buildControllerForClass(string $className): Base
     {
         // Common dependencies across the controllers this module _may_ create.
-        $userMapper                = $this->getMapperFactory()->get(UserMapper::class);
-        $errorMapper               = $this->getMapperFactory()->get(ErrorMapper::class);
-        $workTypeMapper            = $this->getMapperFactory()->get(WorkTypeMapper::class);
-        $courseSpecMapper          = $this->getMapperFactory()->get(CourseSpecificationMapper::class);
-        $unitSpecMapper            = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
-        $folderMapper              = $this->getMapperFactory()->get(FolderMapper::class);
-        $termMapper                = $this->getMapperFactory()->get(Term\Mapper::class);
-        $viewLatestMapper          = $this->getMapperFactory()->get(LatestViewMapper::class);
-        $stateMapper               = $this->getMapperFactory()->get(StateMapper::class);
-        $projectResultCacheMapper  = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
-        $lessonPlanTemplateMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
-        $lessonPlanDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
-        $dialogAgentScenarioMapper = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
-        $linkedAssessmentsMapper   = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
+        $userMapper                 = $this->getMapperFactory()->get(UserMapper::class);
+        $errorMapper                = $this->getMapperFactory()->get(ErrorMapper::class);
+        $workTypeMapper             = $this->getMapperFactory()->get(WorkTypeMapper::class);
+        $courseSpecMapper           = $this->getMapperFactory()->get(CourseSpecificationMapper::class);
+        $unitSpecMapper             = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        $folderMapper               = $this->getMapperFactory()->get(FolderMapper::class);
+        $termMapper                 = $this->getMapperFactory()->get(Term\Mapper::class);
+        $viewLatestMapper           = $this->getMapperFactory()->get(LatestViewMapper::class);
+        $stateMapper                = $this->getMapperFactory()->get(StateMapper::class);
+        $projectResultCacheMapper   = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
+        $lessonPlanTemplateMapper   = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
+        $lessonPlanDataModelMapper  = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
+        $dialogAgentDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class);
+        $dialogAgentScenarioMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
+        $linkedAssessmentsMapper    = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
-        $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
+        $unitImplementationMapper   = $this->getMapperFactory()->get(UnitImplementationMapper::class);
 
         // used for the course level status page (and filtering from the markbook)
         $filtersAssessmentIdFinder  = $this->injector->get('filters.assessmentIdFinder');
@@ -993,6 +994,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentDataModelMapper,
                     $dialogAgentScenarioMapper,
                     $this->injector->get('dialogAgentResponseDataSource'),
                     $courseImplementationMapper,
