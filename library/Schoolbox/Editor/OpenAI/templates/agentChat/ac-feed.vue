@@ -34,6 +34,7 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 
     display: flex;
     flex-direction: column-reverse;
+    justify-content: flex-end;
     /* To prevent the list from scrolling if you click an input */
     position: relative;
 }

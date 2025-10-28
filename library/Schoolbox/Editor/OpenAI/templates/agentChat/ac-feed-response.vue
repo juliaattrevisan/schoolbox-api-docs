@@ -46,7 +46,7 @@ const imageSrc = window.Vue.computed(() => {
         </div>
     </div>
 
-    <div v-else class="ac-feed-response ac-feed-response-success radiolist">
+    <div v-else class="ac-feed-response ac-feed-response-success" :class="{ radiolist: props.allowSelection }">
         <template v-if="props.allowSelection">
             <input
                 :id="radioId"
