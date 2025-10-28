@@ -50,6 +50,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Ramsey\Uuid\Uuid;
 use Twig\Error\Error;
 
 /**
@@ -385,7 +386,8 @@ class Controller extends Assessment\Controller
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        /** @var null|Participant $participant */
+        /** @var Model $assessment */
+
         $participant = $assessment->getParticipantIfExtant($student);
 
         // Is the page being displayed in readonly mode?
@@ -421,9 +423,18 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment' => $assessment,
+            // TODO: This should probably be a ModelToArray
+            'activity' => [
+                'id' => $assessment->getId(),
+                'openingMessage' => $assessment->getOpeningMessage(),
+            ],
             'student' => $student,
             'participant' => $participant,
-            'existingResponse' => $existingResponse,
+            // TODO: This should probably be a ModelToArray
+            'response' => [
+                'aiSessionId' => $existingResponse?->getSessionId() ?? (string)Uuid::uuid4(),
+                'assistanceRequestedAt' => $existingResponse?->getAssistanceRequestedAt() ?? null,
+            ],
             'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
@@ -488,6 +499,8 @@ class Controller extends Assessment\Controller
         } else {
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
+
+        // TODO: update these accordingly to match the above, or remove getResumeResponse entirely
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [

@@ -8,7 +8,7 @@
  # @param \Schoolbox\User $student        The student who will be creating the response
  # @param Participant $participant        A participant instance for $student, if extant
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
- # @param ?IResponse $existingResponse    A pre-existing response that we're potentially resuming
+ # @param array $response                 Info about the response that we are creating/resuming
  # @param string $errorMessage            A system flash message that at some point, can spawn (can't remember when)
  # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
  # @param string $returnUrl               A redirect destination
@@ -21,7 +21,11 @@
     <div class="small-12 island" style="max-width: 64em"> {# $medium-breakpoint: 64em #}
         <section class="content">
             <div id="dialog-agent-chat-container" data-test="dialog-agent-chat-container">
-                <dialog-agent-chat />
+                <dialog-agent-chat
+                    {# TODO: generate-route="" #}
+                    :activity="{{ activity |json_encode }}"
+                    :response="{{ response |json_encode }}"
+                />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentChat.js?v={{ config.site_version }}"></script>
         </section>
