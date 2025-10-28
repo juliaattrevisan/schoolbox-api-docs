@@ -48,6 +48,8 @@ class ModelToArray
             'goals' => 'getGoals',
         ];
 
+        /* filtering out and only get the enabled config values
+         */
         $config = $this->profileConfig->reduce(function (array $carry, Config $config) use ($model, $configKey) {
             if (array_key_exists($config->getName(), $configKey)) {
                 $carry[$config->getName()] = $model->{$configKey[$config->getName()]}();

@@ -177,6 +177,194 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'deleted_at'             => '01/03/2024',
                 ],
             ],
+            'Partial Config - Only Adjustment Fields' => [
+                // Test case 4: Only adjustment_category and adjustment_level enabled
+                new Model()
+                    ->setId(3)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Category B')
+                    ->setAdjustmentLevel('Level 2')
+                    ->setOverview('This overview should not appear.')
+                    ->setInterestsStrengths('These interests should not appear.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category'),
+                    new ProfileConfig()->setName('adjustment_level'),
+                ]),
+                [
+                    'id'                     => 3,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => 'Category B',
+                    'adjustment_level'       => 'Level 2',
+                    'created_at'             => '01/02/2024',
+                    'updated_at'             => null,
+                    'deleted_at'             => null,
+                ],
+            ],
+            'Partial Config - Overview and Goals Only' => [
+                // Test case 5: Only overview and goals fields enabled
+                new Model()
+                    ->setId(4)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Category C')
+                    ->setAdjustmentLevel('Level 3')
+                    ->setOverview('Visible overview.')
+                    ->setGoals('Visible goals.')
+                    ->setInterestsStrengths('Hidden interests.')
+                    ->setNeedsChallenges('Hidden needs.')
+                    ->setStrategiesAdjustments('Hidden strategies.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-15 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-20 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('overview'),
+                    new ProfileConfig()->setName('goals'),
+                ]),
+                [
+                    'id'                     => 4,
+                    'student'                => $userResponse,
+                    'overview'               => 'Visible overview.',
+                    'goals'                  => 'Visible goals.',
+                    'created_at'             => '15/03/2024',
+                    'updated_at'             => '20/03/2024',
+                    'deleted_at'             => null,
+                ],
+            ],
+            'Partial Config - No Text Fields' => [
+                // Test case 6: No text fields enabled (only adjustment fields)
+                new Model()
+                    ->setId(5)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Category D')
+                    ->setAdjustmentLevel('Level 4')
+                    ->setOverview('This should not be visible.')
+                    ->setInterestsStrengths('This should not be visible.')
+                    ->setNeedsChallenges('This should not be visible.')
+                    ->setStrategiesAdjustments('This should not be visible.')
+                    ->setGoals('This should not be visible.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-04-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category'),
+                    new ProfileConfig()->setName('adjustment_level'),
+                ]),
+                [
+                    'id'                     => 5,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => 'Category D',
+                    'adjustment_level'       => 'Level 4',
+                    'created_at'             => '01/04/2024',
+                    'updated_at'             => null,
+                    'deleted_at'             => null,
+                ],
+            ],
+            'Empty Config Collection' => [
+                // Test case 7: No fields enabled at all
+                new Model()
+                    ->setId(6)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Category E')
+                    ->setAdjustmentLevel('Level 5')
+                    ->setOverview('Nothing should be visible.')
+                    ->setInterestsStrengths('Nothing should be visible.')
+                    ->setNeedsChallenges('Nothing should be visible.')
+                    ->setStrategiesAdjustments('Nothing should be visible.')
+                    ->setGoals('Nothing should be visible.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, []),
+                [
+                    'id'                     => 6,
+                    'student'                => $userResponse,
+                    'created_at'             => '01/05/2024',
+                    'updated_at'             => null,
+                    'deleted_at'             => null,
+                ],
+            ],
+            'Partial Config - Three Middle Fields' => [
+                // Test case 8: interests_strengths, needs_challenges, and strategies_adjustments enabled
+                new Model()
+                    ->setId(7)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Hidden Category')
+                    ->setAdjustmentLevel('Hidden Level')
+                    ->setOverview('Hidden overview.')
+                    ->setInterestsStrengths('Visible interests and strengths.')
+                    ->setNeedsChallenges('Visible needs and challenges.')
+                    ->setStrategiesAdjustments('Visible strategies and adjustments.')
+                    ->setGoals('Hidden goals.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-06-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-06-15 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('interests_strengths'),
+                    new ProfileConfig()->setName('needs_challenges'),
+                    new ProfileConfig()->setName('strategies_adjustments'),
+                ]),
+                [
+                    'id'                     => 7,
+                    'student'                => $userResponse,
+                    'interests_strengths'    => 'Visible interests and strengths.',
+                    'needs_challenges'       => 'Visible needs and challenges.',
+                    'strategies_adjustments' => 'Visible strategies and adjustments.',
+                    'created_at'             => '01/06/2024',
+                    'updated_at'             => '15/06/2024',
+                    'deleted_at'             => null,
+                ],
+            ],
+            'Partial Config - Single Field Enabled' => [
+                // Test case 9: Only one field (overview) enabled
+                new Model()
+                    ->setId(8)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Hidden Category')
+                    ->setAdjustmentLevel('Hidden Level')
+                    ->setOverview('Only this overview is visible.')
+                    ->setInterestsStrengths('Hidden.')
+                    ->setNeedsChallenges('Hidden.')
+                    ->setStrategiesAdjustments('Hidden.')
+                    ->setGoals('Hidden.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('overview'),
+                ]),
+                [
+                    'id'                     => 8,
+                    'student'                => $userResponse,
+                    'overview'               => 'Only this overview is visible.',
+                    'created_at'             => '01/07/2024',
+                    'updated_at'             => null,
+                    'deleted_at'             => null,
+                ],
+            ],
+            'Partial Config - Alternating Fields' => [
+                // Test case 10: Alternating fields enabled (category, overview, needs, goals)
+                new Model()
+                    ->setId(9)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory('Visible Category')
+                    ->setAdjustmentLevel('Hidden Level')
+                    ->setOverview('Visible overview.')
+                    ->setInterestsStrengths('Hidden interests.')
+                    ->setNeedsChallenges('Visible needs.')
+                    ->setStrategiesAdjustments('Hidden strategies.')
+                    ->setGoals('Visible goals.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-08-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-08-10 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category'),
+                    new ProfileConfig()->setName('overview'),
+                    new ProfileConfig()->setName('needs_challenges'),
+                    new ProfileConfig()->setName('goals'),
+                ]),
+                [
+                    'id'                     => 9,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => 'Visible Category',
+                    'overview'               => 'Visible overview.',
+                    'needs_challenges'       => 'Visible needs.',
+                    'goals'                  => 'Visible goals.',
+                    'created_at'             => '01/08/2024',
+                    'updated_at'             => '10/08/2024',
+                    'deleted_at'             => null,
+                ],
+            ],
         ];
     }
 }
