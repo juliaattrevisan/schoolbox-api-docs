@@ -416,6 +416,8 @@ class Controller extends Assessment\Controller
 
         // TODO: i'll likely need this to create a blank response here if one doesn't exist already but TBC in the chat ticket
 
+        $userTranslator = new User\Translator\Author\ModelToArray();
+
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
@@ -428,7 +430,7 @@ class Controller extends Assessment\Controller
                 'id' => $assessment->getId(),
                 'openingMessage' => $assessment->getOpeningMessage(),
             ],
-            'student' => $student,
+            'student' => $userTranslator->__invoke($student),
             'participant' => $participant,
             // TODO: This should probably be a ModelToArray
             'response' => [

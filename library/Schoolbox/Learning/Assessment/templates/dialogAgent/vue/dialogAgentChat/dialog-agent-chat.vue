@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
@@ -22,12 +23,18 @@ interface Props {
     generateRoute: string;
     activity: DialogAgentActivity;
     response: DialogAgentResponse;
+    student: UserAuthor;
 }
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
 const currentResponse = window.Vue.ref<DialogAgentResponse>(props.response);
+
+/** If the current user isn't the student, they're the instructor I guess */
+const isInstructor = window.Vue.computed(() => {
+    return props.student.id !== window.schoolboxUser.id;
+});
 
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
@@ -93,31 +100,33 @@ window.Vue.onMounted(() => {
         file: null,
     });
 
-    acStore.feed.push({
-        type: "alert",
-        side: "response",
-        severity: "warning",
-        entryKey: acStore.getNextEntryKey(),
-        message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
-    });
+    if (isInstructor.value) {
+        acStore.feed.push({
+            type: "alert",
+            side: "response",
+            severity: "warning",
+            entryKey: acStore.getNextEntryKey(),
+            message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
+        });
 
-    const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
-    acStore.feed.push({
-        type: "alert",
-        side: "request",
-        severity: "warning-tint",
-        entryKey: acStore.getNextEntryKey(),
-        message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-    });
+        const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
+        acStore.feed.push({
+            type: "alert",
+            side: "request",
+            severity: "warning-tint",
+            entryKey: acStore.getNextEntryKey(),
+            message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
+        });
 
-    const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-    acStore.feed.push({
-        type: "alert",
-        side: "request",
-        severity: "highlight",
-        entryKey: acStore.getNextEntryKey(),
-        message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
-    });
+        const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
+        acStore.feed.push({
+            type: "alert",
+            side: "request",
+            severity: "highlight",
+            entryKey: acStore.getNextEntryKey(),
+            message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
+        });
+    }
 });
 
 /**
@@ -129,22 +138,27 @@ function changeHelpRequest(helpRequested: boolean): void {
     if (helpRequested) {
         currentResponse.value.assistanceRequestedAt = window.dayjs().format(window.dateDisplayFormats.dayjsDateLong);
 
-        acStore.feed.push({
-            type: "alert",
-            side: "request",
-            severity: "warning-tint",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-        });
+        if (isInstructor.value) {
+            acStore.feed.push({
+                type: "alert",
+                side: "request",
+                severity: "warning-tint",
+                entryKey: acStore.getNextEntryKey(),
+                message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
+            });
+        }
     } else {
         currentResponse.value.assistanceRequestedAt = null;
-        acStore.feed.push({
-            type: "alert",
-            side: "request",
-            severity: "highlight",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,
-        });
+
+        if (isInstructor.value) {
+            acStore.feed.push({
+                type: "alert",
+                side: "request",
+                severity: "highlight",
+                entryKey: acStore.getNextEntryKey(),
+                message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,
+            });
+        }
     }
 
     // TODO
@@ -155,7 +169,7 @@ function changeHelpRequest(helpRequested: boolean): void {
     <div class="actions-small-1 l-mar-s--bottom">
         <!-- TODO: Implement Request Teacher Help -->
         <button
-            v-if="currentResponse.assistanceRequestedAt === null"
+            v-if="!isInstructor && currentResponse.assistanceRequestedAt === null"
             class="button"
             type="button"
             @click="changeHelpRequest(true)"
@@ -170,7 +184,7 @@ function changeHelpRequest(helpRequested: boolean): void {
     <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 50vh; height: 100%">
         <template #header>
             <div
-                v-if="currentResponse.assistanceRequestedAt !== null"
+                v-if="isInstructor && currentResponse.assistanceRequestedAt !== null"
                 class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
@@ -187,7 +201,7 @@ function changeHelpRequest(helpRequested: boolean): void {
         </template>
     </ac-feed>
     <ac-prompt
-        prompt-placeholder="Type response here"
+        prompt-placeholder="Type a response here..."
         :prompt-attributes="[]"
         :ai-session-id="currentResponse.aiSessionId"
     />
