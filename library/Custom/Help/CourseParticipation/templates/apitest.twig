@@ -38,7 +38,7 @@
 
                         {% for field in fields %}
                             <label for="{{ field_id }}">{{ field | capitalize }}</label>
-                            <input type="text" name="user[0][{{ field }}]" value="" />
+                            <input id="{{ field_id }}" type="text" name="user[0][{{ field }}]" value="" />
                         {% endfor %}
                     </div>
                 </fieldset>
