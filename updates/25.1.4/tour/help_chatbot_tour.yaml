@@ -6,7 +6,7 @@ tour:
     - student
     - parent
   trigger:
-    urlRegex: '^/$' # Match the root URL only.
+    urlRegex: '^/\$' # Match the root URL only.
     selector: body
     event: tourReady
   steps:
