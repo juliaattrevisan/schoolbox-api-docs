@@ -10,6 +10,7 @@
  # @param string $returnUrlEncoded        An encoded redirect destination so you can go back there
  # @param array $courseAssessments        A struct containing a set of assessments grouped by their units
  # @param bool $isInstructor              Whether the currently logged in guy is an instructor
+ # @param IResponse $existingResponse     A response that can be resumed
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -55,20 +56,33 @@
  #    - not yet reached the due/close datetime (they should be the same for this activity)
  #    - total time spent creating responses has not yet reached the Allowed Duration
  #}
-{% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
-    assessmentId: assessment.id,
-    assessment: assessment,
-    studentId: student.id,
-    student: student
-}) %}
+{% if existingResponse %}
+    {% set action = 'Resume' %}
 
-{% if submitRoute %}
+    {% set actionRoute = routeLookupIfAuthorized('learningAssessment.getResumeResponse', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+        studentId: student.id,
+        student: student
+    }) %}
+{% else %}
+    {% set action = 'Start' %}
+
+    {% set actionRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+        studentId: student.id,
+        student: student
+    }) %}
+{% endif %}
+
+{% if actionRoute %}
     <div class="row">
         <div class="small-12 columns">
             <a class="submit button"
-               href="{{ submitRoute }}{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}"
+               href="{{ actionRoute }}{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}"
                data-test="assessment-summary-create-button"
-            >Start {{ locale.dialogAgent }}</a>
+            >{{ action }} {{ locale.dialogAgent }}</a>
         </div>
     </div>
 {% endif %}

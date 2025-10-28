@@ -351,26 +351,21 @@ class Controller extends Assessment\Controller
         /** @var null|Participant $participant */
         $participant = $assessment->getParticipantIfExtant($student);
 
-        /* Find all the records spawned by $participant
+        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
+         * button which goes to that particular response so students can continue it.
          *
-         * Order them by submitted time to find the most recent, and use that
+         * Otherwise create a new response.
          */
-        $allResponses = $participant ? $participant->getAllResponses() : new GenericCollection(IResponse::class);
+        $existingResponse = null;
 
-        /* TODO If there's a response that has yet to be submitted officially,
-         *  presume that to be "a draft" and resume it upon next click. Maybe.
-         */
-        $latestResponse = null;
+        if ($participant) {
+            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+                ->equals('learner_id', $participant->getUser()->getId())
+                ->isNull('submitted_by')
+                ->isNull('submitted_at');
 
-        if ($allResponses->count()) {
-            foreach ($allResponses as $response) {
-                /* TODO Find the first non-submitted response and...probably resume that? Maybe?
-                 */
-                if (!$response->isSubmitted()) {
-                    $latestResponse = $response;
-                    break;
-                }
-            }
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb);
         }
 
         // Is the page being displayed in readonly mode?
@@ -399,7 +394,74 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'student' => $student,
             'participant' => $participant,
-            'response' => $latestResponse,
+            'existingResponse' => $existingResponse,
+            'errorMessage' => $errorMessage,
+            'readonly' => $isInteractionLocked,
+            'returnUrl' => $returnUrl,
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/response/create.twig',
+            $data
+        );
+    }
+
+
+    /**
+     * Resume an unsubmitted response
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
+     */
+    public function getResumeResponse(IAssessable $assessment, User $student): void
+    {
+        /** @var null|Participant $participant */
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
+         * button which goes to that particular response so students can continue it.
+         *
+         * Otherwise create a new response.
+         */
+        $existingResponse = null;
+
+        if ($participant) {
+            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+                ->equals('learner_id', $participant->getUser()->getId())
+                ->isNull('submitted_by')
+                ->isNull('submitted_at');
+
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb);
+        }
+
+        // Is the page being displayed in readonly mode?
+        /* TODO Are students allowed to visit this after the activity is closed?
+         */
+        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+
+        // For some reason I can't use get/setFlash?
+        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
+        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
+
+        /* Prepare a redirection url
+         */
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+        $data = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    sprintf('Create response for %s', $assessment->getTitle()),
+                ]
+            ),
+            'assessment' => $assessment,
+            'student' => $student,
+            'participant' => $participant,
+            'existingResponse' => $existingResponse,
             'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,

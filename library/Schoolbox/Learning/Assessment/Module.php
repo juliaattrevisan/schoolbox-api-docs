@@ -316,6 +316,9 @@ class Module extends BaseModule
         $this->register('POST', "{$assRoute}/activities/{linkId:\d+}", 'postActivity', $canModify, $preloadLessonPlanAPI);
         $this->register('DELETE', "{$assRoute}/activities/{linkId:\d+}", 'deleteActivity', $canModify, $preloadLessonPlanAPI);
 
+        /* Dialog Agent: resume a response
+         */
+        $this->register('GET', "{$assRoute}/{$studentParam}/resume", 'getResumeResponse', $canSubmit, $preloadParticipant);
 
         // LTI assessment related routes
         // TODO extract to a different module:

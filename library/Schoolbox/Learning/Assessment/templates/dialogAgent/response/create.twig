@@ -8,8 +8,8 @@
  # @param \Schoolbox\User $student        The student who will be creating the response
  # @param Participant $participant        A participant instance for $student, if extant
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
- # @param IResponse $latestResponse       A pre-existing response that we're potentially resuming
- # @param string $errorMessage            A system flash message that at some point, can spawn (can't remember when)
+ # @param IResponse $existingResponse     A pre-existing response that we're potentially resuming
+ # @param string $errorMessage            A system flash message that at some point, can spawn (can't rememberw hen)
  # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
  # @param string $returnUrl               A redirect destination
  #}
@@ -19,7 +19,13 @@
 <div class="row">
     <div class="small-12 island">
         <section class="content">
-            Do the chatbot thing here
+            Do the chatbot thing here:
+
+            {% if existingResponse %}
+                resume it!
+            {% else %}
+                start it!
+            {% endif %}
         </section>
     </div>
 </div>
