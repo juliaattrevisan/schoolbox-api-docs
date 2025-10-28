@@ -162,7 +162,7 @@ function changeHelpRequest(helpRequested: boolean): void {
         <nav><button class="button submit icon-approve">Submit</button></nav>
     </div>
 
-    <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="min-height: 50vh">
+    <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 50vh; height: 100%">
         <template #header>
             <div
                 v-if="currentResponse.assistanceRequestedAt !== null"

@@ -36,13 +36,13 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 <style scoped lang="scss">
 .ac-feed {
     border: 1px solid #b3b3b3;
+    overflow-y: auto;
 }
 
 .ac-feed-list {
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-end;
-    overflow-y: auto;
 
     /* To prevent the list from scrolling if you click an input */
     position: relative;
