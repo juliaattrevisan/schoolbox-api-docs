@@ -109,14 +109,14 @@ class Config
         self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
 
-    public const SECTION_GENERAL = 'general';
-    public const SECTION_OPENAI = 'OpenAI';
-    public const SECTION_AZURE = 'Azure';
+    public const string SECTION_GENERAL = 'general';
+    public const string SECTION_OPENAI = 'OpenAI';
+    public const string SECTION_AZURE = 'Azure';
 
     /**
      * Which form inputs exist for each AI provider?
      */
-    public const DEFAULT_FORM_INPUTS = [
+    public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER      => [
             'type'        => 'select',
             'title'       => 'Provider',
