@@ -61,7 +61,7 @@
         padding: 0;
         &:hover {
             background-color: inherit; // foundation fix
-            border-color: none; // foundation fix
+            border-color: transparent; // foundation fix
             color: inherit; // foundation fix
         }
         &:focus {
