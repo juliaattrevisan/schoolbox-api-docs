@@ -291,7 +291,7 @@ class Controller extends Assessment\Controller
                 ->isNull('submitted_by')
                 ->isNull('submitted_at');
 
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb);
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
         }
 
         /* The total time spent in this learning activity must not exceed the total allowed duration,
