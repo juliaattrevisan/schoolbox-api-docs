@@ -703,8 +703,7 @@ class ResourceBookingCest
         IntegrationTester $i,
         bool $allowClashBookings,
         bool $clashOnFirstEvent,
-    ): void
-    {
+    ): void {
         $resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
         $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
         $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
@@ -759,7 +758,7 @@ class ResourceBookingCest
             $preExistingBooking1Name = 'Pre-existing booking 1 ' . microtime(true);
             $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBooking1Name);
             $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 10:00:00')));
-            $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 14:00:00')));
+            $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 14:00:00')));
             $i->sendRequest($payload);
             $i->seeResponseCodeIs(200);
 
@@ -781,7 +780,7 @@ class ResourceBookingCest
         $preExistingBooking2Name = 'Pre-existing booking 2 ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBooking2Name);
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-03 10:00:00')));
-        $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-03 14:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-03 14:00:00')));
         $i->sendRequest($payload);
         $i->seeResponseCodeIs(200);
 
@@ -802,7 +801,7 @@ class ResourceBookingCest
         $clashBookingsName = 'Clash booking ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $clashBookingsName);
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
-        $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $payload->setFormParam('repeat', 'daily');
         $payload->setFormParam('repeat_until', date('d/m/Y', strtotime('2050-01-04')));
         $i->sendRequest($payload);
@@ -936,7 +935,7 @@ class ResourceBookingCest
         $preExistingBookingName = 'Pre-existing booking ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBookingName);
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 10:00:00')));
-        $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 14:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 14:00:00')));
         $i->sendRequest($payload);
         $i->seeResponseCodeIs(200);
 
@@ -957,7 +956,7 @@ class ResourceBookingCest
         $clashBookingsName = 'Clash booking ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $clashBookingsName);
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
-        $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $i->sendRequest($payload);
         $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
         $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
@@ -991,7 +990,7 @@ class ResourceBookingCest
         $clashBookingsName = 'Clash booking ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $clashBookingsName);
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
-        $payload->setFormParam('endDate'  , date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
         $i->sendRequest($payload);
         $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
         $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
