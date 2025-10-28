@@ -17,7 +17,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -26,7 +25,6 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataM
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
@@ -141,7 +139,6 @@ class Controller extends Assessment\Controller
     public function getSummary(Model|IAssessable $assessment, User $student): void
     {
         /** @var Model $assessment */
-
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
 
         /* Craft a returnUrl, to redirect back to the place from whence you came
@@ -479,8 +476,9 @@ class Controller extends Assessment\Controller
      *  Currently a placeholder to spawn data
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
+     * @throws RouteNotFound
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -490,7 +488,16 @@ class Controller extends Assessment\Controller
          * Otherwise spawn a new instance, configure that, and save it.
          */
         if ($requestPost->get('responseId')) {
-            $response = $this->dialogAgentResponseMapper->findById($requestPost->get('responseId'));
+            $response = $this->dialogAgentResponseMapper->findByColumnList([
+                'id' => $requestPost->get('responseId'),
+                'learner_id' => $student->getId()
+            ])->first();
+
+            /* Intentionally dies if the responseId is not authored by $student
+             */
+            if (null === $response) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
         } else {
             $response = $this->dialogAgentResponseMapper->createModel()
                 ->setCreatedAt(\Alaress_Date_Format::now())

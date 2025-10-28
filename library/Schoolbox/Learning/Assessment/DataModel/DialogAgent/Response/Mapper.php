@@ -149,10 +149,10 @@ class Mapper extends \Schoolbox\Mapper
 
             /* A response might not yet be submitted; in this case, a user is null
              */
-            $submittedBy = $this->hydrateJoin($row, 'learner', 'learner');
+            $submittedBy = $this->hydrateJoin($row, 'submittedBy', 'submittedBy');
 
             if (null !== $submittedBy?->getId()) {
-                $response->setLearner($submittedBy);
+                $response->setSubmittedBy($submittedBy);
             }
 
             $stack->add($response);
