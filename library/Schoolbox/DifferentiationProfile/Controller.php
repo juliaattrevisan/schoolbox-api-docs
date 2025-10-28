@@ -57,7 +57,7 @@ class Controller extends Base
         $translation          = $this->rosettaStone->translate('differentiationProfile', true, true);
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
-        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProifleConfigMapper->findByColumn('is_enabled', 1);
         $payload              = [
             'profiles'             => $profiles->map(
                 fn(Model $profile) => call_user_func($this->profileTranslator, $profile)
