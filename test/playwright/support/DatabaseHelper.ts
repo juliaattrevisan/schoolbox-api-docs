@@ -16,16 +16,31 @@ export default class DatabaseHelper {
      * Initialises the database connection pool
      */
     constructor() {
-        // There are different connection details for CI vs local vagrant
-        this.pool = createPool({
-            host: "vagrant.dev.schoolbox.cloud",
-            user: process.env.CI ? "schoolboxvagrant" : "root",
-            password: process.env.CI ? "abc123" : "tnp879",
-            database: "schoolbox",
-            waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0,
-        });
+        // To run in docker: DOCKER=1 npx playwright test
+        if (process.env.DOCKER === "1") {
+            // There are different connection details for CI vs local vagrant
+            this.pool = createPool({
+                host: "localhost",
+                user: "schoolboxdocker",
+                password: "abc123",
+                database: "schoolbox",
+                waitForConnections: true,
+                connectionLimit: 10,
+                queueLimit: 0,
+            });
+        } else {
+            // To run in vagrant: npx playwright test
+            // There are different connection details for CI vs local vagrant
+            this.pool = createPool({
+                host: "vagrant.dev.schoolbox.cloud",
+                user: process.env.CI ? "schoolboxvagrant" : "root",
+                password: process.env.CI ? "abc123" : "tnp879",
+                database: "schoolbox",
+                waitForConnections: true,
+                connectionLimit: 10,
+                queueLimit: 0,
+            });
+        }
     }
 
     /**
