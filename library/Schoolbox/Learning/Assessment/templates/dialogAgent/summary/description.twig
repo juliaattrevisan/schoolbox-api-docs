@@ -1,0 +1,26 @@
+{##
+ # Dialog Agent description fragment
+ #
+ # Shows the description (or per-participant customised description) of this learning activity.
+ # Adds an immersive reader for accessibility.
+ #
+ # @param DialogAgent\Model $assessment  A dialog agent instance
+ # @param ?Participant $participant      (optional) a Participant instance.
+ #}
+<section>
+    {% set description = (participant and not participant.isExcluded) ? participant.description : assessment.description  %}
+    {% if description|length %}
+        {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
+            <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js?v={{ config.site_version }}" type="text/javascript"></script>
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-immersive-reader]').immersiveReader({title: '{{ assessment.title | escape('js') }}'});
+                });
+            </script>
+            <div class='immersive-reader-button' id="ir-button" data-immersive-reader="button"></div>
+        {% endif %}
+        <article class="content" id="ir-content" >
+            {{ description | purify }}
+        </article>
+    {% endif %}
+</section>

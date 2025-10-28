@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 
 /**
  * @method Model createModel($idValue = null)
@@ -63,6 +65,54 @@ class Mapper extends \Schoolbox\Mapper
         ));
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString(): string
+    {
+        $selectString = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
+        ";
+
+        return $selectString;
+    }
+
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param \PDOStatement $statement
+     * @return GenericCollection|Model
+     * @throws Exception
+     * @throws DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(\PDOStatement $statement): Model|GenericCollection
+    {
+        $stack = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $dialogAgent = $this->hydrate($row);
+
+            /* Bolt on the IAssessable instance
+             */
+            $assessment = $this->hydrateJoin($row, 'assessmentModel', 'assessmentModel');
+            $dialogAgent->setAssessmentModel($assessment);
+
+            $stack->add($dialogAgent);
+        }
+
+        return $stack;
     }
 
 

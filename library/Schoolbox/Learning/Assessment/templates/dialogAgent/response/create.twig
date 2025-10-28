@@ -1,0 +1,25 @@
+{##
+ # Create Response screen for Dialog Agents
+ #
+ # This is where students get to interact with the dialog agent's chosen scenario, using all of that scenario
+ # context fields that the staff entered to evaluate the conversation
+ #
+ # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
+ # @param \Schoolbox\User $student        The student who will be creating the response
+ # @param Participant $participant        A participant instance for $student, if extant
+ # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
+ # @param IResponse $latestResponse       A pre-existing response that we're potentially resuming
+ # @param string $errorMessage            A system flash message that at some point, can spawn (can't remember when)
+ # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
+ # @param string $returnUrl               A redirect destination
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            Do the chatbot thing here
+        </section>
+    </div>
+</div>

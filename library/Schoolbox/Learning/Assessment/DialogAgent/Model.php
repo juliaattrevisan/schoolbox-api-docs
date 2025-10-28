@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use InvalidArgumentException;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
@@ -239,6 +240,34 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Takes $duration seconds and converts it to an (hours, minutes) tuple
+     *
+     * The number of hours and minutes that is represented by getDuration()
+     * (which is the duration represented in seconds)
+     *
+     * @param int|null $duration
+     * @return array
+     */
+    public function getDurationComponents(?int $duration): array
+    {
+        if ($duration && $duration > 0) {
+            return [
+                'hours'   => floor($duration / 3600),
+                'minutes' => ($duration % 3600) / 60
+            ];
+        }
+
+        return [];
+    }
+
+
+    /* Assertions
+     * For some reason these throw exceptions when their requirements are not met, even though these aren't
+     * error states, egregious misconfigurations or particularly extraordinary setups. I think these are
+     * totally expected circumstances that we need to handle with a bit more delicacy.
+     */
+
+    /**
      * Check the dates set on this model are valid
      *
      * @throws InvalidArgumentException if the dates are not validly set
@@ -263,24 +292,35 @@ class Model extends AbstractAssessment
 
 
     /**
-     * Takes $duration seconds and converts it to an (hours, minutes) tuple
+     * Assert whether a student can create a response to this learning activity
      *
-     * The number of hours and minutes that is represented by getDuration()
-     * (which is the duration represented in seconds)
-     *
-     * @param int|null $duration
-     * @return array
+     * @throws \DomainException
      */
-    public function getDurationComponents(?int $duration): array
+    public function assertCanRespond(?Participant $participant = null): void
     {
-        if ($duration && $duration > 0) {
-            return [
-                'hours'   => floor($duration / 3600),
-                'minutes' => ($duration % 3600) / 60
-            ];
+        /* This assessment must be an impl, not a spec
+         */
+        if ($this->getContext()->isSpecificationContext()) {
+            throw new \DomainException('', ErrorMapper::ERROR_NO_COURSE_SPEC_INTERACTIONS);
         }
 
-        return [];
+        /* You must be within the date window, between open and due/close
+         */
+        if ($participant != null) {
+            $openDate = $participant->getOpenDate();
+            $closeDate = $participant->getCloseDate();
+        } else {
+            $openDate = $this->getOpenAt();
+            $closeDate = $this->getCloseAt();
+        }
+
+        if ($openDate->gt(\Alaress_Date_Format::now())) {
+            throw new \DomainException('', ErrorMapper::ERROR_ASSESSMENT_NOT_YET_OPEN);
+        }
+
+        if (\Alaress_Date_Format::now()->gt($closeDate)) {
+            throw new \DomainException('', ErrorMapper::ERROR_ASSESSMENT_CLOSED);
+        }
     }
 
 

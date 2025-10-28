@@ -99,6 +99,8 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
@@ -115,6 +117,7 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMappe
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Response\DataSource as AssessmentResponseDataSource;
+use Schoolbox\Learning\Assessment\Response\SubSource\DialogAgent as ResponseSubSourceDialogAgent;
 use Schoolbox\Learning\Assessment\Response\SubSource\DueWork as ResponseSubSourceDueWork;
 use Schoolbox\Learning\Assessment\Response\SubSource\Lti as ResponseSubSourceLti;
 use Schoolbox\Learning\Assessment\Response\SubSource\Quiz as ResponseSubSourceQuiz;
@@ -1638,6 +1641,16 @@ abstract class Kernel
             )
         );
 
+        /* Dialog Agent Subsources
+         */
+        $di->set(
+            'dialogAgentResponseDataSource',
+            $di->lazyNew(
+                DialogAgentResponseMapperProxy::class,
+                ['mapper' => $mapperFactory->getLazy(DialogAgentResponseMapper::class)]
+            )
+        );
+
         // Register response data source
         $di->set(
             'responseDataSource',
@@ -1656,11 +1669,15 @@ abstract class Kernel
                     /** @var LtiResponseMapperProxy $ltiResponseDataSource */
                     $ltiResponseDataSource = $di->get('ltiResponseDataSource');
 
+                    /** @var DialogAgentResponseMapperProxy $dialogAgentResponseDataSource */
+                    $dialogAgentResponseDataSource = $di->get('dialogAgentResponseDataSource');
+
                     return (new AssessmentResponseDataSource())
                         ->addSubSource(new ResponseSubSourceDueWork($submissionDataSource))
                         ->addSubSource(new ResponseSubSourceTask($completionDataSource))
                         ->addSubSource(new ResponseSubSourceQuiz($attemptDataSource))
-                        ->addSubSource(new ResponseSubSourceLti($ltiResponseDataSource));
+                        ->addSubSource(new ResponseSubSourceLti($ltiResponseDataSource))
+                        ->addSubSource(new ResponseSubSourceDialogAgent($dialogAgentResponseDataSource));
                 }
             )
         );

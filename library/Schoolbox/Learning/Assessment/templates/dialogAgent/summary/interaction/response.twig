@@ -1,0 +1,84 @@
+{# if submitted, try going to inline grader #}
+{% set url     = null %}
+{% set tooltip = null %}
+
+{% set createSubmissionRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+    assessmentId: currentInteraction.assessable.id,
+    assessment: currentInteraction.assessable,
+    studentId: participant.user.id,
+    student: participant.user
+}) %}
+
+{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgentResponse.getParticularResponse', {
+    assessmentId: currentInteraction.assessable.id,
+    studentId:    participant.user.id,
+    responseId:   currentInteraction.id,
+    response:     currentInteraction,
+    assessment:   currentInteraction.assessable,
+    student:      participant.user
+}) %}
+
+{% if currentInteraction.isSubmitted %}
+    {# If it's published, provide a link for teachers to view the submission in the inline grader #}
+    {% set url = viewSubmissionRoute %}
+    {% set tooltip = 'View response' %}
+{% else %}
+    {# If this is a draft submission, provide a link to resume #}
+    {% set url = createSubmissionRoute %}
+    {% set tooltip = 'Resume submission' %}
+{% endif %}
+
+{% if not url %}
+    {# Just link to participant's profile #}
+    {% set url = '/search/user/' ~ participant.user.id %}
+    {% set tooltip = 'View Profile' %}
+{% endif %}
+
+{% set deleteRoute = routeLookupIfAuthorized('learningDialogAgentResponse.deleteParticularResponse', {
+    assessment: currentInteraction.assessable,
+    assessmentId: currentInteraction.assessable.id,
+    participant: participant,
+    studentId: participant.user.id,
+    responseId: currentInteraction.id,
+    response: currentInteraction
+}) %}
+<ul class="information-list threaded">
+    <li class="actions-small-1">
+        <ul class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="card small-12">
+                        {% if url %}
+                        <a href="{{ url }}" title="{{ tooltip }}">
+                        {% endif %}
+                            {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
+                            <p>
+                                {% if currentInteraction.isSubmitted %}
+                                {% endif %}
+                                by {{ participant.user.fullname }}
+                            </p>
+                            {% if currentInteraction.isSubmitted %}
+                                <p class="meta">{{ currentInteraction.submittedAt.short }}</p>
+                            {% else %}
+                                <p class="meta">{{ currentInteraction.updatedAt.short }}</p>
+                            {% endif %}
+                        {% if url %}
+                        </a>
+                        {%  endif %}
+                    </div>
+                </div>
+                {% if deleteRoute %}
+                <nav>
+                    <sbx-pop-out content-id="response-options-{{ currentInteraction.id }}"></sbx-pop-out>
+                </nav>
+                <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
+                    {%  if url %}
+                        <li><a href="{{ url }}" class="icon-task" title="{{ tooltip }}" >{{ tooltip }}</a></li>
+                    {% endif %}
+                    <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete response" data-delete="{{ deleteRoute }}">Delete</a></li>
+                </ul>
+                {% endif %}
+            </li>
+        </ul>
+    </li>
+</ul>

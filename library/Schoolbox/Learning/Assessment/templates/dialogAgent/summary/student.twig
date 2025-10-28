@@ -1,0 +1,81 @@
+{##
+ # Summary screen for Dialog Agent (Discussion) learning activities
+ #
+ # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
+ # @param \Schoolbox\User $student        The student who will be creating the response
+ # @param Participant $participant        A participant instance for $student, if extant
+ # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
+ # @param array $lastViews                A struct that tells you when people last viewed this screen
+ # @param string $returnUrl               A redirect destination
+ # @param string $returnUrlEncoded        An encoded redirect destination so you can go back there
+ # @param array $courseAssessments        A struct containing a set of assessments grouped by their units
+ # @param bool $isInstructor              Whether the currently logged in guy is an instructor
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-2">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: false,
+            student: student,
+            icon: 'icon-dialog-agent',
+            canShowcase: false,
+            isShowcased: false,
+            participant: null,
+            lastViews: lastViews
+        } only %}
+    </div>
+
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+
+    {% include '@learningAssessment/fragments/modifyTot.twig' with {
+         assessment: assessment,
+         gradeRoute: null,
+         viewRoute: null,
+         modifyRoute: modifyRoute,
+         canShowcase: false,
+         isShowcased: false,
+         externalRedirectUrl: null
+    } %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% include '@learningAssessment/dialogAgent/summary/description.twig' with {assessment: assessment, participant: participant} only %}
+    </div>
+</div>
+
+{# Decide if a student can create a response to this Dialog Agent.
+ # They need access to the route and the activity must:
+ #    - be past the open datetime
+ #    - not yet reached the due/close datetime (they should be the same for this activity)
+ #    - total time spent creating responses has not yet reached the Allowed Duration
+ #}
+{% set submitRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
+    assessmentId: assessment.id,
+    assessment: assessment,
+    studentId: student.id,
+    student: student
+}) %}
+
+{% if submitRoute %}
+    <div class="row">
+        <div class="small-12 columns">
+            <a class="submit button"
+               href="{{ submitRoute }}{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}"
+               data-test="assessment-summary-create-button"
+            >Start {{ locale.dialogAgent }}</a>
+        </div>
+    </div>
+{% endif %}
+
+{# Discussion History
+ # This also includes the ability to declare an authoritative response
+ #}
+{% include '@learningAssessment/dialogAgent/history.twig' with {
+    timeline: timeline ?? null
+} %}

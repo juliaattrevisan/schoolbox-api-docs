@@ -12,22 +12,27 @@ namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -46,6 +51,8 @@ use Twig\Error\Error;
 class Controller extends Assessment\Controller
 {
     /**
+     * Constructor.
+     *
      * @param UserMapper $userMapper
      * @param ErrorMapper $errorMapper
      * @param AssessmentMapperProxy $assessmentMapper
@@ -63,7 +70,8 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper ,
+     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper ,
+     * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param EditorTemplateHelper $editorTemplateHelper
@@ -86,7 +94,8 @@ class Controller extends Assessment\Controller
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        protected \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
+        protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
+        private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
         private EditorTemplateHelper $editorTemplateHelper
@@ -116,7 +125,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Assessment Summary Screen for a Lesson Plan
+     * Assessment Summary Screen for a Dialog Agent
      *
      * @param Model|IAssessable $assessment
      * @param User              $student
@@ -255,13 +264,40 @@ class Controller extends Assessment\Controller
             }
         }
 
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Decide if this $student can create a response to this learning activity
+         */
+        $canRespond = false;
+
+        try {
+            $assessment->assertCanRespond($participant);
+            $canRespond = true;
+        } catch (\DomainException $e) {
+            // noop
+        }
+
+        /* The total time spent in this learning activity must not exceed the total allowed duration,
+         * if set; not sure how we're gonna calculate that atm
+         *
+         * TODO figure out how to aggregate total time spent in a chat
+         *  $assessment->assertDuration($participant); ...?
+         */
+
         $twigData = [
             'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
             'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment'        => $assessment,
             'student'           => $student,
             'returnUrl'         => $returnUrl,
+            'returnUrlEncoded'  => Redirect::encode($returnUrl),
             'courseAssessments' => $courseAssessments,
+            'participant'       => $participant,
+            'canRespond'        => $canRespond,
+            /* The full history of interactions for this dialog agent
+             * Note that we won't have feedbacks in this
+             */
+            'timeline' => $participant ? (new FullTimeline($participant))->getForUser($this->getUser()) : null,
 
             /* FIXME Controversial:
              *  whether "staff-only fields" really means "instructor-only fields",
@@ -279,20 +315,83 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * TODO I guess this is where students will create their conversation stuffs
+     * This is where students will create their dialog agent discussion stuffs
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
+     * @throws Error
+     * @throws RouteNotFound
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        // noop
+        /** @var null|Participant $participant */
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Find all the records spawned by $participant
+         *
+         * Order them by submitted time to find the most recent, and use that
+         */
+        $allResponses = $participant ? $participant->getAllResponses() : new GenericCollection(IResponse::class);
+
+        /* TODO If there's a response that has yet to be submitted officially,
+         *  presume that to be "a draft" and resume it upon next click. Maybe.
+         */
+        $latestResponse = null;
+
+        if ($allResponses->count()) {
+            foreach ($allResponses as $response) {
+                /* TODO Find the first non-submitted response and...probably resume that? Maybe?
+                 */
+                if (!$response->isSubmitted()) {
+                    $latestResponse = $response;
+                    break;
+                }
+            }
+        }
+
+        // Is the page being displayed in readonly mode?
+        /* TODO Are students allowed to visit this after the activity is closed?
+         */
+        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+
+        // For some reason I can't use get/setFlash?
+        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
+        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
+
+        /* Prepare a redirection url
+         */
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+
+        $data = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    sprintf('Create Response for %s', $assessment->getTitle()),
+                ]
+            ),
+            'assessment' => $assessment,
+            'student' => $student,
+            'participant' => $participant,
+            'response' => $latestResponse,
+            'errorMessage' => $errorMessage,
+            'readonly' => $isInteractionLocked,
+            'returnUrl' => $returnUrl,
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/response/create.twig',
+            $data
+        );
     }
 
 
     /**
      * TODO This is when students hit the submit button to finalise their dialog agent discussion
+     *  Currently a placeholder to spawn data
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -300,7 +399,39 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
-        // noop
+        $requestPost = $this->requestPost;
+
+        /* If an existing responseId was provided, update that instance
+         * Otherwise spawn a new instance, configure that, and save it.
+         */
+        if ($requestPost->get('responseId')) {
+            $response = $this->dialogAgentResponseMapper->findById($requestPost->get('responseId'));
+        } else {
+            $response = $this->dialogAgentResponseMapper->createModel()
+                ->setCreatedAt(\Alaress_Date_Format::now())
+                ->setUpdatedAt(\Alaress_Date_Format::now());
+        }
+
+        $response->setAssessable($assessment);
+
+        $this->dialogAgentResponseMapper->save($response);
+
+        /* TODO this probably isn't tne nicest way to generate a redirected url
+         *  There *has* to be a cleaner way than this, esp. since returnUrl is a const in the Redirect
+         *  class itself, but is magically being written here.
+         */
+        $this->response = $this->redirectFound(
+            $this->routeGenerator->generate(
+                'learningAssessment.getSummary',
+                [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId'    => $student->getId()
+                ]
+            ) . (
+            ($requestPost->get('returnUrl') === null) ? '' :
+                '?returnUrl=' .  Redirect::encode($requestPost->get('returnUrl'))
+            )
+        );
     }
 
 

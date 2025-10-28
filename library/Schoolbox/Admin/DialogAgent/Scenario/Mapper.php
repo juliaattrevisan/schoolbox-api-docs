@@ -49,6 +49,16 @@ class Mapper extends \Schoolbox\Mapper
                 'multiple'  => true,
             ]
         );
+
+        $this->hasJoin(
+            'criteria',
+            [
+                'mapper'    => Criteria\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'scenario_id',
+                'multiple'  => true,
+            ]
+        );
     }
 
 
@@ -63,6 +73,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
+                {$this->getJoinColumnString('criteria', 'criteria')},
                 {$this->getJoinColumnString('field', 'field')}
         ";
     }
@@ -79,6 +90,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('field', '', 'field')}
+            LEFT JOIN {$this->getJoinSql('criteria', '', 'criteria')}
         ";
     }
 
@@ -94,24 +106,45 @@ class Mapper extends \Schoolbox\Mapper
         /** @var \Schoolbox\Admin\DialogAgent\Scenario\Field\Mapper $scenarioFieldMapper */
         $scenarioFieldMapper = $this->getJoinMapper('field');
 
+        /** @var \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper $scenarioCriteriaMapper */
+        $scenarioCriteriaMapper = $this->getJoinMapper('criteria');
+
         /** @var Model[] $scenarios */
         $scenarios = [];
 
         foreach ($statement as $row) {
+            /* Initialise pieces for this scenario we've never seen
+             */
             if (!isset($scenarios[$row['id']])) {
                 /** @var Model $scenario */
                 $scenario = $this->hydrate($row);
-                $scenario->setFields($scenarioFieldMapper->createCollection());
 
+                $scenario->setFields($scenarioFieldMapper->createCollection())
+                    ->setCriteria($scenarioCriteriaMapper->createCollection());
+
+                /* Add it to the pile
+                 */
                 $scenarios[$row['id']] = $scenario;
             }
+
+            /* Reuse the scenario we already initialised at some point
+             */
+            $scenario = $scenarios[$row['id']];
 
             /* Stack up all the adjoining fields
              */
             $field = $scenarioFieldMapper->hydrate($row, 'field');
 
-            if ($field instanceof Field\Model) {
-                $scenarios[$row['id']]->addField($field);
+            if ($field instanceof Field\Model && null === $scenario->getFields()->getOffset($field->getId())) {
+                $scenario->getFields()->setOffset($field->getId(), $field);
+            }
+
+            /* Stack up all the adjoining criteria
+             */
+            $criterion = $scenarioCriteriaMapper->hydrate($row, 'criteria');
+
+            if ($criterion instanceof Criteria\Model && null === $scenario->getCriteria()->getOffset($criterion->getId())) {
+                $scenario->getCriteria()->setOffset($criterion->getId(), $criterion);
             }
         }
 
@@ -119,6 +152,7 @@ class Mapper extends \Schoolbox\Mapper
          */
         foreach ($scenarios as $scenario) {
             $scenario->getFields()->sortBy('sequence', 'asc');
+            $scenario->getCriteria()->sortBy('sequence', 'asc');
         }
 
         return $this->createCollection(array_values($scenarios));
