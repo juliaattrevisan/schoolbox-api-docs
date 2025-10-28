@@ -92,6 +92,7 @@ class Controller extends Base
             'header'               => $adminConfigs->map(
                 fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
             ),
+            'filterPanel' => $filterPanel,
         ];
         if ($this->isJsonRequest()) {
             $this->response = $this->responseAsJson($payload);

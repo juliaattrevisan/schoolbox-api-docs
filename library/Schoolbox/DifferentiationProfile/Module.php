@@ -60,6 +60,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/manage', 'manageDifferentiationProfiles', $getPerms);
+        $this->register('POST', '/manage', 'filterDifferentiationProfiles', $getPerms);
 //        $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
 
