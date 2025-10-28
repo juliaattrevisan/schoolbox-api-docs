@@ -96,13 +96,13 @@ export default {
          * Compile object ids into csv
          */
         compileResourceIds() {
-          let stack = [];
+            let stack = [];
 
-          for (let i = 0; i < this.resources.length; i++) {
-            stack.push(this.resources[i].id);
-          }
+            for (let i = 0; i < this.resources.length; i++) {
+                stack.push(this.resources[i].id);
+            }
 
-          return stack.join(",");
+            return stack.join(",");
         },
     },
 
@@ -273,19 +273,18 @@ export default {
                             </select>
                         </label>
 
-                      <template v-if="canBookResources">
-                        <search-select
-                            class="l-pad-m--bottom"
-                            v-model:selected="resources"
-                            :endpoint="getBookingEndpoint()"
-                            label="Resources"
-                            label-id="resources"
-                            placeholder=""
-                        >
-                          </search-select
-                        >
-                        <input type="hidden" name="resources" :value="compileResourceIds" />
-                      </template>
+                        <template v-if="canBookResources">
+                            <search-select
+                                class="l-pad-m--bottom"
+                                v-model:selected="resources"
+                                :endpoint="getBookingEndpoint()"
+                                label="Resources"
+                                label-id="resources"
+                                placeholder=""
+                            >
+                            </search-select>
+                            <input type="hidden" name="resources" :value="compileResourceIds" />
+                        </template>
 
                         <template v-if="canInvite">
                             <search-select
