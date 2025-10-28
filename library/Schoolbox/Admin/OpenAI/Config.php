@@ -208,8 +208,6 @@ class Config
     /**
      * Decide if $feature is one of the ai modules we support
      *
-     * Note that atm the Image Generator is treated specially which we need to repair at next opportunity.
-     *
      * @param null|string $feature
      * @return bool
      */
@@ -221,7 +219,7 @@ class Config
             return false;
         }
 
-        return array_key_exists($feature, array_merge(self::ALL_MODULES, ['image']));
+        return array_key_exists($feature, self::ALL_MODULES);
     }
 
     /**
