@@ -3,7 +3,7 @@
  * To display a grid-like display
  */
 
-import type { Header } from "../js/types/manageDifferentiationProfilesTypes";
+import type { Header } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     header: Header[];

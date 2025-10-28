@@ -3,9 +3,12 @@
  * Manage Differentiation Profiles page
  */
 
+import type { User } from "@schoolboxLibrary/types/User";
 import type { MDPHeader, Header, AdjustmentType, Profile } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
-import MdpGrid from "./mdp-grid.vue";
+import MdpGrid from "./grid/mdp-grid.vue";
+import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
+import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -13,6 +16,8 @@ const props = defineProps<{
     adjustmentLevels: AdjustmentType[];
     profiles: Profile[];
 }>();
+
+// #region grid data
 
 const header = window.Vue.ref<Header[]>([
     { id: 0, title: "Student", width: 250, isFixed: true, isSortable: true, key: "student", type: HeaderType.USER },
@@ -38,31 +43,24 @@ const header = window.Vue.ref<Header[]>([
 ]);
 
 const rows = window.Vue.ref<Profile[]>(props.profiles);
+
+// #endregion grid data
 </script>
 
 <template>
     <mdp-grid :header="header" :rows="rows">
         <template #User="{ row, header: columnHeader }">
-            <div class="user-cell">
-                <!-- Custom user/student display -->
-                {{ row[columnHeader.key] || "User" }}
-            </div>
+            <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
         </template>
-
         <template #Adjustment="{ row, header: columnHeader }">
-            <div class="adjustment-cell">
-                <!-- Custom adjustment display -->
-                {{ row[columnHeader.key] || "N/A" }}
-            </div>
+            <mdp-grid-cell-adjustment :adjustment="row[columnHeader.key] as AdjustmentType" />
         </template>
-
         <template #Text="{ row, header: columnHeader }">
             <div class="text-cell">
                 <!-- Custom text display -->
                 {{ row[columnHeader.key] || "" }}
             </div>
         </template>
-
         <template #Date="{ row, header: columnHeader }">
             <div class="date-cell">
                 <!-- Custom date display -->
