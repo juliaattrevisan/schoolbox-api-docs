@@ -31,10 +31,10 @@
                     <legend>Register a User</legend>
                     <div class="small-12 columns">
                         <label for="host">Server</label>
-                        <input type="text" value="192.168.36.10" name="host" />
+                        <input id="host" type="text" value="192.168.36.10" name="host" />
 
                         <label for="schoolCode">School Code</label>
-                        <input type="text" name="schoolCode" value="" />
+                        <input id="schoolCode" type="text" name="schoolCode" value="" />
 
                         {% for field in fields %}
                             <label for="{{ field_id }}">{{ field | capitalize }}</label>
