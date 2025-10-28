@@ -36,10 +36,12 @@ const header = window.Vue.ref<Header[]>([
         isSortable: true,
     },
 ]);
+
+const rows = window.Vue.ref<Profile[]>(props.profiles);
 </script>
 
 <template>
-    <mdp-grid :header="header" />
+    <mdp-grid :header="header" :rows="rows" />
 </template>
 
 <style scoped></style>

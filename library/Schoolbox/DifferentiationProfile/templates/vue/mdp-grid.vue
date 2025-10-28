@@ -7,6 +7,7 @@ import type { Header } from "../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     header: Header[];
+    rows: { [key: string]: unknown }[];
 }>();
 
 /**
@@ -20,13 +21,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
 <template>
     <div class="row">
         <div class="small-12 island">
-            <div
-                ref="unitPlannerContainerEl"
-                class="scrollable"
-                :style="{
-                    '--headerCount': props.header.length - 1,
-                }"
-            >
+            <div ref="unitPlannerContainerEl" class="scrollable">
                 <div class="mdp-grid">
                     <div ref="headerRowEl" class="mdp-grid__row mdp-grid__row--header">
                         <div
@@ -37,6 +32,16 @@ const gridTemplateColumns = window.Vue.computed(() => {
                                 'fixed-left': item.isFixed,
                             }"
                         >
+                            {{ item.title }}
+                        </div>
+                    </div>
+                    <div
+                        v-for="(row, index) in props.rows"
+                        :key="index"
+                        class="mdp-grid__row"
+                        :data-test="`mdp-grid-row-${index}`"
+                    >
+                        <div v-for="item in props.header" :key="item.id">
                             {{ item.title }}
                         </div>
                     </div>
