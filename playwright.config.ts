@@ -37,7 +37,10 @@ export default defineConfig({
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Base URL to use in actions like `await page.goto('/')`. */
-        baseURL: "https://vagrant.dev.schoolbox.cloud",
+        // To run in docker: DOCKER=1 npx playwright test
+        // To run in vagrant: npx playwright test
+        baseURL:
+            process.env.DOCKER === "1" ? "https://docker.dev.schoolbox.cloud" : "https://vagrant.dev.schoolbox.cloud",
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: "retain-on-failure",
