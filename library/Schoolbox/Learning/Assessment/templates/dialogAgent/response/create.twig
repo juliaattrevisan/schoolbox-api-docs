@@ -16,6 +16,19 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+<div class="row" data-assessment-status>
+    <div class="small-12 island">
+
+        {% if errorMessage %}
+        <noscript>
+            <div class="alert-box alert">{{ errorMessage }}</div>
+        </noscript>
+        {% endif %}
+
+        <h1>{{ assessment.title }}</h1>
+    </div>
+</div>
+
 {# Apparently we _really_ want this to be a centered snowflake #}
 <div class="row l-flex l-flex--center">
     <div class="small-12 island" style="max-width: 64em"> {# $medium-breakpoint: 64em #}
