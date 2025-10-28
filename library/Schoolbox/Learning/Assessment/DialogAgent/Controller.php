@@ -272,6 +272,14 @@ class Controller extends Assessment\Controller
 
         try {
             $assessment->assertCanRespond($participant);
+
+            /* The total time spent in this learning activity must not exceed the total allowed duration,
+             * if set; not sure how we're gonna calculate that atm
+             *
+             * TODO figure out how to aggregate total time spent in a chat
+             *  $assessment->assertDuration($participant); ...?
+             */
+
             $canRespond = true;
         } catch (\DomainException $e) {
             // noop
@@ -293,13 +301,6 @@ class Controller extends Assessment\Controller
 
             $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
         }
-
-        /* The total time spent in this learning activity must not exceed the total allowed duration,
-         * if set; not sure how we're gonna calculate that atm
-         *
-         * TODO figure out how to aggregate total time spent in a chat
-         *  $assessment->assertDuration($participant); ...?
-         */
 
         $twigData = [
             'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
