@@ -13,6 +13,7 @@
         {# Output depends on formInput.field #}
         {% set type = formInput.type %}
 
+        {# As does style and attributes #}
         {% if section == 'general'%}
             {% set dataAttrs = "data-feature-openai data-feature-azure" %}
             {% set style = 'display:none' %}
@@ -27,13 +28,39 @@
             {% set style = '' %}
         {% endif %}
 
+        {# Generate label and description from a lookup here, instead of in PHP code #}
+        {% set title %}No title - please add one{% endset %}
+        {% set description %}No description - please add one{% endset %}
+        {% if name == 'provider' %}
+            {% set title %}Provider{% endset %}
+            {% set description %}Select which provider you will use for this AI service; choose "Off" to disable this feature.{% endset %}
+        {% elseif name == 'ai_key' %}
+            {% set title %}OpenAI API Key{% endset %}
+            {% set description %}This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.{% endset %}
+        {% elseif name == 'model' %}
+            {% set title %}OpenAI Model{% endset %}
+            {% set description %}Select which model you wish to use for your OpenAI service.{% endset %}
+        {% elseif name == 'resource_name' %}
+            {% set title %}Azure OpenAI Resource Name{% endset %}
+            {% set description %}The name of your Azure OpenAI Resource.{% endset %}
+        {% elseif name == 'deployment_id' %}
+            {% set title %}Azure OpenAI Deployment ID{% endset %}
+            {% set description %}The deployment name you chose when you deployed the model in Azure.{% endset %}
+        {% elseif name == 'system_prompt' %}
+            {% set title %}System Prompt{% endset %}
+            {% set description %}Provide some additional instructions to shape what the AI service generates.{% endset %}
+        {% elseif name == 'output_quality' %}
+            {% set title %}Output Quality{% endset %}
+            {% set description %}Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.{% endset %}
+        {% endif %}
+
         <label id="{{ feature.feature }}-{{ name }}-label"
                for="{{ feature.feature }}-{{ name }}-value"
                {{ dataAttrs }}
                {{ style }}
         >
-            <span>{{ formInput.title }}</span>
-            <span data-tooltip class="has-tip tip-top hint" data-allow-html='true' title='{{ formInput.description }}'>?</span>
+            <span>{{ title }}</span>
+            <span data-tooltip class="has-tip tip-top hint" data-allow-html='true' title='{{ description }}'>?</span>
         </label>
 
         {% if type == 'textarea' %}

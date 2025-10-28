@@ -118,43 +118,30 @@ class Config
      */
     public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER      => [
-            'type'        => 'select',
-            'title'       => 'Provider',
-            'description' => 'Select which provider you will use for this AI service; choose "Off" to disable this feature.',
-            'options'     => self::PROVIDERS,
-            'section'     => null,
+            'type'    => 'select',
+            'options' => self::PROVIDERS,
+            'section' => null,
         ],
         self::FIELD_AIKEY         => [
-            'type'        => 'input',
-            'title'       => 'OpenAI API Key',
-            'description' => 'This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.',
-            'section'     => self::SECTION_GENERAL,
+            'type'    => 'input',
+            'section' => self::SECTION_GENERAL,
         ],
         self::FIELD_MODEL         => [
-            'type'        => 'select',
-            'title'       => 'OpenAI Model',
-            'description' => 'Select which model you wish to use for your OpenAI service.',
-            'options'     => self::AI_MODELS,
-            'providers'   => [Helper::ENDPOINT_TYPE_OPENAI,],
-            'section'     => self::SECTION_OPENAI,
+            'type'    => 'select',
+            'options' => self::AI_MODELS,
+            'section' => self::SECTION_OPENAI,
         ],
         self::FIELD_RESOURCE_NAME => [
-            'type'        => 'input',
-            'title'       => 'Azure OpenAI Resource Name',
-            'description' => 'The name of your Azure OpenAI Resource.',
-            'section'     => self::SECTION_AZURE,
+            'type'    => 'input',
+            'section' => self::SECTION_AZURE,
         ],
         self::FIELD_DEPLOYMENT_ID => [
-            'type'        => 'input',
-            'title'       => 'Azure OpenAI Deployment ID',
-            'description' => 'The deployment name you chose when you deployed the model in Azure.',
-            'section'     => self::SECTION_AZURE,
+            'type'    => 'input',
+            'section' => self::SECTION_AZURE,
         ],
         self::FIELD_SYSTEM_PROMPT => [
-            'type'        => 'textarea',
-            'title'       => 'System Prompt',
-            'description' => 'Provide some additional instructions to shape what the AI service generates.',
-            'section'     => self::SECTION_GENERAL,
+            'type'    => 'textarea',
+            'section' => self::SECTION_GENERAL,
         ],
     ];
 
@@ -404,11 +391,9 @@ class Config
             // * add output quality
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
-                'type'        => 'select',
-                'title'       => 'Output Quality',
-                'description' => 'Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.',
-                'options'     => self::OUTPUT_QUALITY_OPTIONS,
-                'section'     => self::SECTION_OPENAI,
+                'type'    => 'select',
+                'options' => self::OUTPUT_QUALITY_OPTIONS,
+                'section' => self::SECTION_OPENAI,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
