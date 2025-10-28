@@ -32,7 +32,7 @@ export default class DatabaseHelper {
             // To run in vagrant: npx playwright test
             // There are different connection details for CI vs local vagrant
             this.pool = createPool({
-                host: "https://vagrant.dev.schoolbox.cloud",
+                host: "vagrant.dev.schoolbox.cloud",
                 user: process.env.CI ? "schoolboxvagrant" : "root",
                 password: process.env.CI ? "abc123" : "tnp879",
                 database: "schoolbox",
