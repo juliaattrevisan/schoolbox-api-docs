@@ -30,6 +30,14 @@ use Schoolbox\Learning\Assessment\Participant;
 class Button
 {
     /**
+     * Words for the calls-to-action
+     */
+    private const string LABEL_START = 'Begin';
+    private const string LABEL_RESUME = 'Resume';
+    private const string LABEL_VIEW = 'View';
+
+
+    /**
      * Takes a fully-hydrated $participant along with their $response instances and the assessment.
      * From those, decides what the call to action should be on the Summary screen.
      *
@@ -39,6 +47,13 @@ class Button
      */
     public function generate(Model $assessment, Participant $participant): array
     {
+        $button = [
+            'label' => null,
+            'responseId' => null,
+            'state' => null,
+            'url' => null,  // hurmmm needs a Router, but do we want that here...
+        ];
+
         /* If the assessment has surpassed its publish date, but not yet reached its open date,
          * button says "Begin" in a disabled state.
          */
