@@ -89,7 +89,7 @@ function changeHelpRequest(helpRequested: boolean): void {
         </template>
     </ac-feed>
     <ac-prompt
-        prompt-placeholder="PLACEHOLDER TEXT TO BE CONFIRMED (and possibly controllable?)"
+        prompt-placeholder="Type response here"
         :prompt-attributes="[]"
         :ai-session-id="currentResponse.aiSessionId"
     />
