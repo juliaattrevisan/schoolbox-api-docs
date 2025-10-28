@@ -40,8 +40,8 @@ class Config
         "gpt-4.1-mini",
     ];
 
-    public const OUTPUT_QUALITY_DEFAULT = 'low';
-    public const OUTPUT_QUALITY_OPTIONS = [
+    public const string OUTPUT_QUALITY_DEFAULT = 'low';
+    public const array OUTPUT_QUALITY_OPTIONS = [
         'high',
         'medium',
         'low',
