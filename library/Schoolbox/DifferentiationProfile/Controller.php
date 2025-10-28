@@ -29,7 +29,6 @@ class Controller extends Base
      *
      * @param RosettaStone                 $rosettaStone
      * @param DifferentiationProfileMapper $differentiationProfileMapper
-     * @param ModelToArray                 $profileTranslator
      * @param AdjustmentCategoriesMapper   $adjustmentCategoriesMapper
      * @param AdjustmentLevelsMapper       $adjustmentLevelsMapper
      * @param AdminConfigMapper            $differentiationProifleConfigMapper
@@ -38,7 +37,6 @@ class Controller extends Base
     public function __construct(
         private RosettaStone $rosettaStone,
         private DifferentiationProfileMapper $differentiationProfileMapper,
-        private ModelToArray $profileTranslator,
         private AdjustmentCategoriesMapper $adjustmentCategoriesMapper,
         private AdjustmentLevelsMapper $adjustmentLevelsMapper,
         private AdminConfigMapper $differentiationProifleConfigMapper,
@@ -58,9 +56,14 @@ class Controller extends Base
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
         $adminConfigs         = $this->differentiationProifleConfigMapper->findByColumn('is_enabled', 1);
+        $profileTranslator = new ModelToArray(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $adminConfigs,
+        );
         $payload              = [
             'profiles'             => $profiles->map(
-                fn(Model $profile) => call_user_func($this->profileTranslator, $profile)
+                fn(Model $profile) => call_user_func($profileTranslator, $profile)
             ),
             'adjustmentCategories' => $adjustmentCategories->map(
                 fn(AdjustmentCategoriesModel $category) => [

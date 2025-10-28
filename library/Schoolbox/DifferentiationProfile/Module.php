@@ -71,10 +71,6 @@ class Module extends BaseModule
         return new Controller(
             $this->injector->get('l10n'),
             $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
-            new ModelToArray(
-                $this->getRouter()->getGenerator(),
-                $this->getAuthorizer(),
-            ),
             $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
             $this->getMapperFactory()->get(AdjustmentLevelsMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DifferentiationProfiles\Mapper::class),

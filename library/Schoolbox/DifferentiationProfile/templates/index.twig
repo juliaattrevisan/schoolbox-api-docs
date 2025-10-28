@@ -25,6 +25,8 @@
                 <tr>
                     <td>{{ profile.student.fullName }}</td>
                     {# This will need to follow the same order as the header #}
+                    {# dynamic fields based on profile config #}
+                    {% if profile.adjustment_category is defined %}
                     <td>
                         <label for="adjustment-categories">
                             <select name="adjustment-categories" id="adjustment-categories">
@@ -34,6 +36,8 @@
                             </select>
                         </label>
                     </td>
+                    {% endif %}
+                    {% if profile.adjustment_level is defined %}
                     <td>
                         <label for="adjustment-levels">
                             <select name="adjustment-levels" id="adjustment-levels">
@@ -43,11 +47,24 @@
                             </select>
                         </label>
                     </td>
-                    <td>{{ profile.overview }}</td>
-                    <td>{{ profile.interests_strengths }}</td>
-                    <td>{{ profile.needs_challenges }}</td>
-                    <td>{{ profile.strategies_adjustments }}</td>
-                    <td>{{ profile.goals }}</td>
+                    {% endif %}
+                    {% if profile.overview is defined %}
+                        <td>{{ profile.overview }}</td>
+                    {% endif %}
+                    {% if profile.interests_strengths is defined %}
+                        <td>{{ profile.interests_strengths }}</td>
+                    {% endif %}
+                    {% if profile.learning_styles is defined %}
+                        <td>{{ profile.needs_challenges }}</td>
+                    {% endif %}
+                    {% if profile.learning_styles is defined %}
+                        <td>{{ profile.strategies_adjustments }}</td>
+                    {% endif %}
+                    {% if profile.goals %}
+                        <td>{{ profile.goals }}</td>
+                    {% endif %}
+                    {# end of dynamic fields #}
+                    {# last updated field #}
                     <td>{{ profile.updated_at ?? '' }}</td>
                     {# end #}
                 </tr>
