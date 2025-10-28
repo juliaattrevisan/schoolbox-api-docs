@@ -16,36 +16,14 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
+{# Apparently we _really_ want this to be a centered snowflake #}
+<div class="row l-flex l-flex--center">
+    <div class="small-12 island" style="max-width: 64em"> {# $medium-breakpoint: 64em #}
         <section class="content">
-            Do the chatbot thing here:
-
-            {% if existingResponse %}
-                resume it!
-            {% else %}
-                start it!
-            {% endif %}
-
-            <form method="post" action="{{ routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
-                assessmentId: assessment.id,
-                assessment: assessment,
-                studentId: student.id,
-                student: student
-            }) }}">
-                {% if existingResponse %}
-                    <label for="responseId">Response ID</label>
-                    <input name="responseId" value="{{ existingResponse.id }}" />
-
-                    <label for="sessionId">AI Session ID</label>
-                    <p class="meta">NOTE: This is temporary and does nothing right now, the frontend won't define this in the future</p>
-                    <input name="sessionId" value="{{ existingResponse.sessionId }}" />
-                {% endif %}
-
-                <button type="submit" class="button primary">
-                    Submit Response
-                </button>
-            </form>
+            <div id="dialog-agent-chat-container" data-test="dialog-agent-chat-container">
+                <dialog-agent-chat />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentChat.js?v={{ config.site_version }}"></script>
         </section>
     </div>
 </div>

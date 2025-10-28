@@ -8,6 +8,14 @@ import type { AgentChatPromptAttribute } from "./agentChatTypes";
 
 interface Props {
     /**
+     * Whether or not to allow a file to be uploaded for image context
+     */
+    allowFileDrop?: boolean;
+    /**
+     * The placeholder text for the prompt textarea
+     */
+    promptPlaceholder?: string;
+    /**
      * The extra attributes to show in the prompt (dropdowns)
      */
     promptAttributes: AgentChatPromptAttribute[];
@@ -105,9 +113,8 @@ const isFormDisabled = window.Vue.computed(() => {
 </script>
 
 <template>
-    <!-- file context is only available for the first message -->
     <file-drop
-        v-if="acStore.feed.length === 0"
+        v-if="props.allowFileDrop"
         id="ac-prompt-file-drop"
         v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
@@ -120,14 +127,14 @@ const isFormDisabled = window.Vue.computed(() => {
             v-model.trim="prompt"
             name="prompt"
             rows="1"
-            placeholder="Describe or refine the image you want to generate"
+            :placeholder="props.promptPlaceholder"
             style="resize: vertical; margin-bottom: 0"
             :disabled="isFormDisabled || undefined"
             required
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
     </label>
-    <div class="ac-prompt-actions actions-small-1 l-mar-m--bottom">
+    <div class="ac-prompt-actions actions-small-1 l-mar-s--bottom">
         <div class="list-item">
             <select
                 v-for="(attr, index) in props.promptAttributes"

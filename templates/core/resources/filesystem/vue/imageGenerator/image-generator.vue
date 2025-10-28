@@ -47,7 +47,13 @@ window.Vue.onMounted(() => {
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
         <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 35vh" allow-selection />
-        <ac-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
+        <!-- file context is only available for the first message for now -->
+        <ac-prompt
+            prompt-placeholder="Describe or refine the image you want to generate"
+            :allow-file-drop="acStore.feed.length === 0"
+            :prompt-attributes="props.promptAttributes"
+            :ai-session-id="props.aiSessionId"
+        />
         <div v-if="acStore.uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
             {{ acStore.uploadError }}

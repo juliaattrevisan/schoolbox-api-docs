@@ -169,6 +169,8 @@ module.exports = {
             "./library/Schoolbox/Learning/Assessment/templates/participation/vue/customParticipation.ts",
         dialogAgentStatus:
             "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/status/dialogAgentStatus.ts",
+        dialogAgentChat:
+            "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/dialogAgentChat/dialogAgentChat.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.ts",
