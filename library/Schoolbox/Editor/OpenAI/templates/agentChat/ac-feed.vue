@@ -17,24 +17,31 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 </script>
 
 <template>
-    <div class="l-pad-s ac-feed">
-        <template v-for="(message, index) in reversedFeed" :key="message.entryKey">
-            <br v-if="index > 0" />
+    <div class="ac-feed">
+        <slot name="header"></slot>
 
-            <ac-feed-request v-if="message.type === 'request'" :message="message" />
-            <ac-feed-response v-else :message="message" :allow-selection="props.allowSelection" />
-        </template>
+        <div class="l-pad-s ac-feed-list">
+            <template v-for="(message, index) in reversedFeed" :key="message.entryKey">
+                <br v-if="index > 0" />
+
+                <ac-feed-request v-if="message.type === 'request'" :message="message" />
+                <ac-feed-response v-else :message="message" :allow-selection="props.allowSelection" />
+            </template>
+        </div>
     </div>
 </template>
 
 <style scoped lang="scss">
 .ac-feed {
     border: 1px solid #b3b3b3;
-    overflow-y: auto;
+}
 
+.ac-feed-list {
     display: flex;
     flex-direction: column-reverse;
     justify-content: flex-end;
+    overflow-y: auto;
+
     /* To prevent the list from scrolling if you click an input */
     position: relative;
 }
