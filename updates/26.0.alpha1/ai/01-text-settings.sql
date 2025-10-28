@@ -125,7 +125,7 @@ VALUES (
        ),
        (
            'ai_image_generation',
-           'Image Generation',
+           'Image',
            '',
            (
                SELECT id
