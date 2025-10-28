@@ -41,16 +41,16 @@
                     <section>
                         <fieldset class="content">
                             <div class="small-12 columns">
-                                <label>
+                                <label for="menu-text">
                                     Title
-                                    <input required type="text" name='text' value="{{ item.text ?? '' }}">
                                 </label>
+                                <input id="menu-text" required type="text" name='text' value="{{ item.text ?? '' }}">
                             </div>
                             <div class="small-12 columns">
-                                <label>
+                                <label for="menu-title">
                                     Hover Description
-                                    <input name='title' type="text" value="{{ item.title ?? '' }}">
                                 </label>
+                                <input id="menu-title" name='title' type="text" value="{{ item.title ?? '' }}">
                             </div>
                             <div class="small-10 columns">
                                 <label>

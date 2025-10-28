@@ -5,9 +5,8 @@
              : '#'
          }}"
     >
-        <label>
-            <input type="text" name="name" placeholder="Status name" value="{{ currentStatus.name ?? '' }}" data-item-original-value="{{ currentStatus.name ?? '' }}" data-item-element />
-        </label>
+        <label for="status-name-{{ currentStatus.id ?? 'new' }}">Status Name</label>
+        <input id="status-name-{{ currentStatus.id ?? 'new' }}" type="text" name="name" placeholder="Status name" value="{{ currentStatus.name ?? '' }}" data-item-original-value="{{ currentStatus.name ?? '' }}" data-item-element />
 
         <span class="toast" data-save-item></span>
     </div>
