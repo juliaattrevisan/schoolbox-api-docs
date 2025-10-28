@@ -23,7 +23,7 @@ test.describe("Marking tasks sync between markbooks and task status page", () =>
         try {
             const markbookPage = new MarkbookPage(page);
             const taskStatusPage = new TaskStatusPage(page);
-            // mario izzon id
+            // mario izzo id
             const studentId = 63;
             // assessment id for "Post to Forum: Prologue" - class page
             const assessmentId = 653;
@@ -61,9 +61,9 @@ test.describe("Marking tasks sync between markbooks and task status page", () =>
             await markbookPage.gotoCourseMarkbook(courseId.toString());
             await markbookPage.checkTaskStatus(courseAssessmentId, studentId, "Incomplete");
 
-            tester.isGoingTo("mark the task as completed via the course markbook");
+            tester.isGoingTo("mark the task as completed via the course markbook and check status is completed");
             await markbookPage.markTask(courseAssessmentId, studentId);
-            await markbookPage.checkTaskStatus(courseAssessmentId, studentId, "Incomplete");
+            await markbookPage.checkTaskStatus(courseAssessmentId, studentId, "Completed");
 
             tester.isGoingTo("navigate to the class markbook and see the task is marked as completed");
             await markbookPage.gotoClassMarkbook(classId.toString());
