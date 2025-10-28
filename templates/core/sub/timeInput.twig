@@ -1,15 +1,15 @@
 
 <div class="small-3 large-2 columns">
-    <label>
+    <label for="{{ id }}_hour">
         Hour
-        <input id='{{ id }}_hour' type="text" name="{{ name }}[hour]" value="{{ value is empty ? "" : value|date("h") }}" />
     </label>
+    <input id='{{ id }}_hour' type="text" name="{{ name }}[hour]" value="{{ value is empty ? "" : value|date("h") }}" />
 </div>
 <div class="small-3 large-2 columns">
-    <label>
+    <label for="{{ id }}_minute">
         Minute
-        <input id='{{ id }}_minute' type="text" name="{{ name }}[minute]" value="{{ value is empty ? "" : value|date("i") }}" />
     </label>
+    <input id='{{ id }}_minute' type="text" name="{{ name }}[minute]" value="{{ value is empty ? "" : value|date("i") }}" />
 </div>
 <div class="small-3 large-2 columns">
     <label>
