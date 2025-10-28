@@ -11,7 +11,9 @@ const props = defineProps<{
 </script>
 
 <template>
-    <p>{{ props.user.fullName }}</p>
+    <div class="l-pad-s">
+        <p>{{ props.user.fullName }}</p>
+    </div>
 </template>
 
 <style scoped></style>
