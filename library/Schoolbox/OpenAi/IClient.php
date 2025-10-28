@@ -72,4 +72,40 @@ interface IClient
         ?string $aiSessionId = null,
         ?int $chunkSize = null,
     ): iterable;
+
+    /**
+     * Call the create chat completion API, and receive a standard HTTP response:
+     * * https://platform.openai.com/docs/api-reference/chat/create
+     *
+     * @param array       $payload
+     * @param User        $user
+     * @param string      $feature
+     * @param string|null $aiSessionId
+     * @return ResponseInterface
+     */
+    public function createChatCompletion(
+        array $payload,
+        User $user,
+        string $feature,
+        ?string $aiSessionId = null,
+    ): ResponseInterface;
+
+    /**
+     * Call the create chat completion API, and receive a stream:
+     * * https://platform.openai.com/docs/api-reference/chat-streaming/streaming
+     *
+     * @param array       $payload
+     * @param User        $user
+     * @param string      $feature
+     * @param string|null $aiSessionId
+     * @param int|null    $chunkSize
+     * @return iterable
+     */
+    public function createChatCompletionStream(
+        array $payload,
+        User $user,
+        string $feature,
+        ?string $aiSessionId = null,
+        ?int $chunkSize = null,
+    ): iterable;
 }
