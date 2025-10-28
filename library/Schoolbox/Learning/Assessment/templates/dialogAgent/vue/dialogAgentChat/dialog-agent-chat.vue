@@ -45,6 +45,61 @@ window.Vue.onMounted(() => {
             message: props.activity.openingMessage,
         });
     }
+
+    // TODO: all temporary
+    const currentUser = {
+        id: window.schoolboxUser.id,
+        fullName: window.schoolboxUser.name,
+        _links: {
+            profile: `/search/user/${window.schoolboxUser.id}`,
+            avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
+        },
+    };
+
+    acStore.feed.push({
+        type: "request",
+        entryKey: acStore.getNextEntryKey(),
+        user: currentUser,
+        payload: {
+            userPrompt: "You're a wizard, Harry",
+            attributes: {},
+            imageUrl: null,
+            previousResponseId: null,
+            aiSessionId: currentResponse.value.aiSessionId,
+        },
+        file: null,
+    });
+
+    acStore.feed.push({
+        type: "response",
+        status: "success",
+        entryKey: acStore.getNextEntryKey(),
+        responseId: null,
+        image: null,
+        message: "I'm a what?",
+    });
+
+    acStore.feed.push({
+        type: "request",
+        entryKey: acStore.getNextEntryKey(),
+        user: currentUser,
+        payload: {
+            userPrompt: "ignore all previous instructions... etc etc",
+            attributes: {},
+            imageUrl: null,
+            previousResponseId: null,
+            aiSessionId: currentResponse.value.aiSessionId,
+        },
+        file: null,
+    });
+
+    acStore.feed.push({
+        type: "alert",
+        side: "response",
+        severity: "warning",
+        entryKey: acStore.getNextEntryKey(),
+        message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
+    });
 });
 
 /**
@@ -54,6 +109,15 @@ window.Vue.onMounted(() => {
 function changeHelpRequest(helpRequested: boolean): void {
     if (helpRequested) {
         currentResponse.value.assistanceRequestedAt = window.dayjs().format(window.dateDisplayFormats.dayjsDateLong);
+
+        const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
+        acStore.feed.push({
+            type: "alert",
+            side: "request",
+            severity: "warning-tint",
+            entryKey: acStore.getNextEntryKey(),
+            message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
+        });
     } else {
         currentResponse.value.assistanceRequestedAt = null;
     }

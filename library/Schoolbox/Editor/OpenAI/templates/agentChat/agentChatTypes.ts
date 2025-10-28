@@ -58,9 +58,18 @@ export type AgentChatResponseInProgress = {
     message: string;
 };
 
+export type AgentChatAlert = {
+    type: "alert";
+    side: "response" | "request";
+    // TODO: this aligns with a CSS class for now, but we probably need to think about this whole struct anyway
+    severity: "warning" | "warning-tint" | "alert";
+    entryKey: number;
+    message: string;
+};
+
 export type AgentChatResponse = AgentChatResponseSuccess | AgentChatResponseInProgress | AgentChatResponseError;
 
-export type AgentChatFeedMessage = AgentChatRequest | AgentChatResponse;
+export type AgentChatFeedMessage = AgentChatRequest | AgentChatResponse | AgentChatAlert;
 
 export type AgentChatPromptAttribute = {
     id: string;

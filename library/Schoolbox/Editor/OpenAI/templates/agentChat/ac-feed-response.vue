@@ -59,7 +59,7 @@ const imageSrc = window.Vue.computed(() => {
             <label :for="radioId"> </label>
         </template>
 
-        <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
+        <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0 l-pad-s">
             <b>There was a problem generating the image.</b>
             {{ props.message.message }}
         </p>

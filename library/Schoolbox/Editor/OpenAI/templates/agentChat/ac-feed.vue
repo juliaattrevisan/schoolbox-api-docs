@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import AcFeedAlert from "./ac-feed-alert.vue";
 import AcFeedRequest from "./ac-feed-request.vue";
 import AcFeedResponse from "./ac-feed-response.vue";
 import type { AgentChatFeedMessage } from "./agentChatTypes";
@@ -24,7 +25,8 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
             <template v-for="(message, index) in reversedFeed" :key="message.entryKey">
                 <br v-if="index > 0" />
 
-                <ac-feed-request v-if="message.type === 'request'" :message="message" />
+                <ac-feed-alert v-if="message.type === 'alert'" :message="message" />
+                <ac-feed-request v-else-if="message.type === 'request'" :message="message" />
                 <ac-feed-response v-else :message="message" :allow-selection="props.allowSelection" />
             </template>
         </div>
