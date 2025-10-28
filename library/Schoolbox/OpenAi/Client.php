@@ -16,6 +16,7 @@ use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\RequestOptions;
 use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -72,27 +73,12 @@ class Client implements IClient
      */
     public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
     {
-        $encodedPayload = json_encode($payload);
-
         $url = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
 
-        $request = new Request(
-            'POST',
-            $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::ENDPOINT_RESPONSES),
-            $this->authHeaders + ['Content-Type' => 'application/json'],
-            $encodedPayload,
-        );
-
+        $request = new Request('POST', $url, $this->authHeaders);
         try {
-            $response = $this->httpClient->send(
-                $request,
-                [
-                    RequestOptions::ALLOW_REDIRECTS => false,
-                    RequestOptions::HTTP_ERRORS     => false,
-                    RequestOptions::STREAM          => false,
-                ],
-            );
+            $response = $this->sendRequest($request, $payload, false);
         } catch (BadResponseException $e) {
             $log->setReturnCode($e->getResponse()->getStatusCode())
                 ->setErrorMessage($e->getMessage());
@@ -120,31 +106,16 @@ class Client implements IClient
      */
     public function createResponseStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
-        $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
-        $encodedPayload = json_encode($payload);
-
         $url = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
 
-        $request = new Request(
-            'POST',
-            $url,
-            $this->authHeaders + ['Content-Type' => 'application/json'],
-            $encodedPayload,
-        );
-
-        $response = $this->httpClient->send(
-            $request,
-            [
-                RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => true,
-            ],
-        );
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, true);
 
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {
+            $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
             foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
                 yield $stream;
             }
@@ -213,14 +184,30 @@ class Client implements IClient
             ->setEndpoint($url->__toString());
     }
 
+    /**
+     * Send the request to the AI provider.
+     *
+     * @param RequestInterface $request The request to send.
+     * @param array            $payload The request body to send: will be encoded as JSON.
+     * @param bool             $stream  Should a streaming response be requested?
+     * @return ResponseInterface
+     * @throws BadResponseException     when the response is a 4xx or 5xx
+     * @throws ClientExceptionInterface when something else goes wrong with the request
+     */
     private function sendRequest(
-        UriInterface $url,
-        bool $stream,
+        RequestInterface $request,
         array $payload,
-        User $user,
-        string $feature,
-        ?string $aiSessionId = null,
+        bool $stream,
     ): ResponseInterface {
+        return $this->httpClient->send(
+            $request,
+            [
+                RequestOptions::ALLOW_REDIRECTS => false,
+                RequestOptions::HTTP_ERRORS     => false,
+                RequestOptions::STREAM          => $stream,
+                RequestOptions::JSON            => $payload,
+            ],
+        );
     }
 
     /**
