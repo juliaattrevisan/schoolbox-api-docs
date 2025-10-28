@@ -61,8 +61,16 @@ export type AgentChatResponseInProgress = {
 export type AgentChatAlert = {
     type: "alert";
     side: "response" | "request";
-    // TODO: this aligns with a CSS class for now, but we probably need to think about this whole struct anyway
-    severity: "warning" | "warning-tint" | "alert";
+    /**
+     * TODO: this aligns with a CSS class for now, but we probably need to think about this whole struct anyway
+     *
+     * Currently used for:
+     * - highlight: dialog agent stopped requesting assistance
+     * - warning: guardrails alert
+     * - warning-tint: dialog agent started requesting assistance
+     * - alert: X (although AgentChatResponseError is essentially the same thing)
+     */
+    severity: "highlight" | "warning" | "warning-tint" | "alert";
     entryKey: number;
     message: string;
 };

@@ -100,6 +100,24 @@ window.Vue.onMounted(() => {
         entryKey: acStore.getNextEntryKey(),
         message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
     });
+
+    const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
+    acStore.feed.push({
+        type: "alert",
+        side: "request",
+        severity: "warning-tint",
+        entryKey: acStore.getNextEntryKey(),
+        message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
+    });
+
+    const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
+    acStore.feed.push({
+        type: "alert",
+        side: "request",
+        severity: "highlight",
+        entryKey: acStore.getNextEntryKey(),
+        message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
+    });
 });
 
 /**
@@ -107,10 +125,10 @@ window.Vue.onMounted(() => {
  * @param helpRequested - Whether this should ask for help, or clear the flag
  */
 function changeHelpRequest(helpRequested: boolean): void {
+    const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
     if (helpRequested) {
         currentResponse.value.assistanceRequestedAt = window.dayjs().format(window.dateDisplayFormats.dayjsDateLong);
 
-        const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
         acStore.feed.push({
             type: "alert",
             side: "request",
@@ -120,6 +138,13 @@ function changeHelpRequest(helpRequested: boolean): void {
         });
     } else {
         currentResponse.value.assistanceRequestedAt = null;
+        acStore.feed.push({
+            type: "alert",
+            side: "request",
+            severity: "highlight",
+            entryKey: acStore.getNextEntryKey(),
+            message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,
+        });
     }
 
     // TODO
