@@ -54,7 +54,7 @@ const rows = window.Vue.ref<Profile[]>(props.profiles);
         </template>
         <template #Adjustment="{ row, header: columnHeader }">
             <mdp-grid-cell-adjustment
-                :adjustment="row[columnHeader.key] as AdjustmentType"
+                :adjustment="row[columnHeader.key] as AdjustmentType[]"
                 :options="columnHeader.key === 'adjustment_category' ? adjustmentCategories : adjustmentLevels"
             />
         </template>

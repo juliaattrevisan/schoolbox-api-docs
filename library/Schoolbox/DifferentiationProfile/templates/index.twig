@@ -4,74 +4,11 @@
     [ locale.differentiationProfile.plural ]
 ) }}
 
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 column">
+<div class="f-container">
+    <div class="l-flex-col l-gap-m">
+        <div class="f-no-margins">
             <h1>Manage {{ locale.differentiationProfile.plural }}</h1>
         </div>
-        {# Temporary table placeholder for checking data dump #}
-        <table>
-            <thead>
-            <tr>
-                <th>Student</th>
-                {% for col in header %}
-                    <th>{{ col.terminology ?: col.title }}</th>
-                {% endfor %}
-                <th>Last Updated</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for profile in profiles %}
-                <tr>
-                    <td>{{ profile.student.fullName }}</td>
-                    {# This will need to follow the same order as the header #}
-                    {# dynamic fields based on profile config #}
-                    {% if profile.adjustment_category is defined %}
-                    <td>
-                        <label for="adjustment-categories">
-                            <select name="adjustment-categories" id="adjustment-categories">
-                                {% for category in adjustmentCategories %}
-                                    <option value="{{ category.name }}" {% if profile.adjustment_category == category.name %}selected{% endif %}>{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </td>
-                    {% endif %}
-                    {% if profile.adjustment_level is defined %}
-                    <td>
-                        <label for="adjustment-levels">
-                            <select name="adjustment-levels" id="adjustment-levels">
-                                {% for level in adjustmentLevels %}
-                                    <option value="{{ level.name }}" {% if profile.adjustment_level == level.name %}selected{% endif %}>{{ level.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </td>
-                    {% endif %}
-                    {% if profile.overview is defined %}
-                        <td>{{ profile.overview }}</td>
-                    {% endif %}
-                    {% if profile.interests_strengths is defined %}
-                        <td>{{ profile.interests_strengths }}</td>
-                    {% endif %}
-                    {% if profile.learning_styles is defined %}
-                        <td>{{ profile.needs_challenges }}</td>
-                    {% endif %}
-                    {% if profile.learning_styles is defined %}
-                        <td>{{ profile.strategies_adjustments }}</td>
-                    {% endif %}
-                    {% if profile.goals %}
-                        <td>{{ profile.goals }}</td>
-                    {% endif %}
-                    {# end of dynamic fields #}
-                    {# last updated field #}
-                    <td>{{ profile.updated_at ?? '' }}</td>
-                    {# end #}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {# end of temporary table #}
         <div id="manage-differentiation-profiles-container">
             <manage-differentiation-profiles
                 :header='{{ header|json_encode|raw }}'
