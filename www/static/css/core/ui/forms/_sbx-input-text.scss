@@ -13,8 +13,8 @@
 @mixin form-input-focus {
     background: var(--color-foreground-primary);
     border-color: var(--sbx-color-accent);
-    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--sbx-color-accent);
-    outline-offset: calc(var(--size-form-el-border-width) + 1px);
+    outline: calc(var(--size-form-element-border-width) + 2px) solid var(--sbx-color-accent);
+    outline-offset: calc(var(--size-form-element-border-width) + 1px);
 }
 
 /* So the focus is not active on mouse click */
