@@ -154,12 +154,17 @@ function changeHelpRequest(helpRequested: boolean): void {
 <template>
     <div class="actions-small-1 l-mar-s--bottom">
         <!-- TODO: Implement Request Teacher Help -->
-        <button v-if="currentResponse.assistanceRequestedAt === null" class="button" @click="changeHelpRequest(true)">
+        <button
+            v-if="currentResponse.assistanceRequestedAt === null"
+            class="button"
+            type="button"
+            @click="changeHelpRequest(true)"
+        >
             Request Teacher Help
         </button>
         <!-- TODO: Implement Submit -->
         <!-- TODO: Implement SOBO -->
-        <nav><button class="button submit icon-approve">Submit</button></nav>
+        <nav><button class="button submit icon-approve" type="submit">Submit</button></nav>
     </div>
 
     <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 50vh; height: 100%">
@@ -170,7 +175,11 @@ function changeHelpRequest(helpRequested: boolean): void {
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
-                    <button class="button warning l-mar--0 dac-feed-help-dismiss" @click="changeHelpRequest(false)">
+                    <button
+                        class="button warning l-mar--0 dac-feed-help-dismiss"
+                        type="button"
+                        @click="changeHelpRequest(false)"
+                    >
                         Help No Longer Needed
                     </button>
                 </div>
