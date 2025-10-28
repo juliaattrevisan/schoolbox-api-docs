@@ -4,13 +4,13 @@
 <div class="admin-container row">
     {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-        <div id="differentiation-profiles-container">
-            <differentiation-profiles
+        <div id="admin-differentiation-profiles-container">
+            <admin-differentiation-profiles
                 post-route="{{ routeLookup('differentiationProfiles.postConfig') }}"
                 :data="{{ data.differentiationProfiles|json_encode }}"
                 return-url="{{ returnUrl }}"
             />
         </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/differentiationProfiles.js?v={{ config.site_version }}"></script>
+        <script src="{{ CDN_PREFIX }}/js/bundle/adminDifferentiationProfiles.js?v={{ config.site_version }}"></script>
     </div>
 </div>

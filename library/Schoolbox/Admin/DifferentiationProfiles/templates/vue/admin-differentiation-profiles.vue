@@ -8,7 +8,7 @@ import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { convertObjectToArray } from "@js/util/jsUtils";
-import type { Data, Header } from "../js/types/differentiationProfilesTypes";
+import type { Data, Header } from "../js/types/adminDifferentiationProfilesTypes";
 
 const props = defineProps<{
     postRoute: string;
@@ -63,7 +63,6 @@ async function onSaveSelected(): Promise<void> {
     try {
         isProcessing.value = true;
         loadError.value = null;
-        console.warn(data.value.modules);
         const response = await apiRequest({
             url: props.postRoute,
             method: "POST",
