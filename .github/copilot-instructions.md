@@ -2,75 +2,41 @@
 
 ## Repository Overview
 
-Schoolbox is a comprehensive Learning Management System (LMS) built in PHP with Vue.js frontend. It serves educational institutions with course management, assessments, portfolios, and extensive integrations.
+Schoolbox is a comprehensive Learning Management System (LMS) built in PHP with Vue.js frontend. It serves K-12 schools with course management, assessments, portfolios, and extensive integrations.
 
 **Size**: Large monorepo (~200MB) with 25+ modules  
-**Stack**: PHP 8.2/8.4, Node.js 20.x, Vue.js 3, MySQL, Docker/Vagrant  
+**Stack**: PHP 8.4, Node.js 20.x, Vue.js 3, MariaDB 11.4, Docker/Vagrant  
 **Architecture**: MVC with Aura DI/Router, modular plugin system  
-
-## Critical Build Requirements
-
-### Prerequisites
-- **PHP**: Exactly 8.2.x or 8.4.x (8.3.x causes composer failures)
-- **Node.js**: 20.x, **Composer**: Latest, **MySQL/MariaDB**: For tests
-
-### Essential Build Sequence (ALWAYS follow this order)
-
-1. **Install PHP dependencies:**
-   ```bash
-   composer install  # Add --no-dev for production
-   ```
-   **Common failure**: PHP version mismatch
-
-2. **Install Node dependencies:**
-   ```bash
-   npm ci  # Prefer over npm install for CI
-   ```
-   **Common failure**: Network issues with cdn.sheetjs.com - retry or use npm install
-
-3. **Build frontend assets:**
-   ```bash
-   npm run build      # Development (2-5 min)
-   npm run publish    # Production minified (3-7 min)
-   ```
-
-### Testing Commands (run in this order)
-
-1. **Frontend validation:**
-   ```bash
-   npm run lint          # ESLint (0 warnings required)
-   npm run prettier:check # Formatting
-   npm run typecheck     # TypeScript 
-   npm test             # Jest unit tests
-   ```
-
-2. **PHP validation:**
-   ```bash
-   vendor/bin/phpcs     # PSR-12 standard
-   vendor/bin/paratest -p 4 --configuration phpunit.xml --testsuite default
-   vendor/bin/phpstan analyse  # Level 4 static analysis
-   ```
-
-3. **Integration tests (require running environment):**
-   ```bash
-   vendor/bin/codecept run Integration
-   INSTANCE_ID=smoketest TZ='Australia/Melbourne' npx playwright test  # 10-45 min
-   vendor/bin/behat     # Behavior tests
-   ```
 
 ## Project Architecture
 
 ### Core Directories
 ```
-/docs/                  - Charter code standards and help info
-/library/Schoolbox/     - Main modules (Learning, Assessment, etc.)
-/library/Alaress/       - Framework (Database, Auth, etc.)
-/www/static/js/css/     - Frontend assets
-/vue/                   - Vue.js components with Pinia
-/templates/             - Twig templates
-/test/                  - PHPUnit, Playwright, Codeception, Behat
-/tools/ci/              - Build scripts and CI tools
+* /conf/ - initialisation code for Schoolbox modules
+* /debian/ - APT package building definitions (not deployed to clients)
+* /docker/ - definition of Docker images used in Schoolbox development and production environments
+* /docs/ - documentation for developers
+* /library/ - Schoolbox code base
+* /library/Schoolbox - Schoolbox Modules
+* /library/Alaress - Company wide standard libraries
+* /node_modules/ - directory for external libraries loaded via NPM
+* /templates/ - legacy PHPTemplate and twig html templates and per client overrides
+* /test/ - Codeception (api, smoke tests and integration tests), playright tests (acceptance tests)
+* /tools/ - Build, update and maintenance tools. Also includes cli scripts for sync.
+* /updates/ - per release update files, primarily sql schema changes
+* /www/ - web root directory
+* /www/static - web root directory for static assets (JS, CSS, images) only
+* /vue/ - directory for storing Vue components that are not directly related to a
+  module within `library/`
 ```
+
+### Overview of Terms
+* *Module.* It encapsulates Routing, Permissions and Preloads. Respectively: determines which Controller method should execute based on the route provided, whether the Controller method has the permissions to execute, and what objects it needs to execute.
+* *Controller.* Provides details about the web request to business logic contained in Supporting Classes. Controller arranges the output data for the View to render (in this case, twig). 
+* *Supporting Classes.* Additional high-cohesion classes that contains lower-level details, hiding this from the main Controller methods. Utilises Mappers and Models.
+* *Mapper.* A database abstraction. Gets data out of the database into 'Models' and vice versa. Typically contains other database queries that are commonly used for getting collections of Models.
+* *Model.* A representation of an object from the database. They can only be persisted by the 'Mapper', but you can ask them about their properties and relations and other relevant models.
+* *View.* Renders the output of the Controller method so the user can see it in their browser, typically handled with with Twig for HTML or JSON for APIs.
 
 ### Key Configuration
 - `composer.json` - PHP deps & PSR-4 autoloading
@@ -88,7 +54,7 @@ Schoolbox is a comprehensive Learning Management System (LMS) built in PHP with 
 ## Known Issues & Workarounds
 
 **Network failures**: Retry npm commands if external CDNs fail  
-**PHP version**: Composer requires exactly 8.2.x or 8.4.x  
+**PHP version**: Composer requires exactly 8.4.x  
 **Playwright**: Requires TZ='Australia/Melbourne' for date tests  
 **Performance**: Disable xdebug for paratest if slow  
 
@@ -100,19 +66,6 @@ Both need: `127.0.0.1 docker.dev.schoolbox.cloud` in `/etc/hosts`
 ### Required Services for Full Testing
 MySQL/MariaDB, RabbitMQ, Redis. Use `INSTANCE_ID=smoketest` for tests.
 
-## Essential Modules
-
-### Core Learning (`/library/Schoolbox/Learning/`)
-Course management, submissions, Turnitin integration, CLI tools in `/tools/`
-
-### Assessment & Curriculum (`/library/Schoolbox/Assessment/`, `/Curriculum/`)
-Gradebook, rubrics, reporting with Vue.js frontend
-
-### External Integrations (`/library/External/`)
-SIS connectors, LTI, SSO. Config in `/conf/modules/`
-
-### Frontend (`/vue/`, `/www/static/`)
-Vue 3 + TypeScript, Webpack build, Jest tests, SCSS with BEM naming
 
 ## File Patterns
 - **PHP**: PSR-4 autoloading, `*Test.php` for PHPUnit
@@ -125,7 +78,7 @@ Vue 3 + TypeScript, Webpack build, Jest tests, SCSS with BEM naming
 3. `npm run typecheck`
 4. `npm test`
 5. `vendor/bin/phpcs`
-6. `vendor/bin/paratest`
+6. `vendor/bin/phpstan analyze`
 7. `npm run build` (for UI changes)
 
 ## Commits and PR's
@@ -133,6 +86,11 @@ Vue 3 + TypeScript, Webpack build, Jest tests, SCSS with BEM naming
   `this is a commit message [ticket number]`
   eg. `double click to open feedback UI [SA-20827]`
 - all PR's title's should append the  jira ticket number
+
+## Code Reviews
+- When performing a code review, check for OWASP security issues.
+- When performing a code review, that the code is performant and efficent, without undue complexity.
+- Wehn performing a code review, ensure that code changes are inline with standard practices, code styles and naming conventions.
 
 ## Trust These Instructions
 These are comprehensive and tested. Only search further if commands fail unexpectedly or working with unlisted modules. The build process is reliable when followed exactly - most failures are environment setup or sequence issues.
