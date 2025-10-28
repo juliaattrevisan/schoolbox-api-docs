@@ -41,8 +41,18 @@ const gridTemplateColumns = window.Vue.computed(() => {
                         class="mdp-grid__row"
                         :data-test="`mdp-grid-row-${index}`"
                     >
-                        <div v-for="item in props.header" :key="item.id">
-                            {{ item.title }}
+                        <div
+                            v-for="item in props.header"
+                            :key="item.id"
+                            :class="{
+                                'fixed-left': item.isFixed,
+                            }"
+                        >
+                            <!-- Use dynamic slot based on header key, fallback to default content -->
+                            <slot :name="item.key" :row="row" :header="item" :row-index="index">
+                                <!-- Default content if no slot is provided -->
+                                {{ row[item.key] }}
+                            </slot>
                         </div>
                     </div>
                 </div>

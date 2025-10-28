@@ -41,7 +41,16 @@ const rows = window.Vue.ref<Profile[]>(props.profiles);
 </script>
 
 <template>
-    <mdp-grid :header="header" :rows="rows" />
+    <mdp-grid :header="header" :rows="rows">
+        <template #student="{ row }">
+            <!-- Custom student display - you can customize this -->
+            {{ row.student.fullName || "Student" }}
+        </template>
+        <template #updated_at="{ row }">
+            <!-- Custom student display - you can customize this -->
+            {{ "Huzzah" }}
+        </template>
+    </mdp-grid>
 </template>
 
 <style scoped></style>
