@@ -505,11 +505,15 @@ class Controller extends Assessment\Controller
             }
         } else {
             $response = $this->dialogAgentResponseMapper->createModel()
-                ->setCreatedAt(\Alaress_Date_Format::now())
-                ->setUpdatedAt(\Alaress_Date_Format::now());
+                ->setLearner($student)
+                ->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        $response->setAssessable($assessment);
+        /* TODO populate with whatever snake did
+         */
+        $response->setAssessable($assessment)
+            ->setLearner($student)
+            ->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->dialogAgentResponseMapper->save($response);
 
