@@ -178,7 +178,11 @@ function changeHelpRequest(helpRequested: boolean): void {
         </button>
         <!-- TODO: Implement Submit -->
         <!-- TODO: Implement SOBO -->
-        <nav><button class="button submit icon-approve" type="submit">Submit</button></nav>
+        <nav>
+            <button class="button submit icon-approve" type="submit">
+                {{ isInstructor ? `Submit on behalf of ${props.student.fullName}` : "Submit" }}
+            </button>
+        </nav>
     </div>
 
     <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 50vh; height: 100%">
