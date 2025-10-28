@@ -994,7 +994,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
         // Track which joins we need to hydrate.
         $hydrateCodes           = false;
-        $hydrateCurriculumNodes = false;
         $hydrateHomepage        = false;
         $hydrateGroup           = false;
         $hydrateCourseSpec      = false;
@@ -1025,9 +1024,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 // Instantiate collections we are about to populate
                 if ($hydrateCodes) {
                     $folders[$folderId]->setCodes($codeMapper->createCollection());
-                }
-                if ($hydrateCurriculumNodes) {
-                    $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
                 }
                 // Hydrate reverse joins if present in row
                 if ($hydrateHomepage) {
