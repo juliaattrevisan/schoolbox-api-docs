@@ -141,7 +141,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = new DataModel()
                 ->setId($domainObject->getId())
-                ->setDialogAgent((new DialogAgentDataModel())->setId($domainObject->getDialogAgent()?->getId()))
+                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getDialogAgent()?->getId())))
                 ->setLearner($domainObject->getSubmittedOnBehalfOf())
                 ->setAuthoritative($domainObject->getAuthoritative())
                 ->setSubmittedAt($domainObject->getSubmittedAt())
