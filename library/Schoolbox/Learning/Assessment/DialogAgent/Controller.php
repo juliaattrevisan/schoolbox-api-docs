@@ -478,6 +478,8 @@ class Controller extends Assessment\Controller
      * @param IAssessable $assessment
      * @param User $student
      * @return void
+     * @throws Deleted
+     * @throws Exception
      * @throws RouteNotFound
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
@@ -490,10 +492,13 @@ class Controller extends Assessment\Controller
         if ($requestPost->get('responseId')) {
             $response = $this->dialogAgentResponseMapper->findByColumnList([
                 'id' => $requestPost->get('responseId'),
+                'dialog_agent_id' => $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId(),
                 'learner_id' => $student->getId()
             ])->first();
 
-            /* Intentionally dies if the responseId is not authored by $student
+            /* Intentionally dies if the responseId is not authored by $student for this $assessment instance.
+             * This should stop people from stealing some other guy's response, and also prevent them from stealing
+             * their own response to a different assessment and repurposing it here.
              */
             if (null === $response) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
