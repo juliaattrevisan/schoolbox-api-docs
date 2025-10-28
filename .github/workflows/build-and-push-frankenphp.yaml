@@ -1,7 +1,7 @@
 name: Build and push frankenphp
 
 # Build new frankenphp images:
-# * whenever docker/base-images/** changes?
+# * whenever docker/base-images/** or this file changes?
 #   (develop only for now: master and develop will use the same base images)
 # * manually (workflow_dispatch)?
 # * on a cron?
@@ -12,6 +12,7 @@ on:
      - develop
    paths:
      - 'docker/base-images/**'
+     - '.github/workflows/build-and-push-frankenphp.yaml'
   workflow_dispatch:
 
 permissions:
