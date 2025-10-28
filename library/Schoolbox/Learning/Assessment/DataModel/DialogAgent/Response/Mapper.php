@@ -146,7 +146,7 @@ class Mapper extends \Schoolbox\Mapper
 
             $response->setDialogAgent($dialogAgent)
                 ->setLearner($this->hydrateJoin($row, 'learner', 'learner'))
-                ->setSubmittedBy($this->hydrateJoin($row, 'learner', 'learner'));
+                ->setSubmittedBy($this->hydrateJoin($row, 'submittedBy', 'submittedBy'));
 
             $stack->add($response);
         }
