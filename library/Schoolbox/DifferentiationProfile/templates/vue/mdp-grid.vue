@@ -48,8 +48,8 @@ const gridTemplateColumns = window.Vue.computed(() => {
                                 'fixed-left': item.isFixed,
                             }"
                         >
-                            <!-- Use dynamic slot based on header key, fallback to default content -->
-                            <slot :name="item.key" :row="row" :header="item" :row-index="index">
+                            <!-- Use dynamic slot based on header type, fallback to default content -->
+                            <slot :name="item.type" :row="row" :header="item" :row-index="index">
                                 <!-- Default content if no slot is provided -->
                                 {{ row[item.key] }}
                             </slot>

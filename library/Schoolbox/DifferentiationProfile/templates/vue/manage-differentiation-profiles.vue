@@ -42,13 +42,32 @@ const rows = window.Vue.ref<Profile[]>(props.profiles);
 
 <template>
     <mdp-grid :header="header" :rows="rows">
-        <template #student="{ row }">
-            <!-- Custom student display - you can customize this -->
-            {{ row.student.fullName || "Student" }}
+        <template #User="{ row, header: columnHeader }">
+            <div class="user-cell">
+                <!-- Custom user/student display -->
+                {{ row[columnHeader.key] || "User" }}
+            </div>
         </template>
-        <template #updated_at="{ row }">
-            <!-- Custom student display - you can customize this -->
-            {{ "Huzzah" }}
+
+        <template #Adjustment="{ row, header: columnHeader }">
+            <div class="adjustment-cell">
+                <!-- Custom adjustment display -->
+                {{ row[columnHeader.key] || "N/A" }}
+            </div>
+        </template>
+
+        <template #Text="{ row, header: columnHeader }">
+            <div class="text-cell">
+                <!-- Custom text display -->
+                {{ row[columnHeader.key] || "" }}
+            </div>
+        </template>
+
+        <template #Date="{ row, header: columnHeader }">
+            <div class="date-cell">
+                <!-- Custom date display -->
+                {{ row[columnHeader.key] ? new Date(row[columnHeader.key] as string).toLocaleDateString() : "" }}
+            </div>
         </template>
     </mdp-grid>
 </template>
