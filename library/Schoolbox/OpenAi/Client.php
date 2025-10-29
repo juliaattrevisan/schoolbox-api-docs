@@ -388,12 +388,13 @@ class Client implements IClient
         }
 
         // well we didn't die, so let's assume we got a good response
-
-        /** store the response, and the ai usage */
+        // Set the response code only: the model and token usage should already
+        // have been set in `appendMessageToLog`.
         $log->setReturnCode(200)
-            ->setModel($completedEvent['model'] ?? null)
-            ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
-            ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
+//            ->setModel($completedEvent['model'] ?? null)
+//            ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
+//            ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null)
+        ;
         $this->logMapper->save($log);
     }
 
