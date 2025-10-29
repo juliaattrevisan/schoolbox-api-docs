@@ -218,7 +218,7 @@ class Controller extends Base
             $validation->validationErrorsAreAllClashes($errors)
         ) {
             // Remember the start dates of clash bookings.
-            // Note clash errors always use the START_DATETIME key (see Validation->validateForConflicts()).
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
             foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
@@ -346,7 +346,7 @@ class Controller extends Base
             $validation->validationErrorsAreAllClashes($errors)
         ) {
             // Remember the start dates of clash bookings.
-            // Note clash errors always use the START_DATETIME key (see Validation->validateForConflicts()).
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
             foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
