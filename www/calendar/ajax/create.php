@@ -184,7 +184,10 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
         ->setName($_POST['title'] ?? '')
         ->setNotes($_POST['detail'] ?? '')
-        ->setRelatedBookingList(new GenericCollection(Model::class));
+        ->setRelatedBookingList(new GenericCollection(Model::class))
+        // init booking time to null (this may be changed later to the event time...)
+        ->setBookingStartAt(null)
+        ->setBookingEndAt(null);
     // What about the resource? If it's an open resource, confirm the
     // booking immediately.
     if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {

@@ -202,6 +202,7 @@ class Calendar extends DeprecatedModel
      *                                        * id: if set, only this event ID will be retrieved.
      *                                        If empty, all events for user are retrieved.
      *                                        * type: if set, only events of this type will be retrieved.
+     *                                        * allowResources: if set to true, resource booking events will be included.
      * @return GenericCollection<EventInterface>
      */
     public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [])
@@ -316,6 +317,11 @@ class Calendar extends DeprecatedModel
             }
         }
 
+        // default to hide resource bookings unless explicitly allowed
+        if (true !== ($filter['allowResources'] ?? false)) {
+            $filter_query[] = 'resource_booking.id IS NULL';
+        }
+
         $filter_query = implode(' AND ', $filter_query);
 
         if (strlen($filter_query) > 0) {
@@ -407,7 +413,6 @@ class Calendar extends DeprecatedModel
             LEFT JOIN pronoun ON user.pronoun = pronoun.id
             WHERE
                 event.deleted_at is NULL
-                AND resource_booking.id IS NULL
                 AND folder.deleted_at IS NULL
                 {$access_query}
                 {$dateQuery}
