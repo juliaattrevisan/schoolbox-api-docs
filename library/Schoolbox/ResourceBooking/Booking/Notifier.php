@@ -21,10 +21,13 @@ use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use External_Timetable;
 use Monolog\Logger;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -76,8 +79,9 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * @param ContainerInterface $di
-     * @throws
      * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function getSetters(ContainerInterface $di): array
     {
@@ -150,7 +154,7 @@ class Notifier extends AbstractModuleNotifier
                 // Otherwise, trigger the update event.
                 $diff = $bundle->getEvent()->getDiff();
                 if (!empty($diff['status'])) {
-                    list($new, $old) = $diff['status'];
+                    [$new, $old] = $diff['status'];
                     switch ($new) {
                         case Status\Model::STATUS_APPROVED:
                             $bundle->attach('approved', self::IMMEDIATELY);
@@ -184,9 +188,10 @@ class Notifier extends AbstractModuleNotifier
      * @param string $event
      *
      * @return Envelope
-     * @throws \InvalidArgumentException if $event type isn't recognised
+     * @throws DeletedException
+     * @throws Exception
      */
-    protected function buildEnvelope(Model $object, User $user, $event)
+    protected function buildEnvelope(Model $object, User $user, string $event): Envelope
     {
         /** @var Mapper $this->mapper - This declaration prevents PHPStorm warnings below. */
 
