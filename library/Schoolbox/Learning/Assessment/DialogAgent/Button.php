@@ -217,6 +217,12 @@ class Button
                     ];
                 }
             }
+
+            /* Note that the else clause here would represent a scenario where the first response WAS NOT set to
+             * be authoritative, which is a mistake on our part. The first response is always authoritative and
+             * there is always at least one authoritative response per assessment (unless the student literally
+             * did nothing to contribute to this activity)
+             */
         }
 
         /* Unforeseen scenario.
