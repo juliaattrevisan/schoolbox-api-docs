@@ -750,6 +750,10 @@ class Validation
 
 
     /**
+     * This function was added for backward-compatibility, so the total number of errors can be easily counted.
+     * (As they could be before the date keys were added to the errors data structure.)
+     * @see validateBookingFromPostData() docblock for an explanation of the $errorsStruct data structure.
+     *
      * @param array<string, array<string, array<string>>> $errorsStruct
      * @return array<string>
      */
@@ -757,7 +761,7 @@ class Validation
     {
         $errorsFlattened = [];
 
-        foreach ($errorsStruct as $key => $errorsByDate) {
+        foreach ($errorsStruct as $keyIgnored => $errorsByDate) {
             foreach ($errorsByDate as $dateIgnored => $errors) {
                 foreach ($errors as $error) {
                     $errorsFlattened[] = $error;
