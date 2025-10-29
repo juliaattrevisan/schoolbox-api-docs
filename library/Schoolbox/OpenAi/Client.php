@@ -487,32 +487,15 @@ class Client implements IClient
             }
 
             // At the end: finalise log
+            $log->setReturnCode($log->getReturnCode() ?? 200);
+            $this->logMapper->save($log);
         } else {
             // Log the fact this isn't a stream, too
-            $reason   = sprintf('Expected text/event-stream response: received %s', $contentType);
-            $previous = null;
-            try {
-                $this->finaliseLog(
-                    [
-                        'status'             => 'failed',
-                        'incomplete_details' => [
-                            'reason' => $reason,
-                        ],
-                    ],
-                    $log,
-                );
-            } catch (SchoolboxException $previous) {
-                // Swallow and rethrow.
-                // Note that MapperException is not caught here: that indicates
-                // a failure to save the log, and should not be swallowed or
-                // wrapped in another exception.
-            }
-            throw new BadResponseException(
-                $reason,
-                $request,
-                $response,
-                $previous,
-            );
+            $reason = sprintf('Expected text/event-stream response: received %s', $contentType);
+            $log->setReturnCode(500)
+                ->setErrorMessage($reason);
+            $this->logMapper->save($log);
+            throw new BadResponseException($reason, $request, $response);
         }
     }
 }
