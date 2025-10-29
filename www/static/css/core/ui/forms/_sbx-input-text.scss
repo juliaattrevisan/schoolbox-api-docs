@@ -11,10 +11,10 @@
 
 /* Shared form input focus styles */
 @mixin form-input-focus {
-    background: var(--color-foreground-primary);
+    background: var(--sbx-color-foreground-primary);
     border-color: var(--sbx-color-accent);
-    outline: calc(var(--size-form-element-border-width) + 2px) solid var(--sbx-color-accent);
-    outline-offset: calc(var(--size-form-element-border-width) + 1px);
+    outline: calc(var(--sbx-border-width-normal) + 2px) solid var(--sbx-color-accent);
+    outline-offset: calc(var(--sbx-border-width-normal) + 1px);
 }
 
 /* So the focus is not active on mouse click */
@@ -35,14 +35,14 @@
 
 /* Base */
 .sbx-body input[type="text"] {
-    background-color: var(--color-foreground-primary);
-    border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
+    background-color: var(--sbx-color-foreground-primary);
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
-    color: var(--color-text-primary);
+    color: var(--sbx-color-text-primary);
     font-family: inherit;
     height: 2.25rem;
     line-height: 1;
-    padding: var(--spacing-s);
+    padding: var(--sbx-size-s);
     width: 100%;
     -webkit-font-smoothing: antialiased;
 
@@ -76,7 +76,7 @@
 
 /* States */
 .sbx-input-text--error[type="text"] {
-    border: 1px solid var(--color-alert);
+    border: 1px solid var(--sbx-color-alert);
 }
 
 .sbx-input-text--with-button[type="text"] {
@@ -87,7 +87,7 @@
 .inline-input-container {
     display: inline-flex;
     align-items: stretch;
-    gap: var(--spacing-xs);
+    gap: var(--sbx-size-s);
     flex-direction: row !important;
     justify-content: flex-end;
 }
