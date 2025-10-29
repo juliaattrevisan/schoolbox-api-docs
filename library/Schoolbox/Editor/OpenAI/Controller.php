@@ -18,6 +18,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Scrub;
@@ -347,17 +348,35 @@ class Controller extends Base
          */
         $aiSessionId = (string)Uuid::uuid4();
 
+        $agent = new CkEditorTextChat(
+            $this->clientFactory->buildForFeature(Helper::FEATURE_CHAT),
+            $chatConfig,
+        );
+
         try {
-            (new Helper(
-                trim($chatConfig[Config::FIELD_PROVIDER]['value']),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
-                $this->client,
-                $this->errorMapper,
-                $this->logMapper,
-            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
+            $response = $agent->requestStream(
+                $this->getUser(),
+//                json_decode(
+//                    $this->request->getBody()->getContents(),
+//                    true,
+//                    512,
+//                    JSON_THROW_ON_ERROR,
+//                ),
+                $this->request->getParsedBody(),
+                $aiSessionId
+            );
+            $this->response = $this->responseAsEventStream($response);
+            return;
+//            (new Helper(
+//                trim($chatConfig[Config::FIELD_PROVIDER]['value']),
+//                trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
+//                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
+//                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+//                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
+//                $this->client,
+//                $this->errorMapper,
+//                $this->logMapper,
+//            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */

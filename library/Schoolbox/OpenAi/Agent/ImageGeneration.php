@@ -110,6 +110,7 @@ class ImageGeneration
                 $previousResponseId,
             ),
             $user,
+            // TODO feature should be a const
             $feature,
             $sessionId,
             8192,
