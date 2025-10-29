@@ -19,10 +19,14 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
+use External_Timetable;
 use Monolog\Logger;
+use Psr\Container\ContainerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
+use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -38,6 +42,18 @@ class Notifier extends AbstractModuleNotifier
      * @var string
      */
     protected $slug = NSMapper::NS_RESOURCE_BOOKING;
+
+    /** @var \Schoolbox\Assessment\Term\Mapper */
+    private \Schoolbox\Assessment\Term\Mapper $termMapper;
+
+    /** @var External_Timetable */
+    private External_Timetable $externalTimetable;
+
+    /** @var CampusMapper */
+    private CampusMapper $campusMapper;
+
+    /** @var \Schoolbox\External\Event\Mapper */
+    private \Schoolbox\External\Event\Mapper $externalEventMapper;
 
 
     /**
@@ -55,6 +71,65 @@ class Notifier extends AbstractModuleNotifier
     protected function getSlug()
     {
         return $this->slug;
+    }
+
+
+    /**
+     * @param ContainerInterface $di
+     * @throws
+     * @return array
+     */
+    public static function getSetters(ContainerInterface $di): array
+    {
+        /** @var MapperFactory $mf */
+        $mf = $di->get('mapperFactory');
+
+        return [
+            'setTermMapper' => $mf->get(\Schoolbox\Assessment\Term\Mapper::class),
+            'setExternalTimetable' => $di->get('externalTimetable'),
+            'setCampusMapper' => $mf->get(CampusMapper::class),
+            'setExternalEventMapper' => $mf->get(\Schoolbox\External\Event\Mapper::class),
+        ];
+    }
+
+
+    /**
+     * @param \Schoolbox\Assessment\Term\Mapper $termMapper
+     * @return void
+     */
+    public function setTermMapper(\Schoolbox\Assessment\Term\Mapper $termMapper): void
+    {
+        $this->termMapper = $termMapper;
+    }
+
+
+    /**
+     * @param External_Timetable $externalTimetable
+     * @return void
+     */
+    public function setExternalTimetable(External_Timetable $externalTimetable): void
+    {
+        $this->externalTimetable = $externalTimetable;
+    }
+
+
+    /**
+     * @param CampusMapper $campusMapper
+     * @return void
+     */
+    public function setCampusMapper(CampusMapper $campusMapper): void
+    {
+        $this->campusMapper = $campusMapper;
+    }
+
+
+    /**
+     * @param \Schoolbox\External\Event\Mapper $externalEventMapper
+     * @return void
+     */
+    public function setExternalEventMapper(\Schoolbox\External\Event\Mapper $externalEventMapper): void
+    {
+        $this->externalEventMapper = $externalEventMapper;
     }
 
 
@@ -167,20 +242,15 @@ class Notifier extends AbstractModuleNotifier
         switch ($event) {
             case 'created':
                 // Get the objects needed below for the Validator constructor.
-                // TODO: Inject these.
-                $termMapper = new \Schoolbox\Assessment\Term\Mapper();
-                $externalTimetable = new \External_Timetable();
-                $campusMapper = new \Schoolbox\CampusMapper();
-                $externalEventMapper = new \Schoolbox\External\Event\Mapper();
                 $validation = new Validation(
                     $user,
                     $this->mapper,
                     $this->mapper->getJoinMapper('status'),
-                    $termMapper,
-                    $externalTimetable,
-                    $campusMapper,
+                    $this->termMapper,
+                    $this->externalTimetable,
+                    $this->campusMapper,
                     $this->conf,
-                    $externalEventMapper,
+                    $this->externalEventMapper,
                 );
                 $messageText = ':user booked :resource';
                 $clashErrors = $validation->validateForClashes(
