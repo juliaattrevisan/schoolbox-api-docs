@@ -485,10 +485,17 @@ class Client implements IClient
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
                 yield $message->__toString();
-                $this->onMessage($message, $log);
+
+                // Update the log, and save it:
+                // if that raises an exception, still save the log
+                try {
+                    $this->onMessage($message, $log);
+                } finally {
+                    $this->logMapper->save($log);
+                }
             }
 
-            // At the end: finalise log
+            // If nothing happened: set a default return code, and save log
             $log->setReturnCode($log->getReturnCode() ?? 200);
             $this->logMapper->save($log);
         } else {
