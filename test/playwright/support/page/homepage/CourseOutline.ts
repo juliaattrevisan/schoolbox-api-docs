@@ -82,9 +82,9 @@ export default class CourseOutline {
         const courseOutline = this.homepage.locateComponentByName(courseOutlineHeader);
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
         // Find the activities under the unit using the activity title
-        const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+        const activities = courseOutlineUnit.locator("li[data-assessment]");
         const activity = activities.filter({ hasText: activityName });
-        const activityId = await activity.getAttribute("data-unit-assessment");
+        const activityId = await activity.getAttribute("data-assessment");
         expect(activityId).not.toBeNull();
         if (activityId === null) throw new Error("activityId is null");
         return parseInt(activityId, 10);
@@ -101,10 +101,10 @@ export default class CourseOutline {
         const courseOutline = this.homepage.locateComponentByName(courseOutlineHeader);
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
         // Find the activities under the unit using the activity title
-        const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+        const activities = courseOutlineUnit.locator("li[data-assessment]");
         const activity = activities.filter({ hasText: activityName });
         // gets the activity id
-        const activityId = await activity.getAttribute("data-unit-assessment");
+        const activityId = await activity.getAttribute("data-assessment");
         const courseOutlineId = await courseOutline.getAttribute("id");
 
         this.tester.isGoingTo("click to open the 3-dot menu of the activity");
@@ -147,9 +147,9 @@ export default class CourseOutline {
         const courseOutlineUnit = courseOutline.locator(`li[data-unit="${unitId}"]`);
 
         this.tester.isGoingTo("click to view the status of the activity");
-        const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+        const activities = courseOutlineUnit.locator("li[data-assessment]");
         const activity = activities.filter({ hasText: activityName });
-        const activityId = await activity.getAttribute("data-unit-assessment");
+        const activityId = await activity.getAttribute("data-assessment");
         const courseOutlineId = await courseOutline.getAttribute("id");
         await activity.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
 
@@ -168,7 +168,7 @@ export default class CourseOutline {
         const courseOutlineUnit = courseOutline.locator(`li[data-unit="${unitId}"]`);
 
         this.tester.isGoingTo("click to view the summary of the activity");
-        const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+        const activities = courseOutlineUnit.locator("li[data-assessment]");
         const activity = activities.filter({ hasText: activityName });
         await activity.locator("a").first().click();
     }

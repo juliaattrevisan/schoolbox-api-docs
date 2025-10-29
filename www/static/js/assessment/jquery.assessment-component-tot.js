@@ -63,10 +63,10 @@
         component.on("click.assessmentTotInstance", "[data-action=delete]", function (event) {
             event.preventDefault();
             var $element = $(this);
-            var $assessmentRow = $element.closest("[data-unit-assessment]");
+            var $assessmentRow = $element.closest("[data-assessment]");
             var $taskList = $assessmentRow.closest("[data-task-list]");
             const $customisedAssessments = $element.closest("[data-customised-assessments]");
-            const customisationCount = $customisedAssessments.find("[data-unit-assessment]").length;
+            const customisationCount = $customisedAssessments.find("[data-assessment]").length;
 
             $element.confirmDialog({
                 header: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
