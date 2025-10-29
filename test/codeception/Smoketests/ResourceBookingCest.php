@@ -939,7 +939,7 @@ class ResourceBookingCest
         $i->sendRequest($payload);
         $i->seeResponseCodeIs(200);
 
-        $i->amGoingTo('check that the pre-existing booking 2 has been created');
+        $i->amGoingTo('check that the pre-existing booking has been created');
         $booking = $bookingMapper->findOneByColumn('name', $preExistingBookingName);
         $i->comment('The new booking has id ' . $booking->getId());
         $i->comment('The new booking uses resource ' . $booking->getResource()->getId());
