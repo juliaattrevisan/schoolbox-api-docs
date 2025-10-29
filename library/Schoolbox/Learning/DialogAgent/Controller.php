@@ -31,6 +31,12 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use Twig\Error\Error;
 
+/**
+ * Put activity-specific endpoints here. This \Schoolbox\Learning\*\Controller class is intended for endpoints
+ * that are outside the canonical path suggested by \Schoolbox\Assessment\Controller so you can manage the unique
+ * and nuanced behaviours of your learning activity without exposing it to every other learning activity and break
+ * away from the inheritance tree of \Schoolbox\Assessment\Controller.
+ */
 class Controller extends Base
 {
     /**
