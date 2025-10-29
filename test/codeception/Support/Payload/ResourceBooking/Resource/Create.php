@@ -113,6 +113,11 @@ class Create extends Payload\Request
         $this->setTime('max_reservation_time', $minute, $hour, $day);
     }
 
+    public function setAllowClashBookings(bool $bool): void
+    {
+        $this->setFormParam('allow_clash_bookings', $bool ? '1' : '0');
+    }
+
     private function setTime(string $timeType, string $minute, ?string $hour = null, ?string $day = null)
     {
         $this->setFormParam($timeType . '[minute]', $minute);

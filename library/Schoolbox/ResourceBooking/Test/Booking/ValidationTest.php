@@ -47,7 +47,6 @@ class ValidationTest extends TestCase
         $campusMapper = null,
         $externalEventMapper = null
     ) {
-
         if (!$user) {
             $user = new User();
         }
@@ -147,7 +146,6 @@ class ValidationTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidatePastTime')]
     public function testValidatePastTime($startDate, $expected)
     {
-
         $validation = $this->createValidation();
         $errors = $validation->validatePastTime(new DateTime($startDate));
         $this->assertCount($expected, $errors);
@@ -168,6 +166,7 @@ class ValidationTest extends TestCase
             'no lead time, booked immediately'  => ['PT0M', 'PT0M', 0],
         ];
     }
+
     /**
      *
      *
@@ -299,26 +298,13 @@ class ValidationTest extends TestCase
      */
     public static function providerSimpleValidateForConflicts()
     {
+        $conflictingBookings3 = new Collection()
+            ->add(new Booking\Model()->setId(11))
+            ->add(new Booking\Model()->setId(12))
+            ->add(new Booking\Model()->setId(13));
 
-        $conflictingBookings3 = (new Collection())
-            ->add(
-                (new Booking\Model())
-                    ->setId(11)
-            )
-            ->add(
-                (new Booking\Model())
-                    ->setId(12)
-            )
-            ->add(
-                (new Booking\Model())
-                    ->setId(13)
-            );
-
-        $conflictingBookings1 = (new Collection())
-            ->add(
-                (new Booking\Model())
-                    ->setId(11)
-            );
+        $conflictingBookings1 = new Collection()
+            ->add(new Booking\Model()->setId(11));
 
         $conflictingBookings0 = new Collection();
 
@@ -330,17 +316,18 @@ class ValidationTest extends TestCase
     }
 
     /**
+     * Note this doesn't actually test the clash detection logic.
+     * It just checks that the number of errors returned is as expected,
+     * given that the provided set of clashing bookings was found.
      *
-     *
-     * @param string $startDate
-     * @param string $endDate
-     * @param Collection  $conflictingBookings
-     * @param int    $expected
+     * @param string     $startDate
+     * @param string     $endDate
+     * @param Collection $conflictingBookings
+     * @param int        $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSimpleValidateForConflicts')]
-    public function testSimpleValidateForConflicts($startDate, $endDate, $conflictingBookings, $expected)
+    public function testSimpleValidateForConflicts(string $startDate, string $endDate, Collection $conflictingBookings, int $expected): void
     {
-
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -352,8 +339,10 @@ class ValidationTest extends TestCase
         $resource = new Item\Model();
         $resource->setId(123);
 
-        $errors = $validation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
-        $this->assertCount($expected, $errors);
+        $errors = $validation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
+        $errorsToCount = $validation->getAllErrorStringsAsFlatArray($errors);
+
+        $this->assertCount($expected, $errorsToCount);
     }
 
     /**
@@ -363,105 +352,82 @@ class ValidationTest extends TestCase
      */
     public static function providerRoomValidateForConflicts()
     {
+        $conflictingBookings3 = new Collection()
+            ->add(new Booking\Model()->setId(11))
+            ->add(new Booking\Model()->setId(12))
+            ->add(new Booking\Model()->setId(13));
 
-        $conflictingBookings3 = (new Collection())
-            ->add(
-                (new Booking\Model())
-                    ->setId(11)
-            )
-            ->add(
-                (new Booking\Model())
-                    ->setId(12)
-            )
-            ->add(
-                (new Booking\Model())
-                    ->setId(13)
-            );
-
-        $conflictingBookings1 = (new Collection())
-            ->add(
-                (new Booking\Model())
-                    ->setId(11)
-            );
+        $conflictingBookings1 = new Collection()
+            ->add(new Booking\Model()->setId(11));
 
         $conflictingBookings0 = new Collection();
 
-        $roomEvents3 = (new Collection())
-            ->add(
-                (new Event())
-                ->setId(111)
-            )
-            ->add(
-                (new Event())
-                 ->setId(112)
-            )
-            ->add(
-                (new Event())
-                    ->setId(113)
-            );
+        $roomEvents3 = new Collection()
+            ->add(new Event()->setId(111))
+            ->add(new Event()->setId(112))
+            ->add(new Event()->setId(113));
 
-        $roomEvents1 = (new Collection())
-            ->add(
-                (new Event())
-                    ->setId(111)
-            );
+        $roomEvents1 = new Collection()
+            ->add(new Event()->setId(111));
 
         $roomEvents0 = new Collection();
 
         return [
-            'No conflicting bookings, 3 timetable events' =>    [
-                                                                    '2020-12-31T00:00:00',
-                                                                    '2020-12-31T00:00:00',
-                                                                    $conflictingBookings0,
-                                                                    'abc1',
-                                                                    $roomEvents3,
-                                                                    1
-                                                                ],
-            'No conflicting bookings, 1 timetable event' =>     [
-                                                                    '2020-12-31T00:00:00',
-                                                                    '2020-12-31T00:00:00',
-                                                                    $conflictingBookings0,
-                                                                    'abc1',
-                                                                    $roomEvents1,
-                                                                    1
-                                                                ],
-            'No conflicting bookings, no timetable events' =>   [
-                                                                    '2020-12-31T00:00:00',
-                                                                    '2020-12-31T00:00:00',
-                                                                    $conflictingBookings0,
-                                                                    'abc1',
-                                                                    $roomEvents0,
-                                                                    0
-                                                                ],
-            '3 conflicting bookings, no timetable events' =>    [
-                                                                    '2020-12-31T00:00:00',
-                                                                    '2020-12-31T00:00:00',
-                                                                    $conflictingBookings3,
-                                                                    'abc1',
-                                                                    $roomEvents0,
-                                                                    1
-                                                                ],
-            '1 conflicting booking, no timetable events' =>     [
-                                                                    '2020-12-31T00:00:00',
-                                                                    '2020-12-31T00:00:00',
-                                                                    $conflictingBookings1,
-                                                                    'abc1',
-                                                                    $roomEvents0,
-                                                                    1
-                                                                ],
-            'no conflicting booking, no timetable events' =>    [
-                                                                    '2020-12-31T00:00:00',
-                                                                    '2020-12-31T00:00:00',
-                                                                    $conflictingBookings0,
-                                                                    '',
-                                                                    $roomEvents0,
-                                                                    0
-                                                                ],
+            'No conflicting bookings, 3 timetable events' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings0,
+                'abc1',
+                $roomEvents3,
+                1
+            ],
+            'No conflicting bookings, 1 timetable event' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings0,
+                'abc1',
+                $roomEvents1,
+                1
+            ],
+            'No conflicting bookings, no timetable events' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings0,
+                'abc1',
+                $roomEvents0,
+                0
+            ],
+            '3 conflicting bookings, no timetable events' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings3,
+                'abc1',
+                $roomEvents0,
+                1
+            ],
+            '1 conflicting booking, no timetable events' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings1,
+                'abc1',
+                $roomEvents0,
+                1
+            ],
+            'no conflicting booking, no timetable events' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $conflictingBookings0,
+                '',
+                $roomEvents0,
+                0
+            ],
         ];
     }
 
     /**
-     *
+     * Note this doesn't actually test the clash detection logic.
+     * It just checks that the number of errors returned is as expected,
+     * given that the provided set of clashing bookings and room events was found.
      *
      * @param string $startDate
      * @param string $endDate
@@ -472,13 +438,13 @@ class ValidationTest extends TestCase
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerRoomValidateForConflicts')]
     public function testRoomValidateForConflicts(
-        $startDate,
-        $endDate,
-        $conflictingBookings,
-        $roomCode,
-        $roomEvents,
-        $expected
-    ) {
+        string $startDate,
+        string $endDate,
+        Collection $conflictingBookings,
+        string $roomCode,
+        Collection $roomEvents,
+        int $expected
+    ): void {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -494,9 +460,10 @@ class ValidationTest extends TestCase
         $resource->setRoomCode($roomCode);
 
         /** @var Validation $mockValidation */
-        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate));
+        $errors = $mockValidation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate));
+        $errorsToCount = $mockValidation->getAllErrorStringsAsFlatArray($errors);
 
-        $this->assertCount($expected, $errors);
+        $this->assertCount($expected, $errorsToCount);
     }
 
     /**
@@ -506,164 +473,129 @@ class ValidationTest extends TestCase
      */
     public static function providerSeriesValidateForConflicts()
     {
-
         // Single booking
-        $existingBooking = (new Booking\Model())
+        $existingBooking = new Booking\Model()
                     ->setId(1)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(101)
-                    );
+                    ->setEvent(new Event()->setId(101));
 
         // Recursive booking
-        $existingBookingEventInSeries = (new Booking\Model())
+        $existingBookingEventInSeries = new Booking\Model()
                     ->setId(1)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(101)
-                            ->setSeriesId(10)
-                    );
+                    ->setEvent(new Event()->setId(101)->setSeriesId(10));
 
         // Conflicting bookings, same Series as $existingBooking
-        $conflictingBookingsSameSeries3 = (new Collection())
+        $conflictingBookingsSameSeries3 = new Collection()
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(2)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(102)
-                            ->setSeriesId(10)
-                    )
+                    ->setEvent(new Event()->setId(102)->setSeriesId(10))
             )
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(3)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(103)
-                            ->setSeriesId(10)
-                    )
+                    ->setEvent(new Event()->setId(103)->setSeriesId(10))
             )
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(4)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(104)
-                            ->setSeriesId(10)
-                    )
+                    ->setEvent(new Event()->setId(104)->setSeriesId(10))
             );
 
         // Conflicting bookings, some other Series
-        $conflictingBookingsOtherSeries3 = (new Collection())
+        $conflictingBookingsOtherSeries3 = new Collection()
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(11)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(111)
-                            ->setSeriesId(20)
-                    )
+                    ->setEvent(new Event()->setId(111)->setSeriesId(20))
             )
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(12)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(112)
-                            ->setSeriesId(20)
-                    )
+                    ->setEvent(new Event()->setId(112)->setSeriesId(20))
             )
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(13)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(113)
-                            ->setSeriesId(20)
-                    )
+                    ->setEvent(new Event()->setId(113)->setSeriesId(20))
             );
 
         // No conflicting bookings
         $conflictingBookings0 = new Collection();
 
         // Conflicting bookings, same Id as existing booking
-        $conflictingBookings1 = (new Collection())
+        $conflictingBookings1 = new Collection()
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(21)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(221)
-                    )
+                    ->setEvent(new Event()->setId(221))
             );
 
         // Conflicting bookings, different Id
-        $conflictingBookingsSameId = (new Collection())
+        $conflictingBookingsSameId = new Collection()
             ->add(
-                (new Booking\Model())
+                new Booking\Model()
                     ->setId(1)
-                    ->setEvent(
-                        (new Event())
-                            ->setId(101)
-                    )
+                    ->setEvent(new Event()->setId(101))
             );
 
         return [
-            'booking conflicts with other booking series'           => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBooking,
-                                                                        $conflictingBookingsOtherSeries3,
-                                                                        1,
-                                                                    ],
-            'no conflicting bookings'                               => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBooking,
-                                                                        $conflictingBookings0,
-                                                                        0,
-                                                                    ],
-            'booking in series does not conflict with its series'   => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBookingEventInSeries,
-                                                                        $conflictingBookingsSameSeries3,
-                                                                        0,
-                                                                    ],
-            'booking in series conflicts with other series'         => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBookingEventInSeries,
-                                                                        $conflictingBookingsOtherSeries3,
-                                                                        1
-                                                                    ],
-            'booking in series does not conflict with anything'     => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBookingEventInSeries,
-                                                                        $conflictingBookings0,
-                                                                        0
-                                                                    ],
-            'booking conflicts with another booking'                => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBooking,
-                                                                        $conflictingBookings1,
-                                                                        1
-                                                                    ],
-            'booking does not conflict with itself'                 => [
-                                                                        '2020-12-31T00:00:00',
-                                                                        '2020-12-31T00:00:00',
-                                                                        $existingBooking,
-                                                                        $conflictingBookingsSameId,
-                                                                        0
-                                                                    ],
+            'booking conflicts with other booking series' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBooking,
+                $conflictingBookingsOtherSeries3,
+                1,
+            ],
+            'no conflicting bookings' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBooking,
+                $conflictingBookings0,
+                0,
+            ],
+            'booking in series does not conflict with its series' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEventInSeries,
+                $conflictingBookingsSameSeries3,
+                0,
+            ],
+            'booking in series conflicts with other series' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEventInSeries,
+                $conflictingBookingsOtherSeries3,
+                1
+            ],
+            'booking in series does not conflict with anything' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBookingEventInSeries,
+                $conflictingBookings0,
+                0
+            ],
+            'booking conflicts with another booking' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBooking,
+                $conflictingBookings1,
+                1
+            ],
+            'booking does not conflict with itself' => [
+                '2020-12-31T00:00:00',
+                '2020-12-31T00:00:00',
+                $existingBooking,
+                $conflictingBookingsSameId,
+                0
+            ],
         ];
     }
 
     /**
-     *
+     * Note this doesn't actually test the clash detection logic.
+     * It just checks that the number of errors returned is as expected,
+     * given that the provided set of clashing bookings was found.
+     * It also tests that bookings from the series of bookings being updated are not counted as clashing bookings.
      *
      * @param string $startDate
      * @param string $endDate
@@ -673,11 +605,11 @@ class ValidationTest extends TestCase
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSeriesValidateForConflicts')]
     public function testSeriesValidateForConflicts(
-        $startDate,
-        $endDate,
-        $existingBooking,
-        $conflictingBookings,
-        $expected
+        string $startDate,
+        string $endDate,
+        Booking\Model $existingBooking,
+        Collection $conflictingBookings,
+        int $expected
     ) {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
@@ -690,8 +622,9 @@ class ValidationTest extends TestCase
         $resource->setId(123);
 
         /** @var Validation $mockValidation */
-        $errors = $mockValidation->validateForConflicts($resource, new DateTime($startDate), new DateTime($endDate), $existingBooking);
+        $errors = $mockValidation->validateForClashes($resource, new DateTime($startDate), new DateTime($endDate), $existingBooking);
+        $errorsToCount = $mockValidation->getAllErrorStringsAsFlatArray($errors);
 
-        $this->assertCount($expected, $errors);
+        $this->assertCount($expected, $errorsToCount);
     }
 }

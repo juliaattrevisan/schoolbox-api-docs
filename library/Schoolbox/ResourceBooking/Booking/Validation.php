@@ -13,6 +13,7 @@ use Calendar\Event\Type\EventInterface;
 use DateTime;
 use Alaress_Date_Format;
 use External_Timetable;
+use InvalidArgumentException;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\GenericCollection;
@@ -38,8 +39,8 @@ use Calendar_Api_Config_Mapper;
  */
 class Validation
 {
-    const START_DATETIME = 'start_datetime';
-    const END_DATETIME = 'end_datetime';
+    const string START_PERIOD_ERRORS = 'start_period_errors'; // A key for errors pertaining to the start of the booking period.
+    const string END_PERIOD_ERRORS = 'end_period_errors'; // A key for errors pertaining to the end of the booking period.
     const ERROR_INVALID = 'invalid';
     const ERROR_BEFORE_START = 'before_start';
     const ERROR_IN_PAST = 'in_past';
@@ -135,8 +136,25 @@ class Validation
      * @param Item\Model   $resource
      * @param Values       $postData
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
-     *                                     Leave it out of conflict checks.
-     * @return array
+     *                                      Leave it out of conflict checks.
+     * @return array<string, array<string, array<string>>> Example:
+     *         [
+     *             self::START_PERIOD_ERRORS => [
+     *                 self::ERROR_INVALID => [
+     *                     // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
+     *                     self::ERROR_INVALID
+     *                 ],
+     *                 // Errors on valid dates are keyed by the valid date in YYYY-MM-DD format.
+     *                 // Since the smallest repeat period for series is 'daily', there will be at most one booking per day.
+     *                 '2025-01-01' => [
+     *                     self::ERROR_CONFLICT,
+     *                     ...
+     *                 ],
+     *                 ...
+     *             ],
+     *             self::END_PERIOD_ERRORS => // Array with same structure as start_datetime.
+     *         ]
+     *
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -162,13 +180,13 @@ class Validation
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors[self::START_DATETIME][] = self::ERROR_INVALID;
+            $errors[self::START_PERIOD_ERRORS][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
         try {
             $endDate = Alaress_Date_Format::newLocal($postData['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors[self::END_DATETIME][] = self::ERROR_INVALID;
+            $errors[self::END_PERIOD_ERRORS][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
         // Having a power to override doesn't make you a God. Start comes always before End.
@@ -237,7 +255,7 @@ class Validation
 
                 $errors = array_merge_recursive(
                     $errors,
-                    $this->validateForConflicts($thisResource, $thisStart, $thisEnd)
+                    $this->validateForClashes($thisResource, $thisStart, $thisEnd)
                 );
             }
         } else {
@@ -264,7 +282,7 @@ class Validation
 
                 $errors = array_merge_recursive(
                     $errors,
-                    $this->validateForConflicts($thisResource, $thisStart, $thisEnd, $thisBooking)
+                    $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking)
                 );
             }
         }
@@ -284,7 +302,7 @@ class Validation
     {
         switch ($status) {
             case Status\Model::STATUS_APPROVED:
-                return $this->validateForConflicts(
+                return $this->validateForClashes(
                     $booking->getResource(),
                     $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
                     $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
@@ -307,7 +325,8 @@ class Validation
         $errors = [];
 
         if ($startDate > $endDate) {
-            $errors[self::END_DATETIME][] = self::ERROR_BEFORE_START;
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_BEFORE_START;
         }
 
         return $errors;
@@ -326,7 +345,8 @@ class Validation
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-            $errors[self::START_DATETIME][] = self::ERROR_IN_PAST;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
@@ -346,7 +366,8 @@ class Validation
         $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
 
         if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
-            $errors[self::START_DATETIME][] = self::ERROR_TOO_EARLY;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_TOO_EARLY;
         }
 
         return $errors;
@@ -369,7 +390,8 @@ class Validation
 
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
-            $errors[self::END_DATETIME][] = self::ERROR_TOO_SHORT;
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_TOO_SHORT;
         }
 
         return $errors;
@@ -392,7 +414,8 @@ class Validation
             $latestEnd = clone $startDate;
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
-                $errors[self::END_DATETIME][] = self::ERROR_TOO_LONG;
+                $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_TOO_LONG;
             }
         }
 
@@ -400,8 +423,8 @@ class Validation
     }
 
     /**
-     * Validates whether a booking for this resource conflicts with any
-     * bookings that already exist.
+     * Validates whether a booking for this resource clashes with any bookings that already exist.
+     * Note clashes include ERROR_CONFLICT and ERROR_TIMETABLED_CLASS errors.
      *
      * @param Item\Model $resource
      * @param DateTime   $startDate
@@ -411,12 +434,12 @@ class Validation
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function validateForConflicts(
+    public function validateForClashes(
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
         ?Model $existingBooking = null
-    ) {
+    ): array {
         $errors = [];
 
         // Only check approved bookings. Wow, the calendar population method
@@ -462,7 +485,8 @@ class Validation
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
-            $errors[self::START_DATETIME][] = self::ERROR_CONFLICT;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_CONFLICT;
         } elseif (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
@@ -472,7 +496,8 @@ class Validation
             );
 
             if (count($roomEvents)) {
-                $errors[self::START_DATETIME][] = self::ERROR_TIMETABLED_CLASS;
+                $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $errors[self::START_PERIOD_ERRORS][$startDateKey][] = self::ERROR_TIMETABLED_CLASS;
             }
         }
 
@@ -492,7 +517,8 @@ class Validation
 
         $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
-            $errors[self::END_DATETIME][] = self::ERROR_CURRENT_TERM;
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_CURRENT_TERM;
         }
 
         return $errors;
@@ -701,5 +727,48 @@ class Validation
     {
         $this->eventMapper = $eventMapper;
         return $this;
+    }
+
+
+    /**
+     * Return true if the given array is non-empty, and all values are either ERROR_CONFLICT or ERROR_TIMETABLED_CLASS.
+     * @see validateForClashes()
+     * @param array<string, array<string, array<string>>> $errorsByKey Assumed to come from this class.
+     * @return bool
+     */
+    public function validationErrorsAreAllClashes(array $errorsByKey): bool
+    {
+        if (count($errorsByKey) === 0) {
+            throw new InvalidArgumentException('No errors, so this function should not have been called.');
+        }
+
+        return array_all(
+            $this->getAllErrorStringsAsFlatArray($errorsByKey),
+            static fn ($error) => in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)
+        );
+    }
+
+
+    /**
+     * This function was added for backward-compatibility, so the total number of errors can be easily counted.
+     * (As they could be before the date keys were added to the errors data structure.)
+     * @see validateBookingFromPostData() docblock for an explanation of the $errorsStruct data structure.
+     *
+     * @param array<string, array<string, array<string>>> $errorsStruct
+     * @return array<string>
+     */
+    public function getAllErrorStringsAsFlatArray(array $errorsStruct): array
+    {
+        $errorsFlattened = [];
+
+        foreach ($errorsStruct as $keyIgnored => $errorsByDate) {
+            foreach ($errorsByDate as $dateIgnored => $errors) {
+                foreach ($errors as $error) {
+                    $errorsFlattened[] = $error;
+                }
+            }
+        }
+
+        return $errorsFlattened;
     }
 }

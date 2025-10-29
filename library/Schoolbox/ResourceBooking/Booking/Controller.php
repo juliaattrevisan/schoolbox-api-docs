@@ -25,6 +25,7 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -159,8 +160,8 @@ class Controller extends Base
                 'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                 'currentTerm'       => $this->getTermMapper()->findForToday(),
                 'validationData'    => [
-                                        'start' => Validation::START_DATETIME,
-                                        'end' => Validation::END_DATETIME,
+                                        'start' => Validation::START_PERIOD_ERRORS,
+                                        'end' => Validation::END_PERIOD_ERRORS,
                                         ],
                 'validationErrors'  => [
                                         'invalid' => Validation::ERROR_INVALID,
@@ -190,6 +191,7 @@ class Controller extends Base
      * Creates a booking for this resource.
      *
      * @param Item\Model $item The resource to create a booking for.
+     * @throws Exception
      */
     public function createBooking(Item\Model $item)
     {
@@ -208,6 +210,22 @@ class Controller extends Base
             $this->getExternalEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item, $this->requestPost, null);
+
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
+        $clashBookingStartDatesAsKeys = [];
+        if (
+            count($errors) > 0 && $item->getAllowClashBookings() &&
+            $validation->validationErrorsAreAllClashes($errors)
+        ) {
+            // Remember the start dates of clash bookings.
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
+                $clashBookingStartDatesAsKeys[$startDate] = null;
+            }
+            // Ignore errors since all were clashes and clashes are allowed.
+            $errors = [];
+        }
+
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
@@ -221,6 +239,14 @@ class Controller extends Base
             $booking
                 ->setName($this->requestPost['name'])
                 ->setNotes($this->requestPost['notes']);
+            $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
+            if (
+                $bookingStartDateTime !== null &&
+                array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
+            ) {
+                // Set status to pending because this booking has a clash.
+                $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+            }
             $bookingList = new Collection();
             $bookingList->add($booking);
 
@@ -230,7 +256,8 @@ class Controller extends Base
                     $bookingList,
                     $this->requestPost['repeat'],
                     Alaress_Date_Format::newLocalShort($this->requestPost['repeat_until'])->getDateTimeObject(),
-                    $this->requestPost['campus']
+                    $clashBookingStartDatesAsKeys,
+                    $this->requestPost['campus'],
                 );
             } else {
                 // Just save the event by itself.
@@ -259,7 +286,7 @@ class Controller extends Base
 
         /* Append the booking's id to the url, for the calling module to
          * process in whatever way it needs. This allows a decoupling between
-         * Resource Booking any any modules that use it.
+         * Resource Booking and any modules that use it.
          *
          * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
          * (name/startdate/enddate/details)
@@ -273,8 +300,9 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             $this->response = $this->responseAsJson(
                 [
-                    'item'      => $bookingList,
-                    'errors'    => $errors,
+                    'item' => $bookingList,
+                    'errors' => $errors,
+                    'bookedPendingBecauseClashes' => count($clashBookingStartDatesAsKeys) > 0,
                     'returnUrl' => (string)$returnUrl,
                 ],
             )->withStatus($code);
@@ -289,6 +317,7 @@ class Controller extends Base
      * Stub for update method
      *
      * @param Model $item
+     * @throws Exception
      */
     public function update(Model $item)
     {
@@ -307,7 +336,23 @@ class Controller extends Base
             $this->getConfigLoader(),
             $this->getExternalEventMapper()
         );
-        $errors = $validation->validateBookingFromPostData($item->getResource(), $this->requestPost, $item);
+        $itemResource = $item->getResource();
+        $errors = $validation->validateBookingFromPostData($itemResource, $this->requestPost, $item);
+
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
+        $clashBookingStartDatesAsKeys = [];
+        if (
+            count($errors) > 0 && $itemResource->getAllowClashBookings() &&
+            $validation->validationErrorsAreAllClashes($errors)
+        ) {
+            // Remember the start dates of clash bookings.
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
+                $clashBookingStartDatesAsKeys[$startDate] = null;
+            }
+            // Ignore errors since all were clashes and clashes are allowed.
+            $errors = [];
+        }
 
         if (empty($errors)) {
             $item
@@ -344,25 +389,37 @@ class Controller extends Base
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
 
-                //If item is moderated, already approved and time changed, set item to need approval again
+                // If item is moderated, already approved and time changed, set item to need approval again.
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
+                $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
                 if (
-                    $booking->getResource()->isUserModerator($this->getUser())
-                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                    $bookingStartDateTime !== null &&
+                    array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
                 ) {
-                    /* If you're a Moderator and can moderate this request,
-                     * and you created the booking in the first place,
-                     * set it to Approved - otherwise you'll end up approving your own request anyway
-                     */
-                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-                } elseif (
-                    ($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
-                    $statusId == Status\Model::STATUS_APPROVED &&
-                    $isTimeChanged
-                ) {
+                    // Set status to pending because this booking has a clash.
                     $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                } else {
+                    if (
+                        $booking->getResource()->isUserModerator($this->getUser())
+                        && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                    ) {
+                        /* If you're a Moderator and can moderate this request,
+                         * and you created the booking in the first place,
+                         * set it to Approved - otherwise you'll end up approving your own request anyway
+                         */
+                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                    } elseif (
+                        ($moderationId === Item\ModerationType\Model::TYPE_MODERATED || $moderationId === Item\ModerationType\Model::TYPE_MANAGED) &&
+                        $statusId === Status\Model::STATUS_APPROVED &&
+                        $isTimeChanged
+                    ) {
+                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                    } else {
+                        // Otherwise set the status as if we were creating a non-clashing booking.
+                        $booking->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)));
+                    }
                 }
 
                 $bookingList->add($booking);
@@ -398,8 +455,9 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             $this->response = $this->responseAsJson(
                 [
-                    'item'      => $item,
-                    'errors'    => $errors,
+                    'item' => $item,
+                    'errors' => $errors,
+                    'bookedPendingBecauseClashes' => count($clashBookingStartDatesAsKeys) > 0,
                     'returnUrl' => $returnUrl,
                 ],
             )->withStatus($code);
@@ -469,21 +527,28 @@ class Controller extends Base
     /**
      * Saves each item in a list of bookings into a series of bookings.
      *
-     * @todo make this a mapper method
-     *
      * @param Collection|Model[] $bookingList
-     * @param string             $recurrenceRule
-     * @param DateTime           $repeatUntil
-     * @param int                $campusId
+     * @param string $recurrenceRule
+     * @param DateTime $repeatUntil
+     * @param array  $clashBookingStartDatesAsKeys array<string, null>
+     *               Array containing start dates of bookings that clash with existing bookings.
+     *               This function needs to know which bookings clash so those bookings can be saved with 'pending' status.
+     *               Note the most frequent recurrence rule is 'daily', so the recurrence will have at most one booking per day.
+     *               The dates are stored as keys to enable efficient checks using array_key_exists().
+     *               The format of the dates is expected to be YYYY-MM-DD.
+     * @param ?int $campusId
      *
      * @return Collection
+     * @throws Exception
+     * @todo make this a mapper method
      */
     protected function saveBookingsForRecurrences(
         Collection $bookingList,
-        $recurrenceRule,
+        string $recurrenceRule,
         DateTime $repeatUntil,
-        $campusId = null
-    ) {
+        array $clashBookingStartDatesAsKeys,
+        $campusId = null,
+    ): Collection {
         $newList = new Collection();
         $campus = null;
         if ($campusId) {
@@ -527,6 +592,14 @@ class Controller extends Base
                 foreach ($eventList as $event) {
                     $newBooking = clone $booking;
                     $newBooking->setEvent($event);
+                    $eventStartDateTime = $event->getStartDateTime();
+                    $newBookingStatus = (
+                        $eventStartDateTime !== null &&
+                        array_key_exists($eventStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
+                        ? Status\Model::STATUS_PENDING
+                        : $this->getStatusForNonClashBooking($booking)
+                    );
+                    $newBooking->setStatus($this->getStatusMapper()->createModel($newBookingStatus));
                     $newList->add($newBooking);
                 }
             } else {
@@ -602,24 +675,10 @@ class Controller extends Base
         $booking
             ->setEvent($event)
             ->setResource($resource)
-            ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
+            ->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)))
             ->setName($this->requestPost['name'])
             ->setNotes($this->requestPost['notes'])
             ->setRelatedBookingList(new GenericCollection(Model::class));
-        // What about the resource? If it's an open resource, confirm the
-        // booking immediately.
-        if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
-            $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-        } elseif (
-            $resource->isUserModerator($this->getUser())
-            && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
-        ) {
-            /* If you're a Moderator and can moderate this request,
-             * and you created the booking in the first place,
-             * set it to Approved - otherwise you'll end up approving your own request anyway
-             */
-            $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-        }
 
         return $booking;
     }
@@ -756,8 +815,8 @@ class Controller extends Base
                 'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                 'currentTerm'       => $this->getTermMapper()->findForToday(),
                 'validationData'    => [
-                    'start' => Validation::START_DATETIME,
-                    'end' => Validation::END_DATETIME,
+                    'start' => Validation::START_PERIOD_ERRORS,
+                    'end' => Validation::END_PERIOD_ERRORS,
                 ],
                 'validationErrors'  => [
                     'invalid' => Validation::ERROR_INVALID,
@@ -985,6 +1044,38 @@ class Controller extends Base
                 $callbackUrl ?: $this->getSession()->getHistory()
             );
         }
+    }
+
+    /**
+     * Return the status to be set for a new booking that does not clash with any existing booking.
+     * Note bookings that clash with existing bookings should be given status 'pending'.
+     *
+     * @param Model $booking
+     * @return int
+     */
+    private function getStatusForNonClashBooking(Model $booking): int
+    {
+        $resource = $booking->getResource();
+        $event = $booking->getEvent();
+
+        // What about the resource? If it's an open resource, confirm the
+        // booking immediately.
+        if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
+            return Status\Model::STATUS_APPROVED;
+        }
+
+        if (
+            $resource->isUserModerator($this->getUser())
+            && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+        ) {
+            /* If you're a Moderator and can moderate this request,
+             * and you created the booking in the first place,
+             * set it to Approved - otherwise you'll end up approving your own request anyway
+             */
+            return Status\Model::STATUS_APPROVED;
+        }
+
+        return Status\Model::STATUS_PENDING;
     }
 
     /**

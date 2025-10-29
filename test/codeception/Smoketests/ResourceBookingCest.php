@@ -12,20 +12,26 @@ declare(strict_types=1);
 
 namespace Tests\Smoketests;
 
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\ResourceBooking;
+use Schoolbox\ResourceBooking\Item\ModerationType;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 
 /**
  * Tests:
  * * Approve a booking time slot request for a bookable resource.
- * * Cacnel an approved booking request.
+ * * Cancel an approved booking request.
  * * Create a booking request to be moderated.
  * * Create a category of booking resources.
- * * Create a booking resource
+ * * Create a booking resource.
  * * Reject a booking request.
  * * Update the title and description of a booking request.
- * * Update the title of a category
+ * * Update the title of a category.
  * * Update the title and description of a resource.
+ * * Create a booking that clashes with another booking when clash bookings are allowed (two variants)
+ * * Attempt to create a booking that clashes with another booking when clash bookings are not allowed (two variants)
  *
  * @noinspection PhpUnused
  */
@@ -50,7 +56,7 @@ class ResourceBookingCest
     {
         #GIVEN
         $timestamp  = time();
-        $category_title = 'Testing Caregory Create at ' . $timestamp;
+        $category_title = 'Testing Category Create at ' . $timestamp;
 
         #WHEN
         $category->setCategoryTitle($category_title);
@@ -71,7 +77,7 @@ class ResourceBookingCest
     {
         #GIVEN
         $timestamp  = time();
-        $category_title = 'Testing Caregory Update at ' . $timestamp;
+        $category_title = 'Testing Category Update at ' . $timestamp;
 
         #WHEN
         $category->setCategoryTitle($category_title);
@@ -269,7 +275,6 @@ class ResourceBookingCest
         $i->assertEquals($bookingStatus, '1');
     }
 
-
     /**
      *  Hit /resource-booking/booking/<ID>/approve with POST to approve booking request.
      *
@@ -392,7 +397,6 @@ class ResourceBookingCest
         $i->seeResponseCodeIs(303);
         $i->seeHttpHeader('location', "/");
     }
-
 
     /**
      *  Hit /resource-booking/booking/<ID>/approve with POST to approve booking request.
@@ -623,5 +627,386 @@ class ResourceBookingCest
 
         $bookingStatus = $i->grabFromDatabase('resource_booking', 'resource_booking_status_id', [ 'id' => $bookingId]);
         $i->assertEquals($bookingStatus, '2');
+    }
+
+    // Clash booking tests -------------------------------------------------------------------------------------------//
+    //
+    // Bookings (both pending and approved) that clash with existing pending bookings are always allowed.
+    // Bookings that clash with existing approved bookings are only allowed if resource.allow_clash_bookings is true,
+    // and are always saved as pending.  A pending booking cannot be approved while it clashes with other approved
+    // bookings.
+    //
+    // Info on moderation types:
+    // * Moderation type 'open' means:
+    //      All staff can book the resource, and the booking is automatically approved.
+    //      (if clash bookings are allowed, they are saved as 'pending', otherwise they are refused)
+    // * Moderation type 'managed' means:
+    //      Only moderators can book the resource.  All bookings are automatically approved.
+    //      (if clash bookings are allowed, they are saved as 'pending', otherwise they are refused)
+    // * Moderation type 'moderated' means:
+    //      All staff can request to book the resource. Booking then needs to be approved by a moderator.
+    //      (if clash bookings are allowed, they are saved as 'pending', otherwise they are refused)
+    //
+    // Note for all moderation types, approved and pending bookings may both exist (since moderation type can change).
+
+    /**
+     * @param IntegrationTester $i
+     * @return void
+     */
+    public function createBookingsThatClashWithApprovedBookingsVariant1(IntegrationTester $i): void
+    {
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, false, false);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     * @return void
+     */
+    public function createBookingsThatClashWithApprovedBookingsVariant2(IntegrationTester $i): void
+    {
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, false, true);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     * @return void
+     */
+    public function createBookingsThatClashWithApprovedBookingsVariant3(IntegrationTester $i): void
+    {
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, true, false);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     * @return void
+     */
+    public function createBookingsThatClashWithApprovedBookingsVariant4(IntegrationTester $i): void
+    {
+        $this->createBookingsThatClashWithExistingApprovedBookings($i, true, true);
+    }
+
+    /**
+     * To inspect the results of this test after it has run,
+     * goto https://$schoolboxDomain/resource-booking/item/$resourceId.
+     * Get $resourceId from the test output (look for text "The new resource has id...").
+     *
+     * @param IntegrationTester $i
+     * @param bool $allowClashBookings Whether new bookings are allowed to clash with pre-existing approved bookings.
+     *                                 Note new bookings are always allowed to clash with pre-existing pending bookings.
+     * @param bool $clashOnFirstEvent The first event is created separately to the repeat events, so it is good to test it independently.
+     * @return void
+     * @throws Deleted
+     * @throws Exception
+     * @throws \JsonException
+     */
+    private function createBookingsThatClashWithExistingApprovedBookings(
+        IntegrationTester $i,
+        bool $allowClashBookings,
+        bool $clashOnFirstEvent,
+    ): void {
+        $resourceMapper = \Schoolbox\ResourceBooking\Item\Mapper::getInstance();
+        $bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        $eventMapper = \Schoolbox\Calendar\EventMapper::getInstance();
+
+        // Note regarding choice of moderation type for this test
+        // ------------------------------------------------------
+        // We need a moderation type for which non-clash bookings will be saved as 'approved', so we can confirm that
+        // clash bookings are detected and handled differently (they should be saved with status 'pending').
+        // Both 'open' and 'managed' moderation types meet this criteria.  'Open' was chosen so that the user who
+        // creates the clash booking does not have to be a moderator.
+        //    We don't need to test other moderation types, because the behaviour of new bookings that clash with
+        // existing 'approved' bookings does not depend on the moderation type of the moderation type of the new
+        // booking.  Regardless of the moderation type of the new bookings, any booking that clashes with existing
+        // 'approved' bookings will be:
+        //  * refused if allow_clash_bookings is false.
+        //  * booked with status 'pending' if allow_clash_bookings is true.
+        // Note bookings that clash with existing 'pending' bookings are covered by another test (TODO write test).
+        $moderationTypeId = ModerationType\Model::TYPE_OPEN; // Moderation type 'open' is used so that non-clash bookings will have status 'approved'.
+        $expectedClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_PENDING; // This is true for any moderation type.
+        $expectedNonClashBookingStatusId = ResourceBooking\Booking\Status\Model::STATUS_APPROVED; // This is true for moderation type 'open'.
+
+        // Create a resource -----------------------------------------------------------------------------------------//
+
+        $i->amGoingTo('create a resource with allow_clash_bookings=' . ($allowClashBookings ? 'true' : 'false'));
+        $payload = new Payload\ResourceBooking\Resource\Create();
+        $resourceTitle = 'Test resource created at ' . microtime(true);
+        $payload->setResourceName($resourceTitle);
+        $payload->setResourceCat('3'); // Support Services
+        $payload->setAllowClashBookings($allowClashBookings);
+        $payload->setModerationTypeId((string)$moderationTypeId);
+        $i->sendRequest($payload);
+
+        $i->amGoingTo('Check that the resource has been created');
+        $i->seeResponseCodeIs(303);
+        $resourceId = $resourceMapper->findOneByColumn('name', $resourceTitle)->getId();
+        $i->seeHttpHeader('location', "/resource-booking/item/$resourceId");
+        // Note: The resource can be fetched by sending a GET request to $i->grabHttpHeader('location').
+        //       Since we know the name and the name is unique, faster to get from the database.
+        $resource = $resourceMapper->findOneByColumn('name', $resourceTitle);
+        $i->assertEquals(
+            $allowClashBookings,
+            $resource->getAllowClashBookings(),
+            'Property allow_clash_bookings has the expected value'
+        );
+        $i->comment('The new resource has id ' . $resource->getId());
+
+        if ($clashOnFirstEvent) {
+            // Create a pre-existing booking -----------------------------------------------------------------------------//
+            // (this is designed to clash with the first clash booking created below)
+
+            $i->amGoingTo('create pre-existing booking 1 of that resource, on 2050-01-01, from 10am to 2pm');
+            $preExistingBooking1Name = 'Pre-existing booking 1 ' . microtime(true);
+            $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBooking1Name);
+            $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 10:00:00')));
+            $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 14:00:00')));
+            $i->sendRequest($payload);
+            $i->seeResponseCodeIs(200);
+
+            $i->amGoingTo('check that pre-existing booking 1 has been created');
+            $booking1 = $bookingMapper->findOneByColumn('name', $preExistingBooking1Name);
+            $i->comment('The new booking has id ' . $booking1->getId());
+            $i->comment('The new booking uses resource ' . $booking1->getResource()->getId());
+            $i->assertEquals(
+                $booking1->getStatus()->getId(),
+                $expectedNonClashBookingStatusId,
+                "The booking has the expected statusId for non-clash bookings"
+            );
+        }
+
+        // Create a pre-existing booking to clash with another clash booking created below ---------------------------//
+        // (this is designed to clash with the third clash booking created below)
+
+        $i->amGoingTo('create pre-existing booking 2 of that resource, on 2050-01-03, from 10am to 2pm');
+        $preExistingBooking2Name = 'Pre-existing booking 2 ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBooking2Name);
+        $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-03 10:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-03 14:00:00')));
+        $i->sendRequest($payload);
+        $i->seeResponseCodeIs(200);
+
+        $i->amGoingTo('check that the pre-existing booking 2 has been created');
+        $booking2 = $bookingMapper->findOneByColumn('name', $preExistingBooking2Name);
+        $i->comment('The new booking has id ' . $booking2->getId());
+        $i->comment('The new booking uses resource ' . $booking2->getResource()->getId());
+        $i->assertEquals(
+            $booking2->getStatus()->getId(),
+            $expectedNonClashBookingStatusId,
+            "The booking has the expected statusId for non-clash bookings"
+        );
+
+        // Create clashing bookings (using recurrence) ---------------------------------------------------------------//
+
+        $i->amGoingTo('Attempt to create a series of bookings, some of which will clash with the pre-existing bookings');
+        $i->comment('The bookings will be on 2050-01-01, from 12pm to 4pm, repeating daily until 2050-01-04');
+        $clashBookingsName = 'Clash booking ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $clashBookingsName);
+        $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
+        $payload->setFormParam('repeat', 'daily');
+        $payload->setFormParam('repeat_until', date('d/m/Y', strtotime('2050-01-04')));
+        $i->sendRequest($payload);
+
+        if ($allowClashBookings) {
+            $i->seeResponseCodeIs(200);
+            $i->amGoingTo('confirm that the clash bookings have been created since they are allowed');
+            $clashBookings = $bookingMapper->findByColumn('name', $clashBookingsName);
+            $i->comment('Found ' . count($clashBookings) . ' clash bookings');
+            $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is true");
+            $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => true]);
+
+            foreach ($clashBookings as $clashBooking) {
+                $event = $eventMapper->findOneByColumn('id', $clashBooking->getEvent()->getId());
+                $clashBookingDate = $event->getStartDateTime()->getDatabaseDate();
+                $clashBookingStatusId = $clashBooking->getStatus()->getId();
+
+                $i->comment("The clash booking on $clashBookingDate has id " . $clashBooking->getId());
+                $i->assertEquals(
+                    $clashBooking->getResource()->getId(),
+                    $resource->getId(),
+                    "The clash booking on $clashBookingDate uses resource {$resource->getId()} as expected"
+                );
+
+                switch ($clashBookingDate) {
+                    case '2050-01-01':
+                        if ($clashOnFirstEvent) {
+                            $i->assertEquals(
+                                $clashBookingStatusId,
+                                $expectedClashBookingStatusId,
+                                "The clash booking on $clashBookingDate has the expected statusId for clash bookings"
+                            );
+                        } else {
+                            $i->assertEquals(
+                                $clashBookingStatusId,
+                                $expectedNonClashBookingStatusId,
+                                "The clash booking on $clashBookingDate has the expected statusId for non-clash bookings"
+                            );
+                        }
+                        break;
+                    case '2050-01-03':
+                        $i->assertEquals(
+                            $clashBookingStatusId,
+                            $expectedClashBookingStatusId,
+                            "The clash booking on $clashBookingDate has the expected statusId for clash bookings"
+                        );
+                        break;
+                    case '2050-01-02': // Fall through.
+                    case '2050-01-04':
+                        $i->assertEquals(
+                            $clashBookingStatusId,
+                            $expectedNonClashBookingStatusId,
+                            "The clash booking on $clashBookingDate has the expected statusId for non-clash bookings"
+                        );
+                        break;
+                    default:
+                        $i->assertEquals(true, false, 'Unexpected date for clash booking');
+                }
+            }
+        } else {
+            // If clash bookings are not allowed
+            $i->amGoingTo('confirm that the clash bookings were not created since they are not allowed');
+            $i->seeResponseCodeIs(400);
+        }
+    }
+
+    /**
+     * @param IntegrationTester $i
+     * @return void
+     */
+    public function createBookingThatClashesWithPendingBookingVariant1(IntegrationTester $i): void
+    {
+        $this->createBookingThatClashesWithExistingPendingBooking($i, false);
+    }
+
+    /**
+     * @param IntegrationTester $i
+     * @return void
+     */
+    public function createBookingThatClashesWithPendingBookingVariant2(IntegrationTester $i): void
+    {
+        $this->createBookingThatClashesWithExistingPendingBooking($i, true);
+    }
+
+    /**
+     * To inspect the results of this test after it has run,
+     * * goto https://$schoolboxDomain/resource-booking/item/$resourceId.
+     * * Get $resourceId from the test output (look for text "The new resource has id...").
+     * *
+     * @param IntegrationTester $i
+     * @param bool $allowClashBookings
+     * @return void
+     * @throws Deleted
+     * @throws Exception
+     * @throws \JsonException
+     */
+    private function createBookingThatClashesWithExistingPendingBooking(IntegrationTester $i, bool $allowClashBookings): void
+    {
+        $resourceMapper = ResourceBooking\Item\Mapper::getInstance();
+        $bookingMapper = ResourceBooking\Booking\Mapper::getInstance();
+
+        // Create a resource -----------------------------------------------------------------------------------------//
+
+        $i->amGoingTo('create a resource with allow_clash_bookings=' . ($allowClashBookings ? 'true' : 'false'));
+        $payload = new Payload\ResourceBooking\Resource\Create();
+        $resourceTitle = 'Test resource created at ' . microtime(true);
+        $payload->setResourceName($resourceTitle);
+        $payload->setResourceCat('3'); // Support Services
+        $payload->setAllowClashBookings($allowClashBookings);
+        $payload->setModerationTypeId((string)ModerationType\Model::TYPE_MANAGED); // Start with moderation type 'managed' so we can create 'pending' bookings.
+        $i->sendRequest($payload);
+
+        $i->amGoingTo('Check that the resource has been created');
+        $i->seeResponseCodeIs(303);
+        $resourceId = $resourceMapper->findOneByColumn('name', $resourceTitle)->getId();
+        $i->seeHttpHeader('location', "/resource-booking/item/$resourceId");
+        // Note: The resource can be fetched by sending a GET request to $i->grabHttpHeader('location').
+        //       Since we know the name and the name is unique, faster to get from the database.
+        $resource = $resourceMapper->findOneByColumn('name', $resourceTitle);
+        $i->assertEquals(
+            $allowClashBookings,
+            $resource->getAllowClashBookings(),
+            'Property allow_clash_bookings has the expected value'
+        );
+        $i->comment('The new resource has id ' . $resource->getId());
+
+        // Create a pre-existing 'pending' booking to clash with another clash booking created below -----------------//
+        // (this is designed to clash with the third clash booking created below)
+
+        $i->amGoingTo('create a pre-existing booking of that resource, on 2050-01-01, from 10am to 2pm');
+        $preExistingBookingName = 'Pre-existing booking ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBookingName);
+        $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 10:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 14:00:00')));
+        $i->sendRequest($payload);
+        $i->seeResponseCodeIs(200);
+
+        $i->amGoingTo('check that the pre-existing booking has been created');
+        $booking = $bookingMapper->findOneByColumn('name', $preExistingBookingName);
+        $i->comment('The new booking has id ' . $booking->getId());
+        $i->comment('The new booking uses resource ' . $booking->getResource()->getId());
+        $i->assertEquals(
+            $booking->getStatus()->getId(),
+            ResourceBooking\Booking\Status\Model::STATUS_PENDING,
+            "The booking has status 'pending' as expected"
+        );
+
+        // Create clashing booking with status 'pending' -------------------------------------------------------------//
+
+        $i->amGoingTo('Create a booking that clashes with the pre-existing booking');
+        $i->comment('The booking will be on 2050-01-01, from 12pm to 4pm');
+        $clashBookingsName = 'Clash booking ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $clashBookingsName);
+        $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
+        $i->sendRequest($payload);
+        $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
+        $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
+
+        $i->amGoingTo('confirm that the clash booking has been created');
+        $clashBooking = $bookingMapper->findOneByColumn('name', $clashBookingsName);
+        $i->comment("The clash booking has id " . $clashBooking->getId());
+        $i->assertEquals(
+            $clashBooking->getResource()->getId(),
+            $resource->getId(),
+            "The clash booking uses resource {$resource->getId()} as expected"
+        );
+        $i->assertEquals(
+            $clashBooking->getStatus()->getId(),
+            ResourceBooking\Booking\Status\Model::STATUS_PENDING,
+            "The clash booking has status 'pending' as expected"
+        );
+
+        // Create clashing booking with status 'approved' ------------------------------------------------------------//
+
+        $i->amGoingTo("Set the resource's moderation type to 'open'");
+        $resource->setModerationType(new ModerationType\Model()->setId(ModerationType\Model::TYPE_OPEN));
+        $resourceMapper->save($resource);
+        $i->assertEquals(
+            $resource->getModerationType()->getId(),
+            ModerationType\Model::TYPE_OPEN,
+            "The resource now has moderation type 'open' as expected"
+        );
+        $i->amGoingTo('Create a booking that clashes with the pre-existing booking');
+        $i->comment('The booking will be on 2050-01-01, from 12pm to 4pm');
+        $clashBookingsName = 'Clash booking ' . microtime(true);
+        $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $clashBookingsName);
+        $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 12:00:00')));
+        $payload->setFormParam('endDate', date('d/m/Y g:ia', strtotime('2050-01-01 16:00:00')));
+        $i->sendRequest($payload);
+        $i->amGoingTo("confirm that 'bookedPendingBecauseClashes' is false");
+        $i->canSeeResponseContainsJson(['bookedPendingBecauseClashes' => false]);
+
+        $i->amGoingTo('confirm that the clash booking has been created');
+        $clashBooking = $bookingMapper->findOneByColumn('name', $clashBookingsName);
+        $i->comment("The clash booking has id " . $clashBooking->getId());
+        $i->assertEquals(
+            $clashBooking->getResource()->getId(),
+            $resource->getId(),
+            "The clash booking uses resource {$resource->getId()} as expected"
+        );
+        $i->assertEquals(
+            $clashBooking->getStatus()->getId(),
+            ResourceBooking\Booking\Status\Model::STATUS_APPROVED,
+            "The clash booking has status 'approved' as expected"
+        );
     }
 }

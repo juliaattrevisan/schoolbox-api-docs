@@ -39,7 +39,7 @@ class BookItem extends Payload\Request
         $this->setFormParam('action', '');
         $this->setFormParam('campus', '1');
         $this->setFormParam('repeat', '');
-        $this->setFormParam('repeat_untill', '');
+        $this->setFormParam('repeat_until', '');
         $this->setFormParam('notes', '<p>These are some notes</p>');
         $this->setFormParam('callbackUrl', '');
     }
