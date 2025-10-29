@@ -161,13 +161,21 @@ function changeHelpRequest(helpRequested: boolean): void {
         }
     }
 
-    // TODO
+    console.warn("TODO"); // TODO
+}
+
+/**
+ * When a learner or instructor clicks the submit button inside the modal
+ */
+function submitResponse(): void {
+    // TODO: show a modal first, for students and/or staff?
+
+    console.warn("TODO"); // TODO
 }
 </script>
 
 <template>
     <div class="actions-small-1 l-mar-s--bottom">
-        <!-- TODO: Implement Request Teacher Help -->
         <button
             v-if="!isInstructor && currentResponse.assistanceRequestedAt === null"
             class="button"
@@ -176,10 +184,8 @@ function changeHelpRequest(helpRequested: boolean): void {
         >
             Request Teacher Help
         </button>
-        <!-- TODO: Implement Submit -->
-        <!-- TODO: Implement SOBO -->
         <nav>
-            <button class="button submit icon-approve" type="submit">
+            <button class="button submit icon-approve" type="submit" @click="submitResponse">
                 {{ isInstructor ? `Submit on behalf of ${props.student.fullName}` : "Submit" }}
             </button>
         </nav>
@@ -188,7 +194,7 @@ function changeHelpRequest(helpRequested: boolean): void {
     <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 50vh; height: 100%">
         <template #header>
             <div
-                v-if="isInstructor && currentResponse.assistanceRequestedAt !== null"
+                v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
                 class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
