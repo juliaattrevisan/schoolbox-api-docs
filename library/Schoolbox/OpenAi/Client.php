@@ -329,10 +329,11 @@ class Client implements IClient
     }
 
     /**
-     * @param array $completedEvent
+     * @param array     $completedEvent
      * @param Log\Model $log
      * @return void
-     * @throws MapperException
+     * @throws SchoolboxException if the completed event was an error or failure
+     * @throws MapperException    if the log couldn't be saved
      */
     private function finaliseLog(array $completedEvent, Log\Model $log): void
     {
@@ -453,6 +454,7 @@ class Client implements IClient
      * @param int              $chunkSize How many bytes to read from each stream iteration.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if the request fails
+     * @throws MapperException          if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
         RequestInterface $request,
@@ -470,10 +472,29 @@ class Client implements IClient
             }
         } else {
             // Log the fact this isn't a stream, too
+            $reason   = sprintf('Expected text/event-stream response: received %s', $contentType);
+            $previous = null;
+            try {
+                $this->finaliseLog(
+                    [
+                        'status'             => 'failed',
+                        'incomplete_details' => [
+                            'reason' => $reason,
+                        ],
+                    ],
+                    $log,
+                );
+            } catch (SchoolboxException $previous) {
+                // Swallow and rethrow.
+                // Note that MapperException is not caught here: that indicates
+                // a failure to save the log, and should not be swallowed or
+                // wrapped in another exception.
+            }
             throw new BadResponseException(
-                sprintf('Expected text/event-stream response: received %s', $contentType),
+                $reason,
                 $request,
                 $response,
+                $previous,
             );
         }
     }
