@@ -193,9 +193,9 @@ class Client implements IClient
      * @param StreamInterface $stream    The response's body, as a stream.
      * @param int             $chunkSize How many bytes should be read from the
      *                                   stream at once?
-     * @return iterable<string>
+     * @return iterable<EventStream\Message>
      */
-    private function readEvents(StreamInterface $stream, int $chunkSize, Log\Model $log): iterable
+    private function readEvents(StreamInterface $stream, int $chunkSize): iterable
     {
         $chunkBuffer = '';
         while (!$stream->eof()) {
@@ -220,8 +220,7 @@ class Client implements IClient
                 $message = EventStream\Message::fromString($chunk);
 
                 // Filter fields out of the message as necessary before sending?
-                yield $this->filterForOutput($message)->__toString();
-                $this->onMessage($message, $log);
+                yield $this->filterForOutput($message);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
                 // TODO this should probably raise an exception, to be handled
@@ -238,13 +237,16 @@ class Client implements IClient
         // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
             $message = EventStream\Message::fromString($chunkBuffer);
-            yield $this->filterForOutput($message)->__toString();
-            $this->onMessage($message, $log);
+            yield $this->filterForOutput($message);
         }
     }
 
     /**
      * Write this message to the log.
+     *
+     * TODO this is responsible for handling messages from different endpoints:
+     *      it should differentiate between those messages, and handle
+     *      differently.
      *
      * @param EventStream\Message $message
      * @param Log\Model           $log
@@ -479,10 +481,11 @@ class Client implements IClient
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {
-            foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
+            foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
-                yield $stream;
+                yield $message->__toString();
+                $this->onMessage($message, $log);
             }
 
             // At the end: finalise log
