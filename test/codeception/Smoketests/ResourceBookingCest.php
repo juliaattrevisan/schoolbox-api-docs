@@ -931,7 +931,7 @@ class ResourceBookingCest
         // Create a pre-existing 'pending' booking to clash with another clash booking created below -----------------//
         // (this is designed to clash with the third clash booking created below)
 
-        $i->amGoingTo('create a pre-existing booking of that resource, on 2050-01-03, from 10am to 2pm');
+        $i->amGoingTo('create a pre-existing booking of that resource, on 2050-01-01, from 10am to 2pm');
         $preExistingBookingName = 'Pre-existing booking ' . microtime(true);
         $payload = new Payload\ResourceBooking\Resource\BookItem($resource, $preExistingBookingName);
         $payload->setFormParam('startDate', date('d/m/Y g:ia', strtotime('2050-01-01 10:00:00')));
