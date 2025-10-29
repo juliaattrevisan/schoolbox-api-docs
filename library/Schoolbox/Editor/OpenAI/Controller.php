@@ -355,12 +355,6 @@ class Controller extends Base
         try {
             $response = $agent->requestStream(
                 $this->getUser(),
-//                json_decode(
-//                    $this->request->getBody()->getContents(),
-//                    true,
-//                    512,
-//                    JSON_THROW_ON_ERROR,
-//                ),
                 $this->request->getParsedBody(),
                 $aiSessionId
             );
