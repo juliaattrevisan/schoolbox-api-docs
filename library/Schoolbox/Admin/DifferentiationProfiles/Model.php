@@ -32,14 +32,14 @@ class Model
         'terminology' => [
             'title' => 'Terminology',
             'type' => 'text',
-            'colSpan' => 4,
+            'colSpan' => 3,
             'key' => 'terminology',
             'maxLength' => 100,
         ],
         'description' => [
             'title' => 'Description / Definition',
             'type' => 'text',
-            'colSpan' => 5,
+            'colSpan' => 6,
             'key' => 'description',
             'maxLength' => 256,
         ],
