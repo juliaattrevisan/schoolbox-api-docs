@@ -344,7 +344,7 @@ class Calendar extends DeprecatedModel
             // Start timestamp: don't get events which end before or on that time
             $adf              = Alaress_Date_Format::newFromTimestamp($startTimestamp);
             $dateQueryParts[] = sprintf(
-                "end_datetime < '%s'",
+                "event.end_datetime < '%s'",
                 $adf->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT)
             );
         }
@@ -352,7 +352,7 @@ class Calendar extends DeprecatedModel
             // End timestamp: don't get events which start after that time
             $adf              = Alaress_Date_Format::newFromTimestamp($endTimestamp);
             $dateQueryParts[] = sprintf(
-                "start_datetime >= '%s'",
+                "event.start_datetime >= '%s'",
                 $adf->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT)
             );
         }
@@ -369,8 +369,8 @@ class Calendar extends DeprecatedModel
                 event.series_id,
                 event.owner,
                 GROUP_CONCAT(DISTINCT event_campus.campus_id) as campusList,
-                start_datetime,
-                end_datetime,
+                event.start_datetime as start_datetime,
+                event.end_datetime as end_datetime,
                 allday,
                 YEAR(event.start_datetime) AS year,
                 type,
