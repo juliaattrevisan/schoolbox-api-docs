@@ -255,9 +255,13 @@ class Client implements IClient
     {
         // Prepare the message for logging
         $eventType = $message->eventType;
-        $output    = '';
         $data      = [];
         try {
+            // Need to handle different types of response:
+            // * chat completions returns messages with no event type
+            // * responses returns messages with event types, which should be
+            //   handled uniquely
+
             // Omit partial and completed image data from the output
             $item   = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
             $data[] = $item;
@@ -278,14 +282,14 @@ class Client implements IClient
                 }
             }
 
-            $output .= sprintf("event: %s\ndata: %s\n\n", $eventType, json_encode($item, JSON_THROW_ON_ERROR));
+            // Override message data before writing it
+            $message->data = json_encode($item, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
-            $output .= sprintf("event: %s\n%s\n\n", $eventType, $message->data);
         }
 
         // This chunk gets added to the log
-        $this->appendMessageToLog($output, $data, $log);
+        $this->appendMessageToLog($message, $data, $log);
 
         // Extract the completed event, and add it to the log
         // Is this the final event?
@@ -302,14 +306,17 @@ class Client implements IClient
      * * the model the API endpoint used
      * * the input and output tokens used
      *
-     * @param string    $output The message, formatted as an event stream, with filtered fields.
-     * @param array     $data   The unfiltered parsed data from the message.
-     * @param Log\Model $log    The log to write to.
+     * This also saves the log in its probably incomplete state.
+     *
+     * @param EventStream\Message $message The message, with filtered fields, to be written direct to the log.
+     * @param array               $data    The unfiltered parsed data from the message: the model and token usage will
+     *                                     be extracted from here.
+     * @param Log\Model           $log     The log to write to.
      * @return void
      */
-    private function appendMessageToLog(string $output, array $data, Log\Model $log): void
+    private function appendMessageToLog(EventStream\Message $message, array $data, Log\Model $log): void
     {
-        $log->setResponse(($log->getResponse() ?? '') . $output);
+        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
         foreach ($data as $item) {
             // Model, input and output tokens depend on the endpoint
             $model        = $item['response']['model'] ?? $item['model'] ?? null;
@@ -435,7 +442,10 @@ class Client implements IClient
         }
 
         // Do something with the response:
-        // extract the body, and also log it
+        // extract the body, and also log it.
+        // OpenAI responses to non-streamed requests are a single JSON object
+        // (at least in the case of responses and chat completions), so it can
+        // be decoded and processed as a single object.
         $responseBody = $response->getBody()->getContents();
         $data         = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $this->finaliseLog($data, $log);
@@ -466,10 +476,15 @@ class Client implements IClient
 
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
+        $lastEvent   = null;
         if (str_contains($contentType, 'text/event-stream')) {
             foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
+                // The log should be saved in an incomplete form whenever an
+                // event is read, so in the case of failure something is logged.
                 yield $stream;
             }
+
+            // At the end: finalise log
         } else {
             // Log the fact this isn't a stream, too
             $reason   = sprintf('Expected text/event-stream response: received %s', $contentType);
