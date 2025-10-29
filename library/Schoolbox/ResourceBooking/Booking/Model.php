@@ -71,14 +71,14 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $modifiedAt;
 
     /**
-     * @var Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
-    protected Alaress_Date_Format $bookingStartAt;
+    protected ?Alaress_Date_Format $bookingStartAt;
 
     /**
-     * @var Alaress_Date_Format
+     * @var null|Alaress_Date_Format
      */
-    protected Alaress_Date_Format $bookingEndAt;
+    protected ?Alaress_Date_Format $bookingEndAt;
 
     /**
      * @var Collection|self[]
@@ -296,36 +296,36 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return ?Alaress_Date_Format
      */
-    public function getBookingStartAt(): Alaress_Date_Format
+    public function getBookingStartAt(): ?Alaress_Date_Format
     {
         return $this->bookingStartAt;
     }
 
     /**
-     * @param  Alaress_Date_Format $bookingStartAt
+     * @param  ?Alaress_Date_Format $bookingStartAt
      * @return self
      */
-    public function setBookingStartAt(Alaress_Date_Format $bookingStartAt): self
+    public function setBookingStartAt(?Alaress_Date_Format $bookingStartAt): self
     {
         $this->bookingStartAt = $bookingStartAt;
         return $this;
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return ?Alaress_Date_Format
      */
-    public function getBookingEndAt(): Alaress_Date_Format
+    public function getBookingEndAt(): ?Alaress_Date_Format
     {
         return $this->bookingEndAt;
     }
 
     /**
-     * @param  Alaress_Date_Format $bookingEndAt
+     * @param  ?Alaress_Date_Format $bookingEndAt
      * @return self
      */
-    public function setBookingEndAt(Alaress_Date_Format $bookingEndAt): self
+    public function setBookingEndAt(?Alaress_Date_Format $bookingEndAt): self
     {
         $this->bookingEndAt = $bookingEndAt;
         return $this;
