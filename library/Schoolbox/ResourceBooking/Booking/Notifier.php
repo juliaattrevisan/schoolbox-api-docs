@@ -105,7 +105,7 @@ class Notifier extends AbstractModuleNotifier
      * the booking.)
      *
      * @param Model  $object
-     * @param User   $user
+     * @param User   $user The user whose action triggered the notification.
      * @param string $event
      *
      * @return Envelope
@@ -113,6 +113,8 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function buildEnvelope(Model $object, User $user, $event)
     {
+        /** @var Mapper $this->mapper - This declaration prevents PHPStorm warnings below. */
+
         // Ensure that object is hydrated. Why does this happen?
         /** @var Model $object */
         try {
@@ -164,7 +166,32 @@ class Notifier extends AbstractModuleNotifier
 
         switch ($event) {
             case 'created':
+                // Get the objects needed below for the Validator constructor.
+                // TODO: Inject these.
+                $termMapper = new \Schoolbox\Assessment\Term\Mapper();
+                $externalTimetable = new \External_Timetable();
+                $campusMapper = new \Schoolbox\CampusMapper();
+                $externalEventMapper = new \Schoolbox\External\Event\Mapper();
+                $validation = new Validation(
+                    $user,
+                    $this->mapper,
+                    $this->mapper->getJoinMapper('status'),
+                    $termMapper,
+                    $externalTimetable,
+                    $campusMapper,
+                    $this->conf,
+                    $externalEventMapper,
+                );
                 $messageText = ':user booked :resource';
+                $clashErrors = $validation->validateForClashes(
+                    $object->getResource(),
+                    $object->getEvent()->getStartDateTime()?->getDateTimeObject(),
+                    $object->getEvent()->getEndDateTime()?->getDateTimeObject(),
+                    $object
+                );
+                if (count($clashErrors) > 0) {
+                    $messageText .= ' (with conflicts)';
+                }
                 break;
             case 'approved':
                 $messageText = ':user approved booking of :resource';
