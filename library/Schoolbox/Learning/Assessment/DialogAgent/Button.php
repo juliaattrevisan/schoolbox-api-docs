@@ -222,7 +222,7 @@ class Button
         /* Unforeseen scenario.
          */
         return [
-            'label' => null,
+            'label' => self::LABEL_START,
             'responseId' => null,
             'enabled' => false,
             'url' => null,
