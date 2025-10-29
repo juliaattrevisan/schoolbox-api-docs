@@ -44,7 +44,8 @@ class Button
      * Contains a route generator so you can pre-build the relevant routes here
      * @param \Aura\Router\Generator $routeGenerator
      */
-    public function __construct(private \Aura\Router\Generator $routeGenerator) {
+    public function __construct(private \Aura\Router\Generator $routeGenerator)
+    {
     }
 
 
