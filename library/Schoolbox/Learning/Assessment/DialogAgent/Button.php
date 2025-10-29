@@ -138,39 +138,6 @@ class Button
             }
         }
 
-        /* If you've spent the allotted time across all of your responses, you can't make any more responses.
-         * button says "View" so you can see the authoritative response.
-         *
-         * TODO depends on SA-21229 existing.
-         */
-//        if ($assessment->getDuration() > $totalTime) {
-//            /* No authoritative response, but you've used up all your time. This scenario should be prevented by
-//             * crontabs forcefully setting submitted_at but in the very possible outcome that crontabs fail, this
-//             * will be experienced by users. There have been cases recently where crontabs crashed out entirely.
-//             *
-//             * This means you can get here by a student starting a dialog agent, chatting for a bit, then idling.
-//             * You kind of need two data points to judge how long someone spent in this case:
-//             *
-//             * updated_at - started_at = total time spent in this response
-//             *
-//             * Once you've met the duration allotted you should be forced to view your response in a readonly way.
-//             */
-//            if (null === $authoritativeResponse) {
-//                return [
-//                    'label' => self::LABEL_VIEW,
-//                    'responseId' => null,
-//                    'enabled' => false,
-//                ];
-//            } else {
-//                return [
-//                    'label' => self::LABEL_VIEW,
-//                    'responseId' => $authoritativeResponse->getId(),
-//                    'enabled' => false,
-//                ];
-//            }
-//        }
-
-
         /* Otherwise it's reached its open date, but it's not closed yet; deal with responses somewhat intricately
          * This mega clause represents students -doing stuff-
          */
@@ -240,6 +207,13 @@ class Button
              * did nothing to contribute to this activity)
              */
         }
+
+        /* Assessment Duration
+         *
+         * Note that durations are -per response- and mostly enforced in frontend.
+         * Backend implements a crontab that forcibly shuts whatever the frontend couldn't.
+         * Durations don't factor into whether you can make responses or anything, it's a clerical duty.
+         */
 
         /* Unforeseen scenario.
          */
