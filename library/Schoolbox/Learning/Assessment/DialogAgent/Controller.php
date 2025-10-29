@@ -354,23 +354,6 @@ class Controller extends Assessment\Controller
         /** @var null|Participant $participant */
         $participant = $assessment->getParticipantIfExtant($student);
 
-        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
-         * button which goes to that particular response so students can continue it.
-         *
-         * Otherwise create a new response.
-         */
-        $existingResponse = null;
-
-        if ($participant) {
-            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-                ->equals('learner_id', $participant->getUser()->getId())
-                ->isNull('submitted_by')
-                ->isNull('submitted_at');
-
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb);
-        }
-
         // Is the page being displayed in readonly mode?
         /* TODO Are students allowed to visit this after the activity is closed?
          */
@@ -397,7 +380,7 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'student' => $student,
             'participant' => $participant,
-            'existingResponse' => $existingResponse,
+            'existingResponse' => null,
             'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
