@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Learning\Assessment\Participant;
 
 /**
@@ -38,12 +39,23 @@ class Button
 
 
     /**
+     * Constructor.
+     *
+     * Contains a route generator so you can pre-build the relevant routes here
+     * @param \Aura\Router\Generator $routeGenerator
+     */
+    public function __construct(private \Aura\Router\Generator $routeGenerator) {
+    }
+
+
+    /**
      * Takes a fully-hydrated $participant along with their $response instances and the assessment.
      * From those, decides what the call to action should be on the Summary screen.
      *
      * @param Model $assessment
      * @param Participant $participant
      * @return array
+     * @throws RouteNotFound
      */
     public function generate(Model $assessment, Participant $participant): array
     {
@@ -59,6 +71,7 @@ class Button
                 'label' => self::LABEL_START,
                 'responseId' => null,
                 'enabled' => false,
+                'url' => null,
             ];
         }
 
@@ -87,6 +100,7 @@ class Button
                     'label' => self::LABEL_VIEW,
                     'responseId' => null,
                     'enabled' => false,
+                    'url' => null,
                 ];
             } else {
                 /* If the assessment has surpassed its due date,
@@ -97,6 +111,14 @@ class Button
                     'label' => self::LABEL_VIEW,
                     'responseId' => $authoritativeResponse->getId(),
                     'enabled' => true,
+                    'url' => $this->routeGenerator->generate('learningAssessment.getViewResponse', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId(),
+                        'student' => $participant->getUser(),
+                        'studentId' => $participant->getUser()->getId(),
+                        'response' => $authoritativeResponse,
+                        'responseId' => $authoritativeResponse->getId()
+                    ]),
                 ];
             }
         }
@@ -145,6 +167,12 @@ class Button
                     'label' => self::LABEL_START,
                     'responseId' => null,
                     'enabled' => true,
+                    'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId(),
+                        'student' => $participant->getUser(),
+                        'studentId' => $participant->getUser()->getId(),
+                    ]),
                 ];
             }
 
@@ -162,6 +190,14 @@ class Button
                         'label' => self::LABEL_VIEW,
                         'responseId' => $authoritativeResponse->getId(),
                         'enabled' => true,
+                        'url' => $this->routeGenerator->generate('learningAssessment.getViewResponse', [
+                            'assessment' => $assessment,
+                            'assessmentId' => $assessment->getId(),
+                            'student' => $participant->getUser(),
+                            'studentId' => $participant->getUser()->getId(),
+                            'response' => $authoritativeResponse,
+                            'responseId' => $authoritativeResponse->getId()
+                        ]),
                     ];
                 } else {
                     /* Resume (enabled)
@@ -170,6 +206,14 @@ class Button
                         'label' => self::LABEL_RESUME,
                         'responseId' => $authoritativeResponse->getId(),
                         'enabled' => true,
+                        'url' => $this->routeGenerator->generate('learningAssessment.getResumeResponse', [
+                            'assessment' => $assessment,
+                            'assessmentId' => $assessment->getId(),
+                            'student' => $participant->getUser(),
+                            'studentId' => $participant->getUser()->getId(),
+                            'response' => $authoritativeResponse,
+                            'responseId' => $authoritativeResponse->getId()
+                        ]),
                     ];
                 }
             }
@@ -181,6 +225,7 @@ class Button
             'label' => null,
             'responseId' => null,
             'enabled' => false,
+            'url' => null,
         ];
     }
 }

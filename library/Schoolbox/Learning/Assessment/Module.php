@@ -320,6 +320,10 @@ class Module extends BaseModule
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/resume", 'getResumeResponse', $canSubmit, $preloadParticipant);
 
+        /* Dialog Agent: view a response
+         */
+        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', $canViewSummary, $preloadParticipant);
+
         // LTI assessment related routes
         // TODO extract to a different module:
         //      they are only here so that they can use the standard assessment preloads and permissions

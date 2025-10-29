@@ -11,6 +11,7 @@
  # @param array $courseAssessments        A struct containing a set of assessments grouped by their units
  # @param bool $isInstructor              Whether the currently logged in guy is an instructor
  # @param IResponse $existingResponse     A response that can be resumed
+ # @param array $button                   An array struct representing a call to action
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -50,42 +51,23 @@
     </div>
 </div>
 
-{# Decide if a student can create a response to this Dialog Agent.
- # They need access to the route and the activity must:
- #    - be past the open datetime
- #    - not yet reached the due/close datetime (they should be the same for this activity)
- #    - total time spent creating responses has not yet reached the Allowed Duration
- #}
-{% if existingResponse %}
-    {% set action = 'Resume' %}
+{# Call To Action #}
+<div class="row">
+    <div class="small-12 columns">
+        {# Calculate redirect querystring params, if extant #}
+        {% set redirect = '' %}
 
-    {% set actionRoute = routeLookupIfAuthorized('learningAssessment.getResumeResponse', {
-        assessmentId: assessment.id,
-        assessment: assessment,
-        studentId: student.id,
-        student: student
-    }) %}
-{% else %}
-    {% set action = 'Begin' %}
+        {% if returnUrlEncoded %}
+            {% set redirect = '?' ~ RETURN_URL.name ~ '=' ~ returnUrlEncoded|escape('url')%}
+        {% endif %}
 
-    {% set actionRoute = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', {
-        assessmentId: assessment.id,
-        assessment: assessment,
-        studentId: student.id,
-        student: student
-    }) %}
-{% endif %}
-
-{% if actionRoute %}
-    <div class="row">
-        <div class="small-12 columns">
-            <a class="submit button"
-               href="{{ actionRoute }}{% if returnUrlEncoded %}?{{ RETURN_URL.name }}={{ returnUrlEncoded|escape('url') }}{% endif %}"
-               data-test="assessment-summary-create-button"
-            >{{ action }} {{ locale.dialogAgent }}</a>
-        </div>
+        <a class="submit button"
+           href="{{ button.url }}{{ redirect }}"
+           data-test="assessment-summary-create-button"
+           {% if not button.enabled %} disabled {% endif %}
+        >{{ button.label }} {{ locale.dialogAgent }}</a>
     </div>
-{% endif %}
+</div>
 
 {# Discussion History
  # This also includes the ability to declare an authoritative response
