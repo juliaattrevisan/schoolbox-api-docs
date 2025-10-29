@@ -140,6 +140,7 @@ CREATE TABLE `dialog_agent_response` (
     `authoritative` BOOLEAN,
     `session_id` CHAR(36),
     `assistance_requested_at` DATETIME,
+    `started_at` DATETIME,
     `submitted_at` DATETIME,
     `submitted_by` INT UNSIGNED NULL,
     `created_at` DATETIME NOT NULL,
