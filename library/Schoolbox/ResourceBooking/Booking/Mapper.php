@@ -133,6 +133,22 @@ class Mapper extends BaseMapper
         );
         $this->hasSoftDeleteDateField('deleted_at');
 
+        // Booking start/end datetime (if the booking entry differs from the event's)
+        $this->hasMap(
+            array(
+                'column'            => 'start_datetime',
+                'property'          => 'bookingStartAt',
+                'type'              => self::TYPE_DATETIME,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'            => 'end_datetime',
+                'property'          => 'bookingEndAt',
+                'type'              => self::TYPE_DATETIME,
+            )
+        );
+
         // Join to related bookings
         $this->hasJoin(
             'related_booking',
