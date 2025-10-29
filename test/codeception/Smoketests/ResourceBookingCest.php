@@ -687,7 +687,7 @@ class ResourceBookingCest
 
     /**
      * To inspect the results of this test after it has run,
-     * goto https://vagrant.dev.schoolbox.cloud/resource-booking/item/$resourceId.
+     * goto https://$schoolboxDomain/resource-booking/item/$resourceId.
      * Get $resourceId from the test output (look for text "The new resource has id...").
      *
      * @param IntegrationTester $i
@@ -888,7 +888,7 @@ class ResourceBookingCest
 
     /**
      * To inspect the results of this test after it has run,
-     * * goto https://vagrant.dev.schoolbox.cloud/resource-booking/item/$resourceId.
+     * * goto https://$schoolboxDomain/resource-booking/item/$resourceId.
      * * Get $resourceId from the test output (look for text "The new resource has id...").
      * *
      * @param IntegrationTester $i
