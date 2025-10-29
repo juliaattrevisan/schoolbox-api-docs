@@ -931,7 +931,10 @@ class Controller extends Base
         if ($callbackUrl === $this->routeGenerator->generate('resourceBooking.edit', ['id' => $item->getId()])) {
             $callbackUrl = $this->routeGenerator->generate(
                 'resourceItem.read',
-                ['id' => $item->getResource()->getId()]
+                [
+                    'id' => $item->getResource()->getId(),
+                    'format' => '',
+                ]
             );
         }
         $this->setUpdateStatusResponse($item, $callbackUrl);
