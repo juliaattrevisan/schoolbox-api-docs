@@ -94,7 +94,13 @@ class Client implements IClient
         $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request = new Request('POST', $url, $this->authHeaders);
-        return $this->handleStreamedResponse($request, $payload, $log, $chunkSize ?? self::DEFAULT_CHUNK_SIZE);
+        return $this->handleStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new EventStream\LogHandler\ResponseMessage(),
+            $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
+        );
     }
 
     /**
@@ -116,7 +122,13 @@ class Client implements IClient
         $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request = new Request('POST', $url, $this->authHeaders);
-        return $this->handleStreamedResponse($request, $payload, $log, $chunkSize ?? self::DEFAULT_CHUNK_SIZE);
+        return $this->handleStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new EventStream\LogHandler\ChatCompletionsMessage(),
+            $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
+        );
     }
 
     /**
@@ -462,10 +474,11 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param RequestInterface $request   The request to send.
-     * @param array            $payload   The request body to send.
-     * @param Log\Model        $log       The log to write to.
-     * @param int              $chunkSize How many bytes to read from each stream iteration.
+     * @param RequestInterface                   $request    The request to send.
+     * @param array                              $payload    The request body to send.
+     * @param Log\Model                          $log        The log to write to.
+     * @param EventStream\LogHandler\ILogHandler $logHandler The log handler to use for each message.
+     * @param int                                $chunkSize  How many bytes to read from each stream iteration.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if the request fails
      * @throws MapperException          if somehow the log couldn't be saved
@@ -474,6 +487,7 @@ class Client implements IClient
         RequestInterface $request,
         array $payload,
         Log\Model $log,
+        EventStream\LogHandler\ILogHandler $logHandler,
         int $chunkSize,
     ): iterable {
         $response = $this->sendRequest($request, $payload, true);
@@ -489,7 +503,8 @@ class Client implements IClient
                 // Update the log, and save it:
                 // if that raises an exception, still save the log
                 try {
-                    $this->onMessage($message, $log);
+                    $logHandler->handle($message, $log);
+//                    $this->onMessage($message, $log);
                 } finally {
                     $this->logMapper->save($log);
                 }
