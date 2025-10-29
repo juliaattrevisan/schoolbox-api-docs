@@ -333,6 +333,7 @@ class Client implements IClient
                 $log->setOutputTokens($outputTokens);
             }
         }
+        $this->logMapper->save($log);
     }
 
     /**
