@@ -47,49 +47,140 @@ class Button
      */
     public function generate(Model $assessment, Participant $participant): array
     {
-        $button = [
-            'label' => null,
-            'responseId' => null,
-            'enabled' => true,
-            'url' => null,  // hurmmm needs a Router, but do we want that here...
-        ];
+        $now = \Alaress_Date_Format::now();
 
         /* If the assessment has surpassed its publish date, but not yet reached its open date,
          * button says "Begin" in a disabled state.
          */
+        if ($assessment->getPublishAt()->lte($now) && $assessment->getOpenAt()->gt($now)) {
+            /* Begin (disabled)
+             */
+            return [
+                'label' => self::LABEL_START,
+                'responseId' => null,
+                'enabled' => false,
+            ];
+        }
 
-        /* Otherwise it's reached its open date and we have to deal with responses somewhat intricately
+        /* Everything below here requires you to know about an authoritative response, if extant.
          */
 
-        /* If there are no responses at all, button says "Begin"
-         * You're about to make the first one and the first one is always authoritative.
-         */
+        /** @var null|\Schoolbox\Learning\Assessment\DialogAgent\Response\Model $authoritativeResponse */
+        $authoritativeResponse = null;
 
-        /* Otherwise, there are existing response(s); dig deeper.
-         *
-         * Look for an authoritative response. If there is one:
-         *     - if it has a submitted_at, button says "View"
-         *     - otherwise, button says "Resume"
+        if ($participant->getAllResponses()->count()) {
+            $authoritativeResponse = $participant->getAllResponses()->filter(static function ($response) {
+                return $response->getAuthoritative();
+            })->first();
+        }
+
+        /* The assessment has surpassed its due/close date, but we need to let students see the work they did
+         * previously. This lets them use it for their own revision purposes. Note that dialog agents' Due and
+         * Close date should be the same value: this is enforced elsewhere in the swamp.
          */
+        if ($assessment->getCloseAt()->lte($now)) {
+            if (null === $authoritativeResponse) {
+                /* No authoritative responses; the student never did the work
+                 * Button says "View" in a disabled state.
+                 */
+                return [
+                    'label' => self::LABEL_VIEW,
+                    'responseId' => null,
+                    'enabled' => false,
+                ];
+            } else {
+                /* If the assessment has surpassed its due date,
+                 * but this is an authoritative response,
+                 * button says "View" but lets you continue so you can look at it.
+                 */
+                return [
+                    'label' => self::LABEL_VIEW,
+                    'responseId' => $authoritativeResponse->getId(),
+                    'enabled' => true,
+                ];
+            }
+        }
 
         /* If you've spent the allotted time across all of your responses, you can't make any more responses.
          * button says "View" so you can see the authoritative response.
          *
          * TODO depends on SA-21229 existing.
          */
+//        if ($assessment->getDuration() > $totalTime) {
+//            /* No authoritative response, but you've used up all your time. This scenario should be prevented by
+//             * crontabs forcefully setting submitted_at but in the very possible outcome that crontabs fail, this
+//             * will be experienced by users. There have been cases recently where crontabs crashed out entirely.
+//             *
+//             * This means you can get here by a student starting a dialog agent, chatting for a bit, then idling.
+//             * You kind of need two data points to judge how long someone spent in this case:
+//             *
+//             * updated_at - started_at = total time spent in this response
+//             *
+//             * Once you've met the duration allotted you should be forced to view your response in a readonly way.
+//             */
+//            if (null === $authoritativeResponse) {
+//                return [
+//                    'label' => self::LABEL_VIEW,
+//                    'responseId' => null,
+//                    'enabled' => false,
+//                ];
+//            } else {
+//                return [
+//                    'label' => self::LABEL_VIEW,
+//                    'responseId' => $authoritativeResponse->getId(),
+//                    'enabled' => false,
+//                ];
+//            }
+//        }
 
-        /* If the assessment has surpassed its due/close date,
-         * and there are no authoritative responses,
-         * button says "View" but in a disabled state.
-         *
-         * The student never did the work.
+
+        /* Otherwise it's reached its open date, but it's not closed yet; deal with responses somewhat intricately
          */
+        if ($assessment->getOpenAt()->lte($now)) {
+            if (!$participant->getAllResponses()->count()) {
+                /* If there are no responses at all, button says "Begin"
+                 * You're about to make the first one and the first one is always authoritative.
+                 */
+                return [
+                    'label' => self::LABEL_START,
+                    'responseId' => null,
+                    'enabled' => true,
+                ];
+            }
 
-        /* If the assessment has surpassed its due date,
-         * but this is an authoritative response,
-         * button says "View" but lets you continue so you can look at it.
+            /* Otherwise, there are existing response(s); dig deeper.
+             *
+             * Look for an authoritative response. If there is one:
+             *     - if it has a submitted_at, button says "View"
+             *     - otherwise, button says "Resume"
+             */
+            if (null !== $authoritativeResponse) {
+                if (null !== $authoritativeResponse->getSubmittedAt()) {
+                    /* View (enabled)
+                     */
+                    return [
+                        'label' => self::LABEL_VIEW,
+                        'responseId' => $authoritativeResponse->getId(),
+                        'enabled' => true,
+                    ];
+                } else {
+                    /* Resume (enabled)
+                     */
+                    return [
+                        'label' => self::LABEL_RESUME,
+                        'responseId' => $authoritativeResponse->getId(),
+                        'enabled' => true,
+                    ];
+                }
+            }
+        }
+
+        /* Unforeseen scenario.
          */
-
-        return $button;
+        return [
+            'label' => null,
+            'responseId' => null,
+            'enabled' => false,
+        ];
     }
 }
