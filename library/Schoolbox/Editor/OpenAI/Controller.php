@@ -287,7 +287,7 @@ class Controller extends Base
                     ->asArray();
 
                 $this->response = $this
-                    ->responseAsEventStream(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                    ->responseAsJson($problem)
                     ->withStatus($e->getCode());
                 return;
             }
@@ -301,12 +301,8 @@ class Controller extends Base
                 ->asArray();
 
             $this->response = $this
-                ->responseAsEventStream(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                ->responseAsJson($problem)
                 ->withStatus($e->getCode());
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
             return;
         }
     }
