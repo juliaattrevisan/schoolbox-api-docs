@@ -282,6 +282,9 @@ class Controller extends Base
                 return;
             } catch (SchoolboxException $e) {
                 // This will always be a stream
+                // Unfortunately the exception isn't raised until the response
+                // is output, which doesn't happen until after this method
+                // returns.
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
                     ->asArray();
