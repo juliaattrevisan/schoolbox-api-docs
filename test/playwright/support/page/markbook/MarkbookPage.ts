@@ -26,6 +26,8 @@ export default class MarkbookPage {
 
     static readonly DATA_TEST_MARKBOOK_ASSESSMENT_DROPDOWN = "markbook-assessment-dropdown-[ASSESSMENT_ID]-[ITEM]"; // Replace [ASSESSMENT_ID] with the actual ID and [ITEM] with the item in the list
 
+    static readonly SELECTOR_SHOW_DRAFTS_CHECKBOX = `label[for="show-drafts"]`;
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -152,7 +154,7 @@ export default class MarkbookPage {
      */
     async clickAssessmentDropdownItem(
         assessmentId: string | number,
-        item: "view" | "modify" | "modify-content" | "view-status" | "import-feedback" | "publish",
+        item: "view" | "modify" | "modify-content" | "view-status" | "import-feedback",
     ): Promise<void> {
         const dataTestId = MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT_DROPDOWN.replace(
             "[ASSESSMENT_ID]",
@@ -161,6 +163,27 @@ export default class MarkbookPage {
 
         const dropdownItem = this.page.getByTestId(dataTestId);
         await dropdownItem.locator("a").click();
+    }
+
+    /**
+     * Click the publish grades & feedback button in the assessment dropdown
+     * @param assessmentId - The ID of the assessment
+     */
+    async clickPublishGradesAndFeedback(assessmentId: string | number): Promise<void> {
+        const dataTestId = MarkbookPage.DATA_TEST_MARKBOOK_ASSESSMENT_DROPDOWN.replace(
+            "[ASSESSMENT_ID]",
+            assessmentId.toString(),
+        ).replace("[ITEM]", "publish");
+
+        const dropdownItem = this.page.getByTestId(dataTestId);
+        await dropdownItem.locator("button").click();
+    }
+
+    /**
+     * Clicks publish all button in the Publish Drafts modal
+     */
+    async clickPublishAllInModal(): Promise<void> {
+        await this.page.locator(`button[type="submit"]:has-text("Publish All")`).click();
     }
 
     /**
@@ -273,5 +296,12 @@ export default class MarkbookPage {
     ): Promise<void> {
         const cell = this.getCell(studentId, assessmentId);
         await expect(cell).toHaveText(mark.toString());
+    }
+
+    /**
+     * click Show Drafts checkbox
+     */
+    async clickShowDraftsCheckbox(): Promise<void> {
+        await this.page.locator(MarkbookPage.SELECTOR_SHOW_DRAFTS_CHECKBOX).click();
     }
 }

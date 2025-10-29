@@ -78,6 +78,8 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_WORKSHEET_ATTACHMENT_ZONE = "#WorksheetZone";
 
+    static readonly DATATEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
+
     // Work type constants
     static readonly WORKTYPE_ASSESSMENT_TASK = 1;
 
@@ -427,5 +429,6 @@ export default class AssessmentForm {
             `input[name="rb[${capabilityId}][descriptor][${indicatorId}][${criterionId}][points]"]`,
         );
         await pointsInput.fill(value.toString());
+        await this.page.getByTestId(AssessmentForm.DATATEST_MODIFY_PLANS).click();
     }
 }

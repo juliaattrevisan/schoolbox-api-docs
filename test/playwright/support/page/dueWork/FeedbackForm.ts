@@ -70,6 +70,17 @@ export default class FeedbackForm {
     }
 
     /**
+     * Selects Absent, Not Assessed, etc from the grade dropdown
+     * @param option - The option to select
+     * @param participantId - The ID of the participant to set the grade for
+     */
+    async setSpecialGradeDropdown(option: string, participantId: string | number): Promise<void> {
+        const gradeDropdown = this.page.locator(`form[data-feedback-form="${participantId}"]`);
+        await gradeDropdown.locator("div.combobox_arrow").click();
+        await gradeDropdown.locator("li", { hasText: option }).click();
+    }
+
+    /**
      * Ensure the current grade in the feedback form matches the expected grade
      * @param value - The expected grade
      * @param participantId - The ID of the participant to check the grade for
