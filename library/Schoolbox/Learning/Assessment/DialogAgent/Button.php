@@ -54,13 +54,27 @@ class Button
      * From those, decides what the call to action should be on the Summary screen.
      *
      * @param Model $assessment
-     * @param Participant $participant
+     * @param null|Participant $participant
      * @return array
      * @throws RouteNotFound
      */
-    public function generate(Model $assessment, Participant $participant): array
+    public function generate(Model $assessment, ?Participant $participant): array
     {
         $now = \Alaress_Date_Format::now();
+
+        /* No participant? You might be a staff member creating this thing since that workflow also lands you at
+         * the assessment summary screen. Without a participant you can't do much here.
+         *
+         * I guess...this?
+         */
+        if (null === $participant) {
+            return [
+                'label' => self::LABEL_START,
+                'responseId' => null,
+                'enabled' => false,
+                'url' => null,
+            ];
+        }
 
         /* If the assessment has surpassed its publish date, but not yet reached its open date,
          * button says "Begin" in a disabled state.
