@@ -158,6 +158,7 @@ class Button
 
 
         /* Otherwise it's reached its open date, but it's not closed yet; deal with responses somewhat intricately
+         * This mega clause represents students -doing stuff-
          */
         if ($assessment->getOpenAt()->lte($now)) {
             if (!$participant->getAllResponses()->count()) {
