@@ -195,7 +195,8 @@ window.Vue.onMounted(() => {
                                 <template v-for="activity in unit.assessments" :key="activity.id">
                                     <li
                                         v-if="activity.assessmentType !== 'project'"
-                                        :data-unit-assessment="activity.id"
+                                        :data-assessment="activity.id"
+                                        :data-assessment-title="activity.title"
                                         class="interact child"
                                     >
                                         <linked-activities-modal-item
@@ -207,7 +208,8 @@ window.Vue.onMounted(() => {
                                         v-for="subActivity in activity.assessments"
                                         v-else
                                         :key="subActivity.id"
-                                        :data-unit-assessment="subActivity.id"
+                                        :data-assessment="subActivity.id"
+                                        :data-assessment-title="subActivity.title"
                                         class="interact child"
                                     >
                                         <linked-activities-modal-item
