@@ -43,6 +43,9 @@ class Controller extends Base
         private AdminConfigMapper $differentiationProifleConfigMapper,
         private AdminConfigModelToArray $adminConfigModelToArray,
         private IFactoryFactory $filterFactoryFactory,
+        private \Schoolbox\Filter\Mapper $filterMapper,
+        private \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper,
+        private Mapper $filteredEntityMapper,
     ) {
     }
 
@@ -53,27 +56,54 @@ class Controller extends Base
      */
     public function manageDifferentiationProfiles(): void
     {
+        $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
+
+        $route = $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData');
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
+            $route,
+            $this->getUser(),
+            [],
+            $this->requestQuery->getArrayCopy(),
+        );
+
+        $this->response = $this->responseFromTemplate(
+            '@differentiationProfiles/index.twig',
+            ['filterPanel' => $filterPanel],
+            "Manage $translation"
+        );
+    }
+
+    public function getDifferentiationProfileData(): void
+    {
         $profiles             = $this->differentiationProfileMapper->findStudentList();
-        $translation          = $this->rosettaStone->translate('differentiationProfile', true, true);
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
-        $adminConfigs         = $this->differentiationProifleConfigMapper->findByColumn('is_enabled', 1);
+        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
+
         $profileTranslator = new ModelToArray(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
             $adminConfigs,
         );
 
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
+        $request             = $this->requestPost['filter_selection'] ?: [];
+        $page                = \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
+        $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
             $this->getUser(),
-            \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
-            null,
-            $this->getUser(),
-            [],
-            $this->requestQuery->getArrayCopy(),
+            $page,
         );
 
-        $payload              = [
+        $payload = [
             'profiles'             => $profiles->map(
                 fn(Model $profile) => call_user_func($profileTranslator, $profile)
             ),
@@ -92,16 +122,10 @@ class Controller extends Base
             'header'               => $adminConfigs->map(
                 fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
             ),
-            'filterPanel' => $filterPanel,
         ];
-        if ($this->isJsonRequest()) {
-            $this->response = $this->responseAsJson($payload);
-        } else {
-            $this->response = $this->responseFromTemplate(
-                '@differentiationProfiles/index.twig',
-                $payload,
-                "Manage $translation"
-            );
-        }
+        $this->response = $this->responseAsJson([
+            'data' => $payload,
+            'metadata' => [],
+        ]);
     }
 }

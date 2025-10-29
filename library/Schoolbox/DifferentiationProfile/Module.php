@@ -13,14 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\DifferentiationProfile\Controller;
-use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\UserMapper;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
@@ -60,7 +53,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/manage', 'manageDifferentiationProfiles', $getPerms);
-        $this->register('POST', '/manage', 'filterDifferentiationProfiles', $getPerms);
+        $this->register('POST', '/manage', 'getDifferentiationProfileData', $getPerms);
 //        $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
 
@@ -80,6 +73,9 @@ class Module extends BaseModule
                 $this->getAuthorizer(),
             ),
             $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\DifferentiationProfile\Mapper::class),
         );
     }
 
