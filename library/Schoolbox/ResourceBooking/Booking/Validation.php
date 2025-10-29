@@ -390,7 +390,7 @@ class Validation
 
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
-            $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
             $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_TOO_SHORT;
         }
 
@@ -414,7 +414,7 @@ class Validation
             $latestEnd = clone $startDate;
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
-                $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_DATE_FORMAT);
                 $errors[self::END_PERIOD_ERRORS][$endDateKey][] = self::ERROR_TOO_LONG;
             }
         }
