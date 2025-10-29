@@ -449,8 +449,8 @@ class Client implements IClient
         // (at least in the case of responses and chat completions), so it can
         // be decoded and processed as a single object.
         $responseBody = $response->getBody()->getContents();
-        $data         = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-        $this->finaliseLog($data, $log);
+        $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+        $this->finaliseLog($responseJson, $log);
 
         // Restore the body in its streamable glory
         return $response->withBody(Utils::streamFor($responseBody));
@@ -478,7 +478,6 @@ class Client implements IClient
 
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
-        $lastEvent   = null;
         if (str_contains($contentType, 'text/event-stream')) {
             foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
                 // The log should be saved in an incomplete form whenever an
@@ -490,12 +489,15 @@ class Client implements IClient
             $log->setReturnCode($log->getReturnCode() ?? 200);
             $this->logMapper->save($log);
         } else {
-            // Log the fact this isn't a stream, too
-            $reason = sprintf('Expected text/event-stream response: received %s', $contentType);
-            $log->setReturnCode(500)
-                ->setErrorMessage($reason);
-            $this->logMapper->save($log);
-            throw new BadResponseException($reason, $request, $response);
+            // This is probably an error, so just finalise the log with whatever
+            // we got
+            $responseBody = $response->getBody()->getContents();
+            $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+            $this->finaliseLog($responseJson, $log);
+
+            // Convert it to a single message I guess, if finalising the log
+            // didn't raise an exception?
+            yield new EventStream\Message($responseBody)->__toString();
         }
     }
 }
