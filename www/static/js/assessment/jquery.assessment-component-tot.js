@@ -93,9 +93,9 @@
 
                                     // When all activities are deleted, show the empty selector
                                     if (settings.emptySelector) {
-                                        if ($taskList.find("[data-unit-assessment]").length === 0) {
-                                            component.find(settings.emptySelector).removeAttr("hidden");
-                                            component.find(settings.contentSelector).attr("hidden", true);
+                                        if ($taskList.find("[data-assessment]").length === 0) {
+                                            component.find(settings.emptySelector).removeClass("hide");
+                                            component.find(settings.contentSelector).addClass("hide");
                                         }
                                     }
 

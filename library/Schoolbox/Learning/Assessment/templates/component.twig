@@ -43,7 +43,7 @@
 
 
 {% if assessables is not empty %}
-    <section id="assessment-section-{{ component_id }}">
+    <section id="assessment-section-{{ component_id }}" data-component-content>
         <ul id="assessment-list-{{ component_id }}" class="action-list">
             {% for assessable in assessables %}
                 {% block listItem %}

@@ -127,7 +127,7 @@
         </div>
     </section>
 {% endif %}
-<div class="empty-state" {% if lessonPlans|length %}hidden{% endif %}>
+<div class="empty-state {% if lessonPlans|length %}hide{% endif %}">
     <i class="icon-lesson-plan"></i>
     {% if not readOnly and (hasUnitSpec or hasCourseSpec) %}
         <p>
