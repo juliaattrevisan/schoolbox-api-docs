@@ -93,6 +93,11 @@ Usage:
                    title="Create a new {{ locale.lessonPlan }}"
                    class="button icon-lesson-plan"
                 >New {{ locale.lessonPlan.proper }}</a></li>
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?type=dialogAgent&returnUrl={{ encodedReturnUrl }}"
+                   title="Create a new {{ locale.dialogAgent }}"
+                   class="button icon-dialog-agent"
+                >New {{ locale.dialogAgent.proper }}</a></li>
         </ul>
     </div>
 </li>
