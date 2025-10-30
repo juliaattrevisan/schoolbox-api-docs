@@ -9,16 +9,15 @@
 
 namespace Alaress\Async\Queue;
 
+use Alaress\Async\Notification\Instance\Codec;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
-use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\Client;
 use Predis\ClientInterface;
 use Predis\Transaction\MultiExec;
-use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 
 abstract class RedisQueue implements QueueInterface
 {
@@ -227,10 +226,7 @@ abstract class RedisQueue implements QueueInterface
 
         if ($data) {
             try {
-                $unserial = unserialize(
-                    gzuncompress($data),
-                    ['allowed_classes' => [Instance::class, Param::class, SimpleParam::class],]
-                );
+                $unserial = new Codec(self::COMPRESSION_LEVEL)->decode($data);
             } catch (ErrorException $e) {
                 // noop
             }

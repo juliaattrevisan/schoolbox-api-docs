@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Subscription\Redis;
 
+use Alaress\Async\Notification\Instance\Codec;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Async\Queue\RedisQueue;
 use Predis;
-use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 
 /**
  * Unread retriever class, moved into a separate object so that systems outside
@@ -58,10 +58,8 @@ class UnreadRetriever
                             $this->syncClient->srem($setIdentifier, $messageKey);
                             return false;
                         }
-                        return unserialize(
-                            gzuncompress($data),
-                            ['allowed_classes' => [Instance::class, Param::class, SimpleParam::class],]
-                        );
+
+                        return new Codec(RedisQueue::COMPRESSION_LEVEL)->decode($data);
                     } catch (\ErrorException $e) {
                         return false;
                     }
