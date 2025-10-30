@@ -5,6 +5,7 @@
  */
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import locale from "@js/terminology/rosettaStone";
 import type { Unit } from "./unitPlannerTypes";
 import { useDeleteUnitsStore } from "./store/unitPlannerDeleteUnitStore";
 
@@ -64,7 +65,7 @@ function onModifyUnit(): void {
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-button`"
                         :href="getReturnUrl(props.unit._routes.importIntoClasses)"
                     >
-                        Import into Classes
+                        Import into {{ locale.class.translate(true, true) }}
                     </a>
                 </li>
             </ul>
