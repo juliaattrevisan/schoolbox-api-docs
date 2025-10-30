@@ -134,7 +134,7 @@ class Validation
      * Attempts to validate the creation or update of a booking from post data.
      *
      * @param Item\Model   $resource
-     * @param Values       $postData
+     * @param Values|array       $postData
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
      *                                      Leave it out of conflict checks.
      * @return array<string, array<string, array<string>>> Example:
@@ -162,7 +162,7 @@ class Validation
      */
     public function validateBookingFromPostData(
         Item\Model $resource,
-        Values $postData,
+        Values|array $postData,
         ?Booking $existingBooking = null
     ) {
         // Check:

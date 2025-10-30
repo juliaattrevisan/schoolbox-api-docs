@@ -171,8 +171,17 @@ export default {
                 const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.modal.close();
-                    this.$emit("eventCreated", responseData);
-                    this.$refs.toast.timeout("Created", true, 2000);
+                    // check if errors exist?
+                    if (responseData.errors && responseData.errors.length > 0) {
+                        this.$refs.toast.timeout(
+                            "Event / Task created with some issues: " + responseData.errors.join(", "),
+                            false,
+                            4000,
+                        );
+                    } else {
+                      this.$refs.toast.timeout("Created", true, 2000);
+                    }
+                  this.$emit("eventCreated", responseData.event);
                 } else {
                     this.$refs.toast.timeout("Unable to create event / task. " + responseData.message, false, 3000);
                 }

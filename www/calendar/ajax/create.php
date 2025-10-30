@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
 use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking\Model;
+use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\UserMapper;
@@ -106,19 +107,70 @@ if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner)
 }
 
 // now create the related resource bookings
+$errors = [];
 $bookingList = new Collection();
 if (!empty($resources)) {
     // spawn a Resource Booking object here and link it to the event
+
+    // augment POST with necessary data for validation (hack the calendar form to look like the resource booking form)
+    $postVars = $_POST;
+    $postVars['startDate'] = $startDate->getDatePicker();
+    $postVars['endDate']   = $endDate->getDatePicker();
+    $postVars['campus']   = '';
+
+
+    // Validate this item.
+    $code   = 200;
+    $validation = new Validation(
+        $this->user,
+        \Schoolbox\ResourceBooking\Booking\Mapper::getInstance(),
+        Status\Mapper::getInstance(),
+        \Schoolbox\Assessment\Term\Mapper::getInstance(),
+        $this->getDi()->get('externalTimetable'),
+        \Schoolbox\CampusMapper::getInstance(),
+        $this->config,
+        \Schoolbox\External\Event\Mapper::getInstance()
+    );
+
     foreach ($resources as $resourceId) {
         /** @var Item\Model $item */
         $item = Item\Mapper::getInstance()->findById((int)$resourceId);
 
-        // Build the booking
-        $booking = getBookingFromEvent($item, $event, $user);
+        $errors[$resourceId] = $validation->validateBookingFromPostData($item, $postVars, null);
+
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
+        $clashBookingStartDatesAsKeys = [];
+        if (
+            count($errors) > 0 && $item->getAllowClashBookings() &&
+            $validation->validationErrorsAreAllClashes($errors)
+        ) {
+            // Remember the start dates of clash bookings.
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
+                $clashBookingStartDatesAsKeys[$startDate] = null;
+            }
+            // Ignore errors since all were clashes and clashes are allowed.
+            $errors[$resourceId] = [];
+        }
+
+        // only build booking if there are no errors
+        if (empty($errors[$resourceId])) {
+            // Build the booking
+            $booking = getBookingFromEvent($item, $event, $user);
             $booking
                 ->setName($_POST['title'] ?? '')
                 ->setNotes($_POST['detail'] ?? '');
-        $bookingList->add($booking);
+            $bookingList->add($booking);
+        }
+
+        // if errors are empty, remove from the list
+        if (empty($errors[$resourceId])) {
+            unset($errors[$resourceId]);
+        }
+        // flatten errors
+        if (!empty($errors[$resourceId]) && is_array($errors[$resourceId])) {
+            $errors[$resourceId] = $validation->getAllErrorStringsAsFlatArray($errors[$resourceId]);
+        }
     }
 }
 
@@ -138,6 +190,12 @@ $personalRelationMapper->save($personalRelation);
 
 (new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
 
+// manually craft a json response, to conatin logs and the generated event below..
+$output = [
+    'errors' => array_values($errors),
+    'event'  => null,
+];
+
 // Get event back out of the connector, so I know the rendering is consistent
 if (count($affectedIds) == 1) {
     $calendarConfig = Calendar_Api_Config_Mapper::getInstance()->findOneForClass(Calendar_Api_EventType_Event_Schoolbox_Default::class);
@@ -154,11 +212,13 @@ if (count($affectedIds) == 1) {
             $user,
             $user
         );
-        $output   = $renderer->render();
-        echo $output;
+        $output['event']   = json_decode($renderer->render(), true);
         break;
     }
 }
+
+echo json_encode($output);
+
 exit(1);
 
 function getStatusMapper()
