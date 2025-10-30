@@ -111,6 +111,7 @@ async function onSaveSelected(): Promise<void> {
                                 v-model="data.featureToggle.enabled"
                                 type="checkbox"
                                 name="enabled"
+                                autocomplete="off"
                             />
                             <label for="differentiation-profiles-field" data-test="differentiation-profiles-toggle">
                                 <span>On</span>
