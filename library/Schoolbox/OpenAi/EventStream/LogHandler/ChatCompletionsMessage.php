@@ -10,13 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\EventStream\LogHandler;
 
 use JsonException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
 
 /**
  * Handle messages from OpenAI's Chat Completions API:
- * https://platform.openai.com/docs/api-reference/chat/streaming
+ * https://platform.openai.com/docs/api-reference/chat-streaming
  */
 class ChatCompletionsMessage implements ILogHandler
 {
@@ -76,9 +75,21 @@ class ChatCompletionsMessage implements ILogHandler
             $log->setOutputTokens($outputTokens);
         }
 
-        // Is this the final event? If so, check for errors.
-        // TODO check if it actually is the final event
-
-        $log->setReturnCode(200);
+        // Check the finish reason for whether there was an error:
+        // https://platform.openai.com/docs/api-reference/chat-streaming/streaming#chat_streaming-streaming-choices-finish_reason
+        // Unfortunately none of these choices really indicates an error: the
+        // closest being `length` and `content_filter`.
+        foreach ($rawData['choices'] ?? [] as $choice) {
+            $finishReason = $choice['finish_reason'] ?? null;
+            match ($finishReason) {
+                'length', 'content_filter' => $log
+                    ->setReturnCode(400)
+                    ->setErrorMessage("Failed to generate a full response: $finishReason."),
+                'stop' => $log
+                    ->setReturnCode(200)
+                    ->setErrorMessage(null),
+                default => $log,
+            };
+        }
     }
 }
