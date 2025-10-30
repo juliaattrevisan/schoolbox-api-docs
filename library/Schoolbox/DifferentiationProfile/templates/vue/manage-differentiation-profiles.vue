@@ -4,7 +4,7 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
-import type { User } from "@schoolboxLibrary/types/User";
+import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { MDPHeader, Header, AdjustmentType, Profile } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
