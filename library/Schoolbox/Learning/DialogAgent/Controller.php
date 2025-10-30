@@ -211,7 +211,7 @@ class Controller extends Base
                 ->isNull('submitted_by')
                 ->isNull('submitted_at');
 
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb);
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
         }
 
         // Is the page being displayed in readonly mode?
