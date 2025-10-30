@@ -62,7 +62,18 @@ class ResponseMessage implements ILogHandler
         }
 
         // This chunk gets added to the log
-        $this->appendMessageToLog($message, $rawData, $log);
+        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+        $log = $this->logUsage($rawData, $log);
+
+        // Is this the final event? If so, log its completion status.
+        // There are 3 possible events that indicate the end of a response
+        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+        if (in_array($message->eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
+            $log = $this->logCompletion($rawData, $log);
+        }
+
+//        // Handle raw data the same way the log would be
+//        $this->appendMessageToLog($message, $rawData, $log);
         return $log;
     }
 
@@ -71,31 +82,48 @@ class ResponseMessage implements ILogHandler
      */
     public function handleResponse(array $responseData, Log\Model $log): Log\Model
     {
-        return $log;
+        $log = $this->logUsage($responseData, $log);
+        return $this->logCompletion($responseData, $log);
     }
 
-    /**
-     * Append the message to the log, including:
-     * * the message itself (with redundant field filtered)
-     * * the model the API endpoint used
-     * * the input and output tokens used
-     *
-     * This also saves the log in its probably incomplete state.
-     *
-     * @param Message   $message The message, with filtered fields, to be written direct to the log.
-     * @param array     $rawData The unfiltered parsed data from the message: the model and token usage will be
-     *                           extracted from here.
-     * @param Log\Model $log     The log to write to.
-     * @return void
-     */
-    private function appendMessageToLog(Message $message, array $rawData, Log\Model $log): void
-    {
-        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+//    /**
+//     * Append the message to the log, including:
+//     * * the message itself (with redundant field filtered)
+//     * * the model the API endpoint used
+//     * * the input and output tokens used
+//     *
+//     * This also saves the log in its probably incomplete state.
+//     *
+//     * @param Message   $message The message, with filtered fields, to be written direct to the log.
+//     * @param array     $rawData The unfiltered parsed data from the message: the model and token usage will be
+//     *                           extracted from here.
+//     * @param Log\Model $log     The log to write to.
+//     * @return void
+//     */
+//    private function appendMessageToLog(Message $message, array $rawData, Log\Model $log): void
+//    {
+//        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+//        $log = $this->logUsage($rawData, $log);
+//
+//        // Is this the final event? If so, check for errors.
+//        // There are 3 possible events that indicate the end of a response
+//        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+//        if (in_array($message->eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
+//             $this->logCompletion($rawData, $log);
+//        }
+//    }
 
+    /**
+     * @param array $response
+     * @param Log\Model $log
+     * @return Log\Model
+     */
+    private function logUsage(array $response, Log\Model $log): Log\Model
+    {
         // Find model and token usage
-        $model        = $rawData['response']['model'] ?? null;
-        $inputTokens  = $rawData['response']['usage']['input_tokens'] ?? null;
-        $outputTokens = $rawData['response']['usage']['output_tokens'] ?? null;
+        $model        = $response['response']['model'] ?? null;
+        $inputTokens  = $response['response']['usage']['input_tokens'] ?? null;
+        $outputTokens = $response['response']['usage']['output_tokens'] ?? null;
         if ($model) {
             $log->setModel($model);
         }
@@ -105,47 +133,52 @@ class ResponseMessage implements ILogHandler
         if ($outputTokens) {
             $log->setOutputTokens($outputTokens);
         }
+        return $log;
+    }
 
-        // Is this the final event? If so, check for errors.
-        // There are 3 possible events that indicate the end of a response
-        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if (in_array($message->eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
-            /* If something went wrong on the openAI side, it'll send us an "error" key
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-             * If we get this, send on the human-readable message to the user
-             */
-            if ($rawData["error"] ?? null) {
-                $returnCode = 500;
-                $errorMessage = $rawData["error"]["message"] ?? '';
+    /**
+     * @param array     $rawData
+     * @param Log\Model $log
+     * @return Log\Model
+     */
+    private function logCompletion(array $rawData, Log\Model $log): Log\Model
+    {
+        /* If something went wrong on the openAI side, it'll send us an "error" key
+         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+         * If we get this, send on the human-readable message to the user
+         */
+        if ($rawData["error"] ?? null) {
+            $returnCode   = 500;
+            $errorMessage = $rawData["error"]["message"] ?? '';
 
-                $log->setReturnCode($returnCode)
-                    ->setErrorMessage($errorMessage);
+            $log->setReturnCode($returnCode)
+                ->setErrorMessage($errorMessage);
 
-                throw new SchoolboxException($errorMessage, $returnCode);
-            }
-
-            /* Did we receive an incomplete response? i.e. max output tokens reached?
-             * If so, send those details on so we have some idea of why it failed
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
-             */
-            $status = $rawData["status"] ?? null;
-            if (isset($status) && $status !== "completed") {
-                $returnCode = 500;
-                $title      = sprintf("Failed to generate a response: %s", $status);
-
-                /* there may be some extra details about why it was incomplete */
-                $incompleteMessage = $rawData["incomplete_details"]["reason"] ?? null;
-                if ($incompleteMessage) {
-                    $title .= sprintf(" (%s)", $incompleteMessage);
-                }
-
-                $log->setReturnCode($returnCode)
-                    ->setErrorMessage($incompleteMessage);
-
-                throw new SchoolboxException($title, $returnCode);
-            }
-
-            $log->setReturnCode(200);
+            throw new SchoolboxException($errorMessage, $returnCode);
         }
+
+        /* Did we receive an incomplete response? i.e. max output tokens reached?
+         * If so, send those details on so we have some idea of why it failed
+         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+         */
+        $status = $rawData["status"] ?? null;
+        if (isset($status) && $status !== "completed") {
+            $returnCode = 500;
+            $title      = sprintf("Failed to generate a response: %s", $status);
+
+            /* there may be some extra details about why it was incomplete */
+            $incompleteMessage = $rawData["incomplete_details"]["reason"] ?? null;
+            if ($incompleteMessage) {
+                $title .= sprintf(" (%s)", $incompleteMessage);
+            }
+
+            $log->setReturnCode($returnCode)
+                ->setErrorMessage($incompleteMessage);
+
+            throw new SchoolboxException($title, $returnCode);
+        }
+
+        $log->setReturnCode(200);
+        return $log;
     }
 }
