@@ -640,6 +640,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]);
         }
 
+        /* Dialog Agents have two parts to change
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $breadcrumbs->add([
+                'Modify Settings',
+                null
+            ]);
+        }
+
         $data['breadcrumbs'] = $breadcrumbs;
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
