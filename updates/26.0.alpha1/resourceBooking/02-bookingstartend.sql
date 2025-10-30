@@ -1,4 +1,4 @@
-## resource booking may not start/end at the same time as the event... this will assist in tracking that
+-- resource booking may not start/end at the same time as the event... this will assist in tracking that
 alter table resource_booking
 add start_datetime datetime null after deleted_at;
 
