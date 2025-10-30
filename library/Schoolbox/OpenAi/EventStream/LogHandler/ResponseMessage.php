@@ -21,6 +21,15 @@ use Schoolbox\OpenAi\EventStream\Message;
 class ResponseMessage implements ILogHandler
 {
     /**
+     * The following event types indicate that the response API has finished
+     * processing.
+     *
+     * There are 3 possible events that indicate the end of a response: see
+     * https://platform.openai.com/docs/api-reference/responses-streaming/response.
+     */
+    private const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete'];
+
+    /**
      * When an image is omitted from the request/response: replace the image
      * data with this in the log.
      */
@@ -32,8 +41,9 @@ class ResponseMessage implements ILogHandler
     public function handleMessage(Message $message, Log\Model $log): Log\Model
     {
         // Prepare the message for logging
-        $eventType = $message->eventType;
-        $rawData   = [];
+        $eventType       = $message->eventType;
+        $isFinishedEvent = in_array($eventType, self::EVENT_TYPES_FINISHED);
+        $rawData         = [];
         try {
             // Omit partial and completed image data from the output
             $filteredData = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
@@ -46,7 +56,7 @@ class ResponseMessage implements ILogHandler
             }
 
             // apparently there is a final final image, lets remove that also
-            if ($eventType === 'response.completed' && isset($filteredData['response']['output']) && is_array($filteredData['response']['output'])) {
+            if ($isFinishedEvent && isset($filteredData['response']['output']) && is_array($filteredData['response']['output'])) {
                 // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
                 foreach ($filteredData['response']['output'] as $i => $respOutput) {
                     if (isset($respOutput['result'])) {
@@ -68,12 +78,9 @@ class ResponseMessage implements ILogHandler
         // Is this the final event? If so, log its completion status.
         // There are 3 possible events that indicate the end of a response
         // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if (in_array($message->eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
+        if ($isFinishedEvent) {
             $log = $this->logCompletion($rawData, $log);
         }
-
-//        // Handle raw data the same way the log would be
-//        $this->appendMessageToLog($message, $rawData, $log);
         return $log;
     }
 
@@ -85,33 +92,6 @@ class ResponseMessage implements ILogHandler
         $log = $this->logUsage($responseData, $log);
         return $this->logCompletion($responseData, $log);
     }
-
-//    /**
-//     * Append the message to the log, including:
-//     * * the message itself (with redundant field filtered)
-//     * * the model the API endpoint used
-//     * * the input and output tokens used
-//     *
-//     * This also saves the log in its probably incomplete state.
-//     *
-//     * @param Message   $message The message, with filtered fields, to be written direct to the log.
-//     * @param array     $rawData The unfiltered parsed data from the message: the model and token usage will be
-//     *                           extracted from here.
-//     * @param Log\Model $log     The log to write to.
-//     * @return void
-//     */
-//    private function appendMessageToLog(Message $message, array $rawData, Log\Model $log): void
-//    {
-//        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
-//        $log = $this->logUsage($rawData, $log);
-//
-//        // Is this the final event? If so, check for errors.
-//        // There are 3 possible events that indicate the end of a response
-//        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-//        if (in_array($message->eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
-//             $this->logCompletion($rawData, $log);
-//        }
-//    }
 
     /**
      * @param array $response
