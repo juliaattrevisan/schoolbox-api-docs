@@ -143,9 +143,59 @@
                     <li>
                         <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
                         <label for="scenario-{{ scenario.id }}"><strong>{{ scenario.title }}</strong></label>
-                        <button class="button f-no-bkg l-mar--0" type="button">
+
+                        <div id="scenario-info-{{ scenario.id }}" class="reveal-modal" data-reveal>
+                            <h2>{{ scenario.title }}</h2>
+                            <a class="close-reveal-modal" aria-label="Close">×</a>
+
+                            <strong>Details</strong>
+                            <p>{{ scenario.description }}</p>
+
+                            <strong>Configurations</strong>
+                            <p>The fields that you can use to configure the agent for this scenario are:</p>
+                            <ul>
+                                {% for field in scenario.fields %}
+                                    <li>
+                                        {% if field.type == 'textarea' %}
+                                            <sbx-icon name="textbox" style="display: inline-block"></sbx-icon>
+                                        {% elseif field.type == 'switch' %}
+                                            <sbx-icon name="task" style="display: inline-block"></sbx-icon>
+                                        {% elseif field.type == 'dropdown' %}
+                                            <sbx-icon name="list" style="display: inline-block"></sbx-icon>
+                                        {% else %}
+                                            {# shouldn't end up here, no icon #}
+                                        {% endif %}
+
+                                        <span>{{ field.title }}</span>
+                                        {% if field.meta is not empty %}
+                                            <span data-tooltip class="hint has-tip tip-top" title="{{ field.meta }}">?</span>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <strong>Prompt Template</strong>
+                            <p class="meta">{{ scenario.promptTemplate }}</p>
+
+                            <strong>Assessment Criteria</strong>
+                            <ul>
+                                {% for criterion in scenario.criteria %}
+                                    <li>
+                                        <strong>{{ criterion.title }}</strong>
+                                        <p class="meta">{{ criterion.prompt }}</p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <button
+                            class="button f-no-bkg l-mar--0"
+                            type="button"
+                            data-reveal-id="scenario-info-{{ scenario.id }}"
+                        >
                             <sbx-icon name="curriculum" size="m" color="currentColor"></sbx-icon>
                         </button>
+
                         <article>
                             {{ scenario.description }}
                         </article>

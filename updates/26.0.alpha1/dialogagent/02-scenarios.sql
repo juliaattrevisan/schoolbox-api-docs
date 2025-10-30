@@ -244,9 +244,18 @@ INSERT INTO dialog_agent_scenario_criteria
 VALUES
     (
         1,
-        'Effort rating',
-        '',
+        'Evidence of Understanding',
+        'Find evidence that shows understanding identified in the context of the task.',
         1,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        1,
+        'Attitude and Engagement',
+        'Provide feedback on the students interaction - specifically reviewing the attitude the student used, response language and etiquette of conversation, use supporting evidence.',
+        2,
         NOW(),
         NOW(),
         null
