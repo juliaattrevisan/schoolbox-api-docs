@@ -180,14 +180,15 @@ async function onSaveSelected(): Promise<void> {
                                                 <div :class="`small-12 medium-${header.colSpan} column`">
                                                     <template v-if="header.type === 'checkbox'">
                                                         <input
-                                                            :id="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                            :id="`field-${header.key}-${item.element.id}`"
                                                             v-model="item.element.is_enabled"
                                                             type="checkbox"
+                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
                                                         />
                                                         <label
-                                                            :for="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                            :for="`field-${header.key}-${item.element.id}`"
                                                             class="checkbox-label"
-                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
+                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}-label`"
                                                             >{{ item.element.title }}</label
                                                         >
                                                     </template>

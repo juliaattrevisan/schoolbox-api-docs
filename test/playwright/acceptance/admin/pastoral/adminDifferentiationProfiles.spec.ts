@@ -56,4 +56,20 @@ test.describe("Admin Differentiation Profiles", () => {
             await db.updateInDatabase("differentiation_profiles_config", { sequence: 4 }, { "name like": "goals" });
         }
     });
+
+    test("disable field", async ({ tester, page, db }) => {
+        const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
+        try {
+            await adminDifferentiationProfiles.toggleOn();
+            await adminDifferentiationProfiles.disableField("is_enabled", "3");
+        } finally {
+            tester.isGoingTo("Clean up: Reset the field and toggle off");
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.updateInDatabase(
+                "differentiation_profiles_config",
+                { is_enabled: 1 },
+                { "name like": "overview" },
+            );
+        }
+    });
 });

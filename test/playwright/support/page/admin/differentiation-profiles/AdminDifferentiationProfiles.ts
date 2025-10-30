@@ -67,6 +67,25 @@ export default class AdminDifferentiationProfiles {
     }
 
     /**
+     * Disables a field by unchecking its checkbox, and verifying persistence
+     * @param fieldType - The field type (e.g., 'terminology')
+     * @param fieldIndex - The field index (e.g., '1')
+     */
+    async disableField(fieldType: string, fieldIndex: string): Promise<void> {
+        const testId = `differentiation-profiles-input-${fieldType}-${fieldIndex}`;
+        this.tester.isGoingTo(`Find the input with data-test attribute '${testId}'`);
+        const checkbox = this.page.getByTestId(testId);
+        const label = this.page.getByTestId(`${testId}-label`);
+        this.tester.isGoingTo(`Uncheck the checkbox (by clicking the label)`);
+        await label.click();
+        await this.clickSave();
+        this.tester.isGoingTo("Refresh the page");
+        await this.page.reload();
+        this.tester.isGoingTo(`Ensure the checkbox is unchecked`);
+        await expect(checkbox).not.toBeChecked();
+    }
+
+    /**
      * Drags a field to the top position by handle ID, saves, and verifies the field is in first position
      * @param handleId - The drag handle ID (e.g., '7')
      * @param containerSuffix - The container suffix (e.g., 'details')
