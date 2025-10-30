@@ -268,7 +268,6 @@ class Controller extends Base
                 $response = $agent->requestStream(
                     $this->getUser(),
                     $this->requestPost->get('userPrompt'),
-                    Helper::FEATURE_IMAGE,
                     $sessionId,
                     size: ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
                     style: ($this->requestPost->get('attributes') ?? [])['style'] ?? null,

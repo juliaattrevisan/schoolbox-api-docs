@@ -79,7 +79,6 @@ class ImageGeneration
      *
      * @param User        $user               The user making the request.
      * @param string      $prompt             The user's input prompt.
-     * @param string      $feature            The feature which this request should be logged against.
      * @param string      $sessionId          The session ID against which this request should be logged.
      * @param string|null $size               If provided: a size for the image.
      *                                        Should match a value of `ImageSize`.
@@ -93,7 +92,6 @@ class ImageGeneration
     public function requestStream(
         User $user,
         string $prompt,
-        string $feature,
         string $sessionId,
         ?string $size = null,
         ?string $style = null,
@@ -110,8 +108,7 @@ class ImageGeneration
                 $previousResponseId,
             ),
             $user,
-            // TODO feature should be a const
-            $feature,
+            Helper::FEATURE_IMAGE,
             $sessionId,
             8192,
         );
