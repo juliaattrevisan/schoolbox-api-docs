@@ -62,7 +62,7 @@ class Notifier extends AbstractModuleNotifier
     private \Schoolbox\External\Event\Mapper $externalEventMapper;
 
     /** @var string Suffix for notifications involving creation of bookings with clashes. */
-    private const string CLASH_BOOKING_SUFFIX = ' (with conflicts)';
+    private const string CLASH_BOOKING_SUFFIX = ' (with clashes)';
 
     /**
      * {@inheritdoc}
