@@ -61,11 +61,18 @@
             {% set redirect = '?' ~ RETURN_URL.name ~ '=' ~ returnUrlEncoded|escape('url')%}
         {% endif %}
 
-        <a class="submit button"
-           href="{{ button.url }}{{ redirect }}"
-           data-test="assessment-summary-create-button"
-           {% if not button.enabled %} disabled {% endif %}
-        >{{ button.label }} {{ locale.dialogAgent }}</a>
+        {% if button.enabled %}
+            <a class="submit button"
+               href="{{ button.url }}{{ redirect }}"
+               data-test="assessment-summary-create-button"
+            >{{ button.label }} {{ locale.dialogAgent }}</a>
+        {% else %}
+            <a class="submit button disabled"
+               href="#"
+               aria-disabled="true"
+               data-test="assessment-summary-create-button"
+            >{{ button.label }} {{ locale.dialogAgent }}</a>
+        {% endif %}
     </div>
 </div>
 
