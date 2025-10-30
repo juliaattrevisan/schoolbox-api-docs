@@ -15,6 +15,7 @@ use Schoolbox\Calendar\Event\Attendance;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking\Model;
@@ -61,7 +62,7 @@ if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calend
 
 /* as of 26.0 you can now book resources via the calendar modal */
 $resources = [];
-if ($this->config->get('resource_booking_enabled')) {
+if ($this->config->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
     $resources = (!isset($_POST['resources']) || '' === (string)$_POST['resources']) ? [] : explode(',', $_POST['resources']);
 }
 
