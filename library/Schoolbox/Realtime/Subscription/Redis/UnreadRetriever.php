@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Subscription\Redis;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Predis;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 
 /**
  * Unread retriever class, moved into a separate object so that systems outside
@@ -59,7 +60,7 @@ class UnreadRetriever
                         }
                         return unserialize(
                             gzuncompress($data),
-                            ['allowed_classes' => [Instance::class, Param::class,],]
+                            ['allowed_classes' => [Instance::class, Param::class, SimpleParam::class],]
                         );
                     } catch (\ErrorException $e) {
                         return false;

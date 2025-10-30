@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use Predis\Client;
 use Predis\ClientInterface;
 use Predis\Transaction\MultiExec;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 
 abstract class RedisQueue implements QueueInterface
 {
@@ -226,7 +227,10 @@ abstract class RedisQueue implements QueueInterface
 
         if ($data) {
             try {
-                $unserial = unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class, Param::class,],]);
+                $unserial = unserialize(
+                    gzuncompress($data),
+                    ['allowed_classes' => [Instance::class, Param::class, SimpleParam::class],]
+                );
             } catch (ErrorException $e) {
                 // noop
             }
