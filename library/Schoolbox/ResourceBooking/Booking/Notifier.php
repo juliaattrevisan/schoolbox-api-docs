@@ -19,10 +19,17 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
+use External_Timetable;
 use Monolog\Logger;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted as DeletedException;
+use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -38,6 +45,29 @@ class Notifier extends AbstractModuleNotifier
      * @var string
      */
     protected $slug = NSMapper::NS_RESOURCE_BOOKING;
+
+    /** @var Mapper */
+    protected $mapper; // Defined in base class, but redefined here to inform PHPStan of the type.
+
+    /** @var \Schoolbox\Assessment\Term\Mapper */
+    private \Schoolbox\Assessment\Term\Mapper $termMapper;
+
+    /** @var External_Timetable */
+    private External_Timetable $externalTimetable;
+
+    /** @var CampusMapper */
+    private CampusMapper $campusMapper;
+
+    /** @var \Schoolbox\External\Event\Mapper */
+    private \Schoolbox\External\Event\Mapper $externalEventMapper;
+
+    /** @var string Suffix for notifications involving creation of bookings with clashes. */
+    private const string CLASH_BOOKING_SUFFIX = ' (with clashes)';
+
+    /**
+     * @var null|Validation
+     */
+    private ?Validation $validation = null;
 
 
     /**
@@ -59,6 +89,66 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * @param ContainerInterface $di
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public static function getSetters(ContainerInterface $di): array
+    {
+        /** @var MapperFactory $mf */
+        $mf = $di->get('mapperFactory');
+
+        return [
+            'setTermMapper' => $mf->get(\Schoolbox\Assessment\Term\Mapper::class),
+            'setExternalTimetable' => $di->get('externalTimetable'),
+            'setCampusMapper' => $mf->get(CampusMapper::class),
+            'setExternalEventMapper' => $mf->get(\Schoolbox\External\Event\Mapper::class),
+        ];
+    }
+
+
+    /**
+     * @param \Schoolbox\Assessment\Term\Mapper $termMapper
+     * @return void
+     */
+    public function setTermMapper(\Schoolbox\Assessment\Term\Mapper $termMapper): void
+    {
+        $this->termMapper = $termMapper;
+    }
+
+
+    /**
+     * @param External_Timetable $externalTimetable
+     * @return void
+     */
+    public function setExternalTimetable(External_Timetable $externalTimetable): void
+    {
+        $this->externalTimetable = $externalTimetable;
+    }
+
+
+    /**
+     * @param CampusMapper $campusMapper
+     * @return void
+     */
+    public function setCampusMapper(CampusMapper $campusMapper): void
+    {
+        $this->campusMapper = $campusMapper;
+    }
+
+
+    /**
+     * @param \Schoolbox\External\Event\Mapper $externalEventMapper
+     * @return void
+     */
+    public function setExternalEventMapper(\Schoolbox\External\Event\Mapper $externalEventMapper): void
+    {
+        $this->externalEventMapper = $externalEventMapper;
+    }
+
+
+    /**
      * @param TriggerBundle $bundle
      *
      * @return void
@@ -75,7 +165,7 @@ class Notifier extends AbstractModuleNotifier
                 // Otherwise, trigger the update event.
                 $diff = $bundle->getEvent()->getDiff();
                 if (!empty($diff['status'])) {
-                    list($new, $old) = $diff['status'];
+                    [$new, $old] = $diff['status'];
                     switch ($new) {
                         case Status\Model::STATUS_APPROVED:
                             $bundle->attach('approved', self::IMMEDIATELY);
@@ -105,21 +195,22 @@ class Notifier extends AbstractModuleNotifier
      * the booking.)
      *
      * @param Model  $object
-     * @param User   $user
+     * @param User   $user The user whose action triggered the notification.
      * @param string $event
      *
      * @return Envelope
-     * @throws \InvalidArgumentException if $event type isn't recognised
+     * @throws DeletedException
+     * @throws Exception
      */
-    protected function buildEnvelope(Model $object, User $user, $event)
+    protected function buildEnvelope(Model $object, User $user, string $event): Envelope
     {
         // Ensure that object is hydrated. Why does this happen?
-        /** @var Model $object */
         try {
             $object = $this->mapper->findById($object->getId());
             $resourceMapper = $this->mapper->getJoinMapper('resource');
             $object->setResource($resourceMapper->findById($object->getResource()->getId()));
         } catch (DeletedException $e) {
+            /** @var Model $object */
             $object = $e->getDeletedObject();
             $event  = 'cancelled';
         }
@@ -162,9 +253,40 @@ class Notifier extends AbstractModuleNotifier
             )
         );
 
+        $clashErrors = [];
+        if (in_array($event, ['created', 'updated'])) {
+            // If the event has been created or updated, check for clashes with existing approved events.
+            // This allows the notification message to be modified to alert the moderator of the clashes.
+            /** @var Status\Mapper $bookingStatusMapper */
+            $bookingStatusMapper = $this->mapper->getJoinMapper('status');
+            $startDateTimeAlaressObj = $object->getEvent()->getStartDateTime();
+            $endDateTimeAlaressObj = $object->getEvent()->getEndDateTime();
+            if ($startDateTimeAlaressObj !== null && $endDateTimeAlaressObj !== null) {
+                // Cache $this->validation to avoid unnecessary work on repeated calls to this function.
+                if ($this->validation === null) {
+                    $this->validation = new Validation(
+                        $user,
+                        $this->mapper,
+                        $bookingStatusMapper,
+                        $this->termMapper,
+                        $this->externalTimetable,
+                        $this->campusMapper,
+                        $this->conf,
+                        $this->externalEventMapper,
+                    );
+                }
+                $clashErrors = $this->validation->validateForClashes(
+                    $object->getResource(),
+                    $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                    $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                    $object
+                );
+            }
+        }
+
         switch ($event) {
             case 'created':
-                $messageText = ':user booked :resource';
+                $messageText = ':user booked :resource' . (count($clashErrors) === 0 ? '' : self::CLASH_BOOKING_SUFFIX);
                 break;
             case 'approved':
                 $messageText = ':user approved booking of :resource';
@@ -179,7 +301,7 @@ class Notifier extends AbstractModuleNotifier
                 $messageText = ':user cancelled booking of :resource';
                 break;
             case 'updated':
-                $messageText = ':user changed booking of :resource';
+                $messageText = ':user changed booking of :resource' . (count($clashErrors) === 0 ? '' : self::CLASH_BOOKING_SUFFIX);
                 break;
             default:
                 throw new \InvalidArgumentException(
