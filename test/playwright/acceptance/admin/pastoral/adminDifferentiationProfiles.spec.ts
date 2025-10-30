@@ -12,13 +12,16 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 
 test.describe("Admin Differentiation Profiles", () => {
-    test.skip("Toggle differentiation profiles", async ({ tester, page, db }) => {
+    test.beforeEach(async ({ tester, page }) => {
+        tester.isGoingTo("Login as admin");
+        await tester.loginAsAdmin();
+        tester.isGoingTo("Visit the differentiation profiles page");
+        await page.goto("/adminv2/pastoral/differentiation-profiles");
+    });
+
+    test("Toggle differentiation profiles", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
-            tester.isGoingTo("Login as admin");
-            await tester.loginAsAdmin();
-            tester.isGoingTo("Visit the differentiation profiles page");
-            await page.goto("/adminv2/pastoral/differentiation-profiles");
             await adminDifferentiationProfiles.toggleOn();
         } finally {
             tester.isGoingTo("Clean up: Reset the toggle to off state");
@@ -30,13 +33,9 @@ test.describe("Admin Differentiation Profiles", () => {
         }
     });
 
-    test.skip("rename field", async ({ tester, page, db }) => {
+    test("rename field", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
-            tester.isGoingTo("Login as admin");
-            await tester.loginAsAdmin();
-            tester.isGoingTo("Visit the differentiation profiles page");
-            await page.goto("/adminv2/pastoral/differentiation-profiles");
             tester.isGoingTo("Toggle the differentiation profiles on");
             await adminDifferentiationProfiles.toggleOn();
             tester.isGoingTo("Find the input with data-test attribute 'differentiation-profiles-input-terminology-1'");
@@ -64,23 +63,32 @@ test.describe("Admin Differentiation Profiles", () => {
         }
     });
 
-    test.skip("resequence fields", async ({ tester, page, db }) => {
+    test("resequence fields", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
-            tester.isGoingTo("Login as admin");
-            await tester.loginAsAdmin();
-            tester.isGoingTo("Visit the differentiation profiles page");
-            await page.goto("/adminv2/pastoral/differentiation-profiles");
             tester.isGoingTo("Toggle the differentiation profiles on");
             await adminDifferentiationProfiles.toggleOn();
-            tester.isGoingTo("mouse down on the Goals drag handle and move it to the top of the list to reorder");
-            await page
-                .getByTestId("differentiation-profiles-drag-handle-7")
-                .dragTo(page.getByTestId("differentiation-profiles-drag-handle-3"), {
-                    timeout: 1000,
+            tester.isGoingTo("grab the drag handle for the Goals field");
+            const dragHandle = await page.getByTestId("differentiation-profiles-drag-handle-7");
+            await dragHandle.scrollIntoViewIfNeeded();
+            await dragHandle.hover();
+            await page.mouse.down();
+            tester.isGoingTo("drag the Goals field upwards to reorder");
+            const container = await page.getByTestId("differentiation-profiles-fieldset-details");
+            const box = await container.boundingBox();
+            if (box) {
+                await page.mouse.move(box.x, box.y + 10, {
+                    steps: 30,
                 });
+            }
+            tester.isGoingTo("release the mouse to drop the field in the new position");
+            await page.mouse.up();
             await adminDifferentiationProfiles.clickSave();
-            // TODO - validate that field has been moved
+            tester.isGoingTo("Refresh the page");
+            await page.reload();
+            tester.isGoingTo("Ensure the Goals field is now in the first position");
+            const firstField = container.locator("li").first();
+            await expect(firstField).toContainText("Goals");
         } finally {
             tester.isGoingTo("Clean up: Reset the field and toggle off");
             try {

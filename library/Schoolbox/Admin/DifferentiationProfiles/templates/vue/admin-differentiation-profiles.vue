@@ -141,7 +141,12 @@ async function onSaveSelected(): Promise<void> {
                             </header>
                         </div>
                     </fieldset>
-                    <fieldset v-for="(module, key) in data.modules" :key="key" class="content">
+                    <fieldset
+                        v-for="(module, key) in data.modules"
+                        :key="key"
+                        class="content"
+                        :data-test="`differentiation-profiles-fieldset-${key}`"
+                    >
                         <sortable-wrapper
                             tag="ul"
                             class="information-list sortable ui-sortable"
