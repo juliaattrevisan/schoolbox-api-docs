@@ -140,7 +140,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return \Schoolbox\Assessment\Term\Mapper
      */
-    private function getTermMapper(): \Schoolbox\Assessment\Term\Mapper
+    protected function getTermMapper(): \Schoolbox\Assessment\Term\Mapper
     {
         return $this->termMapper;
     }
@@ -149,7 +149,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return External_Timetable
      */
-    private function getExternalTimetable(): External_Timetable
+    protected function getExternalTimetable(): External_Timetable
     {
         return $this->externalTimetable;
     }
@@ -158,7 +158,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return CampusMapper
      */
-    private function getCampusMapper(): CampusMapper
+    protected function getCampusMapper(): CampusMapper
     {
         return $this->campusMapper;
     }
@@ -167,7 +167,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return \Schoolbox\External\Event\Mapper
      */
-    private function getExternalEventMapper(): \Schoolbox\External\Event\Mapper
+    protected function getExternalEventMapper(): \Schoolbox\External\Event\Mapper
     {
         return $this->externalEventMapper;
     }
