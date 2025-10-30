@@ -181,6 +181,7 @@ async function onSaveSelected(): Promise<void> {
                                                         <label
                                                             :for="`differentiation-profiles-adjustments-field-${item.element.id}`"
                                                             class="checkbox-label"
+                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
                                                             >{{ item.element.title }}</label
                                                         >
                                                     </template>
@@ -195,6 +196,7 @@ async function onSaveSelected(): Promise<void> {
                                                             :id="`field-${header.key}-${item.element.id}`"
                                                             v-model="item.element[header.key]"
                                                             type="text"
+                                                            :maxlength="header.maxLength || undefined"
                                                             :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
                                                         />
                                                     </template>
