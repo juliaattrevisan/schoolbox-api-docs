@@ -114,8 +114,16 @@ if (!empty($resources)) {
 
     // augment POST with necessary data for validation (hack the calendar form to look like the resource booking form)
     $postVars = $_POST;
-    $postVars['startDate'] = $startDate->getDatePicker();
-    $postVars['endDate']   = $endDate->getDatePicker();
+    if ($_POST['allDay']) {
+        $postVars['startDate'] = $dateObj->getDatePicker();
+        $endDate = clone $dateObj;
+        $endDate = $endDate->endOfDay();
+        $postVars['endDate']   = $endDate->getDatePicker();
+    } else {
+        $postVars['startDate'] = $startDate->getDatePicker();
+        $postVars['endDate']   = $endDate->getDatePicker();
+    }
+
     $postVars['campus']   = '';
 
 
@@ -244,10 +252,14 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
         ->setName($_POST['title'] ?? '')
         ->setNotes($_POST['detail'] ?? '')
-        ->setRelatedBookingList(new GenericCollection(Model::class))
+        ->setRelatedBookingList(new GenericCollection(Model::class));
+        if ($event->getAllDay()) {
+            $booking->setBookingStartAt($event->getStartDateTime());
+            $endDate = clone $event->getStartDateTime();
+            $endDate = $endDate->endOfDay();
+            $booking->setBookingEndAt($endDate);
+        }
         // init booking time to null (this may be changed later to the event time...)
-        ->setBookingStartAt(null)
-        ->setBookingEndAt(null);
     // What about the resource? If it's an open resource, confirm the
     // booking immediately.
     if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
