@@ -46,6 +46,9 @@ class Notifier extends AbstractModuleNotifier
      */
     protected $slug = NSMapper::NS_RESOURCE_BOOKING;
 
+    /** @var Mapper */
+    protected $mapper; // Defined in base class, but redefined here to inform PHPStan of the type.
+
     /** @var \Schoolbox\Assessment\Term\Mapper */
     private \Schoolbox\Assessment\Term\Mapper $termMapper;
 
@@ -229,8 +232,6 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function buildEnvelope(Model $object, User $user, string $event): Envelope
     {
-        /** @var Mapper $this->mapper - This declaration prevents PHPStorm warnings below. */
-
         // Ensure that object is hydrated. Why does this happen?
         /** @var Model $object */
         try {
@@ -282,11 +283,12 @@ class Notifier extends AbstractModuleNotifier
 
         switch ($event) {
             case 'created':
-                // Get the objects needed below for the Validator constructor.
+                /** @var Status\Mapper $bookingStatusMapper */
+                $bookingStatusMapper = $this->mapper->getJoinMapper('status');
                 $validation = new Validation(
                     $user,
                     $this->mapper,
-                    $this->mapper->getJoinMapper('status'),
+                    $bookingStatusMapper,
                     $this->getTermMapper(),
                     $this->getExternalTimetable(),
                     $this->getCampusMapper(),
