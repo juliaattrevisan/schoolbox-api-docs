@@ -248,6 +248,8 @@ class Client implements IClient
     }
 
     /**
+     * TODO remove this and handle in `ILogHandler` classes
+     *
      * @param array     $completedEvent
      * @param Log\Model $log
      * @return void
