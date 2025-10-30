@@ -20,6 +20,12 @@ interface ILogHandler
     /**
      * Handle this message, by writing it to a log.
      *
+     * Generally, this will be responsible for:
+     * * setting field values on `$log`
+     *   (e.g. response code, tokens, error message)
+     * * extracting the value from `$message` before it's added to the log's
+     *   response
+     *
      * @param Message   $message
      * @param Log\Model $log
      * @return Log\Model
