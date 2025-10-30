@@ -35,6 +35,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('authoritative', self::TYPE_BOOLEAN, null, 'authoritative');
         $this->uses('session_id', self::TYPE_STRING, null, 'sessionId');
         $this->uses('assistance_requested_at', self::TYPE_DATETIME, null, 'assistanceRequestedAt');
+        $this->uses('started_at', self::TYPE_DATETIME, null, 'startedAt');
         $this->uses('submitted_at', self::TYPE_DATETIME, null, 'submittedAt');
         $this->uses('submitted_by', self::TYPE_INTEGER, null, 'submittedBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
