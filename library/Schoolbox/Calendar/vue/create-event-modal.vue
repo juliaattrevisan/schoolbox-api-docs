@@ -121,10 +121,13 @@ export default {
             return `${searchUrl}?${searchParams}&`;
         },
 
+        /**
+         * Get the endpoint for the booking resource search
+         * @returns {String}- The endpoint for the booking resource search
+         */
         getBookingEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
-            const searchParams = new URLSearchParams({ groupID: 0 }).toString();
-            return `${searchUrl}?${searchParams}&`;
+            return `${searchUrl}?`;
         },
 
         /**
