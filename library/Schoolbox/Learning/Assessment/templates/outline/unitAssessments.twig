@@ -72,7 +72,12 @@
             {% set hasCourseRoutes = saveToCourseRoute is not empty %}
         {% endif %}
 
-        <li class="interact" {% if filterList and assessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %} data-unit-assessment="{{ assessment.id }}">
+        <li
+            class="interact"
+            {% if filterList and assessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %}
+            data-assessment="{{ assessment.id }}"
+            data-assessment-title="{{ assessment.title }}"
+        >
             <div{% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %} class="actions-small-1"{% endif %}>
                 {% if canWrite %}
                     <div class="grip compact"></div>
@@ -195,7 +200,12 @@
                         {% set hasCourseCustomisedRoutes = saveToCourseCustomisedRoute is not empty %}
                     {% endif %}
 
-                    <li class="child"  {% if filterList and customisedAssessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %} data-unit-assessment="{{ customisedAssessment.id }}">
+                    <li
+                        class="child"
+                        {% if filterList and customisedAssessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %}
+                        data-assessment="{{ customisedAssessment.id }}"
+                        data-assessment-title="{{ customisedAssessment.title }}"
+                    >
                     <div class="actions-small-1 l-pad-l--left">
                         <div class="list-item">
                             <div class="small-12 compact card wrap-down">

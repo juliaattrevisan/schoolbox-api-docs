@@ -63,13 +63,18 @@
         component.on("click.assessmentTotInstance", "[data-action=delete]", function (event) {
             event.preventDefault();
             var $element = $(this);
-            var $assessmentRow = $element.closest("[data-unit-assessment]");
+            var $assessmentRow = $element.closest("[data-assessment]");
             var $taskList = $assessmentRow.closest("[data-task-list]");
             const $customisedAssessments = $element.closest("[data-customised-assessments]");
-            const customisationCount = $customisedAssessments.find("[data-unit-assessment]").length;
+            const customisationCount = $customisedAssessments.find("[data-assessment]").length;
+
+            /** If a title exists, we'll use it in the confirmation dialog. otherwise falls back to the generic name */
+            const assessmentTitle = $assessmentRow.attr("data-assessment-title");
 
             $element.confirmDialog({
-                header: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
+                header: assessmentTitle
+                    ? `Are you sure you wish to delete ${assessmentTitle}?`
+                    : `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
                 text: '<span class="alert alert-box"><b>Warning:</b> All customisations, student responses, feedback and marks will also be deleted.</span>',
                 format: "html",
                 confirmLabel: "Yes, permanently delete",
@@ -77,13 +82,17 @@
                 confirmEvent: function () {
                     var toaster = component.find("[data-alert]");
                     toaster.toastActivate({
-                        text: `Deleting ${window.sbProps.l10n.dictionary.activity.singular()}...`,
+                        text: assessmentTitle
+                            ? `Deleting ${assessmentTitle}...`
+                            : `Deleting ${window.sbProps.l10n.dictionary.activity.singular()}...`,
                     });
 
                     $.post($element.attr("href"))
                         .done(function () {
                             toaster.toastTimeout({
-                                text: `${window.sbProps.l10n.dictionary.activity.proper()} deleted.`,
+                                text: assessmentTitle
+                                    ? `${assessmentTitle} deleted.`
+                                    : `${window.sbProps.l10n.dictionary.activity.proper()} deleted.`,
                                 css: "pop success",
                             });
 
@@ -93,9 +102,9 @@
 
                                     // When all activities are deleted, show the empty selector
                                     if (settings.emptySelector) {
-                                        if ($taskList.find("[data-unit-assessment]").length === 0) {
-                                            component.find(settings.emptySelector).removeAttr("hidden");
-                                            component.find(settings.contentSelector).attr("hidden", true);
+                                        if ($taskList.find("[data-assessment]").length === 0) {
+                                            component.find(settings.emptySelector).removeClass("hide");
+                                            component.find(settings.contentSelector).addClass("hide");
                                         }
                                     }
 
@@ -115,7 +124,9 @@
                         })
                         .fail(function () {
                             toaster.toastTimeout({
-                                text: `Could not delete this ${window.sbProps.l10n.dictionary.activity.singular()}.`,
+                                text: assessmentTitle
+                                    ? `Could not delete ${assessmentTitle}.`
+                                    : `Could not delete this ${window.sbProps.l10n.dictionary.activity.singular()}.`,
                                 css: "pop alert",
                             });
                         });

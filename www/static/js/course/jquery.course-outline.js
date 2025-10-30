@@ -110,9 +110,9 @@
                 var unit = ui.item.closest("[data-unit]");
                 var form = unit.find("form.reorder_form");
                 var params = form.serializeArray();
-                unit.find("[data-unit-assessment]").each(function () {
+                unit.find("[data-assessment]").each(function () {
                     // Switch dark on/off
-                    params.push({ name: "id[]", value: $(this).data("unit-assessment") });
+                    params.push({ name: "id[]", value: $(this).data("assessment") });
                 });
                 $.post(form.attr("action"), params, reloadTaskList, "json");
             });

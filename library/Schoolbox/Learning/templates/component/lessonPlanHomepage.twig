@@ -69,7 +69,11 @@
                     {% set hasCourseRoutes = saveToCourseRoute is not empty %}
                 {% endif %}
 
-                <li{% if hasAssessmentRoutes or hasCourseRoutes %} class="actions-small-1"{% endif %} data-unit-assessment="{{ lesson.id }}">
+                <li
+                    {% if hasAssessmentRoutes or hasCourseRoutes %}class="actions-small-1"{% endif %}
+                    data-assessment="{{ lesson.id }}"
+                    data-assessment-title="{{ lesson.title }}"
+                >
                     <div class="list-item">
                         <div class="card small-12">
                             <h3>
@@ -127,7 +131,7 @@
         </div>
     </section>
 {% endif %}
-<div class="empty-state" {% if lessonPlans|length %}hidden{% endif %}>
+<div class="empty-state {% if lessonPlans|length %}hide{% endif %}">
     <i class="icon-lesson-plan"></i>
     {% if not readOnly and (hasUnitSpec or hasCourseSpec) %}
         <p>
