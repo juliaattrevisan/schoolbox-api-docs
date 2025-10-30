@@ -36,12 +36,6 @@ class Client implements IClient
     private const int DEFAULT_CHUNK_SIZE = 128;
 
     /**
-     * When an image is omitted from the request/response: replace the image
-     * data with this in the log.
-     */
-    private const string IMAGE_DATA_OMITTED = 'omitted';
-
-    /**
      * The endpoint which OpenAI-compatible clients use for their Responses
      * feature.
      */
