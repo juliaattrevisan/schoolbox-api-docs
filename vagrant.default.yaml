@@ -84,3 +84,7 @@ aws_bucket: "sbx-dev-cdn"
 
 # The prefix used in the bucket should be firstname.lastname
 # aws_bucket_prefix: "eli.lowinger"
+
+# Disk space allocated to Vagrant's VM: set this if you run out of space.
+# Leave as null to keep space as default
+vm_disk_size: null
