@@ -1,0 +1,114 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Search for messages that match the given pattern(s) and blast from existence.
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+use Alaress\Async\Notification\Instance\Codec;
+use Alaress\Async\Notification\Notification;
+use Alaress\Async\Queue\RedisQueue;
+use Alaress\Redis;
+use Schoolbox\Application\CliTool;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+
+$app = new class extends CliTool\App{
+
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
+    /** @inheritDoc */
+    public function getShortOpts(): array
+    {
+        return ['h'];
+    }
+
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return ['help'];
+    }
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        if ($this->getOpt('h') || $this->getOpt('help')) {
+            $this->printHelp();
+            exit(CliTool\Kernel::EXIT_STATUS_OK);
+        }
+
+        $redis = Redis::getStorageClientInstance();
+        if (!$redis) {
+            $this->getLogger()->critical("Redis instance not available");
+            exit(1);
+        }
+
+        // get a list of all available redis messages o.O;
+        $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:' . INSTANCE_ID . ':m:*')));
+
+        $this->getLogger()->info("Checking redis data...");
+        $acks = 0;
+
+        $codec = new Codec(RedisQueue::COMPRESSION_LEVEL);
+        foreach ($redisList as $key) {
+            $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
+            $msg = $codec->decode($compressed);
+            try {
+                new Notification([ $msg ]);
+            } catch (Error $e) {
+                ++$acks;
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Could not decode message %s: (message: %s)',
+                        $key,
+                        $e->getMessage(),
+                    ),
+                );
+                $this->getLogger()->info('Cleaning up poison message');
+                if ($this->perform()) {
+                    $redis->executeCommand($redis->createCommand('del', [$key]));
+                }
+            }
+        }
+
+        if ($acks == 0) {
+            $this->getLogger()->info("No poisoned messages found!");
+        } elseif ($this->perform()) {
+            $this->getLogger()->info("$acks poisoned messages found and removed");
+        } else {
+            $this->getLogger()->info("$acks poisoned messages found: run with -p to delete");
+        }
+    }
+
+    /**
+     * Print a help message of available options
+     */
+    private function printHelp(): void
+    {
+        echo "
+This script is used to remove poisoned messages from the system PERMANENTLY. It will search the entire notification
+message list and delete any messages which are not able to be converted to notifications.
+
+Please ensure you do a dry run before you run the script as this is unrecoverable.
+
+Usage: cleanup-poison-msgs.php [-p]
+
+Options:
+    -h, --help
+        Print help message and exit.
+    -p, --perform
+        Without this flag, tool will not delete messages
+";
+    }
+};
+
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
+$kernel->runApp();
