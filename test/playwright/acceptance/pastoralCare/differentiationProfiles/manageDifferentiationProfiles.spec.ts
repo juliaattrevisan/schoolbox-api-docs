@@ -41,6 +41,7 @@ test.describe("Manage Differentiation Profiles", () => {
         }
     });
 
+    // skipping as we currently need to call /usr/share/schoolbox/tools/module/refresh-cache.php to get access to page
     test.skip("Verify the page can be accessed once profiles are enabled and service permission is granted", async ({
         tester,
         page,
@@ -51,6 +52,7 @@ test.describe("Manage Differentiation Profiles", () => {
             const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
             await adminDifferentiationProfiles.navigateToPage();
             await adminDifferentiationProfiles.toggleOn();
+            tester.isGoingTo("Grant service permission to admin user");
             await db.haveInDatabase("userAccess", { uid: 1, service: 16, sid: 1, type: 2 });
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that the page is accessible");
