@@ -39,11 +39,11 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('submitted_at', self::TYPE_DATETIME, null, 'submittedAt');
         $this->uses('submitted_by', self::TYPE_INTEGER, null, 'submittedBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('created_by', self::TYPE_INTEGER, null, 'createdBy');
+        $this->uses('created_by', self::TYPE_INTEGER);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('updated_by', self::TYPE_INTEGER, null, 'updatedBy');
+        $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->uses('deleted_by', self::TYPE_INTEGER, null, 'deletedBy');
+        $this->uses('deleted_by', self::TYPE_INTEGER);
 
         $this->joins(
             'dialog_agent_id',
@@ -99,25 +99,35 @@ class Mapper extends \Schoolbox\Mapper
             'submittedBy',
         );
 
-        $this->joins(
-            'created_by',
-            \Schoolbox\UserMapper::class,
-            'id',
-            null,
-            null,
-            'createdBy',
-            'createdBy',
-        );
-
-        $this->joins(
-            'updated_by',
-            \Schoolbox\UserMapper::class,
-            'id',
-            null,
-            null,
-            'updatedBy',
-            'updatedBy',
-        );
+//        $this->joins(
+//            'created_by',
+//            \Schoolbox\UserMapper::class,
+//            'id',
+//            null,
+//            null,
+//            'createdBy',
+//            'createdBy',
+//        );
+//
+//        $this->joins(
+//            'updated_by',
+//            \Schoolbox\UserMapper::class,
+//            'id',
+//            null,
+//            null,
+//            'updatedBy',
+//            'updatedBy',
+//        );
+//
+//        $this->joins(
+//            'deleted_by',
+//            \Schoolbox\UserMapper::class,
+//            'id',
+//            null,
+//            null,
+//            'deletedBy',
+//            'deletedBy',
+//        );
     }
 
 

@@ -116,8 +116,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSessionId($dataModel->getSessionId())
                 ->setAssistanceRequestedAt($dataModel->getAssistanceRequestedAt())
                 ->setCreatedAt($dataModel->getCreatedAt())
+                ->setCreatedBy($dataModel->getCreatedBy())
                 ->setUpdatedAt($dataModel->getUpdatedAt())
-                ->setDeletedAt($dataModel->getDeletedAt());
+                ->setUpdatedBy($dataModel->getUpdatedBy())
+                ->setDeletedAt($dataModel->getDeletedAt())
+                ->setDeletedBy($dataModel->getDeletedBy());
 
             $stack->add($domainObject);
         }
@@ -149,7 +152,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSubmittedAt($domainObject->getSubmittedAt())
                 ->setSubmittedBy($domainObject->getSubmittedBy())
                 ->setSessionId($domainObject->getSessionId())
-                ->setAssistanceRequestedAt($domainObject->getAssistanceRequestedAt());
+                ->setAssistanceRequestedAt($domainObject->getAssistanceRequestedAt())
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setCreatedBy($domainObject->getCreatedBy())
+                ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setUpdatedBy($domainObject->getUpdatedBy())
+                ->setDeletedAt($domainObject->getDeletedAt())
+                ->setDeletedBy($domainObject->getDeletedBy());
 
             $stack->add($dataModel);
         }
