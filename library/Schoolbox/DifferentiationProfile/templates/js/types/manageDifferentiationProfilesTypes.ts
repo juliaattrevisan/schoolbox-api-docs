@@ -59,8 +59,8 @@ export type Text = string | null;
 export type Profile = {
     id: number | null;
     student: User;
-    adjustment_category: unknown | null;
-    adjustment_level: unknown | null;
+    adjustment_category: AdjustmentType[] | null;
+    adjustment_level: AdjustmentType[] | null;
     overview: Text;
     interests_strengths: Text;
     needs_challenges: Text;
