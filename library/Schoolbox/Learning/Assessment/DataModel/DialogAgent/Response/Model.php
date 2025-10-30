@@ -51,6 +51,12 @@ class Model implements ISoftDeletable
     /**
      * @var \Alaress_Date_Format|null
      */
+    private ?\Alaress_Date_Format $startedAt = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
     private ?\Alaress_Date_Format $submittedAt = null;
 
 
@@ -141,6 +147,26 @@ class Model implements ISoftDeletable
     public function setAuthoritative(?bool $authoritative): self
     {
         $this->authoritative = $authoritative;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getStartedAt(): ?\Alaress_Date_Format
+    {
+        return $this->startedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $startedAt
+     * @return $this
+     */
+    public function setStartedAt(?\Alaress_Date_Format $startedAt): self
+    {
+        $this->startedAt = $startedAt;
         return $this;
     }
 
