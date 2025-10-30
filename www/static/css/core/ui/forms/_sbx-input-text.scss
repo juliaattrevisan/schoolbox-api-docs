@@ -4,9 +4,9 @@
  */
 
 :root {
-    --animation-form-input-change: 100ms;
-    --color-form-disabled-background: #edecec;
-    --size-form-element-border-width: 1px;
+    --sbx-animation-form-input-change: 100ms;
+    --sbx-color-form-disabled-background: #edecec;
+    --sbx-size-form-element-border-width: 1px;
 }
 
 /* Shared form input focus styles */
@@ -24,8 +24,8 @@
 
 /* Shared form input disabled styles */
 @mixin form-input-disabled {
-    background-color: var(--color-foreground-secondary);
-    color: var(--color-text-secondary) !important;
+    background-color: var(--sbx-color-foreground-secondary);
+    color: var(--sbx-color-text-secondary) !important;
     cursor: not-allowed;
     pointer-events: auto;
     & + label {
@@ -73,10 +73,7 @@ select[multiple],
     }
 }
 
-input[type="text"],
-input[type="number"],
-select[multiple],
-.c-filter-search-term__field {
+.input-group input[type="text"] {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
@@ -86,6 +83,9 @@ select[multiple],
 }
 
 .sbx-input-text--with-button[type="text"] {
+    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
+}
+.c-filter-search-term input[type="text"].c-filter-search-term__field {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
@@ -100,6 +100,6 @@ select[multiple],
 
 @media (prefers-reduced-motion: reduce) {
     :root {
-        --animation-form-input-change: 0ms;
+        --sbx-animation-form-input-change: 0ms;
     }
 }
