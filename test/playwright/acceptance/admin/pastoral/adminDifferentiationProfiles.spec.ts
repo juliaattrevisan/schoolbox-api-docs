@@ -36,18 +36,8 @@ test.describe("Admin Differentiation Profiles", () => {
     test("rename field", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
-            tester.isGoingTo("Toggle the differentiation profiles on");
             await adminDifferentiationProfiles.toggleOn();
-            tester.isGoingTo("Find the input with data-test attribute 'differentiation-profiles-input-terminology-1'");
-            const terminologyInput = page.getByTestId("differentiation-profiles-input-terminology-1");
-            tester.isGoingTo("Update the input text to 'Party time'");
-            await terminologyInput.clear();
-            await terminologyInput.fill("Party time");
-            await adminDifferentiationProfiles.clickSave();
-            tester.isGoingTo("Refresh the page");
-            await page.reload();
-            tester.isGoingTo("Ensure the text 'Party time' is still visible");
-            await expect(page.getByTestId("differentiation-profiles-input-terminology-1")).toHaveValue("Party time");
+            await adminDifferentiationProfiles.renameField("terminology", "1", "Party time");
         } finally {
             tester.isGoingTo("Clean up: Reset the field and toggle off");
             try {
@@ -66,7 +56,6 @@ test.describe("Admin Differentiation Profiles", () => {
     test("resequence fields", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
-            tester.isGoingTo("Toggle the differentiation profiles on");
             await adminDifferentiationProfiles.toggleOn();
             tester.isGoingTo("grab the drag handle for the Goals field");
             const dragHandle = await page.getByTestId("differentiation-profiles-drag-handle-7");
