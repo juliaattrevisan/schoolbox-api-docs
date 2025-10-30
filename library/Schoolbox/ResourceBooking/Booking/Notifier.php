@@ -250,7 +250,7 @@ class Notifier extends AbstractModuleNotifier
         $clashErrors = [];
         if (in_array($event, ['created', 'updated'])) {
             // If the event has been created or updated, check for clashes with existing approved events.
-            // This allows the notification message can be modified to alert the moderator of the clashes.
+            // This allows the notification message to be modified to alert the moderator of the clashes.
             /** @var Status\Mapper $bookingStatusMapper */
             $bookingStatusMapper = $this->mapper->getJoinMapper('status');
             $validation = new Validation(
