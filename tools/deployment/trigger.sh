@@ -32,7 +32,7 @@ function help() {
   echo ""
   echo "Options:"
   echo "  -h, --help        Show this help message and exit"
-  echo "  -c, --config      Specify a custom configuration file (default: /etc/schoolbox/deploy_config.json)"
+  echo "  -c, --config      Specify a custom configuration file (default: /etc/schoolbox/deployment_config.json)"
   echo "  -i, --id-file     Specify a file to write the deployment ID to (default: /tmp/deployment_id)"
   echo "  -v, --verbose     Enable verbose output for debugging"
   echo ""
@@ -81,6 +81,14 @@ function trigger_deployment() {
   log "Triggering deployment with ID: $deployment_id"
   api_url=$(jq -r '.api_url' "$CONFIG_FILE")
   auth_token=$(jq -r '.auth_token' "$CONFIG_FILE")
+  if [[ -z "$api_url" || "$api_url" == "null" ]]; then
+    error "api_url not found or invalid in configuration file: $CONFIG_FILE"
+    exit 1
+  fi
+  if [[ -z "$auth_token" || "$auth_token" == "null" ]]; then
+    error "auth_token not found or invalid in configuration file: $CONFIG_FILE"
+    exit 1
+  fi
   if response=$(curl --fail-with-body -X POST "$api_url/ready" \
     -H "X-API-Key: $auth_token" \
     -H "Content-Type: application/json" \
