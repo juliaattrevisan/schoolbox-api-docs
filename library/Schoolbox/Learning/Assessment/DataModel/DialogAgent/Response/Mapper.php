@@ -116,7 +116,7 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
             INNER JOIN {$this->getJoinSql('learner', '', 'learner', true)}
-            INNER JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
+            LEFT JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
         ";
     }
 
@@ -145,8 +145,15 @@ class Mapper extends \Schoolbox\Mapper
             $dialogAgent->setAssessmentModel($assessmentModel);
 
             $response->setDialogAgent($dialogAgent)
-                ->setLearner($this->hydrateJoin($row, 'learner', 'learner'))
-                ->setSubmittedBy($this->hydrateJoin($row, 'submittedBy', 'submittedBy'));
+                ->setLearner($this->hydrateJoin($row, 'learner', 'learner'));
+
+            /* A response might not yet be submitted; in this case, a user is null
+             */
+            $submittedBy = $this->hydrateJoin($row, 'submittedBy', 'submittedBy');
+
+            if (null !== $submittedBy?->getId()) {
+                $response->setSubmittedBy($submittedBy);
+            }
 
             $stack->add($response);
         }

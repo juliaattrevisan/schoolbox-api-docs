@@ -17,15 +17,14 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
@@ -70,7 +69,8 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper ,
+     * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
+     * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
@@ -94,6 +94,7 @@ class Controller extends Assessment\Controller
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
@@ -138,7 +139,6 @@ class Controller extends Assessment\Controller
     public function getSummary(Model|IAssessable $assessment, User $student): void
     {
         /** @var Model $assessment */
-
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
 
         /* Craft a returnUrl, to redirect back to the place from whence you came
@@ -272,17 +272,35 @@ class Controller extends Assessment\Controller
 
         try {
             $assessment->assertCanRespond($participant);
+
+            /* The total time spent in this learning activity must not exceed the total allowed duration,
+             * if set; not sure how we're gonna calculate that atm
+             *
+             * TODO figure out how to aggregate total time spent in a chat
+             *  $assessment->assertDuration($participant); ...?
+             */
+
             $canRespond = true;
         } catch (\DomainException $e) {
             // noop
         }
 
-        /* The total time spent in this learning activity must not exceed the total allowed duration,
-         * if set; not sure how we're gonna calculate that atm
+        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
+         * button which goes to that particular response so students can continue it.
          *
-         * TODO figure out how to aggregate total time spent in a chat
-         *  $assessment->assertDuration($participant); ...?
+         * Otherwise create a new response.
          */
+        $existingResponse = null;
+
+        if ($participant) {
+            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+                ->equals('learner_id', $participant->getUser()->getId())
+                ->isNull('submitted_by')
+                ->isNull('submitted_at');
+
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
+        }
 
         $twigData = [
             'lastViews'         => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
@@ -294,6 +312,12 @@ class Controller extends Assessment\Controller
             'courseAssessments' => $courseAssessments,
             'participant'       => $participant,
             'canRespond'        => $canRespond,
+            /* An array representing a call to action
+             */
+            'button' => (new Button($this->routeGenerator))->generate($assessment, $participant),
+            /* An unsubmitted response that can be resumed
+             */
+            'existingResponse' => $existingResponse,
             /* The full history of interactions for this dialog agent
              * Note that we won't have feedbacks in this
              */
@@ -320,35 +344,15 @@ class Controller extends Assessment\Controller
      * @param IAssessable $assessment
      * @param User $student
      * @return void
+     * @throws Deleted
      * @throws Error
+     * @throws Exception
      * @throws RouteNotFound
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
         /** @var null|Participant $participant */
         $participant = $assessment->getParticipantIfExtant($student);
-
-        /* Find all the records spawned by $participant
-         *
-         * Order them by submitted time to find the most recent, and use that
-         */
-        $allResponses = $participant ? $participant->getAllResponses() : new GenericCollection(IResponse::class);
-
-        /* TODO If there's a response that has yet to be submitted officially,
-         *  presume that to be "a draft" and resume it upon next click. Maybe.
-         */
-        $latestResponse = null;
-
-        if ($allResponses->count()) {
-            foreach ($allResponses as $response) {
-                /* TODO Find the first non-submitted response and...probably resume that? Maybe?
-                 */
-                if (!$response->isSubmitted()) {
-                    $latestResponse = $response;
-                    break;
-                }
-            }
-        }
 
         // Is the page being displayed in readonly mode?
         /* TODO Are students allowed to visit this after the activity is closed?
@@ -376,7 +380,78 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'student' => $student,
             'participant' => $participant,
-            'response' => $latestResponse,
+            'existingResponse' => null,
+            'errorMessage' => $errorMessage,
+            'readonly' => $isInteractionLocked,
+            'returnUrl' => $returnUrl,
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/response/create.twig',
+            $data
+        );
+    }
+
+
+    /**
+     * Resume an unsubmitted response
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
+     * @throws Deleted
+     * @throws Error
+     * @throws Exception
+     * @throws RouteNotFound
+     */
+    public function getResumeResponse(IAssessable $assessment, User $student): void
+    {
+        /** @var null|Participant $participant */
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
+         * button which goes to that particular response so students can continue it.
+         *
+         * Otherwise create a new response.
+         */
+        $existingResponse = null;
+
+        if ($participant) {
+            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+                ->equals('learner_id', $participant->getUser()->getId())
+                ->isNull('submitted_by')
+                ->isNull('submitted_at');
+
+            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
+        }
+
+        // Is the page being displayed in readonly mode?
+        /* TODO Are students allowed to visit this after the activity is closed?
+         */
+        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+
+        // For some reason I can't use get/setFlash?
+        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
+        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
+
+        /* Prepare a redirection url
+         */
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+        $data = [
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    sprintf('Create Response for %s', $assessment->getTitle()),
+                ]
+            ),
+            'assessment' => $assessment,
+            'student' => $student,
+            'participant' => $participant,
+            'existingResponse' => $existingResponse,
             'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
@@ -394,8 +469,11 @@ class Controller extends Assessment\Controller
      *  Currently a placeholder to spawn data
      *
      * @param IAssessable $assessment
-     * @param User        $student
+     * @param User $student
      * @return void
+     * @throws Deleted
+     * @throws Exception
+     * @throws RouteNotFound
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -405,14 +483,29 @@ class Controller extends Assessment\Controller
          * Otherwise spawn a new instance, configure that, and save it.
          */
         if ($requestPost->get('responseId')) {
-            $response = $this->dialogAgentResponseMapper->findById($requestPost->get('responseId'));
+            $response = $this->dialogAgentResponseMapper->findByColumnList([
+                'id' => $requestPost->get('responseId'),
+                'dialog_agent_id' => $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId(),
+                'learner_id' => $student->getId()
+            ])->first();
+
+            /* Intentionally dies if the responseId is not authored by $student for this $assessment instance.
+             * This should stop people from stealing some other guy's response, and also prevent them from stealing
+             * their own response to a different assessment and repurposing it here.
+             */
+            if (null === $response) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+            }
         } else {
             $response = $this->dialogAgentResponseMapper->createModel()
-                ->setCreatedAt(\Alaress_Date_Format::now())
-                ->setUpdatedAt(\Alaress_Date_Format::now());
+                ->setSubmittedOnBehalfOf($student)
+                ->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        $response->setAssessable($assessment);
+        /* TODO populate with whatever snake did
+         */
+        $response->setAssessable($assessment)
+            ->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->dialogAgentResponseMapper->save($response);
 
@@ -432,6 +525,19 @@ class Controller extends Assessment\Controller
                 '?returnUrl=' .  Redirect::encode($requestPost->get('returnUrl'))
             )
         );
+    }
+
+
+    /**
+     * View a response's chat log in a readonly mode
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
+     */
+    public function getViewResponse(IAssessable $assessment, User $student): void
+    {
+        // todo implement a readonly viewing mode
     }
 
 
