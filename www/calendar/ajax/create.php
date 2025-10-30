@@ -165,9 +165,6 @@ if (!empty($resources)) {
         if (empty($errors[$resourceId])) {
             // Build the booking
             $booking = getBookingFromEvent($item, $event, $user);
-            $booking
-                ->setName($_POST['title'] ?? '')
-                ->setNotes($_POST['detail'] ?? '');
             $bookingList->add($booking);
         }
 
@@ -262,7 +259,7 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         // init booking time to null (this may be changed later to the event time...)
     // What about the resource? If it's an open resource, confirm the
     // booking immediately.
-    if ($resource->getModerationType()->getId() == Item\ModerationType\Model::TYPE_OPEN) {
+    if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
         $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
     } elseif (
         $resource->isUserModerator($user)
