@@ -42,6 +42,8 @@ class Hydrator extends BaseHydrator
      */
     public const BASE_TYPE = 'assessment';
 
+    // TODO: this should probably be an array_map of AssessmentType::ALL_TYPES instead,
+    // but leaving as-is for now as you can't array_map in a class const
     public const SUB_TYPES = [
         // Filter types and subtypes are defined in ResultTypes.ts.  The subtypes below must match that file.
         'assessment.dueWork',
@@ -49,7 +51,8 @@ class Hydrator extends BaseHydrator
         'assessment.project',
         'assessment.lti',
         'assessment.task',
-        'assessment.quiz'
+        'assessment.quiz',
+        'assessment.dialogAgent',
     ];
 
     /**
@@ -415,15 +418,17 @@ class Hydrator extends BaseHydrator
      */
     public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
     {
-        return match ($type) {
-            'assessment' => $rosettaStone->translate('assessment', false, true),
-            'assessment.dueWork' => $rosettaStone->translate('dueWork', false, true),
-            'assessment.lessonPlan' => $rosettaStone->translate('lessonPlan', false, true),
-            'assessment.project' => $rosettaStone->translate('project', false, true),
-            'assessment.lti' => 'LTI',
-            'assessment.task' => 'Task',
-            'assessment.quiz' => 'Quiz',
-            default => $type,
-        };
+        if ($type === self::BASE_TYPE) {
+            return $rosettaStone->translate('assessment', false, true);
+        }
+
+        /** check if it matches any "assessment.{assessmentType}" */
+        $split = explode('.', $type);
+        $subType = $split[1] ?? '';
+        if (self::BASE_TYPE === $split[0] && in_array($subType, AssessmentType::ALL_TYPES)) {
+            return AssessmentType::stringToReadableName($subType);
+        }
+
+        return $type;
     }
 }

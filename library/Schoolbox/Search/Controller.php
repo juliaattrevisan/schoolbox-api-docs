@@ -12,10 +12,11 @@ use Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Search\Api\SearchFilter;
+use Schoolbox\Search\Api\Database\ResultType;
 use Schoolbox\UserMapper;
-use Twig\Error\Error;
 
 class Controller extends Base
 {
@@ -139,22 +140,21 @@ class Controller extends Base
         $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $subTypes = [
-                ["title" => $rosettaStone->translate("dueWork", false, true), "value" => "assessment.dueWork"],
-                ["title" => $rosettaStone->translate("project", false, true), "value" => "assessment.project"],
-                ["title" => $rosettaStone->translate("lessonPlan", false, true), "value" => "assessment.lessonPlan"],
-                ["title" => "Quiz", "value" => "assessment.quiz"],
-                ["title" => "Task", "value" => "assessment.task"],
-            ];
+            $ltiEnabled = $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
+            $assessmentTypes = AssessmentType::getOptions($ltiEnabled);
 
-            if ($configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
-                $subTypes[] = ["title" => "3rd Party Assessments", "value" => "assessment.lti"];
+            $subTypes = [];
+            foreach ($assessmentTypes as $typeKey => $title) {
+                $subTypes[] = [
+                    "title" => $title,
+                    "value" => sprintf("%s.%s", ResultType\Assessment\Hydrator::BASE_TYPE, $typeKey)
+                ];
             }
 
             // NOTE: Features to include based on NAME_LMS_ENABLED were found by inspecting code in conf/modules/Learning.php.
             $filters[] = [
                 "title" => "Learning " . $rosettaStone->translate("activity", false, true),
-                "value" => "assessment",
+                "value" => ResultType\Assessment\Hydrator::BASE_TYPE,
                 "subTypes" => $subTypes
             ];
         }
