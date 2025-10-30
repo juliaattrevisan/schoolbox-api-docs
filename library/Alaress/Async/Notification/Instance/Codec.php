@@ -15,6 +15,10 @@ use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 
 /**
  * Codec for `Instance` objects.
+ *
+ * The extracted code was also used to compress `TriggerInterface` objects:
+ * I don't know why, or how they are supposed to be uncompressed as the
+ * unserialize call didn't allow them to be reconstructed.
  */
 class Codec implements ICodec
 {
