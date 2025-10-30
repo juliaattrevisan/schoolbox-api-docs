@@ -3,7 +3,9 @@
  * Manage Differentiation Profiles page
  */
 
+import locale from "@js/terminology/rosettaStone";
 import type { User } from "@schoolboxLibrary/types/User";
+import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { MDPHeader, Header, AdjustmentType, Profile } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
@@ -48,7 +50,13 @@ const rows = window.Vue.ref<Profile[]>(props.profiles);
 </script>
 
 <template>
-    <mdp-grid :header="header" :rows="rows">
+    <empty-state v-if="rows.length === 0" icon="icon-learning-support">
+        <p>
+            No {{ locale.differentiationProfile.translate(true, true) }} exist. They will appear here once records have
+            been linked.
+        </p>
+    </empty-state>
+    <mdp-grid v-else :header="header" :rows="rows">
         <template #User="{ row, header: columnHeader }">
             <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
         </template>
