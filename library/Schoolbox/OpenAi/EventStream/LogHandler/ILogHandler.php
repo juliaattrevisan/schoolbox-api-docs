@@ -30,5 +30,5 @@ interface ILogHandler
      * @param Log\Model $log
      * @return Log\Model
      */
-    public function handle(Message $message, Log\Model $log): Log\Model;
+    public function handleMessage(Message $message, Log\Model $log): Log\Model;
 }

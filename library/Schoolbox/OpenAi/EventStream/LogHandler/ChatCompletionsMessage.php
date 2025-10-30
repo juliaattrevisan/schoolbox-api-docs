@@ -19,7 +19,10 @@ use Schoolbox\OpenAi\EventStream\Message;
  */
 class ChatCompletionsMessage implements ILogHandler
 {
-    public function handle(Message $message, Log\Model $log): Log\Model
+    /**
+     * Handle the message by writing it directly to the log.
+     */
+    public function handleMessage(Message $message, Log\Model $log): Log\Model
     {
         // Chat completions messages don't have an event type:
         // just write the message data directly to the log.

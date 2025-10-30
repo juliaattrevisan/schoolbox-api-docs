@@ -12,7 +12,6 @@ namespace Schoolbox\OpenAi\EventStream\LogHandler;
 use JsonException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\OpenAi\EventStream\Message;
 
 /**
@@ -27,12 +26,14 @@ class ResponseMessage implements ILogHandler
      */
     private const string IMAGE_DATA_OMITTED = 'omitted';
 
-
-    public function handle(Message $message, Log\Model $log): Log\Model
+    /**
+     * Handle the message by stripping image data when writing to the log.
+     */
+    public function handleMessage(Message $message, Log\Model $log): Log\Model
     {
         // Prepare the message for logging
         $eventType = $message->eventType;
-        $rawData      = [];
+        $rawData   = [];
         try {
             // Omit partial and completed image data from the output
             $filteredData = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);

@@ -400,10 +400,9 @@ class Client implements IClient
                 yield $message->__toString();
 
                 // Update the log, and save it:
-                // if that raises an exception, still save the log
+                // even if that raises an exception, still save the log
                 try {
-                    $logHandler->handle($message, $log);
-//                    $this->onMessage($message, $log);
+                    $logHandler->handleMessage($message, $log);
                 } finally {
                     $this->logMapper->save($log);
                 }
