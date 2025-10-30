@@ -397,7 +397,7 @@ class Hydrator extends BaseHydrator
      */
     public function getTypeTitleFromType(string $type, RosettaStone $rosettaStone): string
     {
-        if ($type === 'assessment') {
+        if ($type === self::BASE_TYPE) {
             return $rosettaStone->translate('assessment', false, true);
         }
 
