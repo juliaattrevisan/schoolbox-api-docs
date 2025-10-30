@@ -61,6 +61,8 @@ class Notifier extends AbstractModuleNotifier
     /** @var \Schoolbox\External\Event\Mapper */
     private \Schoolbox\External\Event\Mapper $externalEventMapper;
 
+    /** @var string Suffix for notifications involving creation of bookings with clashes. */
+    private const string CLASH_SUFFIX = ' (with conflicts)';
 
     /**
      * {@inheritdoc}
@@ -271,10 +273,7 @@ class Notifier extends AbstractModuleNotifier
 
         switch ($event) {
             case 'created':
-                $messageText = ':user booked :resource';
-                if (count($clashErrors) > 0) {
-                    $messageText .= ' (with conflicts)';
-                }
+                $messageText = ':user booked :resource' . (count($clashErrors) === 0 ? '': self::CLASH_SUFFIX);
                 break;
             case 'approved':
                 $messageText = ':user approved booking of :resource';
@@ -289,10 +288,7 @@ class Notifier extends AbstractModuleNotifier
                 $messageText = ':user cancelled booking of :resource';
                 break;
             case 'updated':
-                $messageText = ':user changed booking of :resource';
-                if (count($clashErrors) > 0) {
-                    $messageText .= ' (with conflicts)';
-                }
+                $messageText = ':user changed booking of :resource' . (count($clashErrors) === 0 ? '': self::CLASH_SUFFIX);
                 break;
             default:
                 throw new \InvalidArgumentException(
