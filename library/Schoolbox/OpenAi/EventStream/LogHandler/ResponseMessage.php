@@ -67,6 +67,14 @@ class ResponseMessage implements ILogHandler
     }
 
     /**
+     * @inheritdoc
+     */
+    public function handleResponse(array $responseData, Log\Model $log): Log\Model
+    {
+        return $log;
+    }
+
+    /**
      * Append the message to the log, including:
      * * the message itself (with redundant field filtered)
      * * the model the API endpoint used
