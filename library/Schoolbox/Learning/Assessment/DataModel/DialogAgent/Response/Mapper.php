@@ -98,6 +98,26 @@ class Mapper extends \Schoolbox\Mapper
             'submittedBy',
             'submittedBy',
         );
+
+        $this->joins(
+            'created_by',
+            \Schoolbox\UserMapper::class,
+            'id',
+            null,
+            null,
+            'createdBy',
+            'createdBy',
+        );
+
+        $this->joins(
+            'updated_by',
+            \Schoolbox\UserMapper::class,
+            'id',
+            null,
+            null,
+            'updatedBy',
+            'updatedBy',
+        );
     }
 
 
