@@ -18,11 +18,11 @@
         {% for field in scenario.fields %}
             <li>
                 {% if field.type == 'textarea' %}
-                    <sbx-icon name="textbox" style="display: inline-block"></sbx-icon>
+                    <sbx-icon name="textbox" style="display: inline-block" data-tooltip title="Text Area"></sbx-icon>
                 {% elseif field.type == 'switch' %}
-                    <sbx-icon name="task" style="display: inline-block"></sbx-icon>
+                    <sbx-icon name="task" style="display: inline-block" data-tooltip title="Switch"></sbx-icon>
                 {% elseif field.type == 'dropdown' %}
-                    <sbx-icon name="list" style="display: inline-block"></sbx-icon>
+                    <sbx-icon name="list" style="display: inline-block" data-tooltip title="Dropdown"></sbx-icon>
                 {% else %}
                     {# shouldn't end up here, no icon #}
                 {% endif %}
