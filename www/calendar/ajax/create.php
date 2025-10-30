@@ -126,9 +126,6 @@ if (!empty($resources)) {
 
     $postVars['campus']   = '';
 
-
-    // Validate this item.
-    $code   = 200;
     $statusMapper = Status\Mapper::getInstance();
     $validation = new Validation(
         $this->user,
@@ -145,19 +142,14 @@ if (!empty($resources)) {
         /** @var Item\Model $item */
         $item = Item\Mapper::getInstance()->findById((int)$resourceId);
 
+        // Validate this item.
         $errors[$resourceId] = $validation->validateBookingFromPostData($item, $postVars, null);
 
         // If clashes are allowed on the booking, and all validation errors are clash errors...
-        $clashBookingStartDatesAsKeys = [];
         if (
-            count($errors) > 0 && $item->getAllowClashBookings() &&
-            $validation->validationErrorsAreAllClashes($errors)
+            count($errors[$resourceId]) > 0 && $item->getAllowClashBookings() &&
+            $validation->validationErrorsAreAllClashes($errors[$resourceId])
         ) {
-            // Remember the start dates of clash bookings.
-            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
-            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
-                $clashBookingStartDatesAsKeys[$startDate] = null;
-            }
             // Ignore errors since all were clashes and clashes are allowed.
             $errors[$resourceId] = [];
         }
@@ -198,7 +190,7 @@ $personalRelationMapper->save($personalRelation);
 
 (new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
 
-// manually craft a json response, to conatin logs and the generated event below..
+// manually craft a json response, to contain logs and the generated event below..
 $output = [
     'errors' => array_values($errors),
     'event'  => null,
