@@ -263,12 +263,16 @@ class Notifier extends AbstractModuleNotifier
                 $this->conf,
                 $this->externalEventMapper,
             );
-            $clashErrors = $validation->validateForClashes(
-                $object->getResource(),
-                $object->getEvent()->getStartDateTime()?->getDateTimeObject(),
-                $object->getEvent()->getEndDateTime()?->getDateTimeObject(),
-                $object
-            );
+            $startDateTimeAlaressObj = $object->getEvent()->getStartDateTime();
+            $endDateTimeAlaressObj = $object->getEvent()->getEndDateTime();
+            if ($startDateTimeAlaressObj !== null && $endDateTimeAlaressObj !== null) {
+                $clashErrors = $validation->validateForClashes(
+                    $object->getResource(),
+                    $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                    $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                    $object
+                );
+            }
         }
 
         switch ($event) {
