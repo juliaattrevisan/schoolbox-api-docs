@@ -445,7 +445,7 @@ class Controller extends Assessment\Controller
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
-                    sprintf('Create response for %s', $assessment->getTitle()),
+                    sprintf('Create Response for %s', $assessment->getTitle()),
                 ]
             ),
             'assessment' => $assessment,
