@@ -288,11 +288,13 @@ class User extends DeprecatedModel
             }
 
             // Always search basic names (firstname, preferred_name, lastname, username).
+            // Some instances use non-numeric synergy_ids, so synergy_id must be included here also.
             $query .= "(
                 firstname like :name
                 or preferred_name like :name
                 or lastname like :name
                 or username like :name
+                or synergy_id like :name
             ) ";
             $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
 
