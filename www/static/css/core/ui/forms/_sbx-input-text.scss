@@ -34,7 +34,9 @@
 }
 
 /* Base */
-.sbx-body input[type="text"] {
+input[type="text"],
+input[type="number"],
+select[multiple] {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
