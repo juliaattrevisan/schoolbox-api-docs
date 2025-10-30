@@ -40,7 +40,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'title:', 'href:', 'start:', 'end:', 'instance-id:', 'cleanup-poison'];
+        return ['help', 'title:', 'href:', 'start:', 'end:', 'instance-id:'];
     }
 
     /** @inheritDoc */
@@ -76,8 +76,6 @@ $app = new class extends CliTool\App{
             $args['end'] = strtotime($this->getOpt('end:'));
         }
 
-        $args['cleanup-poison'] = $this->getOpt('cleanup-poison');
-
         if (!count($args)) {
             $this->getLogger()->error("Insufficient search parameters specified! Try -h for more information and help.");
             exit(1);
@@ -107,44 +105,21 @@ $app = new class extends CliTool\App{
         $this->getLogger()->info("Checking redis data...");
         $acks = 0;
 
-        $restrictiveCodec = new Codec(RedisQueue::COMPRESSION_LEVEL);
-        $permissiveCodec  = new Codec(RedisQueue::COMPRESSION_LEVEL, permissiveUnserialize: true);
+        $codec = new Codec(RedisQueue::COMPRESSION_LEVEL);
         foreach ($redisList as $key) {
             $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
-            $msg = $restrictiveCodec->decode($compressed);
+            $msg = $codec->decode($compressed);
             try {
                 $notification = new Notification([ $msg ]);
             } catch (Error $e) {
                 $this->getLogger()->warning(
                     sprintf(
-                        'Could not decode %s using restrictive codec: (message: %s)',
+                        'Could not decode %s: use cleanup-poison-msgs.php to clean up (message: %s)',
                         $key,
                         $e->getMessage(),
                     ),
                 );
-                if ($args['cleanup-poison']) {
-                    $this->getLogger()->info('Cleaning up poison message');
-                    if ($this->perform()) {
-                        $redis->executeCommand($redis->createCommand('del', [$key]));
-                    }
-                } else {
-                    $this->getLogger()->warning('This message may be cleaned up with the --cleanup-poison flag');
-                }
-
-                // try again with the permissive codec
-                $msg = $permissiveCodec->decode($compressed);
-                try {
-                    $notification = new Notification([ $msg ]);
-                } catch (Error $e) {
-                    $this->getLogger()->warning(
-                        sprintf(
-                            'Could not decode %s using permissive codec: (message: %s)',
-                            $key,
-                            $e->getMessage(),
-                        ),
-                    );
-                    continue;
-                }
+                continue;
             }
 
             $msgArray = $msg->jsonSerialize();
@@ -264,8 +239,6 @@ Options:
         Only notifications delivered before this time will be matched
     -r
         If present, title and href will be treated as preg expression strings and matches done as regexps
-    --cleanup-poison
-        If set, also delete any notifications which are not able to be deserialized
     -p, --perform
         Without this flag, tool will not delete messages
 ";
