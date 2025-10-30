@@ -26,6 +26,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
  * Class Mapper
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findById($identifierValue)
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  *
  * @package Schoolbox\Pastoral\Attachment

@@ -10,6 +10,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as DueWorkResponseFileMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Preview\Chain\Strategy\Internal\PDF;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
@@ -45,7 +46,10 @@ class Internal extends Base
      */
     private const URL_DUE_WORK_RESPONSE_FILE_REGEXP = '`^/learning/assessments/\\d+/\\d+/responses/\\d+/files/(\\d+)`';
 
-
+    /**
+     * Pattern for pastoral attachment file regexps
+     */
+    private const URL_PASTORAL_ATTACHMENT_FILE_REGEXP = '`^/pastoral/student/\\d+/record/\\d+/attachment/(\\d+)`';
     /**
      * Constructor
      *
@@ -81,6 +85,13 @@ class Internal extends Base
         } elseif ($id = $this->isDueWorkResponseFile($uriObject)) {
             try {
                 $item = DueWorkResponseFileMapper::getInstance()->findById($id);
+                $this->processStorage($url, $item);
+            } catch (Exception $e) {
+                //noop
+            }
+        } elseif ($id = $this->isPastoralAttachmentFile($uriObject)) {
+            try {
+                $item = PastoralAttachmentMapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
             } catch (Exception $e) {
                 //noop
@@ -140,6 +151,20 @@ class Internal extends Base
     private function isDueWorkResponseFile(Uri $uri): ?string
     {
         if (preg_match(self::URL_DUE_WORK_RESPONSE_FILE_REGEXP, $uri->getPath(), $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+
+    /**
+     * Get the ID from a pastoral attachment file URL.
+     *
+     * @param Uri $uri
+     * @return string|null
+     */
+    private function isPastoralAttachmentFile(Uri $uri): ?string
+    {
+        if (preg_match(self::URL_PASTORAL_ATTACHMENT_FILE_REGEXP, $uri->getPath(), $matches)) {
             return $matches[1];
         }
         return null;
