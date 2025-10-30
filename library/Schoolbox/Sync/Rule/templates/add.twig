@@ -35,10 +35,10 @@
                     <section>
                         <fieldset class="content">
                             <div class="small-12 columns">
-                                <label>
+                                <label for="rule-name">
                                     Name
-                                    <input type="text" name="name" value="{{ rule.name ?? '' }}" />
                                 </label>
+                                <input id="rule-name" type="text" name="name" value="{{ rule.name ?? '' }}" />
 
                                 <label>
                                     Description

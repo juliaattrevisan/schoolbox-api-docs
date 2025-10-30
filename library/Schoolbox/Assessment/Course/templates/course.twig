@@ -512,8 +512,8 @@ Usage:
                     <div class="small-4 column">
                         <label for="subjectCode">
                             {{ locale.subject.proper }} Code
-                            <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />
                         </label>
+                        <input id="subjectCode" type="text" name="subjectCode" size="40" value="{{ courseSpec.subjectCode ?? '' }}" maxlength="20" />
                     </div>
 
                     {% if curriculumEnabled %}
