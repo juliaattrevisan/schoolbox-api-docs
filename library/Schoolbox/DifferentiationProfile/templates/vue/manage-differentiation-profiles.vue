@@ -6,11 +6,12 @@
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
-import type { MDPHeader, Header, AdjustmentType, Profile } from "../js/types/manageDifferentiationProfilesTypes";
+import type { MDPHeader, Header, AdjustmentType, Profile, Text } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
+import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -67,10 +68,7 @@ const rows = window.Vue.ref<Profile[]>(props.profiles);
             />
         </template>
         <template #Text="{ row, header: columnHeader }">
-            <div class="text-cell">
-                <!-- Custom text display -->
-                {{ row[columnHeader.key] || "" }}
-            </div>
+            <mdp-grid-cell-text :text="row[columnHeader.key] as Text" />
         </template>
         <template #Date="{ row, header: columnHeader }">
             <div class="date-cell">

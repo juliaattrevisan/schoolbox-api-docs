@@ -49,6 +49,11 @@ export type AdjustmentType = {
 };
 
 /**
+ * Contains user/AI generated text data
+ */
+export type Text = string | null;
+
+/**
  * Differentiation profile data
  */
 export type Profile = {
@@ -56,11 +61,11 @@ export type Profile = {
     student: User;
     adjustment_category: unknown | null;
     adjustment_level: unknown | null;
-    overview: string | null;
-    interests_strengths: string | null;
-    needs_challenges: string | null;
-    strategies_adjustments: string | null;
-    goals: string | null;
+    overview: Text;
+    interests_strengths: Text;
+    needs_challenges: Text;
+    strategies_adjustments: Text;
+    goals: Text;
     created_at: string | null;
     updated_at: string | null;
     deleted_at: string | null;
