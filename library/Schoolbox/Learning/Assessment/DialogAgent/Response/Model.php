@@ -21,12 +21,6 @@ class Model extends AbstractResponse
 
 
     /**
-     * @var \Schoolbox\User|null
-     */
-    private ?\Schoolbox\User $learner = null;
-
-
-    /**
      * @var bool|null
      */
     private ?bool $authoritative = null;
@@ -69,26 +63,6 @@ class Model extends AbstractResponse
     public function setDialogAgent(?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent): self
     {
         $this->dialogAgent = $dialogAgent;
-        return $this;
-    }
-
-
-    /**
-     * @return \Schoolbox\User|null
-     */
-    public function getLearner(): ?\Schoolbox\User
-    {
-        return $this->learner;
-    }
-
-
-    /**
-     * @param \Schoolbox\User|null $learner
-     * @return $this
-     */
-    public function setLearner(?\Schoolbox\User $learner): self
-    {
-        $this->learner = $learner;
         return $this;
     }
 
