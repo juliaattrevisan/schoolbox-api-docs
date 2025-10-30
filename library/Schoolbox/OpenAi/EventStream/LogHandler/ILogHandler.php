@@ -26,9 +26,20 @@ interface ILogHandler
      * * extracting the value from `$message` before it's added to the log's
      *   response
      *
-     * @param Message   $message
-     * @param Log\Model $log
-     * @return Log\Model
+     * @param Message   $message The message from OpenAI.
+     *                           This may contain a data structure similar to
+     *                           the one handled by `handleResponse`.
+     * @param Log\Model $log     The log object to update.
+     * @return Log\Model The updated log object.
      */
     public function handleMessage(Message $message, Log\Model $log): Log\Model;
+
+    /**
+     * Handle a full response from OpenAI, by writing it to a log.
+     *
+     * @param array     $responseData The response data from OpenAI.
+     * @param Log\Model $log          The log object to update.
+     * @return Log\Model The updated log object.
+     */
+    public function handleResponse(array $responseData, Log\Model $log): Log\Model;
 }

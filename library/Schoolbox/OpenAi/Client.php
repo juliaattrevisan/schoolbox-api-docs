@@ -77,7 +77,12 @@ class Client implements IClient
         $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request = new Request('POST', $url, $this->authHeaders);
-        return $this->handleNonStreamedResponse($request, $payload, $log);
+        return $this->handleNonStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new EventStream\LogHandler\ResponseMessage(),
+        );
     }
 
     /**
@@ -105,7 +110,12 @@ class Client implements IClient
         $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request = new Request('POST', $url, $this->authHeaders);
-        return $this->handleNonStreamedResponse($request, $payload, $log);
+        return $this->handleNonStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new EventStream\LogHandler\ResponseMessage(),
+        );
     }
 
     /**
@@ -329,9 +339,10 @@ class Client implements IClient
      * Request a non-streamed response from the AI provider, and handle the
      * logging and exceptions appropriately.
      *
-     * @param RequestInterface $request The request to send.
-     * @param array            $payload The request body to send.
-     * @param Log\Model        $log     The log to write to.
+     * @param RequestInterface                   $request    The request to send.
+     * @param array                              $payload    The request body to send.
+     * @param Log\Model                          $log        The log to write to.
+     * @param EventStream\LogHandler\ILogHandler $logHandler The log handler to use for the response.
      * @return ResponseInterface The response from the AI provider.
      * @throws ClientExceptionInterface if the request fails
      * @throws JsonException            if somehow the response body couldn't be decoded
@@ -341,6 +352,7 @@ class Client implements IClient
         RequestInterface $request,
         array $payload,
         Log\Model $log,
+        EventStream\LogHandler\ILogHandler $logHandler,
     ): ResponseInterface {
         try {
             $response = $this->sendRequest($request, $payload, false);
@@ -363,7 +375,9 @@ class Client implements IClient
         // be decoded and processed as a single object.
         $responseBody = $response->getBody()->getContents();
         $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-        $this->finaliseLog($responseJson, $log);
+//        $this->finaliseLog($responseJson, $log);
+        $log = $logHandler->handleResponse($responseJson, $log);
+        $this->logMapper->save($log);
 
         // Restore the body in its streamable glory
         return $response->withBody(Utils::streamFor($responseBody));
@@ -416,7 +430,9 @@ class Client implements IClient
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-            $this->finaliseLog($responseJson, $log);
+//            $this->finaliseLog($responseJson, $log);
+            $log = $logHandler->handleResponse($responseJson, $log);
+            $this->logMapper->save($log);
 
             // Convert it to a single message I guess, if finalising the log
             // didn't raise an exception?
