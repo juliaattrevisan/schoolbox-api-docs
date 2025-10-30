@@ -404,7 +404,7 @@ class Hydrator extends BaseHydrator
         /** check if it matches any "assessment.{assessmentType}" */
         $split = explode('.', $type);
         $subType = $split[1] ?? '';
-        if ($split[0] === 'assessment' && in_array($subType, AssessmentType::ALL_TYPES)) {
+        if (self::BASE_TYPE === $split[0] && in_array($subType, AssessmentType::ALL_TYPES)) {
             return AssessmentType::stringToReadableName($subType);
         }
 
