@@ -154,7 +154,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
         const classId = 83;
         // student id for Jamal Ali
         const studentIdJamal = 60;
-        // student if for Mario Izzo
+        // student id for Mario Izzo
         const studentIdMario = 63;
         // student external id for Jamal Ali
         const studentExternalIdJamal = "540";

@@ -156,7 +156,7 @@ export default class StatusPage {
      * Click the "Import" button in the feedback import modal
      */
     async clickImportButtonInModal(): Promise<void> {
-        await this.page.waitForTimeout(2000); // wait for 1500ms to ensure the data is processed before importing it
+        await this.page.waitForTimeout(2000); // wait for 2000ms to ensure the data is processed before importing it
         await this.page.locator(StatusPage.SELECTOR_FEEDBACK_MODAL_IMPORT_BUTTON).click();
     }
 

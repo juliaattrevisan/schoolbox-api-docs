@@ -33,7 +33,7 @@ export default class MarkbookPage {
     }
 
     /**
-     * navigates to the class markbook page url
+     * navigates to the class homepage url
      * @param classId - The class id
      */
     async goto(classId: string): Promise<void> {
@@ -41,7 +41,7 @@ export default class MarkbookPage {
     }
 
     /**
-     * navigates to the course markbook page url
+     * navigates to the course mark-book page url
      * @param courseId - The course id
      */
     async gotoCourseMarkbook(courseId: string): Promise<void> {
@@ -49,7 +49,7 @@ export default class MarkbookPage {
     }
 
     /**
-     * navigates to the class markbook page url
+     * navigates to the class mark-book page url
      * @param classId - The class id
      */
     async gotoClassMarkbook(classId: string): Promise<void> {
