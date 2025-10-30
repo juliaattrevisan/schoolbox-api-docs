@@ -124,7 +124,7 @@ class Button
                     'label' => self::LABEL_VIEW,
                     'responseId' => $authoritativeResponse->getId(),
                     'enabled' => true,
-                    'url' => $this->routeGenerator->generate('learningAssessment.getViewResponse', [
+                    'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
                         'assessment' => $assessment,
                         'assessmentId' => $assessment->getId(),
                         'student' => $participant->getUser(),
@@ -171,7 +171,7 @@ class Button
                         'label' => self::LABEL_VIEW,
                         'responseId' => $authoritativeResponse->getId(),
                         'enabled' => true,
-                        'url' => $this->routeGenerator->generate('learningAssessment.getViewResponse', [
+                        'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
                             'assessment' => $assessment,
                             'assessmentId' => $assessment->getId(),
                             'student' => $participant->getUser(),
@@ -187,7 +187,7 @@ class Button
                         'label' => self::LABEL_RESUME,
                         'responseId' => $authoritativeResponse->getId(),
                         'enabled' => true,
-                        'url' => $this->routeGenerator->generate('learningAssessment.getResumeResponse', [
+                        'url' => $this->routeGenerator->generate('learningDialogAgent.getResumeResponse', [
                             'assessment' => $assessment,
                             'assessmentId' => $assessment->getId(),
                             'student' => $participant->getUser(),

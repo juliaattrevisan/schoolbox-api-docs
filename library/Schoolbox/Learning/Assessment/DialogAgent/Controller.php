@@ -529,19 +529,6 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * View a response's chat log in a readonly mode
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     */
-    public function getViewResponse(IAssessable $assessment, User $student): void
-    {
-        // todo implement a readonly viewing mode
-    }
-
-
-    /**
      * Decide which URL to send the client back to
      *
      * @param IAssessable $assessment
