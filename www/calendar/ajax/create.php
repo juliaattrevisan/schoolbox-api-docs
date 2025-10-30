@@ -129,10 +129,11 @@ if (!empty($resources)) {
 
     // Validate this item.
     $code   = 200;
+    $statusMapper = Status\Mapper::getInstance();
     $validation = new Validation(
         $this->user,
         \Schoolbox\ResourceBooking\Booking\Mapper::getInstance(),
-        Status\Mapper::getInstance(),
+        $statusMapper,
         \Schoolbox\Assessment\Term\Mapper::getInstance(),
         $this->getDi()->get('externalTimetable'),
         \Schoolbox\CampusMapper::getInstance(),
@@ -161,17 +162,19 @@ if (!empty($resources)) {
             $errors[$resourceId] = [];
         }
 
-        // only build booking if there are no errors
-        if (empty($errors[$resourceId])) {
-            // Build the booking
-            $booking = getBookingFromEvent($item, $event, $user);
-            $bookingList->add($booking);
-        }
-
-        // if errors are empty, remove from the list
-        if (empty($errors[$resourceId])) {
+        // Build the booking
+        $booking = getBookingFromEvent($item, $event, $user);
+        if (!empty($errors[$resourceId])) {
+            // if errors exist, set booking to rejected
+            $booking->setStatus($statusMapper->createModel(Status\Model::STATUS_REJECTED));
+        } else {
+            // if errors are empty, remove from the list
             unset($errors[$resourceId]);
         }
+
+        // add the booking in its current state
+        $bookingList->add($booking);
+
         // flatten errors
         if (!empty($errors[$resourceId]) && is_array($errors[$resourceId])) {
             $errors[$resourceId] = $validation->getAllErrorStringsAsFlatArray($errors[$resourceId]);
@@ -245,8 +248,8 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
     $booking = new Model();
     $booking
         ->setEvent($event)
-        ->setResource($resource)
-        ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
+        ->setResource($resource)getStatusMapper()->createModel(Status\Model::STATUS_PENDING)
+        ->setStatus()
         ->setName($_POST['title'] ?? '')
         ->setNotes($_POST['detail'] ?? '')
         ->setRelatedBookingList(new GenericCollection(Model::class));
