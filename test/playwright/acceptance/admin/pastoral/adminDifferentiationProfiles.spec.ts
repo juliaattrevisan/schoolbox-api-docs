@@ -57,27 +57,7 @@ test.describe("Admin Differentiation Profiles", () => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
             await adminDifferentiationProfiles.toggleOn();
-            tester.isGoingTo("grab the drag handle for the Goals field");
-            const dragHandle = await page.getByTestId("differentiation-profiles-drag-handle-7");
-            await dragHandle.scrollIntoViewIfNeeded();
-            await dragHandle.hover();
-            await page.mouse.down();
-            tester.isGoingTo("drag the Goals field upwards to reorder");
-            const container = await page.getByTestId("differentiation-profiles-fieldset-details");
-            const box = await container.boundingBox();
-            if (box) {
-                await page.mouse.move(box.x, box.y + 10, {
-                    steps: 30,
-                });
-            }
-            tester.isGoingTo("release the mouse to drop the field in the new position");
-            await page.mouse.up();
-            await adminDifferentiationProfiles.clickSave();
-            tester.isGoingTo("Refresh the page");
-            await page.reload();
-            tester.isGoingTo("Ensure the Goals field is now in the first position");
-            const firstField = container.locator("li").first();
-            await expect(firstField).toContainText("Goals");
+            await adminDifferentiationProfiles.dragToTop("7", "details", "Goals");
         } finally {
             tester.isGoingTo("Clean up: Reset the field and toggle off");
             try {

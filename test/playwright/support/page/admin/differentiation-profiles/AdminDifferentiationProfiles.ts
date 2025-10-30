@@ -67,6 +67,36 @@ export default class AdminDifferentiationProfiles {
     }
 
     /**
+     * Drags a field to the top position by handle ID, saves, and verifies the field is in first position
+     * @param handleId - The drag handle ID (e.g., '7')
+     * @param containerSuffix - The container suffix (e.g., 'details')
+     * @param fieldName - The field name to verify in first position (e.g., 'Goals')
+     */
+    async dragToTop(handleId: string, containerSuffix: string, fieldName: string): Promise<void> {
+        this.tester.isGoingTo(`grab the drag handle for the ${fieldName} field`);
+        const dragHandle = await this.page.getByTestId(`differentiation-profiles-drag-handle-${handleId}`);
+        await dragHandle.scrollIntoViewIfNeeded();
+        await dragHandle.hover();
+        await this.page.mouse.down();
+        this.tester.isGoingTo(`drag the ${fieldName} field upwards to reorder`);
+        const container = await this.page.getByTestId(`differentiation-profiles-fieldset-${containerSuffix}`);
+        const box = await container.boundingBox();
+        if (box) {
+            await this.page.mouse.move(box.x, box.y + 10, {
+                steps: 30,
+            });
+        }
+        this.tester.isGoingTo("release the mouse to drop the field in the new position");
+        await this.page.mouse.up();
+        await this.clickSave();
+        this.tester.isGoingTo("Refresh the page");
+        await this.page.reload();
+        this.tester.isGoingTo(`Ensure the ${fieldName} field is now in the first position`);
+        const firstField = container.locator("li").first();
+        await expect(firstField).toContainText(fieldName);
+    }
+
+    /**
      * Clicks the save button and waits for the success message
      */
     async clickSave(): Promise<void> {
