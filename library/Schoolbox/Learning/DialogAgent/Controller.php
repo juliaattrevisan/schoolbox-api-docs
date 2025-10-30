@@ -233,7 +233,7 @@ class Controller extends Base
         $data = [
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
                 [
-                    sprintf('Create response for %s', $assessment->getTitle()),
+                    sprintf('Create Response for %s', $assessment->getTitle()),
                 ]
             ),
             'assessment' => $assessment,
