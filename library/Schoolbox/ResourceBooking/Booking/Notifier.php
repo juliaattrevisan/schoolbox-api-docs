@@ -245,27 +245,33 @@ class Notifier extends AbstractModuleNotifier
             )
         );
 
+        $clashErrors = [];
+        if (in_array($event, ['created', 'updated'])) {
+            // If the event has been created or updated, check for clashes with existing approved events.
+            // This allows the notification message can be modified to alert the moderator of the clashes.
+            /** @var Status\Mapper $bookingStatusMapper */
+            $bookingStatusMapper = $this->mapper->getJoinMapper('status');
+            $validation = new Validation(
+                $user,
+                $this->mapper,
+                $bookingStatusMapper,
+                $this->termMapper,
+                $this->externalTimetable,
+                $this->campusMapper,
+                $this->conf,
+                $this->externalEventMapper,
+            );
+            $clashErrors = $validation->validateForClashes(
+                $object->getResource(),
+                $object->getEvent()->getStartDateTime()?->getDateTimeObject(),
+                $object->getEvent()->getEndDateTime()?->getDateTimeObject(),
+                $object
+            );
+        }
+
         switch ($event) {
             case 'created':
-                /** @var Status\Mapper $bookingStatusMapper */
-                $bookingStatusMapper = $this->mapper->getJoinMapper('status');
-                $validation = new Validation(
-                    $user,
-                    $this->mapper,
-                    $bookingStatusMapper,
-                    $this->termMapper,
-                    $this->externalTimetable,
-                    $this->campusMapper,
-                    $this->conf,
-                    $this->externalEventMapper,
-                );
                 $messageText = ':user booked :resource';
-                $clashErrors = $validation->validateForClashes(
-                    $object->getResource(),
-                    $object->getEvent()->getStartDateTime()?->getDateTimeObject(),
-                    $object->getEvent()->getEndDateTime()?->getDateTimeObject(),
-                    $object
-                );
                 if (count($clashErrors) > 0) {
                     $messageText .= ' (with conflicts)';
                 }
@@ -284,6 +290,9 @@ class Notifier extends AbstractModuleNotifier
                 break;
             case 'updated':
                 $messageText = ':user changed booking of :resource';
+                if (count($clashErrors) > 0) {
+                    $messageText .= ' (with conflicts)';
+                }
                 break;
             default:
                 throw new \InvalidArgumentException(
