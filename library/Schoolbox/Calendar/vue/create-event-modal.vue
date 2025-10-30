@@ -179,9 +179,9 @@ export default {
                             4000,
                         );
                     } else {
-                      this.$refs.toast.timeout("Created", true, 2000);
+                        this.$refs.toast.timeout("Created", true, 2000);
                     }
-                  this.$emit("eventCreated", responseData.event);
+                    this.$emit("eventCreated", responseData.event);
                 } else {
                     this.$refs.toast.timeout("Unable to create event / task. " + responseData.message, false, 3000);
                 }

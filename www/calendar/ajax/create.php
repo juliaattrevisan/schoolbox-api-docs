@@ -250,12 +250,12 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         ->setName($_POST['title'] ?? '')
         ->setNotes($_POST['detail'] ?? '')
         ->setRelatedBookingList(new GenericCollection(Model::class));
-        if ($event->getAllDay()) {
-            $booking->setBookingStartAt($event->getStartDateTime());
-            $endDate = clone $event->getStartDateTime();
-            $endDate = $endDate->endOfDay();
-            $booking->setBookingEndAt($endDate);
-        }
+    if ($event->getAllDay()) {
+        $booking->setBookingStartAt($event->getStartDateTime());
+        $endDate = clone $event->getStartDateTime();
+        $endDate = $endDate->endOfDay();
+        $booking->setBookingEndAt($endDate);
+    }
         // init booking time to null (this may be changed later to the event time...)
     // What about the resource? If it's an open resource, confirm the
     // booking immediately.
