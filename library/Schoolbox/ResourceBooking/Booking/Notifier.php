@@ -233,7 +233,6 @@ class Notifier extends AbstractModuleNotifier
     protected function buildEnvelope(Model $object, User $user, string $event): Envelope
     {
         // Ensure that object is hydrated. Why does this happen?
-        /** @var Model $object */
         try {
             $object = $this->mapper->findById($object->getId());
             $resourceMapper = $this->mapper->getJoinMapper('resource');
