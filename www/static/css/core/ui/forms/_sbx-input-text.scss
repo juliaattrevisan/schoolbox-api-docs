@@ -32,10 +32,23 @@
 }
 
 /* Base */
-input[type="text"],
-input[type="number"],
-select[multiple],
-.c-filter-search-term__field {
+.sbx-body input:not([type]),
+.sbx-body input[type="text"],
+.sbx-body input[type="number"],
+.sbx-body input[type="select-multiple"],
+.sbx-body input[type="password"],
+.sbx-body input[type="date"],
+.sbx-body input[type="datetime"],
+.sbx-body input[type="datetime-local"],
+.sbx-body input[type="month"],
+.sbx-body input[type="week"],
+.sbx-body input[type="email"],
+.sbx-body input[type="search"],
+.sbx-body input[type="tel"],
+.sbx-body input[type="time"],
+.sbx-body input[type="url"],
+.sbx-body input[type="color"],
+.sbx-body textarea {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
