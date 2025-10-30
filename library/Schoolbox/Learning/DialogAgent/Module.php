@@ -20,9 +20,18 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\LockedChecker;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\CanPreview;
+use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
+use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
+use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
+use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
+use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
+use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
 use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -45,8 +54,21 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $isSuper = $this->getAuthRule('isSuperuser');
+        /* Preloaders
+         */
+        $preloadAssessment = function ($params) {
+            return $this->preloadAssessment($params);
+        };
 
+        $preloadParticipant = function ($params) {
+            return $this->preloadAssessmentAndStudent($params);
+        };
+
+        /* Shortcuts to Authorization Rule constructs
+         */
+        $isSuper = $this->getAuthRule('isSuperuser');
+        $canSubmit = $this->buildAuthRuleCanSubmit();
+        $canViewSummary = $this->buildAuthRuleCanViewSummary();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
 
         $canModify = new Rule\Any(
@@ -58,12 +80,144 @@ class Module extends BaseModule
             )
         );
 
-        $preloadAssessment = function ($params) {
-            return $this->preloadAssessment($params);
-        };
+        /* Route Definitions
+         */
+        $assRoute  = '/assessments/{assessmentId:\d+}';
+        $studentParam  = '{studentId:\d+}';
 
+        /* Create a dialog agent's configuration
+         */
         $this->register('GET', '/{assessmentId:\d+}/configure', 'getUpdateForm', $canModify, $preloadAssessment);
         $this->register('POST', '/{assessmentId:\d+}/configure', 'postUpdate', $canModify, $preloadAssessment);
+
+        /* Resume a response
+         */
+        $this->register('GET', "{$assRoute}/{$studentParam}/resume", 'getResumeResponse', $canSubmit, $preloadParticipant);
+
+        /* View a response (readonly mode)
+         */
+        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', $canViewSummary, $preloadParticipant);
+    }
+
+
+    /**
+     * Convert route params into a participant object
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\Exception If assessment is not found
+     * @throws \DomainException If user has interaction but not participant record
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws \LogicException If cyclic graph detected
+     * @throws \Schoolbox\Mapper\DefinitionException If a specified join mapper is not found
+     * @throws NotFound
+     */
+    protected function preloadAssessmentAndStudent(array $params): array
+    {
+        try {
+            // obtain the assessment from our other preload
+            $student     = $this->getUserMapper()->findById($params['studentId']);
+            $assessment  = $this->preloadAssessment($params, $student)['assessment'];
+        } catch (\UnexpectedValueException $e) {
+            // Student isn't a participant
+            throw new NotFound();
+        } catch (\OutOfBoundsException $e) {
+            // given user/assessment combination is invalid: not a participant
+            throw new NotFound();
+        } catch (MapperException $e) {
+            // either assessment or user was not found
+            throw new NotFound();
+        }
+
+        return [
+            'assessment'  => $assessment,
+            'student'     => $student, //IsParentOfStudent accesses this
+        ];
+    }
+
+
+    // will throw invalid arg if route params incorrect
+    /**
+     * To view a summary page requires:
+     * - assessment not soft-deleted
+     * - current user can view the assessment
+     * - either:
+     *   - the current user is an instructor, and viewing their own summary, or:
+     *   - the current user may see the participation of the student who is the
+     *     subject of the summary
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException If required route param not found
+     */
+    private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
+    {
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new AssessmentNotDeleted(),
+            new CanViewAssessable(new Visibility($this->getAccess())),
+            new Rule\Any(
+                // Instructor/staff viewing their own summary page
+                new Rule\All(
+                    $this->buildAuthRuleHasInstructorOrHomepageAccess(),
+                    new Rule\IsUser('studentId')
+                ),
+                // Normal participants (whether explicit or dynamic):
+                // Check after instructor check, so that the summary can show a
+                // polite "User {studentID} is excluded from this assessment"
+                // message.
+                new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
+            )
+        );
+    }
+
+
+    /**
+     * Rules in order of preference:
+     * - SU can submit
+     * - staff/students cannot if due in archived term (ie 'interaction locked')
+     * - staff must have WRITE+ perm to folder
+     * - students cannot if not open
+     * - Students cannot submit if reached response limit
+     * - students cannot if not participant, or a different student to that indicated in URL
+     * - Students cannot submit if assessment does not accept online submissions AND self-reflect is off
+     *
+     * @return Rule\IAuthorizationRule
+     * @throws InvalidArgumentException If required object not found in route params
+     */
+    private function buildAuthRuleCanSubmit()
+    {
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\All(
+                    new Rule\Any(
+                    // (Superuser + impl) or (instructor + !interaction-locked)
+                        new Rule\All(
+                            new Rule\IsSuperuser(),
+                            new IsImplementation()
+                        ),
+                        new Rule\All(
+                            $this->buildAuthRuleHasInstructorOrHomepageAccess(),
+                            new IsInteractionUnLocked(new LockedChecker($this->getTermMapper()))
+                        )
+                    ),
+                    new Rule\Any(
+                        new CanRespondToAssessment($this->getAccess()), // SOBO
+                        new CanPreview($this->getAccess())              // Preview
+                    )
+                ),
+                new Rule\All(
+                    new CanViewAssessable(new Visibility($this->getAccess())),
+                    new Rule\IsUser('studentId'),
+                    new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
+                    new IsAssessmentOpen(),
+                    new Rule\Any(
+                        new CanRespondToAssessment($this->getAccess()),
+                        new CanSelfAssess()
+                    )
+                )
+            )
+        );
     }
 
 
@@ -140,14 +294,19 @@ class Module extends BaseModule
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
 
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy $responseMapperProxy */
+        $responseMapperProxy = $this->injector->get('dialogAgentResponseDataSource');
+
         return new Controller(
             new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
                 $this->getMapperFactory()->get(Access::class),
             ),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
             $assessmentMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
+            $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class),
         );

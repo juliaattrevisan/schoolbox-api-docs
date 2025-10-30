@@ -47,6 +47,21 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
+/**
+ * This fulfils the standard screens enforced in all learning activities via the \Schoolbox\Assessment\Controller.
+ * These include the summary, status, response creation screens.
+ *
+ * Anything outside of that set typically end up in their own controller \Schoolbox\Learning\*\Controller elsewhere
+ * to break away from the inheritance tree here.
+ *
+ * Whether or not that's a great idea is yet to be determined; generally inheritance isn't a good move if you can
+ * recompose your objects to avoid it. Sadly we made this mistake so long ago and consolidated upon it.
+ *
+ * An alternative to putting your activity-specific methods in \Schoolbox\Learning\*\Controller would be to simply
+ * dump them into the relevant subclass of \Schoolbox\Assessment\Controller to inherit its superclass' properties,
+ * methods, and modcons. Both seem acceptable: the latter marries you into the inheritance tree, but splitting away
+ * means you end up duping a lot of perms-based code which is kind of disgusting. You lose either way :(
+ */
 class Controller extends Assessment\Controller
 {
     /**
@@ -525,19 +540,6 @@ class Controller extends Assessment\Controller
                 '?returnUrl=' .  Redirect::encode($requestPost->get('returnUrl'))
             )
         );
-    }
-
-
-    /**
-     * View a response's chat log in a readonly mode
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     */
-    public function getViewResponse(IAssessable $assessment, User $student): void
-    {
-        // todo implement a readonly viewing mode
     }
 
 

@@ -42,7 +42,6 @@ use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSourc
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsCustomParticipationEnabled;
 use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
@@ -315,14 +314,6 @@ class Module extends BaseModule
         //POST/DELETE /learning/assessments/<lesson plan assessment id>/activities/<link id>
         $this->register('POST', "{$assRoute}/activities/{linkId:\d+}", 'postActivity', $canModify, $preloadLessonPlanAPI);
         $this->register('DELETE', "{$assRoute}/activities/{linkId:\d+}", 'deleteActivity', $canModify, $preloadLessonPlanAPI);
-
-        /* Dialog Agent: resume a response
-         */
-        $this->register('GET', "{$assRoute}/{$studentParam}/resume", 'getResumeResponse', $canSubmit, $preloadParticipant);
-
-        /* Dialog Agent: view a response
-         */
-        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', $canViewSummary, $preloadParticipant);
 
         // LTI assessment related routes
         // TODO extract to a different module:
