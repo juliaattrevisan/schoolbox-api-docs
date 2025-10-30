@@ -12,11 +12,9 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Learning\Assessment\Participant;
 
 /**
- * haha
- *
  * andrew.carlton 44 minutes ago
    > Button logic is on the status of the authoritative
-   >    + If it is submitted OR past close/dye date - view activity
+   >    + If it is submitted OR past close/due date - view activity
    >    + If there is a response that is not yet submitted and does have a started at time - resume
    >    + If either no response yet or there is a response but no started at - begin
  *
