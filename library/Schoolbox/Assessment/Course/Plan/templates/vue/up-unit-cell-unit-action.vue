@@ -58,6 +58,15 @@ function onModifyUnit(): void {
                         Delete
                     </button>
                 </li>
+                <li v-if="props.unit._routes.importIntoClasses">
+                    <a
+                        class="icon-import"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-button`"
+                        :href="getReturnUrl(props.unit._routes.importIntoClasses)"
+                    >
+                        Import into Classes
+                    </a>
+                </li>
             </ul>
         </section>
     </div>

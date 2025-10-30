@@ -1076,6 +1076,9 @@ class Controller extends Base
                 'delete' => $this->getRouteIfAuthorized('course.deleteUnitSpecification', [
                     'id' => $unit->getId(),
                 ]) ?: null,
+                'importIntoClasses' => $this->getRouteIfAuthorized('learningAssessmentExporter.getExportFormForUnit', [
+                    'unitSpecId' => $unit->getId(),
+                ]) ?: null,
             ]
         ];
     }
