@@ -65,6 +65,12 @@ class Notifier extends AbstractModuleNotifier
     private const string CLASH_BOOKING_SUFFIX = ' (with clashes)';
 
     /**
+     * @var null|Validation
+     */
+    private ?Validation $validation = null;
+
+
+    /**
      * {@inheritdoc}
      */
     protected function buildTopic($eventLabel, $roleType)
@@ -253,20 +259,23 @@ class Notifier extends AbstractModuleNotifier
             // This allows the notification message to be modified to alert the moderator of the clashes.
             /** @var Status\Mapper $bookingStatusMapper */
             $bookingStatusMapper = $this->mapper->getJoinMapper('status');
-            $validation = new Validation(
-                $user,
-                $this->mapper,
-                $bookingStatusMapper,
-                $this->termMapper,
-                $this->externalTimetable,
-                $this->campusMapper,
-                $this->conf,
-                $this->externalEventMapper,
-            );
             $startDateTimeAlaressObj = $object->getEvent()->getStartDateTime();
             $endDateTimeAlaressObj = $object->getEvent()->getEndDateTime();
             if ($startDateTimeAlaressObj !== null && $endDateTimeAlaressObj !== null) {
-                $clashErrors = $validation->validateForClashes(
+                // Cache $this->validation to avoid unnecessary work on repeated calls to this function.
+                if ($this->validation === null) {
+                    $this->validation = new Validation(
+                        $user,
+                        $this->mapper,
+                        $bookingStatusMapper,
+                        $this->termMapper,
+                        $this->externalTimetable,
+                        $this->campusMapper,
+                        $this->conf,
+                        $this->externalEventMapper,
+                    );
+                }
+                $clashErrors = $this->validation->validateForClashes(
                     $object->getResource(),
                     $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
                     $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
