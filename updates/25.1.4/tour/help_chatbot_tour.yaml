@@ -3,8 +3,6 @@ tour:
   description: 'Introduce users to the new help chatbot'
   roles:
     - staff
-    - student
-    - parent
   trigger:
     urlRegex: '^\/$' # Match the root URL only.
     selector: body
