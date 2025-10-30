@@ -1,6 +1,5 @@
 /**
  * Tests for the differentiation profiles admin settings functionality
- * @summary Tests the differentiation profiles toggle functionality and persistence
  *
  * Prerequisites:
  * 1. Provision sales.tar.gz data
@@ -8,7 +7,7 @@
  * Execute: npx playwright test adminDifferentiationProfiles.spec.ts
  */
 
-import { test, expect } from "@schoolboxTest/playwright/support/integrations";
+import { test } from "@schoolboxTest/playwright/support/integrations";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 
 test.describe("Admin Differentiation Profiles", () => {

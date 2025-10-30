@@ -1,6 +1,5 @@
 /**
  * Utility class for managing differentiation profiles admin settings
- * linked to: library/Schoolbox/Admin/DifferentiationProfiles/templates/vue/differentiation-profiles.vue
  */
 
 import type { Page } from "@playwright/test";
@@ -25,7 +24,7 @@ export default class AdminDifferentiationProfiles {
      * Navigates to the differentiation profiles admin page
      */
     async navigateToPage(): Promise<void> {
-        this.tester.isGoingTo("Visit the differentiation profiles page");
+        this.tester.isGoingTo("Visit the differentiation profiles admin page");
         await this.page.goto("/adminv2/pastoral/differentiation-profiles");
     }
 
