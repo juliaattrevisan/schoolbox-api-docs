@@ -69,39 +69,6 @@
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
 
-    {# The Four Dates of the Apocalypse
-     # This is a unique implementation which doesn't have a due date plus it's horizontally
-     # arranged, unlike the other activities
-     #}
-    {% if context.baseContext is not unitSpecification %}
-        {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
-
-        <div class="row">
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
-            </div>
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
-            </div>
-            {# In dialog agents, Due Date is known as Close Date.
-             #
-             # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
-             # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
-             # "Due Date" in the schema and business logic.
-             #
-             # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
-             # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
-             #}
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
-            </div>
-            {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
-            <div style="display:none">
-                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
-            </div>
-        </div>
-    {% endif %}
-
     {# Allowed Time #}
     <div class="row">
         <div class="small-5 medium-2 columns">
@@ -129,6 +96,41 @@
     </div>
 </fieldset>
 
+{# The Four Dates of the Apocalypse
+ # This is a unique implementation which doesn't have a due date plus it's horizontally
+ # arranged, unlike the other activities
+ #}
+{% if context.baseContext is not unitSpecification %}
+    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+    <fieldset>
+        <legend>Submission Dates</legend>
+        <div class="row">
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
+            </div>
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
+            </div>
+            {# In dialog agents, Due Date is known as Close Date.
+            #
+            # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
+            # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
+            # "Due Date" in the schema and business logic.
+            #
+            # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
+            # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
+            #}
+            <div class="small-12 medium-4 columns">
+                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
+            </div>
+            {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
+            <div style="display:none">
+                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
+            </div>
+        </div>
+    </fieldset>
+{% endif %}
+
 {# Scenario selection #}
 {% if not dialogAgent.instance %}
     {# Create a new Dialog Agent #}
@@ -136,24 +138,25 @@
         <legend class="required">Select scenario</legend>
         {# Scenarios #}
         <div class="radiolist">
-            <ul class="option-list">
+            <ul class="option-list l-flex l-flex-col l-gap-m">
                 {% for scenario in dialogAgent.scenarios %}
-                    {# TODO Snake pls decorate this in a reptilian manner thx #}
-                    <li style="border:1px solid #f00;width:50%;min-height:200px;float:left;padding-right:2rem;">
+                    <li>
                         <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
-                        <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
+                        <label for="scenario-{{ scenario.id }}"><strong>{{ scenario.title }}</strong></label>
 
-                        <article>
+                        {% set scenarioModalId = 'scenario-info-' ~ scenario.id %}
+                        {% include '@learningAssessment/dialogAgent/scenarioInfo.twig' with {
+                            modalId: scenarioModalId,
+                            scenario: scenario
+                        } only %}
+
+                        <button class="button f-no-bkg l-mar--0" type="button" data-reveal-id="{{ scenarioModalId }}">
+                            <sbx-icon name="curriculum" size="m" color="currentColor"></sbx-icon>
+                        </button>
+
+                        <article class="l-mar-xl--left">
                             {{ scenario.description }}
                         </article>
-
-                        <ul>
-                            {% for field in scenario.fields %}
-                                <li>
-                                    {{ field.title }}
-                                </li>
-                            {% endfor %}
-                        </ul>
                     </li>
                 {% endfor %}
             </ul>
@@ -165,8 +168,19 @@
         <legend>Selected scenario</legend>
         <input type="hidden" name="scenarioId" value="{{ dialogAgent.scenario.id }}">
 
-        <h5>{{ dialogAgent.scenario.title }}</h5>
+        {% set scenarioModalId = 'scenario-info-' ~ dialogAgent.scenario.id %}
+        {% include '@learningAssessment/dialogAgent/scenarioInfo.twig' with {
+            modalId: scenarioModalId,
+            scenario: dialogAgent.scenario
+        } only %}
 
+        <h5 class="l-mar--0">
+            {{ dialogAgent.scenario.title }}
+
+            <button class="button f-no-bkg l-mar--0" type="button" data-reveal-id="{{ scenarioModalId }}">
+                <sbx-icon name="curriculum" size="m" color="currentColor"></sbx-icon>
+            </button>
+        </h5>
         <p>
             {{ dialogAgent.scenario.description }}
         </p>
