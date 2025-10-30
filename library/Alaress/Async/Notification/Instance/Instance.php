@@ -230,12 +230,7 @@ class Instance implements JsonSerializable
         $context = null,
         $validate = true
     ) {
-
-        if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
-            $this->tokens = $matches[1];
-        } else {
-            $this->tokens = [];
-        }
+        $this->tokens = self::extractTokens($text);
 
         // cast params to array to prevent errors
         if (!is_array($params)) {
@@ -686,5 +681,21 @@ class Instance implements JsonSerializable
     public function getReplyToUserIds(): array
     {
         return $this->meta['replyToUserIds'] ?? [];
+    }
+
+    /**
+     * Extract would-be tokens out of a notification's text.
+     *
+     * @param string $text
+     * @return array
+     */
+    public static function extractTokens(string $text): array
+    {
+        if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
+            $tokens = $matches[1];
+        } else {
+            $tokens = [];
+        }
+        return $tokens;
     }
 }
