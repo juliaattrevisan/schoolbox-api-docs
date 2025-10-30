@@ -22,6 +22,14 @@ export default class AdminDifferentiationProfiles {
     }
 
     /**
+     * Navigates to the differentiation profiles admin page
+     */
+    async navigateToPage(): Promise<void> {
+        this.tester.isGoingTo("Visit the differentiation profiles page");
+        await this.page.goto("/adminv2/pastoral/differentiation-profiles");
+    }
+
+    /**
      * Toggles the differentiation profiles on, validates terminology is visible, saves and verifies persistence
      */
     async toggleOn(): Promise<void> {

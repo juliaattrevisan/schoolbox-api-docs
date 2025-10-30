@@ -13,10 +13,10 @@ import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page
 
 test.describe("Admin Differentiation Profiles", () => {
     test.beforeEach(async ({ tester, page }) => {
+        const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         tester.isGoingTo("Login as admin");
         await tester.loginAsAdmin();
-        tester.isGoingTo("Visit the differentiation profiles page");
-        await page.goto("/adminv2/pastoral/differentiation-profiles");
+        await adminDifferentiationProfiles.navigateToPage();
     });
 
     test("Toggle differentiation profiles", async ({ tester, page, db }) => {
