@@ -36,7 +36,8 @@
 /* Base */
 input[type="text"],
 input[type="number"],
-select[multiple] {
+select[multiple],
+.c-filter-search-term__field {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -72,7 +73,10 @@ select[multiple] {
     }
 }
 
-.input-group input[type="text"] {
+input[type="text"],
+input[type="number"],
+select[multiple],
+.c-filter-search-term__field {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
