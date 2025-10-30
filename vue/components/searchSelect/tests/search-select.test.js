@@ -224,3 +224,22 @@ test("selected results are not visible when show-selected is false", async () =>
     });
     expect(wrapper.find(`[data-test="ss-selected"]`).exists()).toBe(false);
 });
+
+test("search input is visible by default", async () => {
+    const wrapper = mount(SearchSelect, {
+        props: {
+            ...defaultProps,
+        },
+    });
+    expect(wrapper.find(`[data-test="search-select-input-group"]`).exists()).toBe(true);
+});
+
+test("search input is hidden when showInput is false", async () => {
+    const wrapper = mount(SearchSelect, {
+        props: {
+            ...defaultProps,
+            showInput: false,
+        },
+    });
+    expect(wrapper.find(`[data-test="search-select-input-group"]`).exists()).toBe(false);
+});

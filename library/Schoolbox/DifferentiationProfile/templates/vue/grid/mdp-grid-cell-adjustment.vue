@@ -19,18 +19,9 @@ const selected = window.Vue.ref<AdjustmentType[]>([]);
         <search-select
             v-model:selected="selected"
             :default-results="props.options"
-            label="Search"
-            label-id="students"
-            endpoint="/ajax/user.php?roleTypeID=student&"
+            :show-input="false"
             :is-single-select="false"
-            placeholder="Search for categories..."
         />
-        <!-- <select :value="props.adjustment?.id || ''">
-        <option value="" disabled>Select an option</option>
-        <option v-for="option in props.options" :key="option.id" :value="option.id">
-            {{ option.name }}
-        </option>
-    </select> -->
     </div>
 </template>
 
