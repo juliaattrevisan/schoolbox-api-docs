@@ -19,17 +19,13 @@ test.describe("Admin Differentiation Profiles", () => {
         await adminDifferentiationProfiles.navigateToPage();
     });
 
-    test("Toggle differentiation profiles", async ({ tester, page, db }) => {
+    test("Toggle differentiation profiles on", async ({ tester, page, db }) => {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(tester, page);
         try {
             await adminDifferentiationProfiles.toggleOn();
         } finally {
             tester.isGoingTo("Clean up: Reset the toggle to off state");
-            try {
-                await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-            } catch (error) {
-                console.warn("Cleanup failed:", error);
-            }
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
         }
     });
 
@@ -40,16 +36,12 @@ test.describe("Admin Differentiation Profiles", () => {
             await adminDifferentiationProfiles.renameField("terminology", "1", "Party time");
         } finally {
             tester.isGoingTo("Clean up: Reset the field and toggle off");
-            try {
-                await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-                await db.updateInDatabase(
-                    "differentiation_profiles_config",
-                    { title: "Adjustment Category" },
-                    { "name like": "adjustment_category" },
-                );
-            } catch (error) {
-                console.warn("Cleanup failed:", error);
-            }
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.updateInDatabase(
+                "differentiation_profiles_config",
+                { title: "Adjustment Category" },
+                { "name like": "adjustment_category" },
+            );
         }
     });
 
@@ -60,12 +52,8 @@ test.describe("Admin Differentiation Profiles", () => {
             await adminDifferentiationProfiles.dragToTop("7", "details", "Goals");
         } finally {
             tester.isGoingTo("Clean up: Reset the field and toggle off");
-            try {
-                await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-                await db.updateInDatabase("differentiation_profiles_config", { sequence: 4 }, { "name like": "goals" });
-            } catch (error) {
-                console.warn("Cleanup failed:", error);
-            }
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.updateInDatabase("differentiation_profiles_config", { sequence: 4 }, { "name like": "goals" });
         }
     });
 });
