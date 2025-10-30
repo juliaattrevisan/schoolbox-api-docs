@@ -42,40 +42,25 @@ class ChatCompletionsMessage implements ILogHandler
         }
 
         // This chunk gets added to the log
-        $this->appendMessageToLog($message, $rawData, $log);
+        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+
+        // Otherwise, handle the data from the message as if it were a response
+        $this->handleResponse($rawData, $log);
         return $log;
     }
 
     /**
-     * @inheritdoc
+     * Handle the response, by adding the following to the log:
+     * * the model the API endpoint used
+     * * the input and output tokens used
+     * * an error message and response code, if this was found
      */
     public function handleResponse(array $responseData, Log\Model $log): Log\Model
     {
-        return $log;
-    }
-
-    /**
-     * Append the message to the log, including:
-     * * the message itself (with redundant field filtered)
-     * * the model the API endpoint used
-     * * the input and output tokens used
-     *
-     * This also saves the log in its probably incomplete state.
-     *
-     * @param Message   $message The message, with filtered fields, to be written direct to the log.
-     * @param array     $rawData The unfiltered parsed data from the message: the model and token usage will be
-     *                           extracted from here.
-     * @param Log\Model $log     The log to write to.
-     * @return void
-     */
-    private function appendMessageToLog(Message $message, array $rawData, Log\Model $log): void
-    {
-        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
-
         // Find model and token usage
-        $model        = $rawData['model'] ?? null;
-        $inputTokens  = $rawData['usage']['prompt_tokens'] ?? null;
-        $outputTokens = $rawData['usage']['completion_tokens'] ?? null;
+        $model        = $responseData['model'] ?? null;
+        $inputTokens  = $responseData['usage']['prompt_tokens'] ?? null;
+        $outputTokens = $responseData['usage']['completion_tokens'] ?? null;
         if ($model) {
             $log->setModel($model);
         }
@@ -90,7 +75,7 @@ class ChatCompletionsMessage implements ILogHandler
         // https://platform.openai.com/docs/api-reference/chat-streaming/streaming#chat_streaming-streaming-choices-finish_reason
         // Unfortunately none of these choices really indicates an error: the
         // closest being `length` and `content_filter`.
-        foreach ($rawData['choices'] ?? [] as $choice) {
+        foreach ($responseData['choices'] ?? [] as $choice) {
             $finishReason = $choice['finish_reason'] ?? null;
             match ($finishReason) {
                 'length', 'content_filter' => $log
@@ -102,5 +87,7 @@ class ChatCompletionsMessage implements ILogHandler
                 default => $log,
             };
         }
+
+        return $log;
     }
 }
