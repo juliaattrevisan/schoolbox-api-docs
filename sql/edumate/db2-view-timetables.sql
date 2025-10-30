@@ -3,7 +3,7 @@ SELECT
 	edumate.timetable.timetable_id,
 	edumate.term.start_date,
 	edumate.term.end_date,
-	edumate.term.cycle_start_day,
+	edumate.term.cycle_start_day AS cycle_start_date,
 	edumate.cycle.days_in_cycle
 FROM edumate.timetable
 INNER JOIN edumate.term ON edumate.term.timetable_id = edumate.timetable.timetable_id
