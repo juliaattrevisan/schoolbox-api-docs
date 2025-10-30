@@ -138,6 +138,42 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * @return \Schoolbox\Assessment\Term\Mapper
+     */
+    private function getTermMapper(): \Schoolbox\Assessment\Term\Mapper
+    {
+        return $this->termMapper;
+    }
+
+
+    /**
+     * @return External_Timetable
+     */
+    private function getExternalTimetable(): External_Timetable
+    {
+        return $this->externalTimetable;
+    }
+
+
+    /**
+     * @return CampusMapper
+     */
+    private function getCampusMapper(): CampusMapper
+    {
+        return $this->campusMapper;
+    }
+
+
+    /**
+     * @return \Schoolbox\External\Event\Mapper
+     */
+    private function getExternalEventMapper(): \Schoolbox\External\Event\Mapper
+    {
+        return $this->externalEventMapper;
+    }
+
+
+    /**
      * @param TriggerBundle $bundle
      *
      * @return void
@@ -251,11 +287,11 @@ class Notifier extends AbstractModuleNotifier
                     $user,
                     $this->mapper,
                     $this->mapper->getJoinMapper('status'),
-                    $this->termMapper,
-                    $this->externalTimetable,
-                    $this->campusMapper,
+                    $this->getTermMapper(),
+                    $this->getExternalTimetable(),
+                    $this->getCampusMapper(),
                     $this->conf,
-                    $this->externalEventMapper,
+                    $this->getExternalEventMapper(),
                 );
                 $messageText = ':user booked :resource';
                 $clashErrors = $validation->validateForClashes(
