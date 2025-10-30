@@ -138,7 +138,7 @@
         <legend class="required">Select scenario</legend>
         {# Scenarios #}
         <div class="radiolist">
-            <ul class="option-list l-flex l-flex-col l-gap-s">
+            <ul class="option-list l-flex l-flex-col l-gap-m">
                 {% for scenario in dialogAgent.scenarios %}
                     <li>
                         <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
