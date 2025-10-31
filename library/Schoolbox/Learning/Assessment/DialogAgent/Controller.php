@@ -609,13 +609,10 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-        /* TODO this is probably gonna be your strategic view of people doing a dialog agent activity
-         *  so you can see who requires assistance. It'll need to poll to update periodically.
-         */
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',
             [
-                'assessment' => $assessment
+                'assessment' => $assessment,
             ]
         );
     }

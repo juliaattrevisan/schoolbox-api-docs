@@ -51,13 +51,43 @@
             <table>
                 <thead>
                     <tr>
-                        <th></th>
+                        <th>
+                            &nbsp;
+                        </th>
+                        <th>
+                            Status
+                        </th>
+
+                        {# Scenario fields #}
+
+                        <th>
+                            Actions
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td></td>
-                    </tr>
+                    {% for participant in assessment.allParticipants %}
+                        <tr>
+                            <td>
+                                <div class="card small-12 compact">
+                                    <a href="#">
+                                        <img src="/portrait.php?id={{ participant.user.id }}&size=square64">
+                                        <h3>
+                                            {{ participant.user.fullname }}
+                                        </h3>
+                                    </a>
+                                </div>
+                            </td>
+                            {# Scenario field outcomes #}
+
+                            <td>
+                                status
+                            </td>
+                            <td>
+                                actions
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </section>
