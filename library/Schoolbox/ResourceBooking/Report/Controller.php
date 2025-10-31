@@ -14,12 +14,13 @@ namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
-use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper;
@@ -38,24 +39,12 @@ class Controller extends Base
      * @param Category\Mapper $categoryMapper
      * @param Calendar_Api_Composite $api
      * @param CalendarApiFactory $apiFactory
-     * @param BookingMapper $bookingMapper
-     * @param StatusMapper $statusMapper
-     * @param TermMapper $termMapper
-     * @param \External_Timetable $externalTimetableHandler
-     * @param CampusMapper $campusMapper
-     * @param \Schoolbox\External\Event\Mapper $eventMapper
      */
     public function __construct(
         protected Item\Mapper $itemMapper,
         protected Category\Mapper $categoryMapper,
         protected Calendar_Api_Composite $api,
         protected CalendarApiFactory $apiFactory,
-        protected BookingMapper $bookingMapper,
-        protected StatusMapper $statusMapper,
-        protected TermMapper $termMapper,
-        protected \External_Timetable $externalTimetableHandler,
-        protected CampusMapper $campusMapper,
-        protected \Schoolbox\External\Event\Mapper $eventMapper,
     ) {
     }
 
@@ -140,43 +129,39 @@ class Controller extends Base
         $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         // if we are only showing clashes, filter the event list now
+        $clashesOnlyList = new GenericCollection(EventInterface::class);
         if ($clashesOnly) {
-            $validation = new Validation(
-                $this->getUser(),
-                $this->bookingMapper,
-                $this->statusMapper,
-                $this->termMapper,
-                $this->externalTimetableHandler,
-                $this->campusMapper,
-                $this->getConfigLoader(),
-                $this->eventMapper
-            );
-
-            $clashingEvents = [];
             foreach ($eventList as $event) {
-                /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
+                // check if any other events clash with us (overlapping time, same resource)
+                $collides = $eventList->filter(function ($otherEvent) use ($event) {
+                    /* @var \Calendar\Event\Type\ResourceBooking\Event $otherEvent */
+                    /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
 
-                // we should always be a resource booking event, but just in case lets add that event and move along..
-                // stan was complaining `Call to an undefined method Calendar\Event\Type\EventInterface::getBooking()` below...
-                if (!$event instanceof \Calendar\Event\Type\ResourceBooking\Event) {
-                    $clashingEvents[] = $event;
-                    continue;
-                }
+                    // skip ourself
+                    if ($otherEvent->getBooking()->getId() === $event->getBooking()->getId()) {
+                        return false;
+                    }
 
-                // if only clashes, only save if we are a clash.. expensive (we hit the db each call).. but no other way
-                if (
-                    !empty($validation->validateForClashes(
-                        $event->getBooking()->getResource(),
-                        $event->getStartTime()->getDateTimeObject(),
-                        $event->getEndTime()->getDateTimeObject(),
-                        $event->getBooking()
-                    ))
-                ) {
-                    $clashingEvents[] = $event;
-                }
+                    // must be same resource
+                    if ($otherEvent->getBooking()->getResource()->getId() !== $event->getBooking()->getResource()->getId()) {
+                        return false;
+                    }
+
+                    // check for time overlap
+                    if (
+                        $event->getStartTime()->getDateTimeObject()->getTimestamp() <= $otherEvent->getEndTime()->getDateTimeObject()->getTimestamp()
+                        && $event->getEndTime()->getDateTimeObject()->getTimestamp() >= $otherEvent->getStartTime()->getDateTimeObject()->getTimestamp()
+                    ) {
+                        return true;
+                    }
+
+                    return false;
+                });
+                // if we have any collisions, add us to the list
+                $clashesOnlyList = $clashesOnlyList->merge($collides);
             }
-            // swap list
-            $eventList = $clashingEvents;
+            // collisions should overwrite the event list
+            $eventList = $clashesOnlyList;
         }
 
         $this->response = $this->responseFromTemplate(

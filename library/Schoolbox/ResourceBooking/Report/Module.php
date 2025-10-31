@@ -75,8 +75,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        $eventMapper = $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class);
-
         return new Controller(
             $this->getMapperFactory()->get(Item\Mapper::class),
             $this->getMapperFactory()->get(Category\Mapper::class),
@@ -84,14 +82,8 @@ class Module extends BaseModule
             new CalendarApiFactory(
                 $this->injector->get('user'),
                 new External_Timetable(),
-                $eventMapper
+                $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class)
             ),
-            $this->getMapperFactory()->get(BookingMapper::class),
-            $this->getMapperFactory()->get(StatusMapper::class),
-            $this->getMapperFactory()->get(TermMapper::class),
-            $this->injector->get('externalTimetable'),
-            $this->getMapperFactory()->get(CampusMapper::class),
-            $eventMapper,
         );
     }
 }
