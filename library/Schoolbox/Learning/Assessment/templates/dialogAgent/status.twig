@@ -179,13 +179,13 @@
                                 {% set currentStatus = statuses[participant.user.id] %}
 
                                 {# Assistance requested (there's also an rfc variant here if you needed it) #}
-                                {% if currentStatus.assistanceRequestedAt is defined %}
-                                    {% set title = 'Assistance requested at ' ~ currentStatus.assistanceRequestedAt.local %}
+                                {% if currentStatus.meta.assistanceRequestedAt is defined %}
+                                    {% set title = 'Assistance requested at ' ~ currentStatus.meta.assistanceRequestedAt.local %}
                                 {% endif %}
 
                                 {# Submitted (there's also an rfc variant here if you needed it)  #}
-                                {% if currentStatus.submittedAt is defined %}
-                                    {% set title = 'Submitted at ' ~ currentStatus.submittedAt.local ~ ' by ' ~ currentStatus.submittedBy %}
+                                {% if currentStatus.meta.submittedAt is defined %}
+                                    {% set title = 'Submitted at ' ~ currentStatus.meta.submittedAt.local ~ ' by ' ~ currentStatus.meta.submittedBy %}
                                 {% endif %}
 
                                 {# A shortcut to their response screen #}

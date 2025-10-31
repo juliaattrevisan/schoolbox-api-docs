@@ -81,6 +81,13 @@ class Status
                 'status' => self::STATUS_PENDING,
                 'css' => self::CSS_PENDING,
                 'response' => null,
+                'actions' => [
+                    'view' => null,
+                    'sobo' => null,
+                    'reset' => null,
+                    'reopen' => null,
+                    'assisted' => null
+                ],
             ];
         }
 
@@ -98,6 +105,13 @@ class Status
                 'status' => self::STATUS_PENDING,
                 'css' => self::CSS_PENDING,
                 'response' => null,
+                'actions' => [
+                    'view' => null,
+                    'sobo' => null,
+                    'reset' => null,
+                    'reopen' => null,
+                    'assisted' => null
+                ],
             ];
         }
 
@@ -108,11 +122,20 @@ class Status
                 'status' => self::STATUS_SUBMITTED,
                 'css' => self::CSS_SUBMITTED,
                 'response' => $authoritativeResponse,
-                'submittedAt' => [
-                    'local' => $authoritativeResponse->getSubmittedAt()->getLocal(),
-                    'rfc' => $authoritativeResponse->getSubmittedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                'meta' => [
+                    'submittedAt' => [
+                        'local' => $authoritativeResponse->getSubmittedAt()->getLocal(),
+                        'rfc' => $authoritativeResponse->getSubmittedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                    ],
+                    'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
                 ],
-                'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
+                'actions' => [
+                    'view' => null,
+                    'sobo' => null,
+                    'reset' => null,
+                    'reopen' => null,
+                    'assisted' => null
+                ],
             ];
         }
 
@@ -123,6 +146,13 @@ class Status
                 'status' => self::STATUS_PENDING,
                 'css' => self::CSS_PENDING,
                 'response' => null,
+                'actions' => [
+                    'view' => null,
+                    'sobo' => null,
+                    'reset' => null,
+                    'reopen' => null,
+                    'assisted' => null
+                ],
             ];
         }
 
@@ -136,9 +166,18 @@ class Status
                 'status' => self::STATUS_REQUIRES_ASSISTANCE,
                 'css' => self::CSS_REQUIRES_ASSISTANCE,
                 'response' => $authoritativeResponse,
-                'assistanceRequestedAt' => [
-                    'local' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
-                    'rfc' => $authoritativeResponse->getAssistanceRequestedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                'meta' => [
+                    'assistanceRequestedAt' => [
+                        'local' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
+                        'rfc' => $authoritativeResponse->getAssistanceRequestedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                    ],
+                ],
+                'actions' => [
+                    'view' => null,
+                    'sobo' => null,
+                    'reset' => null,
+                    'reopen' => null,
+                    'assisted' => null
                 ],
             ];
         }
@@ -149,6 +188,13 @@ class Status
             'status' => self::STATUS_IN_PROGRESS,
             'css' => self::CSS_IN_PROGRESS,
             'response' => $authoritativeResponse,
+            'actions' => [
+                'view' => null,
+                'sobo' => null,
+                'reset' => null,
+                'reopen' => null,
+                'assisted' => null
+            ],
         ];
     }
 }
