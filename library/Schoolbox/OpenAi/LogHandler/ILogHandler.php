@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\EventStream\LogHandler;
+namespace Schoolbox\OpenAi\LogHandler;
 
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;

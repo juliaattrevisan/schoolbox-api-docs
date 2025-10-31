@@ -80,7 +80,7 @@ class Client implements IClient
             $request,
             $payload,
             $log,
-            new EventStream\LogHandler\ResponseMessage(),
+            new LogHandler\ResponseMessage(),
         );
     }
 
@@ -96,7 +96,7 @@ class Client implements IClient
             $request,
             $payload,
             $log,
-            new EventStream\LogHandler\ResponseMessage(),
+            new LogHandler\ResponseMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
         );
     }
@@ -113,7 +113,7 @@ class Client implements IClient
             $request,
             $payload,
             $log,
-            new EventStream\LogHandler\ChatCompletionsMessage(),
+            new LogHandler\ChatCompletionsMessage(),
         );
     }
 
@@ -129,7 +129,7 @@ class Client implements IClient
             $request,
             $payload,
             $log,
-            new EventStream\LogHandler\ChatCompletionsMessage(),
+            new LogHandler\ChatCompletionsMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
         );
     }
@@ -274,10 +274,10 @@ class Client implements IClient
      * Request a non-streamed response from the AI provider, and handle the
      * logging and exceptions appropriately.
      *
-     * @param RequestInterface                   $request    The request to send.
-     * @param array                              $payload    The request body to send.
-     * @param Log\Model                          $log        The log to write to.
-     * @param EventStream\LogHandler\ILogHandler $logHandler The log handler to use for the response.
+     * @param RequestInterface       $request    The request to send.
+     * @param array                  $payload    The request body to send.
+     * @param Log\Model              $log        The log to write to.
+     * @param LogHandler\ILogHandler $logHandler The log handler to use for the response.
      * @return ResponseInterface The response from the AI provider.
      * @throws ClientExceptionInterface if the request fails
      * @throws JsonException            if somehow the response body couldn't be decoded
@@ -287,7 +287,7 @@ class Client implements IClient
         RequestInterface $request,
         array $payload,
         Log\Model $log,
-        EventStream\LogHandler\ILogHandler $logHandler,
+        LogHandler\ILogHandler $logHandler,
     ): ResponseInterface {
         try {
             $response = $this->sendRequest($request, $payload, false);
@@ -321,11 +321,11 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param RequestInterface                   $request    The request to send.
-     * @param array                              $payload    The request body to send.
-     * @param Log\Model                          $log        The log to write to.
-     * @param EventStream\LogHandler\ILogHandler $logHandler The log handler to use for each message.
-     * @param int                                $chunkSize  How many bytes to read from each stream iteration.
+     * @param RequestInterface       $request    The request to send.
+     * @param array                  $payload    The request body to send.
+     * @param Log\Model              $log        The log to write to.
+     * @param LogHandler\ILogHandler $logHandler The log handler to use for each message.
+     * @param int                    $chunkSize  How many bytes to read from each stream iteration.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if the request fails
      * @throws MapperException          if somehow the log couldn't be saved
@@ -334,7 +334,7 @@ class Client implements IClient
         RequestInterface $request,
         array $payload,
         Log\Model $log,
-        EventStream\LogHandler\ILogHandler $logHandler,
+        LogHandler\ILogHandler $logHandler,
         int $chunkSize,
     ): iterable {
         $response = $this->sendRequest($request, $payload, true);
