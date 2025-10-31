@@ -36,10 +36,19 @@ class Cursor implements ICursor
 
     public function next(Collection $collection): ?string
     {
+        /* Return null if there are not enough records
+         * to warrant a next cursor which indicates end of results
+         */
+        if ($collection->count() < $this->limit) {
+            return null;
+        }
+
         $lastRecord = $collection->last();
         if (!isset($lastRecord)) {
             return null;
         }
+
+
 
         return $this->codec->encode([
             's.chosen_name' => $lastRecord->getStudent()->getGivenName(),
