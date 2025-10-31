@@ -42,13 +42,14 @@ function onModifyUnit(): void {
                 is-component-action
             ></sbx-pop-out>
             <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
-                <li v-if="props.unit._routes.modify">
+                <li v-if="props.unit._routes.courseMarkbook">
                     <a
-                        class="icon-modify"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
-                        @click.prevent="onModifyUnit"
-                        >Modify</a
+                        class="icon-curriculum"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-button`"
+                        :href="getReturnUrl(props.unit._routes.courseMarkbook)"
                     >
+                        Course Markbook
+                    </a>
                 </li>
                 <li v-if="props.unit._routes.delete">
                     <button
@@ -59,6 +60,14 @@ function onModifyUnit(): void {
                         Delete
                     </button>
                 </li>
+                <li v-if="props.unit._routes.modify">
+                    <a
+                        class="icon-modify"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
+                        @click.prevent="onModifyUnit"
+                        >Modify</a
+                    >
+                </li>
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
                         class="icon-import"
@@ -66,15 +75,6 @@ function onModifyUnit(): void {
                         :href="getReturnUrl(props.unit._routes.importIntoClasses)"
                     >
                         Import into {{ locale.class.translate(true, true) }}
-                    </a>
-                </li>
-                <li v-if="props.unit._routes.courseMarkbook">
-                    <a
-                        class="icon-curriculum"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-button`"
-                        :href="getReturnUrl(props.unit._routes.courseMarkbook)"
-                    >
-                        Course Markbook
                     </a>
                 </li>
             </ul>
