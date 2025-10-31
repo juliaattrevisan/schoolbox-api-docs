@@ -49,7 +49,8 @@
 .sbx-body input[type="url"],
 .sbx-body input[type="color"],
 .sbx-body textarea,
-.sbx-body .selectize-input .sbx-body .c-filter-search-term__field {
+.sbx-body .selectize-input,
+.sbx-body .c-filter-search-term__field {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
