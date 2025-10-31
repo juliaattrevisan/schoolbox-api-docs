@@ -615,6 +615,7 @@ class Controller extends Assessment\Controller
     {
         /* Yank out scenario fields
          */
+        /** @var Model $assessment */
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
         $this->response = $this->responseFromTemplate(
