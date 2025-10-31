@@ -7,7 +7,10 @@
  # Note that this deviates from inheriting from assessment/status/status.twig because you'd have to trun off
  # all the duework-specific stuff.
  #
- # @param IAssessable $assessment  The dialog agent currently being conducted by students
+ # @param DialogAgent\Model $assessment         A Dialog Agent assessment instance (synonymous with Discussion)
+ # @param Collection $breadcrumbs               A set of key-value tuples for breadcrumb rendering
+ # @param array $statuses                       A set of (status, metadata) tuples to tell staff about
+ # @param DialogAgent\Scenario\Model $scenario  The scenario that was chosen for $assessment along with its fields etc.
  #}
 
 {#<script>#}
@@ -39,6 +42,9 @@
 
 {# TODO what is this about #}
 {% set viewCustomParticipationRoute = false %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row actions-small-1">
     <div class="list-item">

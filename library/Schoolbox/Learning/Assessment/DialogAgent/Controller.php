@@ -619,6 +619,11 @@ class Controller extends Assessment\Controller
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',
             [
+                'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                    [
+                        sprintf('Status for %s', $assessment->getTitle()),
+                    ]
+                ),
                 'assessment' => $assessment,
                 'scenario' => $scenario,
                 'statuses' => (new Statuses())->generate($assessment),
