@@ -164,8 +164,10 @@ class Controller extends Base
 
                     return false;
                 });
-                // if we have any collisions, add us to the list
-                $clashesOnlyList = $clashesOnlyList->merge($collides);
+                // if we have any collisions, add them to the list
+                foreach ($collides as $collideEvent) {
+                    $clashesOnlyList->add($collideEvent);
+                }
             }
             // collisions should overwrite the event list
             $eventList = $clashesOnlyList;
