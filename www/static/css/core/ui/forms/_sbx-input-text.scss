@@ -48,7 +48,8 @@
 .sbx-body input[type="time"],
 .sbx-body input[type="url"],
 .sbx-body input[type="color"],
-.sbx-body textarea {
+.sbx-body textarea,
+.sbx-body .selectize-input {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -107,6 +108,16 @@
     gap: var(--sbx-size-s);
     flex-direction: row !important;
     justify-content: flex-end;
+}
+
+// Selectize overrides to match input styles
+.sbx-body .selectize-input {
+    height: 2.5rem;
+    line-height: 1.875rem;
+    padding: 3px 0;
+}
+.selectize-control.multi .selectize-input.has-items {
+    padding: 0 0 3px 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
