@@ -16,9 +16,9 @@
 <script>
     /* TODO REALLY REALLY cheap for now until snake remakes this nicely
      */
-    setTimeout(function(){
-        window.location.reload(1);
-    }, 7000);
+    // setTimeout(function(){
+    //     window.location.reload(1);
+    // }, 7000);
 </script>
 
 <style>
@@ -101,7 +101,7 @@
     'pending': {
         'label': 'Pending',
         'value': 'pending',
-        'css': '',
+        'css': 'pending',
     },
     'in-progress': {
         'label': 'In Progress',
@@ -129,7 +129,7 @@
                 <li>
                     <input type="checkbox" id="filter-{{ status.value }}" {{ checked }} data-status="{{ status.value }}" />
                     <label for="filter-{{ status.value }}">
-                        <span class="progress-tick tiny {{ status.css }}"></span> {{ status.label }}
+                        <span class="progress-tick dialog-agent tiny {{ status.css }}"></span> {{ status.label }}
                     </label>
                 </li>
                 {% set checked = '' %}
@@ -142,7 +142,7 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <table>
+            <table class="dialog-agent">
                 <thead>
                     <tr>
                         <th>
@@ -174,7 +174,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="col-status">
+                            <td class="col-status text-center">
                                 {% set title = '' %}
                                 {% set currentStatus = statuses[participant.user.id] %}
 
@@ -203,10 +203,10 @@
 
                                 {% if viewRoute %}
                                     <a href="{{ viewRoute ?? '#' }}">
-                                        <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ title }}"></span>
+                                        <span class="progress-tick dialog-agent {{ currentStatus.css }}" title="{{ title }}"></span>
                                     </a>
                                 {% else %}
-                                    <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ title }}"></span>
+                                    <span class="progress-tick dialog-agent {{ currentStatus.css }}" title="{{ title }}"></span>
                                 {% endif %}
                             </td>
 

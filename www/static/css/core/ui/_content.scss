@@ -583,36 +583,49 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
     // Dialog Agent
     // snake please refactor these styles in some reptilian manner
-    &.in-progress {
-        @extend .icon-approve;
-        background-color: #0c78cf;
-        transform: rotate(135deg);
-        &:before {
-            visibility: visible;
-            // counter-rotation
-            transform: rotate(-135deg);
+    &.dialog-agent {
+        &.pending {
+            @extend .icon-collapse;
+            background-color: $base;
         }
-    }
-    &.requires-assistance {
-        @extend .icon-approve;
-        background-color: $warning-color;
-        transform: rotate(135deg);
-        &:before {
-            visibility: visible;
-            // counter-rotation
-            transform: rotate(-135deg);
+        &.in-progress {
+            @extend .icon-time-value;
+            background-color: #0c78cf;
+            transform: rotate(135deg);
+            &:before {
+                visibility: visible;
+                // counter-rotation
+                transform: rotate(-135deg);
+            }
         }
-    }
-    &.submitted {
-        @extend .icon-approve;
-        background-color: $success-color;
-        border-radius: $progress-tick-size-regular;
-        transform: rotate(360deg);
-        &:before {
-            visibility: visible;
+        &.requires-assistance {
+            @extend .icon-alert;
+            background-color: $warning-color;
+            transform: rotate(135deg);
+            &:before {
+                visibility: visible;
+                // counter-rotation
+                transform: rotate(-135deg);
+            }
+        }
+        &.submitted {
+            @extend .icon-approve;
+            background-color: $success-color;
+            border-radius: $progress-tick-size-regular;
+            transform: rotate(360deg);
+            &:before {
+                visibility: visible;
+            }
         }
     }
 }
+
+// Dialog Agent
+// Center those icons in the Status column (!?)
+.dialog-agent .col-status .progress-tick {
+    margin: 0.25rem auto 0 auto;
+}
+
 
 .countdown {
     font-weight: 100;
