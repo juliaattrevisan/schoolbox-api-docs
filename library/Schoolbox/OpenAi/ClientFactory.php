@@ -13,7 +13,6 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
 use Schoolbox\Admin\OpenAI;
 use UnexpectedValueException;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
 use Schoolbox\IConfigLoader;
@@ -95,21 +94,19 @@ class ClientFactory
             switch ($feature) {
                 case Helper::FEATURE_CHAT:
                     // Chat does use deployment ID
-                    // TODO remove deprecated configs when more features are migrated to this factory
                     return $this->buildAzure(
                         $apiKey,
-                        $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME),
-                        $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID),
+                        $aiConfig[OpenAi\Config::SECTION_AZURE][OpenAI\Config::FIELD_RESOURCE_NAME]['value'] ?? '',
+                        $aiConfig[OpenAi\Config::SECTION_AZURE][OpenAI\Config::FIELD_DEPLOYMENT_ID]['value'] ?? '',
                         '2023-12-01-preview',
                     );
                 case Helper::FEATURE_IMAGE:
                     throw new UnexpectedValueException('Image feature for Azure is not implemented');
                 default:
                     // Default does not use deployment ID
-                    // TODO remove deprecated configs when more features are migrated to this factory
                     return $this->buildAzure(
                         $apiKey,
-                        $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME),
+                        $aiConfig[OpenAi\Config::SECTION_AZURE][OpenAI\Config::FIELD_RESOURCE_NAME]['value'] ?? '',
                         null,
                         '2025-03-01-preview',
                     );
