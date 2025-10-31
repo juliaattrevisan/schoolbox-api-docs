@@ -40,7 +40,6 @@ class Module extends BaseModule
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
         $this->addGetRoute('index', $basePath, '');
-        $this->addGetRoute('download', $basePath, '/download');
     }
 
     /**
