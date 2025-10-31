@@ -79,6 +79,7 @@ if ($_SESSION['communityLogin'] ?? false) {
         );
     }
 
+    //Remember that the user has attempted to login once, next time we will go directly to the page
     $_SESSION['communityLogin'] = true;
 
     /* Set the URL to redirect the user to after login */
