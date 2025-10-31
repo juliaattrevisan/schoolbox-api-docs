@@ -108,7 +108,10 @@ class Status
                 'status' => self::STATUS_SUBMITTED,
                 'css' => self::CSS_SUBMITTED,
                 'response' => $authoritativeResponse,
-                'submittedAt' => $authoritativeResponse->getSubmittedAt()->getLocal(),
+                'submittedAt' => [
+                    'local' => $authoritativeResponse->getSubmittedAt()->getLocal(),
+                    'rfc' => $authoritativeResponse->getSubmittedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                ],
                 'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
             ];
         }
@@ -133,7 +136,10 @@ class Status
                 'status' => self::STATUS_REQUIRES_ASSISTANCE,
                 'css' => self::CSS_REQUIRES_ASSISTANCE,
                 'response' => $authoritativeResponse,
-                'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
+                'assistanceRequestedAt' => [
+                    'local' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
+                    'rfc' => $authoritativeResponse->getAssistanceRequestedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                ],
             ];
         }
 
