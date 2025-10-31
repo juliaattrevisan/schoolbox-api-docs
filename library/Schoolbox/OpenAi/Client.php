@@ -20,7 +20,6 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -258,70 +257,6 @@ class Client implements IClient
     }
 
     /**
-     * TODO remove this and handle in `ILogHandler` classes
-     *
-     * @param array     $completedEvent
-     * @param Log\Model $log
-     * @return void
-     * @throws SchoolboxException if the completed event was an error or failure
-     * @throws MapperException    if the log couldn't be saved
-     */
-    private function finaliseLog(array $completedEvent, Log\Model $log): void
-    {
-        /* If something went wrong on the openAI side, it'll send us an "error" key
-         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-         * If we get this, send on the human-readable message to the user
-         */
-        if ($completedEvent["error"] ?? null) {
-            $returnCode = 500;
-
-            $errorMessage = $completedEvent["error"]["message"] ?? '';
-
-            $log->setReturnCode($returnCode)
-                ->setErrorMessage($errorMessage);
-            $this->logMapper->save($log);
-
-            throw new SchoolboxException($errorMessage, $returnCode);
-        }
-
-        /* Did we receive an incomplete response? i.e. max output tokens reached?
-         * If so, send those details on so we have some idea of why it failed
-         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
-         */
-        $status = $completedEvent["status"] ?? null;
-        if ($status !== "completed") {
-            $returnCode = 500;
-
-            $title = sprintf(
-                "Failed to generate a response: %s",
-                $status ?? "unknown"
-            );
-
-            /* there may be some extra details about why it was incomplete */
-            $incompleteMessage = $completedEvent["incomplete_details"]["reason"] ?? null;
-            if ($incompleteMessage) {
-                $title .= sprintf(" (%s)", $incompleteMessage);
-            }
-
-            $log->setReturnCode($returnCode)
-                ->setErrorMessage($incompleteMessage);
-            $this->logMapper->save($log);
-
-            throw new SchoolboxException($title, $returnCode);
-        }
-
-        // well we didn't die, so let's assume we got a good response
-        // Set the response code only: the model and token usage should already
-        // have been set in `appendMessageToLog`.
-        $log->setReturnCode(200)
-//            ->setModel($completedEvent['model'] ?? null)
-//            ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
-//            ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null)
-        ;
-        $this->logMapper->save($log);
-    }
-
-    /**
      * Filter unwanted fields out of `$message` before it's output.
      *
      * Currently this filters nothing, but there's scope for determining
@@ -375,7 +310,6 @@ class Client implements IClient
         // be decoded and processed as a single object.
         $responseBody = $response->getBody()->getContents();
         $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-//        $this->finaliseLog($responseJson, $log);
         $log = $logHandler->handleResponse($responseJson, $log);
         $this->logMapper->save($log);
 
@@ -430,7 +364,6 @@ class Client implements IClient
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-//            $this->finaliseLog($responseJson, $log);
             $log = $logHandler->handleResponse($responseJson, $log);
             $this->logMapper->save($log);
 
