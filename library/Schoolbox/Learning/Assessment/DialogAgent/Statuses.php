@@ -124,34 +124,24 @@ class Statuses
 
         /* A session identifier exists but not yet submitted: participant is still doing the stuff
          * and maybe needs help
+         *
+         * If assistance was requested and the response is still in progress, send a special status
          */
-        if (null === $authoritativeResponse->getSubmittedAt()) {
-            /* If assistance was requested and the response is still in progress, send a special status
-             */
-            if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
-                return [
-                    'status' => self::STATUS_REQUIRES_ASSISTANCE,
-                    'css' => self::CSS_REQUIRES_ASSISTANCE,
-                    'response' => $authoritativeResponse,
-                    'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
-                ];
-            }
-
-            /* Otherwise we're just doing the stuff
-             */
+        if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
             return [
-                'status' => self::STATUS_IN_PROGRESS,
-                'css' => self::CSS_IN_PROGRESS,
+                'status' => self::STATUS_REQUIRES_ASSISTANCE,
+                'css' => self::CSS_REQUIRES_ASSISTANCE,
                 'response' => $authoritativeResponse,
+                'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
             ];
         }
 
-        /* Unforeseen circumstance: not sure how we'd end up here
+        /* Otherwise we're just doing the stuff
          */
         return [
-            'status' => null,
-            'css' => null,
-            'response' => null,
+            'status' => self::STATUS_IN_PROGRESS,
+            'css' => self::CSS_IN_PROGRESS,
+            'response' => $authoritativeResponse,
         ];
     }
 }
