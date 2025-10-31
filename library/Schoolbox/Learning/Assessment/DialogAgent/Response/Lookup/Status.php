@@ -8,11 +8,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DialogAgent;
+namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 
+use Schoolbox\Learning\Assessment\DialogAgent\Model;
 use Schoolbox\Learning\Assessment\Participant;
 
-class Statuses
+class Status
 {
     /**
      * Consts correlating to a nice phrase to say in frontend world
