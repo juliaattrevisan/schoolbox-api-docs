@@ -6,8 +6,10 @@
 import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
+import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useAddUnitsStore, MAX_UNITS } from "./store/unitPlannerAddUnitsStore";
 
+const unitPlannerStore = useUnitPlannerStore();
 const addUnitsStore = useAddUnitsStore();
 
 /**
@@ -27,13 +29,17 @@ function onAddSelected(): void {
 window.Vue.onMounted(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("isNewCourse") === "1") {
-        addUnitsStore.prompt();
         urlParams.delete("isNewCourse");
         window.history.replaceState(
             {},
             "",
             `${window.location.pathname}${urlParams.toString().length > 0 ? `?${urlParams.toString()}` : ""}`,
         ); // remove the param from the URL
+        // only show the prompt if there are no units yet
+        // this is to avoid the case when isNewCourse is within a getReturnUrl already
+        if (unitPlannerStore.unitCount === 0) {
+            addUnitsStore.prompt();
+        }
     }
 });
 </script>
