@@ -6,7 +6,13 @@
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
-import type { MDPHeader, Header, AdjustmentType, Profile, Text } from "../js/types/manageDifferentiationProfilesTypes";
+import type {
+    MDPHeader,
+    Header,
+    AdjustmentType,
+    Profile,
+    AdjustmentText,
+} from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
@@ -68,7 +74,7 @@ const rows = window.Vue.ref<Profile[]>(props.profiles);
             />
         </template>
         <template #Text="{ row, header: columnHeader }">
-            <mdp-grid-cell-text :text="row[columnHeader.key] as Text" />
+            <mdp-grid-cell-text :text="row[columnHeader.key] as AdjustmentText" />
         </template>
         <template #Date="{ row, header: columnHeader }">
             <div class="date-cell">
