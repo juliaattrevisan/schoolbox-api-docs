@@ -8,6 +8,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress_Date_Format;
@@ -16,7 +18,6 @@ use Calendar_Api_Composite;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
-use Schoolbox\ResourceBooking\Booking\Model;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Category;

@@ -8,6 +8,8 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress\Authorizer\Authorizer;
