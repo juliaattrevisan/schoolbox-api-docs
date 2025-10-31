@@ -185,7 +185,7 @@
                                     {% set title = 'Submitted at ' ~ currentStatus.submittedAt ~ ' by ' ~ currentStatus.submittedBy %}
                                 {% endif %}
 
-                                <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ currentStatus.status }}"></span><br />
+                                <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ title }}"></span><br />
                             </td>
 
                             {# Scenario Fields evaluated per person by the ai
