@@ -21,12 +21,26 @@ function onDeleteUnit(): void {
 }
 
 /**
- * Navigate to the modify unit page
+ * Navigate to the course markbook page
  * We use a function here instead of a href as the
  * 'isNewCourse=1' param may be present when the component is mounted
  * And we want to ensure it's removed from the URL when navigating
  */
-function onModifyUnit(): void {
+function onCourseMarkbook(): void {
+    window.location.href = getReturnUrl(props.unit._routes.courseMarkbook!);
+}
+
+/**
+ * Navigate to the import into classes page
+ */
+function onImportIntoClasses(): void {
+    window.location.href = getReturnUrl(props.unit._routes.importIntoClasses!);
+}
+
+/**
+ * Navigate to the modify unit page
+ */
+function onModify(): void {
     window.location.href = getReturnUrl(props.unit._routes.modify!);
 }
 </script>
@@ -46,7 +60,7 @@ function onModifyUnit(): void {
                     <a
                         class="icon-curriculum"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-button`"
-                        :href="getReturnUrl(props.unit._routes.courseMarkbook)"
+                        @click.prevent="onCourseMarkbook"
                     >
                         Course Markbook
                     </a>
@@ -64,7 +78,7 @@ function onModifyUnit(): void {
                     <a
                         class="icon-modify"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
-                        @click.prevent="onModifyUnit"
+                        @click.prevent="onModify"
                         >Modify</a
                     >
                 </li>
@@ -72,7 +86,7 @@ function onModifyUnit(): void {
                     <a
                         class="icon-import"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-button`"
-                        :href="getReturnUrl(props.unit._routes.importIntoClasses)"
+                        @click.prevent="onImportIntoClasses"
                     >
                         Import into {{ locale.class.translate(true, true) }}
                     </a>
