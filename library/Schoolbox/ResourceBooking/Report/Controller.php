@@ -13,6 +13,11 @@ namespace Schoolbox\ResourceBooking\Report;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Calendar_Api_Composite;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
+use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 
@@ -142,11 +147,49 @@ class Controller extends Base
             )
         );
 
+        // we may be editing this list, so temp var it
+        $eventList = $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
+
+        // if we are only showing clashes, filter the event list now
+        if ($clashesOnly) {
+            // TODO: inject these things...
+            $validation = new Validation(
+                $this->getUser(),
+                BookingMapper::getInstance(),
+                StatusMapper::getInstance(),
+                TermMapper::getInstance(),
+                $this->getDi()->get('externalTimetable'),
+                CampusMapper::getInstance(),
+                $this->getConfigLoader(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+            );
+
+            $clashingEvents = [];
+            /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
+            foreach ($eventList as $key => $event) {
+
+                // if only clashes, only save if we are a clash.. expensive (we hit the db each call).. but no other way
+                if (
+                    $validation->validateForClashes(
+                        $event->getBooking()->getResource(),
+                        $event->getStartTime()->getDateTimeObject(),
+                        $event->getEndTime()->getDateTimeObject(),
+                        $event->getBooking()
+                    )
+                )
+                {
+                    $clashingEvents[] = $event;
+                }
+            }
+            // swap list
+            $eventList = $clashingEvents;
+        }
+
         $this->response = $this->responseFromTemplate(
             '@resourceBookingReport/index.twig',
             [
                 'categoryList' => $categoryList,
-                'eventList'    => $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp()),
+                'eventList'    => $eventList,
                 'search'       => [
                     'start'    => $start,
                     'end'      => $end,
