@@ -92,12 +92,12 @@ export default class AdminDifferentiationProfiles {
      */
     async dragToTop(handleId: string, containerSuffix: string, fieldName: string): Promise<void> {
         this.tester.isGoingTo(`grab the drag handle for the ${fieldName} field`);
-        const dragHandle = await this.page.getByTestId(`differentiation-profiles-drag-handle-${handleId}`);
+        const dragHandle = this.page.getByTestId(`differentiation-profiles-drag-handle-${handleId}`);
         await dragHandle.scrollIntoViewIfNeeded();
         await dragHandle.hover();
         await this.page.mouse.down();
         this.tester.isGoingTo(`drag the ${fieldName} field upwards to reorder`);
-        const container = await this.page.getByTestId(`differentiation-profiles-fieldset-${containerSuffix}`);
+        const container = this.page.getByTestId(`differentiation-profiles-fieldset-${containerSuffix}`);
         const box = await container.boundingBox();
         if (box) {
             await this.page.mouse.move(box.x, box.y + 10, {

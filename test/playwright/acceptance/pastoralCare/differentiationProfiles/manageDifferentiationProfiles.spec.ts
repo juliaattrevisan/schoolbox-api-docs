@@ -12,17 +12,17 @@ import ManageDifferentiationProfiles from "@schoolboxTest/playwright/support/pag
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 
 test.describe("Manage Differentiation Profiles", () => {
-    test.beforeEach(async ({ tester, page }) => {
+    test.beforeEach(async ({ tester }) => {
         tester.isGoingTo("Login as admin");
         await tester.loginAsAdmin();
     });
 
-    test("Verify the page can't be accessed when profiles are disabled", async ({ tester, page, db }) => {
+    test("Verify the page can't be accessed when profiles are disabled", async ({ tester, page }) => {
         const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         await manageDifferentiationProfiles.navigateToPage();
         tester.isGoingTo("Verify that the page is not found");
         const notFoundPage = page.getByText("Page Not Found");
-        await expect(notFoundPage).toBeDefined();
+        expect(notFoundPage).toBeDefined();
     });
 
     test("Verify the page can't be accessed without service permission enabled", async ({ tester, page, db }) => {
@@ -34,7 +34,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that the page is not found");
             const notFoundPage = page.getByText("Page Not Found");
-            await expect(notFoundPage).toBeDefined();
+            expect(notFoundPage).toBeDefined();
         } finally {
             tester.isGoingTo("Clean up: Reset the toggle to off state");
             await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
@@ -57,7 +57,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that the page is accessible");
             const pageTitle = page.getByText("Manage Differentiation Profiles");
-            await expect(pageTitle).toBeDefined();
+            expect(pageTitle).toBeDefined();
         } finally {
             tester.isGoingTo("Clean up: Reset the toggle to off state");
             await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
