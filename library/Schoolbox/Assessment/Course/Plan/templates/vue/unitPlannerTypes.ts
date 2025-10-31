@@ -88,6 +88,7 @@ export type Unit = {
         modify: string | null;
         delete: string | null;
         importIntoClasses: string | null;
+        courseMarkbook: string | null;
     };
 };
 

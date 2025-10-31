@@ -68,6 +68,15 @@ function onModifyUnit(): void {
                         Import into {{ locale.class.translate(true, true) }}
                     </a>
                 </li>
+                <li v-if="props.unit._routes.courseMarkbook">
+                    <a
+                        class="icon-curriculum"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-button`"
+                        :href="getReturnUrl(props.unit._routes.courseMarkbook)"
+                    >
+                        Course Markbook
+                    </a>
+                </li>
             </ul>
         </section>
     </div>

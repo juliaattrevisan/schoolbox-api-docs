@@ -1079,6 +1079,12 @@ class Controller extends Base
                 'importIntoClasses' => $this->getRouteIfAuthorized('learningAssessmentExporter.getExportFormForUnit', [
                     'unitSpecId' => $unit->getId(),
                 ]) ?: null,
+                'courseMarkbook' => $this->getRouteIfAuthorized('courseMarkbook.getRedirect', [
+                    'courseSpec' => $unit->getCourse(),
+                    'courseSpecId' => $unit->getCourse()->getId(),
+                    'unitSpecId' => $unit->getId(),
+                    'folderId' => 0,
+                ]) ?: null,
             ]
         ];
     }
