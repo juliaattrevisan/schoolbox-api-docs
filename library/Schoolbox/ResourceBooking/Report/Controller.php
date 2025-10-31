@@ -30,26 +30,6 @@ class Controller extends Base
     protected const MAX_REPORTING_PERIOD_MONTHS = 3;
 
     /**
-     * @var Item\Mapper
-     */
-    protected $itemMapper;
-
-    /**
-     * @var Category\Mapper
-     */
-    protected $categoryMapper;
-
-    /**
-     * @var Calendar_Api_Composite
-     */
-    protected $api;
-
-    /**
-     * @var CalendarApiFactory
-     */
-    protected $apiFactory;
-
-    /**
      * Constructor
      *
      * @param Mapper $itemMapper
@@ -64,23 +44,17 @@ class Controller extends Base
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      */
     public function __construct(
-        Item\Mapper $itemMapper,
-        Category\Mapper $categoryMapper,
-        Calendar_Api_Composite $api,
-        CalendarApiFactory $apiFactory,
-        private BookingMapper $bookingMapper,
-        private StatusMapper $statusMapper,
-        private TermMapper $termMapper,
-        private \External_Timetable $externalTimetableHandler,
-        private CampusMapper $campusMapper,
-        private \Schoolbox\External\Event\Mapper $eventMapper,
+        protected Item\Mapper $itemMapper,
+        protected Category\Mapper $categoryMapper,
+        protected Calendar_Api_Composite $api,
+        protected CalendarApiFactory $apiFactory,
+        protected BookingMapper $bookingMapper,
+        protected StatusMapper $statusMapper,
+        protected TermMapper $termMapper,
+        protected \External_Timetable $externalTimetableHandler,
+        protected CampusMapper $campusMapper,
+        protected \Schoolbox\External\Event\Mapper $eventMapper,
     ) {
-        $this
-            ->setItemMapper($itemMapper)
-            ->setCategoryMapper($categoryMapper)
-            ->setApi($api)
-            ->setApiFactory($apiFactory)
-        ;
     }
 
     /**
@@ -122,7 +96,7 @@ class Controller extends Base
 
         // Set up category list
         $categoryList = [];
-        foreach ($this->getCategoryMapper()->findAll(['order' => ['name' => 'asc']]) as $category) {
+        foreach ($this->categoryMapper->findAll(['order' => ['name' => 'asc']]) as $category) {
             $categoryList[$category->getId()] = $category;
         }
         $allCategories = array_keys($categoryList);
@@ -139,29 +113,29 @@ class Controller extends Base
         if (!empty($selectedCategories)) {
 
             /** @var Item\Model[] $resources */
-            $resources = $this->getItemMapper()->findByColumn(
+            $resources = $this->itemMapper->findByColumn(
                 'resource_category_id',
                 $selectedCategories
             );
         } else {
 
             /** @var Item\Model[] $resources */
-            $resources = $this->getItemMapper()->findAll();
+            $resources = $this->itemMapper->findAll();
         }
 
         // Build the list of events (slowly)
         $showClasses = $this->requestQuery->getBool('classes', true);
         $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
 
-        $this->getApi()->add(
-            $this->getApiFactory()->buildFromResourceCollection(
+        $this->api->add(
+            $this->apiFactory->buildFromResourceCollection(
                 $resources,
                 $showClasses
             )
         );
 
         // we may be editing this list, so temp var it
-        $eventList = $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
+        $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         // if we are only showing clashes, filter the event list now
         if ($clashesOnly) {
@@ -211,79 +185,5 @@ class Controller extends Base
                 ],
             ],
         );
-    }
-
-    /**
-     * @return Item\Mapper
-     */
-    protected function getItemMapper()
-    {
-        return $this->itemMapper;
-    }
-
-    /**
-     * @param  Item\Mapper $itemMapper
-     *
-     * @return $this
-     */
-    protected function setItemMapper($itemMapper)
-    {
-        $this->itemMapper = $itemMapper;
-        return $this;
-    }
-
-    /**
-     * @return Category\Mapper
-     */
-    protected function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
-
-    /**
-     * @param  Category\Mapper $categoryMapper
-     *
-     * @return $this
-     */
-    protected function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-        return $this;
-    }
-
-    /**
-     * @return Calendar_Api_Composite
-     */
-    protected function getApi()
-    {
-        return $this->api;
-    }
-
-    /**
-     * @param  Calendar_Api_Composite $api
-     * @return $this
-     */
-    protected function setApi($api)
-    {
-        $this->api = $api;
-        return $this;
-    }
-
-    /**
-     * @return CalendarApiFactory
-     */
-    protected function getApiFactory()
-    {
-        return $this->apiFactory;
-    }
-
-    /**
-     * @param  CalendarApiFactory $apiFactory
-     * @return $this
-     */
-    protected function setApiFactory($apiFactory)
-    {
-        $this->apiFactory = $apiFactory;
-        return $this;
     }
 }
