@@ -41,6 +41,8 @@ class Status
      */
     public function __construct()
     {
+        /* TODO add routeGenerator here so that Status becomes similar to NextRoutes
+         */
     }
 
 
