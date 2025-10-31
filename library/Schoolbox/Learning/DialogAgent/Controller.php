@@ -261,6 +261,7 @@ class Controller extends Base
      */
     public function getViewResponse(IAssessable $assessment, User $student): void
     {
+        echo "View a response";
         // todo implement a readonly viewing mode
     }
 
