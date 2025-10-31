@@ -4,7 +4,7 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitForm";
 import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
-import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
+import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
 import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
@@ -39,18 +39,21 @@ test.describe("Due Work - Mark type tests", () => {
     /**
      * (Step 1) - Create 2 due works on a unit page and 1 on the homepage after importing it
      */
-    test.skip("Create activities", async ({ tester, page }) => {
-        const courseModify = new CourseModify(page, tester);
+    test("Create activities", async ({ tester, page }) => {
+        const unitPlanner = new UnitPlanner(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
+        const persuasionUnitId = 17; // "Persuasion and the Media"
 
-        tester.isGoingTo("navigate to Year 9 English Modify course page");
-        await courseModify.goto(6);
+        tester.isGoingTo("navigate to Year 9 English Modify unit planner page");
+        await unitPlanner.goto(6);
 
-        tester.isGoingTo(`create a new unit with the name "${unitName}"`);
-        newUnitSpecId = await courseModify.createNewUnit(unitName);
+        tester.isGoingTo("click on the create activity button for the Persuasion and the Media unit");
+        await page
+            .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${persuasionUnitId}-activities-1-button`)
+            .click();
 
         tester.isGoingTo(`create a new due work with the name "${dueWorkName1}"`);
-        await courseModify.clickNewActivityButton("due-work");
+        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
 
         // Create a second due work, self reflection without rubric, input percentage, display letter grade
         await assessmentForm.setTitle(dueWorkName1);
@@ -61,9 +64,14 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.clickCreate();
 
+        tester.isGoingTo("click on the create activity button for the Persuasion and the Media unit");
+        await page
+            .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${persuasionUnitId}-activities-1-button`)
+            .click();
+
         // Create a second due work, self reflection with rubric, input total mark, display percentage
         tester.isGoingTo(`create a new due work with the name "${dueWorkName2}"`);
-        await courseModify.clickNewActivityButton("due-work");
+        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
 
         await assessmentForm.setTitle(dueWorkName2);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
@@ -81,10 +89,12 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.fillRubricCriterionPoints(0, 420, 1, "2");
         await assessmentForm.clickCreate();
 
-        // Now back on the course modify page, import the unit into the homepage
+        // Now back on the unit planner page, import the unit into the homepage
         tester.isGoingTo("import the new unit into 9A English");
-        await courseModify.clickUnitMenu(newUnitSpecId);
-        await courseModify.clickImportUnitToClasses();
+        tester.isGoingTo("click on the unit action button for unit 'Persuasion and the Media'");
+        await page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${persuasionUnitId}`).click();
+        tester.isGoingTo("wait for dropdown and click the import button");
+        await page.getByTestId(`up-unit-cell-unit-action-${persuasionUnitId}-import-link`).click();
 
         const classToImportRow = page
             .locator("#importForm li")

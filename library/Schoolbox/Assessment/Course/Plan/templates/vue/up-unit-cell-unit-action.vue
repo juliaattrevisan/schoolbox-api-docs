@@ -35,7 +35,7 @@ function onDeleteUnit(): void {
                 <li v-if="props.unit._routes.courseMarkbook">
                     <a
                         class="icon-curriculum"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-button`"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-link`"
                         :href="getReturnUrl(props.unit._routes.courseMarkbook!)"
                     >
                         Course Markbook
@@ -61,7 +61,7 @@ function onDeleteUnit(): void {
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
                         class="icon-import"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-button`"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-link`"
                         :href="getReturnUrl(props.unit._routes.importIntoClasses!)"
                     >
                         Import into {{ locale.class.translate(true, true) }}
