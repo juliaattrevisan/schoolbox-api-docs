@@ -97,10 +97,10 @@ class Mapper extends BaseMapper
                         $pb = $pb->any(
                             $this->getPredicateBuilder()->like(
                                 's.chosen_name',
-                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($nameSearch[0]) . '%'
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
                             )->like(
                                 's.lastname',
-                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($nameSearch[0]) . '%')
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%')
                         );
                     }
                 }
@@ -125,20 +125,22 @@ class Mapper extends BaseMapper
 
         $pb->isNull('differentiation_profiles.deleted_at');
 
-        $pb = $this->applyCursor(
-            $pb,
-            $cursorParams,
-            $order ?? $this->getDefaultOrderByParams()
-        );
+        if (!empty($cursorParams)) {
+            $pb = $this->applyCursor(
+                $pb,
+                $cursorParams,
+                $order ?? $this->getDefaultOrderByParams()
+            );
+        }
 
         $where = implode(' AND ', $pb->getWhere());
 
         $limit = null === $limit ? '' : "LIMIT {$limit}";
         $orderBy = "ORDER BY " . ((null === $order) ? '' : implode(', ', array_map(
-            fn($col, $dir) => "{$col} {$dir}",
-            array_keys($order),
-            $order,
-        )) . ',') . ' p.student_id asc';
+                    fn($col, $dir) => "{$col} {$dir}",
+                    array_keys($order),
+                    $order,
+                )) . ',') . ' p.student_id asc';
 
         $query = "{$this->getSelectString()}
                 {$this->getFromString()}
@@ -202,16 +204,16 @@ class Mapper extends BaseMapper
             $columnBuilders[] = $columnBuilder->all($thisBuilder);
 
             $previousColumnBuilders[] = $pb->emptyClone()->equals($column, $value);
-
-            // Put each column builder into the main predicate builder
-            $subBuilder = $pb->emptyClone();
-            foreach ($columnBuilders as $columnBuilder) {
-                // All the builders in the column builder must match
-                $subBuilder = $subBuilder->all($columnBuilder);
-            }
-            // Any of the column builders may match
-            $pb = $pb->any($subBuilder);
         }
+
+        // Put each column builder into the main predicate builder
+        $subBuilder = $pb->emptyClone();
+        foreach ($columnBuilders as $columnBuilder) {
+            // All the builders in the column builder must match
+            $subBuilder = $subBuilder->all($columnBuilder);
+        }
+        // Any of the column builders may match
+        $pb = $pb->any($subBuilder);
         return $pb;
     }
 
