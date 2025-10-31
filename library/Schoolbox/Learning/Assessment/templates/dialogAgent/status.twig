@@ -78,6 +78,63 @@
     </ul>
 </div>
 
+{# Metadata about the activity #}
+<div class="row">
+    <div class="small-12 large-4 columns">
+        <ul class="meta">
+            {% include '@learning/fragments/meta/dueDate.twig' %}
+            {% include '@learning/fragments/meta/workType.twig' %}
+            {% if not assessment.isSpecification %}
+                {% if readonly ?? false %}
+                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{# Status filters of some kind
+ # This is a far nicer way to build this construct instead of that crazy idea in status.twig supercless
+ #}
+{% set statusLookup = {
+    'pending': {
+        'label': 'Pending',
+        'value': 'pending',
+        'css': '',
+    },
+    'inprogress': {
+        'label': 'In Progress',
+        'value': 'inprogress',
+        'css': 'pending',
+    },
+    'assistance': {
+        'label': 'Assistance Requested',
+        'value': 'assistancerequested',
+        'css': 'failed',
+    },
+    'submitted': {
+        'label': 'Submitted',
+        'value': 'submitted',
+        'css': 'reviewed',
+    },
+} %}
+
+<div class="row">
+    <div class="small-12 columns text-right">
+        <ul class="filters" data-participant-filters id="filters">
+            {% for key, status in statusLookup %}
+                <li>
+                    <input type="checkbox" id="filter-{{ status.value }}" checked="checked" data-status="{{ status.value }}" />
+                    <label for="filter-{{ status.value }}">
+                        <span class="progress-tick tiny {{ status.css }}"></span> {{ status.label }}
+                    </label>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{# The Table of Joyful Data #}
 <div class="row">
     <div class="small-12 island">
         <section>
