@@ -89,7 +89,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(BookingMapper::class),
             $this->getMapperFactory()->get(StatusMapper::class),
             $this->getMapperFactory()->get(TermMapper::class),
-            $this->getMapperFactory()->get(\External_Timetable::class),
+            $this->injector->get('externalTimetable'),
             $this->getMapperFactory()->get(CampusMapper::class),
             $eventMapper,
         );
