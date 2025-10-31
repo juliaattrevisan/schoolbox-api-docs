@@ -82,13 +82,13 @@ class Module extends BaseModule
 
         /* Route Definitions
          */
-        $assRoute  = '/assessments/{assessmentId:\d+}';
+        $assRoute  = '/{assessmentId:\d+}';
         $studentParam  = '{studentId:\d+}';
 
         /* Create a dialog agent's configuration
          */
-        $this->register('GET', '/{assessmentId:\d+}/configure', 'getUpdateForm', $canModify, $preloadAssessment);
-        $this->register('POST', '/{assessmentId:\d+}/configure', 'postUpdate', $canModify, $preloadAssessment);
+        $this->register('GET', "/{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
+        $this->register('POST', "/{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
         /* Resume a response
          */
