@@ -105,30 +105,33 @@
     'inprogress': {
         'label': 'In Progress',
         'value': 'inprogress',
-        'css': 'pending',
+        'css': 'in-progress',
     },
-    'assistance': {
-        'label': 'Assistance Requested',
+    'assistancerequested': {
+        'label': 'Requires Assistance',
         'value': 'assistancerequested',
-        'css': 'failed',
+        'css': 'assistance-requested',
     },
     'submitted': {
         'label': 'Submitted',
         'value': 'submitted',
-        'css': 'reviewed',
+        'css': 'submitted',
     },
 } %}
 
 <div class="row">
     <div class="small-12 columns text-right">
         <ul class="filters" data-participant-filters id="filters">
+            {% set checked = 'checked="checked"' %}
+
             {% for key, status in statusLookup %}
                 <li>
-                    <input type="checkbox" id="filter-{{ status.value }}" checked="checked" data-status="{{ status.value }}" />
+                    <input type="checkbox" id="filter-{{ status.value }}" {{ checked }} data-status="{{ status.value }}" />
                     <label for="filter-{{ status.value }}">
                         <span class="progress-tick tiny {{ status.css }}"></span> {{ status.label }}
                     </label>
                 </li>
+                {% set checked = '' %}
             {% endfor %}
         </ul>
     </div>

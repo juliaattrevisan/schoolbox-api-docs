@@ -581,6 +581,37 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             line-height: 0.85;
         }
     }
+    // Dialog Agent
+    // snake please refactor these styles in some reptilian manner
+    &.in-progress {
+        @extend .icon-approve;
+        background-color: #0c78cf;
+        transform: rotate(135deg);
+        &:before {
+            visibility: visible;
+            // counter-rotation
+            transform: rotate(-135deg);
+        }
+    }
+    &.assistance-requested {
+        @extend .icon-approve;
+        background-color: $warning-color;
+        transform: rotate(135deg);
+        &:before {
+            visibility: visible;
+            // counter-rotation
+            transform: rotate(-135deg);
+        }
+    }
+    &.submitted {
+        @extend .icon-approve;
+        background-color: $success-color;
+        border-radius: $progress-tick-size-regular;
+        transform: rotate(360deg);
+        &:before {
+            visibility: visible;
+        }
+    }
 }
 
 .countdown {
