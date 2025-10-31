@@ -188,7 +188,26 @@
                                     {% set title = 'Submitted at ' ~ currentStatus.submittedAt ~ ' by ' ~ currentStatus.submittedBy %}
                                 {% endif %}
 
-                                <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ title }}"></span><br />
+                                {# A shortcut to their response screen #}
+                                {% set viewRoute = null %}
+                                {% if currentStatus.response %}
+                                    {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
+                                        assessment: assessment,
+                                        assessmentId: assessment.id,
+                                        student: participant.user,
+                                        studentId: participant.user.id,
+                                        response: currentStatus.response,
+                                        responseId: currentStatus.response.id
+                                    } )%}
+                                {% endif %}
+
+                                {% if viewRoute %}
+                                    <a href="{{ viewRoute ?? '#' }}">
+                                        <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ title }}"></span><br />
+                                    </a>
+                                {% else %}
+                                    <span class="progress-tick tiny {{ currentStatus.css }}" title="{{ title }}"></span><br />
+                                {% endif %}
                             </td>
 
                             {# Scenario Fields evaluated per person by the ai

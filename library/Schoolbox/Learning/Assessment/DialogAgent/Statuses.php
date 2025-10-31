@@ -79,6 +79,7 @@ class Statuses
             return [
                 'status' => self::STATUS_PENDING,
                 'css' => self::CSS_PENDING,
+                'response' => null,
             ];
         }
 
@@ -95,6 +96,7 @@ class Statuses
             return [
                 'status' => self::STATUS_PENDING,
                 'css' => self::CSS_PENDING,
+                'response' => null,
             ];
         }
 
@@ -104,6 +106,7 @@ class Statuses
             return [
                 'status' => self::STATUS_SUBMITTED,
                 'css' => self::CSS_SUBMITTED,
+                'response' => $authoritativeResponse,
                 'submittedAt' => $authoritativeResponse->getSubmittedAt()->getLocal(),
                 'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
             ];
@@ -115,6 +118,7 @@ class Statuses
             return [
                 'status' => self::STATUS_PENDING,
                 'css' => self::CSS_PENDING,
+                'response' => null,
             ];
         }
 
@@ -128,6 +132,7 @@ class Statuses
                 return [
                     'status' => self::STATUS_REQUIRES_ASSISTANCE,
                     'css' => self::CSS_REQUIRES_ASSISTANCE,
+                    'response' => $authoritativeResponse,
                     'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
                 ];
             }
@@ -137,6 +142,7 @@ class Statuses
             return [
                 'status' => self::STATUS_IN_PROGRESS,
                 'css' => self::CSS_IN_PROGRESS,
+                'response' => $authoritativeResponse,
             ];
         }
 
@@ -144,7 +150,8 @@ class Statuses
          */
         return [
             'status' => null,
-            'css' => null
+            'css' => null,
+            'response' => null,
         ];
     }
 }
