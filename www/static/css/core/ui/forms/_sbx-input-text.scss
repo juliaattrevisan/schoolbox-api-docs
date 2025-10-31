@@ -15,11 +15,6 @@
     outline-offset: calc(var(--sbx-border-width-normal) + 1px);
 }
 
-/* So the focus is not active on mouse click */
-@mixin form-input-focus-not-visible {
-    outline: 0;
-}
-
 /* Shared form input disabled styles */
 @mixin form-input-disabled {
     background-color: var(--sbx-color-foreground-secondary);
@@ -102,8 +97,8 @@
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
-/* Inline container used in the story (kept minimal, no structural changes) */
-.inline-input-container {
+/* Inline container used in the story  */
+.sbx .inline-input-container {
     display: inline-flex;
     align-items: stretch;
     gap: var(--sbx-size-s);
