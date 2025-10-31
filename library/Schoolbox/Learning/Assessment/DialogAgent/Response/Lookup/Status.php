@@ -82,11 +82,11 @@ class Status
                 'css' => self::CSS_PENDING,
                 'response' => null,
                 'actions' => [
-                    'view' => null,
-                    'sobo' => null,
-                    'reset' => null,
-                    'reopen' => null,
-                    'assisted' => null
+                    'view' => false,
+                    'sobo' => false,
+                    'reset' => false,
+                    'reopen' => false,
+                    'assisted' => false
                 ],
             ];
         }
@@ -106,11 +106,11 @@ class Status
                 'css' => self::CSS_PENDING,
                 'response' => null,
                 'actions' => [
-                    'view' => null,
-                    'sobo' => null,
-                    'reset' => null,
-                    'reopen' => null,
-                    'assisted' => null
+                    'view' => false,
+                    'sobo' => false,
+                    'reset' => false,
+                    'reopen' => false,
+                    'assisted' => false,
                 ],
             ];
         }
@@ -130,11 +130,11 @@ class Status
                     'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
                 ],
                 'actions' => [
-                    'view' => null,
-                    'sobo' => null,
-                    'reset' => null,
-                    'reopen' => null,
-                    'assisted' => null
+                    'view' => true,
+                    'sobo' => false,
+                    'reset' => false,
+                    'reopen' => true,
+                    'assisted' => false,
                 ],
             ];
         }
@@ -147,11 +147,11 @@ class Status
                 'css' => self::CSS_PENDING,
                 'response' => null,
                 'actions' => [
-                    'view' => null,
-                    'sobo' => null,
-                    'reset' => null,
-                    'reopen' => null,
-                    'assisted' => null
+                    'view' => false,
+                    'sobo' => false,
+                    'reset' => false,
+                    'reopen' => false,
+                    'assisted' => false,
                 ],
             ];
         }
@@ -173,11 +173,11 @@ class Status
                     ],
                 ],
                 'actions' => [
-                    'view' => null,
-                    'sobo' => null,
-                    'reset' => null,
-                    'reopen' => null,
-                    'assisted' => null
+                    'view' => true,
+                    'sobo' => true,
+                    'reset' => true,
+                    'reopen' => false,
+                    'assisted' => true,
                 ],
             ];
         }
@@ -189,11 +189,11 @@ class Status
             'css' => self::CSS_IN_PROGRESS,
             'response' => $authoritativeResponse,
             'actions' => [
-                'view' => null,
-                'sobo' => null,
-                'reset' => null,
-                'reopen' => null,
-                'assisted' => null
+                'view' => true,
+                'sobo' => true,
+                'reset' => true,
+                'reopen' => false,
+                'assisted' => false,
             ],
         ];
     }
