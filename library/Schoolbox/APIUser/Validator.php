@@ -36,7 +36,7 @@ class Validator
         $search = $requestQuery->get('search', '');
         $cursor = $requestQuery->get('cursor', '');
         $limit = $requestQuery->get('limit', '5');
-        $filterJson = $requestQuery->get('filter', '');
+        $filterFromGet = $requestQuery->get('filter', '');
 
         if (!is_string($search)) {
             throw new SchoolboxException("Parameter 'search' must have a string value.");
@@ -58,14 +58,17 @@ class Validator
         $cursor = (string)$cursor; // Set type to that expected according to the API docs.
 
         $filter = null;
-        if ($filterJson === '') {
+        if ($filterFromGet === '') {
             $filter = [];
-        } elseif (is_string($filterJson)) {
+        } elseif (is_string($filterFromGet)) {
             try {
-                $filter = json_decode($filterJson, true, flags: JSON_THROW_ON_ERROR);
+                // Assume $filterFromGet is a JSON-encoded string.
+                $filter = json_decode($filterFromGet, true, flags: JSON_THROW_ON_ERROR);
             } catch (\JsonException) {
                 $filter = null;
             }
+        } elseif (is_array($filterFromGet)) {
+            $filter = $filterFromGet; // The filter wasn't passed as JSON after all.
         }
 
         if (!is_array($filter)) {
