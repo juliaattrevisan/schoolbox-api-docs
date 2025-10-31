@@ -81,6 +81,16 @@ class Statuses
             ];
         }
 
+        /* Submitted: disregard all other statuses
+         */
+        if (null !== $authoritativeResponse->getSubmittedAt()) {
+            return [
+                'status' => self::STATUS_SUBMITTED,
+                'submittedAt' => $authoritativeResponse->getSubmittedAt()->getLocal(),
+                'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
+            ];
+        }
+
         /* No session identifier yet; participant hasn't sent their first message to ai services
          */
         if (null === $authoritativeResponse->getSessionId()) {
@@ -106,16 +116,6 @@ class Statuses
              */
             return [
                 'status' => self::STATUS_IN_PROGRESS,
-            ];
-        }
-
-        /* Submitted: disregard all other statuses
-         */
-        if (null !== $authoritativeResponse->getSubmittedAt()) {
-            return [
-                'status' => self::STATUS_SUBMITTED,
-                'submittedAt' => $authoritativeResponse->getSubmittedAt()->getLocal(),
-                'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
             ];
         }
 
