@@ -61,9 +61,9 @@ if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calend
 }
 
 /* as of 26.0 you can now book resources via the calendar modal */
-$resources = [];
+$resourceIds = [];
 if ($this->config->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
-    $resources = (!isset($_POST['resources']) || '' === (string)$_POST['resources']) ? [] : explode(',', $_POST['resources']);
+    $resourceIds = (!isset($_POST['resources']) || '' === (string)$_POST['resources']) ? [] : explode(',', $_POST['resources']);
 }
 
 $event
@@ -110,7 +110,7 @@ if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner)
 // now create the related resource bookings
 $errors = [];
 $bookingList = new Collection();
-if (!empty($resources)) {
+if (!empty($resourceIds)) {
     // spawn a Resource Booking object here and link it to the event
 
     // augment POST with necessary data for validation (hack the calendar form to look like the resource booking form)
@@ -139,7 +139,7 @@ if (!empty($resources)) {
         \Schoolbox\External\Event\Mapper::getInstance()
     );
 
-    foreach ($resources as $resourceId) {
+    foreach ($resourceIds as $resourceId) {
         /** @var Item\Model $item */
         $item = Item\Mapper::getInstance()->findById((int)$resourceId);
 
