@@ -16,6 +16,7 @@ use Calendar_Api_Composite;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Category;
@@ -151,8 +152,15 @@ class Controller extends Base
             );
 
             $clashingEvents = [];
-            /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
-            foreach ($eventList as $key => $event) {
+            foreach ($eventList as $event) {
+                /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
+
+                // we should always be a resource booking event, but just in case lets add that event and move along..
+                // stan was complaining `Call to an undefined method Calendar\Event\Type\EventInterface::getBooking()` below...
+                if (!$event instanceof \Calendar\Event\Type\ResourceBooking\Event) {
+                    $clashingEvents[] = $event;
+                    continue;
+                }
 
                 // if only clashes, only save if we are a clash.. expensive (we hit the db each call).. but no other way
                 if (
@@ -162,8 +170,7 @@ class Controller extends Base
                         $event->getEndTime()->getDateTimeObject(),
                         $event->getBooking()
                     )
-                )
-                {
+                ) {
                     $clashingEvents[] = $event;
                 }
             }
