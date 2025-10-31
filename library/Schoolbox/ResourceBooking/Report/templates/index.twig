@@ -150,8 +150,16 @@
                     </div>
 
                     <div class="small-6 columns">
+                        <fieldset class="radiolist">
+                            <legend>Clashes</legend>
+                            <ul class="option-list">
+                                <li><input type="radio" name="clashes" value="all" id="clashesAll" checked=""><label for="clashesAll">Show All Bookings</label></li>
+                                <li><input type="radio" name="clashes" value="only" id="clashesOnly"><label for="clashesOnly">Only Show Clash Bookings</label></li>
+                            </ul>
+                        </fieldset>
+
                         <fieldset>
-                            <legend>Show Classes</legend>
+                            <legend>Classes</legend>
                             <input type="hidden" name="classes" value="0" />
                             <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
                             <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
