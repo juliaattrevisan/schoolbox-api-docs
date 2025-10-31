@@ -78,7 +78,7 @@ $app = new class extends CliTool\App {
             }
         }
 
-        if ($acks == 0) {
+        if ($acks === 0) {
             $this->getLogger()->info("No poisoned messages found!");
         } elseif ($this->perform()) {
             $this->getLogger()->info("$acks poisoned messages found and removed");

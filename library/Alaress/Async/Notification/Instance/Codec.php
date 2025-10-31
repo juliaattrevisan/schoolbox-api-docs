@@ -27,7 +27,10 @@ class Codec implements ICodec
      *
      * @param int  $compressionLevel      Compression level to use when encoding
      * @param bool $permissiveUnserialize Whether to allow all classes when unserializing: otherwise, allows only a
-     *                                    known safe set.
+     *                                    known safe set:
+     *                                    * `\Alaress\Async\Notification\Instance\Instance`
+     *                                    * `\Alaress\Async\Notification\Parameter\Param`
+     *                                    * `\Schoolbox\Realtime\Notification\Parameter\SimpleParam`
      */
     public function __construct(
         private int $compressionLevel,
