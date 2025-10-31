@@ -20,7 +20,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
-use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Model as StatusModel;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper;
@@ -136,6 +136,11 @@ class Controller extends Base
                 $collides = $eventList->filter(function ($otherEvent) use ($event) {
                     /* @var \Calendar\Event\Type\ResourceBooking\Event $otherEvent */
                     /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
+
+                    // only care if the booking is pending, so we can see conflicts (that we need to action)
+                    if ($otherEvent->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
+                        return false;
+                    }
 
                     // skip ourself
                     if ($otherEvent->getBooking()->getId() === $event->getBooking()->getId()) {
