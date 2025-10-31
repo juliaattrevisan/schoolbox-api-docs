@@ -17,103 +17,30 @@ Usage:
 <script type="text/javascript">
     $(function () {
 
-        $('[data-collapser]').collapsable();
-
         // Mage Buttons
-        var $mageNextButton = $('[data-mage-next="unit-info"]');
-        var $mageCreateUnitButton = $('[data-mage-next="spawn-unit"]');
-        var $mageSaveCourseButton = $('[data-mage-next="main-course"]');
-
+        const $mageNextButton = $('[data-mage-next="unit-info"]');
+        const $mageSaveCourseButton = $('[data-mage-next="main-course"]');
 
         /**
          * Apply the javascript validator
-         *
-         * @param modifyValidation
+         * @param modifyValidation - validation rules and messages
          */
         function initValidator(modifyValidation) {
             $("#update-course-form").alaressValidate(modifyValidation);
-
-            $('[data-unit-name]').each(function() {
-                $(this).rules('add', {
-                    requiredNotBlank: true,
-                    messages: {
-                        required: "Please enter a name for this {{ locale.unit }}."
-                    }
-                });
-            });
-
-            {# This validation was triggering even though it was okay to be empty
-             # That condition exists when you want to save the course without
-             # creating a new unit; as usual, solve the problem by deleting the problem
-             #}
-            if ($('[data-unit-spec]').length) {
-                $mageSaveCourseButton.on('click', function () {
-                    $('[data-new-unit]').remove();
-                });
-            }
         }
-
-
-        /**
-         *  Toggle button availability
-         *
-         *  @return void
-         */
-        function toggleSaveCourse() {
-            let invalidUnits = 0;
-            let hasUnits = $('[data-unit-spec]').length;
-
-            /* No units? No submit
-             */
-            if (!hasUnits) {
-                $mageSaveCourseButton.attr('disabled', true);
-                return;
-            }
-
-            /* Every unit must have a name
-             */
-            $.each($('[data-unit-name]'), function(index, element) {
-                if ($.trim($(element).val()) === '') {
-                    invalidUnits++;
-                }
-            });
-
-            if (invalidUnits) {
-                $mageSaveCourseButton.attr('disabled', true);
-            } else {
-                $mageSaveCourseButton.attr('disabled', false);
-            }
-        }
-
-
-        /* Disable save course button while editing is occurring
-         * Check that all the units have names
-         * This is built excessively because of various input methods like copy-paste
-         * and tabindexing
-         */
-        toggleSaveCourse();
-
-        $(document).on('keyup', '[data-unit-name]', function() {
-            toggleSaveCourse();
-        });
-
 
         /**
          * Validation for the final save course form
          * (the other validation is done in each mage step below)
          */
-        var modifyValidation = {
+        const modifyValidation = {
             rules: {
                 name: "required",
                 parent: "required",
-                newUnitName: {
-                    requiredNotBlank: true
-                }
             },
             messages: {
                 name: "Please enter a name for this course.",
                 parent: "Please select a {{ locale.faculty }} or {{ locale.class }} for this course.",
-                newUnitName: 'Please create at least one {{ locale.unit }} for this course.'
             },
             onfocusout: false,
             onkeyup: false
@@ -124,58 +51,15 @@ Usage:
          */
         initValidator(modifyValidation);
 
-
-        /**
-         * Deletion of Units
-         */
-        $(document).on('click', '[data-action="delete-unit"]', function (e) {
-            e.preventDefault();
-            var $button = $(this);
-
-            $(this).confirmDialog({
-                text: 'Are you sure you wish to delete this {{ locale.unit }}? This will also delete all {{ locale.activity.plural }} in the {{ locale.unit }}.',
-                confirmEvent: function () {
-                    $.post($button.attr('href'))
-                        .done(function () {
-                            var $listItem = $button.closest('[data-unit-spec]');
-
-                            $listItem.slideUp(400, function () {
-                                $listItem.detach();
-
-                                /* Toggle button availability
-                                 */
-                                toggleSaveCourse();
-                            });
-                        });
-                }
-            });
-        });
-
-        var newUnitName = $('#new-unit-name');
-
         // 'Next' Button
         $mageNextButton.mage({
             reenablePrevious: true,
             onXhrDone: function (data) {
                 if (data.id) {
-                    // Update the Browser URL
-                    history.pushState(data, '', data['urlModifyCourse']);
-
-                    // Update the DOM
-                    $mageCreateUnitButton.attr('formaction', data['urlNewUnit']);
-                    $mageSaveCourseButton.parents('form').attr('action', data['urlModifyCourse']);
+                    // Update the Browser URL, navigating to the new unit planner
+                    const coursePlanUrl = `{{ routeLookup('coursePlan.getPlan') }}`;
+                    window.location.href = `${coursePlanUrl.replace("{id}", data.id)}?isNewCourse=1`;
                 }
-                // Remove the submit row
-                $mageNextButton.closest('[data-mage-submitrow]').slideUp(400, function () {
-                    $(this).detach();
-                });
-                $mageNextButton.mage('enable');
-
-                // Show the 'New Unit' section
-                $mageCreateUnitButton.closest('[data-mage-collapsed]').slideDown();
-
-                // Display the 'Save Course' section
-                $mageSaveCourseButton.closest('[data-mage-collapsed]').slideDown();
             },
 
             // Reset validation always
@@ -199,75 +83,10 @@ Usage:
             }
         });
 
-        // 'Create Unit' Button
-        $mageCreateUnitButton.mage({
-            reenablePrevious: true,
-            submittable: '[data-unit-spec]',
-
-            setFormData: function (formData) {
-                formData.push({name: 'name', value: newUnitName.val()});
-            },
-
-            onXhrDone: function (data) {
-                var newDOM = $(data).hide();
-                $('[data-unit-list]').append(newDOM);
-                /* 400ms is the default value
-                 */
-                newDOM.slideDown(400, function() {
-                    /* Toggle button availability after the animation finishes
-                     *
-                     * If you do it too soon, toggleSaveCourse can't recognise the
-                     * injection of the new html (hasUnits returns 0 too quickly)
-                     */
-                    toggleSaveCourse();
-
-                    {# This validation was triggering even though it was okay to be empty
-                     # That condition exists when you want to save the course without
-                     # creating a new unit; as usual, solve the problem by deleting the problem
-                     #}
-                    if ($('[data-unit-spec]').length) {
-                        $mageSaveCourseButton.on('click', function () {
-                            $('[data-new-unit]').remove();
-                        });
-                    }
-                });
-                newDOM.find('[data-collapser]').collapsable();
-                //I'm not sure what's going on in here, but a new version of jQuery has added a
-                //display:block to this script tag, which will render out the tag code contents
-                //into the browser, so it needs to be removed. Perhaps $().before() adds it in.
-                if (newDOM[0].tagName === "SCRIPT") { //just make sure it only applies to <script> tags, as I don't know if this is accessed in other ways
-                    newDOM[0].style.display = 'none';
-                }
-                newUnitName.val('');
-                $(this).val($(this).data('mage-reset')).removeAttr('disabled').removeData('mage-submitted');
-                $(document).foundation();
-            },
-
-            // Reset validation always
-            onXhrAlways: function() {
-                initValidator(modifyValidation);
-
-                /* Toggle button availability
-                 */
-                toggleSaveCourse();
-            },
-
-            validateOptions: {
-                rules: {
-                    newUnitName: {
-                        requiredNotBlank: true
-                    }
-                },
-                messages: {
-                    newUnitName: "Please enter a name for your new {{ locale.unit }}"
-                }
-            }
-        });
-
         {# only alert on changing templates if we have changed the template #}
         {% if courseSpec %}
         // Template input: show a warning if changing the selected option
-        var templateInput = $('[data-template]');
+        const templateInput = $('[data-template]');
 
         templateInput.change(function() {
             $("[data-template-warning]").toggleClass("hide", Number({{ courseSpec.template.id ?? null }}) === Number(templateInput.val()));
@@ -277,96 +96,15 @@ Usage:
 
         // Automatically expand the Unit specified in the URL hash
         if (window.location.hash) {
-            var unitSpecId = window.location.hash.slice(1);
+            const unitSpecId = window.location.hash.slice(1);
             $('[data-collapser=unit-' + unitSpecId + ']').trigger('click');
         }
-
-        // To track if we need to re-expand the unit after dragging
-        let currentDraggedUnitWasExpanded = false;
-        // If the units can be sorted, set up the drag/drop functionality
-        $('[data-unit-list][data-sortable]').sortable({
-            placeholder: 'sortable-placeholder',
-            items: '> [data-unit-spec]',
-            forcePlaceholderSize: true,
-            handle: '[data-grip-unit]',
-            axis: 'y',
-            start: function (event, ui) {
-                const unitId = ui.item.data('unit-spec');
-
-                // Set the height of the placeholder to match the INITIAL height of the item, so we can transition it if needed
-                ui.placeholder.height(ui.item.outerHeight());
-
-                // Collapse the unit when dragging
-                // (cannot use JQuery to read data attributes as it does not update the value...)
-                currentDraggedUnitWasExpanded = document.querySelector(`[data-collapsable="unit-${unitId}"]`).dataset.collapseState === 'uncollapsed';
-                if (currentDraggedUnitWasExpanded) {
-                    ui.item.find(`[data-collapser="unit-${unitId}"]`).trigger('click');
-
-                    // We need to use the padding of the item and the inner item height as the new placeholder height
-                    // as the placeholder already has a fixed height set and we need to wait for the collapse animation
-                    // to finish before it will be correct.
-                    const itemPadding = parseInt(window.getComputedStyle(ui.item[0]).paddingTop, 10) * 2;
-                    const actionsItemHeight = ui.item.find('[data-unit-actions]').outerHeight();
-                    const actualItemHeight = actionsItemHeight + itemPadding;
-
-                    // 400 is the default collapse animation time from $(...).slideUp()
-                    const collapseTime = 400;
-
-                    // Instead of immediately changing the height, animate it to the new height so that the height change
-                    // matches with the height change as a result of the collapse animation.
-                    ui.helper.animate({height: actualItemHeight}, collapseTime, 'linear');
-                    ui.placeholder.animate({height: actualItemHeight}, collapseTime, 'linear');
-
-                    // Ensure sortable is aware of the new height of the placeholder
-                    setTimeout(() => {
-                        $('[data-unit-list][data-sortable]').sortable('refreshPositions');
-                    }, collapseTime);
-                }
-            },
-            update: async function (event, ui) {
-                const sequence = Array.from(document.querySelectorAll('[data-unit-spec]')).map((unit) => parseInt(unit.dataset.folderId, 10));
-
-                var $toastFeedback = $('[data-relation="ajax-response"]');
-                $toastFeedback.toastActivate({ text: "Saving..." });
-                try {
-                    const currentSequence = sequence;
-                    const response = await fetch($(this).data('action'), {
-                        method: "POST",
-                        body: JSON.stringify({
-                            sequence: currentSequence,
-                        }),
-                        headers: {
-                            Accept: "application/json",
-                            "Content-Type": "application/json",
-                        },
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(response);
-                    }
-
-                    $toastFeedback.toastTimeout({ text: "Save successful", css: "success" });
-                } catch (error) {
-                    $toastFeedback.toastTimeout({ text: "Save failed!", css: "alert" });
-                }
-            },
-            stop: function (event, ui) {
-                // Re-expand the unit if it was expanded before dragging
-                if (currentDraggedUnitWasExpanded) {
-                    const unitId = ui.item.data('unit-spec');
-                    ui.item.find(`[data-collapser="unit-${unitId}"]`).trigger('click');
-                }
-
-                // Unset any temporary height set on the placeholder
-                ui.placeholder.css('height', '');
-            }
-        });
 
         // Re apply course framework
         $('a[data-action="reapply-framework"]').on('click', function (event) {
             event.preventDefault();
 
-            var element = $(this);
+            const element = $(this);
 
             element.confirmDialog({
                 header: "Are you sure you wish to re-apply the framework?",
@@ -539,65 +277,6 @@ Usage:
                             </div>
                         </div>
                     {% endif %}
-                </fieldset>
-                <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec %} disabled="disabled"{% endif %}>
-                    <legend>{{ locale.unit.properPlural }}</legend>
-                    {# Don't delete the inline style, it's needed -#}
-                    <div class="small-12 column no-pad"{% if not courseSpec %} style="display:none;"{% endif %} data-mage-collapsed>
-
-                        <ul
-                            {% if courseSpec %}
-                                class="information-list unit-list sortable-card ui-sortable"
-                                data-sortable
-                                data-unit-list
-                                data-action="{{ routeLookup('folder.postFolderSequence', {id: courseSpec.folder.id, folder: courseSpec.folder}) }}"
-                            {% else %}
-                                data-unit-list
-                                class="information-list unit-list"
-                            {% endif %}
-                        >
-                            {% if courseSpec %}
-                            {% for unitSpec in courseSpec.units|sort((a,b) => b.folder.sequence <=> a.folder.sequence) %}
-                                {% if folderAccess[unitSpec.folder.id] > 0 %}
-                                    {% include '@course/unit.twig' with {
-                                        unitSpec:         unitSpec,
-                                        encodedReturnUrl: encodedReturnUrls[unitSpec.id],
-                                        '_expanded':      false,
-                                        '_writable':      folderAccess[unitSpec.folder.id] > 1,
-                                        toastSelector:    '[data-relation="ajax-response"]'
-                                    } only %}
-                                {% endif %}
-                            {% endfor %}
-                            {% endif %}
-                        </ul>
-                        {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
-                        {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
-                            <div data-new-unit>
-                                <div class="list-item">
-                                    <div class="new-unit">
-                                        <label for="newUnitName">{{ locale.unit.proper }} name</label>
-                                        <div class="input-group">
-                                            <input type="text" value="" placeholder="New {{ locale.unit }} name" id="new-unit-name" data-test="course-new-unit-name" name="newUnitName" maxlength="255" />
-                                            <button name="spawn-unit"
-                                                    class="button icon-add"
-                                                    data-test="course-new-unit-add"
-                                                    data-mage-next="spawn-unit"
-                                                    data-mage-working="Working..."
-                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
-                                            >Create {{ locale.unit.proper }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small-12 column">
-                                        {# Don't delete the inline style, it's needed -#}
-                                        <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                        <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
-                    </div>
                 </fieldset>
             </section>
 

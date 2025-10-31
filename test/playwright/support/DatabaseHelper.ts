@@ -222,8 +222,13 @@ export default class DatabaseHelper {
         column: string,
         criteria: CriteriaPairs | CriteriaPairs[] = {},
     ): Promise<unknown> {
-        const results = await this.grabColumnFromDatabase(table, column, criteria);
-        return results[0] || null;
+        try {
+            const results = await this.grabColumnFromDatabase(table, column, criteria);
+            return results[0] || null;
+        } catch (error) {
+            console.error(`Error fetching ${column} from ${table}:`, error);
+            return null;
+        }
     }
 
     /**

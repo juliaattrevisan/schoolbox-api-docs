@@ -204,54 +204,22 @@ test.describe("Unit Planner Tests", () => {
             await page.getByRole("treeitem", { name: " English" }).click();
             await page.getByRole("button", { name: "Use this folder" }).click();
 
-            tester.isGoingTo("click Next to create the course");
+            tester.isGoingTo("click Next to create the course and go to unit planner");
             await page.getByRole("button", { name: "Next" }).click();
-
-            tester.isGoingTo("wait for the URL to change to course/modify/{courseId}");
-            await page.waitForURL("**/course/modify/*");
-
-            // grab the courseId from the URL after the navigation is complete
-            const courseId = page.url().split("/").pop();
-            console.warn(`Created course with ID ${courseId}`);
-
-            tester.isGoingTo("navigate to unit planner page to verify empty units message");
-            await page.goto(`/course/plan/${courseId}`);
 
             tester.isGoingTo("confirm the empty units message is visible");
             await expect(page.getByText("This course currently does not have any units")).toBeVisible();
 
-            tester.isGoingTo("click the 'creating a unit' button to open the modal");
-            await page.getByRole("button", { name: "creating a unit." }).click();
+            tester.isGoingTo("confirm the create units modal is immediatey visible");
+            await expect(page.getByTestId(`up-add-units-title`)).toBeVisible();
 
             tester.isGoingTo("create both units using the modal and verify they are visible");
             await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
         } finally {
-            tester.isGoingTo("remove the units and course created");
-            const firstUnitFolderId = (await db.grabFromDatabase("folder", "id", {
-                name: firstUnitName,
-            })) as number | null;
-            if (firstUnitFolderId !== null) {
-                await db.dontHaveInDatabase("homepage_config", { cid: firstUnitFolderId });
-                await db.dontHaveInDatabase("perms", { cid: firstUnitFolderId });
-                await db.dontHaveInDatabase("course_unit_specification", { folder_id: firstUnitFolderId });
-                await db.dontHaveInDatabase("folder", { id: firstUnitFolderId });
-            }
-            const secondUnitFolderId = (await db.grabFromDatabase("folder", "id", {
-                name: secondUnitName,
-            })) as number | null;
-            if (secondUnitFolderId !== null) {
-                await db.dontHaveInDatabase("homepage_config", { cid: secondUnitFolderId });
-                await db.dontHaveInDatabase("perms", { cid: secondUnitFolderId });
-                await db.dontHaveInDatabase("course_unit_specification", { folder_id: secondUnitFolderId });
-                await db.dontHaveInDatabase("folder", { id: secondUnitFolderId });
-            }
-            const courseFolderId = (await db.grabFromDatabase("folder", "id", { name: courseName })) as number | null;
-            if (courseFolderId) {
-                await db.dontHaveInDatabase("course_specification", { folder_id: courseFolderId });
-                await db.dontHaveInDatabase("homepage_config", { cid: courseFolderId });
-                await db.dontHaveInDatabase("perms", { cid: courseFolderId });
-                await db.dontHaveInDatabase("folder", { id: courseFolderId });
-            }
+            tester.isGoingTo("delete the units and course created");
+            await UnitPlanner.dbDeleteUnit(db, firstUnitName);
+            await UnitPlanner.dbDeleteUnit(db, secondUnitName);
+            await UnitPlanner.dbDeleteCourse(db, courseName);
         }
     });
 
@@ -331,16 +299,8 @@ test.describe("Unit Planner Tests", () => {
             tester.isGoingTo("create a new unit using the modal and verify it is visible");
             await unitPlanner.createUnitsInModal([firstUnitName]);
         } finally {
-            tester.isGoingTo("remove the unit created");
-            const newUnitFolderId = (await db.grabFromDatabase("folder", "id", {
-                name: firstUnitName,
-            })) as number | null;
-            if (newUnitFolderId !== null) {
-                await db.dontHaveInDatabase("homepage_config", { cid: newUnitFolderId });
-                await db.dontHaveInDatabase("perms", { cid: newUnitFolderId });
-                await db.dontHaveInDatabase("course_unit_specification", { folder_id: newUnitFolderId });
-                await db.dontHaveInDatabase("folder", { id: newUnitFolderId });
-            }
+            tester.isGoingTo("delete the unit created");
+            await UnitPlanner.dbDeleteUnit(db, firstUnitName);
         }
     });
 

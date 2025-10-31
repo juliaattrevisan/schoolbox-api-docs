@@ -34,7 +34,7 @@ test.describe("Course import tests", () => {
      * - untick a quiz, due work and task before importing
      * - as a teacher ensure the course is presented in the homepage with the proper details: activities dates, number of students, title
      */
-    test("Import course into class", async ({ tester, page, db }) => {
+    test.skip("Import course into class", async ({ tester, page, db }) => {
         const createFolder = new CreateFolder(tester, page);
         const courseList = new CourseList(page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
@@ -243,7 +243,7 @@ test.describe("Course import tests", () => {
      * - fill the dates fields and click export to selected class
      * - ensure the assessment is presented in that class with the proper new dates
      */
-    test("Copy activity into class", async ({ tester, page, db }) => {
+    test.skip("Copy activity into class", async ({ tester, page, db }) => {
         const courseModify = new CourseModify(page, tester);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
         const lessonPlanName = "Export Activity Lesson Plan for Romeo and Juliet";

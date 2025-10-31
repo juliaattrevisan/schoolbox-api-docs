@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 import type { Page } from "@playwright/test";
 
 export default class UnitPlanner {
@@ -243,8 +244,8 @@ export default class UnitPlanner {
 
     /**
      * Click the confirm delete node button
+     * @param folderId - The ID of the folder
      */
-
     async clickConfirmDeleteNodeButton(folderId: number): Promise<void> {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_MODAL_CONFIRM_DELETE_NODE.replace("{folderId}", folderId.toString()))
@@ -254,9 +255,8 @@ export default class UnitPlanner {
 
     /**
      * Click the confirm delete node button
-     * @param folderId - The ID of the folder
+     * @param tabName - The name of the tab
      */
-
     async clickUnitPlannerTabs(tabName: string): Promise<void> {
         await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_TABS.replace("{tabName}", tabName)).click();
     }
@@ -298,6 +298,40 @@ export default class UnitPlanner {
         await this.page.reload();
         for (const unitName of unitNames) {
             await expect(this.page.getByTestId(/^unit-planner-unit-link-/).getByText(unitName)).toBeVisible();
+        }
+    }
+
+    /**
+     * Delete a unit from the database
+     * @param db - The database helper
+     * @param unitName - The name of the unit to delete
+     */
+    static async dbDeleteUnit(db: DatabaseHelper, unitName: string): Promise<void> {
+        const folderId = (await db.grabFromDatabase("folder", "id", {
+            name: unitName,
+        })) as number | null;
+        if (folderId !== null) {
+            await db.dontHaveInDatabase("homepage_config", { cid: folderId });
+            await db.dontHaveInDatabase("perms", { cid: folderId });
+            await db.dontHaveInDatabase("course_unit_specification", { folder_id: folderId });
+            await db.dontHaveInDatabase("folder", { id: folderId });
+        }
+    }
+
+    /**
+     * Delete a course from the database
+     * @param db - The database helper
+     * @param courseName - The name of the course to delete
+     */
+    static async dbDeleteCourse(db: DatabaseHelper, courseName: string): Promise<void> {
+        const folderId = (await db.grabFromDatabase("folder", "id", {
+            name: courseName,
+        })) as number | null;
+        if (folderId !== null) {
+            await db.dontHaveInDatabase("course_specification", { folder_id: folderId });
+            await db.dontHaveInDatabase("homepage_config", { cid: folderId });
+            await db.dontHaveInDatabase("perms", { cid: folderId });
+            await db.dontHaveInDatabase("folder", { id: folderId });
         }
     }
 }

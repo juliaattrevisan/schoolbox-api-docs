@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import UpAddUnits from "../up-add-units-modal.vue";
 import { useAddUnitsStore } from "../store/unitPlannerAddUnitsStore";
 import { useUnitPlannerStore } from "../store/unitPlannerStore";
@@ -22,18 +22,28 @@ jest.mock("@js/util/sbx/apiUtils", () => ({
     apiRequest: jest.fn(),
 }));
 
-// Mock global properties
+// Extend the existing window.Vue setup from jest-setup.js
 global.window = {
     ...global.window,
     Vue: {
+        ...global.window.Vue,
         ref,
         computed,
+        onMounted,
         watch: jest.fn(),
     },
     sbProps: {
+        ...global.window.sbProps,
         toastActivate: jest.fn(() => ({
             timeout: jest.fn(),
         })),
+    },
+    location: {
+        search: "",
+        pathname: "/test-path",
+    },
+    history: {
+        replaceState: jest.fn(),
     },
 };
 

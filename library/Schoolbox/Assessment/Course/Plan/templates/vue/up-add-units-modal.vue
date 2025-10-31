@@ -19,6 +19,23 @@ function onAddSelected(): void {
     }
     void addUnitsStore.create();
 }
+
+/**
+ * Check for the existence of ?isNewCourse=1 query param and
+ * if found show the add units modal automatically
+ */
+window.Vue.onMounted(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("isNewCourse") === "1") {
+        addUnitsStore.prompt();
+        urlParams.delete("isNewCourse");
+        window.history.replaceState(
+            {},
+            "",
+            `${window.location.pathname}${urlParams.toString().length > 0 ? `?${urlParams.toString()}` : ""}`,
+        ); // remove the param from the URL
+    }
+});
 </script>
 
 <template>

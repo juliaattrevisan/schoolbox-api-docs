@@ -11,6 +11,7 @@ import { vOnClickOutside } from "@vueuse/components";
 
 interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
+    isCloseDisabled?: boolean; // Whether to disable closing the modal
     size?: "m" | "s"; // Size of the modal, 'm' for medium and 's' for small
 }
 const props = defineProps<Props>();
@@ -36,6 +37,9 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
  * To close the modal
  */
 function close(): void {
+    if (props.isCloseDisabled) {
+        return;
+    }
     if (!isOpen.value) return;
     isOpen.value = false;
 }
@@ -121,9 +125,9 @@ function onBackgroundClick(): void {
     }
     &:has(.modal__container--s) {
         .modal__container--s {
-            width: 500px;
+            width: 600px;
         }
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             .modal__container--s {
                 width: 100%;
             }
