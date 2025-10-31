@@ -604,15 +604,17 @@ class Controller extends Assessment\Controller
     /**
      * @inheritDoc
      *
-     * @param IAssessable $assessment
+     * @param IAssessable|Model $assessment
      * @return void
+     * @throws Error
      */
-    public function getStatus(IAssessable $assessment): void
+    public function getStatus(IAssessable|Model $assessment): void
     {
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',
             [
                 'assessment' => $assessment,
+                'statuses' => (new Statuses())->generate($assessment),
             ]
         );
     }

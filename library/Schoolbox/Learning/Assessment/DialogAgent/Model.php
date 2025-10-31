@@ -178,14 +178,7 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeResponse(Participant $participant, $publishedOnly): ?IResponse
     {
-        // TODO: Implement getAuthoritativeResponse() method.
-        //  foreach ($participant responses) {
-        //      if $response->getAuthoritative() {
-        //          return true;
-        //      }
-        //  }
-
-        return null;
+        return $participant->getAllResponses()->filterBy('authoritative', true)->first();
     }
 
 

@@ -71,18 +71,34 @@
                             <td>
                                 <div class="card small-12 compact">
                                     <a href="#">
-                                        <img src="/portrait.php?id={{ participant.user.id }}&size=square64">
+                                        <img src="/portrait.php?id={{ participant.user.id }}&size=square64" alt="{{ participant.user.fullname }}">
                                         <h3>
                                             {{ participant.user.fullname }}
                                         </h3>
                                     </a>
                                 </div>
                             </td>
+                            <td>
+                                {% set title = '' %}
+                                {% set currentStatus = statuses[participant.user.id] %}
+
+                                {# Assistance requested #}
+                                {% if currentStatus.assistanceDate is defined %}
+                                    {% set title = currentStatus.assistanceDate.database %}
+                                {% endif %}
+
+                                {# Submitted #}
+                                {% if currentStatus.submittedAt is defined %}
+                                    {% set title = 'Submitted at ' ~ currentStatus.submittedAt ~ ' by ' ~ currentStatus.submittedBy %}
+                                {% endif %}
+
+                                <span title="{{ title }}">
+                                    {{ currentStatus.status }}
+                                </span>
+                            </td>
+
                             {# Scenario field outcomes #}
 
-                            <td>
-                                status
-                            </td>
                             <td>
                                 actions
                             </td>
