@@ -21,7 +21,7 @@ class Mapper extends BaseMapper
     /**
      * Setup mapper
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('differentiation_profiles_adjustment_category');
         $this->hasModel(Model::class);

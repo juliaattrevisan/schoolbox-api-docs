@@ -56,7 +56,7 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $pageCurrent = $this->routeGenerator->generate('differentiationProfiles.getIndex');
+        $pageCurrent = $this->routeGenerator->generate('adminDifferentiationProfiles.getIndex');
 
         /* Get all the configs and sort it by sequence, so it will always be in the sequence order
          */
@@ -76,13 +76,13 @@ class Controller extends ConfigController
                  );
 
         $this->response = $this->responseFromTemplate(
-            '@differentiationProfiles/index.twig',
+            '@adminDifferentiationProfiles/index.twig',
             [
                 'pageCurrent'    => $pageCurrent,
                 'allBreadcrumbs' => new Subnav(
                     $this->getConfigLoader(),
                     $this->getUser()
-                )->generateBreadcrumbs($this->routeGenerator->generate('differentiationProfiles.getIndex')),
+                )->generateBreadcrumbs($this->routeGenerator->generate('adminDifferentiationProfiles.getIndex')),
                 'returnUrl' => Redirect::encode($pageCurrent),
                 'data' => [
                     'differentiationProfiles' => [
@@ -97,7 +97,7 @@ class Controller extends ConfigController
                     ]
                 ],
                 '_routes' => [
-                    'update' => $this->getRouteIfAuthorized('differentiationProfiles.postConfig')
+                    'update' => $this->getRouteIfAuthorized('adminDifferentiationProfiles.postConfig')
                 ],
             ],
             'Differentiation Profiles'

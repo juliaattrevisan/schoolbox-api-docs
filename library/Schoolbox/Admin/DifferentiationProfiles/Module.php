@@ -24,7 +24,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'differentiationProfiles';
+    protected $basename = 'adminDifferentiationProfiles';
 
 
     /**

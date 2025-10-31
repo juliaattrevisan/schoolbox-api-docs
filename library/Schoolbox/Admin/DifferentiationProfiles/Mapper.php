@@ -36,4 +36,12 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('module', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
     }
+
+    protected function getDefaultOrderByParams(): array
+    {
+        return [
+          'module' => 'ASC',
+          'sequence' => 'ASC',
+        ];
+    }
 }
