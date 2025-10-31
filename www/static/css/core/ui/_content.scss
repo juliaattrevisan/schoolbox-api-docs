@@ -593,7 +593,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             transform: rotate(-135deg);
         }
     }
-    &.assistance-requested {
+    &.requires-assistance {
         @extend .icon-approve;
         background-color: $warning-color;
         transform: rotate(135deg);

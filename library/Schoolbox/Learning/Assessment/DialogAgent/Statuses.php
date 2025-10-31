@@ -14,10 +14,23 @@ use Schoolbox\Learning\Assessment\Participant;
 
 class Statuses
 {
+    /**
+     * Consts correlating to a nice phrase to say in frontend world
+     */
     private const string STATUS_PENDING = 'Pending';
     private const string STATUS_IN_PROGRESS = 'In Progress';
-    private const string STATUS_REQUESTED_ASSISTANCE = 'Requires Assistance';
+    private const string STATUS_REQUIRES_ASSISTANCE = 'Requires Assistance';
     private const string STATUS_SUBMITTED = 'Submitted';
+
+
+    /**
+     * Consts correlating to progress tick cosmetics, as defined in _content.scss where I've already left
+     * a note for snake to please refactor these styles in some reptilian manner
+     */
+    private const string CSS_PENDING = 'pending';
+    private const string CSS_IN_PROGRESS = 'in-progress';
+    private const string CSS_REQUIRES_ASSISTANCE = 'requires-assistance';
+    private const string CSS_SUBMITTED = 'submitted';
 
 
     /**
@@ -63,6 +76,7 @@ class Statuses
         if (!$participant->getAllResponses()->count()) {
             return [
                 'status' => self::STATUS_PENDING,
+                'css' => self::CSS_PENDING,
             ];
         }
 
@@ -78,6 +92,7 @@ class Statuses
         if (null === $authoritativeResponse) {
             return [
                 'status' => self::STATUS_PENDING,
+                'css' => self::CSS_PENDING,
             ];
         }
 
@@ -86,6 +101,7 @@ class Statuses
         if (null !== $authoritativeResponse->getSubmittedAt()) {
             return [
                 'status' => self::STATUS_SUBMITTED,
+                'css' => self::CSS_SUBMITTED,
                 'submittedAt' => $authoritativeResponse->getSubmittedAt()->getLocal(),
                 'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
             ];
@@ -96,6 +112,7 @@ class Statuses
         if (null === $authoritativeResponse->getSessionId()) {
             return [
                 'status' => self::STATUS_PENDING,
+                'css' => self::CSS_PENDING,
             ];
         }
 
@@ -107,7 +124,8 @@ class Statuses
              */
             if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
                 return [
-                    'status' => self::STATUS_REQUESTED_ASSISTANCE,
+                    'status' => self::STATUS_REQUIRES_ASSISTANCE,
+                    'css' => self::CSS_REQUIRES_ASSISTANCE,
                     'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
                 ];
             }
@@ -116,6 +134,7 @@ class Statuses
              */
             return [
                 'status' => self::STATUS_IN_PROGRESS,
+                'css' => self::CSS_IN_PROGRESS,
             ];
         }
 
@@ -123,6 +142,7 @@ class Statuses
          */
         return [
             'status' => null,
+            'css' => null
         ];
     }
 }

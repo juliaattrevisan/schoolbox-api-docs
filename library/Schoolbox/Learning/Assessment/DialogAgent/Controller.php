@@ -609,6 +609,7 @@ class Controller extends Assessment\Controller
      * @throws Deleted
      * @throws Error
      * @throws Exception
+     * @throws RouteNotFound
      */
     public function getStatus(IAssessable|Model $assessment): void
     {
