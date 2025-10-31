@@ -79,6 +79,9 @@ if ($_SESSION['communityLogin'] ?? false) {
         );
     }
 
+    //Remember that the user has attempted to login once, next time we will go directly to the page
+    $_SESSION['communityLogin'] = true;
+
     /* Set the URL to redirect the user to after login */
     if (isset($_GET['page'])) {
         if (isset($_GET['menu'])) {
@@ -133,8 +136,6 @@ if ($_SESSION['communityLogin'] ?? false) {
     $formArray['loginButton'] = 'Login';
     $formArray['textBox1'] = $user->getUsername();
     $formArray['textBox2'] = $password;
-
-    $_SESSION['communityLogin'] = true;
 }
 ?>
 
