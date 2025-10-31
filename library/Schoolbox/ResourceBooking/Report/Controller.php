@@ -20,6 +20,7 @@ use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Item\Mapper;
 
 class Controller extends Base
 {
@@ -51,10 +52,16 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Item\Mapper            $itemMapper
-     * @param Category\Mapper        $categoryMapper
+     * @param Mapper $itemMapper
+     * @param Category\Mapper $categoryMapper
      * @param Calendar_Api_Composite $api
-     * @param CalendarApiFactory     $apiFactory
+     * @param CalendarApiFactory $apiFactory
+     * @param BookingMapper $bookingMapper
+     * @param StatusMapper $statusMapper
+     * @param TermMapper $termMapper
+     * @param \External_Timetable $externalTimetableHandler
+     * @param CampusMapper $campusMapper
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
      */
     public function __construct(
         Item\Mapper $itemMapper,
