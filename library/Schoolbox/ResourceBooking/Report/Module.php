@@ -17,6 +17,10 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
 use Calendar_Api_Composite;
 use External_Timetable;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\ResourceBooking\Booking\Mapper as BookingMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as StatusMapper;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\ResourceBooking\Category;
@@ -70,6 +74,8 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $eventMapper = $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class);
+
         return new Controller(
             $this->getMapperFactory()->get(Item\Mapper::class),
             $this->getMapperFactory()->get(Category\Mapper::class),
@@ -77,8 +83,14 @@ class Module extends BaseModule
             new CalendarApiFactory(
                 $this->injector->get('user'),
                 new External_Timetable(),
-                $this->getMapperFactory()->get(\Schoolbox\External\Event\Mapper::class)
+                $eventMapper
             ),
+            $this->getMapperFactory()->get(BookingMapper::class),
+            $this->getMapperFactory()->get(StatusMapper::class),
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(\External_Timetable::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $eventMapper,
         );
     }
 }

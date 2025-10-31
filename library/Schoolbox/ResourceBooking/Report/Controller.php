@@ -60,7 +60,13 @@ class Controller extends Base
         Item\Mapper $itemMapper,
         Category\Mapper $categoryMapper,
         Calendar_Api_Composite $api,
-        CalendarApiFactory $apiFactory
+        CalendarApiFactory $apiFactory,
+        private BookingMapper $bookingMapper,
+        private StatusMapper $statusMapper,
+        private TermMapper $termMapper,
+        private \External_Timetable $externalTimetableHandler,
+        private CampusMapper $campusMapper,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
     ) {
         $this
             ->setItemMapper($itemMapper)
@@ -152,16 +158,15 @@ class Controller extends Base
 
         // if we are only showing clashes, filter the event list now
         if ($clashesOnly) {
-            // TODO: inject these things...
             $validation = new Validation(
                 $this->getUser(),
-                BookingMapper::getInstance(),
-                StatusMapper::getInstance(),
-                TermMapper::getInstance(),
-                $this->getDi()->get('externalTimetable'),
-                CampusMapper::getInstance(),
+                $this->bookingMapper,
+                $this->statusMapper,
+                $this->termMapper,
+                $this->externalTimetableHandler,
+                $this->campusMapper,
                 $this->getConfigLoader(),
-                \Schoolbox\External\Event\Mapper::getInstance(),
+                $this->eventMapper
             );
 
             $clashingEvents = [];
