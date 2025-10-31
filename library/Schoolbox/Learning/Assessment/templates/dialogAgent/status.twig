@@ -1,0 +1,65 @@
+{##
+ # Status screen for Dialog Agents
+ #
+ # Here you can see a strategic overview of people doing their responses and whether they needed help.
+ # Async endpoints fulfil mutations and this polls periodically to get the latest status on responses.
+ #
+ # Note that this deviates from inheriting from assessment/status/status.twig because you'd have to trun off
+ # all the duework-specific stuff.
+ #
+ # @param IAssessable $assessment  The dialog agent currently being conducted by students
+ #}
+
+{# TODO what is this about #}
+{% set viewCustomParticipationRoute = false %}
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1 data-test="assessment-status-meta-title">Status of {{ assessment.title }}</h1>
+        </div>
+    </div>
+    <nav>
+        <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
+        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+
+        {% if modifyRoute %}
+            {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+                assessment: assessment,
+                modifyRoute: modifyRoute,
+                returnUrlName: RETURN_URL.name,
+                returnUrl: RETURN_URL.current,
+            } only %}
+        {% endif %}
+
+        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) %}
+
+        {% if not assessment.isSpecification and viewCustomParticipationRoute %}
+            <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
