@@ -53,7 +53,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/manage', 'manageDifferentiationProfiles', $getPerms);
-        $this->register('POST', '/manage', 'getDifferentiationProfileData', $getPerms);
+        $this->register('GET', '/list', 'getDifferentiationProfileData', $getPerms);
 //        $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
 
@@ -64,7 +64,6 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('l10n'),
-            $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
             $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
             $this->getMapperFactory()->get(AdjustmentLevelsMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DifferentiationProfiles\Mapper::class),

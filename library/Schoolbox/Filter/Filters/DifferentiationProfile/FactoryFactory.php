@@ -40,7 +40,6 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $this->getMapperFactory()->get(AdjustmentCategoryMapper::class)
                 );
             case AdjustmentCategory\Definition::class:
                 return new AdjustmentCategory\Factory(

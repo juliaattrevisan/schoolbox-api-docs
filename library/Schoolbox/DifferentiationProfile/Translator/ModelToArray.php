@@ -28,6 +28,8 @@ class ModelToArray
             'student' => [
                 'id' => $student->getId(),
                 'fullName' => $student->getFullName(),
+                'givenName' => $student->getGivenName(),
+                'lastName' => $student->getLastName(),
                 'yearLevel' => $student->getYear() ? [
                     'id' => $student->getYear()->getId(),
                     'name' => $student->getYear()->getName(),

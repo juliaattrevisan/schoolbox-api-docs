@@ -7,6 +7,9 @@
 
 namespace Schoolbox\DifferentiationProfile;
 
+use Alaress\Database\Predicate\Builder;
+use Schoolbox\Collection;
+use Schoolbox\Filter\Filters\DifferentiationProfile\Name\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
@@ -19,6 +22,7 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    public const int DEFAULT_LIMIT = 20;
     /**
      * Setup mapper
      */
@@ -48,17 +52,12 @@ class Mapper extends BaseMapper
      */
     public function findStudentList()
     {
-        $query = "SELECT {$this->getColumnString()}, {$this->getJoinColumnString('student', 's')}
-                FROM pastoral p
-                INNER JOIN user s ON p.student_id = s.id AND s.deleted_at IS NULL
-                LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
-                LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
-                LEFT JOIN differentiation_profiles ON p.student_id = differentiation_profiles.student_id AND differentiation_profiles.deleted_at IS NULL
+        $query = "{$this->getSelectString()}
+                {$this->getFromString()}
                 WHERE p.expires_at IS NULL AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
-                GROUP BY p.student_id
-                ORDER BY s.lastname ASC, s.chosen_name ASC
-        ;";
-
+                GROUP BY p.student_id, s.lastname, s.chosen_name
+                ORDER BY s.lastname, s.chosen_name;
+        ";
         $statement = $this->getDatabase()->prepareQuery($query);
         $statement->execute();
 
@@ -78,11 +77,166 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
+    public function findByFilters(
+        ?array $nameSearch,
+        ?array $yearLevelIds,
+        ?array $campusIds,
+        ?array $adjustmentCategories,
+        ?array $adjustmentLevels,
+        ?array $cursorParams = null,
+        ?array $order = null,
+        ?int $limit = null
+    ): GenericCollection {
+        $pb = $this->getPredicateBuilder();
+        if (!empty($nameSearch)) {
+            // Just use the first one, and split it into tokens
+            foreach ($nameSearch as $nameSearchString => $_) {
+                $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
+                foreach ($names as $name) {
+                    if (strlen($name) > 0 && $name !== Definition::KEY_ALL) {
+                        $pb = $pb->any(
+                            $this->getPredicateBuilder()->like(
+                                's.chosen_name',
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($nameSearch[0]) . '%'
+                            )->like(
+                                's.lastname',
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($nameSearch[0]) . '%')
+                        );
+                    }
+                }
+            }
+        }
+
+        if (!empty($yearLevelIds)) {
+            $pb = $pb->in('s.year_id', $yearLevelIds);
+        }
+
+        if (!empty($campusIds)) {
+            $pb = $pb->in('sc.campus', $campusIds);
+        }
+
+        if (!empty($adjustmentCategories)) {
+            $pb = $pb->in('ac.id', $adjustmentCategories);
+        }
+
+        if (!empty($adjustmentLevels)) {
+            $pb = $pb->in('al.id', $adjustmentLevels);
+        }
+
+        $pb->isNull('differentiation_profiles.deleted_at');
+
+        $pb = $this->applyCursor(
+            $pb,
+            $cursorParams,
+            $order ?? $this->getDefaultOrderByParams()
+        );
+
+        $where = implode(' AND ', $pb->getWhere());
+
+        $limit = null === $limit ? '' : "LIMIT {$limit}";
+        $orderBy = "ORDER BY " . ((null === $order) ? '' : implode(', ', array_map(
+            fn($col, $dir) => "{$col} {$dir}",
+            array_keys($order),
+            $order,
+        )) . ',') . ' p.student_id asc';
+
+        $query = "{$this->getSelectString()}
+                {$this->getFromString()}
+                INNER JOIN userCampus sc ON s.id = sc.uid
+                LEFT JOIN differentiation_profiles_adjustment_category ac ON differentiation_profiles.adjustment_category = ac.id
+                LEFT JOIN differentiation_profiles_adjustment_level al ON differentiation_profiles.adjustment_level = al.id
+                WHERE p.expires_at IS NULL
+                AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+                AND {$where}
+                GROUP BY p.student_id, s.lastname, s.chosen_name
+                {$orderBy}
+                {$limit}
+        ;";
+
+        $statement = $this->getDatabase()->executeQuery(
+            $query,
+            $pb->getParams()
+        );
+
+        $collection = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $model = $this->hydrate($row);
+            /* No profile exists yet, let's create an empty one
+             */
+            if (null === $model) {
+                $model = $this->createModel();
+            }
+            $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
+            $collection->add($model);
+        }
+
+        return $collection;
+    }
+
+    private function applyCursor(Builder $pb, $cursorParams, $order): Builder
+    {
+        /* Build up the cursor predicates
+         * This is synonymous to how we do it in Alaress\Database\Cursor\MapperCursor
+         */
+        $columnBuilders         = [];
+        $previousColumnBuilders = [];
+        foreach ($order as $column => $direction) {
+            $value = $cursorParams[$column] ?? null;
+            if (!isset($value)) {
+                continue;
+            }
+
+            if ( $direction === self::SORT_ORDER_ASC ) {
+                $thisBuilder = $pb->emptyClone()->greaterThan($column, $value);
+            } else if ( $direction === self::SORT_ORDER_DESC ) {
+                $thisBuilder = $pb->emptyClone()->lessThan($column, $value);
+            } else {
+                continue;
+            }
+
+            $columnBuilder = $pb->emptyClone();
+            foreach ($previousColumnBuilders as $previousColumnBuilder) {
+                $columnBuilder = $columnBuilder->all($previousColumnBuilder);
+            }
+            $columnBuilders[] = $columnBuilder->all($thisBuilder);
+
+            $previousColumnBuilders[] = $pb->emptyClone()->equals($column, $value);
+
+            // Put each column builder into the main predicate builder
+            $subBuilder = $pb->emptyClone();
+            foreach ($columnBuilders as $columnBuilder) {
+                // All the builders in the column builder must match
+                $subBuilder = $subBuilder->all($columnBuilder);
+            }
+            // Any of the column builders may match
+            $pb = $pb->any($subBuilder);
+        }
+        return $pb;
+    }
+
+    protected function getSelectString(): string
+    {
+        return "SELECT {$this->getColumnString()}, {$this->getJoinColumnString('student', 's')}";
+    }
+
+    protected function getFromString(): string
+    {
+        return "
+            FROM differentiation_profiles
+            RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL
+            INNER JOIN user s ON p.student_id = s.id AND s.deleted_at IS NULL
+            LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+            LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
+        ";
+    }
+
     protected function getDefaultOrderByParams(): array
     {
         return [
-            'student.lastname' => 'ASC',
-            'student.chosen_name' => 'ASC',
+            's.lastname' => 'ASC',
+            's.chosen_name' => 'ASC',
+            'p.student_id' => 'ASC',
         ];
     }
 }

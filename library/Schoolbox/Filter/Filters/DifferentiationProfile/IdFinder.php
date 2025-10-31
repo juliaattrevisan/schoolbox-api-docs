@@ -66,19 +66,50 @@ class IdFinder extends AbstractIdFinder
             $pb = $pb->in('al.id', $diffProfileAdjustmentLevels);
         }
 
+        $studentName = $completeFilters[Name\Definition::class] ?? null;
+//        if (isset($studentName) && count($studentName) > 0) {
+//            // Just use the first one, and split it into tokens
+//            foreach ($studentName as $studentNameString => $_) {
+//                $names = array_map('trim', preg_split('/\\s+/', (string)$studentNameString));
+//                foreach ($names as $name) {
+//                    if (strlen($name) > 0 && $name !== Name\Definition::KEY_ALL) {
+//                        $pb = $pb->any(
+//                            $this->getMapper()->getPredicateBuilder()->like(
+//                                's.chosen_name',
+//                                '%' . $this->getMapper()->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+//                            )->like(
+//                                's.lastname',
+//                                '%' . $this->getMapper()->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+//                            )
+//                        );
+//                    }
+//                }
+//            }
+//        }
+
         // Filter out deleted profiles
         if (!$deleted) {
             $pb->isNull('dp.deleted_at');
         }
 
+        $pb = $pb->any(
+            $this->getMapper()->getPredicateBuilder()->isTrue(
+                'lpt.contribute_differentiation_profile',
+            )->isTrue(
+                'lps.contribute_differentiation_profile',
+            )
+        );
+
         $wheres = $pb->getWhere();
         $params = $pb->getParams();
 
-        $query = "SELECT DISTINCT dp.id
+        $query = "SELECT DISTINCT s.id
                   FROM differentiation_profiles dp
                   RIGHT JOIN pastoral p ON dp.student_id = p.student_id
                   INNER JOIN user s ON p.student_id = s.id
                   INNER JOIN userCampus sc ON s.id = sc.uid
+                  LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+                  LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
                   LEFT JOIN differentiation_profiles_adjustment_category ac ON dp.adjustment_category = ac.id
                   LEFT JOIN differentiation_profiles_adjustment_level al ON dp.adjustment_level = al.id
         ";
