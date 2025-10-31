@@ -165,12 +165,12 @@ class Controller extends Base
 
                 // if only clashes, only save if we are a clash.. expensive (we hit the db each call).. but no other way
                 if (
-                    $validation->validateForClashes(
+                    !empty($validation->validateForClashes(
                         $event->getBooking()->getResource(),
                         $event->getStartTime()->getDateTimeObject(),
                         $event->getEndTime()->getDateTimeObject(),
                         $event->getBooking()
-                    )
+                    ))
                 ) {
                     $clashingEvents[] = $event;
                 }
