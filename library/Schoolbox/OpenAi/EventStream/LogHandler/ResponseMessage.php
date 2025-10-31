@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\EventStream\LogHandler;
 
 use JsonException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
 
@@ -27,7 +26,7 @@ class ResponseMessage implements ILogHandler
      * There are 3 possible events that indicate the end of a response: see
      * https://platform.openai.com/docs/api-reference/responses-streaming/response.
      */
-    private const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete'];
+    private const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete', 'error'];
 
     /**
      * When an image is omitted from the request/response: replace the image
@@ -94,16 +93,18 @@ class ResponseMessage implements ILogHandler
     }
 
     /**
-     * @param array $response
+     * Log the usage and model from the response.
+     *
+     * @param array     $responseData
      * @param Log\Model $log
      * @return Log\Model
      */
-    private function logUsage(array $response, Log\Model $log): Log\Model
+    private function logUsage(array $responseData, Log\Model $log): Log\Model
     {
         // Find model and token usage
-        $model        = $response['response']['model'] ?? null;
-        $inputTokens  = $response['response']['usage']['input_tokens'] ?? null;
-        $outputTokens = $response['response']['usage']['output_tokens'] ?? null;
+        $model        = $responseData['response']['model'] ?? null;
+        $inputTokens  = $responseData['response']['usage']['input_tokens'] ?? null;
+        $outputTokens = $responseData['response']['usage']['output_tokens'] ?? null;
         if ($model) {
             $log->setModel($model);
         }
@@ -117,48 +118,48 @@ class ResponseMessage implements ILogHandler
     }
 
     /**
-     * @param array     $rawData
+     * Log the completion status from the response.
+     *
+     * @param array     $responseData
      * @param Log\Model $log
      * @return Log\Model
      */
-    private function logCompletion(array $rawData, Log\Model $log): Log\Model
+    private function logCompletion(array $responseData, Log\Model $log): Log\Model
     {
         /* If something went wrong on the openAI side, it'll send us an "error" key
          * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-         * If we get this, send on the human-readable message to the user
+         * If we get this, save the error message and return code.
+         *
+         * Note that it's not possible to raise an exception and have that
+         * exception's response code be respected in the output: the response
+         * headers and some of its content have already been sent.
          */
-        if ($rawData["error"] ?? null) {
+        if ($responseData["error"] ?? null) {
             $returnCode   = 500;
-            $errorMessage = $rawData["error"]["message"] ?? '';
+            $errorMessage = $responseData["error"]["message"] ?? '';
 
             $log->setReturnCode($returnCode)
                 ->setErrorMessage($errorMessage);
 
-            throw new SchoolboxException($errorMessage, $returnCode);
+            return $log;
         }
 
         /* Did we receive an incomplete response? i.e. max output tokens reached?
          * If so, send those details on so we have some idea of why it failed
          * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
          */
-        $status = $rawData["status"] ?? null;
+        $status = $responseData["status"] ?? null;
         if (isset($status) && $status !== "completed") {
-            $returnCode = 500;
-            $title      = sprintf("Failed to generate a response: %s", $status);
-
-            /* there may be some extra details about why it was incomplete */
-            $incompleteMessage = $rawData["incomplete_details"]["reason"] ?? null;
-            if ($incompleteMessage) {
-                $title .= sprintf(" (%s)", $incompleteMessage);
-            }
+            $returnCode        = 500;
+            $incompleteMessage = $responseData["incomplete_details"]["reason"] ?? null;
 
             $log->setReturnCode($returnCode)
                 ->setErrorMessage($incompleteMessage);
 
-            throw new SchoolboxException($title, $returnCode);
+            return $log;
         }
 
-        $log->setReturnCode(200);
+        $log->setReturnCode($log->getReturnCode() ?? 200);
         return $log;
     }
 }
