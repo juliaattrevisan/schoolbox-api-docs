@@ -178,6 +178,13 @@ function upgrade_instances(){
     }
     done
     log "All instances are offline."
+    # Trigger deployment to notify ecs of upgrade starting only in cloud-hosted primary hosts
+    if [[ -s "/tmp/deployment_id" ]] && [[ -s "/etc/schoolbox/deployment_config.json" ]]; then
+      deployment_id=$(cat /tmp/deployment_id)
+      log "Deployment ID '$deployment_id' found"
+      "$site_root"/tools/deployment/trigger.sh --id-file /tmp/deployment_id
+      log "Deployment ID '$deployment_id' triggered"
+    fi
   else
     log "Not enabling maintenance mode because not primary host."
   fi
