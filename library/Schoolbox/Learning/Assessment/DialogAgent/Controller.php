@@ -619,6 +619,9 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
+        /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
+         */
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',
             [
