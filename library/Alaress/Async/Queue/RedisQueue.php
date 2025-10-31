@@ -9,7 +9,6 @@
 
 namespace Alaress\Async\Queue;
 
-use Alaress\Async\Notification\Instance\Codec;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Scheduler\Trigger\TriggerInterface;

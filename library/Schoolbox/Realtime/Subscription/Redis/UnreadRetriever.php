@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Subscription\Redis;
 
-use Alaress\Async\Notification\Instance\Codec;
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Queue\RedisQueue;
 use Predis;
 
 /**
