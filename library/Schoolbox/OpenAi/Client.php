@@ -113,7 +113,7 @@ class Client implements IClient
             $request,
             $payload,
             $log,
-            new EventStream\LogHandler\ResponseMessage(),
+            new EventStream\LogHandler\ChatCompletionsMessage(),
         );
     }
 

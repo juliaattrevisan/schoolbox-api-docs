@@ -359,16 +359,6 @@ class Controller extends Base
             );
             $this->response = $this->responseAsEventStream($response);
             return;
-//            (new Helper(
-//                trim($chatConfig[Config::FIELD_PROVIDER]['value']),
-//                trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
-//                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
-//                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-//                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
-//                $this->client,
-//                $this->errorMapper,
-//                $this->logMapper,
-//            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
