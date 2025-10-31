@@ -68,7 +68,7 @@ class Validator
                 $filter = null;
             }
         } elseif (is_array($filterFromGet)) {
-            $filter = $filterFromGet; // The filter wasn't passed as JSON after all.
+            $filter = $filterFromGet; // The filter may be passed as an array.
         }
 
         if (!is_array($filter)) {
