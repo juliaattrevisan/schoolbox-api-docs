@@ -7,10 +7,12 @@ use Alaress\Codec\Json\Base64;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Filter\IdFinder;
+use Schoolbox\User;
 
 class Cursor implements ICursor
 {
     public function __construct(
+        private User $viewer,
         private IdFinder $finder,
         private array|Collection $completedFilters,
         private ?array $order = null,
@@ -27,6 +29,7 @@ class Cursor implements ICursor
         }
 
         return $this->finder->findProfilesForStudentsByFilters(
+            $this->viewer,
             $this->completedFilters,
             $decoded ?? null,
             $this->order,
@@ -65,6 +68,7 @@ class Cursor implements ICursor
     public function retrieveResultCount(): ?int
     {
         return $this->finder->findProfilesForStudentsByFilters(
+            $this->viewer,
             $this->completedFilters,
             null,
             null,

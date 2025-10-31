@@ -52,6 +52,7 @@ class Finder extends AbstractIdFinder
      * @return Collection|GenericCollection|Model[]
      */
     public function findProfilesForStudentsByFilters(
+        User $viewer,
         array $filters,
         ?array $cursor,
         ?array $order,
@@ -81,6 +82,7 @@ class Finder extends AbstractIdFinder
         /** @var Mapper $mapper */
         $mapper = $this->getMapper();
         return $mapper->findByFilters(
+            $viewer,
             $studentName,
             $diffProfileYearLevels,
             $diffProfileCampuses,

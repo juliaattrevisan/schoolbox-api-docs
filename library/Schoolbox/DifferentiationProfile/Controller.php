@@ -111,6 +111,7 @@ class Controller extends Base
         $finder = Filter\Filters\DifferentiationProfile\Finder::getInstance($this->filterMapper, $this->mapper);
 
         $cursor = new Cursor(
+            $this->getUser(),
             $finder,
             $dynamicFilters,
             [

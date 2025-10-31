@@ -8,10 +8,11 @@
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\DifferentiationProfile\Name\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -78,6 +79,7 @@ class Mapper extends BaseMapper
     }
 
     public function findByFilters(
+        User $viewer,
         ?array $nameSearch,
         ?array $yearLevelIds,
         ?array $campusIds,
@@ -135,6 +137,20 @@ class Mapper extends BaseMapper
 
         $where = implode(' AND ', $pb->getWhere());
 
+        /* Ensure viewer has access to view differentiation profiles
+         */
+        $service = UserAccess::SERVICE_DIFFERENTIATION_PROFILE;
+        $accessLevel = UserAccess::ACCESS_WRITE;
+
+        $param = array_merge(
+            $pb->getParams(),
+            [
+                'service'     => $service,
+                'accessLevel' => $accessLevel,
+                'viewerId'    => $viewer->getId(),
+            ]
+        );
+
         $limit = null === $limit ? '' : "LIMIT {$limit}";
         $orderBy = "ORDER BY " . ((null === $order) ? '' : implode(', ', array_map(
                     fn($col, $dir) => "{$col} {$dir}",
@@ -145,6 +161,7 @@ class Mapper extends BaseMapper
         $query = "{$this->getSelectString()}
                 {$this->getFromString()}
                 INNER JOIN userCampus sc ON s.id = sc.uid
+                INNER JOIN userAccess ua ON sc.campus = ua.sid AND ua.service = :service AND ua.type >= :accessLevel AND ua.uid = :viewerId
                 LEFT JOIN differentiation_profiles_adjustment_category ac ON differentiation_profiles.adjustment_category = ac.id
                 LEFT JOIN differentiation_profiles_adjustment_level al ON differentiation_profiles.adjustment_level = al.id
                 WHERE p.expires_at IS NULL
@@ -157,7 +174,7 @@ class Mapper extends BaseMapper
 
         $statement = $this->getDatabase()->executeQuery(
             $query,
-            $pb->getParams()
+            $param
         );
 
         $collection = $this->createCollection();
