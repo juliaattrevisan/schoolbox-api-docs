@@ -31,12 +31,12 @@ use TextFormatter;
  */
 class Instance implements JsonSerializable
 {
-    const MAX_FIELD_SIZE = 512;
+    public const MAX_FIELD_SIZE = 512;
 
     /**
      * Default life time of this instance in seconds.
      */
-    const DEFAULT_TTL = 1209600; // 2 weeks
+    public const DEFAULT_TTL = 1209600; // 2 weeks
 
     /**
      * A type of action for this instance, as used by `$this->get/setAction`.
@@ -88,6 +88,16 @@ class Instance implements JsonSerializable
      * Array key to find event object identifier.
      */
     public const EVENT_OBJECT_ID = 'eventObjectId';
+
+    /**
+     * Allowed classes, when attempting to unserialize an instance of this
+     * class.
+     */
+    public const ALLOWED_UNSERIALIZE_CLASSES = [
+        self::class,
+        Param::class,
+        SimpleParam::class,
+    ];
 
     /**
      * The :tokenised string that forms the base template of the message

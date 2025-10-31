@@ -226,7 +226,10 @@ abstract class RedisQueue implements QueueInterface
 
         if ($data) {
             try {
-                $unserial = new Codec(self::COMPRESSION_LEVEL)->decode($data);
+                $unserial = unserialize(
+                    gzuncompress($data),
+                    ['allowed_classes' => Instance::ALLOWED_UNSERIALIZE_CLASSES],
+                );
             } catch (ErrorException $e) {
                 // noop
             }

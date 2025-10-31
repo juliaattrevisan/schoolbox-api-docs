@@ -58,8 +58,10 @@ class UnreadRetriever
                             $this->syncClient->srem($setIdentifier, $messageKey);
                             return false;
                         }
-
-                        return new Codec(RedisQueue::COMPRESSION_LEVEL)->decode($data);
+                        return unserialize(
+                            gzuncompress($data),
+                            ['allowed_classes' => Instance::ALLOWED_UNSERIALIZE_CLASSES],
+                        );
                     } catch (\ErrorException $e) {
                         return false;
                     }
