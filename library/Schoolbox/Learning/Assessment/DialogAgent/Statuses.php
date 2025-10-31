@@ -26,8 +26,10 @@ class Statuses
     /**
      * Consts correlating to progress tick cosmetics, as defined in _content.scss where I've already left
      * a note for snake to please refactor these styles in some reptilian manner
+     *
+     * Note that CSS_PENDING is '' because that defaults to an empty grey cube
      */
-    private const string CSS_PENDING = 'pending';
+    private const string CSS_PENDING = '';
     private const string CSS_IN_PROGRESS = 'in-progress';
     private const string CSS_REQUIRES_ASSISTANCE = 'requires-assistance';
     private const string CSS_SUBMITTED = 'submitted';
