@@ -113,7 +113,7 @@ INNER JOIN edumate.view_student_mail_carers ON edumate.view_student_mail_carers.
 INNER JOIN edumate.contact c1 ON c1.contact_id = edumate.view_student_mail_carers.carer1_contact_id
 INNER JOIN edumate.carer car1 ON car1.contact_id = c1.contact_id
 LEFT JOIN edumate.contact c2 ON c2.contact_id = edumate.view_student_mail_carers.carer2_contact_id
-LEFT JOIN edumate.carer car2 ON car2.contact_id = c2.contact_id;
+LEFT JOIN edumate.carer car2 ON car2.contact_id = c2.contact_id
 LEFT JOIN sys_user su1 ON su1.contact_id = c1.contact_id
 LEFT JOIN sys_user su2 ON su2.contact_id = c2.contact_id
 ;
