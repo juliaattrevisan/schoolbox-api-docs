@@ -606,14 +606,21 @@ class Controller extends Assessment\Controller
      *
      * @param IAssessable|Model $assessment
      * @return void
+     * @throws Deleted
      * @throws Error
+     * @throws Exception
      */
     public function getStatus(IAssessable|Model $assessment): void
     {
+        /* Yank out scenario fields
+         */
+        $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',
             [
                 'assessment' => $assessment,
+                'scenario' => $scenario,
                 'statuses' => (new Statuses())->generate($assessment),
             ]
         );

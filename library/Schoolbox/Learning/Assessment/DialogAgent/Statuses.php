@@ -98,7 +98,7 @@ class Statuses
             if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
                 return [
                     'status' => self::STATUS_REQUESTED_ASSISTANCE,
-                    'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt(),
+                    'assistanceDate' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
                 ];
             }
 
