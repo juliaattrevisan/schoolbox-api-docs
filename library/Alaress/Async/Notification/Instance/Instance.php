@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
 
+use __PHP_Incomplete_Class;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
@@ -20,6 +21,7 @@ use OutOfBoundsException;
 use RuntimeException;
 use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use TextFormatter;
+use UnexpectedValueException;
 
 /**
  * Basically a really big container of specific things that get put together in a special way
@@ -380,6 +382,23 @@ class Instance implements JsonSerializable
         return $instance;
     }
 
+    /**
+     * Assert this instance is fully serialized.
+     *
+     * @return void
+     * @throws UnexpectedValueException if any parameters were not unserialized
+     *                                  as complete classes.
+     */
+    public function assertFullyUnserialized(): void
+    {
+        foreach ($this->params as $key => $param) {
+            if ($param instanceof __PHP_Incomplete_Class) {
+                throw new UnexpectedValueException(
+                    sprintf('Parameter "%s" was not properly unserialized', $key),
+                );
+            }
+        }
+    }
 
     /**
      * Flatten this notification instance

@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Predis\Client;
 use Predis\ClientInterface;
 use Predis\Transaction\MultiExec;
+use UnexpectedValueException;
 
 abstract class RedisQueue implements QueueInterface
 {
@@ -130,7 +131,15 @@ abstract class RedisQueue implements QueueInterface
                 continue;
             }
             try {
-                $instances[] = self::inflate($data);
+                // Validate the instance inflated properly first:
+                // if it did not, remove it from the queue
+                $instance = self::inflate($data);
+                try {
+                    $instance->assertFullyUnserialized();
+                    $instances[] = $instance;
+                } catch (UnexpectedValueException $e) {
+                    $this->redis->srem($this->getRedisSetKey(), $key);
+                }
             } catch (InvalidArgumentException $e) {
                 // the thing we're pointing at doesn't exist or payload invalid? remove the reference
                 $this->redis->srem($this->getRedisSetKey(), $key);
