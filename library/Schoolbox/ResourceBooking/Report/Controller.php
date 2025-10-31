@@ -129,6 +129,11 @@ class Controller extends Base
         $clashesOnlyList = new GenericCollection(EventInterface::class);
         if ($clashesOnly) {
             foreach ($eventList as $event) {
+                // only care about resource booking events (they SHOULD all be resource bookings anyway)
+                if (!($event instanceof \Calendar\Event\Type\ResourceBooking\Event)) {
+                    continue;
+                }
+
                 // check if any other events clash with us (overlapping time, same resource)
                 $collides = $eventList->filter(function ($otherEvent) use ($event) {
                     /* @var \Calendar\Event\Type\ResourceBooking\Event $otherEvent */
