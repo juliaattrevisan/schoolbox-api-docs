@@ -9,12 +9,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\Notification\Instance\Codec;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
-use Alaress\Async\Notification\NotificationBundle;
-use Alaress\Async\Notification\Parameter\Param;
-use Alaress\Async\Queue\RedisQueue;
 use Alaress\Redis;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -105,10 +101,10 @@ $app = new class extends CliTool\App{
         $this->getLogger()->info("Checking redis data...");
         $acks = 0;
 
-        $codec = new Codec(RedisQueue::COMPRESSION_LEVEL);
         foreach ($redisList as $key) {
             $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
-            $msg = $codec->decode($compressed);
+            $uncompress = gzuncompress($compressed);
+            $msg        = unserialize($uncompress, ['allowed_classes' => Instance::ALLOWED_UNSERIALIZE_CLASSES]);
             try {
                 $notification = new Notification([ $msg ]);
             } catch (Error $e) {
