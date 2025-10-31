@@ -133,6 +133,8 @@ class Controller extends Base
 
         // Build the list of events (slowly)
         $showClasses = $this->requestQuery->getBool('classes', true);
+        $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
+
         $this->getApi()->add(
             $this->getApiFactory()->buildFromResourceCollection(
                 $resources,
@@ -150,6 +152,7 @@ class Controller extends Base
                     'end'      => $end,
                     'category' => $selectedCategories,
                     'classes'  => $showClasses,
+                    'clashesOnly'  => $clashesOnly,
                 ],
             ],
         );

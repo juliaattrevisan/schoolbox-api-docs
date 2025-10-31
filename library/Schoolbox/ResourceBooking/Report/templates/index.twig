@@ -153,8 +153,8 @@
                         <fieldset class="radiolist">
                             <legend>Clashes</legend>
                             <ul class="option-list">
-                                <li><input type="radio" name="clashes" value="all" id="clashesAll" checked=""><label for="clashesAll">Show All Bookings</label></li>
-                                <li><input type="radio" name="clashes" value="only" id="clashesOnly"><label for="clashesOnly">Only Show Clash Bookings</label></li>
+                                <li><input type="radio" name="clashesOnly" value="0" id="clashesAll" {% if not search.clashesOnly %}checked{% endif %}><label for="clashesAll">Show All Bookings</label></li>
+                                <li><input type="radio" name="clashesOnly" value="1" id="clashesOnly" {% if search.clashesOnly %}checked{% endif %} ><label for="clashesOnly">Only Show Clash Bookings</label></li>
                             </ul>
                         </fieldset>
 
