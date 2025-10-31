@@ -102,7 +102,8 @@ class Mapper extends BaseMapper
                                 '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
                             )->like(
                                 's.lastname',
-                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%')
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                            )
                         );
                     }
                 }
@@ -153,10 +154,10 @@ class Mapper extends BaseMapper
 
         $limit = null === $limit ? '' : "LIMIT {$limit}";
         $orderBy = "ORDER BY " . ((null === $order) ? '' : implode(', ', array_map(
-                    fn($col, $dir) => "{$col} {$dir}",
-                    array_keys($order),
-                    $order,
-                )) . ',') . ' p.student_id asc';
+            fn($col, $dir) => "{$col} {$dir}",
+            array_keys($order),
+            $order,
+        )) . ',') . ' p.student_id asc';
 
         $query = "{$this->getSelectString()}
                 {$this->getFromString()}
@@ -206,9 +207,9 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            if ( $direction === self::SORT_ORDER_ASC ) {
+            if ($direction === self::SORT_ORDER_ASC) {
                 $thisBuilder = $pb->emptyClone()->greaterThan($column, $value);
-            } else if ( $direction === self::SORT_ORDER_DESC ) {
+            } else if ($direction === self::SORT_ORDER_DESC) {
                 $thisBuilder = $pb->emptyClone()->lessThan($column, $value);
             } else {
                 continue;

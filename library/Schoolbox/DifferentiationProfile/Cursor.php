@@ -6,14 +6,14 @@ use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
-use Schoolbox\Filter\IdFinder;
+use Schoolbox\Filter\Filters\DifferentiationProfile\Finder;
 use Schoolbox\User;
 
 class Cursor implements ICursor
 {
     public function __construct(
         private User $viewer,
-        private IdFinder $finder,
+        private Finder $finder,
         private array|Collection $completedFilters,
         private ?array $order = null,
         private ?int $limit = null,

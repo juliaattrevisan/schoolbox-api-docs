@@ -108,6 +108,7 @@ class Controller extends Base
             $page,
         );
 
+        /** @var Filter\Filters\DifferentiationProfile\Finder $finder */
         $finder = Filter\Filters\DifferentiationProfile\Finder::getInstance($this->filterMapper, $this->mapper);
 
         $cursor = new Cursor(

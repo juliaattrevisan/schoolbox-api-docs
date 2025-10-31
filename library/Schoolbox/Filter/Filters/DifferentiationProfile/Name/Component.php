@@ -22,9 +22,9 @@ class Component extends BaseComponent
      * input into this component's text input), concatenated into a single
      * string.
      *
-     * @return array|Filter\Selection\Model[]
+     * @return array|Filter\Selection\Model[]|string[]
      */
-    public function toContext()
+    public function toContext(): array
     {
         $context = parent::toContext();
 
