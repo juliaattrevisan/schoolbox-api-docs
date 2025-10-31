@@ -101,7 +101,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventT
             $this->getViewer(),
             null,
             null,
-            array('id' => $eventId)
+            ['id' => $eventId, 'allowResources' => true] // we now allow creating resource bookings, so set allowResources to true
         );
     }
 

@@ -589,8 +589,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         }
 
         $query .= '
-            WHERE DATE(start_datetime) >= :startDate
-            AND DATE(end_datetime) <= :endDate
+            WHERE DATE(event.start_datetime) >= :startDate
+            AND DATE(event.end_datetime) <= :endDate
             AND event.deleted_at IS NULL
         ';
 

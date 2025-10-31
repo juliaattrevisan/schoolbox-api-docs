@@ -678,7 +678,10 @@ class Controller extends Base
             ->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)))
             ->setName($this->requestPost['name'])
             ->setNotes($this->requestPost['notes'])
-            ->setRelatedBookingList(new GenericCollection(Model::class));
+            ->setRelatedBookingList(new GenericCollection(Model::class))
+            // init booking time to null (this may be changed later to the event time...)
+            ->setBookingStartAt(null)
+            ->setBookingEndAt(null);
 
         return $booking;
     }

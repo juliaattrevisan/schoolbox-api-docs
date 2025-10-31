@@ -41,6 +41,7 @@ const INITIAL_PAYLOAD = {
         status: null,
         canModify: null,
         canInvite: null,
+        canBookResources: null,
     },
     attendees: {
         guests: [],

@@ -8,13 +8,20 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Calendar;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access;
 use Schoolbox\Calendar\Event\Attendance;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader;
+use Schoolbox\GenericCollection;
+use Schoolbox\ResourceBooking\Booking\Model;
+use Schoolbox\ResourceBooking\Booking\Validation;
+use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Booking\Status;
 use Schoolbox\UserMapper;
 use Calendar\Event\Type\Day\Renderer\Javascript;
 use Schoolbox\Permission\Access\Access as FolderAccess;
@@ -51,6 +58,12 @@ $guests = [];
 
 if ((new Attendance\ValidCanInvite())->isSatisfiedBy($user, $config->get('calendar_student_can_invite'))) {
     $guests = (!isset($_POST['guests']) || '' === (string)$_POST['guests']) ? [] : explode(',', $_POST['guests']);
+}
+
+/* as of 26.0 you can now book resources via the calendar modal */
+$resourceIds = [];
+if ($this->config->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
+    $resourceIds = (!isset($_POST['resources']) || '' === (string)$_POST['resources']) ? [] : explode(',', $_POST['resources']);
 }
 
 $event
@@ -94,7 +107,78 @@ if ($eventAccess->checkDestination($user, Event::ACCESS_PERSONAL, $user, $owner)
     error(35);
 }
 
+// now create the related resource bookings
+$errors = [];
+$bookingList = new Collection();
+if (!empty($resourceIds)) {
+    // spawn a Resource Booking object here and link it to the event
+
+    // augment POST with necessary data for validation (hack the calendar form to look like the resource booking form)
+    $postVars = $_POST;
+    if ($_POST['allDay']) {
+        $postVars['startDate'] = $dateObj->getDatePicker();
+        $endDate = clone $dateObj;
+        $endDate = $endDate->endOfDay();
+        $postVars['endDate']   = $endDate->getDatePicker();
+    } else {
+        $postVars['startDate'] = $startDate->getDatePicker();
+        $postVars['endDate']   = $endDate->getDatePicker();
+    }
+
+    $postVars['campus']   = '';
+
+    $statusMapper = Status\Mapper::getInstance();
+    $validation = new Validation(
+        $this->user,
+        \Schoolbox\ResourceBooking\Booking\Mapper::getInstance(),
+        $statusMapper,
+        \Schoolbox\Assessment\Term\Mapper::getInstance(),
+        $this->getDi()->get('externalTimetable'),
+        \Schoolbox\CampusMapper::getInstance(),
+        $this->config,
+        \Schoolbox\External\Event\Mapper::getInstance()
+    );
+
+    foreach ($resourceIds as $resourceId) {
+        /** @var Item\Model $item */
+        $item = Item\Mapper::getInstance()->findById((int)$resourceId);
+
+        // Validate this item.
+        $errors[$resourceId] = $validation->validateBookingFromPostData($item, $postVars, null);
+
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
+        if (
+            count($errors[$resourceId]) > 0 && $item->getAllowClashBookings() &&
+            $validation->validationErrorsAreAllClashes($errors[$resourceId])
+        ) {
+            // Ignore errors since all were clashes and clashes are allowed.
+            $errors[$resourceId] = [];
+        }
+
+        // Build the booking
+        $booking = getBookingFromEvent($item, $event, $user);
+        if (!empty($errors[$resourceId])) {
+            // if errors exist, set booking to rejected
+            $booking->setStatus($statusMapper->createModel(Status\Model::STATUS_REJECTED));
+        } else {
+            // if errors are empty, remove from the list
+            unset($errors[$resourceId]);
+        }
+
+        // add the booking in its current state
+        $bookingList->add($booking);
+
+        // flatten errors
+        if (!empty($errors[$resourceId]) && is_array($errors[$resourceId])) {
+            $errors[$resourceId] = $validation->getAllErrorStringsAsFlatArray($errors[$resourceId]);
+        }
+    }
+}
+
 $affectedIds = EventMapper::getInstance()->save($event);
+
+$bookingMapper = \Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+$bookingMapper->save($bookingList);
 
 /* Save a Personal Relation
  */
@@ -106,6 +190,12 @@ $personalRelationMapper = new \Schoolbox\Calendar\Relation\PersonalMapper();
 $personalRelationMapper->save($personalRelation);
 
 (new Attendance\Transactor(Attendance\Mapper::getInstance(), UserMapper::getInstance()))->update($event, $guests);
+
+// manually craft a json response, to contain logs and the generated event below..
+$output = [
+    'errors' => array_values($errors),
+    'event'  => null,
+];
 
 // Get event back out of the connector, so I know the rendering is consistent
 if (count($affectedIds) == 1) {
@@ -123,9 +213,64 @@ if (count($affectedIds) == 1) {
             $user,
             $user
         );
-        $output   = $renderer->render();
-        echo $output;
+        $output['event']   = json_decode($renderer->render(), true);
         break;
     }
 }
+
+echo json_encode($output);
+
 exit(1);
+
+function getStatusMapper()
+{
+    return \Schoolbox\ResourceBooking\Booking\Status\Mapper::getInstance();
+}
+
+/**
+ * Helper for getting a booking from an event.
+ *
+ * @param  Item\Model     $resource
+ * @param  Calendar\Event $event
+ *
+ * @return Model
+ * @throws \Schoolbox\Mapper\Exception
+ */
+function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user)
+{
+    $booking = new Model();
+    $booking
+        ->setEvent($event)
+        ->setResource($resource)
+        ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
+        ->setName($_POST['title'] ?? '')
+        ->setNotes($_POST['detail'] ?? '')
+        ->setRelatedBookingList(new GenericCollection(Model::class));
+
+    // Set booking start and end dates based on whether it's an all-day event
+    if ($event->getAllDay()) {
+        $booking->setBookingStartAt($event->getStartDateTime());
+        $endDate = clone $event->getStartDateTime();
+        $endDate = $endDate->endOfDay();
+        $booking->setBookingEndAt($endDate);
+    } else {
+        $booking->setBookingStartAt($event->getStartDateTime());
+        $booking->setBookingEndAt($event->getEndDateTime());
+    }
+
+    // What about the resource? If it's an open resource, confirm the
+    // booking immediately.
+    if ($resource->getModerationType()->getId() === Item\ModerationType\Model::TYPE_OPEN) {
+        $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+    } elseif (
+        $resource->isUserModerator($user)
+        && (int)$event->getAuthor()->getId() === (int)$user->getId()
+    ) {
+        /* If you're a Moderator and can moderate this request,
+         * and you created the booking in the first place,
+         * set it to Approved - otherwise you'll end up approving your own request anyway
+         */
+        $booking->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+    }
+    return $booking;
+}

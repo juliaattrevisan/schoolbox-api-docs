@@ -23,6 +23,7 @@ export default {
     props: [
         "userId",
         "canInvite",
+        "canBookResources",
         "eventTypes",
         "eventCreateUrl",
         "eventCreateFormUrl",
@@ -40,6 +41,7 @@ export default {
             event: {},
             isProcessing: false, //to disable on form submission to prevent rapid fire
             selected: [],
+            resources: [],
         };
     },
 
@@ -89,6 +91,19 @@ export default {
 
             return stack.join(",");
         },
+
+        /**
+         * Compile object ids into csv
+         */
+        compileResourceIds() {
+            let stack = [];
+
+            for (let i = 0; i < this.resources.length; i++) {
+                stack.push(this.resources[i].id);
+            }
+
+            return stack.join(",");
+        },
     },
 
     created() {
@@ -107,6 +122,15 @@ export default {
         },
 
         /**
+         * Get the endpoint for the booking resource search
+         * @returns {String}- The endpoint for the booking resource search
+         */
+        getBookingEndpoint() {
+            const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
+            return `${searchUrl}?`;
+        },
+
+        /**
          * Open this modal.
          */
         open(event) {
@@ -120,6 +144,8 @@ export default {
             /* Clear selectize contents
              */
             this.selected = [];
+
+            this.resources = [];
         },
 
         /**
@@ -148,8 +174,17 @@ export default {
                 const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.modal.close();
-                    this.$emit("eventCreated", responseData);
-                    this.$refs.toast.timeout("Created", true, 2000);
+                    // check if errors exist?
+                    if (responseData.errors && responseData.errors.length > 0) {
+                        this.$refs.toast.timeout(
+                            "Event / Task created with some issues: " + responseData.errors.join(", "),
+                            false,
+                            4000,
+                        );
+                    } else {
+                        this.$refs.toast.timeout("Created", true, 2000);
+                    }
+                    this.$emit("eventCreated", responseData.event);
                 } else {
                     this.$refs.toast.timeout("Unable to create event / task. " + responseData.message, false, 3000);
                 }
@@ -249,6 +284,19 @@ export default {
                                 </option>
                             </select>
                         </label>
+
+                        <template v-if="canBookResources">
+                            <search-select
+                                class="l-pad-m--bottom"
+                                v-model:selected="resources"
+                                :endpoint="getBookingEndpoint()"
+                                label="Resources"
+                                label-id="resources"
+                                placeholder=""
+                            >
+                            </search-select>
+                            <input type="hidden" name="resources" :value="compileResourceIds" />
+                        </template>
 
                         <template v-if="canInvite">
                             <search-select

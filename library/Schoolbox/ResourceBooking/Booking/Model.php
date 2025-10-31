@@ -71,6 +71,16 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $modifiedAt;
 
     /**
+     * @var null|Alaress_Date_Format
+     */
+    protected ?Alaress_Date_Format $bookingStartAt;
+
+    /**
+     * @var null|Alaress_Date_Format
+     */
+    protected ?Alaress_Date_Format $bookingEndAt;
+
+    /**
      * @var Collection|self[]
      */
     protected $relatedBookingList;
@@ -282,6 +292,42 @@ class Model implements ISoftDeletable, JsonSerializable
     public function setNotes($notes)
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    /**
+     * @return ?Alaress_Date_Format
+     */
+    public function getBookingStartAt(): ?Alaress_Date_Format
+    {
+        return $this->bookingStartAt;
+    }
+
+    /**
+     * @param  ?Alaress_Date_Format $bookingStartAt
+     * @return self
+     */
+    public function setBookingStartAt(?Alaress_Date_Format $bookingStartAt): self
+    {
+        $this->bookingStartAt = $bookingStartAt;
+        return $this;
+    }
+
+    /**
+     * @return ?Alaress_Date_Format
+     */
+    public function getBookingEndAt(): ?Alaress_Date_Format
+    {
+        return $this->bookingEndAt;
+    }
+
+    /**
+     * @param  ?Alaress_Date_Format $bookingEndAt
+     * @return self
+     */
+    public function setBookingEndAt(?Alaress_Date_Format $bookingEndAt): self
+    {
+        $this->bookingEndAt = $bookingEndAt;
         return $this;
     }
 
