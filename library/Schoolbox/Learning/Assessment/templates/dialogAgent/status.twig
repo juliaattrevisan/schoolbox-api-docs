@@ -219,9 +219,27 @@
                                 </td>
                             {% endfor %}
 
-                            <td>
-                                {# TODO whatever this actions tot thingy is supposed to be #}
-                                actions
+                            <td class="actions-small-1">
+                                <nav>
+                                    <sbx-pop-out content-id="response-options-{{ participant.user.id }}"></sbx-pop-out>
+                                </nav>
+                                <ul id="response-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                                    <li>
+                                        <a class="icon-search" title="View {{ locale.dialogAgent.proper }}">View {{ locale.dialogAgent.proper }}</a>
+                                    </li>
+                                    <li>
+                                        <a class="icon-approve" title="Submit on behalf of {{ participant.user.formatName }}">Submit on behalf of {{ participant.user.formatName }}</a>
+                                    </li>
+                                    <li>
+                                        <a class="icon-refresh" title="Reset {{ locale.dialogAgent.proper }}">Reset {{ locale.dialogAgent.proper }}</a>
+                                    </li>
+                                    <li>
+                                        <a class="icon-undo" title="Reopen {{ locale.dialogAgent.proper }}">Reopen {{ locale.dialogAgent.proper }}</a>
+                                    </li>
+                                    <li>
+                                        <a class="icon-medical" title="Mark as assisted">Mark as assisted</a>
+                                    </li>
+                                </ul>
                             </td>
                         </tr>
                     {% endfor %}
