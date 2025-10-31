@@ -22,11 +22,9 @@ class DifferentiationProfiles extends ModuleLoader
      */
     public function configure(ContainerInterface $di): void
     {
-        if ($di->get('config')->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED)) {
-            $namespace = 'differentiation-profiles';
+        $namespace = 'differentiation-profiles';
 
-            $module = new Module($di);
-            $module->registerModule("/$namespace");
-        }
+        $module = new Module($di);
+        $module->registerModule("/$namespace");
     }
 }
