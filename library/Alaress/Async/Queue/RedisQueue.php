@@ -208,7 +208,7 @@ abstract class RedisQueue implements QueueInterface
      */
     private static function deflate(Instance|TriggerInterface $instance): string
     {
-        return new Codec(self::COMPRESSION_LEVEL)->encode($instance);
+        return gzcompress(serialize($instance), self::COMPRESSION_LEVEL);
     }
 
 
