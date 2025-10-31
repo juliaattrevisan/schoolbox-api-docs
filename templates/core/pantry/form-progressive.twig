@@ -117,9 +117,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <label>Ooh, a text input!
-                            <input type="text" name="part-2-text" value="{{ part2 }}" placeholder="Leave this blank" />
-                        </label>
+                        <label for="part-2-text">Ooh, a text input!</label>
+                        <input id="part-2-text" type="text" name="part-2-text" value="{{ part2 }}" placeholder="Leave this blank" />
                         <div class="row" data-mage-submitrow {% if hashUsed %}style="display:none;"{% endif %}>
                             <div class="small-12 column">
                                 <div class="alert alert-box icon-alert" data-mage-error></div>

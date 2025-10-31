@@ -7,19 +7,19 @@
  * Any custom properties specific to forms
  */
 :root {
-    --animation-form-input-change: 100ms; // used to animate input changes like toggle switch, checkbox, radio etc
-    --color-form-disabled-background: #edecec;
-    --size-form-element-border-width: 1px;
+    --sbx-animation-form-input-change: 100ms; // used to animate input changes like toggle switch, checkbox, radio etc
+    --sbx-color-form-disabled-background: #edecec;
+    --sbx-size-form-element-border-width: 1px;
 }
 
 /**
  *  Shared form input focus styles
  */
 @mixin form-input-focus {
-    background: var(--color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
+    background: var(--sbx-color-foreground-primary); // ^foundation-fixes^ - won't need once _forms.scss is removed
     border-color: var(--sbx-color-accent);
-    outline: calc(var(--size-form-el-border-width) + 2px) solid var(--sbx-color-accent);
-    outline-offset: calc(var(--size-form-el-border-width) + 1px);
+    outline: calc(var(--sbx-size-form-element-border-width) + 2px) solid var(--sbx-color-accent);
+    outline-offset: calc(var(--sbx-size-form-element-border-width) + 1px);
 }
 
 /**
@@ -33,8 +33,8 @@
  *  Shared form input disabled styles
  */
 @mixin form-input-disabled {
-    background-color: var(--color-foreground-secondary);
-    color: var(--color-text-secondary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    background-color: var(--sbx-color-foreground-secondary);
+    color: var(--sbx-color-text-secondary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     cursor: not-allowed;
     pointer-events: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed
     & + label {
@@ -44,7 +44,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     :root {
-        --animation-form-input-change: 0ms;
+        --sbx-animation-form-input-change: 0ms;
     }
 }
 
@@ -53,7 +53,7 @@
  *  on the skin configurer
  */
 input[type="color"] {
-    background-color: var(--color-foreground-primary);
+    background-color: var(--sbx-color-foreground-primary);
     border-color: var(--sbx-color-accent);
     border-radius: var(--roundness-form-elements);
 }
@@ -62,7 +62,7 @@ input[type="color"] {
  *  So the hr also changes on the skin configurer
  */
 hr {
-    border-color: var(--color-text-secondary);
+    border-color: var(--sbx-color-text-secondary);
 }
 
 /**
@@ -71,8 +71,8 @@ hr {
  */
 .c-input-range {
     &__input::-webkit-slider-runnable-track {
-        background-color: var(--color-foreground-primary);
-        border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
+        background-color: var(--sbx-color-foreground-primary);
+        border: var(--sbx-size-form-element-border-width) solid var(--sbx-color-accent);
     }
     &__input::-webkit-slider-thumb {
         background-color: var(--sbx-color-accent);

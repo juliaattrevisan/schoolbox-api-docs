@@ -24,21 +24,17 @@
                 <input type="hidden" name="provider" value="{{ app.providerName }}" />
                 <div class="row">
                     <div class="small-12 column">
-                        <label>Endpoint
-                            <input type="text" name="host" value=""/>
-                        </label>
+                        <label for="tass-entity-host">Endpoint</label>
+                        <input id="tass-entity-host" type="text" name="host" value=""/>
 
-                        <label>App Code
-                            <input type="text" name="app" value="" />
-                        </label>
+                        <label for="tass-entity-app">App Code</label>
+                        <input id="tass-entity-app" type="text" name="app" value="" />
 
-                        <label>Token
-                            <input type="text" name="key" value=""/>
-                        </label>
+                        <label for="tass-entity-key">Token</label>
+                        <input id="tass-entity-key" type="text" name="key" value=""/>
 
-                        <label>Company Code
-                            <input type="text" name="companycode" value=""/>
-                        </label>
+                        <label for="tass-entity-companycode">Company Code</label>
+                        <input id="tass-entity-companycode" type="text" name="companycode" value=""/>
                     </div>
                     <div class="small-12 column">
                         <input type="submit" value="Install New Key">

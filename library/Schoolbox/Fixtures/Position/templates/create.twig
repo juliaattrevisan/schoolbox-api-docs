@@ -52,10 +52,10 @@
                         <input type="hidden" name="sportId" value="{{ sport.id }}"/>
                         <input type="hidden" name="positionId" value="{{ position.id }}"/>
 
-                        <label>
+                        <label for="position-name-{% if position.id %}{{ position.id }}{% endif %}">
                             Name
-                            <input type="text" name="name" value="{{ position.name }}"/>
                         </label>
+                        <input id="position-name-{% if position.id %}{{ position.id }}{% endif %}" type="text" name="name" value="{{ position.name }}"/>
                     </div>
                 </fieldset>
             </section>

@@ -37,12 +37,12 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
+                        <label for="reset-username">
                             Username
-                            <input type="text"
-                                   readonly
-                                   value="{{ reset.getUser().getUsername() }}" />
                         </label>
+                        <input id="reset-username" type="text"
+                               readonly
+                               value="{{ reset.getUser().getUsername() }}" />
                         <label>
                             New Password
                             <input type="password"

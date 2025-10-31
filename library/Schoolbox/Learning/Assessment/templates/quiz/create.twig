@@ -123,14 +123,12 @@
         </div>
         <div class="small-7 medium-10 columns no-pad {% if not assessment.duration %}hide{% endif %}" id="durationPanel">
             <div class="small-6 columns">
-                <label>Hours
-                    <input name='durationHours' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).hours ?? '' }}{% endif %}" />
-                </label>
+                <label for="duration-hours">Hours</label>
+                <input id="duration-hours" name='durationHours' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).hours ?? '' }}{% endif %}" />
             </div>
             <div class="small-6 columns">
-                <label>Minutes
-                    <input name='durationMinutes' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).minutes ?? '' }}{% endif %}" />
-                </label>
+                <label for="duration-minutes">Minutes</label>
+                <input id="duration-minutes" name='durationMinutes' type="text" value="{% if assessment.duration %}{{ assessment.durationComponents(assessment.duration).minutes ?? '' }}{% endif %}" />
             </div>
         </div>
     </div>
@@ -147,14 +145,12 @@
         </div>
         <div class="small-7 medium-10 columns no-pad {% if not assessment.readingTimeDuration %}hide{% endif %}" id="readingTimeDurationPanel">
             <div class="small-6 columns">
-                <label>Hours
-                    <input name='readingTimeDurationHours' type="text" value="{% if assessment.readingTimeDuration %}{{ assessment.durationComponents(assessment.readingTimeDuration).hours ?? '' }}{% endif %}" />
-                </label>
+                <label for="reading-time-hours">Hours</label>
+                <input id="reading-time-hours" name='readingTimeDurationHours' type="text" value="{% if assessment.readingTimeDuration %}{{ assessment.durationComponents(assessment.readingTimeDuration).hours ?? '' }}{% endif %}" />
             </div>
             <div class="small-6 columns">
-                <label>Minutes
-                    <input name='readingTimeDurationMinutes' type="text" value="{% if assessment.readingTimeDuration %}{{ assessment.durationComponents(assessment.readingTimeDuration).minutes ?? '' }}{% endif %}" />
-                </label>
+                <label for="reading-time-minutes">Minutes</label>
+                <input id="reading-time-minutes" name='readingTimeDurationMinutes' type="text" value="{% if assessment.readingTimeDuration %}{{ assessment.durationComponents(assessment.readingTimeDuration).minutes ?? '' }}{% endif %}" />
             </div>
         </div>
     </div>

@@ -93,7 +93,7 @@
                     <div class="small-12 medium-6 columns">
                         {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
                          this <input> field, moving up one will break the form. See SA-18992 for more. #}
-                        <label> Points <input id="points" type="text" inputmode="numeric" name="points" {% if canModifyPoints == false %}readonly {% endif %}/> </label>
+                        <label for="points"> Points </label><input id="points" type="text" inputmode="numeric" name="points" {% if canModifyPoints == false %}readonly {% endif %}/>
                     </div>
                 {% endif %}
                 <div class="small-12 columns">

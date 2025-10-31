@@ -1,9 +1,8 @@
 <div class="list-item">
     {% set url = school is defined ? routeLookup('sportsfixturesSchool.postEditSchool', {entityId: school.id}) : routeLookup('sportsfixturesSchool.postAddSchool') %}
     <div class="small-12 compact card" data-action="{{ url }}">
-        <label>
-            <input type="text" name="name" value="{{ school.name ?? '' }}" data-item-original-value="{{ school.name ?? '' }}" data-item-element />
-        </label>
+        <label for="school-name-{{ school.id ?? 'new' }}">School Name</label>
+        <input id="school-name-{{ school.id ?? 'new' }}" type="text" name="name" value="{{ school.name ?? '' }}" data-item-original-value="{{ school.name ?? '' }}" data-item-element />
 
         <span class="toast" data-save-item></span>
     </div>

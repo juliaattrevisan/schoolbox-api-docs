@@ -1,17 +1,18 @@
 /**
  *   The <input type="text"> element is used to create a text input field that can be used to input data.
  */
-.c-input-text[type="text"] {
-    background-color: var(--color-foreground-primary);
-    border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
+.sbx-input-text[type="text"] {
+    background-color: var(--sbx-color-foreground-primary);
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
+    color: var(--sbx-color-text-primary);
     color: var(--color-text-primary);
     font-size: max(16px, 1rem);
     font-family: inherit;
     height: 2.25rem;
     line-height: 1;
     margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
-    padding: var(--spacing-s);
+    padding: var(--sbx-size-s);
     transition: none; // ^foundation-fixes^ - won't need once _forms.scss is removed
     width: 100%;
     -webkit-font-smoothing: antialiased;
@@ -38,11 +39,11 @@
     }
 }
 
-.c-input-text--error[type="text"] {
+.sbx-input-text--error[type="text"] {
     border: 1px solid var(--color-alert);
 }
 
-.c-input-text--with-button[type="text"] {
+.sbx-input-text--with-button[type="text"] {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 .inline-input-container {
