@@ -1,3 +1,9 @@
+/**
+ * Test some of the variations around mark types for due works.
+ * 1. Provision sales.tar.gz data
+ * 2. Execute npx playwright test markTypes.spec.ts
+ */
+
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
@@ -20,7 +26,6 @@ test.describe("Due Work - Mark type tests", () => {
     const learnerId = 25;
 
     const unitName = `Test Unit ${Date.now()}`;
-    let newUnitSpecId: number | null = null;
     let newUnitId: number | null = null;
 
     let classLink: string | null = null; // The homepage link for the class that we imported to
@@ -96,10 +101,7 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo("wait for dropdown and click the import button");
         await page.getByTestId(`up-unit-cell-unit-action-${persuasionUnitId}-import-link`).click();
 
-        const classToImportRow = page
-            .locator("#importForm li")
-            .filter({ hasText: "9A English" })
-            .filter({ hasText: "Displayed in Course Outline" });
+        const classToImportRow = page.locator("#importForm li").filter({ hasText: "9A English" }).first();
 
         classLink = await classToImportRow.locator("a").first().getAttribute("href");
         if (classLink === null) {
