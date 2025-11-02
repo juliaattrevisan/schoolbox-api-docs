@@ -5,6 +5,7 @@
 
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
+import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type {
     MDPHeader,
@@ -50,13 +51,34 @@ const header = window.Vue.ref<Header[]>([
     },
 ]);
 
-const rows = window.Vue.ref<Profile[]>([]);
+const rows = window.Vue.ref<Profile[] | null>(null);
 
 // #endregion grid data
+
+/**
+ * When we start loading new data, we reset the data to null to show the loading state
+ */
+function onLoading(): void {
+    rows.value = null; // Reset the data to show loading state
+}
+
+/**
+ * When the data has successfully loaded
+ * @param data - The profile data
+ */
+function onLoaded(data: Profile[]): void {
+    debugger;
+    rows.value = data;
+}
+
+const filterKey = "MDP";
+
+listenForFilterLoading(filterKey, onLoading);
+listenForFilterLoad<Profile[]>(filterKey, (detail) => onLoaded(detail.content));
 </script>
 
 <template>
-    <empty-state v-if="rows.length === 0" icon="icon-learning-support">
+    <empty-state v-if="!rows || rows.length === 0" icon="icon-learning-support">
         <p>
             No {{ locale.differentiationProfile.translate(true, true) }} exist. They will appear here once records have
             been linked.
