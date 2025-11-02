@@ -20,6 +20,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
+use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Scrub;
 
@@ -152,14 +153,37 @@ class Controller extends Base
              */
             $aiSessionId = (string)Uuid::uuid4();
 
+            $lessonPlanAgent = new LessonPlanGeneration(
+                $this->clientFactory->buildForFeature(Helper::FEATURE_LESSONPLAN),
+                $lpConfig,
+                trim((string)$this->getConfigLoader()->get('spellcheck_language')),
+                $this->curriculumNodeMapper,
+            );
+
             try {
+                $response = $lessonPlanAgent->request(
+                    $this->user,
+                    $inputs['templateTitle'],
+                    $inputs['lessonPlanTitle'],
+                    $inputs['context'],
+                    $inputs['fields'],
+                    $inputs['duration'],
+                    $inputs['curriculumNodeIds'],
+                    $inputs['additionalContext'],
+                    $inputs['generateForField'],
+                    $aiSessionId,
+                );
+                $data = json_decode($response->getBody()->getContents(), true);
+
+                // I've seen no evidence the below is actually done anywhere:
+                // it used to be there, but was removed at some point.
                 /* Send it and decode the result (if any: sometimes it returns null)
                  * and dodge around all its weird encoding business with a double-decode,
                  * and ditching all its training markdown (lol) that it loves to use
                  *
                  * https://community.openai.com/t/json-returning-with-json/584818/6
                  */
-                $data = $helper->request($this->getUser(), $payload, Helper::FEATURE_LESSONPLAN, $aiSessionId);
+//                $data = $helper->request($this->getUser(), $payload, Helper::FEATURE_LESSONPLAN, $aiSessionId);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
