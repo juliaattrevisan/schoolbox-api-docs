@@ -12,6 +12,7 @@ import type {
     Header,
     AdjustmentType,
     Profile,
+    Payload,
     AdjustmentText,
 } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
@@ -51,7 +52,8 @@ const header = window.Vue.ref<Header[]>([
     },
 ]);
 
-const rows = window.Vue.ref<Profile[] | null>(null);
+const data = window.Vue.ref<Payload | null>(null);
+const rows = window.Vue.ref<Profile[]>([]);
 
 // #endregion grid data
 
@@ -59,26 +61,29 @@ const rows = window.Vue.ref<Profile[] | null>(null);
  * When we start loading new data, we reset the data to null to show the loading state
  */
 function onLoading(): void {
-    rows.value = null; // Reset the data to show loading state
+    data.value = null; // Reset the data to show loading state
 }
 
 /**
  * When the data has successfully loaded
- * @param data - The profile data
+ * @param $data - The profile data
  */
-function onLoaded(data: Profile[]): void {
-    debugger;
-    rows.value = data;
+function onLoaded($data: Payload): void {
+    data.value = $data;
+    rows.value = data.value.data.profiles;
 }
 
 const filterKey = "MDP";
 
 listenForFilterLoading(filterKey, onLoading);
-listenForFilterLoad<Profile[]>(filterKey, (detail) => onLoaded(detail.content));
+listenForFilterLoad<Payload>(filterKey, (detail) => onLoaded(detail.content));
 </script>
 
 <template>
-    <empty-state v-if="!rows || rows.length === 0" icon="icon-learning-support">
+    <div v-if="data === null" class="c-island l-pad-m">
+        <div class="loader"></div>
+    </div>
+    <empty-state v-else-if="rows.length === 0" icon="icon-learning-support">
         <p>
             No {{ locale.differentiationProfile.translate(true, true) }} exist. They will appear here once records have
             been linked.
