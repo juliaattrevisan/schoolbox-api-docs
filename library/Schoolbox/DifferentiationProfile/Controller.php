@@ -33,7 +33,7 @@ class Controller extends Base
      * @param RosettaStone                 $rosettaStone
      * @param AdjustmentCategoriesMapper   $adjustmentCategoriesMapper
      * @param AdjustmentLevelsMapper       $adjustmentLevelsMapper
-     * @param AdminConfigMapper            $differentiationProifleConfigMapper
+     * @param AdminConfigMapper            $differentiationProfileConfigMapper
      * @param AdminConfigModelToArray      $adminConfigModelToArray
      * @param IFactoryFactory              $filterFactoryFactory
      * @param Mapper                       $filterMapper
@@ -44,7 +44,7 @@ class Controller extends Base
         private RosettaStone $rosettaStone,
         private AdjustmentCategoriesMapper $adjustmentCategoriesMapper,
         private AdjustmentLevelsMapper $adjustmentLevelsMapper,
-        private AdminConfigMapper $differentiationProifleConfigMapper,
+        private AdminConfigMapper $differentiationProfileConfigMapper,
         private AdminConfigModelToArray $adminConfigModelToArray,
         private IFactoryFactory $filterFactoryFactory,
         private \Schoolbox\Filter\Mapper $filterMapper,
@@ -62,7 +62,7 @@ class Controller extends Base
     {
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
-        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
         $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
 
         $route = $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData');
@@ -101,8 +101,7 @@ class Controller extends Base
 
     public function getDifferentiationProfileData(): void
     {
-
-        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
 
         $profileTranslator = new ModelToArray(
             $this->getRouter()->getGenerator(),
