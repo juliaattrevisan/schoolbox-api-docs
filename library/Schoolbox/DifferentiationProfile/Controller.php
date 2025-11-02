@@ -60,6 +60,9 @@ class Controller extends Base
      */
     public function manageDifferentiationProfiles(): void
     {
+        $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
+        $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
+        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
         $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
 
         $route = $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData');
@@ -74,15 +77,31 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             '@differentiationProfiles/index.twig',
-            ['filterPanel' => $filterPanel],
+            [
+                'filterPanel' => $filterPanel,
+                'adjustmentCategories' => $adjustmentCategories->map(
+                    fn(AdjustmentCategoriesModel $category) => [
+                        'id'   => $category->getId(),
+                        'name' => $category->getName(),
+                    ]
+                ),
+                'adjustmentLevels'     => $adjustmentLevels->map(
+                    fn(AdjustmentLevelsModel $level) => [
+                        'id'   => $level->getId(),
+                        'name' => $level->getName(),
+                    ]
+                ),
+                'header'               => $adminConfigs->map(
+                    fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
+                ),
+            ],
             "Manage $translation"
         );
     }
 
     public function getDifferentiationProfileData(): void
     {
-        $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
-        $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
+
         $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
 
         $profileTranslator = new ModelToArray(
@@ -170,22 +189,6 @@ class Controller extends Base
 
         $payload = [
             'profiles'             => $data,
-            'adjustmentCategories' => $adjustmentCategories->map(
-                fn(AdjustmentCategoriesModel $category) => [
-                    'id'   => $category->getId(),
-                    'name' => $category->getName(),
-                ]
-            ),
-            'adjustmentLevels'     => $adjustmentLevels->map(
-                fn(AdjustmentLevelsModel $level) => [
-                    'id'   => $level->getId(),
-                    'name' => $level->getName(),
-                ]
-            ),
-            'header'               => $adminConfigs->map(
-                fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
-            ),
-            'filterPanel' => $filterPanel,
         ];
         $this->response = $this->responseAsJson([
             'data' => $payload,
