@@ -52,6 +52,12 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo("navigate to Year 9 English Modify unit planner page");
         await unitPlanner.goto(6);
 
+        tester.isGoingTo("click the create units button to open the modal");
+        await page.getByTestId(`unit-planner-create-units`).click();
+
+        tester.isGoingTo(`create a new unit with the name "${unitName}"`);
+        await unitPlanner.createUnitsInModal([unitName]);
+
         tester.isGoingTo("click on the create activity button for the Persuasion and the Media unit");
         await page
             .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${persuasionUnitId}-activities-1-button`)
