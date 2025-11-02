@@ -23,7 +23,6 @@ const props = defineProps<{
     header: MDPHeader[];
     adjustmentCategories: AdjustmentType[];
     adjustmentLevels: AdjustmentType[];
-    profiles: Profile[];
 }>();
 
 // #region grid data
@@ -51,7 +50,7 @@ const header = window.Vue.ref<Header[]>([
     },
 ]);
 
-const rows = window.Vue.ref<Profile[]>(props.profiles);
+const rows = window.Vue.ref<Profile[]>([]);
 
 // #endregion grid data
 </script>
