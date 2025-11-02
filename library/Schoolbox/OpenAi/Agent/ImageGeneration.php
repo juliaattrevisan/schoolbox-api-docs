@@ -117,6 +117,8 @@ class ImageGeneration
     /**
      * Build a payload for the AI provider.
      *
+     * TODO revert back to \Schoolbox\Editor\OpenAI\Payload\ImageGeneration?
+     *
      * @param string      $prompt              The user's input prompt.
      * @param bool        $stream              Whether or not to request a stream.
      * @param string|null $size                If provided: a size for the image.

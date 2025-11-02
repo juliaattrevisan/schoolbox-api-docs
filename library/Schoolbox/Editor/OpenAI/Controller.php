@@ -98,7 +98,7 @@ class Controller extends Base
                 trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
                 trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
-                $this->curriculumNodeMapper
+                $this->curriculumNodeMapper,
             ));
 
             /* Generate a payload for ai, using the prompt pieces for System and User info
