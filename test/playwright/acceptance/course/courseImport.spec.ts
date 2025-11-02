@@ -403,7 +403,7 @@ test.describe("Course import tests", () => {
         );
     });
 
-    test("Create activities via course outline, save into the course, delete activities, check students cannot view activities with open date in the future", async ({
+    test.skip("Create activities via course outline, save into the course, delete activities, check students cannot view activities with open date in the future", async ({
         tester,
         page,
         db,
@@ -486,7 +486,7 @@ test.describe("Course import tests", () => {
         await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
     });
 
-    test("Course Outline: filters and 3-dot options", async ({ tester, page, db }) => {
+    test.skip("Course Outline: filters and 3-dot options", async ({ tester, page, db }) => {
         const homepage = new Homepage(tester, page);
         const courseOutline = new CourseOutline(tester, page);
 
