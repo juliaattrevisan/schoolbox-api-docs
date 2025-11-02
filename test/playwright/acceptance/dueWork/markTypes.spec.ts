@@ -47,7 +47,6 @@ test.describe("Due Work - Mark type tests", () => {
     test("Create activities", async ({ tester, page }) => {
         const unitPlanner = new UnitPlanner(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
-        const persuasionUnitId = 17; // "Persuasion and the Media"
 
         tester.isGoingTo("navigate to Year 9 English Modify unit planner page");
         await unitPlanner.goto(6);
@@ -58,13 +57,18 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo(`create a new unit with the name "${unitName}"`);
         await unitPlanner.createUnitsInModal([unitName]);
 
-        tester.isGoingTo("click on the create activity button for the Persuasion and the Media unit");
+        // get <a> tag where the text matches the unit name, then get its data-test attribute to find the unit spec id
+        const unitLink = page.locator("a").filter({ hasText: unitName });
+        const unitLinkAttribute = await unitLink.getAttribute("data-test");
+        const newUnitSpecId = Number(unitLinkAttribute?.replace("unit-planner-unit-link-", ""));
+
+        tester.isGoingTo("click on the create activity button for the new unit");
         await page
-            .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${persuasionUnitId}-activities-1-button`)
+            .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${newUnitSpecId}-activities-1-button`)
             .click();
 
         tester.isGoingTo(`create a new due work with the name "${dueWorkName1}"`);
-        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
+        await unitPlanner.clickCreateActivityOption("due-work", newUnitSpecId);
 
         // Create a second due work, self reflection without rubric, input percentage, display letter grade
         await assessmentForm.setTitle(dueWorkName1);
@@ -75,14 +79,14 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.clickCreate();
 
-        tester.isGoingTo("click on the create activity button for the Persuasion and the Media unit");
+        tester.isGoingTo("click on the create activity button for the new unit");
         await page
-            .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${persuasionUnitId}-activities-1-button`)
+            .getByTestId(`sbx-pop-out-dropdown-activities-list-activity-${newUnitSpecId}-activities-1-button`)
             .click();
 
         // Create a second due work, self reflection with rubric, input total mark, display percentage
         tester.isGoingTo(`create a new due work with the name "${dueWorkName2}"`);
-        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
+        await unitPlanner.clickCreateActivityOption("due-work", newUnitSpecId);
 
         await assessmentForm.setTitle(dueWorkName2);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
@@ -102,12 +106,16 @@ test.describe("Due Work - Mark type tests", () => {
 
         // Now back on the unit planner page, import the unit into the homepage
         tester.isGoingTo("import the new unit into 9A English");
-        tester.isGoingTo("click on the unit action button for unit 'Persuasion and the Media'");
-        await page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${persuasionUnitId}`).click();
+        tester.isGoingTo("click on the unit action button for the new unit");
+        await page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${newUnitSpecId}`).click();
         tester.isGoingTo("wait for dropdown and click the import button");
-        await page.getByTestId(`up-unit-cell-unit-action-${persuasionUnitId}-import-link`).click();
+        await page.getByTestId(`up-unit-cell-unit-action-${newUnitSpecId}-import-link`).click();
 
-        const classToImportRow = page.locator("#importForm li").filter({ hasText: "9A English" }).first();
+        // const classToImportRow = page.locator("#importForm li").filter({ hasText: "9A English" }).first();
+        const classToImportRow = page
+            .locator("#importForm li")
+            .filter({ hasText: "9A English" })
+            .filter({ hasText: "Displayed in Course Outline" });
 
         classLink = await classToImportRow.locator("a").first().getAttribute("href");
         if (classLink === null) {
