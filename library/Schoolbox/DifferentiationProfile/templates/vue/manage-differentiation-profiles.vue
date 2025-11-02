@@ -112,3 +112,14 @@ listenForFilterLoad<Payload>(filterKey, (detail) => onLoaded(detail.content));
 </template>
 
 <style scoped></style>
+
+<style>
+/* A few tweaks to adjust the filter panel to sit properly within the layout */
+#filter_panel {
+    padding: 0;
+}
+
+#filter_panel section {
+    margin-bottom: 0;
+}
+</style>
