@@ -10,7 +10,7 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
-use GuzzleHttp\Client;
+use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
@@ -22,7 +22,6 @@ use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
-use Scrub;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -40,9 +39,6 @@ class Controller extends Base
      * Controller constructor.
      */
     public function __construct(
-        private Client $client,
-        private \Schoolbox\Error\Mapper $errorMapper,
-        private Log\Mapper $logMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private ClientFactory $clientFactory,
     ) {
@@ -56,7 +52,7 @@ class Controller extends Base
      * @throws ClientExceptionInterface
      * @throws Deleted
      * @throws Exception
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function postLessonPlan(): void
     {
@@ -141,8 +137,8 @@ class Controller extends Base
      * Generates an image as part of a conversation
      *
      * @return void
-     * @throws Exception
-     * @throws \JsonException
+     * @throws ClientExceptionInterface
+     * @throws JsonException
      */
     public function postImage(): void
     {
@@ -227,8 +223,7 @@ class Controller extends Base
      * to /openai route via some direct javascript thing
      *
      * @return void
-     * @throws Exception
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function postAiAssistant(): void
     {
