@@ -4,7 +4,7 @@
     [ locale.differentiationProfile.plural ]
 ) }}
 
-{% set reportContentId = 'manage-differentiation-profiles' %}
+{% set reportContentId = 'manage-differentiation-profiles-container' %}
 
 {% autoescape 'js' %}
     <script type="text/javascript">
@@ -33,7 +33,7 @@
                 quickload: false,
             } only %}
         </div>
-        <div id="manage-differentiation-profiles-container">
+        <div id="{{ reportContentId }}">
             <manage-differentiation-profiles
                 :header='{{ header|json_encode|raw }}'
                 :adjustment-categories='{{ adjustmentCategories|json_encode|raw }}'

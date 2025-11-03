@@ -8,7 +8,7 @@ import { isArrayOfNumbers } from "./arrayUtils";
  * A type representing either a nested object or an array of numbers
  * These two are currently the only types we need to consider for query parameters
  */
-type Nested = {
+export type Nested = {
     [key: string]: Nested | number[];
 };
 

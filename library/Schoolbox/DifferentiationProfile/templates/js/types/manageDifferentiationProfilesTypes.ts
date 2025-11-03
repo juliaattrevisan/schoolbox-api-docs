@@ -1,5 +1,6 @@
 import type { User } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
+import { Nested } from "@js/util/queryUtils";
 
 /**
  * Differentiation Profile header configuration
@@ -70,6 +71,15 @@ export type Profile = {
     created_at: string | null;
     updated_at: string | null;
     deleted_at: string | null;
+};
+
+/**
+ * The expected query parameters
+ */
+export type QueryParams = {
+    filter_selection?: Nested;
+    limit?: string;
+    cursor?: string;
 };
 
 /**

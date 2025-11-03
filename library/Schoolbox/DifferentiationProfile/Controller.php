@@ -190,15 +190,12 @@ class Controller extends Base
             'profiles'             => $data,
         ];
         $this->response = $this->responseAsJson([
-            'status' => 200,
-            'content' => [
-                'data' => $payload,
-                'metadata' => [
-                    'count'  => $count,
-                    'cursor' => [
-                        'next'    => $next,
-                        'current' => $current,
-                    ],
+            'data' => $payload,
+            'metadata' => [
+                'count'  => $count,
+                'cursor' => [
+                    'next'    => $next,
+                    'current' => $current,
                 ],
             ],
         ]);
