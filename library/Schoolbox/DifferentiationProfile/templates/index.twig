@@ -4,6 +4,23 @@
     [ locale.differentiationProfile.plural ]
 ) }}
 
+{% set reportContentId = 'manage-differentiation-profiles' %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                document.dispatchEvent(new CustomEvent('manage-differentiation-profiles__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
+            });
+        });
+    </script>
+{% endautoescape %}
+
 <div class="f-container">
     <div class="l-flex-col l-gap-m">
         <div class="f-no-margins">
@@ -11,8 +28,7 @@
         </div>
         <div>
             {% include '@filters/panel.twig' with {
-                contentId: 'filterPanel',
-                eventKey:  'MDP',
+                contentId: reportContentId,
                 panel:     filterPanel,
                 quickload: false,
             } only %}
