@@ -65,7 +65,10 @@ class Helper
 
     /**
      * Controller constructor.
+     *
+     * Whilst this class is deprecated, its constants have not yet been.
      */
+    #[\Deprecated('Use \Schoolbox\OpenAi\ClientFactory::buildForFeature to create a client')]
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiKey,
