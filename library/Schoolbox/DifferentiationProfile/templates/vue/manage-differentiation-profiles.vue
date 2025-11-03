@@ -5,17 +5,11 @@
 
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
-import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { Nested } from "@js/util/queryUtils";
 import { getSearchString } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
-import type {
-    MDPHeader,
-    Header,
-    AdjustmentType,
-    Profile,
-    AdjustmentText,
-} from "../js/types/manageDifferentiationProfilesTypes";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import type { MDPHeader, Header, AdjustmentType, AdjustmentText } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
@@ -60,7 +54,6 @@ const header = window.Vue.ref<Header[]>([
 
 const endpoint = window.Vue.ref<string>("");
 const filters = window.Vue.ref<Nested>({});
-
 const { isLoading, payload, isEmpty, loadError } = useLoadData(endpoint);
 
 /**
@@ -83,6 +76,9 @@ window.Vue.onMounted(() => {
 <template>
     <div v-if="isLoading" class="c-island l-pad-m">
         <div class="loader"></div>
+    </div>
+    <div v-else-if="loadError" class="c-island l-pad-m">
+        <data-load-error data-title="record" :further-info="loadError" />
     </div>
     <empty-state v-else-if="isEmpty" icon="icon-learning-support">
         <p>
