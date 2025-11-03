@@ -36,6 +36,34 @@ class LessonPlanGeneration
     ) {
     }
 
+    /**
+     * Request a lesson plan be generated.
+     *
+     * @param User        $user              The user making the request: will be logged.
+     * @param string      $templateTitle     The name of the template which is being used to create the lesson plan.
+     * @param string      $lessonPlanTitle   The proposed name for the lesson plan.
+     * @param string      $context           Basic context provided for the lesson plan.
+     *                                       Seems to be the name of the folder the lesson plan is being created in.
+     * @param array<array{
+     *     id: int,
+     *     title: string,
+     *     description: string,
+     *     body: string,
+     *     template: string,
+     *     visibility: string,
+     * }>                 $fields            Each field within the lesson plan, and its title and description.
+     * @param string      $duration          How long is the lesson plan expected to take?
+     *                                       This should be a time-like value.
+     * @param array<int>  $curriculumNodeIds List of related nodes to provide context for.
+     * @param string      $additionalContext Any additional context provided for the lesson plan.
+     * @param string|null $generateForField  If provided: generate context for this field only.
+     * @param string|null $aiSessionId       If provided: associate the log with this session ID.
+     * @return ResponseInterface
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
     public function request(
         User $user,
         string $templateTitle,
@@ -70,7 +98,7 @@ class LessonPlanGeneration
         );
 
         return $this->client->createResponse(
-            json_decode($payload, true),
+            $payload,
             $user,
             Helper::FEATURE_LESSONPLAN,
             $aiSessionId,

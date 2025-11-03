@@ -233,10 +233,9 @@ class LessonPlan
      * @param array $curriculumNodeIds
      * @param string $additionalContext
      * @param ?string $generateForField
-     * @return string
+     * @return array
      * @throws Deleted
      * @throws Exception
-     * @throws \JsonException
      */
     public function generate(
         string $templateTitle,
@@ -247,7 +246,7 @@ class LessonPlan
         array $curriculumNodeIds,
         string $additionalContext = '',
         ?string $generateForField = null
-    ): string {
+    ): array {
         /* Details about how to use each field
          */
         $responseFormat = self::RESPONSE_FORMAT;
@@ -324,7 +323,7 @@ class LessonPlan
             ]);
         }
 
-        return json_encode($payload, JSON_THROW_ON_ERROR);
+        return $payload;
     }
 
 

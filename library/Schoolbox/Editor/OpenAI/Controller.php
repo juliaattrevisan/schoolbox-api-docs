@@ -163,17 +163,16 @@ class Controller extends Base
             try {
                 $response = $lessonPlanAgent->request(
                     $this->user,
-                    $inputs['templateTitle'],
-                    $inputs['lessonPlanTitle'],
-                    $inputs['context'],
-                    $inputs['fields'],
-                    $inputs['duration'],
-                    $inputs['curriculumNodeIds'],
-                    $inputs['additionalContext'],
-                    $inputs['generateForField'],
+                    $this->requestPost->get('templateTitle'),
+                    $this->requestPost->get('lessonPlanTitle'),
+                    $this->requestPost->get('context'),
+                    $this->requestPost->get('fields'),
+                    $this->requestPost->get('duration'),
+                    $this->requestPost->get('curriculumNodeIds'),
+                    $this->requestPost->get('additionalContext') ?? '',
+                    $this->requestPost->get('generateForField') ?? null,
                     $aiSessionId,
                 );
-                $data = json_decode($response->getBody()->getContents(), true);
 
                 // I've seen no evidence the below is actually done anywhere:
                 // it used to be there, but was removed at some point.
@@ -183,7 +182,7 @@ class Controller extends Base
                  *
                  * https://community.openai.com/t/json-returning-with-json/584818/6
                  */
-//                $data = $helper->request($this->getUser(), $payload, Helper::FEATURE_LESSONPLAN, $aiSessionId);
+                $data = json_decode($response->getBody()->getContents(), true);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
