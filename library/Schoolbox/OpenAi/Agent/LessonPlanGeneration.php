@@ -9,13 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent;
 
-use Psr\Http\Message\ResponseInterface;
+use JsonException;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\LessonPlan;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Agent for generating lesson plans via OpenAI.
@@ -58,8 +59,8 @@ class LessonPlanGeneration
      * @param string      $additionalContext Any additional context provided for the lesson plan.
      * @param string|null $generateForField  If provided: generate context for this field only.
      * @param string|null $aiSessionId       If provided: associate the log with this session ID.
-     * @return ResponseInterface
-     * @throws \JsonException
+     * @return array{0: array, 1: int} 0: response body, 1: status
+     * @throws JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
@@ -75,7 +76,7 @@ class LessonPlanGeneration
         string $additionalContext,
         ?string $generateForField,
         ?string $aiSessionId = null
-    ): ResponseInterface {
+    ): array {
         // Use existing payload generation to create payload:
         // however, it should not json_encode
         $payloadGenerator = new LessonPlan(
@@ -96,12 +97,60 @@ class LessonPlanGeneration
             $additionalContext,
             $generateForField,
         );
-
-        return $this->client->createResponse(
+        $response = $this->client->createResponse(
             $payload,
             $user,
             Helper::FEATURE_LESSONPLAN,
             $aiSessionId,
         );
+
+        // This response used to need special handling of its return, because it
+        // was not guaranteed to be valid JSON.
+        // That no longer seems to be required, but the original comment was:
+        // Send it and decode the result (if any: sometimes it returns null)
+        // and dodge around all its weird encoding business with a double-decode,
+        // and ditching all its training markdown (lol) that it loves to use
+        //
+        // https://community.openai.com/t/json-returning-with-json/584818/6
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
+        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
+        if (!isset($relevantData)) {
+            return [$data['output'] ?? null, 500];
+        }
+        try {
+            /* if this didn't decode correctly, then some weird response came from the AI:
+             * send that on... so we can figure out what happened
+             */
+            $newFieldData = json_decode(
+                $relevantData,
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            );
+        } catch (JsonException $e) {
+            return [$data['output'] ?? null, 500];
+        }
+
+        /* Since we request the fields to be keyed by their title, not ID for AI reasons,
+         * translate it back to IDs for frontend sanity
+         */
+        foreach ($fields as $field) {
+            // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
+            $fieldKey = $payloadGenerator->getPayloadFieldKey($fields, $field['id']);
+            if (isset($newFieldData[$fieldKey])) {
+                $fields[$field['id']] = Scrub::html($newFieldData[$fieldKey]);
+            }
+        }
+
+        /* if the AI didn't return anything, then we don't want to send an empty field back
+         * just send whatever on earth the AI sent back to us, it'll be wrong... but it'll be something
+         */
+        if (empty($fields)) {
+            $fields = $newFieldData;
+        }
+
+        return [$fields, 200];
     }
 }
