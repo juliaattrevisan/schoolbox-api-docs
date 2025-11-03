@@ -14,9 +14,9 @@ import SsQueryInput from "./ss-query-input.vue";
 import SsResults from "./ss-results.vue";
 
 interface Props {
-    label: string; // the label text
-    labelId: string; // the label id
-    endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useQuerySearch
+    label?: string; // the label text
+    labelId?: string; // the label id
+    endpoint?: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useQuerySearch
     queryKey?: string; // the key to use for search
     manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isRequired?: boolean; // whether the input requires a value
@@ -33,8 +33,12 @@ interface Props {
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
     showSelected?: boolean; // whether to show the selected items
+    showInput?: boolean; // whether to show the input, sometimes we don't need search at all if defaultResults is all the results available
 }
 const props = withDefaults(defineProps<Props>(), {
+    label: "",
+    labelId: "search-select-input",
+    endpoint: "",
     defaultResults: undefined,
     formValueName: "",
     placeholder: "Search...",
@@ -43,6 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
     buttonTitle: "Browse",
     queryKey: "query",
     showSelected: true,
+    showInput: true,
 });
 
 const emit = defineEmits<{
@@ -190,9 +195,11 @@ function onButtonSelected(): void {
 
 <template>
     <div ref="searchSelectEl" v-on-click-outside="onClickOutside" :data-test="`search-select-${props.labelId}`">
-        <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
-        <slot name="meta"></slot>
-        <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
+        <template v-if="props.showInput">
+            <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
+            <slot name="meta"></slot>
+            <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
+        </template>
         <ss-selected
             v-if="props.showSelected"
             :selected="selected"
@@ -203,7 +210,7 @@ function onButtonSelected(): void {
             @select="onSelect"
             @remove="onRemove"
         />
-        <div class="input-group f-no-margins">
+        <div v-if="props.showInput" class="input-group f-no-margins" data-test="search-select-input-group">
             <ss-query-input
                 v-if="!props.isReadOnly"
                 v-model:query="query"

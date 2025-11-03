@@ -111,6 +111,7 @@ async function onSaveSelected(): Promise<void> {
                                 v-model="data.featureToggle.enabled"
                                 type="checkbox"
                                 name="enabled"
+                                autocomplete="off"
                             />
                             <label for="differentiation-profiles-field" data-test="differentiation-profiles-toggle">
                                 <span>On</span>
@@ -141,7 +142,12 @@ async function onSaveSelected(): Promise<void> {
                             </header>
                         </div>
                     </fieldset>
-                    <fieldset v-for="(module, key) in data.modules" :key="key" class="content">
+                    <fieldset
+                        v-for="(module, key) in data.modules"
+                        :key="key"
+                        class="content"
+                        :data-test="`differentiation-profiles-fieldset-${key}`"
+                    >
                         <sortable-wrapper
                             tag="ul"
                             class="information-list sortable ui-sortable"
@@ -174,14 +180,15 @@ async function onSaveSelected(): Promise<void> {
                                                 <div :class="`small-12 medium-${header.colSpan} column`">
                                                     <template v-if="header.type === 'checkbox'">
                                                         <input
-                                                            :id="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                            :id="`field-${header.key}-${item.element.id}`"
                                                             v-model="item.element.is_enabled"
                                                             type="checkbox"
+                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
                                                         />
                                                         <label
-                                                            :for="`differentiation-profiles-adjustments-field-${item.element.id}`"
+                                                            :for="`field-${header.key}-${item.element.id}`"
                                                             class="checkbox-label"
-                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}`"
+                                                            :data-test="`differentiation-profiles-input-${header.key}-${item.element.id}-label`"
                                                             >{{ item.element.title }}</label
                                                         >
                                                     </template>

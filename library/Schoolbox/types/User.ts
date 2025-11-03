@@ -7,7 +7,15 @@ type UserLinks = {
 };
 
 /**
- * The start of a SBX User type
+ * The user's year level
+ */
+type UserYearLevel = {
+    id: number;
+    name: string | null;
+};
+
+/**
+ * SBX User type
  */
 export type User = {
     externalId?: number;
@@ -20,6 +28,7 @@ export type User = {
     title: string | null;
     pronoun: string | null;
     _links?: UserLinks;
+    yearLevel?: UserYearLevel;
 };
 
 /**
