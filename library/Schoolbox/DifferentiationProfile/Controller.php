@@ -69,7 +69,7 @@ class Controller extends Base
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
-            $route . "?filter_selection",
+            $route,
             $this->getUser(),
             [],
             $this->requestQuery->getArrayCopy(),

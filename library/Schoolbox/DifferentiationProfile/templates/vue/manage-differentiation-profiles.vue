@@ -70,6 +70,7 @@ function onLoading(): void {
  */
 function onLoaded($data: Payload): void {
     data.value = $data;
+    console.warn("onloaded");
     rows.value = data.value.data.profiles;
 }
 

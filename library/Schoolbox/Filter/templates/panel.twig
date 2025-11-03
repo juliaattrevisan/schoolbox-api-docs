@@ -278,7 +278,7 @@ Usage:
             // Post there if so, otherwise update the history state and filters
             // immediately.
             if (href) {
-                $.post(href, data)
+                $.get(href, data)
                     .done(function(response){
 
                         // Did we get not get JSON ?
