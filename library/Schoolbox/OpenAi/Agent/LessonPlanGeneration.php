@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent;
 
 use JsonException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\LessonPlan;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
 use Scrub;
@@ -60,10 +62,8 @@ class LessonPlanGeneration
      * @param string|null $generateForField  If provided: generate context for this field only.
      * @param string|null $aiSessionId       If provided: associate the log with this session ID.
      * @return array{0: array, 1: int} 0: response body, 1: status
-     * @throws JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws ClientExceptionInterface
+     * @throws MapperException
      */
     public function request(
         User $user,
@@ -77,8 +77,6 @@ class LessonPlanGeneration
         ?string $generateForField,
         ?string $aiSessionId = null
     ): array {
-        // Use existing payload generation to create payload:
-        // however, it should not json_encode
         $payloadGenerator = new LessonPlan(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
