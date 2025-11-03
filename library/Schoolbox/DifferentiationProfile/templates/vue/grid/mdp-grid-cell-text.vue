@@ -4,10 +4,10 @@
  */
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
-import type { Text } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { AdjustmentText } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
-    text: Text;
+    text: AdjustmentText;
 }>();
 </script>
 
