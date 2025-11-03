@@ -222,42 +222,4 @@ class ImageGeneration
             ],
         ];
     }
-
-    /**
-     * Parses the attributes from the frontend, will throw if any of the attributes are invalid
-     * @param array<string,?string> $userAttributes
-     * @return array<string,?string>
-     * @throws \InvalidArgumentException
-     */
-    private static function parseAttributes(array $userAttributes): array
-    {
-        $parsed = [];
-
-        foreach (self::getAttributes() as $attribute) {
-            $parsed[$attribute['id']] = null;
-            $value = trim((string)($userAttributes[$attribute['id']] ?? ''));
-
-            /* Force values to always be either null or a meaningful string at the end */
-            if ('' === $value) {
-                $value = null;
-            }
-
-            if (null === $value) {
-                if (!$attribute['required']) {
-                    continue;
-                }
-
-                throw new \InvalidArgumentException("Attribute '{$attribute['id']}' is required");
-            }
-
-
-            if (!array_key_exists($value, $attribute['options'])) {
-                throw new \InvalidArgumentException("Attribute '{$attribute['id']}' has an invalid value: {$value}");
-            }
-
-            $parsed[$attribute['id']] = $value;
-        }
-
-        return $parsed;
-    }
 }
