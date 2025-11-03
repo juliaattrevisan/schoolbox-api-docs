@@ -22,6 +22,7 @@
                 :header='{{ header|json_encode|raw }}'
                 :adjustment-categories='{{ adjustmentCategories|json_encode|raw }}'
                 :adjustment-levels='{{ adjustmentLevels|json_encode|raw }}'
+                route='{{ route }}'
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/manageDifferentiationProfiles.js?v={{ config.site_version }}"></script>

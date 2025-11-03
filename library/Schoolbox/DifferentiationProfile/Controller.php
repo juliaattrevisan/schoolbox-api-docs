@@ -65,11 +65,10 @@ class Controller extends Base
         $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
         $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
 
-        $route = $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData');
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
-            $route,
+            null,
             $this->getUser(),
             [],
             $this->requestQuery->getArrayCopy(),
@@ -94,6 +93,7 @@ class Controller extends Base
                 'header'               => $adminConfigs->map(
                     fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
                 ),
+                'route' => $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData'),
             ],
             "Manage $translation"
         );

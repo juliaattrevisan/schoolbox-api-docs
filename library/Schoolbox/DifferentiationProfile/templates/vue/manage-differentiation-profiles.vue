@@ -25,6 +25,7 @@ const props = defineProps<{
     header: MDPHeader[];
     adjustmentCategories: AdjustmentType[];
     adjustmentLevels: AdjustmentType[];
+    route: string;
 }>();
 
 // #region grid data
