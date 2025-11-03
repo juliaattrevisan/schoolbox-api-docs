@@ -14,7 +14,6 @@ import type {
     Header,
     AdjustmentType,
     Profile,
-    Payload,
     AdjustmentText,
 } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
@@ -22,7 +21,8 @@ import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
-import { ON_FILTER_CHANGE, type FiltersChangeEventDetail } from "../js/MDPEvents";
+import { ON_FILTER_CHANGE } from "../js/MDPEvents";
+import { useLoadData } from "./composable/useLoadData";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -56,68 +56,41 @@ const header = window.Vue.ref<Header[]>([
     },
 ]);
 
-const rows = window.Vue.ref<Profile[]>([]);
-
 // #endregion grid data
 
+const endpoint = window.Vue.ref<string>("");
 const filters = window.Vue.ref<Nested>({});
-const isProcessing = window.Vue.ref(true);
-const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
-/**
- * retrieve data for the grid
- */
-async function load(): Promise<void> {
-    const toast = window.sbProps.toastActivate("Loading...");
-    const endpoint = new URL(props.route, window.location.origin);
-    const queryData: Nested = {};
-    if (Object.keys(filters.value).length > 0) {
-        queryData.filter_selection = filters.value;
-    }
-    endpoint.search = getSearchString(queryData);
-    try {
-        isProcessing.value = true;
-        loadError.value = null;
-        const response = await apiRequest<Payload>({
-            url: endpoint.toString(),
-            method: "GET",
-        });
-        if (!response.success) {
-            throw new Error(response.message || "Failed to load");
-        }
-        toast.timeout({ text: "Loaded successfully" });
-        rows.value = response.data.data.profiles;
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
-        loadError.value = errorMessage;
-        toast.timeout({ text: errorMessage, isSuccess: false });
-    } finally {
-        isProcessing.value = false;
-    }
-}
+const { isLoading, payload, isEmpty, loadError } = useLoadData(endpoint);
 
 /**
  * Listen for filter changes and reload data accordingly
  */
 window.Vue.onMounted(() => {
-    document.addEventListener(ON_FILTER_CHANGE, (event: CustomEvent<FiltersChangeEventDetail>) => {
+    document.addEventListener(ON_FILTER_CHANGE, (event) => {
         filters.value = event.detail.selectedFilters;
-        void load();
+        const newEndpoint = new URL(props.route, window.location.origin);
+        const queryData: Nested = {};
+        if (Object.keys(filters.value).length > 0) {
+            queryData.filter_selection = filters.value;
+        }
+        newEndpoint.search = getSearchString(queryData);
+        endpoint.value = newEndpoint.toString();
     });
 });
 </script>
 
 <template>
-    <div v-if="isProcessing" class="c-island l-pad-m">
+    <div v-if="isLoading" class="c-island l-pad-m">
         <div class="loader"></div>
     </div>
-    <empty-state v-else-if="rows.length === 0" icon="icon-learning-support">
+    <empty-state v-else-if="isEmpty" icon="icon-learning-support">
         <p>
             No {{ locale.differentiationProfile.translate(true, true) }} exist. They will appear here once records have
             been linked.
         </p>
     </empty-state>
-    <mdp-grid v-else :header="header" :rows="rows">
+    <mdp-grid v-else-if="payload" :header="header" :rows="payload.data.profiles">
         <template #User="{ row, header: columnHeader }">
             <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
         </template>
