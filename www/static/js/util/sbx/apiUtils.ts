@@ -19,6 +19,17 @@ export type Metadata = {
 };
 
 /**
+ * Typical params that may be available when loading a url
+ */
+export enum SearchParam {
+    SELECTED = "selected",
+    SORT_BY = "sortBy",
+    ORDER = "order",
+    LIMIT = "limit",
+    CURSOR = "cursor",
+}
+
+/**
  * Metadata typically for API responses using page-based pagination
  */
 export type PaginationMeta = {

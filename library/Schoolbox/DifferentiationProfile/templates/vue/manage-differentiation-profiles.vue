@@ -6,10 +6,18 @@
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import type { Nested } from "@js/util/queryUtils";
+import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import type { MDPHeader, Header, AdjustmentType, AdjustmentText } from "../js/types/manageDifferentiationProfilesTypes";
+import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
+import type {
+    MDPHeader,
+    Header,
+    AdjustmentType,
+    AdjustmentText,
+    Payload,
+} from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
@@ -53,6 +61,8 @@ const header = window.Vue.ref<Header[]>([
 // #endregion grid data
 
 const url = window.Vue.ref<string>("");
+const searchParams = new URLSearchParams();
+const LIMIT = 2; // the current set limit for the number of records to fetch at once
 const filters = window.Vue.ref<Nested>({});
 const { isLoading, payload, isEmpty, loadError } = useLoadData(url);
 
@@ -63,18 +73,25 @@ window.Vue.onMounted(() => {
     document.addEventListener(ON_FILTER_CHANGE, (event) => {
         filters.value = event.detail.selectedFilters;
         const newUrl = new URL(props.route, window.location.origin);
-        const searchParams = new URLSearchParams();
         const keyValuePairs = getKeyValuePairs({ filter_selection: filters.value });
         const map = new Map(Object.entries(keyValuePairs));
         // then append each key-value pair to the searchParams object
         map.forEach((value, key) => {
             searchParams.append(key, value);
         });
-        searchParams.set("limit", "3");
+        searchParams.set("limit", LIMIT.toString());
         newUrl.search = searchParams.toString();
         url.value = newUrl.toString();
     });
 });
+
+/**
+ * Handle previous/next page button clicks
+ * @param cursor - the cursor to use for the previous/next page
+ */
+function onPaginate(cursor: string): void {
+    searchParams.set(SearchParam.CURSOR as string, cursor);
+}
 </script>
 
 <template>
@@ -90,26 +107,36 @@ window.Vue.onMounted(() => {
             been linked.
         </p>
     </empty-state>
-    <mdp-grid v-else-if="payload" :header="header" :rows="payload.data.profiles">
-        <template #User="{ row, header: columnHeader }">
-            <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
-        </template>
-        <template #Adjustment="{ row, header: columnHeader }">
-            <mdp-grid-cell-adjustment
-                :adjustment="row[columnHeader.key] as AdjustmentType[]"
-                :options="columnHeader.key === 'adjustment_category' ? adjustmentCategories : adjustmentLevels"
-            />
-        </template>
-        <template #Text="{ row, header: columnHeader }">
-            <mdp-grid-cell-text :text="row[columnHeader.key] as AdjustmentText" />
-        </template>
-        <template #Date="{ row, header: columnHeader }">
-            <div class="date-cell">
-                <!-- Custom date display -->
-                {{ row[columnHeader.key] ? new Date(row[columnHeader.key] as string).toLocaleDateString() : "" }}
-            </div>
-        </template>
-    </mdp-grid>
+    <template v-else-if="payload">
+        <mdp-grid :header="header" :rows="payload.data.profiles">
+            <template #User="{ row, header: columnHeader }">
+                <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
+            </template>
+            <template #Adjustment="{ row, header: columnHeader }">
+                <mdp-grid-cell-adjustment
+                    :adjustment="row[columnHeader.key] as AdjustmentType[]"
+                    :options="columnHeader.key === 'adjustment_category' ? adjustmentCategories : adjustmentLevels"
+                />
+            </template>
+            <template #Text="{ row, header: columnHeader }">
+                <mdp-grid-cell-text :text="row[columnHeader.key] as AdjustmentText" />
+            </template>
+            <template #Date="{ row, header: columnHeader }">
+                <div class="date-cell">
+                    <!-- Custom date display -->
+                    {{ row[columnHeader.key] ? new Date(row[columnHeader.key] as string).toLocaleDateString() : "" }}
+                </div>
+            </template>
+        </mdp-grid>
+        <cursor-pagination
+            :url="url"
+            :metadata="(payload as Payload).metadata"
+            :limit="LIMIT"
+            :is-loading="isLoading"
+            @previous="onPaginate"
+            @next="onPaginate"
+        />
+    </template>
 </template>
 
 <style scoped></style>
