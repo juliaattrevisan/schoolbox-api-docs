@@ -25,6 +25,7 @@ import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
 import { ON_FILTER_CHANGE } from "../js/MDPEvents";
 import { useLoadData } from "./composable/useLoadData";
+import { add } from "lodash";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -60,11 +61,25 @@ const header = window.Vue.ref<Header[]>([
 
 // #endregion grid data
 
+// #region grid loading / filtering /  pagination
+
 const url = window.Vue.ref<string>("");
-const searchParams = new URLSearchParams();
 const LIMIT = 2; // the current set limit for the number of records to fetch at once
 const filters = window.Vue.ref<Nested>({});
 const { isLoading, payload, isEmpty, loadError } = useLoadData(url);
+
+/**
+ * Adds filter search parameters to the given URLSearchParams object.
+ * @param $searchParams - The URLSearchParams object to modify.
+ * @param $filters - The filters to apply.
+ */
+function addFilterSearchParams($searchParams: URLSearchParams, $filters: Nested): void {
+    const keyValuePairs = getKeyValuePairs({ filter_selection: $filters });
+    const map = new Map(Object.entries(keyValuePairs));
+    map.forEach((value, key) => {
+        $searchParams.append(key, value);
+    });
+}
 
 /**
  * Listen for filter changes and reload data accordingly
@@ -73,12 +88,8 @@ window.Vue.onMounted(() => {
     document.addEventListener(ON_FILTER_CHANGE, (event) => {
         filters.value = event.detail.selectedFilters;
         const newUrl = new URL(props.route, window.location.origin);
-        const keyValuePairs = getKeyValuePairs({ filter_selection: filters.value });
-        const map = new Map(Object.entries(keyValuePairs));
-        // then append each key-value pair to the searchParams object
-        map.forEach((value, key) => {
-            searchParams.append(key, value);
-        });
+        const searchParams = new URLSearchParams();
+        addFilterSearchParams(searchParams, filters.value);
         searchParams.set("limit", LIMIT.toString());
         newUrl.search = searchParams.toString();
         url.value = newUrl.toString();
@@ -90,8 +101,16 @@ window.Vue.onMounted(() => {
  * @param cursor - the cursor to use for the previous/next page
  */
 function onPaginate(cursor: string): void {
+    const newUrl = new URL(props.route, window.location.origin);
+    const searchParams = new URLSearchParams();
+    addFilterSearchParams(searchParams, filters.value);
+    searchParams.set("limit", LIMIT.toString());
     searchParams.set(SearchParam.CURSOR as string, cursor);
+    newUrl.search = searchParams.toString();
+    url.value = newUrl.toString();
 }
+
+// #endregion grid loading / filtering /  pagination
 </script>
 
 <template>
