@@ -90,25 +90,25 @@ class Mapper extends BaseMapper
         ?int $limit = null
     ): GenericCollection {
         $pb = $this->getPredicateBuilder();
-        // if (!empty($nameSearch)) {
-        //     // Just use the first one, and split it into tokens
-        //     foreach ($nameSearch as $nameSearchString => $_) {
-        //         $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
-        //         foreach ($names as $name) {
-        //             if (strlen($name) > 0 && $name !== Definition::KEY_ALL) {
-        //                 $pb = $pb->any(
-        //                     $this->getPredicateBuilder()->like(
-        //                         's.chosen_name',
-        //                         '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
-        //                     )->like(
-        //                         's.lastname',
-        //                         '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
-        //                     )
-        //                 );
-        //             }
-        //         }
-        //     }
-        // }
+        if (!empty($nameSearch)) {
+            // Just use the first one, and split it into tokens
+            foreach ($nameSearch as $nameSearchString => $_) {
+                $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
+                foreach ($names as $name) {
+                    if (strlen($name) > 0 && $name !== Definition::KEY_ALL) {
+                        $pb = $pb->any(
+                            $this->getPredicateBuilder()->like(
+                                's.chosen_name',
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                            )->like(
+                                's.lastname',
+                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                            )
+                        );
+                    }
+                }
+            }
+        }
 
         if (!empty($yearLevelIds)) {
             $pb = $pb->in('s.year_id', $yearLevelIds);
