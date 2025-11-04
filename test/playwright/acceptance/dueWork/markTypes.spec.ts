@@ -111,7 +111,6 @@ test.describe("Due Work - Mark type tests", () => {
         tester.isGoingTo("wait for dropdown and click the import button");
         await page.getByTestId(`up-unit-cell-unit-action-${newUnitSpecId}-import-link`).click();
 
-        // const classToImportRow = page.locator("#importForm li").filter({ hasText: "9A English" }).first();
         const classToImportRow = page
             .locator("#importForm li")
             .filter({ hasText: "9A English" })

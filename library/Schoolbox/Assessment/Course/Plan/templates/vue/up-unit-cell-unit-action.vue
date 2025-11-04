@@ -50,14 +50,6 @@ function onDeleteUnit(): void {
                         Delete
                     </button>
                 </li>
-                <li v-if="props.unit._routes.modify">
-                    <a
-                        class="icon-modify"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
-                        :href="getReturnUrl(props.unit._routes.modify!)"
-                        >Modify</a
-                    >
-                </li>
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
                         class="icon-import"
@@ -66,6 +58,14 @@ function onDeleteUnit(): void {
                     >
                         Import into {{ locale.class.translate(true, true) }}
                     </a>
+                </li>
+                <li v-if="props.unit._routes.modify">
+                    <a
+                        class="icon-modify"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
+                        :href="getReturnUrl(props.unit._routes.modify!)"
+                        >Modify</a
+                    >
                 </li>
             </ul>
         </section>
