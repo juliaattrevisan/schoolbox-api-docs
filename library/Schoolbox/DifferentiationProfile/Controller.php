@@ -113,7 +113,7 @@ class Controller extends Base
         $page                = \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
         $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
 
-        $limit = $this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
+        $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
 
         // Convert the request into a set of selections, and update them in the frontend
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);

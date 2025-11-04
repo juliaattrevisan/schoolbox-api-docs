@@ -52,9 +52,9 @@ const header = window.Vue.ref<Header[]>([
 
 // #endregion grid data
 
-const endpoint = window.Vue.ref<string>("");
+const url = window.Vue.ref<string>("");
 const filters = window.Vue.ref<Nested>({});
-const { isLoading, payload, isEmpty, loadError } = useLoadData(endpoint);
+const { isLoading, payload, isEmpty, loadError } = useLoadData(url);
 
 /**
  * Listen for filter changes and reload data accordingly
@@ -62,13 +62,14 @@ const { isLoading, payload, isEmpty, loadError } = useLoadData(endpoint);
 window.Vue.onMounted(() => {
     document.addEventListener(ON_FILTER_CHANGE, (event) => {
         filters.value = event.detail.selectedFilters;
-        const newEndpoint = new URL(props.route, window.location.origin);
+        const newUrl = new URL(props.route, window.location.origin);
         const queryData: Nested = {};
         if (Object.keys(filters.value).length > 0) {
             queryData.filter_selection = filters.value;
         }
-        newEndpoint.search = getSearchString(queryData);
-        endpoint.value = newEndpoint.toString();
+        queryData.limit = 3;
+        newUrl.search = getSearchString(queryData);
+        url.value = newUrl.toString();
     });
 });
 </script>
