@@ -75,7 +75,12 @@ async function onCreateSelected(): Promise<void> {
     <template v-if="props.unit.curriculum._routes.modifyCurriculum">
         <div v-if="component === null" class="component-action">
             <section>
-                <button @click.prevent="onCreateSelected">{{ createText }}</button>
+                <button
+                    :data-test="`unit-planner-curriculum-create-${props.unit.folderId}`"
+                    @click.prevent="onCreateSelected"
+                >
+                    {{ createText }}
+                </button>
             </section>
         </div>
         <fn-actions
