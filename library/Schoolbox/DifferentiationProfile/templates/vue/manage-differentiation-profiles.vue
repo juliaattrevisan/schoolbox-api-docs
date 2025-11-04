@@ -10,6 +10,7 @@ import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import type {
     MDPHeader,
@@ -25,7 +26,6 @@ import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
 import { ON_FILTER_CHANGE } from "../js/MDPEvents";
 import { useLoadData } from "./composable/useLoadData";
-import { add } from "lodash";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -66,7 +66,7 @@ const header = window.Vue.ref<Header[]>([
 const url = window.Vue.ref<string>("");
 const LIMIT = 2; // the current set limit for the number of records to fetch at once
 const filters = window.Vue.ref<Nested>({});
-const { isLoading, payload, isEmpty, loadError } = useLoadData(url);
+const { isNewLoading, isMoreLoading, payload, sortBy, isEmpty, hasRows, loadError } = useLoadData(url);
 
 /**
  * Adds filter search parameters to the given URLSearchParams object.
@@ -114,7 +114,7 @@ function onPaginate(cursor: string): void {
 </script>
 
 <template>
-    <div v-if="isLoading" class="c-island l-pad-m">
+    <div v-if="isNewLoading" class="c-island l-pad-m">
         <div class="loader"></div>
     </div>
     <div v-else-if="loadError" class="c-island l-pad-m">
@@ -126,7 +126,7 @@ function onPaginate(cursor: string): void {
             been linked.
         </p>
     </empty-state>
-    <template v-else-if="payload">
+    <template v-else-if="hasRows">
         <mdp-grid :header="header" :rows="payload.data.profiles">
             <template #User="{ row, header: columnHeader }">
                 <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
@@ -151,7 +151,7 @@ function onPaginate(cursor: string): void {
             :url="url"
             :metadata="(payload as Payload).metadata"
             :limit="LIMIT"
-            :is-loading="isLoading"
+            :is-loading="isNewLoading || isMoreLoading"
             @previous="onPaginate"
             @next="onPaginate"
         />

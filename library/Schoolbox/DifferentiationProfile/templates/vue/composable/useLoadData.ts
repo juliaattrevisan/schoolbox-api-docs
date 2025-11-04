@@ -1,40 +1,75 @@
 /**
- * Retrieve a set of pastoral records based on the provided url.
+ * Retrieve a set of table payload data based on the provided url.
  */
 
 import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { isNewUrl } from "@js/util/queryUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import { isSignificantUrlChange } from "@js/util/sbx/urlUtils";
 import type { Payload } from "../../js/types/manageDifferentiationProfilesTypes";
 
 /**
- * load the pastoral records from the given url.
- * @param url - the url to load the records from
- * @returns isLoading, payload, isEmpty, loadError
+ * load the pastoral report table data from the given url.
+ * @param url - the url to load the table data
+ * @returns isNewLoading, payload, isEmpty, loadError
  */
 export function useLoadData(url: Ref<string>): {
-    isLoading: Ref<boolean>;
+    isNewLoading: Ref<boolean>;
+    isMoreLoading: Ref<boolean>;
     payload: Ref<Payload | null>;
+    sortBy: Ref<string>;
     isEmpty: Ref<boolean>;
+    hasRows: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
-    const isLoading = window.Vue.ref(true); // to notify when a new results is being loaded
+    const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new table and loading data for the same table
+    const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
+    const isMoreLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<Payload | null>(null); // to store the payload that matches the current query
-    const isEmpty = window.Vue.computed(() => payload.value === null && !isLoading.value); // To show that no payload match the current report table
+    const sortBy = window.Vue.ref<string>(""); // the current sort by field - this should update when a new payload is loaded
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
+    const isEmpty = window.Vue.computed(
+        () =>
+            !isNewLoading.value &&
+            !isMoreLoading.value &&
+            loadError.value === null &&
+            payload.value !== null &&
+            payload.value.metadata.count === 0,
+    ); // To show that no payload match the current report table
+    const hasRows = window.Vue.computed(
+        () => payload.value !== null && payload.value.data.profiles.length > 0 && payload.value.metadata.count > 0,
+    ); // To show that the report table has rows
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+
+    /**
+     * get the default sortBy field based on the first sortable header in the payload
+     * @returns the default sortBy field
+     */
+    // function getDefaultSortBy(): string {
+    //     // we assume that the first tableHeader is isSortable true is the default sortBy
+    //     if (payload.value && payload.value.data.tableHeaders.length > 0) {
+    //         const firstSortableHeader = payload.value.data.tableHeaders.find((header) => header.isSortable);
+    //         return firstSortableHeader ? firstSortableHeader.key : "";
+    //     }
+    //     return "";
+    // }
 
     /**
      * search for payload that match the current query
      */
     async function load(): Promise<void> {
         // abort the previous search if it's still running
-        if (isLoading.value && controller) {
+        if (isNewLoading.value || isMoreLoading.value) {
             controller.abort();
         }
         try {
-            isLoading.value = true;
+            // to distinguish between loading a new table and loading data for the same table
+            // so the entire table doesn't need to be re-rendered to just load new rows
+            if (isNewLoad.value) {
+                isNewLoading.value = true;
+            } else {
+                isMoreLoading.value = true;
+            }
             loadError.value = null;
             controller = new AbortController();
             const response = await apiRequest<Payload>({
@@ -43,13 +78,16 @@ export function useLoadData(url: Ref<string>): {
                 signal: controller.signal,
             });
             if (!response.success) {
+                if ("detail" in response && response.detail && response.detail instanceof Error) {
+                    throw response.detail;
+                }
                 throw new Error(response.message || "Failed to load data");
             }
             const newPayload = response.data;
             // check if the response does not have the expected structure
-            if (!Array.isArray(newPayload.data.profiles)) {
-                throw new Error("Unexpected response format");
-            }
+            // if (!Array.isArray(newPayload.data.tableHeaders)) {
+            //     throw new Error("Unexpected response format");
+            // }
             payload.value = newPayload;
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
@@ -63,7 +101,12 @@ export function useLoadData(url: Ref<string>): {
             loadError.value = "An unexpected error occurred while loading the data.";
             console.error(error);
         } finally {
-            isLoading.value = false;
+            if (isNewLoad.value) {
+                // sortBy.value = getDefaultSortBy();
+                isNewLoading.value = false;
+            } else {
+                isMoreLoading.value = false;
+            }
         }
     }
 
@@ -73,23 +116,18 @@ export function useLoadData(url: Ref<string>): {
      */
     window.Vue.watch(url, (newUrl, oldUrl) => {
         if (url.value !== "" && newUrl !== oldUrl) {
-            void load();
-        }
-    });
-
-    /**
-     * Load on mount if there's already a URL set
-     */
-    window.Vue.onMounted(() => {
-        if (url.value !== "") {
+            isNewLoad.value = isNewUrl(oldUrl, newUrl);
             void load();
         }
     });
 
     return {
-        isLoading,
+        isNewLoading,
+        isMoreLoading,
         payload,
+        sortBy,
         isEmpty,
+        hasRows,
         loadError,
     };
 }
