@@ -6,7 +6,7 @@
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import type { Nested } from "@js/util/queryUtils";
-import { getSearchString } from "@js/util/queryUtils";
+import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { MDPHeader, Header, AdjustmentType, AdjustmentText } from "../js/types/manageDifferentiationProfilesTypes";
@@ -63,12 +63,15 @@ window.Vue.onMounted(() => {
     document.addEventListener(ON_FILTER_CHANGE, (event) => {
         filters.value = event.detail.selectedFilters;
         const newUrl = new URL(props.route, window.location.origin);
-        const queryData: Nested = {};
-        if (Object.keys(filters.value).length > 0) {
-            queryData.filter_selection = filters.value;
-        }
-        queryData.limit = 3;
-        newUrl.search = getSearchString(queryData);
+        const searchParams = new URLSearchParams();
+        const keyValuePairs = getKeyValuePairs({ filter_selection: filters.value });
+        const map = new Map(Object.entries(keyValuePairs));
+        // then append each key-value pair to the searchParams object
+        map.forEach((value, key) => {
+            searchParams.append(key, value);
+        });
+        searchParams.set("limit", "3");
+        newUrl.search = searchParams.toString();
         url.value = newUrl.toString();
     });
 });
