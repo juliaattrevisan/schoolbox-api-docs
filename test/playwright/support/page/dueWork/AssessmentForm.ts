@@ -429,6 +429,5 @@ export default class AssessmentForm {
             `input[name="rb[${capabilityId}][descriptor][${indicatorId}][${criterionId}][points]"]`,
         );
         await pointsInput.fill(value.toString());
-        await this.page.getByTestId(AssessmentForm.DATATEST_MODIFY_PLANS).click();
     }
 }
