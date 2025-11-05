@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Metadata;
 
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Domains;
+
 class Builder
 {
     /**
@@ -49,7 +51,8 @@ class Builder
     private function buildAttendanceLink(array $credentials, array $class): string
     {
         return sprintf(
-            'https://portals.veracross.com/%s/%s/class/%s/attendance',
+            '%s/%s/%s/class/%s/attendance',
+            Domains::AVAILABLE[$credentials['region']]['attendance'],
             $credentials['schoolroute'],
             $credentials['portalaccessname'],
             /* TODO These ids are too easy to mix up: this might be class_id, id, or internal_class_id
