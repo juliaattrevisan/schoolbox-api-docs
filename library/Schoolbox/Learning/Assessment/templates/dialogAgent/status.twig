@@ -256,7 +256,7 @@
                                                         event.preventDefault();
 
                                                         $.post('{{ soboRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            console.log(responseText);
+                                                            window.location.reload();
                                                         });
                                                     });
                                                 });
@@ -280,7 +280,7 @@
                                                         event.preventDefault();
 
                                                         $.post('{{ resetRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            console.log(responseText);
+                                                            window.location.reload();
                                                         });
                                                     });
                                                 });
@@ -304,7 +304,7 @@
                                                         event.preventDefault();
 
                                                         $.post('{{ reopenRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            console.log(responseText);
+                                                            window.location.reload();
                                                         });
                                                     });
                                                 });
@@ -327,7 +327,7 @@
                                                         event.preventDefault();
 
                                                         $.post('{{ assistanceResolvedRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            console.log(responseText);
+                                                            window.location.reload();
                                                         });
                                                     });
                                                 });
