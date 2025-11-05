@@ -37,6 +37,16 @@ class Status
 
 
     /**
+     * Consts correlating to available endpoints
+     */
+    private const string ACTION_VIEW = 'view';
+    private const string ACTION_SOBO = 'sobo';
+    private const string ACTION_RESET = 'reset';
+    private const string ACTION_REOPEN = 'reopen';
+    private const string ACTION_RESOLVED = 'resolved';
+
+
+    /**
      * Returns a set of (user id, status) tuples for a given assessment
      *
      * @param Model $assessment  A fully hydrated assessment with participants and responses etc.
@@ -82,11 +92,11 @@ class Status
                 'response' => null,
                 'actions' => [
                     'length' => 0,
-                    'view' => false,
-                    'sobo' => false,
-                    'reset' => false,
-                    'reopen' => false,
-                    'resolved' => false
+                    self::ACTION_VIEW => false,
+                    self::ACTION_SOBO => false,
+                    self::ACTION_RESET => false,
+                    self::ACTION_REOPEN => false,
+                    self::ACTION_RESOLVED => false
                 ],
             ];
         }
@@ -107,11 +117,11 @@ class Status
                 'response' => null,
                 'actions' => [
                     'length' => 0,
-                    'view' => false,
-                    'sobo' => false,
-                    'reset' => false,
-                    'reopen' => false,
-                    'resolved' => false,
+                    self::ACTION_VIEW => false,
+                    self::ACTION_SOBO => false,
+                    self::ACTION_RESET => false,
+                    self::ACTION_REOPEN => false,
+                    self::ACTION_RESOLVED => false,
                 ],
             ];
         }
@@ -132,11 +142,11 @@ class Status
                 ],
                 'actions' => [
                     'length' => 1,
-                    'view' => true,
-                    'sobo' => false,
-                    'reset' => false,
-                    'reopen' => true,
-                    'resolved' => false,
+                    self::ACTION_VIEW => true,
+                    self::ACTION_SOBO => false,
+                    self::ACTION_RESET => false,
+                    self::ACTION_REOPEN => true,
+                    self::ACTION_RESOLVED => false,
                 ],
             ];
         }
@@ -150,11 +160,11 @@ class Status
                 'response' => null,
                 'actions' => [
                     'length' => 0,
-                    'view' => false,
-                    'sobo' => false,
-                    'reset' => false,
-                    'reopen' => false,
-                    'resolved' => false,
+                    self::ACTION_VIEW => false,
+                    self::ACTION_SOBO => false,
+                    self::ACTION_RESET => false,
+                    self::ACTION_REOPEN => false,
+                    self::ACTION_RESOLVED => false,
                 ],
             ];
         }
@@ -177,11 +187,11 @@ class Status
                 ],
                 'actions' => [
                     'length' => 1,
-                    'view' => true,
-                    'sobo' => true,
-                    'reset' => true,
-                    'reopen' => false,
-                    'resolved' => true,
+                    self::ACTION_VIEW => true,
+                    self::ACTION_SOBO => true,
+                    self::ACTION_RESET => true,
+                    self::ACTION_REOPEN => false,
+                    self::ACTION_RESOLVED => true,
                 ],
             ];
         }
@@ -194,11 +204,11 @@ class Status
             'response' => $authoritativeResponse,
             'actions' => [
                 'length' => 1,
-                'view' => true,
-                'sobo' => true,
-                'reset' => true,
-                'reopen' => false,
-                'resolved' => false,
+                self::ACTION_VIEW => true,
+                self::ACTION_SOBO => true,
+                self::ACTION_RESET => true,
+                self::ACTION_REOPEN => false,
+                self::ACTION_RESOLVED => false,
             ],
         ];
     }
