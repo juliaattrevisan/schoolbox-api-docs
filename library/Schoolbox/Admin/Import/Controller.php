@@ -29,9 +29,11 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Domains;
 use Schoolbox\External\Event\Export\Classes;
 use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
@@ -119,6 +121,21 @@ class Controller extends ConfigController
          */
         $configContext['dsn'][$dataSource] = (new DSNFactory())->produceDSNParts($dataSource, $key);
 
+        /**
+         * Connector-specific parts from backend
+         */
+        /* These domains are only partially encoded into the dsn; the meaning to the dsn value $region
+         * is actually part of a lookup as multiple urls stem from the choice made in the ui
+         *
+         * TODO Not really sure how to refactor this now, except by converting veracross dsn to json
+         *  and storing the entire configuration setup in there. This is the first time a suds connector
+         *  had to fulfil both front- and backend requirements as part of suds control panel...hmm.
+         *  This is the only place where you have to see a list of possibilities
+         */
+        $configContext['dsn'][Factory::VERACROSS]['_domains'] = [
+            'available' => Domains::AVAILABLE,
+        ];
+
         /* If you run the Live Sync, you might get a message about it
          * This message persists to keep reminding people that it's still going
          */
@@ -197,7 +214,7 @@ class Controller extends ConfigController
                 ],
                 /* Decide if the current suds selection uses the cyclic grid
                  */
-                'cyclicGrid' => !(new ValidUsesScheduleTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView)
+                'cyclicGrid' => !(new ValidUsesScheduleTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView),
             ],
             'School Data Import'
         );
