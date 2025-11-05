@@ -314,7 +314,7 @@
                                             </li>
                                         {% endif %}
 
-                                        {% if currentStatus.actions.assisted %}
+                                        {% if currentStatus.actions.resolved %}
                                             {% set assistanceResolvedRoute = routeLookupIfAuthorized('learningDialogAgent.postAssistanceResolve', {
                                                 assessment: assessment,
                                                 assessmentId: assessment.id,

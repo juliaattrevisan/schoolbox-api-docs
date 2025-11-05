@@ -96,7 +96,7 @@ class Status
                     'sobo' => false,
                     'reset' => false,
                     'reopen' => false,
-                    'assisted' => false
+                    'resolved' => false
                 ],
             ];
         }
@@ -121,7 +121,7 @@ class Status
                     'sobo' => false,
                     'reset' => false,
                     'reopen' => false,
-                    'assisted' => false,
+                    'resolved' => false,
                 ],
             ];
         }
@@ -146,7 +146,7 @@ class Status
                     'sobo' => false,
                     'reset' => false,
                     'reopen' => true,
-                    'assisted' => false,
+                    'resolved' => false,
                 ],
             ];
         }
@@ -164,7 +164,7 @@ class Status
                     'sobo' => false,
                     'reset' => false,
                     'reopen' => false,
-                    'assisted' => false,
+                    'resolved' => false,
                 ],
             ];
         }
@@ -191,7 +191,7 @@ class Status
                     'sobo' => true,
                     'reset' => true,
                     'reopen' => false,
-                    'assisted' => true,
+                    'resolved' => true,
                 ],
             ];
         }
@@ -208,7 +208,7 @@ class Status
                 'sobo' => true,
                 'reset' => true,
                 'reopen' => false,
-                'assisted' => false,
+                'resolved' => false,
             ],
         ];
     }
