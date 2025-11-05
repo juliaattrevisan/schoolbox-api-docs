@@ -24,6 +24,7 @@ interface Props {
     courseTitle: string;
     units: Unit[];
     routeFolderSequence: string | null;
+    routeImportIntoClasses: string | null;
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
     routeCurriculumCoverage: string | null;
@@ -164,6 +165,7 @@ window.Vue.onUnmounted(() => {
         :course-id="store.courseId"
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
+        :route-import-into-classes="props.routeImportIntoClasses"
     />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">

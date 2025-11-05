@@ -12,6 +12,7 @@ interface Props {
     courseId: number;
     folderId: number;
     routeCurriculumCoverage: string | null;
+    routeImportIntoClasses: string | null;
 }
 const props = defineProps<Props>();
 
@@ -63,6 +64,15 @@ function onPrintSelected(): void {
         </li>
         <li>
             <a href="#" class="icon-print" @click.prevent="onPrintSelected">Print Unit Planner</a>
+        </li>
+        <li v-if="props.routeImportIntoClasses">
+            <a
+                class="icon-import"
+                :data-test="`up-header-${props.courseId}-import-link`"
+                :href="getReturnUrl(props.routeImportIntoClasses!)"
+            >
+                Import into {{ locale.class.translate(true, true) }}
+            </a>
         </li>
     </ul>
 </template>
