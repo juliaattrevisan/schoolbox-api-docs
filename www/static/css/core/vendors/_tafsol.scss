@@ -971,11 +971,6 @@ button[data-action],
     }
 }
 
-input[type="checkbox"]:not(.plain) + label::before,
-input[type="checkbox"]:not(.plain) + label::after {
-    border-radius: calc(var(--border-radius) / 4) !important;
-}
-
 .checklist-container {
     border-radius: var(--border-radius);
     overflow: hidden;
