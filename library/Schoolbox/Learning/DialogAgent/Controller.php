@@ -299,7 +299,7 @@ class Controller extends Base
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
         $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
 
-        /* $student cannot request help:
+        /* $student cannot request help for a response if:
          *     - response is already submitted
          *     - this response id isn't theirs to change
          *     - this response has been repurposed illegally by messing around in the url
@@ -353,7 +353,7 @@ class Controller extends Base
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
         $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
 
-        /* $student cannot request help:
+        /* You cannot resolve a request for assistance for a response if::
          *     - response is non-authoritative
          *     - response is already submitted
          *     - this response id isn't theirs to change
@@ -367,6 +367,63 @@ class Controller extends Base
         /* Mutate the field as one might expect
          */
         $existingResponse->setAssistanceRequestedAt(null);
+
+        $this->dialogAgentResponseMapper->save($existingResponse);
+
+        /* TODO snake async payload response in some reptilian manner
+         */
+    }
+
+
+    /**
+     * Forcibly submit a student's authoritative response
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postSobo(IAssessable $assessment, User $student): void
+    {
+        /* No response id, somehow: malformed post request.
+         */
+        if ('' === trim((string)$this->requestPost->get('responseId'))) {
+            $this->sendError('Response not found.', [], 404);
+            return;
+        }
+
+        /* See if the response id requested actually exists
+         */
+        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+            ->equals('id', (int)$this->requestPost->get('responseId'))
+            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+            ->equals('learner_id', $student->getId())
+            ->equals('authoritative', true)
+            ->isNull('submitted_by')
+            ->isNull('submitted_at');
+
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
+        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
+
+        /* You cannot sobo a student's response if:
+         *     - response is non-authoritative
+         *     - response is already submitted
+         *     - this response id isn't theirs to change
+         *     - this response has been repurposed illegally by messing around in the url
+         */
+        if (null === $existingResponse) {
+            $this->sendError('You cannot resolve assistance for this discussion activity.');
+            return;
+        }
+
+        /* Mutate the fields as one might expect
+         */
+        $existingResponse
+            ->setSubmittedAt(\Alaress_Date_Format::now())
+            ->setSubmittedOnBehalfOf($student)
+            ->setSubmittedBy($this->getUser());
 
         $this->dialogAgentResponseMapper->save($existingResponse);
 
@@ -406,7 +463,7 @@ class Controller extends Base
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
         $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
 
-        /* $student cannot request help:
+        /* You cannot reopen a response if:
          *     - response is non-authoritative
          *     - this response id isn't theirs to change
          *     - this response has been repurposed illegally by messing around in the url
@@ -418,7 +475,9 @@ class Controller extends Base
 
         /* Mutate the field as one might expect
          */
-        $existingResponse->setSubmittedAt(null)->setSubmittedBy(null);
+        $existingResponse
+            ->setSubmittedAt(null)
+            ->setSubmittedBy(null);
 
         $this->dialogAgentResponseMapper->save($existingResponse);
 

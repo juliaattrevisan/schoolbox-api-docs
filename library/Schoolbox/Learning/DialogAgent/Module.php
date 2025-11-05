@@ -100,15 +100,20 @@ class Module extends BaseModule
 
         /* Student requests assistance for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{responseId:\d+}", 'postAssistanceRequest', $canSubmit, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/assistance", 'postAssistanceRequest', $canSubmit, $preloadParticipant);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/resolve", 'postAssistanceResolve', $canWrite, $preloadParticipant);
 
+        /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
+         * with details about who did the sobo
+         */
+        $this->register('POST', "{$assRoute}/{$studentParam}/sobo", 'postSobo', $canWrite, $preloadParticipant);
+
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{responseId:\d+}", 'postReopen', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/reopen", 'postReopen', $canWrite, $preloadParticipant);
 
         /* Resets a dialog agent for a particular person. This creates a new authoritative response instance,
          * setting all other responses to non-authoritative, basically letting students start afresh.

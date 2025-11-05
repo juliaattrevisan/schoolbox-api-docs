@@ -242,8 +242,25 @@
                                         {% endif %}
 
                                         {% if currentStatus.actions.sobo %}
-                                                              <li>
-                                                <a class="icon-approve" title="Submit on behalf of {{ participant.user.formatName }}">Submit on behalf of {{ participant.user.formatName }}</a>
+                                            {% set soboRoute = routeLookupIfAuthorized('learningDialogAgent.postSobo', {
+                                                assessment: assessment,
+                                                assessmentId: assessment.id,
+                                                student: participant.user,
+                                                studentId: participant.user.id,
+                                            }) %}
+                                            <script>
+                                                $(function() {
+                                                    $('[data-action-sobo="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                        event.preventDefault();
+
+                                                        $.post('{{ soboRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                            console.log(responseText);
+                                                        });
+                                                    });
+                                                });
+                                            </script>
+                                            <li>
+                                                <a class="icon-approve" title="Submit on behalf of {{ participant.user.formatName }}" data-action-sobo="{{ currentStatus.response.id }}">Submit on behalf of {{ participant.user.formatName }}</a>
                                             </li>
                                         {% endif %}
 
