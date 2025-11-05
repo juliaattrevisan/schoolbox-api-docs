@@ -85,10 +85,10 @@
     }
 }
 
-.input-group input[type="text"] {
+.input-group:has(> input[type="text"] + a) input[type="text"],
+.input-group:has(> input[type="text"] + button) input[type="text"] {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
-
 /* States */
 .sbx-input-text--error[type="text"] {
     border: 1px solid var(--sbx-color-alert);
