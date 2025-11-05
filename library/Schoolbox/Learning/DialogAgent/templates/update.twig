@@ -58,10 +58,10 @@
                          </label>
 
                          <select id="language" name="language">
-                             {% for value, name in language %}
+                             {% for value, name in languages.available %}
                                  {% set selected = '' %}
 
-                                 {% if value == assessment.language %}
+                                 {% if value == languages.selected %}
                                     {% set selected = 'selected' %}
                                  {% endif %}
 
