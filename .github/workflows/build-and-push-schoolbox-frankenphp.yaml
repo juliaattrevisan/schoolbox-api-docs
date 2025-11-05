@@ -37,7 +37,7 @@ jobs:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-    if: github.repository == 'alaress/schoolbox' && (github.ref_name == 'master' || github.ref_name == 'develop')
+    if: github.repository == 'alaress/schoolbox' && (github.event.release.target_commitish == 'master' || github.event.release.target_commitish == 'develop')
     strategy:
       matrix:
         build:
@@ -110,7 +110,7 @@ jobs:
           build-args: |
             ENV=prod
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
-            BASE_BRANCH=${{ github.ref_name }}
+            BASE_BRANCH=${{ github.event.release.target_commitish }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
