@@ -1,0 +1,3 @@
+-- TODO Rename authhost to region
+-- set it to either "Australia" or "Global" depending on the url that already existed here
+-- due to the execution of 01-authhost.sql and its evolution into master

@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Domains;
 
 /**
  * Class Generator
@@ -92,14 +93,14 @@ class Generator
      * @param string $schoolRoute
      * @param string $clientId
      * @param string $clientSecret
-     * @param string $authhost
+     * @param string $region
      * @param bool $deepLog
      */
     public function __construct(
         private string $schoolRoute,
         private string $clientId,
         private string $clientSecret,
-        private string $authhost,
+        private string $region,
         private bool $deepLog = false,
     ) {
     }
@@ -180,8 +181,9 @@ class Generator
              */
             try {
                 $this->log(sprintf(
-                    "Generating access token via %s...\n",
-                    $this->authhost
+                    "Generating access token via %s %s...\n",
+                    $this->region,
+                    Domains::AVAILABLE[$this->region]['auth'],
                 ));
 
                 $response = $this->client->request('POST', $endpoint, [
@@ -276,7 +278,7 @@ class Generator
         return new Client([
             'headers' => $headers,
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'base_uri' => $this->authhost,
+            'base_uri' => Domains::AVAILABLE[$this->region]['auth'],
             'timeout' => self::DEFAULT_TIMEOUT,
             'http_errors' => false,
         ]);

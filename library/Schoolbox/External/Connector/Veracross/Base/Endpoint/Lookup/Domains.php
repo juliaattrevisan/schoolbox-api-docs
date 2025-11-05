@@ -18,16 +18,12 @@ class Domains
      */
     public const array AVAILABLE = [
         'Australia' => [
-            'domains' => [
-                'auth' => 'https://accounts.veracross.au',
-                'attendance' => 'https://portals.veracross.au',
-            ]
+            'auth' => 'https://accounts.veracross.au',
+            'attendance' => 'https://portals.veracross.au',
         ],
         'Global' => [
-            'domains' => [
-                'auth' => 'https://accounts.veracross.com',
-                'attendance' => 'https://portals.veracross.com',
-            ]
+            'auth' => 'https://accounts.veracross.com',
+            'attendance' => 'https://portals.veracross.com',
         ],
     ];
 }

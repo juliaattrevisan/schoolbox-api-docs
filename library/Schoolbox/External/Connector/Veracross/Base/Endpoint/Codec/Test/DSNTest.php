@@ -32,13 +32,13 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN 1' => [
-                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;authhost=https://accounts.veracross.au',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia',
                 [
                     'schoolroute' => 'api-aaabbbccc',
                     'clientid' => 'klo25j98ASjFgVh25j0g9gs87',
                     'clientsecret' => 'j258AjDJ489G78j45nhfy1z0v8',
                     'portalaccessname' => 'facultythingy',
-                    'authhost' => 'https://accounts.veracross.au',
+                    'region' => 'Australia',
                 ]
             ],
         ];
@@ -70,8 +70,8 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN Re-encode 1' => [
-                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;authhost=https://accounts.veracross.au',
-                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;authhost=https://accounts.veracross.au',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia',
             ],
         ];
     }
