@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-npm-artifact:
-    timeout-minutes: 15
+    timeout-minutes: 30
     runs-on: onprem-k3s
     steps:
       - name: Checkout
