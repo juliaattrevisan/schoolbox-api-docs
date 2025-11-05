@@ -225,6 +225,7 @@
                                         <sbx-pop-out content-id="response-options-{{ participant.user.id }}"></sbx-pop-out>
                                     </nav>
                                     <ul id="response-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                                        {# View a particular response #}
                                         {% if currentStatus.actions.view %}
                                             {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
                                                 assessment: assessment,
@@ -241,6 +242,7 @@
                                             {% endif %}
                                         {% endif %}
 
+                                        {# SOBO a student #}
                                         {% if currentStatus.actions.sobo %}
                                             {% set soboRoute = routeLookupIfAuthorized('learningDialogAgent.postSobo', {
                                                 assessment: assessment,
@@ -264,10 +266,28 @@
                                             </li>
                                         {% endif %}
 
+                                        {# Reset a particular response's contents #}
                                         {% if currentStatus.actions.reset %}
-                                        <li>
-                                            <a class="icon-refresh" title="Reset {{ locale.dialogAgent.proper }}">Reset {{ locale.dialogAgent.proper }}</a>
-                                        </li>
+                                            {% set resetRoute = routeLookupIfAuthorized('learningDialogAgent.postReset', {
+                                                assessment: assessment,
+                                                assessmentId: assessment.id,
+                                                student: participant.user,
+                                                studentId: participant.user.id,
+                                            }) %}
+                                            <script>
+                                                $(function() {
+                                                    $('[data-action-reset="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                        event.preventDefault();
+
+                                                        $.post('{{ resetRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                            console.log(responseText);
+                                                        });
+                                                    });
+                                                });
+                                            </script>
+                                            <li>
+                                                <a class="icon-refresh" title="Reset {{ locale.dialogAgent.proper }}" data-action-reset="{{ currentStatus.response.id }}">Reset {{ locale.dialogAgent.proper }}</a>
+                                            </li>
                                         {% endif %}
 
                                         {% if currentStatus.actions.reopen %}

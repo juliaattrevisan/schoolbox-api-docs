@@ -433,6 +433,44 @@ class Controller extends Base
 
 
     /**
+     * Resetting a dialog agent for a particular student sets the entirety of that students responses to
+     * non-authoritative and creates a new authoritative response for them to fill in, letting them Begin Again
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
+     * @throws Deleted
+     * @throws Exception
+     */
+    public function postReset(IAssessable $assessment, User $student): void
+    {
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* Reset existing responses to non-authoritative
+         */
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
+        foreach ($participant->getAllResponses() as $response) {
+            $response->setAuthoritative(false);
+
+            $this->dialogAgentResponseMapper->save($response);
+        }
+
+        /* Spawn a new one
+         */
+        $newResponse = $this->dialogAgentResponseMapper->createModel()
+            ->setAssessable($assessment)
+            ->setDialogAgent($this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId()))
+            ->setSubmittedOnBehalfOf($student)
+            ->setAuthoritative(true);
+
+        $this->dialogAgentResponseMapper->save($newResponse);
+
+        /* TODO snake async payload response in some reptilian manner
+         */
+    }
+
+
+    /**
      * Reopening a dialog agent for a particular student basically means "unsubmit this student's authoritative response"
      * The responseId provided must be the student's authoritative response for it to be reopened.
      *
@@ -480,43 +518,6 @@ class Controller extends Base
             ->setSubmittedBy(null);
 
         $this->dialogAgentResponseMapper->save($existingResponse);
-
-        /* TODO snake async payload response in some reptilian manner
-         */
-    }
-
-
-    /**
-     * Resetting a dialog agent for a particular student sets the entirety of that students responses to
-     * non-authoritative and creates a new authoritative response for them to fill in, letting them Begin Again
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     * @throws Deleted
-     * @throws Exception
-     */
-    public function postReset(IAssessable $assessment, User $student): void
-    {
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        /* Reset existing responses to non-authoritative
-         */
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
-        foreach ($participant->getAllResponses() as $response) {
-            $response->setAuthoritative(false);
-
-            $this->dialogAgentResponseMapper->save($response);
-        }
-
-        /* Spawn a new one
-         */
-        $newResponse = $this->dialogAgentResponseMapper->createModel()
-            ->setDialogAgent($this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-            ->setSubmittedOnBehalfOf($student)
-            ->setAuthoritative(true);
-
-        $this->dialogAgentResponseMapper->save($newResponse);
 
         /* TODO snake async payload response in some reptilian manner
          */
