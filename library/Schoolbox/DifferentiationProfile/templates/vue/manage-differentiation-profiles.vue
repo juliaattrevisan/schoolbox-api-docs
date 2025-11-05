@@ -66,7 +66,7 @@ const header = window.Vue.ref<Header[]>([
 const url = window.Vue.ref<string>("");
 const LIMIT = 2; // the current set limit for the number of records to fetch at once
 const filters = window.Vue.ref<Nested>({});
-const { isNewLoading, isMoreLoading, payload, sortBy, isEmpty, hasRows, loadError } = useLoadData(url);
+const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(url);
 
 /**
  * Adds filter search parameters to the given URLSearchParams object.
@@ -126,7 +126,7 @@ function onPaginate(cursor: string): void {
             been linked.
         </p>
     </empty-state>
-    <template v-else-if="hasRows">
+    <template v-else-if="hasRows && payload">
         <mdp-grid :header="header" :rows="payload.data.profiles">
             <template #User="{ row, header: columnHeader }">
                 <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
