@@ -1,6 +1,6 @@
 import type { User } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
-import { Nested } from "@js/util/queryUtils";
+import type { Nested } from "@js/util/queryUtils";
 
 /**
  * Differentiation Profile header configuration
