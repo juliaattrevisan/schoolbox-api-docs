@@ -840,6 +840,20 @@ input[type="checkbox"].plain {
     margin: 0;
     min-height: inherit;
 }
+<<<<<<< HEAD
+=======
+
+body:not(.sbx-body) {
+    .checklist,
+    .radiolist {
+        input[type="radio"]:not(.plain),
+        input[type="checkbox"]:not(.plain) {
+            @include fancy-check();
+        }
+    }
+}
+
+>>>>>>> fd734b3fbf1 (Updated old UI scopes[SA-21017])
 .checklist .checklist {
     margin-left: 2rem;
 }
@@ -896,16 +910,32 @@ input[type="checkbox"].plain {
     }
 }
 
-.toggle-set {
-    display: flex;
-    justify-content: space-between;
-    max-width: 20rem;
+body:not(.sbx-body) {
+    .toggle-set {
+        display: flex;
+        justify-content: space-between;
+        max-width: 20rem;
 
-    input[type="radio"]:not(.plain),
-    input[type="checkbox"]:not(.plain) {
-        @include vaporwave();
+        input[type="radio"]:not(.plain),
+        input[type="checkbox"]:not(.plain) {
+            @include vaporwave();
+        }
     }
 }
+body:not(.sbx-body) {
+    input[type="radio"]:not(.plain) {
+        @include fancy-check("radio-label");
+        @include vaporwave("input-toggle");
+    }
+}
+
+body:not(.sbx-body) {
+    input[type="checkbox"]:not(.plain) {
+        @include fancy-check("checkbox-label");
+        @include vaporwave("input-toggle");
+    }
+}
+<<<<<<< HEAD
 input[type="radio"]:not(.plain) {
     @include fancy-check("radio-label");
     @include vaporwave("input-toggle");
@@ -931,6 +961,27 @@ ul.filters {
     }
     label {
         padding: 0 12px 0 8px;
+=======
+
+body:not(.sbx-body) {
+    ul.filters {
+        align-items: center;
+        &:before {
+            display: inline-block;
+            content: "Showing:";
+            margin-right: 8px;
+        }
+        input[type="checkbox"] {
+            @include vaporwave($toggle-width: auto);
+        }
+        li {
+            display: inline-block;
+            margin-bottom: 3px;
+        }
+        label {
+            padding: 0 12px 0 8px;
+        }
+>>>>>>> fd734b3fbf1 (Updated old UI scopes[SA-21017])
     }
 }
 
@@ -1042,25 +1093,27 @@ ul.filters {
     }
 }
 
-input[type="radio"]:not(.plain) + label {
-    &:before,
-    &:after {
-        border-radius: 1rem;
-    }
-}
-
-// Disabled
-input[type="checkbox"]:not(.plain):disabled,
-input[type="radio"]:not(.plain):disabled,
-input[type="checkbox"][readonly]:not(.plain),
-input[type="radio"][readonly]:not(.plain) {
-    & + label {
-        cursor: $cursor-default-value;
-        pointer-events: none;
-        opacity: 0.5;
-
+body:not(.sbx-body) {
+    input[type="radio"]:not(.plain) + label {
+        &:before,
         &:after {
+            border-radius: 1rem;
+        }
+    }
+
+    // Disabled
+    input[type="checkbox"]:not(.plain):disabled,
+    input[type="radio"]:not(.plain):disabled,
+    input[type="checkbox"][readonly]:not(.plain),
+    input[type="radio"][readonly]:not(.plain) {
+        & + label {
+            cursor: $cursor-default-value;
+            pointer-events: none;
             opacity: 0.5;
+
+            &:after {
+                opacity: 0.5;
+            }
         }
     }
 }
