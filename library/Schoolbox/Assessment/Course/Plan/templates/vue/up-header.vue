@@ -4,6 +4,8 @@
  */
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import locale from "@js/terminology/rosettaStone";
+import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 
 interface Props {
     courseTitle: string;
@@ -12,6 +14,8 @@ interface Props {
     routeCurriculumCoverage: string | null;
 }
 const props = defineProps<Props>();
+
+const addStore = useAddUnitsStore();
 
 /**
  * To show the print option under three dot menu
@@ -25,7 +29,16 @@ function onPrintSelected(): void {
     <div class="row actions-small-1 actions-medium-2">
         <div class="button-action small-12 columns">
             <h1>Unit Planner - {{ props.courseTitle }}</h1>
-            <sbx-pop-out content-id="unit-dropdown"></sbx-pop-out>
+            <div class="l-flex-row l-gap-s">
+                <button
+                    class="button icon-add"
+                    data-test="unit-planner-create-units"
+                    @click.prevent="addStore.prompt()"
+                >
+                    Create {{ locale.unit.translate(true, true) }}
+                </button>
+                <sbx-pop-out content-id="unit-dropdown"></sbx-pop-out>
+            </div>
         </div>
     </div>
     <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
