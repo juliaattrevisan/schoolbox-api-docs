@@ -37,16 +37,6 @@ class Status
 
 
     /**
-     * Constructor.
-     */
-    public function __construct()
-    {
-        /* TODO add routeGenerator here so that Status becomes similar to NextRoutes
-         */
-    }
-
-
-    /**
      * Returns a set of (user id, status) tuples for a given assessment
      *
      * @param Model $assessment  A fully hydrated assessment with participants and responses etc.
