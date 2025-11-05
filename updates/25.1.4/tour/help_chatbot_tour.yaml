@@ -1,5 +1,5 @@
 tour:
-  title: 'Help Chatbot'
+  title: 'Help Chatbot Tour'
   description: 'Introduce users to the new help chatbot'
   roles:
     - staff
