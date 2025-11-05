@@ -63,7 +63,11 @@ class helperMethodsTest extends TestCase
         $months = $helper->getMonthsInRange(
             $startDate,
             $endDate,
-            StudentByMonth::COLUMN_DATE_FORMAT
+            StudentByMonth::COLUMN_DATE_FORMAT,
+            Alaress_Date_Format::newDatabaseDate(
+                '2025-10-02 12:00:00',
+                new DateTimeZone('UTC')
+            )
         );
 
         // Validate the count of months

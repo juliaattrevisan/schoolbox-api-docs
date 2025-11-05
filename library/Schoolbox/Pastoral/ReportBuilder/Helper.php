@@ -652,11 +652,25 @@ class Helper
         return $this->report['beforeDate'] ?? null;
     }
 
+    /**
+     * @param Alaress_Date_Format|null $startDate start of the date range
+     * @param Alaress_Date_Format|null $endDate end of the date range
+     * @param string                   $format format the month string will be returned in
+     * @param Alaress_Date_Format|null $now if not set it will be defaulted to now
+     * @return Collection
+     */
     public function getMonthsInRange(
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
+        ?Alaress_Date_Format $now = null,
     ): Collection {
+        /* Default now to current date
+         */
+        if (null === $now) {
+            $now = Alaress_Date_Format::now();
+        };
+
         /* Return empty collection if either date is null.
          */
         if (null === $startDate || null === $endDate) {
@@ -668,8 +682,8 @@ class Helper
         /* If the current month is in the future, skip it to the current month
          * This is to avoid showing future months in the report
          */
-        if ($endDate->startOfMonth()->gt((Alaress_Date_Format::now())->startOfMonth())) {
-            $current = (Alaress_Date_Format::now())->startOfMonth();
+        if ($endDate->startOfMonth()->gt((clone $now)->startOfMonth())) {
+            $current = (clone $now)->startOfMonth();
         } else {
             $current = $endDate->startOfMonth();
         }
@@ -683,16 +697,23 @@ class Helper
     }
 
     /**
-     * @param Alaress_Date_Format|null $startDate
-     * @param Alaress_Date_Format|null $endDate
-     * @param string                   $format
+     * @param Alaress_Date_Format|null $startDate start of the date range
+     * @param Alaress_Date_Format|null $endDate end of the date range
+     * @param string                   $format format the week string will be returned in
+     * @param Alaress_Date_Format|null $now if not set it will be defaulted to now
      * @return Collection
      */
     public function getWeeksInRange(
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
+        ?Alaress_Date_Format $now = null,
     ): Collection {
+        /* Default now to current date
+         */
+        if (null === $now) {
+            $now = Alaress_Date_Format::now();
+        };
         /* Return empty collection if either date is null.
          */
         if (null === $startDate || null === $endDate) {
@@ -707,8 +728,8 @@ class Helper
         /* If the current week is in the future, skip it to the current date
          * This is to avoid showing future weeks in the report
          */
-        if ($end->endOfDay()->gt((Alaress_Date_Format::now())->endOfDay())) {
-            $current = Alaress_Date_Format::now();
+        if ($end->endOfDay()->gt((clone $now)->endOfDay())) {
+            $current = clone $now;
         } else {
             $current = $end;
         }
