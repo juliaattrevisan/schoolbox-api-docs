@@ -76,13 +76,6 @@ class Status
      */
     private function calculate(Model $assessment, Participant $participant): array
     {
-        /* The "length" node indicates whether there was at least one action available.
-         *
-         * This is used to decide whether to render a tot menu to prevent you rendering a tot button
-         * that had no actions inside the tot menu. You could infer this from Pending Status as an
-         * alternative, but you'd need to hardcode the states in frontend to do that.
-         */
-
         /* No responses? No trabajo
          */
         if (!$participant->getAllResponses()->count()) {
@@ -91,7 +84,6 @@ class Status
                 'css' => self::CSS_PENDING,
                 'response' => null,
                 'actions' => [
-                    'length' => 0,
                     self::ACTION_VIEW => false,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
@@ -116,7 +108,6 @@ class Status
                 'css' => self::CSS_PENDING,
                 'response' => null,
                 'actions' => [
-                    'length' => 0,
                     self::ACTION_VIEW => false,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
@@ -141,7 +132,6 @@ class Status
                     'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
                 ],
                 'actions' => [
-                    'length' => 1,
                     self::ACTION_VIEW => true,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
@@ -159,7 +149,6 @@ class Status
                 'css' => self::CSS_PENDING,
                 'response' => null,
                 'actions' => [
-                    'length' => 0,
                     self::ACTION_VIEW => false,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
@@ -186,7 +175,6 @@ class Status
                     ],
                 ],
                 'actions' => [
-                    'length' => 1,
                     self::ACTION_VIEW => true,
                     self::ACTION_SOBO => true,
                     self::ACTION_RESET => true,
@@ -203,7 +191,6 @@ class Status
             'css' => self::CSS_IN_PROGRESS,
             'response' => $authoritativeResponse,
             'actions' => [
-                'length' => 1,
                 self::ACTION_VIEW => true,
                 self::ACTION_SOBO => true,
                 self::ACTION_RESET => true,

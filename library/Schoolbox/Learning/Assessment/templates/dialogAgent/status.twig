@@ -220,124 +220,137 @@
                             {% endfor %}
 
                             <td class="actions-small-1">
-                                {% if currentStatus.actions.length %}
-                                    <nav>
-                                        <sbx-pop-out content-id="response-options-{{ participant.user.id }}"></sbx-pop-out>
-                                    </nav>
-                                    <ul id="response-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
-                                        {# View a particular response #}
-                                        {% if currentStatus.actions.view %}
-                                            {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
-                                                assessment: assessment,
-                                                assessmentId: assessment.id,
-                                                student: participant.user,
-                                                studentId: participant.user.id,
-                                                response: currentStatus.response,
-                                                responseId: currentStatus.response.id
-                                            }) %}
-                                            {% if viewRoute %}
-                                                <li>
-                                                    <a href="{{ viewRoute }}" class="icon-search" title="View {{ locale.dialogAgent.proper }}" data-action-view="{{ currentStatus.response.id }}">View {{ locale.dialogAgent.proper }}</a>
-                                                </li>
-                                            {% endif %}
-                                        {% endif %}
+                                <nav>
+                                    <sbx-pop-out content-id="response-options-{{ participant.user.id }}"></sbx-pop-out>
+                                </nav>
+                                <ul id="response-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                                    {# Summary screen always exists for a person#}
+                                    {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                                        assessment: assessment,
+                                        assessmentId: assessment.id,
+                                        student: participant.user,
+                                        studentId: participant.user.id,
+                                    }) %}
 
-                                        {# SOBO a student #}
-                                        {% if currentStatus.actions.sobo %}
-                                            {% set soboRoute = routeLookupIfAuthorized('learningDialogAgent.postSobo', {
-                                                assessment: assessment,
-                                                assessmentId: assessment.id,
-                                                student: participant.user,
-                                                studentId: participant.user.id,
-                                            }) %}
-                                            <script>
-                                                $(function() {
-                                                    $('[data-action-sobo="{{ currentStatus.response.id }}"]').on('click', function(event) {
-                                                        event.preventDefault();
+                                    {% if summaryRoute %}
+                                        <li>
+                                            <a href="{{ summaryRoute }}" class="icon-search" title="View {{ locale.dialogAgent.proper }} history">{{ locale.dialogAgent.proper }} History</a>
+                                        </li>
+                                    {% endif %}
 
-                                                        $.post('{{ soboRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            window.location.reload();
-                                                        });
-                                                    });
-                                                });
-                                            </script>
+                                    {# View a particular response #}
+                                    {% if currentStatus.actions.view %}
+                                        {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                            response: currentStatus.response,
+                                            responseId: currentStatus.response.id
+                                        }) %}
+
+                                        {% if viewRoute %}
                                             <li>
-                                                <a class="icon-approve" title="Submit on behalf of {{ participant.user.formatName }}" data-action-sobo="{{ currentStatus.response.id }}">Submit on behalf of {{ participant.user.formatName }}</a>
+                                                <a href="{{ viewRoute }}" class="icon-search" title="View {{ locale.dialogAgent.proper }}" data-action-view="{{ currentStatus.response.id }}">View {{ locale.dialogAgent.proper }}</a>
                                             </li>
                                         {% endif %}
+                                    {% endif %}
 
-                                        {# Reset a particular response's contents #}
-                                        {% if currentStatus.actions.reset %}
-                                            {% set resetRoute = routeLookupIfAuthorized('learningDialogAgent.postReset', {
-                                                assessment: assessment,
-                                                assessmentId: assessment.id,
-                                                student: participant.user,
-                                                studentId: participant.user.id,
-                                            }) %}
-                                            <script>
-                                                $(function() {
-                                                    $('[data-action-reset="{{ currentStatus.response.id }}"]').on('click', function(event) {
-                                                        event.preventDefault();
+                                    {# SOBO a student #}
+                                    {% if currentStatus.actions.sobo %}
+                                        {% set soboRoute = routeLookupIfAuthorized('learningDialogAgent.postSobo', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-sobo="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
 
-                                                        $.post('{{ resetRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            window.location.reload();
-                                                        });
+                                                    $.post('{{ soboRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
                                                     });
                                                 });
-                                            </script>
-                                            <li>
-                                                <a class="icon-refresh" title="Reset {{ locale.dialogAgent.proper }}" data-action-reset="{{ currentStatus.response.id }}">Reset {{ locale.dialogAgent.proper }}</a>
-                                            </li>
-                                        {% endif %}
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-approve" title="Submit on behalf of {{ participant.user.formatName }}" data-action-sobo="{{ currentStatus.response.id }}">Submit on behalf of {{ participant.user.formatName }}</a>
+                                        </li>
+                                    {% endif %}
 
-                                        {# Reopen ("unsubmit") a response #}
-                                        {% if currentStatus.actions.reopen %}
-                                            {% set reopenRoute = routeLookupIfAuthorized('learningDialogAgent.postReopen', {
-                                                assessment: assessment,
-                                                assessmentId: assessment.id,
-                                                student: participant.user,
-                                                studentId: participant.user.id,
-                                            }) %}
-                                            <script>
-                                                $(function() {
-                                                    $('[data-action-reopen="{{ currentStatus.response.id }}"]').on('click', function(event) {
-                                                        event.preventDefault();
+                                    {# Reset a particular response's contents #}
+                                    {% if currentStatus.actions.reset %}
+                                        {% set resetRoute = routeLookupIfAuthorized('learningDialogAgent.postReset', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-reset="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
 
-                                                        $.post('{{ reopenRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            window.location.reload();
-                                                        });
+                                                    $.post('{{ resetRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
                                                     });
                                                 });
-                                            </script>
-                                            <li>
-                                                <a class="icon-undo" title="Reopen {{ locale.dialogAgent.proper }}" data-action-reopen="{{ currentStatus.response.id }}">Reopen {{ locale.dialogAgent.proper }}</a>
-                                            </li>
-                                        {% endif %}
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-refresh" title="Reset {{ locale.dialogAgent.proper }}" data-action-reset="{{ currentStatus.response.id }}">Reset {{ locale.dialogAgent.proper }}</a>
+                                        </li>
+                                    {% endif %}
 
-                                        {% if currentStatus.actions.resolved %}
-                                            {% set assistanceResolvedRoute = routeLookupIfAuthorized('learningDialogAgent.postAssistanceResolve', {
-                                                assessment: assessment,
-                                                assessmentId: assessment.id,
-                                                student: participant.user,
-                                                studentId: participant.user.id,
-                                            }) %}
-                                            <script>
-                                                $(function() {
-                                                    $('[data-action-assistance-resolved="{{ currentStatus.response.id }}"]').on('click', function(event) {
-                                                        event.preventDefault();
+                                    {# Reopen ("unsubmit") a response #}
+                                    {% if currentStatus.actions.reopen %}
+                                        {% set reopenRoute = routeLookupIfAuthorized('learningDialogAgent.postReopen', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-reopen="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
 
-                                                        $.post('{{ assistanceResolvedRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
-                                                            window.location.reload();
-                                                        });
+                                                    $.post('{{ reopenRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
                                                     });
                                                 });
-                                            </script>
-                                            <li>
-                                                <a class="icon-medical" title="Mark as assisted" data-action-assistance-resolved="{{ currentStatus.response.id }}">Mark as assisted</a>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                {% endif %}
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-undo" title="Reopen {{ locale.dialogAgent.proper }}" data-action-reopen="{{ currentStatus.response.id }}">Reopen {{ locale.dialogAgent.proper }}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if currentStatus.actions.resolved %}
+                                        {% set assistanceResolvedRoute = routeLookupIfAuthorized('learningDialogAgent.postAssistanceResolve', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-assistance-resolved="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
+
+                                                    $.post('{{ assistanceResolvedRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-medical" title="Mark as assisted" data-action-assistance-resolved="{{ currentStatus.response.id }}">Mark as assisted</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
                             </td>
                         </tr>
                     {% endfor %}
