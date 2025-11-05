@@ -10,7 +10,6 @@ import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import type {
     MDPHeader,
@@ -127,7 +126,7 @@ function onPaginate(cursor: string): void {
         </p>
     </empty-state>
     <template v-else-if="hasRows && payload">
-        <mdp-grid :header="header" :rows="payload.data.profiles">
+        <mdp-grid :header="header" :rows="payload.data.profiles" :is-loading="isMoreLoading">
             <template #User="{ row, header: columnHeader }">
                 <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
             </template>
