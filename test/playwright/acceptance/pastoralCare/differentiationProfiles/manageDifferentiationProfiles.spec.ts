@@ -69,4 +69,33 @@ test.describe("Manage Differentiation Profiles", () => {
             await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
         }
     });
+
+    test("Verify profiles can be shown", async ({ tester, page, db }) => {
+        try {
+            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+            await manageDifferentiationProfiles.enablePage(db);
+            await manageDifferentiationProfiles.addPastoralTypes();
+            await tester.loginAsAdmin();
+            await manageDifferentiationProfiles.navigateToPage();
+            tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
+            const marioIzzo = page.getByText("Mario Izzo");
+            const msPenelopeLi = page.getByText("Ms Penelope Li");
+            await expect(marioIzzo).toBeVisible();
+            await expect(msPenelopeLi).toBeVisible();
+        } finally {
+            tester.isGoingTo("Clean up: Reset data state");
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
+            await db.updateInDatabase(
+                "lu_pastoral_type",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Bullying" },
+            );
+            await db.updateInDatabase(
+                "lu_pastoral_subtype",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Award/Achievement" },
+            );
+        }
+    });
 });
