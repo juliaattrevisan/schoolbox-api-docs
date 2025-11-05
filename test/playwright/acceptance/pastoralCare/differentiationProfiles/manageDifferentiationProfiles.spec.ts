@@ -59,7 +59,10 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that the page is accessible");
             const pageTitle = page.getByText("Manage Differentiation Profiles");
-            expect(pageTitle).toBeVisible();
+            await expect(pageTitle).toBeVisible();
+            tester.isGoingTo("Verify that the empty state is visible");
+            const emptyState = page.getByText("No Differentiation Profiles exist");
+            await expect(emptyState).toBeVisible();
         } finally {
             tester.isGoingTo("Clean up: Reset the toggle to off state");
             await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
