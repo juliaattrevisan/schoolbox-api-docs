@@ -9,6 +9,13 @@
         <div class="f-no-margins">
             <h1>Manage {{ locale.differentiationProfile.plural }}</h1>
         </div>
+        <div>
+            {% include '@filters/panel.twig' with {
+                contentId: 'filterPanel',
+                panel:     filterPanel,
+                quickload: false,
+            } only %}
+        </div>
         <div id="manage-differentiation-profiles-container">
             <manage-differentiation-profiles
                 :header='{{ header|json_encode|raw }}'

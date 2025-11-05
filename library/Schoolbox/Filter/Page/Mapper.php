@@ -48,6 +48,7 @@ class Mapper extends \Schoolbox\Mapper
                 Model::PAGE_BADGE_LIST,
                 Model::PAGE_AWARD_LIST,
                 Model::PAGE_CLASS_PASTORAL,
+                Model::PAGE_DIFFERENTIATION_PROFILE,
             ]
         );
         $this->uses('enabled', self::TYPE_BOOLEAN);

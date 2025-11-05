@@ -78,6 +78,8 @@ class differentiationProfileModelToArrayTest extends TestCase
         $userResponse = [
             'id'               => 100,
             'fullName'         => 'Unknown User',
+            'givenName'       => null,
+            'lastName'        => null,
             'yearLevel'        => null,
         ];
 

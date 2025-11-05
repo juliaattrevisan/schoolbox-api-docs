@@ -325,6 +325,50 @@ class Controller extends BaseController
         $this->postPushDefaultSelections($page);
     }
 
+    // Functions for routes accessible by Differentiation Profile Moderators --------------------------------------------------------//
+
+    /**
+     * Display a page where admins can alter default filter selections
+     *
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
+     * @throws RouteNotFound
+     * @throws TwigError
+     */
+    public function getPageSettingsDifferentiationProfile(IFactoryFactory $factoryFactory, string $page): void
+    {
+        $this->getPageSettings($factoryFactory, $page);
+    }
+
+    /**
+     * Load up all settings for this page, overlay new settings, and save
+     *
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     * @throws InvalidColumnException
+     * @throws InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws DefinitionException If join $name isn't on this mapper
+     * @throws MapperException If an alias is incorrect
+     * @throws UnderflowException
+     */
+    public function postSavePageSettingsDifferentiationProfile(IFactoryFactory $factoryFactory, string $page): void
+    {
+        $this->postSavePageSettings($factoryFactory, $page);
+    }
+
+    /**
+     * Push default selections to users in the given roles.
+     *
+     * @param string $page
+     * @throws Exception
+     */
+    public function postPushDefaultSelectionsDifferentiationProfile(string $page): void
+    {
+        $this->postPushDefaultSelections($page);
+    }
+
     // Functions for routes accessible by LMS Moderators -------------------------------------------------------------//
 
     /**
@@ -450,17 +494,18 @@ class Controller extends BaseController
     {
         $labelBuilder = new LabelBuilder();
         return [
-            Page\Model::PAGE_PENDING_ASSESSMENTS  => $labelBuilder->buildLabel(Page\Model::PAGE_PENDING_ASSESSMENTS),
-            Page\Model::PAGE_GRADES               => $labelBuilder->buildLabel(Page\Model::PAGE_GRADES),
-            Page\Model::PAGE_CLASS_MARK_BOOK      => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_MARK_BOOK),
-            Page\Model::PAGE_COURSE_MARK_BOOK     => $labelBuilder->buildLabel(Page\Model::PAGE_COURSE_MARK_BOOK),
-            Page\Model::PAGE_RUBRIC_MARK_BOOK     => $labelBuilder->buildLabel(Page\Model::PAGE_RUBRIC_MARK_BOOK),
-            Page\Model::PAGE_LEARNING_ANALYTICS   => $labelBuilder->buildLabel(Page\Model::PAGE_LEARNING_ANALYTICS),
-            Page\Model::PAGE_UPCOMING_ASSESSMENTS => $labelBuilder->buildLabel(Page\Model::PAGE_UPCOMING_ASSESSMENTS),
-            Page\Model::PAGE_ASSESSMENT_CALENDAR  => $labelBuilder->buildLabel(Page\Model::PAGE_ASSESSMENT_CALENDAR),
-            Page\Model::PAGE_BADGE_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_BADGE_LIST),
-            Page\Model::PAGE_AWARD_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_AWARD_LIST),
-            Page\Model::PAGE_CLASS_PASTORAL       => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_PASTORAL),
+            Page\Model::PAGE_PENDING_ASSESSMENTS     => $labelBuilder->buildLabel(Page\Model::PAGE_PENDING_ASSESSMENTS),
+            Page\Model::PAGE_GRADES                  => $labelBuilder->buildLabel(Page\Model::PAGE_GRADES),
+            Page\Model::PAGE_CLASS_MARK_BOOK         => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_MARK_BOOK),
+            Page\Model::PAGE_COURSE_MARK_BOOK        => $labelBuilder->buildLabel(Page\Model::PAGE_COURSE_MARK_BOOK),
+            Page\Model::PAGE_RUBRIC_MARK_BOOK        => $labelBuilder->buildLabel(Page\Model::PAGE_RUBRIC_MARK_BOOK),
+            Page\Model::PAGE_LEARNING_ANALYTICS      => $labelBuilder->buildLabel(Page\Model::PAGE_LEARNING_ANALYTICS),
+            Page\Model::PAGE_UPCOMING_ASSESSMENTS    => $labelBuilder->buildLabel(Page\Model::PAGE_UPCOMING_ASSESSMENTS),
+            Page\Model::PAGE_ASSESSMENT_CALENDAR     => $labelBuilder->buildLabel(Page\Model::PAGE_ASSESSMENT_CALENDAR),
+            Page\Model::PAGE_BADGE_LIST              => $labelBuilder->buildLabel(Page\Model::PAGE_BADGE_LIST),
+            Page\Model::PAGE_AWARD_LIST              => $labelBuilder->buildLabel(Page\Model::PAGE_AWARD_LIST),
+            Page\Model::PAGE_CLASS_PASTORAL          => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_PASTORAL),
+            Page\Model::PAGE_DIFFERENTIATION_PROFILE => $labelBuilder->buildLabel(Page\Model::PAGE_DIFFERENTIATION_PROFILE),
         ];
     }
 
