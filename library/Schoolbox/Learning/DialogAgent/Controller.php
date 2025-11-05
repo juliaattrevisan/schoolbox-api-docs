@@ -481,7 +481,7 @@ class Controller extends Base
      * @throws Exception
      * @throws \Alaress\Web\Controller\Exception
      */
-    public function postRepen(IAssessable $assessment, User $student): void
+    public function postReopen(IAssessable $assessment, User $student): void
     {
         /* No response id, somehow: malformed post request.
          */

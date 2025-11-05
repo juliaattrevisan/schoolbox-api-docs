@@ -290,10 +290,28 @@
                                             </li>
                                         {% endif %}
 
+                                        {# Reopen ("unsubmit") a response #}
                                         {% if currentStatus.actions.reopen %}
-                                        <li>
-                                            <a class="icon-undo" title="Reopen {{ locale.dialogAgent.proper }}">Reopen {{ locale.dialogAgent.proper }}</a>
-                                        </li>
+                                            {% set reopenRoute = routeLookupIfAuthorized('learningDialogAgent.postReopen', {
+                                                assessment: assessment,
+                                                assessmentId: assessment.id,
+                                                student: participant.user,
+                                                studentId: participant.user.id,
+                                            }) %}
+                                            <script>
+                                                $(function() {
+                                                    $('[data-action-reopen="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                        event.preventDefault();
+
+                                                        $.post('{{ reopenRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                            console.log(responseText);
+                                                        });
+                                                    });
+                                                });
+                                            </script>
+                                            <li>
+                                                <a class="icon-undo" title="Reopen {{ locale.dialogAgent.proper }}" data-action-reopen="{{ currentStatus.response.id }}">Reopen {{ locale.dialogAgent.proper }}</a>
+                                            </li>
                                         {% endif %}
 
                                         {% if currentStatus.actions.assisted %}
