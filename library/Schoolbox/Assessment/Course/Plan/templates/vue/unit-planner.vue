@@ -125,8 +125,11 @@ window.Vue.watch(
     },
 );
 
-window.Vue.onMounted(() => {
+window.Vue.onBeforeMount(() => {
     store.init(props.courseId, props.units, props.template, props.editorTemplates);
+});
+
+window.Vue.onMounted(() => {
     activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,

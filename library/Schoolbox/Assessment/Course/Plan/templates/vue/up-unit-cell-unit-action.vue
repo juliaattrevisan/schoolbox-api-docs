@@ -5,6 +5,7 @@
  */
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import locale from "@js/terminology/rosettaStone";
 import type { Unit } from "./unitPlannerTypes";
 import { useDeleteUnitsStore } from "./store/unitPlannerDeleteUnitStore";
 
@@ -17,16 +18,6 @@ const props = defineProps<{
  */
 function onDeleteUnit(): void {
     useDeleteUnitsStore().prompt(props.unit);
-}
-
-/**
- * Navigate to the modify unit page
- * We use a function here instead of a href as the
- * 'isNewCourse=1' param may be present when the component is mounted
- * And we want to ensure it's removed from the URL when navigating
- */
-function onModifyUnit(): void {
-    window.location.href = getReturnUrl(props.unit._routes.modify!);
 }
 </script>
 
@@ -41,13 +32,14 @@ function onModifyUnit(): void {
                 is-component-action
             ></sbx-pop-out>
             <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
-                <li v-if="props.unit._routes.modify">
+                <li v-if="props.unit._routes.courseMarkbook">
                     <a
-                        class="icon-modify"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
-                        @click.prevent="onModifyUnit"
-                        >Modify</a
+                        class="icon-curriculum"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-link`"
+                        :href="getReturnUrl(props.unit._routes.courseMarkbook!)"
                     >
+                        Course Markbook
+                    </a>
                 </li>
                 <li v-if="props.unit._routes.delete">
                     <button
@@ -57,6 +49,23 @@ function onModifyUnit(): void {
                     >
                         Delete
                     </button>
+                </li>
+                <li v-if="props.unit._routes.importIntoClasses">
+                    <a
+                        class="icon-import"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-link`"
+                        :href="getReturnUrl(props.unit._routes.importIntoClasses!)"
+                    >
+                        Import into {{ locale.class.translate(true, true) }}
+                    </a>
+                </li>
+                <li v-if="props.unit._routes.modify">
+                    <a
+                        class="icon-modify"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
+                        :href="getReturnUrl(props.unit._routes.modify!)"
+                        >Modify</a
+                    >
                 </li>
             </ul>
         </section>

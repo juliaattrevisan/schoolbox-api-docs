@@ -43,13 +43,6 @@ export default class CourseModify {
     }
 
     /**
-     * Clicks the import unit to classes button under the open 3-dot menu
-     */
-    async clickImportUnitToClasses(): Promise<void> {
-        await this.page.locator(`.f-dropdown a[data-action="import-unit"]:visible`).click();
-    }
-
-    /**
      * Clicks a unit arrow
      * @param unitNumber - The unit number to click
      */

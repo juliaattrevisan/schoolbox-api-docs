@@ -1076,6 +1076,15 @@ class Controller extends Base
                 'delete' => $this->getRouteIfAuthorized('course.deleteUnitSpecification', [
                     'id' => $unit->getId(),
                 ]) ?: null,
+                'importIntoClasses' => $this->getRouteIfAuthorized('learningAssessmentExporter.getExportFormForUnit', [
+                    'unitSpecId' => $unit->getId(),
+                ]) ?: null,
+                'courseMarkbook' => $this->getRouteIfAuthorized('courseMarkbook.getRedirect', [
+                    'courseSpec' => $unit->getCourse(),
+                    'courseSpecId' => $unit->getCourse()->getId(),
+                    'unitSpecId' => $unit->getId(),
+                    'folderId' => 0,
+                ]) ?: null,
             ]
         ];
     }
