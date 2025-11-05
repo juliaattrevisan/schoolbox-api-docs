@@ -315,9 +315,26 @@
                                         {% endif %}
 
                                         {% if currentStatus.actions.assisted %}
-                                        <li>
-                                            <a class="icon-medical" title="Mark as assisted">Mark as assisted</a>
-                                        </li>
+                                            {% set assistanceResolvedRoute = routeLookupIfAuthorized('learningDialogAgent.postAssistanceResolve', {
+                                                assessment: assessment,
+                                                assessmentId: assessment.id,
+                                                student: participant.user,
+                                                studentId: participant.user.id,
+                                            }) %}
+                                            <script>
+                                                $(function() {
+                                                    $('[data-action-assistance-resolved="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                        event.preventDefault();
+
+                                                        $.post('{{ assistanceResolvedRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                            console.log(responseText);
+                                                        });
+                                                    });
+                                                });
+                                            </script>
+                                            <li>
+                                                <a class="icon-medical" title="Mark as assisted" data-action-assistance-resolved="{{ currentStatus.response.id }}">Mark as assisted</a>
+                                            </li>
                                         {% endif %}
                                     </ul>
                                 {% endif %}
