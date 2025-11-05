@@ -1,0 +1,118 @@
+/**
+ * checkbox input
+ * Scope: UI Uplift
+ */
+:root {
+    --sbx-animation-form-input-change: 100ms;
+}
+
+/* Shared form input focus styles */
+@mixin form-input-focus {
+    background: var(--sbx-color-foreground-primary);
+    border-color: var(--sbx-color-accent);
+    outline: calc(var(--sbx-border-width-normal) + 2px) solid var(--sbx-color-accent);
+    outline-offset: calc(var(--sbx-border-width-normal) + 1px);
+}
+
+/* So the focus is not active on mouse click */
+@mixin form-input-focus-not-visible {
+    outline: 0;
+}
+
+/* Shared form input disabled styles */
+@mixin form-input-disabled {
+    background-color: var(--sbx-color-foreground-secondary);
+    color: var(--sbx-color-text-secondary) !important;
+    cursor: not-allowed;
+    pointer-events: auto;
+    & + label {
+        opacity: 1 !important;
+    }
+}
+
+/* Base */
+.sbx-body input[type="checkbox"] {
+    -webkit-appearance: none;
+    appearance: none; // remove native styles
+    background-color: var(--sbx-color-foreground-primary);
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+    border-radius: var(--sbx-border-radius-normal);
+    color: var(--sbx-color-accent);
+    cursor: pointer;
+    display: grid;
+    height: 1.875rem;
+    width: 1.875rem;
+    line-height: 1;
+    margin: 0;
+    min-height: auto;
+    opacity: 1;
+    place-content: center;
+    position: static;
+    transform: translateY(-0.075em);
+
+    &:hover:not(:disabled) {
+        // no reduced contrast on hover
+        background-color: var(--sbx-color-foreground-primary);
+        border-color: var(--sbx-color-accent);
+        color: var(--sbx-color-text-primary);
+    }
+
+    /* tick mark */
+    &::before {
+        background-color: CanvasText; // high contrast mode
+        box-shadow: inset 1rem 1rem var(--sbx-color-accent); // visible when printed
+        content: "";
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        height: 1rem;
+        width: 1rem;
+        transform: scale(0);
+        transform-origin: bottom left;
+        transition: var(--sbx-animation-form-input-change) transform;
+    }
+
+    &:checked::before {
+        transform: scale(1);
+    }
+
+    /* focus / disabled use shared mixins like text input */
+    &:focus {
+        @include form-input-focus;
+    }
+
+    &:focus:not(:focus-visible) {
+        @include form-input-focus-not-visible;
+    }
+
+    &:disabled {
+        @include form-input-disabled;
+    }
+}
+
+/* Intermediate state */
+.sbx-body .sbx-input-checkbox--intermediate[type="checkbox"]::before {
+    clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
+    transform: scale(1);
+}
+
+/* Error state */
+.sbx-body .sbx-input-checkbox--error[type="checkbox"] {
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-alert);
+    border-radius: var(--sbx-border-radius-normal);
+}
+
+/* Label next to checkbox */
+.sbx-body .sbx-input-checkbox[type="checkbox"] + label {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0;
+    vertical-align: baseline;
+}
+
+/* Inline container used in the story */
+.sbx .inline-checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sbx-size-s);
+    flex-direction: row !important;
+    justify-content: flex-start;
+}
