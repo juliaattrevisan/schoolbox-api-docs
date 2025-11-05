@@ -9,8 +9,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
-use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Redis;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -42,8 +42,6 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function run(): void
     {
-        $this->deprecationNotice("SA-19334");
-
         if ($this->getOpt('h') || $this->getOpt('help')) {
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
@@ -80,8 +78,6 @@ $app = new class extends CliTool\App{
         }
 
         $this->checkRedis($args, $regexMode);
-
-        $this->deprecationNotice("SA-19334");
     }
 
 
@@ -108,10 +104,21 @@ $app = new class extends CliTool\App{
         foreach ($redisList as $key) {
             $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
             $uncompress = gzuncompress($compressed);
+            $msg        = unserialize($uncompress, ['allowed_classes' => Instance::ALLOWED_UNSERIALIZE_CLASSES]);
+            try {
+                $notification = new Notification([ $msg ]);
+            } catch (Error $e) {
+                $this->getLogger()->warning(
+                    sprintf(
+                        'Could not decode %s: use cleanup-poison-msgs.php to clean up (message: %s)',
+                        $key,
+                        $e->getMessage(),
+                    ),
+                );
+                continue;
+            }
 
-            $msg = unserialize($uncompress);
             $msgArray = $msg->jsonSerialize();
-            $notification = new Notification([ $msg ]);
             $msgArray['title']['plain'] = $decorator->renderTitleAsPlaintext($notification);
 
             if ($this->checkData($args, $regexMode, $msgArray)) {

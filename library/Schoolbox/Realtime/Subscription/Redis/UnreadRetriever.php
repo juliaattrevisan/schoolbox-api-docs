@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Realtime\Subscription\Redis;
 
 use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Parameter\Param;
 use Predis;
+use UnexpectedValueException;
 
 /**
  * Unread retriever class, moved into a separate object so that systems outside
@@ -57,10 +57,23 @@ class UnreadRetriever
                             $this->syncClient->srem($setIdentifier, $messageKey);
                             return false;
                         }
-                        return unserialize(
+
+                        // Validate the instance inflated properly first:
+                        // if it did not, remove it from the queue
+                        $instance = unserialize(
                             gzuncompress($data),
-                            ['allowed_classes' => [Instance::class, Param::class,],]
+                            ['allowed_classes' => Instance::ALLOWED_UNSERIALIZE_CLASSES],
                         );
+
+                        if ($instance instanceof Instance) {
+                            try {
+                                $instance->assertFullyUnserialized();
+                                return $instance;
+                            } catch (UnexpectedValueException $e) {
+                                $this->syncClient->srem($setIdentifier, $messageKey);
+                            }
+                        }
+                        return false;
                     } catch (\ErrorException $e) {
                         return false;
                     }

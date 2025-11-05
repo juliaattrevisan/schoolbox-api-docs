@@ -52,7 +52,7 @@ class Controller extends Base
             return; //exit early the message field is not set...
         }
         try {
-            $bob = new NotificationInstanceBuilder(validate: false);
+            $bob = new NotificationInstanceBuilder();
 
             // Note that setting href to # has the effect of automarking the
             // notification as read: see SA-17727.
@@ -66,6 +66,18 @@ class Controller extends Base
                 ->setIcon('/images/icon.php?size=192&icon=' . NSMapper::NS_MESSAGE)
                 ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
                 ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
+
+            // Set default values for all tokens
+            $tokens = Instance::extractTokens($data['message'] ?? '');
+            foreach ($tokens as $token) {
+                $bob->setParam(
+                    $token,
+                    new Parameter\Param(
+                        ':' . $token,
+                        stacking: Parameter\ParameterInterface::STACKING_REPLACE_NO_DECORATION,
+                    ),
+                );
+            }
 
             // Attach any messageParams as well.
             // Using a `\Schoolbox\Realtime\Notification\Parameter\SimpleParam` causes the unserialization in

@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
 
+use __PHP_Incomplete_Class;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
@@ -20,6 +21,7 @@ use OutOfBoundsException;
 use RuntimeException;
 use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use TextFormatter;
+use UnexpectedValueException;
 
 /**
  * Basically a really big container of specific things that get put together in a special way
@@ -31,12 +33,12 @@ use TextFormatter;
  */
 class Instance implements JsonSerializable
 {
-    const MAX_FIELD_SIZE = 512;
+    public const MAX_FIELD_SIZE = 512;
 
     /**
      * Default life time of this instance in seconds.
      */
-    const DEFAULT_TTL = 1209600; // 2 weeks
+    public const DEFAULT_TTL = 1209600; // 2 weeks
 
     /**
      * A type of action for this instance, as used by `$this->get/setAction`.
@@ -88,6 +90,16 @@ class Instance implements JsonSerializable
      * Array key to find event object identifier.
      */
     public const EVENT_OBJECT_ID = 'eventObjectId';
+
+    /**
+     * Allowed classes, when attempting to unserialize an instance of this
+     * class.
+     */
+    public const ALLOWED_UNSERIALIZE_CLASSES = [
+        self::class,
+        Param::class,
+        SimpleParam::class,
+    ];
 
     /**
      * The :tokenised string that forms the base template of the message
@@ -230,12 +242,7 @@ class Instance implements JsonSerializable
         $context = null,
         $validate = true
     ) {
-
-        if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
-            $this->tokens = $matches[1];
-        } else {
-            $this->tokens = [];
-        }
+        $this->tokens = self::extractTokens($text);
 
         // cast params to array to prevent errors
         if (!is_array($params)) {
@@ -375,6 +382,23 @@ class Instance implements JsonSerializable
         return $instance;
     }
 
+    /**
+     * Assert this instance is fully serialized.
+     *
+     * @return void
+     * @throws UnexpectedValueException if any parameters were not unserialized
+     *                                  as complete classes.
+     */
+    public function assertFullyUnserialized(): void
+    {
+        foreach ($this->params as $key => $param) {
+            if ($param instanceof __PHP_Incomplete_Class) {
+                throw new UnexpectedValueException(
+                    sprintf('Parameter "%s" was not properly unserialized', $key),
+                );
+            }
+        }
+    }
 
     /**
      * Flatten this notification instance
@@ -686,5 +710,21 @@ class Instance implements JsonSerializable
     public function getReplyToUserIds(): array
     {
         return $this->meta['replyToUserIds'] ?? [];
+    }
+
+    /**
+     * Extract would-be tokens out of a notification's text.
+     *
+     * @param string $text
+     * @return array
+     */
+    public static function extractTokens(string $text): array
+    {
+        if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
+            $tokens = $matches[1];
+        } else {
+            $tokens = [];
+        }
+        return $tokens;
     }
 }
