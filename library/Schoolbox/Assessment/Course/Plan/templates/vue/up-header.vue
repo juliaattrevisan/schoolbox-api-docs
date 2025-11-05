@@ -44,10 +44,9 @@ function onPrintSelected(): void {
     </div>
     <ul id="unit-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true">
         <li>
-            <a :href="`/course/modify/${props.courseId}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
-        </li>
-        <li>
-            <a :href="`/homepage/${props.folderId}`" class="icon-home">View Homepage</a>
+            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar"
+                >Assessment Calendar</a
+            >
         </li>
         <li>
             <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
@@ -57,14 +56,6 @@ function onPrintSelected(): void {
                 >Curriculum Coverage</a
             >
         </li>
-        <li>
-            <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar"
-                >Assessment Calendar</a
-            >
-        </li>
-        <li>
-            <a href="#" class="icon-print" @click.prevent="onPrintSelected">Print Unit Planner</a>
-        </li>
         <li v-if="props.routeImportIntoClasses">
             <a
                 class="icon-import"
@@ -73,6 +64,15 @@ function onPrintSelected(): void {
             >
                 Import into {{ locale.class.translate(true, true) }}
             </a>
+        </li>
+        <li>
+            <a :href="`/course/modify/${props.courseId}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
+        </li>
+        <li>
+            <a href="#" class="icon-print" @click.prevent="onPrintSelected">Print Unit Planner</a>
+        </li>
+        <li>
+            <a :href="`/homepage/${props.folderId}`" class="icon-home">View Homepage</a>
         </li>
     </ul>
 </template>
