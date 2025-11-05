@@ -31,7 +31,7 @@ export const Default: Story = {
     render: () => ({
         template: `
 <div class="l-flex-row l-flex--align-center">
-    <input id="cbx1" type="checkbox" class="c-input-checkbox" />
+    <input id="cbx1" type="checkbox" class="sbx-input-checkbox" />
     <label for="cbx1" class="c-label l-pad-s--horiz">Checkbox</label>
 </div>
             `,
@@ -48,7 +48,7 @@ export const Disabled: Story = {
     render: () => ({
         template: `
 <div class="l-flex-row l-flex--align-center">
-    <input id="cbx2" type="checkbox" class="c-input-checkbox" disabled />
+    <input id="cbx2" type="checkbox" class="sbx-input-checkbox" disabled />
     <label for="cbx2" class="c-label l-pad-s--horiz">Checkbox</label>
 </div>
             `,
@@ -65,7 +65,7 @@ export const Error: Story = {
     render: () => ({
         template: `
 <div class="l-flex-row l-flex--align-center">
-    <input id="cbx2" type="checkbox" class="c-input-checkbox error"/>
+    <input id="cbx2" type="checkbox" class="sbx-input-checkbox error"/>
     <label for="cbx2" class="c-label l-pad-s--horiz">Checkbox</label>
 </div>
             `,
@@ -85,7 +85,7 @@ export const Intermediate: Story = {
     render: () => ({
         template: `
 <div class="l-flex-row l-flex--align-center">
-    <input id="cbx3" type="checkbox" class="c-input-checkbox c-input-checkbox--intermediate" />
+    <input id="cbx3" type="checkbox" class="sbx-input-checkbox sbx-input-checkbox--intermediate" />
     <label for="cbx3" class="c-label l-pad-s--horiz">Checkbox</label>
 </div>
             `,
