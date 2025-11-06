@@ -612,6 +612,10 @@ body.sbx-body {
             }
         }
     }
+    input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
+    body.login input[type="checkbox"]:not(.plain) + label:before {
+        display: none;
+    }
 }
 
 %fancy-check {

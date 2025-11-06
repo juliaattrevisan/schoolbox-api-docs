@@ -14,11 +14,6 @@
     outline-offset: calc(var(--sbx-border-width-normal) + 1px);
 }
 
-/* So the focus is not active on mouse click */
-@mixin form-input-focus-not-visible {
-    outline: 0;
-}
-
 /* Shared form input disabled styles */
 @mixin form-input-disabled {
     background-color: var(--sbx-color-foreground-secondary);
@@ -77,10 +72,6 @@
     /* focus / disabled use shared mixins like text input */
     &:focus {
         @include form-input-focus;
-    }
-
-    &:focus:not(:focus-visible) {
-        @include form-input-focus-not-visible;
     }
 
     &:disabled {
