@@ -91,7 +91,13 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                         'bookingEvents' => [],
                     ];
                 }
-                $groupedBookings[$itemId]['bookingEvents'][] = $event;
+                if (empty($groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()])) {
+                    $groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()] = [
+                        'date'  => $event->getStartTime(),
+                        'events' => [],
+                    ];
+                }
+                $groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()]['events'][] = $event;
             }
         }
         usort($groupedBookings, function ($a, $b) {

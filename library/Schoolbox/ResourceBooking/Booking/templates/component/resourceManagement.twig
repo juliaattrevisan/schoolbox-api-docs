@@ -58,61 +58,80 @@
                 </li>
                 <li class="content small-12" data-collapse-state="uncollapsed" data-collapsable="collap-{{ item.resource.id }}">
                     <ul>
-                        {% for event in item.bookingEvents %}
+                        {% for date in item.bookingEvents %}
                         <li class="actions-small-1">
-                            <div class="list-item">
-                                {# show booker's card #}
+                            <div class="">
+                                {# show date card #}
                                 <div class="small-12 card">
-                                    <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                        {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
-                                    </a>
-
+                                    {# booking date, may have multiple bookings under this date #}
                                     <h4>
-                                        {% include 'sub/timespan.twig' with {
-                                        start: event.booking.event.startDateTime,
-                                        end:   event.booking.event.endDateTime
-                                        } %}
+                                        {{ date.date.getDateOnly }}
                                     </h4>
 
-                                    <p class="meta">
-                                        Requested by
-                                        <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                        on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
-                                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                            by
-                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                        {% endif %}
-                                    </p>
+                                    <ul>
+                                    {% for event in date.events %}
+                                        <li class="actions-small-1">
+                                            <div class="list-item">
+
+                                                {# cardception #}
+                                                <div class="compact small-12 card">
+                                                    {# time, and only time (start - end) #}
+                                                    <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
+
+                                                    {# small portrait of booker #}
+                                                    <a href="/search/user/{{ event.booking.event.owner.id }}">
+                                                        {% include 'include/portrait.twig' with {user: event.booking.event.owner, render: 'tiny'} only %}
+                                                    </a>
+
+                                                    {# meta to show on the side of the portrait #}
+                                                    <p class="meta">
+                                                        Requested by
+                                                        <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                                        on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
+                                                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                                                            by
+                                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {# tot #}
+                                            <nav>
+                                                <sbx-pop-out content-id="resourceManagement-status-{{ event.booking.id }}"></sbx-pop-out>
+                                            </nav>
+                                            <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
+                                                       class="icon-modify">Modify Booking</a>
+                                                </li>
+                                                <li class="separator">Set Status</li>
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                       data-set-status="approved"
+                                                       class="icon-approve">Approved</a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                       data-set-status="pending"
+                                                       class="icon-undo">Pending</a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                       data-set-status="rejected"
+                                                       class="icon-close">Rejected</a>
+                                                </li>
+                                            </ul>
+
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
-                            <nav>
-                                <sbx-pop-out content-id="resourceManagement-status-{{ event.booking.id }}"></sbx-pop-out>
-                            </nav>
-                            <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
-                                <li>
-                                    <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-                                       class="icon-modify">Modify Booking</a>
-                                </li>
-                                <li class="separator">Set Status</li>
-                                <li>
-                                    <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                       data-series-id="{{ event.booking.event.seriesId }}"
-                                       data-set-status="approved"
-                                       class="icon-approve">Approved</a>
-                                </li>
-                                <li>
-                                    <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                       data-series-id="{{ event.booking.event.seriesId }}"
-                                       data-set-status="pending"
-                                       class="icon-undo">Pending</a>
-                                </li>
-                                <li>
-                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                       data-series-id="{{ event.booking.event.seriesId }}"
-                                       data-set-status="rejected"
-                                       class="icon-close">Rejected</a>
-                                </li>
-                            </ul>
+
                         </li>
                         {% endfor %}
                     </ul>
