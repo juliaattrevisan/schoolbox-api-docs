@@ -32,6 +32,7 @@ export default class ManageDifferentiationProfiles {
 
     /**
      * Enable the page enabling differentiation profiles and granting service permission
+     * @param db - Database helper instance
      */
     async enablePage(db: DatabaseHelper): Promise<void> {
         const adminDifferentiationProfiles = new AdminDifferentiationProfiles(this.tester, this.page);

@@ -24,7 +24,7 @@ test.describe("Manage Differentiation Profiles", () => {
         await manageDifferentiationProfiles.navigateToPage();
         tester.isGoingTo("Verify that 'You do not have permission to view this page.' is shown");
         const noPermissionText = page.getByText("You do not have permission to view this page.");
-        expect(noPermissionText).toBeVisible();
+        await expect(noPermissionText).toBeVisible();
     });
 
     test("Verify the page can't be accessed without service permission enabled", async ({ tester, page, db }) => {
@@ -36,7 +36,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that 'You do not have permission to view this page.' is shown");
             const noPermissionText = page.getByText("You do not have permission to view this page.");
-            expect(noPermissionText).toBeVisible();
+            await expect(noPermissionText).toBeVisible();
         } finally {
             tester.isGoingTo("Clean up: Reset the toggle to off state");
             await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
@@ -78,9 +78,9 @@ test.describe("Manage Differentiation Profiles", () => {
             await tester.loginAsAdmin();
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
-            const container = await page.getByTestId("manage-differentiation-profiles-container");
-            const marioIzzo = await container.getByText("Mario Izzo");
-            const msPenelopeLi = await container.getByText("Ms Penelope Li");
+            const container = page.getByTestId("manage-differentiation-profiles-container");
+            const marioIzzo = container.getByText("Mario Izzo");
+            const msPenelopeLi = container.getByText("Ms Penelope Li");
             await expect(marioIzzo).toBeVisible();
             await expect(msPenelopeLi).toBeVisible();
         } finally {
@@ -116,9 +116,9 @@ test.describe("Manage Differentiation Profiles", () => {
             await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out
             await page.waitForLoadState("load"); // Waits for full page reload
             tester.isGoingTo("Verify that Ms Jana Reed and Mr Leon Reed are visible");
-            const container = await page.getByTestId("manage-differentiation-profiles-container");
-            const msJanaReed = await container.getByText("Ms Jana Reed");
-            const mrLeonReed = await container.getByText("Mr Leon Reed");
+            const container = page.getByTestId("manage-differentiation-profiles-container");
+            const msJanaReed = container.getByText("Ms Jana Reed");
+            const mrLeonReed = container.getByText("Mr Leon Reed");
             await expect(msJanaReed).toBeVisible();
             await expect(mrLeonReed).toBeVisible();
         } finally {
