@@ -7,7 +7,15 @@
     <tbody id="permission-roles">
 
         {% if record.id != '' %}
-            {% for userAccess in record.accessWithPermission|filter(userAccess => userAccess.role or userAccess.roleType) %}
+            {% for userAccess in record.accessWithPermission|filter(userAccess =>
+                (userAccess.role or userAccess.roleType) and
+                (
+                    ((userAccess.role and userAccess.role.isStaff) or userAccess.roletype == 'staff') or
+                    (((userAccess.role and userAccess.role.isParent) or userAccess.roletype == 'parent') and config.pastoral_parent_access) or
+                    (((userAccess.role and userAccess.role.isStudent) or userAccess.roletype == 'student') and config.pastoral_student_access))
+                )
+            %}
+
                 {% set roleId = null %}
                 {% if userAccess.roleType %}
                     {% set roleId = 'role-type-' ~ userAccess.roleType %}
