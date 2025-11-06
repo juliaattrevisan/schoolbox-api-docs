@@ -78,10 +78,49 @@ test.describe("Manage Differentiation Profiles", () => {
             await tester.loginAsAdmin();
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
-            const marioIzzo = page.getByText("Mario Izzo");
-            const msPenelopeLi = page.getByText("Ms Penelope Li");
+            const container = await page.getByTestId("manage-differentiation-profiles-container");
+            const marioIzzo = await container.getByText("Mario Izzo");
+            const msPenelopeLi = await container.getByText("Ms Penelope Li");
             await expect(marioIzzo).toBeVisible();
             await expect(msPenelopeLi).toBeVisible();
+        } finally {
+            tester.isGoingTo("Clean up: Reset data state");
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
+            await db.updateInDatabase(
+                "lu_pastoral_type",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Bullying" },
+            );
+            await db.updateInDatabase(
+                "lu_pastoral_subtype",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Award/Achievement" },
+            );
+        }
+    });
+
+    test("verify name filter", async ({ tester, page, db }) => {
+        try {
+            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+            await manageDifferentiationProfiles.enablePage(db);
+            await manageDifferentiationProfiles.addPastoralTypes();
+            await tester.loginAsAdmin();
+            await manageDifferentiationProfiles.navigateToPage();
+            tester.isGoingTo("Click on the name filter button");
+            await page.getByTestId("sbx-pop-out-filter-component-36-button").click();
+            tester.isGoingTo("Type 'reed' in the name filter input");
+            await page.locator('input[name="filter_selection[36][]"]').fill("reed");
+            tester.isGoingTo("Click apply filters button");
+            await page.getByTestId("panel-apply-filters-button").click();
+            await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out
+            await page.waitForLoadState("load"); // Waits for full page reload
+            tester.isGoingTo("Verify that Ms Jana Reed and Mr Leon Reed are visible");
+            const container = await page.getByTestId("manage-differentiation-profiles-container");
+            const msJanaReed = await container.getByText("Ms Jana Reed");
+            const mrLeonReed = await container.getByText("Mr Leon Reed");
+            await expect(msJanaReed).toBeVisible();
+            await expect(mrLeonReed).toBeVisible();
         } finally {
             tester.isGoingTo("Clean up: Reset data state");
             await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });

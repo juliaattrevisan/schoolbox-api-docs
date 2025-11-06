@@ -33,7 +33,7 @@
                 quickload: false,
             } only %}
         </div>
-        <div id="{{ reportContentId }}">
+        <div id="{{ reportContentId }}" class="f-no-margins" data-test="manage-differentiation-profiles-container">
             <manage-differentiation-profiles
                 :header='{{ header|json_encode|raw }}'
                 :adjustment-categories='{{ adjustmentCategories|json_encode|raw }}'
