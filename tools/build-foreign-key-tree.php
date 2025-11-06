@@ -37,7 +37,23 @@ $kernel = new Kernel(
         {
             global $argc, $argv;
             if (count($argv) < 2) {
-                echo "Usage: build-fk-graph.php [table] [table...]\n";
+                $scriptName = basename($argv[0]);
+                echo <<<HELP
+                NAME
+                    $scriptName - Build a tree of foreign key relations for a given table.
+
+                SYNOPSIS
+                    $scriptName [TABLE...]
+
+                DESCRIPTION
+                    $scriptName builds a tree of foreign key relations for each TABLE, so as to determine which tables need to be deleted from before rows in TABLE can be deleted.
+
+                    It searches recursively for other tables which have relations to TABLE, and adds them to the tree.
+
+                    Rows in leaf nodes must be deleted before rows in parent nodes.
+
+
+                HELP;
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
             $baseTables = array_slice($argv, 1);
