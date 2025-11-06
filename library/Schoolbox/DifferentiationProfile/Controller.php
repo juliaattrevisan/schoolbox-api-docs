@@ -111,6 +111,7 @@ class Controller extends Base
         $profileTranslator = new ModelToArray(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
+            $this->getUser(),
             $adminConfigs,
         );
 
