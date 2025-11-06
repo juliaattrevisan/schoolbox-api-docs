@@ -64,9 +64,13 @@
                                 {# show date card #}
                                 <div class="small-12 card">
                                     {# booking date, may have multiple bookings under this date #}
-                                    <h4>
-                                        {{ date.date.getDateOnly }}
-                                    </h4>
+                                    <div>
+                                        {{ date.dateFormat.dayName }}
+                                        <h4>
+                                            {{ date.dateFormat.day }}
+                                        </h4>
+                                        {{ date.dateFormat.monthName }}
+                                    </div>
 
                                     <ul>
                                     {% for event in date.events %}

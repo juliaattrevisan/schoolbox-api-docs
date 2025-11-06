@@ -93,7 +93,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                 }
                 if (empty($groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()])) {
                     $groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()] = [
-                        'date'  => $event->getStartTime(),
+                        'dateFormat'  => [
+                            'day'  => $event->getStartTime()->getDay(),
+                            'monthName'=> $event->getStartTime()->getUsingFormat('M'),
+                            'dayName' => $event->getStartTime()->getUsingFormat('D'),
+                        ],
                         'events' => [],
                     ];
                 }
