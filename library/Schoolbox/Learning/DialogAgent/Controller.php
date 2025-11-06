@@ -20,6 +20,7 @@ use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextMode
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Langauge;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -103,11 +104,9 @@ class Controller extends Base
                 DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
                 DialogAgentDataModel::HELPFULNESS_EXTREME => 'Extreme',
             ],
-            'language' => [
-                'en-au' => 'English (AU)',
-                'en-us' => 'English (US)',
-                /* TODO what's the full list of languages here...?
-                 */
+            'languages' => [
+                'available' => Langauge::AVAILABLE,
+                'selected' => $assessment->getLanguage() ?? Langauge::DEFAULT,
             ]
         ];
 
