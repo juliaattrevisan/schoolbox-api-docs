@@ -1,4 +1,5 @@
 import type { User } from "@schoolboxLibrary/types/User";
+import type { Metadata } from "@js/util/sbx/apiUtils";
 
 /**
  * Routes for the Pastoral
@@ -70,6 +71,16 @@ type PastoralComment = {
     createdAt: string;
     body: string;
     private: boolean;
+};
+
+/**
+ * The expected payload for a Pastoral records load.
+ */
+export type RecordsPayload = {
+    data: {
+        results: PastoralRecord[];
+    };
+    metadata: Metadata;
 };
 
 /**
