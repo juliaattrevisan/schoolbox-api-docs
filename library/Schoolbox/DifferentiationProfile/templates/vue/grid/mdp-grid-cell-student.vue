@@ -25,10 +25,11 @@ function onLinkedRecordsSelected(): void {
 </script>
 
 <template>
-    <div class="l-flex-row l-flex--no-wrap l-pad-s l-gap-m">
-        <user-photo :user="props.user" render="small" />
-        <div class="l-flex-col l-flex--justify-center f-no-margins">
-            <!-- <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
+    <div class="l-flex-col l-pad-s l-gap-m">
+        <div class="l-flex-row l-flex--no-wrap l-gap-m">
+            <user-photo :user="props.user" render="small" />
+            <div class="l-flex-col l-flex--justify-center f-no-margins">
+                <!-- <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
                 {{ props.user.lastName }},
                 {{ props.user.preferredName || props.user.firstName }}
             </a>
@@ -36,11 +37,12 @@ function onLinkedRecordsSelected(): void {
                 {{ props.user.lastName }},
                 {{ props.user.preferredName || props.user.firstName }}
             </template> -->
-            {{ props.user.fullName }}
-            <button v-if="props.profile._routes?.linkedRecords" class="button" @click="onLinkedRecordsSelected">
-                View Linked Records
-            </button>
+                {{ props.user.fullName }}
+            </div>
         </div>
+        <button v-if="props.profile._routes?.linkedRecords" class="button" @click="onLinkedRecordsSelected">
+            View Linked Records
+        </button>
     </div>
 </template>
 
