@@ -84,6 +84,9 @@ class differentiationProfileModelToArrayTest extends TestCase
             'givenName' => null,
             'lastName'  => null,
             'yearLevel' => null,
+            '_routes'   => [
+                'profile' => null,
+            ],
         ];
 
         $routes = [
