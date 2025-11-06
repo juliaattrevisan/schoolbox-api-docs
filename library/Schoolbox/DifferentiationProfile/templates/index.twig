@@ -35,10 +35,18 @@
         </div>
         <div id="{{ reportContentId }}" class="f-no-margins" data-test="manage-differentiation-profiles-container">
             <manage-differentiation-profiles
-                :header='{{ header|json_encode|raw }}'
-                :adjustment-categories='{{ adjustmentCategories|json_encode|raw }}'
-                :adjustment-levels='{{ adjustmentLevels|json_encode|raw }}'
-                route='{{ route }}'
+                :header="{{ header|json_encode }}"
+                :adjustment-categories="{{ adjustmentCategories|json_encode }}"
+                :adjustment-levels="{{ adjustmentLevels|json_encode }}"
+                route="{{ route }}"
+                :pastoral-config="{{ {
+                    pastoralPointEnabled: config.pastoral_point_enabled,
+                    pastoralActionEnable: config.pastoral_action_enable,
+                    pastoralSeverity: config.pastoral_severity,
+                }|json_encode }}"
+                :pastoral-routes="{{ {
+                    getStudentRecord: routeLookup('pastoral.getStudentRecord'),
+                }|json_encode }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/manageDifferentiationProfiles.js?v={{ config.site_version }}"></script>

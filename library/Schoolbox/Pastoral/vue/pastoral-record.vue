@@ -11,9 +11,8 @@ const props = defineProps<{
     record: PastoralRecord;
 }>();
 
-const routes = window.Vue.inject<Routes>("routes");
-const config = window.Vue.inject<Config>("config");
-const showSeverity = window.Vue.inject<boolean>("showSeverity");
+const routes = window.Vue.inject<Routes>("pastoralRoutes");
+const config = window.Vue.inject<Config>("pastoralConfig");
 const severityColors = window.Vue.inject<SeverityColors>("severityColors");
 </script>
 
@@ -35,7 +34,7 @@ const severityColors = window.Vue.inject<SeverityColors>("severityColors");
                     {{ props.record.student.fullName }}: {{ props.record.heading }}
                     <span
                         v-if="
-                            showSeverity &&
+                            config?.pastoralSeverity &&
                             props.record.severity &&
                             severityColors &&
                             severityColors[props.record.severity.id]
@@ -81,11 +80,15 @@ const severityColors = window.Vue.inject<SeverityColors>("severityColors");
                 <p v-if="props.record.tags.length > 0" class="spaced">
                     <template v-for="tag in props.record.tags" :key="tag.id">
                         <a
+                            v-if="routes?.getReportTags"
                             class="neutral label hide-on-print"
                             :href="routes?.getReportTags.replace('{tagId}', tag.id.toString())"
                         >
                             {{ tag.name }}
                         </a>
+                        <template v-else>
+                            {{ tag.name }}
+                        </template>
                         <b class="show-for-print"> {{ tag.name }}</b>
                     </template>
                 </p>

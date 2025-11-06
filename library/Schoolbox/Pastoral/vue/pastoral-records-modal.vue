@@ -33,6 +33,15 @@ window.Vue.watch(
     },
 );
 
+// /**
+//  * when the modal is closed, clear the load url
+//  */
+// window.Vue.watch(isOpen, (newVal) => {
+//     if (newVal === false) {
+//         loadUrl.value = "";
+//     }
+// });
+
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
  */

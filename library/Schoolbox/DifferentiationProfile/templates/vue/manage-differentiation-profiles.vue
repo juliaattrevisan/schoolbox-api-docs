@@ -12,6 +12,7 @@ import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
+import type { Routes, Config, SeverityColors } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type {
     MDPHeader,
     Header,
@@ -33,7 +34,14 @@ const props = defineProps<{
     adjustmentCategories: AdjustmentType[];
     adjustmentLevels: AdjustmentType[];
     route: string;
+    pastoralConfig: Config;
+    pastoralRoutes: Routes;
+    severityColors: SeverityColors;
 }>();
+
+window.Vue.provide("pastoralConfig", props.pastoralConfig);
+window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
+window.Vue.provide("severityColors", props.severityColors);
 
 // #region grid data
 

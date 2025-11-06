@@ -6,7 +6,7 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
  */
 export type Routes = {
     getStudentRecord: string; // to get a specific pastoral record for a student
-    getReportTags: string; // to only display the selected tag within the report
+    getReportTags?: string; // to only display the selected tag within the report
 };
 
 /**
@@ -15,6 +15,7 @@ export type Routes = {
 export type Config = {
     pastoralPointEnabled: boolean;
     pastoralActionEnable: boolean;
+    pastoralSeverity: boolean;
 };
 
 /**
