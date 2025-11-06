@@ -53,10 +53,10 @@
                                 <h3>{{ item.resource.name }}</h3>
                             </a>
                         </div>
-                        <div class="expander icon-down-arrow" data-collapser="collap-{{ item.resource.id }}"></div>
+                        <div class="expander icon-up-arrow" data-collapser="collap-{{ item.resource.id }}"></div>
                     </div>
                 </li>
-                <li class="content small-12 hide" data-collapse-state="collapsed" data-collapsable="collap-{{ item.resource.id }}">
+                <li class="content small-12" data-collapse-state="uncollapsed" data-collapsable="collap-{{ item.resource.id }}">
                     <ul>
                         {% for event in item.bookingEvents %}
                         <li class="actions-small-1">
