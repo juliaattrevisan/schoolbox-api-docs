@@ -34,7 +34,7 @@ Usage:
 
 {# Where should CourseSpec title link point ? #}
 {% set titleUrl = linkToUnits
-        ? routeLookup('course.modifyCourse', { id: courseSpec.id })
+        ? routeLookup('coursePlan.getPlan', { id: courseSpec.id })
         : importUrl
 %}
 
