@@ -1,11 +1,36 @@
 import type { User } from "@schoolboxLibrary/types/User";
 
 /**
+ * Routes for the Pastoral
+ */
+export type Routes = {
+    getStudentRecord: string; // to get a specific pastoral record for a student
+    getReportTags: string; // to only display the selected tag within the report
+};
+
+/**
+ * Configuration object for pastoral settings
+ */
+export type Config = {
+    pastoralPointEnabled: boolean;
+    pastoralActionEnable: boolean;
+};
+
+/**
  * Pastoral event severity
  */
 type Severity = {
     id: number;
     name: string;
+};
+
+/**
+ * Severity colors configuration
+ */
+export type SeverityColors = {
+    [severityId: number]: {
+        back: string;
+    };
 };
 
 /**
