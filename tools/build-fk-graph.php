@@ -16,17 +16,16 @@ require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new Kernel(
     new class extends App {
         private array $loadedRelations = [];
-        private array $relationsTree = [];
         private IStatement $query;
 
         public function run(): void
         {
-            global $argv;
-            $baseTable = $argv[1] ?? null;
-            if (!$baseTable) {
-                echo "Usage: build-fk-graph.php <baseTable>\n";
+            global $argc, $argv;
+            if (count($argv) < 2) {
+                echo "Usage: build-fk-graph.php [table] [table...]\n";
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
+            $baseTables = array_slice($argv, 1);
             $this->query = $this->getDatabaseInternal()->prepareQuery("
                 SELECT DISTINCT
                     fks.TABLE_NAME AS `table`
@@ -44,12 +43,12 @@ $kernel = new Kernel(
                 ORDER BY fks.TABLE_NAME
             ");
 
-
-            $this->relationsTree = [
-                $baseTable => [],
-            ];
-            $this->buildRelationsTree($baseTable, $this->relationsTree[$baseTable]);
-            $this->outputRelationsTree($this->relationsTree);
+            $relationsTree = [];
+            foreach ($baseTables as $baseTable) {
+                $relationsTree[$baseTable] ??= [];
+                $this->buildRelationsTree($baseTable, $relationsTree[$baseTable]);
+            }
+            $this->outputRelationsTree($relationsTree);
         }
 
         private function buildRelationsTree(string $table, array &$location): void
