@@ -866,6 +866,7 @@ body:not(.sbx-body) {
 
     input[type="checkbox"]:not(.plain):not(:disabled) {
         border: none;
+        display: none;
 
         &:checked + label {
             background: $content-ui-background;
