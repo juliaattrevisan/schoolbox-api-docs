@@ -17,6 +17,7 @@ import type {
     AdjustmentType,
     AdjustmentText,
     Payload,
+    Profile,
 } from "../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
@@ -128,7 +129,7 @@ function onPaginate(cursor: string): void {
     <template v-else-if="hasRows && payload">
         <mdp-grid :header="header" :rows="payload.data.profiles" :is-loading="isMoreLoading">
             <template #User="{ row, header: columnHeader }">
-                <mdp-grid-cell-student :user="row[columnHeader.key] as User" />
+                <mdp-grid-cell-student :user="row[columnHeader.key] as User" :profile="row as Profile" />
             </template>
             <template #Adjustment="{ row, header: columnHeader }">
                 <mdp-grid-cell-adjustment

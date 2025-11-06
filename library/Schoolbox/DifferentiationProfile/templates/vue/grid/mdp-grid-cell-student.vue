@@ -5,10 +5,23 @@
 
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     user: User;
+    profile: Profile;
 }>();
+
+const emit = defineEmits<{
+    linkedRecords: [user: User];
+}>();
+
+/**
+ * When the linked records button is clicked
+ */
+function onLinkedRecordsSelected(): void {
+    emit("linkedRecords", props.user);
+}
 </script>
 
 <template>
@@ -24,6 +37,9 @@ const props = defineProps<{
                 {{ props.user.preferredName || props.user.firstName }}
             </template> -->
             {{ props.user.fullName }}
+            <button v-if="props.profile._routes?.linkedRecords" class="button" @click="onLinkedRecordsSelected">
+                View Linked Records
+            </button>
         </div>
     </div>
 </template>
