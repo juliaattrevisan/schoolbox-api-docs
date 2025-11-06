@@ -61,7 +61,7 @@ class Module extends BaseModule
         $this->register('GET', '/list', 'getDifferentiationProfileData', $getPerms);
         $this->register(
             'GET',
-            '/linkedPastoral/{studentId}',
+            '/linkedRecords/{studentId}',
             'getLinkedPastoralRecords',
             $getPerms,
         );

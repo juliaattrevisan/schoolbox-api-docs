@@ -40,9 +40,12 @@ class differentiationProfileModelToArrayTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvokeData')]
     public function testInvokeData($model, $configs, $expected)
     {
+        $user = $this->createMock(User::class);
+
         $translator = new ModelToArray(
             $this->routeGenerator,
             $this->authorizer,
+            $user,
             $configs,
         );
 
@@ -76,11 +79,15 @@ class differentiationProfileModelToArrayTest extends TestCase
             ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT));
 
         $userResponse = [
-            'id'               => 100,
-            'fullName'         => 'Unknown User',
-            'givenName'       => null,
-            'lastName'        => null,
-            'yearLevel'        => null,
+            'id'        => 100,
+            'fullName'  => 'Unknown User',
+            'givenName' => null,
+            'lastName'  => null,
+            'yearLevel' => null,
+        ];
+
+        $routes = [
+            'linkedRecords' => null,
         ];
 
         return [
@@ -109,6 +116,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => null,
                     'updated_at'             => null,
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Complete Profile' => [
@@ -147,6 +155,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/01/2024',
                     'updated_at'             => '02/01/2024',
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Deleted Profile' => [
@@ -177,6 +186,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => null,
                     'updated_at'             => null,
                     'deleted_at'             => '01/03/2024',
+                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Only Adjustment Fields' => [
@@ -201,6 +211,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/02/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Overview and Goals Only' => [
@@ -229,6 +240,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '15/03/2024',
                     'updated_at'             => '20/03/2024',
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - No Text Fields' => [
@@ -256,6 +268,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/04/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Empty Config Collection' => [
@@ -278,6 +291,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/05/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Three Middle Fields' => [
@@ -308,6 +322,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/06/2024',
                     'updated_at'             => '15/06/2024',
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Single Field Enabled' => [
@@ -333,6 +348,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/07/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Alternating Fields' => [
@@ -365,6 +381,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'created_at'             => '01/08/2024',
                     'updated_at'             => '10/08/2024',
                     'deleted_at'             => null,
+                    '_routes'                => $routes,
                 ],
             ],
         ];
