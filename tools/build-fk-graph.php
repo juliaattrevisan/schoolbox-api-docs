@@ -15,9 +15,24 @@ require_once __DIR__ . '/../conf/core/require.php';
 
 $kernel = new Kernel(
     new class extends App {
+        /**
+         * Map of relations already loaded: added so that recursive relations
+         * are not loaded in an infinite loop.
+         *
+         * @var array<string, true>
+         */
         private array $loadedRelations = [];
-        private IStatement $query;
 
+        /**
+         * Query for querying list of tables with an FK to a given table.
+         *
+         * @var IStatement
+         */
+        private IStatement $selectRelatedTablesQuery;
+
+        /**
+         * @return void
+         */
         public function run(): void
         {
             global $argc, $argv;
@@ -26,7 +41,13 @@ $kernel = new Kernel(
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
             $baseTables = array_slice($argv, 1);
-            $this->query = $this->getDatabaseInternal()->prepareQuery("
+            $selectBaseTableQuery = $this->getDatabaseInternal()->prepareQuery("
+                SELECT TABLE_NAME
+                FROM information_schema.TABLES
+                WHERE TABLE_SCHEMA = :schema
+                  AND TABLE_NAME   = :table
+            ");
+            $this->selectRelatedTablesQuery = $this->getDatabaseInternal()->prepareQuery("
                 SELECT DISTINCT
                     fks.TABLE_NAME AS `table`
                 FROM information_schema.REFERENTIAL_CONSTRAINTS fks
@@ -45,12 +66,28 @@ $kernel = new Kernel(
 
             $relationsTree = [];
             foreach ($baseTables as $baseTable) {
+                // Verify table exists
+                $selectBaseTableQuery->execute(['schema' => SQL_db, 'table' => $baseTable]);
+                if ($selectBaseTableQuery->rowCount() === 0) {
+                    $this->getLogger()->warning("Table '$baseTable' does not exist: skipping");
+                    continue;
+                }
+
+                // Build its tree
                 $relationsTree[$baseTable] ??= [];
                 $this->buildRelationsTree($baseTable, $relationsTree[$baseTable]);
             }
             $this->outputRelationsTree($relationsTree);
         }
 
+        /**
+         * Build a tree of relations for a given table.
+         *
+         * @param string $table     Table to build a tree for.
+         * @param array  &$location Where in the previously-built tree to store
+         *                          this table's tree.
+         * @return void
+         */
         private function buildRelationsTree(string $table, array &$location): void
         {
             // Don't reload relations if already loaded
@@ -59,10 +96,12 @@ $kernel = new Kernel(
             }
             $this->loadedRelations[$table] = true;
 
-            $this->query->execute(['schema' => SQL_db, 'table' => $table]);
-            $joinedTables = $this->query->fetchColumnArray('table');
+            // Fetch its relations
+            $this->selectRelatedTablesQuery->execute(['schema' => SQL_db, 'table' => $table]);
+            $joinedTables = $this->selectRelatedTablesQuery->fetchColumnArray('table');
             $this->loadedRelations[$table] = $joinedTables;
 
+            // Build the relation tree
             foreach ($joinedTables as $joinedTable) {
                 $location[$joinedTable] = [];
                 $loadedRelation = $this->loadedRelations[$joinedTable] ?? null;
@@ -82,6 +121,13 @@ $kernel = new Kernel(
             }
         }
 
+        /**
+         * Output the fully-built tree.
+         *
+         * @param array $relationsTree
+         * @param int   $depth
+         * @return void
+         */
         private function outputRelationsTree(array $relationsTree, int $depth = 0): void
         {
             foreach ($relationsTree as $table => $relations) {
