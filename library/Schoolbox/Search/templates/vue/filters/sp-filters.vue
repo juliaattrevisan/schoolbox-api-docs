@@ -148,11 +148,6 @@ window.Vue.watch(
         display: grid;
         transition: grid-template-rows 300ms;
     }
-
-    &__inner-container {
-        overflow: hidden;
-    }
-
     &__toggle-button {
         background: none;
         color: var(--content-ui-foreground);
