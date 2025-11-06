@@ -48,6 +48,7 @@
     place-content: center;
     position: static;
     transform: translateY(-0.075em);
+    margin: 0 0 0.5rem 0;
 
     &:hover:not(:disabled) {
         // no reduced contrast on hover

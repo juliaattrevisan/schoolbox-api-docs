@@ -603,6 +603,15 @@ body.sbx-body {
     input[type="checkbox"]:not(.plain):has(+ label.input-toggle) {
         display: none;
     }
+    input[type="checkbox"]:not(.plain):checked {
+        + label.checkbox-label,
+        + label {
+            &:before,
+            &:after {
+                display: none;
+            }
+        }
+    }
 }
 
 %fancy-check {
