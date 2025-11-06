@@ -116,8 +116,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setSessionId($dataModel->getSessionId())
                 ->setAssistanceRequestedAt($dataModel->getAssistanceRequestedAt())
                 ->setCreatedAt($dataModel->getCreatedAt())
+                ->setCreatedBy($dataModel->getCreatedBy())
                 ->setUpdatedAt($dataModel->getUpdatedAt())
-                ->setDeletedAt($dataModel->getDeletedAt());
+                ->setUpdatedBy($dataModel->getUpdatedBy())
+                ->setDeletedAt($dataModel->getDeletedAt())
+                ->setDeletedBy($dataModel->getDeletedBy());
 
             $stack->add($domainObject);
         }
@@ -142,14 +145,20 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         foreach ($domainObjects as $domainObject) {
             $dataModel = new DataModel()
                 ->setId($domainObject->getId())
-                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getDialogAgent()?->getId())))
+                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
                 ->setLearner($domainObject->getSubmittedOnBehalfOf())
                 ->setAuthoritative($domainObject->getAuthoritative())
                 ->setStartedAt($domainObject->getStartedAt())
                 ->setSubmittedAt($domainObject->getSubmittedAt())
                 ->setSubmittedBy($domainObject->getSubmittedBy())
                 ->setSessionId($domainObject->getSessionId())
-                ->setAssistanceRequestedAt($domainObject->getAssistanceRequestedAt());
+                ->setAssistanceRequestedAt($domainObject->getAssistanceRequestedAt())
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setCreatedBy($domainObject->getCreatedBy())
+                ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setUpdatedBy($domainObject->getUpdatedBy())
+                ->setDeletedAt($domainObject->getDeletedAt())
+                ->setDeletedBy($domainObject->getDeletedBy());
 
             $stack->add($dataModel);
         }

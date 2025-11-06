@@ -11,9 +11,16 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
 
 use Schoolbox\Learning\Assessment\AbstractResponse;
+use Schoolbox\Mapper\Traits\Model\CreatedBy;
+use Schoolbox\Mapper\Traits\Model\DeletedBy;
+use Schoolbox\Mapper\Traits\Model\UpdatedBy;
 
 class Model extends AbstractResponse
 {
+    use CreatedBy;
+    use UpdatedBy;
+    use DeletedBy;
+
     /**
      * @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
      */

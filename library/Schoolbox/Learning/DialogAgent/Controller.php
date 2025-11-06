@@ -262,4 +262,53 @@ class Controller extends Base
     {
         // todo implement a readonly viewing mode
     }
+
+
+    /**
+     * The current user requested assistance on a particular response
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @return void
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Alaress\Web\Controller\Exception
+     */
+    public function postAssistance(IAssessable $assessment, User $student): void
+    {
+        /* No response id, somehow: malformed post request.
+         */
+        if ('' === trim((string)$this->requestPost->get('responseId'))) {
+            $this->sendError('Response not found.', [], 404);
+            return;
+        }
+
+        /* See if the response id requested actually exists
+         */
+        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
+            ->equals('id', (int)$this->requestPost->get('responseId'))
+            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
+            ->equals('learner_id', $student->getId())
+            ->isNull('submitted_by')
+            ->isNull('submitted_at');
+
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
+        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
+
+        /* $student cannot request help:
+         *     - response is already submitted
+         *     - this response id isn't theirs to change
+         *     - this response has been repurposed illegally by messing around in the url
+         */
+        if (null === $existingResponse) {
+            $this->sendError('You cannot request assistance for this discussion activity.');
+            return;
+        }
+
+        /* Mutate the field as one might expect
+         */
+        $existingResponse->setAssistanceRequestedAt(\Alaress_Date_Format::now());
+
+        $this->dialogAgentResponseMapper->save($existingResponse);
+    }
 }
