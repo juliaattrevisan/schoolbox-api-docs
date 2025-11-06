@@ -4,6 +4,7 @@ import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/Asses
 import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * Clicks the due work title in the class and course mark-book and checks its dropdown options
@@ -30,6 +31,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
         const feedbackForm = new FeedbackForm(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
         const statusPage = new StatusPage(tester, page);
+        const commonPage = new Common(page);
 
         // assessment id for "Persuasive Article" - class page
         const assessmentId = 665;
@@ -49,6 +51,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
         try {
             tester.isGoingTo("navigate to the class markbook");
             await markbookPage.gotoClassMarkbook(classId.toString());
+            await commonPage.resetFiltersToDefault();
             tester.isGoingTo(
                 "click the due work title, click the 'View' option and check it redirects to the due work details page",
             );
@@ -147,6 +150,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
         const feedbackForm = new FeedbackForm(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
         const statusPage = new StatusPage(tester, page);
+        const commonPage = new Common(page);
 
         // assessment id for "Persuasive Article" - class page
         const assessmentId = 665;
@@ -166,6 +170,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
         try {
             tester.isGoingTo("navigate to the course markbook");
             await markbookPage.gotoCourseMarkbook(courseId.toString());
+            await commonPage.resetFiltersToDefault();
             tester.isGoingTo(
                 "click the due work title, click the 'View' option and check it redirects to the due work details page",
             );
@@ -245,18 +250,15 @@ test.describe("Test Due Work options in class and course mark-book", () => {
             await markbookPage.validateInputMark(studentIdJamal, assessmentIdCourse, "80 %");
         } finally {
             // clean up - reset the assessment title and clear all feedback
-
             const boxId = (await db.grabFromDatabase("submission_return", "box_id", {
                 mark: "75 %",
                 deleted_at: null,
             })) as string;
-
             await db.updateInDatabase(
                 "submission_return",
                 { deleted_at: "2025-10-01 11:20:13" },
                 { box_id: `${boxId}`, deleted_at: null },
             );
-
             await db.updateInDatabase("assessment", { title: "Persuasive Article" }, { id: assessmentId });
         }
     });
