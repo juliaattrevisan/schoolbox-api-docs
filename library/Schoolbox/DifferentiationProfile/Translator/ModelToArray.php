@@ -35,6 +35,12 @@ class ModelToArray
                     'name' => $student->getYear()->getName(),
                 ] : null,
             ],
+            '_routes' => [
+                'linkedRecords' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.getLinkedPastoralRecords',
+                    ['studentId' => $student->getId()],
+                ),
+            ],
             'created_at'            => $model->getCreatedAt()?->getLocalShort(),
             'updated_at'            => $model->getUpdatedAt()?->getLocalShort(),
             'deleted_at'            => $model->getDeletedAt()?->getLocalShort(),
