@@ -244,7 +244,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM differentiation_profiles
-            RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL
+            RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
             INNER JOIN user s ON p.student_id = s.id AND s.deleted_at IS NULL
             LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
             LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
