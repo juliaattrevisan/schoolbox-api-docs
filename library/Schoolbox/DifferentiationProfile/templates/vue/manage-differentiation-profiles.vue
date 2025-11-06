@@ -10,6 +10,7 @@ import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
 import type { Routes, Config, SeverityColors } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
@@ -180,6 +181,7 @@ function onLinkedRecordsSelected(profile: Profile): void {
                 </div>
             </template>
         </mdp-grid>
+        <loading-table v-if="isMoreLoading" :rows="5" row-height="3rem" />
         <cursor-pagination
             :url="url"
             :metadata="(payload as Payload).metadata"
