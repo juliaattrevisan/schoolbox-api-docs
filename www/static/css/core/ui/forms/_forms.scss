@@ -594,6 +594,17 @@ td {
         transition: opacity $switch-paddle-transition-speed $switch-paddle-transition-ease;
     }
 }
+body.sbx-body {
+    .switch {
+        input[type="checkbox"]:not(.plain) {
+            display: none;
+        }
+    }
+    input[type="checkbox"]:not(.plain):has(+ label.input-toggle) {
+        display: none;
+    }
+}
+
 %fancy-check {
     position: absolute;
     width: 0;
@@ -911,29 +922,14 @@ body:not(.sbx-body) {
     }
 }
 
-body:not(.sbx-body) {
-    .toggle-set {
-        display: flex;
-        justify-content: space-between;
-        max-width: 20rem;
+.toggle-set {
+    display: flex;
+    justify-content: space-between;
+    max-width: 20rem;
 
-        input[type="radio"]:not(.plain),
-        input[type="checkbox"]:not(.plain) {
-            @include vaporwave();
-        }
-    }
-}
-body:not(.sbx-body) {
-    input[type="radio"]:not(.plain) {
-        @include fancy-check("radio-label");
-        @include vaporwave("input-toggle");
-    }
-}
-
-body:not(.sbx-body) {
+    input[type="radio"]:not(.plain),
     input[type="checkbox"]:not(.plain) {
-        @include fancy-check("checkbox-label");
-        @include vaporwave("input-toggle");
+        @include vaporwave();
     }
 }
 <<<<<<< HEAD
@@ -963,6 +959,16 @@ ul.filters {
     label {
         padding: 0 12px 0 8px;
 =======
+
+input[type="radio"]:not(.plain) {
+    @include fancy-check("radio-label");
+    @include vaporwave("input-toggle");
+}
+
+input[type="checkbox"]:not(.plain) {
+    @include fancy-check("checkbox-label");
+    @include vaporwave("input-toggle");
+}
 
 body:not(.sbx-body) {
     ul.filters {
