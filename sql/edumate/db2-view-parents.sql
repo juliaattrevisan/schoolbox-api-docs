@@ -42,11 +42,17 @@ INNER JOIN edumate.carer ON edumate.carer.contact_id = edumate.contact.contact_i
 CREATE OR REPLACE VIEW SCHOOLBOX_PARENTS AS
 SELECT DISTINCT
 car1.carer_number,
+replace(c1.firstname, '&#039;','''') AS FIRST_NAME,
+replace(c1.preferred_name, '&#039;','''') AS PREFERRED_NAME,
+replace(c1.surname, '&#039;','''') AS SURNAME,
 replace(c1.firstname, '&#039;','''')||CHR(32)||replace(c1.surname, '&#039;','''') AS FULL_NAME,
 replace(c1.email_address, '&#039;','''') AS EMAIL,
 su1.username as USERNAME,
 c1.mobile_phone AS MOBILE,
 car2.carer_number AS SPOUSE_CARER_NUMBER,
+replace(c2.firstname, '&#039;','''') AS SPOUSE_FIRST_NAME,
+replace(c2.preferred_name, '&#039;','''') AS SPOUSE_PREFERRED_NAME,
+replace(c2.surname, '&#039;','''') AS SPOUSE_SURNAME,
 replace(c2.firstname, '&#039;','''')||CHR(32)||replace(c2.surname, '&#039;','''') AS SPOUSE_FULL_NAME,
 replace(c2.email_address, '&#039;','''') AS SPOUSE_EMAIL,
 su2.username as SPOUSE_USERNAME,
@@ -70,11 +76,17 @@ LEFT JOIN sys_user su2 ON su2.contact_id = c2.contact_id
 UNION
 SELECT DISTINCT
 car1.carer_number,
+replace(c1.firstname, '&#039;','''') AS FIRST_NAME,
+replace(c1.preferred_name, '&#039;','''') AS PREFERRED_NAME,
+replace(c1.surname, '&#039;','''') AS SURNAME,
 replace(c1.firstname, '&#039;','''')||CHR(32)||replace(c1.surname, '&#039;','''') AS FULL_NAME,
 replace(c1.email_address, '&#039;','''') AS EMAIL,
 su1.username as USERNAME,
 c1.mobile_phone AS MOBILE,
 car2.carer_number AS SPOUSE_CARER_NUMBER,
+replace(c2.firstname, '&#039;','''') AS SPOUSE_FIRST_NAME,
+replace(c2.preferred_name, '&#039;','''') AS SPOUSE_PREFERRED_NAME,
+replace(c2.surname, '&#039;','''') AS SPOUSE_SURNAME,
 replace(c2.firstname, '&#039;','''')||CHR(32)||replace(c2.surname, '&#039;','''') AS SPOUSE_FULL_NAME,
 replace(c2.email_address, '&#039;','''') AS SPOUSE_EMAIL,
 su2.username as SPOUSE_USERNAME,
@@ -101,7 +113,7 @@ INNER JOIN edumate.view_student_mail_carers ON edumate.view_student_mail_carers.
 INNER JOIN edumate.contact c1 ON c1.contact_id = edumate.view_student_mail_carers.carer1_contact_id
 INNER JOIN edumate.carer car1 ON car1.contact_id = c1.contact_id
 LEFT JOIN edumate.contact c2 ON c2.contact_id = edumate.view_student_mail_carers.carer2_contact_id
-LEFT JOIN edumate.carer car2 ON car2.contact_id = c2.contact_id;
+LEFT JOIN edumate.carer car2 ON car2.contact_id = c2.contact_id
 LEFT JOIN sys_user su1 ON su1.contact_id = c1.contact_id
 LEFT JOIN sys_user su2 ON su2.contact_id = c2.contact_id
 ;
