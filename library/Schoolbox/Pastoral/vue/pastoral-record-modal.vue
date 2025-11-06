@@ -3,10 +3,11 @@
  * Display a list of pastoral records within a modal
  */
 
-import { useTemplateRef, toRefs, toRef, type Ref } from "vue";
+import { useTemplateRef, toRefs } from "vue";
 import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import { SearchParam } from "@js/util/sbx/apiUtils";
 import { useLoadRecords } from "./composable/useLoadRecords";
 import PastoralRecord from "./pastoral-record.vue";
 
@@ -16,13 +17,21 @@ const props = defineProps<{
     meta?: string;
 }>();
 
-// const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
-// const title = window.Vue.inject<string>("title");
 const isOpen = window.Vue.ref(false);
-// const selectedHeader = window.Vue.ref<TableHeader | null>(null);
-// const scopeUrl = window.Vue.ref("");
-// const scopeUrlParams = new URLSearchParams();
-const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(toRef(() => props.url));
+const loadUrl = window.Vue.ref(props.url);
+const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(loadUrl);
+
+/**
+ * whenever a new url is passed in,
+ * load that url and open the modal
+ */
+window.Vue.watch(
+    () => props.url,
+    () => {
+        loadUrl.value = props.url;
+        isOpen.value = true;
+    },
+);
 
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
@@ -34,11 +43,13 @@ const { arrivedState } = useScroll(modalResultsEl, {
 
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    // if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
-    //     scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-    //     scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
-    // }
-    // notify at bottom to prompt loading more results
+    if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
+        const newUrl = new URL(props.url, window.location.origin);
+        const searchParams = new URLSearchParams();
+        searchParams.set(SearchParam.CURSOR as string, payload.value.metadata.cursor.next);
+        newUrl.search = searchParams.toString();
+        loadUrl.value = newUrl.toString();
+    }
 });
 </script>
 
