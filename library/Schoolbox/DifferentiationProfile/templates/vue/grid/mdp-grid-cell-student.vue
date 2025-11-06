@@ -13,14 +13,14 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    linkedRecords: [user: User];
+    linkedRecordsSelect: [profile: Profile];
 }>();
 
 /**
  * When the linked records button is clicked
  */
 function onLinkedRecordsSelected(): void {
-    emit("linkedRecords", props.user);
+    emit("linkedRecordsSelect", props.profile);
 }
 </script>
 

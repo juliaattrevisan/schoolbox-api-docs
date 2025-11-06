@@ -11,6 +11,7 @@ import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
+import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
 import type {
     MDPHeader,
     Header,
@@ -111,6 +112,26 @@ function onPaginate(cursor: string): void {
 }
 
 // #endregion grid loading / filtering /  pagination
+
+// #region linked records selected
+
+const linkedRecordsUrl = window.Vue.ref<string>("");
+const linkedRecordsTitle = window.Vue.ref<string>("");
+const linkedRecordsMeta = window.Vue.ref<string>("");
+
+/**
+ * When linked records is selected for a profile
+ * @param profile - the profile to view linked records for
+ */
+function onLinkedRecordsSelected(profile: Profile): void {
+    if (profile._routes?.linkedRecords) {
+        linkedRecordsTitle.value = `${profile.student.fullName} - Linked Records`;
+        // linkedRecordsMeta.value = `Student ID: ${profile.student.externalId || profile.student.id}`;
+        linkedRecordsUrl.value = profile._routes.linkedRecords;
+    }
+}
+
+// #endregion linked records selected
 </script>
 
 <template>
@@ -129,7 +150,11 @@ function onPaginate(cursor: string): void {
     <template v-else-if="hasRows && payload">
         <mdp-grid :header="header" :rows="payload.data.profiles" :is-loading="isMoreLoading">
             <template #User="{ row, header: columnHeader }">
-                <mdp-grid-cell-student :user="row[columnHeader.key] as User" :profile="row as Profile" />
+                <mdp-grid-cell-student
+                    :user="row[columnHeader.key] as User"
+                    :profile="row as Profile"
+                    @linked-records-select="onLinkedRecordsSelected"
+                />
             </template>
             <template #Adjustment="{ row, header: columnHeader }">
                 <mdp-grid-cell-adjustment
@@ -156,6 +181,7 @@ function onPaginate(cursor: string): void {
             @next="onPaginate"
         />
     </template>
+    <pastoral-records-modal :url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
 </template>
 
 <style scoped></style>
