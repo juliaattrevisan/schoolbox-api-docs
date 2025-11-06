@@ -211,10 +211,8 @@ class Controller extends Base
      *
      * @return void
      */
-    public function getLinkedPastoralRecords(): void
+    public function getLinkedPastoralRecords(?int $studentId): void
     {
-        $studentId = $this->requestPost['studentId'] ?? null;
-
         if (null === $studentId) {
             $this->sendJsonError('student id is missing.', 400);
             return;
