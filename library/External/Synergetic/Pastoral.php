@@ -1569,7 +1569,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             'classificationCode' => mb_substr($documentClassificationCode, 0, 15, self::CHARACTER_ENCODING),
             'createdDate' => $pastoral->getCreatedAt()->getDatabase(),
             'createdOwnerId' => $pastoral->getOwner()->getExternalId(),
-            'modifiedDate' => $pastoral->getCreatedAt()->getDatabase(),
+            'modifiedDate' => $pastoral->getUpdatedAt()->getDatabase(),
             'modifiedOwnerId' => $pastoral->getOwner()->getExternalId(),
         ];
 
