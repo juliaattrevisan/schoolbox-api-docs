@@ -12,35 +12,32 @@ import { useLoadRecords } from "./composable/useLoadRecords";
 import PastoralRecord from "./pastoral-record.vue";
 
 const props = defineProps<{
-    url: string;
     title?: string;
     meta?: string;
 }>();
 
 const isOpen = window.Vue.ref(false);
-const loadUrl = window.Vue.ref(props.url);
-const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(loadUrl);
+const url = defineModel<string>("url", { default: "" }); // to open/close the modal
+const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
 /**
- * whenever a new url is passed in,
- * load that url and open the modal
+ * whenever a new url is passed in open the modal,
+ * useLoadRecords will handle loading the data
  */
-window.Vue.watch(
-    () => props.url,
-    () => {
-        loadUrl.value = props.url;
+window.Vue.watch(url, (newVal) => {
+    if (newVal !== "" && !isOpen.value) {
         isOpen.value = true;
-    },
-);
+    }
+});
 
-// /**
-//  * when the modal is closed, clear the load url
-//  */
-// window.Vue.watch(isOpen, (newVal) => {
-//     if (newVal === false) {
-//         loadUrl.value = "";
-//     }
-// });
+/**
+ * when the modal is closed, clear the url
+ */
+window.Vue.watch(isOpen, (newVal) => {
+    if (newVal === false) {
+        url.value = "";
+    }
+});
 
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
@@ -53,11 +50,11 @@ const { arrivedState } = useScroll(modalResultsEl, {
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
-        const newUrl = new URL(props.url, window.location.origin);
+        const newUrl = new URL(url.value, window.location.origin);
         const searchParams = new URLSearchParams();
         searchParams.set(SearchParam.CURSOR as string, payload.value.metadata.cursor.next);
         newUrl.search = searchParams.toString();
-        loadUrl.value = newUrl.toString();
+        url.value = newUrl.toString();
     }
 });
 </script>

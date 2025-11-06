@@ -189,7 +189,7 @@ function onLinkedRecordsSelected(profile: Profile): void {
             @next="onPaginate"
         />
     </template>
-    <pastoral-records-modal :url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
+    <pastoral-records-modal v-model:url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
 </template>
 
 <style scoped></style>
