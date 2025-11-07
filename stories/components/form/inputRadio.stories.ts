@@ -30,14 +30,10 @@ type Story = StoryObj<typeof StorybookSlot>;
 export const Default: Story = {
     render: () => ({
         template: `
-<fieldset class="c-fieldset">
-    <div class="c-fieldset__container">
         <div class="l-flex-row l-flex--align-center">
-            <input id="rad2" name="list" type="radio" class="c-input-radio" />
+            <input id="rad2" name="list" type="radio" class="sbx-input-radio" />
             <label for="rad2" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
-    </div>
-</fieldset>
             `,
     }),
     parameters: {
@@ -51,14 +47,10 @@ export const Default: Story = {
 export const Checked: Story = {
     render: () => ({
         template: `
-<fieldset class="c-fieldset">
-    <div class="c-fieldset__container">
         <div class="l-flex-row l-flex--align-center">
-            <input id="rad2" name="list" type="radio" class="c-input-radio" checked/>
+            <input id="rad2" name="list" type="radio" class="sbx-input-radio" checked/>
             <label for="rad2" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
-    </div>
-</fieldset>
             `,
     }),
     parameters: {
@@ -72,14 +64,10 @@ export const Checked: Story = {
 export const Disabled: Story = {
     render: () => ({
         template: `
-<fieldset class="c-fieldset">
-    <div class="c-fieldset__container">
         <div class="l-flex-row l-flex--align-center">
-            <input id="rad6" name="list" type="radio" class="c-input-radio" disabled />
+            <input id="rad6" name="list" type="radio" class="sbx-input-radio" disabled />
             <label for="rad6" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
-    </div>
-</fieldset>
             `,
     }),
     parameters: {
@@ -92,13 +80,10 @@ export const Disabled: Story = {
 export const Error: Story = {
     render: () => ({
         template: `
-<fieldset class="c-fieldset">
         <div class="l-flex-row l-flex--align-center">
-            <input id="rad6" name="list" type="radio" class="c-input-radio error" />
+            <input id="rad6" name="list" type="radio" class="sbx-input-radio error" />
             <label for="rad6" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
-    </div>
-</fieldset>
             `,
     }),
     parameters: {
