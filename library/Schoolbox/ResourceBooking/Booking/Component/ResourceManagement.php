@@ -95,7 +95,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                     $groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()] = [
                         'dateFormat'  => [
                             'day'  => $event->getStartTime()->getDay(),
-                            'monthName'=> $event->getStartTime()->getUsingFormat('M'),
+                            'monthName' => $event->getStartTime()->getUsingFormat('M'),
                             'dayName' => $event->getStartTime()->getUsingFormat('D'),
                         ],
                         'events' => [],
