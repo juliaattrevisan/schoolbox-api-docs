@@ -116,6 +116,7 @@ WORKDIR /usr/share/schoolbox
 RUN <<EOF
 addgroup --gid ${GROUP_ID} schoolboxsuper
 useradd -m -g schoolboxsuper -G adm,sudo,www-data -s /bin/bash -u ${USER_ID} schoolboxsuper
+chown -R schoolboxsuper:schoolboxsuper /config/caddy /data/caddy;
 EOF
 
 # Create /var/log/schoolbox folder, writable by www-data and its group
