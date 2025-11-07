@@ -841,14 +841,15 @@ input[type="checkbox"].plain {
     min-height: inherit;
 }
 
-.checklist,
-.radiolist {
-    input[type="radio"]:not(.plain),
-    input[type="checkbox"]:not(.plain) {
-        @include fancy-check();
+body:not(.sbx-body) {
+    .checklist,
+    .radiolist {
+        input[type="radio"]:not(.plain),
+        input[type="checkbox"]:not(.plain) {
+            @include fancy-check();
+        }
     }
 }
-
 .checklist .checklist {
     margin-left: 2rem;
 }
@@ -905,20 +906,24 @@ input[type="checkbox"].plain {
     }
 }
 
-.toggle-set {
-    display: flex;
-    justify-content: space-between;
-    max-width: 20rem;
+body:not(.sbx-body) {
+    .toggle-set {
+        display: flex;
+        justify-content: space-between;
+        max-width: 20rem;
 
-    input[type="radio"]:not(.plain),
-    input[type="checkbox"]:not(.plain) {
-        @include vaporwave();
+        input[type="radio"]:not(.plain),
+        input[type="checkbox"]:not(.plain) {
+            @include vaporwave();
+        }
     }
 }
 
-input[type="radio"]:not(.plain) {
-    @include fancy-check("radio-label");
-    @include vaporwave("input-toggle");
+body:not(.sbx-body) {
+    input[type="radio"]:not(.plain) {
+        @include fancy-check("radio-label");
+        @include vaporwave("input-toggle");
+    }
 }
 
 input[type="checkbox"]:not(.plain) {
