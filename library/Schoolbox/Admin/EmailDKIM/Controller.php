@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
 use Schoolbox\Auth\KeyPairGenerator;
@@ -160,18 +161,11 @@ class Controller extends Base
     public function postDKIMConfig(): void
     {
         $domain = trim($this->requestPost->get('domain', ''));
-        $selector = trim($this->requestPost->get('selector', ''));
         $publicKey = trim($this->requestPost->get('publicKey', ''));
         $privateKey = trim($this->requestPost->get('privateKey', ''));
 
         if (empty($domain)) {
             $this->response = $this->responseAsJson(['error' => 'Domain name is required'])
-                ->withStatus(400);
-            return;
-        }
-
-        if (empty($selector)) {
-            $this->response = $this->responseAsJson(['error' => 'Selector is required'])
                 ->withStatus(400);
             return;
         }
@@ -205,16 +199,14 @@ class Controller extends Base
             $this->emailDKIMMapper->save($emailDKIM);
 
             $this->response = $this->responseAsJson([
-                'success' => true,
-                'message' => 'DKIM configuration created successfully',
-                'data' => [
-                    'id' => $emailDKIM->getId(),
-                    'domain' => $emailDKIM->getDomain()
-                ]
+                'id' => $emailDKIM->getId(),
+                'domain' => $emailDKIM->getDomain()
             ]);
         } catch (MapperException $e) {
-            $this->response = $this->responseAsJson(['error' => $e->getMessage()])
-                ->withStatus(500);
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(500)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem);
             return;
         }
     }
