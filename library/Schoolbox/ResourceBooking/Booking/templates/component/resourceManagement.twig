@@ -78,25 +78,26 @@
                                             <div class="list-item">
 
                                                 {# cardception #}
-                                                <div class="small-12 card">
+                                                <div class="small-12">
                                                     {# time, and only time (start - end) #}
                                                     <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
+                                                    <div class="small-12 card l-flex-row l-gap-l dummy-content highlighter l-mar-m--bottom ">
+                                                        {# small portrait of booker #}
+                                                        <a href="/search/user/{{ event.booking.event.owner.id }}">
+                                                            {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
+                                                        </a>
 
-                                                    {# small portrait of booker #}
-                                                    <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                                        {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
-                                                    </a>
-
-                                                    {# meta to show on the side of the portrait #}
-                                                    <p class="meta">
-                                                        Requested by
-                                                        <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                                        on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
-                                                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                                            by
+                                                        {# meta to show on the side of the portrait #}
+                                                        <p class="meta">
+                                                            Requested by
                                                             <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                                        {% endif %}
-                                                    </p>
+                                                            on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
+                                                            {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                                                                by
+                                                                <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
 
