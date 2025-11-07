@@ -62,7 +62,7 @@
                         <li class="actions-small-1">
                             <div class="">
                                 {# show date card #}
-                                <div class="small-12 card">
+                                <div class="small-12 card l-flex-row l-gap-l dummy-content highlighter l-mar-m--bottom">
                                     {# booking date, may have multiple bookings under this date #}
                                     <div>
                                         {{ date.dateFormat.dayName }}
@@ -78,13 +78,13 @@
                                             <div class="list-item">
 
                                                 {# cardception #}
-                                                <div class="compact small-12 card">
+                                                <div class="small-12 card">
                                                     {# time, and only time (start - end) #}
                                                     <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
 
                                                     {# small portrait of booker #}
                                                     <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                                        {% include 'include/portrait.twig' with {user: event.booking.event.owner, render: 'tiny'} only %}
+                                                        {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
                                                     </a>
 
                                                     {# meta to show on the side of the portrait #}
