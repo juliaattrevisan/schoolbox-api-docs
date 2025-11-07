@@ -89,7 +89,7 @@ COPY ./config/frankenphp/* /etc/frankenphp/
 RUN \
     useradd www-data; \
     mkdir -p /var/lib/schoolbox; \
-    chown -R www-data:www-data /var/lib/schoolbox;
+    chown -R www-data:www-data /var/lib/schoolbox /config/caddy /data/caddy;
 
 EXPOSE 80 443
 
