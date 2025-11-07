@@ -144,9 +144,7 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if !vm_disk_size.nil?
-    config.vm.define "hashicorp" do |h|
-      h.vm.disk :disk, size: vm_disk_size, primary: true
-    end
+    config.vm.disk :disk, size: vm_disk_size, primary: true
   end
 
   if puppet_sync_type != 'none'
