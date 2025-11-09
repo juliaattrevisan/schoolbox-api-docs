@@ -29,6 +29,11 @@ export default class Common {
 
     static readonly CLASS_ID_DEMO2 = 106;
 
+    // Filters
+    static readonly SELECTOR_RESET_DEFAULTS = "#defaults_reset";
+
+    static readonly DATA_TEST_APPLY_FILTERS = "panel-apply-filters-button";
+
     // TODO: Replace following with data-test selectors where possible
 
     /**
@@ -479,5 +484,11 @@ export default class Common {
         }
 
         return formattedDate;
+    }
+
+    // filters - set filters to default
+    async resetFiltersToDefault(): Promise<void> {
+        await this.page.locator(Common.SELECTOR_RESET_DEFAULTS).click();
+        await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
     }
 }

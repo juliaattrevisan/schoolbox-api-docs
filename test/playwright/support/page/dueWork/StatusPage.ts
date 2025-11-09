@@ -25,6 +25,16 @@ export default class StatusPage {
 
     static readonly DATA_TEST_PARTICIPANT_JELLY_TOT_RESPONSE_HISTORY = "assessment-status-feedback-responseHistory-"; // Append "-[participantId]"
 
+    static readonly SELECTOR_FEEDBACK_IMPORT_MODAL = "#import-feedback-modal";
+
+    static readonly SELECTOR_FEEDBACK_IMPORT_TEXTAREA = "#importFeedbackInput";
+
+    static readonly SELECTOR_FEEDBACK_IMPORT_MARK_AND_COMMENT_RADIO = 'label[for="importFeedbackMarkAndComment"]';
+
+    static readonly SELECTOR_FEEDBACK_MODAL_IMPORT_BUTTON = `a.submit:has-text("Import")`;
+
+    static readonly SELECTOR_GRADE_INPUT = "assessment-feedback-mark-input-"; // Append "-[studentId]"
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -125,5 +135,49 @@ export default class StatusPage {
     async verticalQuizReviewComment(comment: string): Promise<void> {
         const commentEditor = this.page.locator(StatusPage.SELECTOR_COMMENT_QUIZ_REVIEW);
         await this.tester.fillCKEditorByLocator(commentEditor, comment);
+    }
+
+    /**
+     * Type in the feedback import modal textarea
+     * @param feedbackText - The feedback text to enter
+     */
+    async enterFeedbackImportModalText(feedbackText: string): Promise<void> {
+        await this.page.locator(StatusPage.SELECTOR_FEEDBACK_IMPORT_TEXTAREA).fill(feedbackText);
+    }
+
+    /**
+     * Tick on the "Import mark and comment" radio button in the feedback import modal
+     */
+    async clickImportMarkAndCommentRadio(): Promise<void> {
+        await this.page.locator(StatusPage.SELECTOR_FEEDBACK_IMPORT_MARK_AND_COMMENT_RADIO).click();
+    }
+
+    /**
+     * Click the "Import" button in the feedback import modal
+     */
+    async clickImportButtonInModal(): Promise<void> {
+        await this.page.waitForTimeout(2000); // wait for 2000ms to ensure the data is processed before importing it
+        await this.page.locator(StatusPage.SELECTOR_FEEDBACK_MODAL_IMPORT_BUTTON).click();
+    }
+
+    /**
+     * Verify the grade input value for a given student
+     * @param studentId - The student ID
+     * @param expectedGrade - The expected grade value
+     */
+    async verifyGradeInputForStudent(studentId: number, expectedGrade: string): Promise<void> {
+        const studentRow = this.page.getByTestId(`${StatusPage.SELECTOR_GRADE_INPUT}${studentId}`);
+        const gradeInput = await studentRow.getAttribute("value");
+        expect(gradeInput).toBe(expectedGrade);
+    }
+
+    /**
+     * Verify the comment value for a given student
+     * @param studentName - The student name
+     * @param expectedComment - The expected comment value
+     */
+    async verifyCommentForStudent(studentName: string, expectedComment: string): Promise<void> {
+        const commentLocator = this.page.locator(`p[data-placeholder="Feedback for ${studentName}"]`);
+        await expect(commentLocator).toHaveText(expectedComment);
     }
 }

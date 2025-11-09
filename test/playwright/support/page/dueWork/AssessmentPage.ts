@@ -20,6 +20,8 @@ export default class AssessmentPage {
 
     static readonly DATA_TEST_ASSESSMENT_SUMMARY_SELF_ACKNOWLEDGE_BUTTON = "assessment-summary-self-acknowledge-button";
 
+    static readonly SELECTOR_RETURN_BUTTON = 'a:has-text("Return")';
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -90,5 +92,12 @@ export default class AssessmentPage {
         await this.tester.common.waitForModalToBeOpen();
         await this.tester.common.clickConfirmButton();
         await this.tester.common.waitForModalToBeClosed();
+    }
+
+    /**
+     * Clicks the return button to go back to the previous page
+     */
+    async clickReturn(): Promise<void> {
+        await this.page.locator(AssessmentPage.SELECTOR_RETURN_BUTTON).click();
     }
 }
