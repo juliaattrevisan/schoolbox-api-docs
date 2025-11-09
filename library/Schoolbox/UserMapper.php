@@ -459,11 +459,37 @@ class UserMapper extends Mapper
             }
         }
 
-        // Load campuses and linked users
-        // (linked users include roles only, thus a custom query is required)
-        $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', array_keys($users));
-        foreach ($users as $userId => $user) {
-            $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
+        // Load one-to-many relations
+        if (!empty($users)) {
+            // Load campuses
+            $userIds          = array_keys($users);
+            $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
+            foreach ($users as $userId => $user) {
+                $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
+            }
+
+            // Load linked users
+            // (linked users include roles only, thus a custom query is required)
+            $findLinkedUsersPb    = $this->getPredicateBuilder()->in('id', $userIds);
+            $findLinkedUsersQuery = $this->getDatabase()->prepare("
+                SELECT
+                    `{$this->getTable()}`.`{$this->getIdentifierColumn()}`,
+                    {$this->getColumnString('lu')},
+                    {$this->getJoinColumnString('role', 'lur')}
+                FROM `{$this->getTable()}`
+                INNER JOIN {$this->getJoinSql('user_link', '', 'lu')}
+                INNER JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
+                WHERE {$findLinkedUsersPb->getWhereIntersect()}
+            ");
+            $findLinkedUsersQuery->execute($findLinkedUsersPb->getParams());
+            foreach ($findLinkedUsersQuery as $row) {
+                $userId     = $row['id'];
+                $linkedUser = $this->hydrate($row, 'lu');
+                $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
+                if (isset($users[$userId])) {
+                    $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
+                }
+            }
         }
 
         return $this->createCollection(array_values($users));
