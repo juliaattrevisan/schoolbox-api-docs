@@ -389,34 +389,30 @@ class UserMapper extends Mapper
         foreach ($statement as $row) {
             $userId = $row['id'];
 
-            // Don't override previous hydrations of this user: add to it instead
-            if (!isset($users[$userId])) {
+            /** @var Role $role */
+            $role = $this->hydrateJoin($row, 'role', 'g');
 
-                /** @var Role $role */
-                $role = $this->hydrateJoin($row, 'role', 'g');
+            /** @var YearLevel\Model $year */
+            $year = $this->hydrateJoin($row, 'year', 'lyl');
 
-                /** @var YearLevel\Model $year */
-                $year = $this->hydrateJoin($row, 'year', 'lyl');
+            /** @var House $schoolHouse **/
+            $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
 
-                /** @var House $schoolHouse **/
-                $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
+            /** @var \HouseResidential $residentialHouse **/
+            $residentialHouse = $this->hydrateJoin($row, 'residentialHouse', 'rh');
 
-                /** @var \HouseResidential $residentialHouse **/
-                $residentialHouse = $this->hydrateJoin($row, 'residentialHouse', 'rh');
+            /** @var User\Pronoun\Model|null $pronoun **/
+            $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
 
-                /** @var User\Pronoun\Model|null $pronoun **/
-                $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
-
-                $users[$userId] = $this->hydrate($row)
-                    ->setSuperuser($row['superuser'] == 1)
-                    ->setRole($role)
-                    ->setYear($year)
-                    ->setSchoolHouse($schoolHouse)
-                    ->setResidentialHouse($residentialHouse)
-                    ->setLinkedUsers($this->createCollection())
-                    ->setPronoun($pronoun)
-                    ->setCampusCollection($campusMapper->createCollection());
-            }
+            $users[$userId] = $this->hydrate($row)
+                ->setSuperuser($row['superuser'] == 1)
+                ->setRole($role)
+                ->setYear($year)
+                ->setSchoolHouse($schoolHouse)
+                ->setResidentialHouse($residentialHouse)
+                ->setLinkedUsers($this->createCollection())
+                ->setPronoun($pronoun)
+                ->setCampusCollection($campusMapper->createCollection());
 
             /* Portrait Image
              */
