@@ -459,7 +459,7 @@ class UserMapper extends Mapper
             }
         }
 
-        // Load one-to-many relations
+        // Load one-to-many relations in separate queries
         if (!empty($users)) {
             // Load campuses
             $userIds          = array_keys($users);
@@ -469,7 +469,7 @@ class UserMapper extends Mapper
             }
 
             // Load linked users
-            // (linked users include roles only, thus a custom query is required)
+            // (a custom query is required so that roles only are joined)
             $findLinkedUsersPb    = $this->getPredicateBuilder()->in('id', $userIds);
             $findLinkedUsersQuery = $this->getDatabase()->prepare("
                 SELECT
@@ -485,9 +485,14 @@ class UserMapper extends Mapper
             foreach ($findLinkedUsersQuery as $row) {
                 $userId     = $row['id'];
                 $linkedUser = $this->hydrate($row, 'lu');
-                $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
-                if (isset($users[$userId])) {
-                    $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
+                if ($linkedUser instanceof User) {
+                    $linkedUserRole = $this->hydrateJoin($row, 'role', 'lur');
+                    if ($linkedUserRole instanceof Role) {
+                        $linkedUser = $linkedUser->setRole($linkedUserRole);
+                    }
+                    if (isset($users[$userId])) {
+                        $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
+                    }
                 }
             }
         }
