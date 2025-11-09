@@ -327,7 +327,7 @@ class UserMapper extends Mapper
                 }
             }
         }
-        $query = $this->getSelectString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
+        $query = $this->getSelectString() . ' ' . $this->getFromString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateSelect($statement);
