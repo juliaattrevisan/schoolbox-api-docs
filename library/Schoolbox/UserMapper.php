@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use DomainException;
 use House;
 use HouseMapper;
+use HouseResidential;
 use HouseResidentialMapper;
 use PDOStatement;
 use Predis\ClientInterface;
@@ -392,13 +393,13 @@ class UserMapper extends Mapper
             /** @var Role $role */
             $role = $this->hydrateJoin($row, 'role', 'g');
 
-            /** @var YearLevel\Model $year */
+            /** @var YearLevel\Model|null $year */
             $year = $this->hydrateJoin($row, 'year', 'lyl');
 
-            /** @var House $schoolHouse **/
+            /** @var House|null $schoolHouse **/
             $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
 
-            /** @var \HouseResidential $residentialHouse **/
+            /** @var HouseResidential|null $residentialHouse **/
             $residentialHouse = $this->hydrateJoin($row, 'residentialHouse', 'rh');
 
             /** @var User\Pronoun\Model|null $pronoun **/
