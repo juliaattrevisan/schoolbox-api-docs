@@ -345,8 +345,6 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('role', 'g')},
                 {$this->getJoinColumnString('schoolHouse', 'h')},
                 {$this->getJoinColumnString('residentialHouse', 'rh')},
-                {$this->getColumnString('lu')},
-                {$this->getJoinColumnString('role', 'lur')},
                 {$this->getJoinColumnString('year', 'lyl')},
                 {$this->getJoinColumnString('portrait', 'portrait')},
                 {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')},
@@ -362,9 +360,7 @@ class UserMapper extends Mapper
         return "
             FROM `{$this->getTable()}`
             LEFT JOIN superusers su ON su.id = user.id
-            JOIN {$this->getJoinSql('role', '', 'g', true)}
-            LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
-            LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
+            INNER JOIN {$this->getJoinSql('role', '', 'g', true)}
             LEFT JOIN {$this->getJoinSql('year', '', 'lyl', true)}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
             LEFT JOIN {$this->getJoinSql('residentialHouse', '', 'rh')}
@@ -420,28 +416,6 @@ class UserMapper extends Mapper
                     ->setLinkedUsers($this->createCollection())
                     ->setPronoun($pronoun)
                     ->setCampusCollection($campusMapper->createCollection());
-            }
-
-//            $campus = $campusMapper->hydrate($row, 'c');
-//
-//            /* If the campus object has no id, then it spawned a campus
-//             * object from nonexistent data (e.g. a user with no campus)
-//             * In this case, the campus object will be totally empty but
-//             * still occupy slots in the user's campus collection stack
-//             */
-//            if ($campus) {
-//                // Don't double add
-//                $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
-//            }
-
-            // TODO fetch linked users (with role only) in another query
-            $linkedUser = $this->hydrate($row, 'lu');
-
-            if ($linkedUser) {
-                // Don't double add
-                $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
-
-                $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
             }
 
             /* Portrait Image
