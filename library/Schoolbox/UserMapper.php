@@ -343,7 +343,6 @@ class UserMapper extends Mapper
             SELECT
                 {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                 {$this->getJoinColumnString('role', 'g')},
-                {$this->getJoinColumnString('userCampus', 'c')},
                 {$this->getJoinColumnString('schoolHouse', 'h')},
                 {$this->getJoinColumnString('residentialHouse', 'rh')},
                 {$this->getColumnString('lu')},
@@ -364,7 +363,6 @@ class UserMapper extends Mapper
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             JOIN {$this->getJoinSql('role', '', 'g', true)}
-            LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
             LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
             LEFT JOIN {$this->getJoinSql('year', '', 'lyl', true)}
@@ -424,18 +422,19 @@ class UserMapper extends Mapper
                     ->setCampusCollection($campusMapper->createCollection());
             }
 
-            $campus = $campusMapper->hydrate($row, 'c');
+//            $campus = $campusMapper->hydrate($row, 'c');
+//
+//            /* If the campus object has no id, then it spawned a campus
+//             * object from nonexistent data (e.g. a user with no campus)
+//             * In this case, the campus object will be totally empty but
+//             * still occupy slots in the user's campus collection stack
+//             */
+//            if ($campus) {
+//                // Don't double add
+//                $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
+//            }
 
-            /* If the campus object has no id, then it spawned a campus
-             * object from nonexistent data (e.g. a user with no campus)
-             * In this case, the campus object will be totally empty but
-             * still occupy slots in the user's campus collection stack
-             */
-            if ($campus) {
-                // Don't double add
-                $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
-            }
-
+            // TODO fetch linked users (with role only) in another query
             $linkedUser = $this->hydrate($row, 'lu');
 
             if ($linkedUser) {
@@ -458,6 +457,13 @@ class UserMapper extends Mapper
                 $portrait->setMimetype($mime);
                 $users[$userId]->setPortrait($portrait);
             }
+        }
+
+        // Load campuses and linked users
+        // (linked users include roles only, thus a custom query is required)
+        $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', array_keys($users));
+        foreach ($users as $userId => $user) {
+            $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
         }
 
         return $this->createCollection(array_values($users));
