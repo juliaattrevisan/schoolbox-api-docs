@@ -352,6 +352,15 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('portrait', 'portrait')},
                 {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')},
                 {$this->getJoinColumnString('pronoun', 'p')}
+        ";
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFromString(): string
+    {
+        return "
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
             JOIN {$this->getJoinSql('role', '', 'g', true)}
