@@ -360,7 +360,7 @@ class UserMapper extends Mapper
     protected function getFromString(): string
     {
         return "
-            FROM `user`
+            FROM `{$this->getTable()}`
             LEFT JOIN superusers su ON su.id = user.id
             JOIN {$this->getJoinSql('role', '', 'g', true)}
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
