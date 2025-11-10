@@ -16,11 +16,12 @@ use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\RequestOptions;
 use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
 /**
@@ -31,19 +32,19 @@ class Client implements IClient
     /**
      * Default chunk size when reading a streaming response.
      */
-    private const DEFAULT_CHUNK_SIZE = 128;
-
-    /**
-     * When an image is omitted from the request/response: replace the image
-     * data with this in the log.
-     */
-    private const IMAGE_DATA_OMITTED = 'omitted';
+    private const int DEFAULT_CHUNK_SIZE = 128;
 
     /**
      * The endpoint which OpenAI-compatible clients use for their Responses
      * feature.
      */
-    private const RESPONSES_ENDPOINT = '/responses';
+    private const string ENDPOINT_RESPONSES = '/responses';
+
+    /**
+     * The endpoint which OpenAI-compatible clients use for their Chat
+     * Completion feature.
+     */
+    private const string ENDPOINT_CHAT_COMPLETIONS = '/chat/completions';
 
     /**
      * Constructor
@@ -72,52 +73,15 @@ class Client implements IClient
      */
     public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
     {
-        $encodedPayload = json_encode($payload);
-
-        $url = $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::RESPONSES_ENDPOINT);
-        $log = $this->logMapper->createModel()
-            ->setUser($user)
-            ->setPrompt($encodedPayload)
-            ->setFeature($feature)
-            ->setSessionId($aiSessionId)
-            ->setEndpoint($url->__toString());
-
-        $request = new Request(
-            'POST',
-            $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::RESPONSES_ENDPOINT),
-            $this->authHeaders + ['Content-Type' => 'application/json'],
-            $encodedPayload,
+        $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
+        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request = new Request('POST', $url, $this->authHeaders);
+        return $this->handleNonStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new LogHandler\ResponseMessage(),
         );
-
-        try {
-            $response = $this->httpClient->send(
-                $request,
-                [
-                    RequestOptions::ALLOW_REDIRECTS => false,
-                    RequestOptions::HTTP_ERRORS     => false,
-                    RequestOptions::STREAM          => false,
-                ],
-            );
-        } catch (BadResponseException $e) {
-            $log->setReturnCode($e->getResponse()->getStatusCode())
-                ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
-            throw $e;
-        } catch (ClientExceptionInterface $e) {
-            $log->setReturnCode(null)
-                ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
-            throw $e;
-        }
-
-        // Do something with the response:
-        // extract the body, and also log it
-        $responseBody = $response->getBody()->getContents();
-        $data         = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-        $this->finaliseLog($data, $log);
-
-        // Restore the body in its streamable glory
-        return $response->withBody(Utils::streamFor($responseBody));
     }
 
     /**
@@ -125,47 +89,114 @@ class Client implements IClient
      */
     public function createResponseStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
-        $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
-        $encodedPayload = json_encode($payload);
+        $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
+        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request = new Request('POST', $url, $this->authHeaders);
+        return $this->handleStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new LogHandler\ResponseMessage(),
+            $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
+        );
+    }
 
-        $url = $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::RESPONSES_ENDPOINT);
-        $log = $this->logMapper->createModel()
+    /**
+     * @inheritdoc
+     */
+    public function createChatCompletion(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
+    {
+        $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
+        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request = new Request('POST', $url, $this->authHeaders);
+        return $this->handleNonStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new LogHandler\ChatCompletionsMessage(),
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createChatCompletionStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
+    {
+        $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
+        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request = new Request('POST', $url, $this->authHeaders);
+        return $this->handleStreamedResponse(
+            $request,
+            $payload,
+            $log,
+            new LogHandler\ChatCompletionsMessage(),
+            $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
+        );
+    }
+
+    /**
+     * Generate the URL to which a request to an OpenAI-compatible AI provider
+     * should be sent.
+     *
+     * @param string&self::ENDPOINT_* $endpoint The endpoint to send to.
+     * @return UriInterface
+     */
+    private function generateUrl(string $endpoint): UriInterface
+    {
+        return $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') . $endpoint);
+    }
+
+    /**
+     * Generate the log for this request.
+     *
+     * @param User         $user        The user making the request.
+     * @param string       $feature     An identifier for the feature being requested.
+     * @param string|null  $aiSessionId If provided: this call's session ID (generated by Schoolbox, not OpenAI).
+     * @param UriInterface $url         The URL to send the request to.
+     * @param array        $payload     The request body to send.
+     * @return Log\Model
+     * @noinspection PhpDocMissingThrowsInspection - this will never throw
+     */
+    private function generateLog(
+        User $user,
+        string $feature,
+        ?string $aiSessionId,
+        UriInterface $url,
+        array $payload,
+    ): Log\Model {
+        /** @noinspection PhpUnhandledExceptionInspection - this will never throw */
+        return $this->logMapper->createModel()
             ->setUser($user)
-            ->setPrompt($encodedPayload)
+            ->setPrompt(json_encode($payload))
             ->setFeature($feature)
             ->setSessionId($aiSessionId)
             ->setEndpoint($url->__toString());
+    }
 
-        $request = new Request(
-            'POST',
-            $url,
-            $this->authHeaders + ['Content-Type' => 'application/json'],
-            $encodedPayload,
-        );
-
-        $response = $this->httpClient->send(
+    /**
+     * Send the request to the AI provider.
+     *
+     * @param RequestInterface $request The request to send.
+     * @param array            $payload The request body to send: will be encoded as JSON.
+     * @param bool             $stream  Should a streaming response be requested?
+     * @return ResponseInterface
+     * @throws BadResponseException     when the response is a 4xx or 5xx
+     * @throws ClientExceptionInterface when something else goes wrong with the request
+     */
+    private function sendRequest(
+        RequestInterface $request,
+        array $payload,
+        bool $stream,
+    ): ResponseInterface {
+        return $this->httpClient->send(
             $request,
             [
                 RequestOptions::ALLOW_REDIRECTS => false,
                 RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => true,
+                RequestOptions::STREAM          => $stream,
+                RequestOptions::JSON            => $payload,
             ],
         );
-
-        // This needs to be an event stream: otherwise raise an exception
-        $contentType = $response->getHeaderLine('Content-Type');
-        if (str_contains($contentType, 'text/event-stream')) {
-            foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
-                yield $stream;
-            }
-        } else {
-            // Log the fact this isn't a stream, too
-            throw new BadResponseException(
-                sprintf('Expected text/event-stream response: received %s', $contentType),
-                $request,
-                $response,
-            );
-        }
     }
 
     /**
@@ -177,9 +208,9 @@ class Client implements IClient
      * @param StreamInterface $stream    The response's body, as a stream.
      * @param int             $chunkSize How many bytes should be read from the
      *                                   stream at once?
-     * @return iterable<string>
+     * @return iterable<EventStream\Message>
      */
-    private function readEvents(StreamInterface $stream, int $chunkSize, Log\Model $log): iterable
+    private function readEvents(StreamInterface $stream, int $chunkSize): iterable
     {
         $chunkBuffer = '';
         while (!$stream->eof()) {
@@ -204,8 +235,7 @@ class Client implements IClient
                 $message = EventStream\Message::fromString($chunk);
 
                 // Filter fields out of the message as necessary before sending?
-                yield $this->filterForOutput($message)->__toString();
-                $this->onMessage($message, $log);
+                yield $this->filterForOutput($message);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
                 // TODO this should probably raise an exception, to be handled
@@ -222,154 +252,8 @@ class Client implements IClient
         // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
             $message = EventStream\Message::fromString($chunkBuffer);
-            yield $this->filterForOutput($message)->__toString();
-            $this->onMessage($message, $log);
+            yield $this->filterForOutput($message);
         }
-    }
-
-    /**
-     * Write this message to the log.
-     *
-     * @param EventStream\Message $message
-     * @param Log\Model           $log
-     * @return void
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function onMessage(EventStream\Message $message, Log\Model $log): void
-    {
-        // Prepare the message for logging
-        $eventType = $message->eventType;
-        $output    = '';
-        $data      = [];
-        try {
-            // Omit partial and completed image data from the output
-            $item   = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
-            $data[] = $item;
-            if ($eventType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
-                $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
-            }
-            if ($eventType === 'response.output_item.done' && isset($item['item']['result'])) {
-                $item['item']['result'] = self::IMAGE_DATA_OMITTED;
-            }
-
-            // apparently there is a final final image, lets remove that also
-            if ($eventType === 'response.completed' && isset($item['response']['output']) && is_array($item['response']['output'])) {
-                // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
-                foreach ($item['response']['output'] as $i => $respOutput) {
-                    if (isset($respOutput['result'])) {
-                        $item['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
-                    }
-                }
-            }
-
-            $output .= sprintf("event: %s\ndata: %s\n\n", $eventType, json_encode($item, JSON_THROW_ON_ERROR));
-        } catch (JsonException $e) {
-            // If it's not JSON, still save the raw data
-            $output .= sprintf("event: %s\n%s\n\n", $eventType, $message->data);
-        }
-
-        // This chunk gets added to the log
-        $this->appendMessageToLog($output, $data, $log);
-
-        // Extract the completed event, and add it to the log
-        // Is this the final event?
-        // There are 3 possible events that indicate the end of a response
-        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if (in_array($eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
-            $this->finaliseLog($data[0]['response'], $log);
-        }
-    }
-
-    /**
-     * Append the message to the log, including:
-     * * the message itself (with redundant field filtered)
-     * * the model the API endpoint used
-     * * the input and output tokens used
-     *
-     * @param string    $output The message, formatted as an event stream, with filtered fields.
-     * @param array     $data   The unfiltered parsed data from the message.
-     * @param Log\Model $log    The log to write to.
-     * @return void
-     */
-    private function appendMessageToLog(string $output, array $data, Log\Model $log): void
-    {
-        $log->setResponse(($log->getResponse() ?? '') . $output);
-        foreach ($data as $item) {
-            // Model, input and output tokens depend on the endpoint
-            $model        = $item['response']['model'] ?? $item['model'] ?? null;
-            $inputTokens  = $item['response']['usage']['input_tokens'] ?? $item['usage']['prompt_tokens'] ?? null;
-            $outputTokens = $item['response']['usage']['output_tokens'] ?? $item['usage']['completion_tokens'] ?? null;
-
-            if ($model) {
-                $log->setModel($model);
-            }
-            if ($inputTokens) {
-                $log->setInputTokens($inputTokens);
-            }
-            if ($outputTokens) {
-                $log->setOutputTokens($outputTokens);
-            }
-        }
-    }
-
-    /**
-     * @param array $completedEvent
-     * @param Log\Model $log
-     * @return void
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function finaliseLog(array $completedEvent, Log\Model $log): void
-    {
-        /* If something went wrong on the openAI side, it'll send us an "error" key
-         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-         * If we get this, send on the human-readable message to the user
-         */
-        if ($completedEvent["error"] ?? null) {
-            $returnCode = 500;
-
-            $errorMessage = $completedEvent["error"]["message"] ?? '';
-
-            $log->setReturnCode($returnCode)
-                ->setErrorMessage($errorMessage);
-            $this->logMapper->save($log);
-
-            throw new SchoolboxException($errorMessage, $returnCode);
-        }
-
-        /* Did we receive an incomplete response? i.e. max output tokens reached?
-         * If so, send those details on so we have some idea of why it failed
-         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
-         */
-        $status = $completedEvent["status"] ?? null;
-        if ($status !== "completed") {
-            $returnCode = 500;
-
-            $title = sprintf(
-                "Failed to generate a response: %s",
-                $status ?? "unknown"
-            );
-
-            /* there may be some extra details about why it was incomplete */
-            $incompleteMessage = $completedEvent["incomplete_details"]["reason"] ?? null;
-            if ($incompleteMessage) {
-                $title .= sprintf(" (%s)", $incompleteMessage);
-            }
-
-            $log->setReturnCode($returnCode)
-                ->setErrorMessage($incompleteMessage);
-            $this->logMapper->save($log);
-
-            throw new SchoolboxException($title, $returnCode);
-        }
-
-        // well we didn't die, so let's assume we got a good response
-
-        /** store the response, and the ai usage */
-        $log->setReturnCode(200)
-            ->setModel($completedEvent['model'] ?? null)
-            ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
-            ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
-        $this->logMapper->save($log);
     }
 
     /**
@@ -384,5 +268,108 @@ class Client implements IClient
     private function filterForOutput(EventStream\Message $message): EventStream\Message
     {
         return $message;
+    }
+
+    /**
+     * Request a non-streamed response from the AI provider, and handle the
+     * logging and exceptions appropriately.
+     *
+     * @param RequestInterface       $request    The request to send.
+     * @param array                  $payload    The request body to send.
+     * @param Log\Model              $log        The log to write to.
+     * @param LogHandler\ILogHandler $logHandler The log handler to use for the response.
+     * @return ResponseInterface The response from the AI provider.
+     * @throws ClientExceptionInterface if the request fails
+     * @throws JsonException            if somehow the response body couldn't be decoded
+     * @throws MapperException          if somehow the log couldn't be saved
+     */
+    private function handleNonStreamedResponse(
+        RequestInterface $request,
+        array $payload,
+        Log\Model $log,
+        LogHandler\ILogHandler $logHandler,
+    ): ResponseInterface {
+        try {
+            $response = $this->sendRequest($request, $payload, false);
+        } catch (BadResponseException $e) {
+            $log->setReturnCode($e->getResponse()->getStatusCode())
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw $e;
+        } catch (ClientExceptionInterface $e) {
+            $log->setReturnCode(null)
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw $e;
+        }
+
+        // Do something with the response:
+        // extract the body, and also log it.
+        // OpenAI responses to non-streamed requests are a single JSON object
+        // (at least in the case of responses and chat completions), so it can
+        // be decoded and processed as a single object.
+        $responseBody = $response->getBody()->getContents();
+        $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+        $log = $logHandler->handleResponse($responseJson, $log);
+        $this->logMapper->save($log);
+
+        // Restore the body in its streamable glory
+        return $response->withBody(Utils::streamFor($responseBody));
+    }
+
+    /**
+     * Request a streamed response from the AI provider, and handle the logging
+     * and exceptions appropriately.
+     *
+     * @param RequestInterface       $request    The request to send.
+     * @param array                  $payload    The request body to send.
+     * @param Log\Model              $log        The log to write to.
+     * @param LogHandler\ILogHandler $logHandler The log handler to use for each message.
+     * @param int                    $chunkSize  How many bytes to read from each stream iteration.
+     * @return iterable<string> Each message in the stream as it's received.
+     * @throws ClientExceptionInterface if the request fails
+     * @throws MapperException          if somehow the log couldn't be saved
+     */
+    private function handleStreamedResponse(
+        RequestInterface $request,
+        array $payload,
+        Log\Model $log,
+        LogHandler\ILogHandler $logHandler,
+        int $chunkSize,
+    ): iterable {
+        $response = $this->sendRequest($request, $payload, true);
+
+        // This needs to be an event stream: otherwise raise an exception
+        $contentType = $response->getHeaderLine('Content-Type');
+        if (str_contains($contentType, 'text/event-stream')) {
+            foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
+                // The log should be saved in an incomplete form whenever an
+                // event is read, so in the case of failure something is logged.
+                yield $message->__toString();
+
+                // Update the log, and save it:
+                // even if that raises an exception, still save the log
+                try {
+                    $logHandler->handleMessage($message, $log);
+                } finally {
+                    $this->logMapper->save($log);
+                }
+            }
+
+            // If nothing happened: set a default return code, and save log
+            $log->setReturnCode($log->getReturnCode() ?? 200);
+            $this->logMapper->save($log);
+        } else {
+            // This is probably an error, so just finalise the log with whatever
+            // we got
+            $responseBody = $response->getBody()->getContents();
+            $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+            $log = $logHandler->handleResponse($responseJson, $log);
+            $this->logMapper->save($log);
+
+            // Convert it to a single message I guess, if finalising the log
+            // didn't raise an exception?
+            yield new EventStream\Message($responseBody)->__toString();
+        }
     }
 }

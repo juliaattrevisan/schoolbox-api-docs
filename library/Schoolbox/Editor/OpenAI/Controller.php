@@ -18,6 +18,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Scrub;
@@ -267,7 +268,6 @@ class Controller extends Base
                 $response = $agent->requestStream(
                     $this->getUser(),
                     $this->requestPost->get('userPrompt'),
-                    Helper::FEATURE_IMAGE,
                     $sessionId,
                     size: ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
                     style: ($this->requestPost->get('attributes') ?? [])['style'] ?? null,
@@ -281,12 +281,15 @@ class Controller extends Base
                 return;
             } catch (SchoolboxException $e) {
                 // This will always be a stream
+                // Unfortunately the exception isn't raised until the response
+                // is output, which doesn't happen until after this method
+                // returns.
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
                     ->asArray();
 
                 $this->response = $this
-                    ->responseAsEventStream(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                    ->responseAsJson($problem)
                     ->withStatus($e->getCode());
                 return;
             }
@@ -300,12 +303,8 @@ class Controller extends Base
                 ->asArray();
 
             $this->response = $this
-                ->responseAsEventStream(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                ->responseAsJson($problem)
                 ->withStatus($e->getCode());
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
             return;
         }
     }
@@ -347,17 +346,19 @@ class Controller extends Base
          */
         $aiSessionId = (string)Uuid::uuid4();
 
+        $agent = new CkEditorTextChat(
+            $this->clientFactory->buildForFeature(Helper::FEATURE_CHAT),
+            $chatConfig,
+        );
+
         try {
-            (new Helper(
-                trim($chatConfig[Config::FIELD_PROVIDER]['value']),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
-                $this->client,
-                $this->errorMapper,
-                $this->logMapper,
-            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
+            $response = $agent->requestStream(
+                $this->getUser(),
+                $this->request->getParsedBody(),
+                $aiSessionId
+            );
+            $this->response = $this->responseAsEventStream($response);
+            return;
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */

@@ -346,7 +346,7 @@ class Config
         foreach ($formInputs as $name => $formInput) {
             $section = $formInput['section'];
             match ($section) {
-                self::SECTION_GENERAL,  self::SECTION_OPENAI, self::SECTION_AZURE => $blank[$section][$name]['value'] = '',
+                self::SECTION_GENERAL, self::SECTION_OPENAI, self::SECTION_AZURE => $blank[$section][$name]['value'] = '',
                 default => $blank[$name]['value'] = '',
             };
         }

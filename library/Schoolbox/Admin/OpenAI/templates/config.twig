@@ -14,13 +14,13 @@
         {% set type = formInput.type %}
 
         {# As does style and attributes #}
-        {% if section == 'general'%}
+        {% if section == 'general' %}
             {% set dataAttrs = "data-feature-openai data-feature-azure" %}
             {% set style = 'display:none' %}
-        {% elseif section == 'OpenAI'%}
+        {% elseif section == 'OpenAI' %}
             {% set dataAttrs = "data-feature-openai" %}
             {% set style = 'display:none' %}
-        {% elseif section == 'Azure'%}
+        {% elseif section == 'Azure' %}
             {% set dataAttrs = "data-feature-azure" %}
             {% set style = 'display:none' %}
         {% else %}
