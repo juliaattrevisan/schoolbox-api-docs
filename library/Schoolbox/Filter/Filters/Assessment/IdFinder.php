@@ -614,7 +614,7 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
-        /* Dialog Agent
+        /* Dialog Agent - filters swamp
          */
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DIALOG_AGENT)) {
             $joinClause .= "
