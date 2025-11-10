@@ -513,6 +513,10 @@ class Controller extends BaseController
 
 
         /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
+         * TODO Potentially add $isPrimaryCarer to each of these clauses for more intricate behaviour, but I'm not that
+         *  sure about what $isPrimaryCarer's behaviour was supposed to be anymore. SA-12147 rewrote the whole page...
+         *  Anyway, from the docblocks, it seems that $isPrimaryCarer was supposed to restrict *which parent* could see
+         *  emergency contacts.
          */
         $hasContacts = count($contacts) > 0;
         $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
