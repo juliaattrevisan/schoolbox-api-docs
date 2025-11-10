@@ -362,16 +362,23 @@ class Controller extends BaseController
             $contactList = $this->externalUser->getStudentContactList([$student->getExternalId()]);
             foreach ($contactList as $contact) {
                 $main = null;
-                try {
-                    $main = $this->userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);
-                } catch (MapperException $e) {
-                    // noop
+
+                if (null !== $contact['StudentContactID']) {
+                    try {
+                        $main = $this->userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);
+                    } catch (MapperException $e) {
+                        // noop
+                    }
                 }
+
                 $spouse = null;
-                try {
-                    $spouse = $this->userMapper->findByExternalId($contact['StudentContactSpouseID'], Role::PARENT);
-                } catch (MapperException $e) {
-                    // noop
+
+                if (null !== $contact['StudentContactSpouseID']) {
+                    try {
+                        $spouse = $this->userMapper->findByExternalId($contact['StudentContactSpouseID'], Role::PARENT);
+                    } catch (MapperException $e) {
+                        // noop
+                    }
                 }
 
                 /* This is maybe a controversial change
