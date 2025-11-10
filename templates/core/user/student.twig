@@ -895,7 +895,7 @@
                                 {# up to 3 emergency contact blocks
                                  # show no header if no emergencies
                                  #}
-                                {% if hasEmergencyContacts %}
+                                {% if user.isShowContacts and hasEmergencyContacts %}
                                     <h2 class="subheader">Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">

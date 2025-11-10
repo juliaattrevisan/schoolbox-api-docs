@@ -539,7 +539,6 @@ class Controller extends BaseController
         ];
 
         /* Decide whether the Contacts tab should show for the viewer:
-         *   - the viewer must be a primary carer, or
          *   - the viewee's Hide Contact Details checkbox is unticked
          *
          * and:
@@ -547,7 +546,7 @@ class Controller extends BaseController
          *   - the viewee must have at least one contact, or
          *   - the viewee must have at least one emergency contact
          */
-        $hasContactTab = (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts));
+        $hasContactTab = $student->isShowContacts() && (count($contacts) > 0 || $hasEmergencyContacts);
 
         /* (For specific role types) If any of these fail, the tab should never exist */
         $tabConstraintsRoleType = [
