@@ -49,9 +49,8 @@ function onPrintSelected(): void {
                 class="icon-import"
                 :data-test="`up-header-${props.courseId}-import-link`"
                 :href="getReturnUrl(props.routeImportIntoClasses!)"
+                >Import into {{ locale.class.translate(true, true) }}</a
             >
-                Import into {{ locale.class.translate(true, true) }}
-            </a>
         </li>
         <li>
             <a href="#" class="icon-print" @click.prevent="onPrintSelected">Print Unit Planner</a>
