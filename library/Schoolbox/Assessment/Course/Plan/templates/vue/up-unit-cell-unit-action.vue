@@ -58,11 +58,13 @@ function onDeleteUnit(): void {
                 </li>
                 <!-- prettier-ignore -->
                 <li v-if="props.unit._routes.delete">
+                    <!-- we ignore this li as the formatting is adding whitespace -->
                     <button
                         class="icon-delete"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
                         @click.prevent="onDeleteUnit"
-                    >Delete</button>
+                    >Delete
+                    </button>
                 </li>
             </ul>
         </section>
