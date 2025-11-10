@@ -132,7 +132,7 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
      * published feedback with Resubmission Required.
      */
     if (mark.hrInstructor === "" && mark.norm === null) {
-      return "–";
+        return "–";
     }
 
     const relevantMark = mbStore.showDisplayMarks ? mark.hr : mark.hrInstructor;
