@@ -514,6 +514,7 @@ class Controller extends BaseController
 
         /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
          */
+        $hasContacts = count($contacts) > 0;
         $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
 
         /* (For all role types) If any of these fail, the tab should never exist */
@@ -546,7 +547,7 @@ class Controller extends BaseController
          *   - the viewee must have at least one contact, or
          *   - the viewee must have at least one emergency contact
          */
-        $hasContactTab = $student->isShowContacts() && (count($contacts) > 0 || $hasEmergencyContacts);
+        $hasContactTab = $student->isShowContacts() && ($hasContacts || $hasEmergencyContacts);
 
         /* (For specific role types) If any of these fail, the tab should never exist */
         $tabConstraintsRoleType = [
