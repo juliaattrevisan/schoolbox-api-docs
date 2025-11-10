@@ -10,7 +10,7 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
-use GuzzleHttp\Client;
+use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
@@ -20,8 +20,8 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
+use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
-use Scrub;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -39,9 +39,6 @@ class Controller extends Base
      * Controller constructor.
      */
     public function __construct(
-        private Client $client,
-        private \Schoolbox\Error\Mapper $errorMapper,
-        private Log\Mapper $logMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private ClientFactory $clientFactory,
     ) {
@@ -55,7 +52,7 @@ class Controller extends Base
      * @throws ClientExceptionInterface
      * @throws Deleted
      * @throws Exception
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function postLessonPlan(): void
     {
@@ -81,85 +78,33 @@ class Controller extends Base
         }
 
         try {
-            $helper = new Helper(
-                trim($lpConfig[Config::FIELD_PROVIDER]['value']),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_AIKEY]['value']),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
-                $this->client,
-                $this->errorMapper,
-                $this->logMapper,
-            );
-
-            $payloadGenerator = (new Payload\LessonPlan(
-                trim($lpConfig[Config::FIELD_PROVIDER]['value']),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
-                trim((string)$this->getConfigLoader()->get('spellcheck_language')),
-                $this->curriculumNodeMapper
-            ));
-
-            /* Generate a payload for ai, using the prompt pieces for System and User info
-             * From a POST payload
-             */
-            $inputs = [
-                'templateTitle' => $this->requestPost->get('templateTitle'),
-                'lessonPlanTitle' => $this->requestPost->get('lessonPlanTitle'),
-                'context' => $this->requestPost->get('context'),
-                'fields' => $this->requestPost->get('fields'),
-                'duration' => $this->requestPost->get('duration'),
-                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
-                'additionalContext' => $this->requestPost->get('additionalContext') ?? '',
-                'generateForField' => $this->requestPost->get('generateForField') ?? null,
-            ];
-
-//            $inputs = [
-//                'templateTitle' => 'MYP Unit Planner',
-//                'lessonPlanTitle' => 'Scott Science',
-//                'context' => 'Year 8 Science',
-//                'fields' => [
-//                    [
-//                        'id' => 'Learning Objectives',
-//                        'title' => 'Learning Objectives',
-//                        'description' => 'What students should learn from the lesson',
-//                        'visibility' => 'student',
-//                        'body' => '',
-//                        'selected' => true
-//                    ]
-//                ],
-//                'duration' => '17 minutes',
-//                'curriculumNodeIds' => [
-//                    4156, 4157, 4160
-//                ],
-//                'additionalContext' => '',
-//            ];
-
-            $payload = $payloadGenerator->generate(
-                $inputs['templateTitle'],
-                $inputs['lessonPlanTitle'],
-                $inputs['context'],
-                $inputs['fields'],
-                $inputs['duration'],
-                $inputs['curriculumNodeIds'],
-                $inputs['additionalContext'],
-                $inputs['generateForField'],
-            );
-
             /** gen a sessionID guid for keeping track of what is happening
              * for lessonplan each ai request is a new session
              */
             $aiSessionId = (string)Uuid::uuid4();
 
+            $lessonPlanAgent = new LessonPlanGeneration(
+                $this->clientFactory->buildForFeature(Helper::FEATURE_LESSONPLAN),
+                $lpConfig,
+                trim((string)$this->getConfigLoader()->get('spellcheck_language')),
+                $this->curriculumNodeMapper,
+            );
+
             try {
-                /* Send it and decode the result (if any: sometimes it returns null)
-                 * and dodge around all its weird encoding business with a double-decode,
-                 * and ditching all its training markdown (lol) that it loves to use
-                 *
-                 * https://community.openai.com/t/json-returning-with-json/584818/6
-                 */
-                $data = $helper->request($this->getUser(), $payload, Helper::FEATURE_LESSONPLAN, $aiSessionId);
+                [$response, $status] = $lessonPlanAgent->request(
+                    $this->user,
+                    $this->requestPost->get('templateTitle'),
+                    $this->requestPost->get('lessonPlanTitle'),
+                    $this->requestPost->get('context'),
+                    $this->requestPost->get('fields'),
+                    $this->requestPost->get('duration'),
+                    $this->requestPost->get('curriculumNodeIds'),
+                    $this->requestPost->get('additionalContext') ?? '',
+                    $this->requestPost->get('generateForField') ?? null,
+                    $aiSessionId,
+                );
+
+                $this->response = $this->responseAsJson($response)->withStatus($status);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
@@ -170,43 +115,6 @@ class Controller extends Base
 
                 return;
             }
-            /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
-            $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
-
-            /* if this didn't decode correctly (i.e. null) then some weird response came from the AI
-             * send that on... so we can figure out what happened
-             */
-            if ($newFieldData === null) {
-                $returnCode = 500;
-
-                $this->response = $this->responseAsJson([
-                    'output' => $data["output"]
-                ])->withStatus($returnCode);
-
-                return;
-            }
-
-            /* Since we request the fields to be keyed by their title, not ID for AI reasons,
-             * translate it back to IDs for frontend sanity
-             */
-            $fields = [];
-            foreach ($inputs['fields'] as $field) {
-                // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
-                $fieldKey = $payloadGenerator->getPayloadFieldKey($inputs['fields'], $field['id']);
-                if (isset($newFieldData[$fieldKey])) {
-                    $fields[$field['id']] = Scrub::html($newFieldData[$fieldKey]);
-                }
-            }
-
-            /* if the AI didn't return anything, then we don't want to send an empty field back
-             * just send whatever on earth the AI sent back to us, it'll be wrong... but it'll be something
-             */
-            if (empty($fields)) {
-                $fields = $newFieldData;
-            }
-
-            $this->response = $this->responseAsJson($fields);
-
             return;
         } catch (\DomainException $e) {
             /* Not configured? Not found
@@ -229,8 +137,8 @@ class Controller extends Base
      * Generates an image as part of a conversation
      *
      * @return void
-     * @throws Exception
-     * @throws \JsonException
+     * @throws ClientExceptionInterface
+     * @throws JsonException
      */
     public function postImage(): void
     {
@@ -315,8 +223,7 @@ class Controller extends Base
      * to /openai route via some direct javascript thing
      *
      * @return void
-     * @throws Exception
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function postAiAssistant(): void
     {

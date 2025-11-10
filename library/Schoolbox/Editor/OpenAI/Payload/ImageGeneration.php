@@ -99,21 +99,20 @@ class ImageGeneration
      * Generate the payload for creating an image
      * Optionally include a previousResponseId if this is part of a conversation
      *
-     * @param string $userPrompt
-     * @param array<string,?string> $userAttributes
-     * @param ?string $imageUrl
-     * @param ?string $previousResponseId
-     * @return string
-     * @throws \JsonException
+     * @param string      $userPrompt
+     * @param string|null $imageSize
+     * @param string|null $imageStyle
+     * @param string|null $imageUrl
+     * @param string|null $previousResponseId
+     * @return array
      */
     public function generate(
         string $userPrompt,
-        array $userAttributes,
+        ?string $imageSize,
+        ?string $imageStyle,
         ?string $imageUrl = null,
         ?string $previousResponseId = null,
-    ): string {
-        $attributes = self::parseAttributes($userAttributes);
-
+    ): array {
         /* See https://platform.openai.com/docs/api-reference/responses/create */
         $payload = [
             /* An ordered list of instructions for OpenAi
@@ -137,7 +136,7 @@ class ImageGeneration
                     'background' => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
                     'quality' => $this->imageOutputQuality,
-                    'size' => $attributes[self::ATTRIBUTE_KEY_SIZE] ?? 'auto',
+                    'size' => $imageSize ?? 'auto',
                 ],
             ],
             /* A kind of OpenAI currency to use in this request
@@ -158,7 +157,6 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $imageStyle = $attributes[self::ATTRIBUTE_KEY_STYLE];
         $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
             '[CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]' => trim($this->systemPrompt),
             '[IMAGE_STYLE]' => $imageStyle !== null ? sprintf(self::PROMPT_SYSTEM_IMAGE_STYLE, $imageStyle) : '',
@@ -196,7 +194,7 @@ class ImageGeneration
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        return json_encode($payload, JSON_THROW_ON_ERROR);
+        return $payload;
     }
 
     /**
@@ -223,43 +221,5 @@ class ImageGeneration
                 'required' => false,
             ],
         ];
-    }
-
-    /**
-     * Parses the attributes from the frontend, will throw if any of the attributes are invalid
-     * @param array<string,?string> $userAttributes
-     * @return array<string,?string>
-     * @throws \InvalidArgumentException
-     */
-    private static function parseAttributes(array $userAttributes): array
-    {
-        $parsed = [];
-
-        foreach (self::getAttributes() as $attribute) {
-            $parsed[$attribute['id']] = null;
-            $value = trim((string)($userAttributes[$attribute['id']] ?? ''));
-
-            /* Force values to always be either null or a meaningful string at the end */
-            if ('' === $value) {
-                $value = null;
-            }
-
-            if (null === $value) {
-                if (!$attribute['required']) {
-                    continue;
-                }
-
-                throw new \InvalidArgumentException("Attribute '{$attribute['id']}' is required");
-            }
-
-
-            if (!array_key_exists($value, $attribute['options'])) {
-                throw new \InvalidArgumentException("Attribute '{$attribute['id']}' has an invalid value: {$value}");
-            }
-
-            $parsed[$attribute['id']] = $value;
-        }
-
-        return $parsed;
     }
 }
