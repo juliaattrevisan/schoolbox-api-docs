@@ -840,16 +840,6 @@ input[type="checkbox"].plain {
     margin: 0;
     min-height: inherit;
 }
-
-body:not(.sbx-body) {
-    .checklist,
-    .radiolist {
-        input[type="radio"]:not(.plain),
-        input[type="checkbox"]:not(.plain) {
-            @include fancy-check();
-        }
-    }
-}
 .checklist .checklist {
     margin-left: 2rem;
 }
@@ -906,26 +896,20 @@ body:not(.sbx-body) {
     }
 }
 
-body:not(.sbx-body) {
-    .toggle-set {
-        display: flex;
-        justify-content: space-between;
-        max-width: 20rem;
+.toggle-set {
+    display: flex;
+    justify-content: space-between;
+    max-width: 20rem;
 
-        input[type="radio"]:not(.plain),
-        input[type="checkbox"]:not(.plain) {
-            @include vaporwave();
-        }
+    input[type="radio"]:not(.plain),
+    input[type="checkbox"]:not(.plain) {
+        @include vaporwave();
     }
 }
-
-body:not(.sbx-body) {
-    input[type="radio"]:not(.plain) {
-        @include fancy-check("radio-label");
-        @include vaporwave("input-toggle");
-    }
+input[type="radio"]:not(.plain) {
+    @include fancy-check("radio-label");
+    @include vaporwave("input-toggle");
 }
-
 input[type="checkbox"]:not(.plain) {
     @include fancy-check("checkbox-label");
     @include vaporwave("input-toggle");
@@ -1259,4 +1243,28 @@ input.invalid-data:focus {
     background-color: $alert-color;
     color: #fff;
     opacity: 1;
+}
+
+// UI uplift styles (.sbx-body) overrides for when UI uplift toggle is active
+body.sbx-body {
+    input[type="radio"]:not(.plain) {
+        &:has(+ label.block),
+        &:has(+ label.input-toggle),
+        + label.radio-label {
+            display: none;
+        }
+    }
+}
+body:not(.sbx-body) {
+    .checklist,
+    .radiolist {
+        input[type="radio"]:not(.plain),
+        input[type="checkbox"]:not(.plain) {
+            @include fancy-check();
+        }
+    }
+    input[type="radio"]:not(.plain) {
+        @include fancy-check("radio-label");
+        @include vaporwave("input-toggle");
+    }
 }
