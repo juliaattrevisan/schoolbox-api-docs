@@ -511,7 +511,6 @@ class Controller extends BaseController
         // scope (e.g. search results, grades).
         $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
 
-
         /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
          *
          * Anyway, from the docblocks, it seems that $isPrimaryCarer was supposed to restrict *which parent(s)* could see

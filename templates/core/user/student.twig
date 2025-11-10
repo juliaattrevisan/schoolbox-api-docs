@@ -731,9 +731,9 @@
                     <section class="content">
                         {% block contacts_island %}
                             {% block contacts %}
-                                <h2 class="subheader">Contact Information</h2>
-
                                 {% if user.isShowContacts and contacts|length %}
+                                    <h2>Contact Information</h2>
+
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% for contact in contacts %}
@@ -887,6 +887,7 @@
                                         </ul>
                                     </section>
                                 {% endif %}
+
                             {% endblock contacts %}
                         {% endblock contacts_island %}
 
@@ -896,7 +897,7 @@
                                  # show no header if no emergencies
                                  #}
                                 {% if user.isShowContacts and hasEmergencyContacts %}
-                                    <h2 class="subheader">Emergency Contact Information</h2>
+                                    <h2>Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% set i = 0 %}
