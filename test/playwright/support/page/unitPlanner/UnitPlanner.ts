@@ -32,6 +32,8 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_ACTIVITY_DELETE = "unit-planner-delete-activity-{activityId}";
 
+    static readonly DATA_TEST_ACTIVITY_DROPDOWN_OPTIONS = "unit-planner-{action}-activity-{activityId}";
+
     static readonly DATA_TEST_SELECT_CURRICULUM_LINK = "unit-planner-select-curriculum-code-{unitId}";
 
     static readonly DATA_TEST_REMOVE_CURRICULUM_ICON = "fn-list-node-remove-{nodeId}";
@@ -39,6 +41,10 @@ export default class UnitPlanner {
     static readonly DATA_TEST_MODAL_CONFIRM_DELETE_NODE = "fn-delete-node-confirm-{folderId}";
 
     static readonly DATA_TEST_UNIT_PLANNER_TABS = "unit-planner-tabs-{tabName}";
+
+    static readonly DATA_TEST_RUBRIC_MANAGE_DROPDOWN = "sbx-pop-out-dropdown-unit-{unitId}-rubric-capabilities-button";
+
+    static readonly DATA_TEST_CURRICULUM_CREATE_MODIFY = "unit-planner-curriculum-{action}-{folderId}";
 
     static readonly DATA_TEST_ADD_UNITS_NAME_INPUT = "up-add-units-name-input-{index}";
 
@@ -133,6 +139,23 @@ export default class UnitPlanner {
     }
 
     /**
+     * Check whether create activity button is presented in the unit or not
+     * pass true to check it is visible and false to check it is not visible
+     * @param unitId - The ID of the unit
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async checkCreateActivityButtonVisibility(unitId: number, shouldBeVisible: boolean): Promise<void> {
+        const createActivityButtonLocator = this.page.getByTestId(
+            UnitPlanner.DATA_TEST_CREATE_ACTIVITY_BUTTON.replace("{unitId}", unitId.toString()),
+        );
+        if (shouldBeVisible) {
+            await expect(createActivityButtonLocator).toBeVisible();
+        } else {
+            await expect(createActivityButtonLocator).not.toBeVisible();
+        }
+    }
+
+    /**
      * Click the create activity button
      * @param unitId - The ID of the unit
      */
@@ -140,6 +163,30 @@ export default class UnitPlanner {
         await this.page
             .getByTestId(UnitPlanner.DATA_TEST_CREATE_ACTIVITY_BUTTON.replace("{unitId}", unitId.toString()))
             .click();
+    }
+
+    /**
+     * Check if the options under Create Activity menu are presented based on the activity id and action
+     * @param action - The action to check: export, modify or delete
+     * @param activityId - The ID of the activity
+     * @param shouldBeVisible - Whether the option should be visible or not; pass true to check it is visible and false to check it is not visible
+     */
+    async checkActivityMenuOptionVisibility(
+        action: string,
+        activityId: number,
+        shouldBeVisible: boolean,
+    ): Promise<void> {
+        const activityMenuOptionLocator = this.page.getByTestId(
+            UnitPlanner.DATA_TEST_ACTIVITY_DROPDOWN_OPTIONS.replace("{action}", action).replace(
+                "{activityId}",
+                activityId.toString(),
+            ),
+        );
+        if (shouldBeVisible) {
+            await expect(activityMenuOptionLocator).toBeVisible();
+        } else {
+            await expect(activityMenuOptionLocator).not.toBeVisible();
+        }
     }
 
     /**
@@ -259,6 +306,102 @@ export default class UnitPlanner {
      */
     async clickUnitPlannerTabs(tabName: string): Promise<void> {
         await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_TABS.replace("{tabName}", tabName)).click();
+    }
+
+    /**
+     * Check if the unit is presented in the unit planner
+     * pass true to check it is visible and false to check it is not visible
+     * @param unitId - The ID of the unit
+     * @param shouldBeVisible - Whether the unit should be visible or not
+     */
+    async checkUnitVisibility(unitId: number, shouldBeVisible: boolean): Promise<void> {
+        const unitLinkLocator = this.page.getByTestId(
+            UnitPlanner.DATA_TEST_UNIT_LINK.replace("{unitId}", unitId.toString()),
+        );
+        if (shouldBeVisible) {
+            await expect(unitLinkLocator).toBeVisible();
+        } else {
+            await expect(unitLinkLocator).not.toBeVisible();
+        }
+    }
+
+    /**
+     * Check if the create text box button is presented in the unit
+     * pass true to check it is visible and false to check it is not visible
+     * @param unitId - The ID of the unit
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async checkCreateTextBoxButtonVisibility(unitId: number, shouldBeVisible: boolean): Promise<void> {
+        const createTextBoxButtonLocator = this.page.getByTestId(
+            UnitPlanner.DATA_TEST_CREATE_TEXT_BOX_BUTTON.replace("{unitId}", unitId.toString()),
+        );
+        if (shouldBeVisible) {
+            await expect(createTextBoxButtonLocator).toBeVisible();
+        } else {
+            await expect(createTextBoxButtonLocator).not.toBeVisible();
+        }
+    }
+
+    /**
+     * Check whether the create or modify curriculum button is presented in the unit or not
+     * pass 'create' to check the create button and 'modify' to check the modify button
+     * pass true to check it is visible and false to check it is not visible
+     * @param action - 'create' or 'modify'
+     * @param folderId - The ID of the folder
+     * @param shouldBeVisible - Whether the button should be visible or not
+     */
+    async checkCurriculumCreateModifyButtonVisibility(
+        action: "create" | "modify",
+        folderId: number,
+        shouldBeVisible: boolean,
+    ): Promise<void> {
+        const curriculumButtonLocator = this.page.getByTestId(
+            UnitPlanner.DATA_TEST_CURRICULUM_CREATE_MODIFY.replace("{action}", action).replace(
+                "{folderId}",
+                folderId.toString(),
+            ),
+        );
+        if (shouldBeVisible) {
+            await expect(curriculumButtonLocator).toBeVisible();
+        } else {
+            await expect(curriculumButtonLocator).not.toBeVisible();
+        }
+    }
+
+    /**
+     * Click the manage rubric capabilities dropdown
+     * @param unitId - The ID of the unit
+     */
+    async clickManageRubricCapabilitiesDropdown(unitId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_RUBRIC_MANAGE_DROPDOWN.replace("{unitId}", unitId.toString()))
+            .click();
+    }
+
+    /**
+     * Checks whether the Manage Course Capabilities and/or Manage Unit Capabilities options are visible in the dropdown or not
+     * set true to check course option and true to check unit option
+     * set false to check it is not visible
+     * @param unitId - The ID of the unit
+     * @param checkCourseOption - Whether to check for Manage Course Capabilities option
+     * @param checkUnitOption - Whether to check for Manage Unit Capabilities option
+     */
+    async checkRubricCapabilitiesOptions(
+        unitId: number,
+        checkCourseOption: boolean,
+        checkUnitOption: boolean,
+    ): Promise<void> {
+        const dropdownLocator = this.page.locator(`ul[id="dropdown-unit-${unitId}-rubric-capabilities"]`);
+        if (checkCourseOption === true) {
+            await expect(dropdownLocator).toContainText("Manage Course Capabilities");
+        } else {
+            await expect(dropdownLocator).not.toContainText("Manage Course Capabilities");
+        }
+        if (checkUnitOption === true) {
+            await expect(dropdownLocator).toContainText("Manage Unit Capabilities");
+        } else {
+            await expect(dropdownLocator).not.toContainText("Manage Unit Capabilities");
+        }
     }
 
     /**

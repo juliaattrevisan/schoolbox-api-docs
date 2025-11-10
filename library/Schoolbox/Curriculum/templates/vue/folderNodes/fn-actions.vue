@@ -28,7 +28,9 @@ function onModifySelected(): void {
 <template>
     <div v-if="folderNodesStore().hasLoaded" class="component-action">
         <section>
-            <button @click.prevent="onModifySelected">Modify Curriculum</button>
+            <button :data-test="`unit-planner-curriculum-modify-${props.folderId}`" @click.prevent="onModifySelected">
+                Modify Curriculum
+            </button>
         </section>
     </div>
 </template>
