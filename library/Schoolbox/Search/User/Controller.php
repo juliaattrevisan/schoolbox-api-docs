@@ -538,23 +538,33 @@ class Controller extends BaseController
             'contacts'     => true,
         ];
 
+        /* Decide whether the Contacts tab should show for the viewer:
+         *   - the viewer must be a primary carer, or
+         *   - the viewee's Hide Contact Details checkbox is unticked
+         *
+         * and:
+         *
+         *   - the viewee must have at least one contact, or
+         *   - the viewee must have at least one emergency contact
+         */
+        $hasContactTab = (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts));
+
         /* (For specific role types) If any of these fail, the tab should never exist */
         $tabConstraintsRoleType = [
             'student' => [
                 /* only a student can view their own profile tabs, this is checked by $tabs already so fall back to true */
                 '_default' => true,
-                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+                'contacts' => $hasContactTab,
             ],
             'parent'  => [
                 /* only parents of a student can view the contacts tab, this is checked by $tabs already so fall back to true */
                 '_default' => true,
-                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+                'contacts' => $hasContactTab,
             ],
             'staff'   => [
                 /* staff can view a student's profile tabs if their role has viewStudentProfile enabled */
                 '_default' => $this->getUser()->getRole()->getViewStudentProfile(),
-                'contacts' => $this->getUser()->getRole()->getViewStudentProfile()
-                    && (($student->isShowContacts() && count($contacts) > 0) || ($isPrimaryCarer && $hasEmergencyContacts)),
+                'contacts' => $this->getUser()->getRole()->getViewStudentProfile() && $hasContactTab,
             ],
         ];
 
