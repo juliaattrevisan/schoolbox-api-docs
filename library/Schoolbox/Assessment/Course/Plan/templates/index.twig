@@ -5,7 +5,7 @@
         course-title="{{ course.title }}"
         {% set routeFolderSequence = routeLookupIfAuthorized('folder.postFolderSequence', {id: course.folder.id, folder: course.folder}) %}
         :route-folder-sequence="{{ routeFolderSequence ? (routeFolderSequence |json_encode) : 'null' }}"
-        {% set routeImportIntoClasses = routeLookup('courseImport.getImport', { courseSpecId: course.id ?: 0, folderId: course.folder.id ?? 0, componentId: 0 }) %}
+        {% set routeImportIntoClasses = routeLookup('courseImport.getImport', { courseSpecId: course.id ?? 0, folderId: 0, componentId: 0 }) %}
         :route-import-into-classes="{{ routeImportIntoClasses ? (routeImportIntoClasses |json_encode) : 'null' }}"
         :units="{{ units |json_encode }}"
         :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
