@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 /**
@@ -100,19 +100,19 @@ $app = new class extends CliTool\App
         $remoteSystemName = ucwords($externalType);
 
             echo <<<HELP
-    
+
     Schoolbox Markbook Sync Script
-    
+
     Description:   Syncs existing markbook data from Schoolbox into {$remoteSystemName}
     Usage:         php sync.php --parent=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--perform] [--update-only]
-    
+
         --parent=xxx         the Schoolbox ID of parent folder to start the traversal, defaults to 0, format --parent=237
         --start=yyyy-mm-dd   Only sync work due after this date, format --start=2016-04-20, defaults to current semester
         --end=yyyy-mm-dd     Only sync work due before this date, format --end=2016-08-15, default to current semester
         -p, --perform:       if set, will actually update anything in the remote system, otherwise just a dry run
         --update-only:       if set, will not create any new items in the remote system, only updates existing markbooks
     {$additionalParameters}
-    
+
     HELP;
     }
 
