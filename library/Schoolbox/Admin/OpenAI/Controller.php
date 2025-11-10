@@ -10,12 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI;
 
-use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 
 class Controller extends ConfigController
@@ -28,19 +25,9 @@ class Controller extends ConfigController
     {
         $textFeatures = new Config()->fetchFeatures($this->getConfigMapper());
 
-        $imageConfigContext = $this->buildConfigContext(
-            $this->buildImageConfigPredicate(),
-            $this->routeGenerator->generate('adminOpenAi.postOptions'),
-        );
-
-        /* Make islands independent of each other for validation reasons
-         */
-        $imageConfigContext['formId'] = 'imageSettings';
-
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
-            'imageConfigContext' => $imageConfigContext,
             'features' => $textFeatures,
             'fields' => Config::FIELDS,
             'providers' => Config::PROVIDERS,
@@ -70,31 +57,15 @@ class Controller extends ConfigController
             $conf = $this->getConfigMapper()->findOneByColumn('name', $configName);
             // save the new config into that item
             try {
-                $conf->setValue($aiConf->encode($postData[$feature]));
+                $conf->setValue($aiConf->encode($postData[$feature], $feature));
             } catch (Exception $e) {
                 throw new Exception("Failed to encode config for feature '$feature': " . $e->getMessage(), 0, $e);
             }
             $this->getConfigMapper()->save($conf);
         }
 
-        /* Now save image config
-         */
-        $this->updateConfig($postData, $this->buildImageConfigPredicate());
-
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
-    }
-
-    /**
-     *
-     * Returns a predicate builder for finding all custom config for this module
-     *
-     * @return Builder
-     * @throws InvalidColumnException
-     */
-    private function buildImageConfigPredicate(): Builder
-    {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_IMAGE);
     }
 }

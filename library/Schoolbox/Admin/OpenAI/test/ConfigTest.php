@@ -150,7 +150,7 @@ class ConfigTest extends TestCase
         ];
 
         // Should not throw
-        $json = $cfg->encode($input);
+        $json = $cfg->encode($input, Helper::FEATURE_CHAT);
         $this->assertIsString($json);
 
         // decode should return an array
@@ -171,7 +171,7 @@ class ConfigTest extends TestCase
         $cfg = new Config();
         $this->expectException(\Schoolbox\Mapper\Exception::class);
         // provider validation happens before structure checks - provider must be nested ['value'=>...]
-        $cfg->encode([Config::FIELD_PROVIDER => ['value' => 'INVALID_PROVIDER']]);
+        $cfg->encode([Config::FIELD_PROVIDER => ['value' => 'INVALID_PROVIDER']], Helper::FEATURE_CHAT);
     }
 
     /**
@@ -183,17 +183,20 @@ class ConfigTest extends TestCase
         $this->expectException(\Schoolbox\Mapper\Exception::class);
 
         // missing the Azure top-level key -> should trigger invalid structure
-        $cfg->encode([
-            Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI],
-            Helper::ENDPOINT_TYPE_GENERAL => [
-                Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
-                Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+        $cfg->encode(
+            [
+                Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI],
+                Helper::ENDPOINT_TYPE_GENERAL => [
+                    Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
+                    Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+                ],
+                Helper::ENDPOINT_TYPE_OPENAI => [
+                    Config::FIELD_MODEL => ['value' => 'gpt-4o'],
+                ],
+                // NOTE: Helper::ENDPOINT_TYPE_AZURE is intentionally omitted
             ],
-            Helper::ENDPOINT_TYPE_OPENAI => [
-                Config::FIELD_MODEL => ['value' => 'gpt-4o'],
-            ],
-            // NOTE: Helper::ENDPOINT_TYPE_AZURE is intentionally omitted
-        ]);
+            Helper::FEATURE_CHAT,
+        );
     }
 
     /**
@@ -218,7 +221,7 @@ class ConfigTest extends TestCase
             ],
         ];
 
-        $json = $cfg->encode($input);
+        $json = $cfg->encode($input, Helper::FEATURE_CHAT);
         $this->assertIsString($json);
 
         $decoded = $cfg->decode($json);
@@ -251,7 +254,7 @@ class ConfigTest extends TestCase
         $this->expectException(\Schoolbox\Mapper\Exception::class);
 
         // should throw due to missing top-level OpenAI section
-        $cfg->encode($input);
+        $cfg->encode($input, Helper::FEATURE_CHAT);
     }
 
     /**
@@ -280,6 +283,6 @@ class ConfigTest extends TestCase
         $this->expectException(\Schoolbox\Mapper\Exception::class);
 
         // should throw due to extra nested field
-        $cfg->encode($input);
+        $cfg->encode($input, Helper::FEATURE_CHAT);
     }
 }
