@@ -111,6 +111,10 @@
     padding: 0 0 3px 3px;
 }
 
+// color picker input width fix
+.sbx-body input[type="text"].clr-color {
+    width: calc(100% - 80px);
+}
 // Additional styles for button in input group
 .sbx-body .input-group button.button.icon-search {
     align-items: center;
