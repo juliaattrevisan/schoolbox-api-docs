@@ -49,7 +49,7 @@
 .sbx-body input[type="url"],
 .sbx-body input[type="color"],
 .sbx-body .selectize-input,
-.sbx-body .c-filter-search-term__field {
+.sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -101,18 +101,9 @@
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
-/* Inline container used in the story  */
-.sbx .inline-input-container {
-    display: inline-flex;
-    align-items: stretch;
-    gap: var(--sbx-size-s);
-    flex-direction: row !important;
-    justify-content: flex-end;
-}
-
 // Selectize overrides to match input styles
 .sbx-body .selectize-input {
-    height: 2.5rem;
+    height: auto;
     line-height: 1.875rem;
     padding: 3px 0;
 }
