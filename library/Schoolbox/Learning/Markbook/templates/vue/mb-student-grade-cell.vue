@@ -131,11 +131,11 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
      * meaningful human-readable mark. This unfortunately might share the same signature as a draft mark and/or a
      * published feedback with Resubmission Required.
      */
-    const relevantMark = mbStore.showDisplayMarks ? mark.hr : mark.hrInstructor;
-
     if (mark.hrInstructor === "" && mark.norm === null) {
-        return "–";
+      return "–";
     }
+
+    const relevantMark = mbStore.showDisplayMarks ? mark.hr : mark.hrInstructor;
 
     return relevantMark ?? "–";
 }
