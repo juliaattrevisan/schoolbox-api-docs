@@ -3,35 +3,9 @@
  * Scope: UI Uplift
  */
 
-:root {
-    --sbx-animation-form-input-change: 100ms;
-}
+@use "sbx-form";
 
-/* Shared form input focus styles */
-@mixin form-input-focus {
-    background: var(--sbx-color-foreground-primary);
-    border-color: var(--sbx-color-accent);
-    outline: calc(var(--sbx-border-width-normal) + 2px) solid var(--sbx-color-accent);
-    outline-offset: calc(var(--sbx-border-width-normal) + 1px);
-}
-
-/* So the focus is not active on mouse click */
-@mixin form-input-focus-not-visible {
-    outline: 0;
-}
-
-/* Shared form input disabled styles */
-@mixin form-input-disabled {
-    background-color: var(--sbx-color-foreground-secondary);
-    color: var(--sbx-color-text-secondary) !important;
-    cursor: not-allowed;
-    pointer-events: auto;
-    & + label {
-        opacity: 1 !important;
-    }
-}
-
-/* Base */
+// Base
 .sbx-body input:not([type]),
 .sbx-body input[type="text"],
 .sbx-body input[type="number"],
@@ -62,13 +36,13 @@
     -webkit-font-smoothing: antialiased;
 
     &:focus {
-        @include form-input-focus;
+        @include sbx-form.form-input-focus;
     }
     &:focus:not(:focus-visible) {
-        @include form-input-focus-not-visible;
+        @include sbx-form.form-input-focus-not-visible;
     }
     &:disabled {
-        @include form-input-disabled;
+        @include sbx-form.form-input-disabled;
     }
 
     &[readonly] {
@@ -80,7 +54,7 @@
             color: inherit; // foundation fix
         }
         &:focus {
-            @include form-input-focus-not-visible;
+            @include sbx-form.form-input-focus-not-visible;
         }
     }
 }
@@ -89,14 +63,8 @@
 .sbx-body .input-group:has(> input[type="text"] + button) input[type="text"] {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
-/* States */
-.sbx-input-text--error[type="text"] {
-    border: 1px solid var(--sbx-color-alert);
-}
 
-.sbx-input-text--with-button[type="text"] {
-    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
-}
+// States
 .sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
@@ -122,10 +90,4 @@
     justify-content: center;
     margin: 0;
     padding: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    :root {
-        --sbx-animation-form-input-change: 0ms;
-    }
 }
