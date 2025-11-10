@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades;
 
-use Alaress_Date_Format;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
@@ -150,7 +150,9 @@ class Helper
             $workTypeAssessments = new GenericCollection(IAssessable::class);
             foreach ($folderAssessments as $folderAssessment) {
                 if (
-                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
+                    /* Filters swamp - only allow worktypes that show on the grades page (check Work Types in admin)
+                     */
+                    ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti || $folderAssessment instanceof DialogAgent) &&
                     $folderAssessment->getWorkType() &&
                     \in_array($folderAssessment->getWorkType()->getId(), $workTypes->getPropertyValues('id'), true) &&
                     $visibility->isVisibleToUserOrChildOfUser($folderAssessment, $viewer, true, null, !$this->access->isInstructor($viewer, $folderAssessment->getBaseContext()->getFolder()))
