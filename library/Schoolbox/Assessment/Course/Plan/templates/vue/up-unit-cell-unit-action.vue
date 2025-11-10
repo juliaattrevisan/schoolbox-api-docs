@@ -41,15 +41,6 @@ function onDeleteUnit(): void {
                         Course Markbook
                     </a>
                 </li>
-                <li v-if="props.unit._routes.delete">
-                    <button
-                        class="icon-delete"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
-                        @click.prevent="onDeleteUnit"
-                    >
-                        Delete
-                    </button>
-                </li>
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
                         class="icon-import"
@@ -66,6 +57,15 @@ function onDeleteUnit(): void {
                         :href="getReturnUrl(props.unit._routes.modify!)"
                         >Modify</a
                     >
+                </li>
+                <li v-if="props.unit._routes.delete">
+                    <button
+                        class="icon-delete"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
+                        @click.prevent="onDeleteUnit"
+                    >
+                        Delete
+                    </button>
                 </li>
             </ul>
         </section>
