@@ -53,4 +53,7 @@
     &:disabled {
         @include sbx-form.form-input-disabled;
     }
+    & + label {
+        cursor: pointer;
+    }
 }
