@@ -56,14 +56,13 @@ function onDeleteUnit(): void {
                         >Modify</a
                     >
                 </li>
+                <!-- prettier-ignore -->
                 <li v-if="props.unit._routes.delete">
                     <button
                         class="icon-delete"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
                         @click.prevent="onDeleteUnit"
-                    >
-                        Delete
-                    </button>
+                    >Delete</button>
                 </li>
             </ul>
         </section>
