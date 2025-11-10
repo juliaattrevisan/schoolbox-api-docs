@@ -642,6 +642,12 @@ class Controller extends BaseController
                 /* A set of contacts (if any) for this student
                  */
                 'contacts' => $contacts,
+                /* Decide whether the Contact Information island was meant to show
+                 */
+                'hasContacts' => $hasContacts,
+                /* Decide whether the Emergency Contact Information island was meant to show
+                 */
+                'hasEmergencyContacts' => $hasEmergencyContacts,
                 /* Decides if the Geosnapshot button could be accessed
                  */
                 'isGeosnapshotAvailable' => $isGeosnapshotAvailable,

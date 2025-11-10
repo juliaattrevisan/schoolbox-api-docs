@@ -13,11 +13,6 @@
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
 
-{# Emergency Contact Information. Due to non-normalised in the connectors we had to compile them
- # separately, and specially, in this new customisable payload.
- #}
-{% set hasEmergencyContacts = externalUser.data.roleTypes.tabs.emergencyContacts|length %}
-
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
     {
@@ -731,7 +726,7 @@
                     <section class="content">
                         {% block contacts_island %}
                             {% block contacts %}
-                                {% if user.isShowContacts and contacts|length %}
+                                {% if hasContacts %}
                                     <h2>Contact Information</h2>
 
                                     <section>
@@ -896,7 +891,7 @@
                                 {# up to 3 emergency contact blocks
                                  # show no header if no emergencies
                                  #}
-                                {% if user.isShowContacts and hasEmergencyContacts %}
+                                {% if hasEmergencyContacts %}
                                     <h2>Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">
