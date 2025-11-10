@@ -87,6 +87,15 @@ class Notifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle): void
     {
+        /* Ignore drafts in all circumstances: no notifications required
+         */
+        /** @var \Schoolbox\Learning\Moment\Model $moment */
+        $moment = $bundle->getEvent()->getObject();
+
+        if ($moment->isDraft()) {
+            return;
+        }
+
         $crudMethod = $bundle->getMethod();
 
         /**
@@ -112,6 +121,7 @@ class Notifier extends AbstractModuleNotifier
         /* When a learning moment gets updated to then be in Submitted For Approval
          */
         if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
+            $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         }
     }
@@ -153,8 +163,10 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        // if the learning moment is draft (now draft, may have just been created, may have been moved to draft, do not notify
-        if ($model->isDraft() || $model->isSubmitted()) {
+        /* Learning Moments only broadcast notifications if they're in Published or Rejected states.
+         * Drafts are disregarded in all cases for notifications and exited earlier in bundleTriggers instead of here.
+         */
+        if (!$model->isPublished() && !$model->isRejected()) {
             return $envelope;
         }
 
