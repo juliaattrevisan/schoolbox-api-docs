@@ -614,6 +614,17 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
+        /* Dialog Agent
+         */
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DIALOG_AGENT)) {
+            $joinClause .= "
+                $joinType JOIN dialog_agent dialogAgent ON dialogAgent.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('dialogAgent.id');
+            }
+        }
+
         // Project
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
             $joinClause .= "
