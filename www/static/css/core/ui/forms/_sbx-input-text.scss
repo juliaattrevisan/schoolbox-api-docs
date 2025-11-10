@@ -48,9 +48,8 @@
 .sbx-body input[type="time"],
 .sbx-body input[type="url"],
 .sbx-body input[type="color"],
-.sbx-body textarea,
 .sbx-body .selectize-input,
-.sbx-body .c-filter-search-term__field {
+.sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -86,10 +85,10 @@
     }
 }
 
-.input-group input[type="text"] {
+.sbx-body .input-group:has(> input[type="text"] + a) input[type="text"],
+.sbx-body .input-group:has(> input[type="text"] + button) input[type="text"] {
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
-
 /* States */
 .sbx-input-text--error[type="text"] {
     border: 1px solid var(--sbx-color-alert);
@@ -102,18 +101,9 @@
     border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
 }
 
-/* Inline container used in the story  */
-.sbx .inline-input-container {
-    display: inline-flex;
-    align-items: stretch;
-    gap: var(--sbx-size-s);
-    flex-direction: row !important;
-    justify-content: flex-end;
-}
-
 // Selectize overrides to match input styles
 .sbx-body .selectize-input {
-    height: 2.5rem;
+    height: auto;
     line-height: 1.875rem;
     padding: 3px 0;
 }
@@ -121,6 +111,10 @@
     padding: 0 0 3px 3px;
 }
 
+// color picker input width fix
+.sbx-body input[type="text"].clr-color {
+    width: calc(100% - 80px);
+}
 // Additional styles for button in input group
 .sbx-body .input-group button.button.icon-search {
     align-items: center;

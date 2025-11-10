@@ -156,11 +156,6 @@ async function applyFilters(): Promise<void> {
         display: grid;
         transition: grid-template-rows 300ms;
     }
-
-    &__inner-container {
-        overflow: hidden;
-    }
-
     &__toggle-button {
         background: none;
         color: var(--content-ui-foreground);

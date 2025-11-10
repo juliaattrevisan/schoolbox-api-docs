@@ -134,7 +134,7 @@
 
 {% endif %}
 </head>
-<body class="login side">
+<body class="login side {{ config.advanced_ui_enabled ? 'sbx-body' : '' }}">
 <div id="container">
 	<div id="content">
 		<form id="login" method="post" action="{{ routeLookup('login.postLogin') }}?{{ requestParams|escape }}">
