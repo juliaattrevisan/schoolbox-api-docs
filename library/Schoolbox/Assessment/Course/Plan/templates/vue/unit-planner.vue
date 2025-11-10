@@ -4,10 +4,8 @@
  */
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
-import locale from "@js/terminology/rosettaStone";
 import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
@@ -26,6 +24,7 @@ interface Props {
     courseTitle: string;
     units: Unit[];
     routeFolderSequence: string | null;
+    routeImportIntoClasses: string | null;
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
     routeCurriculumCoverage: string | null;
@@ -34,7 +33,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
-const addStore = useAddUnitsStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
@@ -127,9 +125,6 @@ window.Vue.watch(
 
 window.Vue.onBeforeMount(() => {
     store.init(props.courseId, props.units, props.template, props.editorTemplates);
-});
-
-window.Vue.onMounted(() => {
     activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
@@ -137,7 +132,9 @@ window.Vue.onMounted(() => {
         headerRowHeight,
         unitPlannerContainerScrollTop,
     );
+});
 
+window.Vue.onMounted(() => {
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
     resizeObserver.value.observe(document.querySelector("#container")!);
@@ -167,6 +164,7 @@ window.Vue.onUnmounted(() => {
         :course-id="store.courseId"
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
+        :route-import-into-classes="props.routeImportIntoClasses"
     />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
@@ -237,15 +235,6 @@ window.Vue.onUnmounted(() => {
                                 :is-sortable-placeholder="true"
                             />
                         </template>
-                    </div>
-                    <div class="fixed-left l-pad-s f-no-margins no-print">
-                        <button
-                            class="button icon-add"
-                            data-test="unit-planner-create-units"
-                            @click.prevent="addStore.prompt()"
-                        >
-                            Create {{ locale.unit.translate(true, true) }}
-                        </button>
                     </div>
                 </div>
             </div>

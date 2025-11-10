@@ -37,26 +37,15 @@ function onDeleteUnit(): void {
                         class="icon-curriculum"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-course-link`"
                         :href="getReturnUrl(props.unit._routes.courseMarkbook!)"
-                    >
-                        Course Markbook
+                        >Course Markbook
                     </a>
-                </li>
-                <li v-if="props.unit._routes.delete">
-                    <button
-                        class="icon-delete"
-                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
-                        @click.prevent="onDeleteUnit"
-                    >
-                        Delete
-                    </button>
                 </li>
                 <li v-if="props.unit._routes.importIntoClasses">
                     <a
                         class="icon-import"
                         :data-test="`up-unit-cell-unit-action-${props.unit.id}-import-link`"
                         :href="getReturnUrl(props.unit._routes.importIntoClasses!)"
-                    >
-                        Import into {{ locale.class.translate(true, true) }}
+                        >Import into {{ locale.class.translate(true, true) }}
                     </a>
                 </li>
                 <li v-if="props.unit._routes.modify">
@@ -66,6 +55,16 @@ function onDeleteUnit(): void {
                         :href="getReturnUrl(props.unit._routes.modify!)"
                         >Modify</a
                     >
+                </li>
+                <!-- prettier-ignore -->
+                <li v-if="props.unit._routes.delete">
+                    <!-- we ignore this li as the formatting is adding whitespace -->
+                    <button
+                        class="icon-delete"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
+                        @click.prevent="onDeleteUnit"
+                    >Delete
+                    </button>
                 </li>
             </ul>
         </section>
