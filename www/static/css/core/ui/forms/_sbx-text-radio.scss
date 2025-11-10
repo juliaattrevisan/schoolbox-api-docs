@@ -3,32 +3,8 @@
  * Scope: UI Uplift
  */
 
-:root {
-    --sbx-animation-form-input-change: 100ms;
-}
-/* Shared form input focus styles */
-@mixin form-input-focus {
-    background: var(--sbx-color-foreground-primary);
-    border-color: var(--sbx-color-accent);
-    outline: calc(var(--sbx-border-width-normal) + 2px) solid var(--sbx-color-accent);
-    outline-offset: calc(var(--sbx-border-width-normal) + 1px);
-}
+@use "sbx-form";
 
-/* So the focus is not active on mouse click */
-@mixin form-input-focus-not-visible {
-    outline: 0;
-}
-
-/* Shared form input disabled styles */
-@mixin form-input-disabled {
-    background-color: var(--sbx-color-foreground-secondary);
-    color: var(--sbx-color-text-secondary) !important;
-    cursor: not-allowed;
-    pointer-events: auto;
-    & + label {
-        opacity: 1 !important;
-    }
-}
 .sbx-body input[type="radio"] {
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
@@ -69,16 +45,12 @@
         transform: scale(1);
     }
     &:focus {
-        @include form-input-focus;
+        @include sbx-form.form-input-focus;
     }
     &:focus:not(:focus-visible) {
-        @include form-input-focus-not-visible;
+        @include sbx-form.form-input-focus-not-visible;
     }
     &:disabled {
-        @include form-input-disabled;
-    }
-    &.sbx-input-radio--intermediate::before {
-        clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
-        transform: scale(1);
+        @include sbx-form.form-input-disabled;
     }
 }
