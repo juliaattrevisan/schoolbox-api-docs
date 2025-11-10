@@ -125,9 +125,6 @@ window.Vue.watch(
 
 window.Vue.onBeforeMount(() => {
     store.init(props.courseId, props.units, props.template, props.editorTemplates);
-});
-
-window.Vue.onMounted(() => {
     activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
@@ -135,7 +132,9 @@ window.Vue.onMounted(() => {
         headerRowHeight,
         unitPlannerContainerScrollTop,
     );
+});
 
+window.Vue.onMounted(() => {
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateContainerHeight);
     resizeObserver.value.observe(document.querySelector("#container")!);
