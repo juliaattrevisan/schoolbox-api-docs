@@ -126,8 +126,7 @@ class Controller extends Base
         $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         // if we are only showing clashes, filter the event list now
-        $clashesOnlyList = new GenericCollection(EventInterface::class);
-
+        $clashesOnlyList = [];
         if ($clashesOnly) {
             foreach ($eventList as $event) {
                 // check if any other events clash with us (overlapping time, same resource)
@@ -185,22 +184,13 @@ class Controller extends Base
                 });
                 // if we have any collisions, add them to the list
                 foreach ($collides as $collideEvent) {
-                    $clashesOnlyList->add($collideEvent);
+                    // de-duplicate, use hash from object
+                    $eventHash = spl_object_hash($collideEvent);
+                    $clashesOnlyList[$eventHash] = $collideEvent;
                 }
             }
-
-                // de duplicate the clash list
-                $dupesCheck = [];
-                $eventV2 = new GenericCollection(EventInterface::class);
-                foreach ($clashesOnlyList as $collideEvent) {
-                    $dupe = spl_object_hash($collideEvent);
-                    if (!in_array($dupe, $dupesCheck, true)) {
-                        $dupesCheck[] = $dupe;
-                        $eventV2->add($collideEvent);
-                    }
-                }
             // collisions should overwrite the event list
-            $eventList = $eventV2;
+            $eventList = $clashesOnlyList;
         }
 
         $this->response = $this->responseFromTemplate(
