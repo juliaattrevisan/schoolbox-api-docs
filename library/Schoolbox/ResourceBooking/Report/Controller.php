@@ -122,7 +122,14 @@ class Controller extends Base
             )
         );
 
-        // we may be editing this list, so temp var it
+        /*
+         * we may be editing this list, so temp var it
+         * explicitly set the types of events, as buildFromResourceCollection only returns these types
+         * \Calendar\Event\Type\ResourceBooking\Event
+         * \Calendar\Event\Type\Timetable\Event
+         * \Calendar\Event\Type\SudsTimetable\Event
+         */
+        /** @var GenericCollection<\Calendar\Event\Type\ResourceBooking\Event | \Calendar\Event\Type\Timetable\Event | \Calendar\Event\Type\SudsTimetable\Event> $eventList */
         $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         // if we are only showing clashes, filter the event list now
