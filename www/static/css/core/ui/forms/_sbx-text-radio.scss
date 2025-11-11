@@ -50,8 +50,11 @@
     &:focus:not(:focus-visible) {
         @include sbx-form.form-input-focus-not-visible;
     }
-    &:disabled {
+    &:disabled,
+    &[readonly] {
         @include sbx-form.form-input-disabled;
+        cursor: not-allowed;
+        pointer-events: none;
     }
     & + label {
         cursor: pointer;
