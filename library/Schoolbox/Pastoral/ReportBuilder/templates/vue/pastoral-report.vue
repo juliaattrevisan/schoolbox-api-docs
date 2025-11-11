@@ -108,7 +108,7 @@ function onPrintSelected(): void {
             </nav>
         </div>
         <div>
-            <dl v-if="props.tabs.length > 1" class="tabs">
+            <dl v-if="props.tabs.length > 1" class="tabs no-print">
                 <dd
                     v-for="tab in props.tabs"
                     :key="tab.type"
@@ -134,5 +134,19 @@ function onPrintSelected(): void {
     --sbx-pr-table-row-hover-colour: #f4f3f3;
     --sbx-pr-table-first-header-width: 250px;
     --sbx-pr-table-total-header-width: 110px;
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+    .scrollable {
+        max-height: none !important; /* Expand scrollable elements to full height in print view */
+        overflow: visible !important; /* Ensure all content is visible */
+    }
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
+    }
 }
 </style>
