@@ -24,7 +24,7 @@ const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
  */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
-urlParams.set("limit", "10");
+urlParams.set("limit", "50");
 url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
