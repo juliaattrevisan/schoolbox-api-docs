@@ -116,8 +116,6 @@ function printAllRecords(): void {
     scopeUrl.value = `${selectedTab?.value._links.view}?${scopeUrlParams.toString()}`; // load all records
 }
 
-defineExpose({ printAllRecords });
-
 // #endregion Print all records
 </script>
 
