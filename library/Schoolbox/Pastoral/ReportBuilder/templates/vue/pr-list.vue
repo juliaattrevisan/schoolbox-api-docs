@@ -6,9 +6,9 @@
 import { toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
+import PrGeneratePrint from "./pr-generate-print.vue";
 import { useLoadRecords } from "./composable/useLoadRecords";
 import { usePrintRecords } from "./composable/usePrintRecords";
 import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
@@ -82,12 +82,7 @@ defineExpose({ printAllRecords });
             <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />
         </template>
     </div>
-    <basic-modal v-model:is-open="isLoadingPrint" size="s">
-        <div class="l-flex-col l-flex--center l-gap-s">
-            <div class="loader"></div>
-            <h3><em>Generating print report, please wait... </em></h3>
-        </div>
-    </basic-modal>
+    <pr-generate-print v-model:is-loading="isLoadingPrint" />
 </template>
 
 <style scoped></style>

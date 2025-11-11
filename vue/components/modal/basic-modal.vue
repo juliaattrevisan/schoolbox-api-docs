@@ -13,8 +13,14 @@ interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
     isCloseDisabled?: boolean; // Whether to disable closing the modal
     size?: "m" | "s"; // Size of the modal, 'm' for medium and 's' for small
+    showCloseButton?: boolean; // Whether to show the close button
 }
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    hasBackgroundClick: false,
+    isCloseDisabled: false,
+    size: "m",
+    showCloseButton: true,
+});
 
 const modalSize = window.Vue.computed(() => props.size || "m"); // Default size is medium
 const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
@@ -77,6 +83,7 @@ function onBackgroundClick(): void {
                     <div class="modal__container_main"><slot></slot></div>
                     <slot name="footer"></slot>
                     <button
+                        v-if="props.showCloseButton"
                         class="close-modal"
                         title="Close modal"
                         aria-label="Close modal"

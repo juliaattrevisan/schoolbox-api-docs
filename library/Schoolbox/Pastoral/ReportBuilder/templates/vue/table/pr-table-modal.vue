@@ -12,6 +12,7 @@ import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
 import { usePrintRecords } from "../composable/usePrintRecords";
 import PrRecord from "../pr-record.vue";
+import PrGeneratePrint from "../pr-generate-print.vue";
 
 const props = defineProps<{
     selectedCell: SelectedCell | null;
@@ -152,6 +153,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
             </div>
         </template>
     </basic-modal>
+    <pr-generate-print v-model:is-loading="isLoadingPrint" />
 </template>
 
 <style scoped>
