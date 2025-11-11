@@ -24,7 +24,7 @@ const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
  */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
-urlParams.set("limit", "1000");
+urlParams.set("limit", "50");
 url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
@@ -45,26 +45,39 @@ window.Vue.onMounted(async (): Promise<void> => {
     });
 });
 
+// #region Print all records
+
+const hasPrinted = window.Vue.ref(false);
+
 /**
- * Load all records for printing
+ * Print all records in the list
  */
-function loadAllRecords(): void {
-    // all records are already loaded
-    if (payload.value && payload.value.metadata.cursor.next === null) {
+function printAllRecords(): void {
+    // print previously selected so we don't re-fetch again
+    if (hasPrinted.value) {
         window.print();
         return;
     }
-    urlParams.set("limit", "1000");
+    // all records are already loaded so just print
+    if (payload.value && payload.value.metadata.cursor.next === null) {
+        window.print();
+        hasPrinted.value = true;
+        return;
+    }
     watchOnce(payload, async () => {
         // triggers only once - wait for all images to load before printing
         await window.Vue.nextTick();
         await waitForAllImages(containerEl.value);
         window.print();
+        hasPrinted.value = true;
     });
-    url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
+    urlParams.set("limit", "1000");
+    url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`; // load all records
 }
 
-defineExpose({ loadAllRecords });
+defineExpose({ printAllRecords });
+
+// #endregion Print all records
 </script>
 
 <template>

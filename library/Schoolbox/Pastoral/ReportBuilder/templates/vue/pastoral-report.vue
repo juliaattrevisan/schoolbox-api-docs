@@ -78,7 +78,7 @@ window.Vue.onMounted((): void => {
  * Print the records in the list view
  */
 function onPrintSelected(): void {
-    prListEl.value?.loadAllRecords();
+    prListEl.value?.printAllRecords();
 }
 </script>
 
