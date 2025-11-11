@@ -152,4 +152,82 @@ class Client
 
         return json_decode($deanonymisationResponse->getBody()->getContents(), true);
     }
+
+    /**
+     * Anonymise `$text`, and also return a mapping of anonymised tokens to
+     * their original values.
+     *
+     * The original text should be able to be restored with `strtr`:
+     * ```php
+     * $anonymisedResult = $this->anonymiseWithTokens($text);
+     * $originalText = strtr($anonymisedResult['anonymisedText'], $anonymisedResult['pairs']);
+     * ```
+     *
+     * A more useful real-world example is asymmetric de-anonymisation:
+     * using an anonymised value as the input to another function, which will
+     * generate text based on that value, which must be de-anonymised.
+     * ```php
+     * $anonymisedResult = $this->anonymiseWithTokens($text);
+     * $anonymisedValue = someOtherFunction($anonymisedResult['anonymisedText']);
+     * $deanonymisedValue = strtr($anonymisedValue, $anonymisedResult['pairs']);
+     * ```
+     *
+     * @param string $text
+     * @return array{anonymisedText: string, pairs: array<string, string>}
+     */
+    public function anonymiseWithTokens(string $text): array
+    {
+        $analysisItems   = $this->analyse($text);
+        $anonymiseResult = $this->anonymise($text, $analysisItems, new Anonymiser\Hash());
+        $anonymisedText  = $anonymiseResult['text'];
+        $anonymiseItems  = $anonymiseResult['items'];
+
+        usort($analysisItems, $this->sortItems(...));
+        usort($anonymiseItems, $this->sortItems(...));
+
+        $anonPairs = [];
+        foreach ($analysisItems as $item) {
+            $anonPairs[] = $this->extractToken($text, $item);
+        }
+        $deanonPairs = [];
+        foreach ($anonymiseItems as $item) {
+            $deanonPairs[] = $this->extractToken($anonymisedText, $item);
+        }
+
+        return [
+            'anonymisedText' => $anonymisedText,
+            'pairs'          => array_combine($anonPairs, $deanonPairs),
+        ];
+    }
+
+    /**
+     * Sort items returned by `$this->analyse()` and `$this->anonymise()`.
+     *
+     * Required by `$this->anonymiseWithTokens()`: it depends on the items being
+     * processed in order.
+     *
+     * @param array $itemA
+     * @param array $itemB
+     * @return int
+     */
+    private function sortItems(array $itemA, array $itemB): int
+    {
+        if (!isset($itemA['start'], $itemB['start'])) {
+            return 0;
+        }
+        return $itemA['start'] <=> $itemB['start'];
+    }
+
+    /**
+     * Extract the token from `$text` referenced by `$item`.
+     *
+     * @param string $text The text from which to extract the token.
+     * @param array  $item A single item returned by `$this->analyse()` or
+     *                    `$this->anonymise()`.
+     * @return string
+     */
+    private function extractToken(string $text, array $item): string
+    {
+        return mb_substr($text, $item['start'], $item['end'] - $item['start']);
+    }
 }
