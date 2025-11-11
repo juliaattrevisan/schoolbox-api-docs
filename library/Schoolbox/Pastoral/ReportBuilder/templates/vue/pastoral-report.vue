@@ -19,8 +19,8 @@ const props = defineProps<{
     severityColors: SeverityColors;
 }>();
 
-// Create reactive state
 const selectedTab = window.Vue.ref<Tab | null>(null);
+const prListEl = window.Vue.useTemplateRef<InstanceType<typeof PrList>>("prListEl");
 const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
 const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
@@ -74,9 +74,10 @@ window.Vue.onMounted((): void => {
     }
 });
 
-const prListEl = window.Vue.useTemplateRef<InstanceType<typeof PrList>>("prListEl");
-
-function onPrint(): void {
+/**
+ * Print the records in the list view
+ */
+function onPrintSelected(): void {
     prListEl.value?.loadAllRecords();
 }
 </script>
@@ -91,7 +92,7 @@ function onPrint(): void {
                     class="sbx-icon-only-button f-no-margins"
                     aria-label="Print records"
                     title="Print records"
-                    @click="onPrint"
+                    @click="onPrintSelected"
                 >
                     <sbx-icon name="print" />
                 </button>
