@@ -66,14 +66,14 @@
                          </label>
 
                          <select id="language" name="language">
-                             {% for value, name in languages.available %}
+                             {% for value in languages.available %}
                                  {% set selected = '' %}
 
                                  {% if value == languages.selected %}
                                     {% set selected = 'selected' %}
                                  {% endif %}
 
-                                 <option value="{{ value }}" {{ selected }}>{{ name }}</option>
+                                 <option value="{{ value }}" {{ selected }}>{{ value }}</option>
                              {% endfor %}
                          </select>
                      </div>
