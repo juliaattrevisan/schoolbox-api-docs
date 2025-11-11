@@ -90,8 +90,8 @@ function onPrintSelected(): void {
                 <button
                     v-if="selectedTab?.type === TabType.LIST"
                     class="sbx-icon-only-button f-no-margins"
-                    aria-label="Print records"
-                    title="Print records"
+                    aria-label="Print Report Results"
+                    title="Print Report Results"
                     @click="onPrintSelected"
                 >
                     <sbx-icon name="print" />

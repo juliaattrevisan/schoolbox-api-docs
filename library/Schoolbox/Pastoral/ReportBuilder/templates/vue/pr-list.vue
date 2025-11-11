@@ -6,6 +6,7 @@
 import { toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
 import { useLoadRecords } from "./composable/useLoadRecords";
@@ -23,7 +24,7 @@ const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
  */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
-urlParams.set("limit", "50");
+urlParams.set("limit", "10");
 url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
@@ -48,7 +49,13 @@ window.Vue.onMounted(async (): Promise<void> => {
  * Print all records in the list
  */
 const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
-const { printAllRecords } = usePrintRecords(url, urlParams, payload, containerEl, selectedTab?.value._links.view);
+const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
+    url,
+    urlParams,
+    payload,
+    containerEl,
+    selectedTab?.value._links.view,
+);
 defineExpose({ printAllRecords });
 </script>
 
@@ -75,6 +82,12 @@ defineExpose({ printAllRecords });
             <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />
         </template>
     </div>
+    <basic-modal v-model:is-open="isLoadingPrint" size="s">
+        <div class="l-flex-col l-flex--center l-gap-s">
+            <div class="loader"></div>
+            <h3><em>Generating print report, please wait... </em></h3>
+        </div>
+    </basic-modal>
 </template>
 
 <style scoped></style>

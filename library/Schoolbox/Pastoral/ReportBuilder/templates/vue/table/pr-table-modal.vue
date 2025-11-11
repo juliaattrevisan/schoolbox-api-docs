@@ -89,7 +89,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
  * Print all records in the list modal
  */
 const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
-const { printAllRecords } = usePrintRecords(
+const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
     scopeUrl,
     scopeUrlParams,
     payload,
@@ -116,8 +116,8 @@ const { printAllRecords } = usePrintRecords(
                     <nav class="l-flex-row l-flex--align-center f-no-margins">
                         <button
                             class="sbx-icon-only-button f-no-margins"
-                            aria-label="Print records"
-                            title="Print records"
+                            aria-label="Print Report Results"
+                            title="Print Report Results"
                             @click="printAllRecords"
                         >
                             <sbx-icon name="print" />
