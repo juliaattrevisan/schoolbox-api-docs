@@ -135,9 +135,12 @@ class Controller extends Base
                     /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $otherEvent */
                     /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $event */
 
+                    // fetch the resource IDs (depending on type, we hydrate differently)
+                    $eventResourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event) ? $event->getBooking()->getResource()->getId() : $event->getResourceId();
+                    $otherEventResourceId = ($otherEvent instanceof \Calendar\Event\Type\ResourceBooking\Event) ? $otherEvent->getBooking()->getResource()->getId() : $otherEvent->getResourceId();
 
                     // must be same resource
-                    if ((int)$otherEvent->getResourceId() !== (int)$event->getResourceId()) {
+                    if ((int)$eventResourceId !== (int)$otherEventResourceId) {
                         return false;
                     }
 
@@ -148,11 +151,6 @@ class Controller extends Base
                     ) {
                         // skip ourself
                         if ($otherEvent->getBooking()->getId() === $event->getBooking()->getId()) {
-                            return false;
-                        }
-
-                        // must be same resource (redundant check, but safe)
-                        if ($otherEvent->getBooking()->getResource()->getId() !== $event->getBooking()->getResource()->getId()) {
                             return false;
                         }
 
