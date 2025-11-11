@@ -24,7 +24,7 @@ const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
  */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
-urlParams.set("limit", "10");
+urlParams.set("limit", "50");
 url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
@@ -49,6 +49,11 @@ window.Vue.onMounted(async (): Promise<void> => {
  * Load all records for printing
  */
 function loadAllRecords(): void {
+    // all records are already loaded
+    if (payload.value && payload.value.metadata.cursor.next === null) {
+        window.print();
+        return;
+    }
     urlParams.set("limit", "1000");
     watchOnce(payload, async () => {
         // triggers only once - wait for all images to load before printing
