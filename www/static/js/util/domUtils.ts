@@ -349,3 +349,33 @@ export function addMarks(toMark: string, wordList: string[], allowPartialMatches
     });
     return marked;
 }
+
+/**
+ * Wait for all images to load before showing print dialog
+ * @param containerEl - the container element to search for images within
+ */
+export async function waitForAllImages(containerEl: HTMLElement | null): Promise<void> {
+    await window.Vue.nextTick();
+    // Find all images in the container
+    const images = containerEl?.querySelectorAll("img") || [];
+    // Create promises for each image
+    const imagePromises = Array.from(images).map((img) => {
+        return new Promise<void>((resolve) => {
+            if (img.complete) {
+                // Image already loaded
+                resolve();
+            } else {
+                // Wait for image to load or error
+                const onLoad = (): void => {
+                    img.removeEventListener("load", onLoad);
+                    img.removeEventListener("error", onLoad);
+                    resolve();
+                };
+                img.addEventListener("load", onLoad);
+                img.addEventListener("error", onLoad);
+            }
+        });
+    });
+    // Wait for all images to finish loading
+    await Promise.all(imagePromises);
+}

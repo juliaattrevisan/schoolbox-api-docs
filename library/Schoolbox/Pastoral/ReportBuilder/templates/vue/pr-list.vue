@@ -6,6 +6,7 @@
 import { toRefs, type Ref } from "vue";
 import { useScroll, watchOnce } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import { waitForAllImages } from "@js/util/domUtils";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
 import { useLoadRecords } from "./composable/useLoadRecords";
@@ -45,45 +46,14 @@ window.Vue.onMounted(async (): Promise<void> => {
 });
 
 /**
- * Wait for all images to load before showing print dialog
- */
-async function waitForAllImages(): Promise<void> {
-    await window.Vue.nextTick();
-
-    // Find all images in the scrollable container
-    const images = containerEl.value?.querySelectorAll("img") || [];
-
-    // Create promises for each image
-    const imagePromises = Array.from(images).map((img) => {
-        return new Promise<void>((resolve) => {
-            if (img.complete) {
-                // Image already loaded
-                resolve();
-            } else {
-                // Wait for image to load or error
-                const onLoad = (): void => {
-                    img.removeEventListener("load", onLoad);
-                    img.removeEventListener("error", onLoad);
-                    resolve();
-                };
-                img.addEventListener("load", onLoad);
-                img.addEventListener("error", onLoad);
-            }
-        });
-    });
-
-    // Wait for all images to finish loading
-    await Promise.all(imagePromises);
-}
-
-/**
- *
+ * Load all records for printing
  */
 function loadAllRecords(): void {
     urlParams.set("limit", "50");
     watchOnce(payload, async () => {
         // triggers only once - wait for all images to load before printing
-        await waitForAllImages();
+        await window.Vue.nextTick();
+        await waitForAllImages(containerEl.value);
         window.print();
     });
     url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
