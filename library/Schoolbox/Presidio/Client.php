@@ -123,7 +123,7 @@ class Client
      * @param string             $text            Text to de-anonymise, from the `text` key of `$this->anonymise()`.
      * @param array              $anonymiseResult Result of the anonymisation process, from the `items` key of
      *                                            `$this->anonymise()`.
-     * @param Anonymiser\Decrypt $anonymiser      The decrypt anonymiser to use: must use the same key as the
+     * @param Anonymiser\Decrypt $decrypt         The decrypt anonymiser to use: must use the same key as the
      *                                            `Anonymiser\Encrypt` instance used in `$this->anonymise()`.
      * @return array{text: string, items: array} text: de-anonymised text
      *                                           items: a list of what was de-anonymised
