@@ -160,4 +160,16 @@ function onBackgroundClick(): void {
 .v-leave-to {
     opacity: 0;
 }
+
+@media print {
+    // Override modal styles for print view, making it inline and fully expanded
+    .modal {
+        height: auto;
+        overflow: visible;
+        position: absolute;
+    }
+    .modal__container {
+        top: 0;
+    }
+}
 </style>

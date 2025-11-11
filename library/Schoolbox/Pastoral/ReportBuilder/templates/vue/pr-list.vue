@@ -17,7 +17,6 @@ const props = defineProps<{
 }>();
 
 const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
-const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
 
 /**
  * Load the initial records
@@ -47,6 +46,7 @@ window.Vue.onMounted(async (): Promise<void> => {
 
 // #region Print all records
 
+const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
 const hasPrinted = window.Vue.ref(false);
 
 /**

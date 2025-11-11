@@ -148,7 +148,7 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
-        <div ref="containerRef" class="pr-table-container" data-test="pr-table-container">
+        <div ref="containerRef" class="pr-table-container hide-on-print" data-test="pr-table-container">
             <table class="pr-table">
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
