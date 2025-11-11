@@ -14,9 +14,10 @@ class Base
 {
     /**
      * Maximum number of results returnable from the cursor at once:
-     * IMO 20 results is a sensible maximum.
+     * We've updated to 1000 to account for the need to trigger a
+     * print load, where 'all' results are needed.
      */
-    public const LIMIT_MAX = 20;
+    public const LIMIT_MAX = 1000;
 
     /**
      * Minimum number of results returnable and should really be more than 0
