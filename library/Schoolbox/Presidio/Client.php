@@ -241,17 +241,4 @@ class Client
         }
         return $itemA['start'] <=> $itemB['start'];
     }
-
-    /**
-     * Extract the token from `$text` referenced by `$item`.
-     *
-     * @param string $text The text from which to extract the token.
-     * @param array  $item A single item returned by `$this->analyse()` or
-     *                    `$this->anonymise()`.
-     * @return string
-     */
-    private function extractToken(string $text, array $item): string
-    {
-        return mb_substr($text, $item['start'], $item['end'] - $item['start']);
-    }
 }
