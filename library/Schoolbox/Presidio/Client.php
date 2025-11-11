@@ -172,11 +172,16 @@ class Client
      * $deanonymisedValue = strtr($anonymisedValue, $anonymisedResult['pairs']);
      * ```
      *
-     * @param string $text
+     * @param string                    $text         The text to anonymise.
+     * @param ?callable(string): string $hashFunction A function which takes a value to anonymise, and anonymises it.
+     *                                                Defaults to a sha-1 hash.
      * @return array{anonymisedText: string, pairs: array<string, string>}
      */
-    public function anonymiseWithTokens(string $text): array
+    public function anonymiseWithTokens(string $text, ?callable $hashFunction = null): array
     {
+        if (!isset($hashFunction)) {
+            $hashFunction = fn ($value) => hash('sha1', $value);
+        }
         // It is possible to do this without the anonymiser:
         // that gives more control over how the anonymised text is generated.
         $analysisItems = $this->analyse($text);
@@ -202,8 +207,8 @@ class Client
             // Everything from start to end of token: anonymised
             $value = mb_substr($text, $start, $end - $start);
 
-            // TODO consider a callback for calculating the anonymised value
-            $anonValue         = hash('sha1', $value);
+            // Anonymise the value, and add it to pairs and anonymised value
+            $anonValue         = $hashFunction($value);
             $anonymiseParts[]  = $anonValue;
             $pairs[$anonValue] = $value;
 
