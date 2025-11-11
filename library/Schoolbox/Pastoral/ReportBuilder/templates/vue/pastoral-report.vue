@@ -7,6 +7,7 @@ import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./table/pr-table.vue";
+import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
 
 const props = defineProps<{
     title: string;
@@ -33,6 +34,12 @@ window.Vue.provide("routes", props.routes);
 window.Vue.provide("localePastoral", props.localePastoral);
 window.Vue.provide("showSeverity", props.showSeverity);
 window.Vue.provide("severityColors", props.severityColors);
+
+/**
+ * Keep the container below the height of the viewport
+ */
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth);
 
 /**
  * Handle tab selection and update URL without adding to browser history
@@ -109,8 +116,10 @@ function onPrint(): void {
                 </dd>
             </dl>
             <template v-if="selectedTab">
-                <pr-list v-if="selectedTab.type === TabType.LIST" ref="prListEl" :min-width="minWidth" />
-                <pr-table v-else v-model:records-or-points="recordsOrPoints" :min-width="minWidth" />
+                <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
+                    <pr-list v-if="selectedTab.type === TabType.LIST" ref="prListEl" :scrollable-el="scrollableEl" />
+                    <pr-table v-else v-model:records-or-points="recordsOrPoints" :min-width="minWidth" />
+                </div>
             </template>
         </div>
     </div>
