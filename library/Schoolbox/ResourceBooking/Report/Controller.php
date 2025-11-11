@@ -135,6 +135,12 @@ class Controller extends Base
                     /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $otherEvent */
                     /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $event */
 
+
+                    // must be same resource
+                    if ((int)$otherEvent->getResourceId() !== (int)$event->getResourceId()) {
+                        return false;
+                    }
+
                     // only check for status of pending bookings if they are resource bookings
                     if (
                         $otherEvent instanceof \Calendar\Event\Type\ResourceBooking\Event &&
@@ -145,7 +151,7 @@ class Controller extends Base
                             return false;
                         }
 
-                        // must be same resource
+                        // must be same resource (redundant check, but safe)
                         if ($otherEvent->getBooking()->getResource()->getId() !== $event->getBooking()->getResource()->getId()) {
                             return false;
                         }
@@ -157,11 +163,8 @@ class Controller extends Base
                     } elseif (
                         $event instanceof \Calendar\Event\Type\Timetable\Event &&
                         $otherEvent instanceof \Calendar\Event\Type\Timetable\Event
-                    ) { // if not booking, then assume its a timetable event, which may have a resource id, so check that
-                        if ((int)$otherEvent->getResourceId() !== (int)$event->getResourceId()) {
-                            return false;
-                        }
-
+                    ) {
+                        // if not booking, then assume its a timetable event
                         // check if the for the same homepage (class)
                         if ($event->getCategoryId() === $otherEvent->getCategoryId()) {
                             return false;
