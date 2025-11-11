@@ -85,8 +85,9 @@ function onPrint(): void {
     <div class="l-flex-col l-gap-m">
         <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
-            <nav v-if="selectedTab?._links.export" class="l-flex-row l-flex--align-center f-no-margins">
+            <nav class="l-flex-row l-flex--align-center f-no-margins">
                 <button
+                    v-if="selectedTab?.type === TabType.LIST"
                     class="sbx-icon-only-button f-no-margins"
                     aria-label="Print records"
                     title="Print records"
@@ -95,6 +96,7 @@ function onPrint(): void {
                     <sbx-icon name="print" />
                 </button>
                 <a
+                    v-if="selectedTab?._links.export"
                     class="sbx-icon-only-button f-no-margins"
                     :href="`${selectedTab._links.export}?selected=${recordsOrPoints}`"
                     aria-label="Download Report as CSV"
