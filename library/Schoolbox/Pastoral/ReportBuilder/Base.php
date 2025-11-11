@@ -68,9 +68,9 @@ class Base
         if (null !== $this->limit) {
             /* Set a maximum number of results should be returned otherwise reject
              */
-            if ($this->limit > static::LIMIT_MAX) {
+            if ($this->limit > self::LIMIT_MAX) {
                 throw new ValueError(
-                    sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
+                    sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit),
                     self::BAD_REQUEST_ERROR_CODE
                 );
             }
