@@ -30,16 +30,18 @@ const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRe
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
  */
-const { arrivedState } = useScroll(props.scrollableEl, {
-    offset: { bottom: 30 },
-});
-
-const { bottom } = toRefs(arrivedState);
-window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
-        urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
-    }
+window.Vue.onMounted(async (): Promise<void> => {
+    await window.Vue.nextTick();
+    const { arrivedState } = useScroll(props.scrollableEl, {
+        offset: { bottom: 30 },
+    });
+    const { bottom } = toRefs(arrivedState);
+    window.Vue.watch(bottom, (isAtBottom) => {
+        if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
+            urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
+            url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
+        }
+    });
 });
 
 /**
