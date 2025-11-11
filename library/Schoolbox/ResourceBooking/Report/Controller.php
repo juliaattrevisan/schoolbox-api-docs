@@ -129,32 +129,45 @@ class Controller extends Base
         $clashesOnlyList = new GenericCollection(EventInterface::class);
         if ($clashesOnly) {
             foreach ($eventList as $event) {
-                // only care about resource booking events (they SHOULD all be resource bookings anyway)
-                if (!($event instanceof \Calendar\Event\Type\ResourceBooking\Event)) {
-                    continue;
-                }
-
                 // check if any other events clash with us (overlapping time, same resource)
                 $collides = $eventList->filter(function ($otherEvent) use ($event) {
-                    /* @var \Calendar\Event\Type\ResourceBooking\Event $otherEvent */
-                    /* @var \Calendar\Event\Type\ResourceBooking\Event $event */
+                    /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $otherEvent */
+                    /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $event */
 
-                    // only care if the booking is pending, so we can see conflicts (that we need to action)
-                    if ($otherEvent->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
-                        return false;
+                    // only check for status of pending bookings if they are resource bookings
+                    if (
+                        $otherEvent instanceof \Calendar\Event\Type\ResourceBooking\Event &&
+                        $event instanceof \Calendar\Event\Type\ResourceBooking\Event
+                    ) {
+                        // skip ourself
+                        if ($otherEvent->getBooking()->getId() === $event->getBooking()->getId()) {
+                            return false;
+                        }
+
+                        // must be same resource
+                        if ($otherEvent->getBooking()->getResource()->getId() !== $event->getBooking()->getResource()->getId()) {
+                            return false;
+                        }
+
+                        // only care if the booking is pending, so we can see conflicts (that we need to action)
+                        if ($otherEvent->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
+                            return false;
+                        }
+                    } elseif (
+                        $event instanceof \Calendar\Event\Type\Timetable\Event &&
+                        $otherEvent instanceof \Calendar\Event\Type\Timetable\Event
+                    ) { // if not booking, then assume its a timetable event, which may have a resource id, so check that
+                        if ((int)$otherEvent->getResourceId() !== (int)$event->getResourceId()) {
+                            return false;
+                        }
+
+                        // check if the for the same homepage (class)
+                        if ($event->getCategoryId() === $otherEvent->getCategoryId()) {
+                            return false;
+                        }
                     }
 
-                    // skip ourself
-                    if ($otherEvent->getBooking()->getId() === $event->getBooking()->getId()) {
-                        return false;
-                    }
-
-                    // must be same resource
-                    if ($otherEvent->getBooking()->getResource()->getId() !== $event->getBooking()->getResource()->getId()) {
-                        return false;
-                    }
-
-                    // check for time overlap
+                    // check for time overlap (for collisions)
                     if (
                         $event->getStartTime()->getDateTimeObject()->getTimestamp() <= $otherEvent->getEndTime()->getDateTimeObject()->getTimestamp()
                         && $event->getEndTime()->getDateTimeObject()->getTimestamp() >= $otherEvent->getStartTime()->getDateTimeObject()->getTimestamp()
@@ -162,6 +175,7 @@ class Controller extends Base
                         return true;
                     }
 
+                    // no collision, safe to ignore
                     return false;
                 });
                 // if we have any collisions, add them to the list
