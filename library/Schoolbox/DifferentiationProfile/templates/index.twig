@@ -4,6 +4,23 @@
     [ locale.differentiationProfile.plural ]
 ) }}
 
+{% set reportContentId = 'manage-differentiation-profiles-container' %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                document.dispatchEvent(new CustomEvent('manage-differentiation-profiles__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
+            });
+        });
+    </script>
+{% endautoescape %}
+
 <div class="f-container">
     <div class="l-flex-col l-gap-m">
         <div class="f-no-margins">
@@ -11,17 +28,17 @@
         </div>
         <div>
             {% include '@filters/panel.twig' with {
-                contentId: 'filterPanel',
+                contentId: reportContentId,
                 panel:     filterPanel,
                 quickload: false,
             } only %}
         </div>
-        <div id="manage-differentiation-profiles-container">
+        <div id="{{ reportContentId }}" class="f-no-margins" data-test="manage-differentiation-profiles-container">
             <manage-differentiation-profiles
                 :header='{{ header|json_encode|raw }}'
                 :adjustment-categories='{{ adjustmentCategories|json_encode|raw }}'
                 :adjustment-levels='{{ adjustmentLevels|json_encode|raw }}'
-                :profiles='{{ profiles|json_encode|raw }}'
+                route='{{ route }}'
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/manageDifferentiationProfiles.js?v={{ config.site_version }}"></script>

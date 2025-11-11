@@ -27,6 +27,9 @@ export default class PastoralExpiry {
 
     static readonly DATA_TEST_APPLY_DEFAULT_EXPIRY_CHECKBOX = "audiences-modify-apply-default-expiry";
 
+    static readonly DATA_TEST_CONTRIBUTE_DIFFERENTIATION_PROFILE_CHECKBOX =
+        "audiences-modify-contribute-differentiation-profile";
+
     static readonly DATA_TEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
 
     static readonly SELECTOR_VISIBILITY_ROLE_LINK = 'a[title="Add Role"]';
@@ -117,6 +120,13 @@ export default class PastoralExpiry {
      */
     async clickApplyDefaultExpiry(): Promise<void> {
         await this.page.getByTestId(PastoralExpiry.DATA_TEST_APPLY_DEFAULT_EXPIRY_CHECKBOX).click();
+    }
+
+    /**
+     * Click apply to differentiation profiles checkbox
+     */
+    async clickApplyToDifferentiationProfiles(): Promise<void> {
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_CONTRIBUTE_DIFFERENTIATION_PROFILE_CHECKBOX).click();
     }
 
     /**

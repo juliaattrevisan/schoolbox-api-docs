@@ -3,11 +3,13 @@
  * To display a grid-like display
  */
 
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { Header } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     header: Header[];
     rows: { [key: string]: unknown }[];
+    isLoading: boolean;
 }>();
 
 /**
@@ -33,26 +35,29 @@ const gridTemplateColumns = window.Vue.computed(() => {
                     {{ item.title }}
                 </div>
             </div>
-            <div
-                v-for="(row, index) in props.rows"
-                :key="index"
-                class="mdp-grid__row"
-                :data-test="`mdp-grid-row-${index}`"
-            >
+            <loading-table v-if="props.isLoading" :rows="5" :only-body="true" row-height="5rem" />
+            <template v-else>
                 <div
-                    v-for="item in props.header"
-                    :key="item.id"
-                    :class="{
-                        'fixed-left': item.isFixed,
-                    }"
+                    v-for="(row, index) in props.rows"
+                    :key="index"
+                    class="mdp-grid__row"
+                    :data-test="`mdp-grid-row-${index}`"
                 >
-                    <!-- Use dynamic slot based on header type, fallback to default content -->
-                    <slot :name="item.type" :row="row" :header="item" :row-index="index">
-                        <!-- Default content if no slot is provided -->
-                        {{ row[item.key] }}
-                    </slot>
+                    <div
+                        v-for="item in props.header"
+                        :key="item.id"
+                        :class="{
+                            'fixed-left': item.isFixed,
+                        }"
+                    >
+                        <!-- Use dynamic slot based on header type, fallback to default content -->
+                        <slot :name="item.type" :row="row" :header="item" :row-index="index">
+                            <!-- Default content if no slot is provided -->
+                            {{ row[item.key] }}
+                        </slot>
+                    </div>
                 </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>

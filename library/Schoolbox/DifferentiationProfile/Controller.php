@@ -33,7 +33,7 @@ class Controller extends Base
      * @param RosettaStone                 $rosettaStone
      * @param AdjustmentCategoriesMapper   $adjustmentCategoriesMapper
      * @param AdjustmentLevelsMapper       $adjustmentLevelsMapper
-     * @param AdminConfigMapper            $differentiationProifleConfigMapper
+     * @param AdminConfigMapper            $differentiationProfileConfigMapper
      * @param AdminConfigModelToArray      $adminConfigModelToArray
      * @param IFactoryFactory              $filterFactoryFactory
      * @param Mapper                       $filterMapper
@@ -44,7 +44,7 @@ class Controller extends Base
         private RosettaStone $rosettaStone,
         private AdjustmentCategoriesMapper $adjustmentCategoriesMapper,
         private AdjustmentLevelsMapper $adjustmentLevelsMapper,
-        private AdminConfigMapper $differentiationProifleConfigMapper,
+        private AdminConfigMapper $differentiationProfileConfigMapper,
         private AdminConfigModelToArray $adminConfigModelToArray,
         private IFactoryFactory $filterFactoryFactory,
         private \Schoolbox\Filter\Mapper $filterMapper,
@@ -60,13 +60,15 @@ class Controller extends Base
      */
     public function manageDifferentiationProfiles(): void
     {
+        $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
+        $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
         $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
 
-        $route = $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData');
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
-            $route,
+            null,
             $this->getUser(),
             [],
             $this->requestQuery->getArrayCopy(),
@@ -74,16 +76,32 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             '@differentiationProfiles/index.twig',
-            ['filterPanel' => $filterPanel],
+            [
+                'filterPanel' => $filterPanel,
+                'adjustmentCategories' => $adjustmentCategories->map(
+                    fn(AdjustmentCategoriesModel $category) => [
+                        'id'   => $category->getId(),
+                        'name' => $category->getName(),
+                    ]
+                ),
+                'adjustmentLevels'     => $adjustmentLevels->map(
+                    fn(AdjustmentLevelsModel $level) => [
+                        'id'   => $level->getId(),
+                        'name' => $level->getName(),
+                    ]
+                ),
+                'header'               => $adminConfigs->map(
+                    fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
+                ),
+                'route' => $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData'),
+            ],
             "Manage $translation"
         );
     }
 
     public function getDifferentiationProfileData(): void
     {
-        $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
-        $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
-        $adminConfigs         = $this->differentiationProifleConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
 
         $profileTranslator = new ModelToArray(
             $this->getRouter()->getGenerator(),
@@ -95,7 +113,7 @@ class Controller extends Base
         $page                = \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
         $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
 
-        $limit = $this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
+        $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
 
         // Convert the request into a set of selections, and update them in the frontend
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
@@ -170,21 +188,6 @@ class Controller extends Base
 
         $payload = [
             'profiles'             => $data,
-            'adjustmentCategories' => $adjustmentCategories->map(
-                fn(AdjustmentCategoriesModel $category) => [
-                    'id'   => $category->getId(),
-                    'name' => $category->getName(),
-                ]
-            ),
-            'adjustmentLevels'     => $adjustmentLevels->map(
-                fn(AdjustmentLevelsModel $level) => [
-                    'id'   => $level->getId(),
-                    'name' => $level->getName(),
-                ]
-            ),
-            'header'               => $adminConfigs->map(
-                fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
-            ),
         ];
         $this->response = $this->responseAsJson([
             'data' => $payload,
