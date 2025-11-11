@@ -177,26 +177,45 @@ class Client
      */
     public function anonymiseWithTokens(string $text): array
     {
-        $analysisItems   = $this->analyse($text);
-        $anonymiseResult = $this->anonymise($text, $analysisItems, new Anonymiser\Hash());
-        $anonymisedText  = $anonymiseResult['text'];
-        $anonymiseItems  = $anonymiseResult['items'];
-
+        // It is possible to do this without the anonymiser:
+        // that gives more control over how the anonymised text is generated.
+        $analysisItems = $this->analyse($text);
         usort($analysisItems, $this->sortItems(...));
-        usort($anonymiseItems, $this->sortItems(...));
 
-        $anonPairs = [];
+        // Go thru each analysis item, and:
+        // * keep the text between the previous item and this one unanonymised
+        // * anonymise the text in this item
+        $anonymiseParts = [];
+        $lastEnd        = 0;
+        $pairs = [];
         foreach ($analysisItems as $item) {
-            $anonPairs[] = $this->extractToken($text, $item);
-        }
-        $deanonPairs = [];
-        foreach ($anonymiseItems as $item) {
-            $deanonPairs[] = $this->extractToken($anonymisedText, $item);
+            // Somehow start and end don't exist? Skip
+            if (!isset($item['start'], $item['end'])) {
+                continue;
+            }
+            $start = $item['start'];
+            $end   = $item['end'];
+
+            // Everything from last end to start of token: unanonymised
+            $anonymiseParts[] = mb_substr($text, $lastEnd, $start - $lastEnd);
+
+            // Everything from start to end of token: anonymised
+            $value = mb_substr($text, $start, $end - $start);
+
+            // TODO consider a callback for calculating the anonymised value
+            $anonValue         = hash('sha1', $value);
+            $anonymiseParts[]  = $anonValue;
+            $pairs[$anonValue] = $value;
+
+            // Next item: check from the end of this one
+            $lastEnd = $end;
         }
 
+        // Add the remaining content after the last item, unanonymised
+        $anonymiseParts[] = mb_substr($text, $lastEnd);
         return [
-            'anonymisedText' => $anonymisedText,
-            'pairs'          => array_combine($anonPairs, $deanonPairs),
+            'anonymisedText' => implode('', $anonymiseParts),
+            'pairs'          => $pairs,
         ];
     }
 
