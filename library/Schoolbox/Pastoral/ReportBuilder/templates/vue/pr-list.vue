@@ -4,12 +4,12 @@
  */
 
 import { toRefs, type Ref } from "vue";
-import { useScroll, watchOnce } from "@vueuse/core";
+import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import { waitForAllImages } from "@js/util/domUtils";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
 import { useLoadRecords } from "./composable/useLoadRecords";
+import { usePrintRecords } from "./composable/usePrintRecords";
 import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
@@ -44,40 +44,12 @@ window.Vue.onMounted(async (): Promise<void> => {
     });
 });
 
-// #region Print all records
-
-const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
-const hasPrinted = window.Vue.ref(false);
-
 /**
  * Print all records in the list
  */
-function printAllRecords(): void {
-    // print previously selected so we don't re-fetch again
-    if (hasPrinted.value) {
-        window.print();
-        return;
-    }
-    // all records are already loaded so just print
-    if (payload.value && payload.value.metadata.cursor.next === null) {
-        window.print();
-        hasPrinted.value = true;
-        return;
-    }
-    watchOnce(payload, async () => {
-        // triggers only once - wait for all images to load before printing
-        await window.Vue.nextTick();
-        await waitForAllImages(containerEl.value);
-        window.print();
-        hasPrinted.value = true;
-    });
-    urlParams.set("limit", "1000");
-    url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`; // load all records
-}
-
+const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
+const { printAllRecords } = usePrintRecords(url, urlParams, payload, containerEl, selectedTab?.value._links.view);
 defineExpose({ printAllRecords });
-
-// #endregion Print all records
 </script>
 
 <template>

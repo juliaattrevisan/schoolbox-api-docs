@@ -4,13 +4,13 @@
  */
 
 import { useTemplateRef, toRefs, type Ref } from "vue";
-import { useScroll, watchOnce } from "@vueuse/core";
-import { waitForAllImages } from "@js/util/domUtils";
+import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { TableHeader, SelectedCell, Tab } from "../../js/types/pastoralReportTypes";
 import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
+import { usePrintRecords } from "../composable/usePrintRecords";
 import PrRecord from "../pr-record.vue";
 
 const props = defineProps<{
@@ -85,38 +85,17 @@ window.Vue.watch(bottom, (isAtBottom) => {
     }
 });
 
-// #region Print all records
-
-const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
-const hasPrinted = window.Vue.ref(false);
-
 /**
- * Print all records in the list
+ * Print all records in the list modal
  */
-function printAllRecords(): void {
-    // print previously selected so we don't re-fetch again
-    if (hasPrinted.value) {
-        window.print();
-        return;
-    }
-    // all records are already loaded so just print
-    if (payload.value && payload.value.metadata.cursor.next === null) {
-        window.print();
-        hasPrinted.value = true;
-        return;
-    }
-    watchOnce(payload, async () => {
-        // triggers only once - wait for all images to load before printing
-        await window.Vue.nextTick();
-        await waitForAllImages(containerEl.value);
-        window.print();
-        hasPrinted.value = true;
-    });
-    scopeUrlParams.set("limit", "1000");
-    scopeUrl.value = `${selectedTab?.value._links.view}?${scopeUrlParams.toString()}`; // load all records
-}
-
-// #endregion Print all records
+const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
+const { printAllRecords } = usePrintRecords(
+    scopeUrl,
+    scopeUrlParams,
+    payload,
+    containerEl,
+    selectedTab?.value._links.scope,
+);
 </script>
 
 <template>
