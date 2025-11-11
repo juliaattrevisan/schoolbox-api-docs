@@ -251,6 +251,7 @@ const isFirstUnit = window.Vue.computed(() => {
             <div v-if="!contentIsEmpty" class="content-overlay">
                 <div class="show-more-container" :data-visible="showViewMoreGradient">
                     <button
+                        :data-test="`unit-planner-view-more-button-${props.unit.id}-${props.column.type}`"
                         :data-visible="showViewMoreInner"
                         :tabindex="showViewMoreInner ? 0 : -1"
                         @click.prevent="store.toggleViewMore(props.unit.id)"

@@ -52,6 +52,12 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_ADD_UNITS_CREATE_BUTTON = "up-add-units-create";
 
+    static readonly DATA_TEST_DROPDOWN_MENU = "sbx-pop-out-unit-dropdown-button";
+
+    static readonly DATA_TEST_IMPORT_INTO_CLASS_OPTION = "up-header-{courseId}-import-link";
+
+    static readonly DATA_TEST_VIEW_MORE = "unit-planner-view-more-button-{unitId}-{columType}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -476,5 +482,48 @@ export default class UnitPlanner {
             await db.dontHaveInDatabase("perms", { cid: folderId });
             await db.dontHaveInDatabase("folder", { id: folderId });
         }
+    }
+
+    /**
+     * Click the unit planner 3-dot menu
+     */
+    async clickUnitPlannerDotMenu(): Promise<void> {
+        await this.page.getByTestId(UnitPlanner.DATA_TEST_DROPDOWN_MENU).click();
+    }
+
+    /**
+     * Click the Import into classes option from the unit planner dropdown menu
+     * @param courseId - The ID of the course
+     */
+    async clickImportIntoClass(courseId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_IMPORT_INTO_CLASS_OPTION.replace("{courseId}", courseId.toString()))
+            .click();
+    }
+
+    /**
+     * Click export to class for an activity
+     * @param activityId - The ID of the activity
+     */
+    async clickExportToClass(activityId: number): Promise<void> {
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_ACTIVITY_EXPORT.replace("{activityId}", activityId.toString()))
+            .click();
+    }
+
+    /**
+     * Click the View More button for an unit
+     * @param unitId - The ID of the unit
+     * @param columnType - The type of the column: curriculum-overview, activities, rubric-capabilities
+     */
+    async clickViewMoreButton(unitId: number, columnType: string): Promise<void> {
+        await this.page
+            .getByTestId(
+                UnitPlanner.DATA_TEST_VIEW_MORE.replace("{unitId}", unitId.toString()).replace(
+                    "{columType}",
+                    columnType,
+                ),
+            )
+            .click();
     }
 }

@@ -3,8 +3,6 @@
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
-import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
-import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
 import ImportCourseIntoClass from "@schoolboxTest/playwright/support/page/courses/ImportCourseIntoClass";
 import CreateLessonPlan from "@schoolboxTest/playwright/support/page/lessonPlan/CreateLessonPlan";
 import TemplateList from "@schoolboxTest/playwright/support/page/lessonPlan/TemplateList";
@@ -14,6 +12,7 @@ import dayjs from "dayjs";
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
+import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 
 test.describe("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -34,16 +33,15 @@ test.describe("Course import tests", () => {
      * - untick a quiz, due work and task before importing
      * - as a teacher ensure the course is presented in the homepage with the proper details: activities dates, number of students, title
      */
-    test.skip("Import course into class", async ({ tester, page, db }) => {
+    test("Import course into class", async ({ tester, page, db }) => {
         const createFolder = new CreateFolder(tester, page);
-        const courseList = new CourseList(page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
-        const courseModify = new CourseModify(page, tester);
         const createLessonPlan = new CreateLessonPlan(tester, page);
         const templateList = new TemplateList(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
         const manageGroup = new ManageGroup(page);
         const editorTemplate = new EditorTemplate(page, tester);
+        const unitPlanner = new UnitPlanner(tester, page);
 
         const folderName = `Automation Course Import Folder1`;
         const homepageTemplateOption = "Course";
@@ -94,10 +92,10 @@ test.describe("Course import tests", () => {
         await manageGroup.clickFromRadioButton("role");
         await manageGroup.clickAddMembers();
 
-        tester.isGoingTo("modify the course, add add a lesson plan and project with a task under it");
-        await courseModify.goto(6); // Navigate to Year 9 English course modify page
-        await courseModify.clickUnitArrow(15); // Click the 3-dot menu for Romeo and Juliet unit
-        await courseModify.clickNewActivityButton("lesson-plan");
+        tester.isGoingTo("via unit planner, add add a lesson plan and project with a task under it");
+        await unitPlanner.goto(6); // Navigate to Year 9 English unin planner page
+        await unitPlanner.clickCreateActivityButton(15); //  Click Create Activity button for Romeo and Juliet unit
+        await unitPlanner.clickCreateActivityOption("lesson-plan", 15);
         await templateList.clickTemplateLink(3);
         await tester.common.clickSubmitButton();
         await createLessonPlan.typeName(lessonPlanName);
@@ -112,9 +110,9 @@ test.describe("Course import tests", () => {
         await createLessonPlan.clickLinkActivityButton(); // Click Link Activity button
 
         tester.isGoingTo("add a project with a due work under it");
-        await courseModify.goto(6); // Navigate to Year 9 English course modify page
-        await courseModify.clickUnitArrow(15); // Click the 3-dot menu for Romeo and Juliet unit
-        await courseModify.clickNewActivityButton("project");
+        await unitPlanner.goto(6); // Navigate to Year 9 English unin planner page
+        await unitPlanner.clickCreateActivityButton(15); //  Click Create Activity button for Romeo and Juliet unit
+        await unitPlanner.clickCreateActivityOption("project", 15);
         await page.locator("input#title").fill(projectName);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.clickCreate();
@@ -133,10 +131,12 @@ test.describe("Course import tests", () => {
         await page.locator(`li[data-assessment="${dueworkId}"]`).click();
         await expect(page.locator("#ir-content")).toContainText("This is a learning activity description.");
 
-        tester.isGoingTo("navigate to the course list and click the option Import into classes from the dropdown menu");
-        await courseList.goto();
-        await courseList.clickCourseDotMenu(6); // Click the 3-dot menu for Year 9 English course
-        await courseList.clickImportIntoClass(6);
+        tester.isGoingTo(
+            "navigate to the unit planner and click the option Import into classes from the dropdown menu",
+        );
+        await unitPlanner.goto(6);
+        await unitPlanner.clickUnitPlannerDotMenu();
+        await unitPlanner.clickImportIntoClass(6);
 
         tester.isGoingTo("type a class name, select it from the results and click the Next button");
         await importCourseIntoClass.typeClassName(folderName);
@@ -243,11 +243,11 @@ test.describe("Course import tests", () => {
      * - fill the dates fields and click export to selected class
      * - ensure the assessment is presented in that class with the proper new dates
      */
-    test.skip("Copy activity into class", async ({ tester, page, db }) => {
-        const courseModify = new CourseModify(page, tester);
+    test("Copy activity into class", async ({ tester, page, db }) => {
         const importCourseIntoClass = new ImportCourseIntoClass(page);
         const lessonPlanName = "Export Activity Lesson Plan for Romeo and Juliet";
         const projectName = "Export Activity Project for Romeo and Juliet";
+        const unitPlanner = new UnitPlanner(tester, page);
 
         const folderId = (await db.grabFromDatabase("folder", "id", {
             name: "Automation Course Import Folder1",
@@ -264,14 +264,15 @@ test.describe("Course import tests", () => {
             "title like": projectName,
         })) as number;
 
-        tester.isGoingTo("navigate to Year 9 English Modify course page");
-        await courseModify.goto(6);
+        tester.isGoingTo("navigate to Year 9 English Unit planner page and click view more for Romeo and Juliet unit");
+        await unitPlanner.goto(6);
+        await unitPlanner.clickViewMoreButton(15, "activities");
 
-        tester.isGoingTo("click the arrow to expand Romeo and Juliet unit");
-        await courseModify.clickUnitArrow(15);
+        tester.isGoingTo("click the 3-dot menu for Romeo and Juliet unit");
+        await unitPlanner.clickActivityDotMenu(52);
 
-        tester.isGoingTo("click the export icon for Romeo and Juliet Key Quote Activity");
-        await courseModify.clickExportIcon(52);
+        tester.isGoingTo("click the export for Romeo and Juliet Key Quote Activity");
+        await unitPlanner.clickExportToClass(52);
 
         tester.isGoingTo("tick the checkbox");
         const courseImplementationId = (await db.grabFromDatabase("course_implementation", "id", {
@@ -286,7 +287,9 @@ test.describe("Course import tests", () => {
         await page.click("input[type=submit]");
 
         tester.isGoingTo("click the export icon for Present a scene of Romeo and Juliet");
-        await courseModify.clickExportIcon(146);
+        await unitPlanner.clickViewMoreButton(15, "activities");
+        await unitPlanner.clickActivityDotMenu(146);
+        await unitPlanner.clickExportToClass(146);
 
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
@@ -295,7 +298,9 @@ test.describe("Course import tests", () => {
         await page.click("input[type=submit]");
 
         tester.isGoingTo("click the export icon for Post-Unit Quiz");
-        await courseModify.clickExportIcon(151);
+        await unitPlanner.clickViewMoreButton(15, "activities");
+        await unitPlanner.clickActivityDotMenu(151);
+        await unitPlanner.clickExportToClass(151);
 
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
@@ -304,7 +309,9 @@ test.describe("Course import tests", () => {
         await page.click("input[type=submit]");
 
         tester.isGoingTo("click the export icon for Lesson Plan for Romeo and Juliet");
-        await courseModify.clickExportIcon(lessonPlanId);
+        await unitPlanner.clickViewMoreButton(15, "activities");
+        await unitPlanner.clickActivityDotMenu(lessonPlanId);
+        await unitPlanner.clickExportToClass(lessonPlanId);
 
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
@@ -319,7 +326,9 @@ test.describe("Course import tests", () => {
         await page.click("input[type=submit]");
 
         tester.isGoingTo("click the export icon for Project for Romeo and Juliet");
-        await courseModify.clickExportIcon(projectId);
+        await unitPlanner.clickViewMoreButton(15, "activities");
+        await unitPlanner.clickActivityDotMenu(projectId);
+        await unitPlanner.clickExportToClass(projectId);
 
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
@@ -403,7 +412,7 @@ test.describe("Course import tests", () => {
         );
     });
 
-    test.skip("Create activities via course outline, save into the course, delete activities, check students cannot view activities with open date in the future", async ({
+    test("Create activities via course outline, save into the course, delete activities, check students cannot view activities with open date in the future", async ({
         tester,
         page,
         db,
@@ -486,7 +495,7 @@ test.describe("Course import tests", () => {
         await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
     });
 
-    test.skip("Course Outline: filters and 3-dot options", async ({ tester, page, db }) => {
+    test("Course Outline: filters and 3-dot options", async ({ tester, page, db }) => {
         const homepage = new Homepage(tester, page);
         const courseOutline = new CourseOutline(tester, page);
 
