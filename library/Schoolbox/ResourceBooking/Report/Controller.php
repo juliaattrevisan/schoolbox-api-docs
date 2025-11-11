@@ -171,10 +171,13 @@ class Controller extends Base
                         }
                     }
 
-                    // check for time overlap (for collisions)
+                    /* check for time overlap (for collisions)
+                     * @see \Schoolbox\ResourceBooking\Booking\Validation::getConflictingBookings
+                     * we are using the same `startTime + 1` / `endTime - 1` logic here
+                     */
                     if (
-                        $event->getStartTime()->getDateTimeObject()->getTimestamp() <= $otherEvent->getEndTime()->getDateTimeObject()->getTimestamp()
-                        && $event->getEndTime()->getDateTimeObject()->getTimestamp() >= $otherEvent->getStartTime()->getDateTimeObject()->getTimestamp()
+                        ($event->getStartTime()->getDateTimeObject()->getTimestamp() + 1 ) <= ($otherEvent->getEndTime()->getDateTimeObject()->getTimestamp() - 1)
+                        && ($event->getEndTime()->getDateTimeObject()->getTimestamp() - 1) >= ($otherEvent->getStartTime()->getDateTimeObject()->getTimestamp() + 1 )
                     ) {
                         return true;
                     }
