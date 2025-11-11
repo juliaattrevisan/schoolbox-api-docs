@@ -156,55 +156,21 @@ class Controller extends Base
         $current = $cursor->current($profiles);
         $next = $cursor->next($profiles);
 
-//
-//        $idFinder       = Filter\Filters\DifferentiationProfile\IdFinder::getInstance($this->filterMapper, $this->mapper);
-//        $profileIds       = $idFinder->findIdsByFilters($dynamicFilters, $this->getUser());
-//
-//        if (count($profileIds) > 0) {
-//            $cursor = new MapperCursor(
-//                $this->mapper,
-//                20,
-//                [
-//                    's.lastname' => $this->mapper::SORT_ORDER_ASC,
-//                    's.chosen_name' => $this->mapper::SORT_ORDER_ASC,
-//                ],
-//                $this->mapper->getPredicateBuilder()
-//                             ->in('s.id', $profileIds)
-//                            ->any(
-//                                $this->mapper->getPredicateBuilder()->isTrue(
-//                                    'lpt.contribute_differentiation_profile',
-//                                )->isTrue(
-//                                    'lps.contribute_differentiation_profile',
-//                                )
-//                            )
-//            );
-//            $profiles = $cursor->retrieveResults($this->requestPost['cursor'] ?? null);
-//            $data = $profiles->map(
-//                fn(Model $profile) => call_user_func($profileTranslator, $profile)
-//            );
-//            $count   = $cursor->retrieveResultCount();
-//            $next    = $cursor->next($profiles);
-//            $current = $cursor->current($profiles);
-//        } else {
-//            $data = [];
-//            $count = 0;
-//            $next = null;
-//            $current = null;
-//        }
-
         $payload = [
             'profiles'             => $data,
         ];
-        $this->response = $this->responseAsJson([
-            'data' => $payload,
-            'metadata' => [
-                'count'  => $count,
-                'cursor' => [
-                    'next'    => $next,
-                    'current' => $current,
+        $this->response = $this->responseAsJson(
+            [
+                'data' => $payload,
+                'metadata' => [
+                    'count'  => $count,
+                    'cursor' => [
+                        'next'    => $next,
+                        'current' => $current,
+                    ],
                 ],
-            ],
-        ]);
+            ]
+        );
     }
 
     /**
@@ -230,7 +196,7 @@ class Controller extends Base
             AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
         ";
 
-        $params = [
+        $params      = [
             'studentId' => $studentId,
         ];
         $pastoralIds = $this->pastoralMapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
@@ -242,21 +208,55 @@ class Controller extends Base
              */
             ['created_at' => PastoralMapper::SORT_ORDER_DESC],
             $this->pastoralMapper->getPredicateBuilder()
-                ->in('id', $pastoralIds)
+                                 ->in('id', $pastoralIds)
         );
 
-        $data = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
-        $this->response = $this->responseAsJson([
-            'data' => [
-                'results' => $data->map($this->pastoralTranslator),
-            ],
-            'metadata' => [
-                'count'  => $cursor->retrieveResultCount(),
-                'cursor' => [
-                    'next'    => $cursor->next($data),
-                    'current' => $cursor->current($data),
+        $data           = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+        $this->response = $this->responseAsJson(
+            [
+                'data'     => [
+                    'results' => $data->map($this->pastoralTranslator),
                 ],
-            ],
-        ]);
+                'metadata' => [
+                    'count'  => $cursor->retrieveResultCount(),
+                    'cursor' => [
+                        'next'    => $cursor->next($data),
+                        'current' => $cursor->current($data),
+                    ],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Save differentiation profile data
+     *
+     * @param User $student
+     * @return void
+     */
+    public function postDifferentiationProfileData(User $student): void
+    {
+        $post = $this->requestPost;
+
+        try {
+            /** @var Model $model */
+            $model = $this->mapper->createModel();
+            $model
+                ->setId($post->getInt('id'))
+                ->setStudent($student)
+                ->setAdjustmentLevel($post->getInt('adjustment_level'))
+                ->setAdjustmentCategory($post->getInt('adjustment_category'))
+                ->setOverview($post->get('overview'))
+                ->setGoals($post->get('goals'))
+                ->setStrategiesAdjustments($post->get('strategies_adjustments'))
+                ->setNeedsChallenges($post->get('needs_challenges'))
+                ->setInterestsStrengths($post->get('interests_strengths'));
+
+            $this->mapper->save($model);
+
+            $this->response = $this->responseEmpty(200);
+        } catch (\Exception $e) {
+            $this->sendJsonError('Failed to save differentiation profile data.', 500);
+        }
     }
 }
