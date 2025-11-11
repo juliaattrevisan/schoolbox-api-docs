@@ -66,6 +66,12 @@ window.Vue.onMounted((): void => {
         selectedTab.value = firstTab;
     }
 });
+
+const prListEl = window.Vue.useTemplateRef<InstanceType<typeof PrList>>("prListEl");
+
+function onPrint(): void {
+    prListEl.value?.loadAllRecords();
+}
 </script>
 
 <template>
@@ -73,6 +79,7 @@ window.Vue.onMounted((): void => {
         <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
             <nav v-if="selectedTab?._links.export">
+                <button @click="onPrint">Print</button>
                 <a
                     :href="`${selectedTab._links.export}?selected=${recordsOrPoints}`"
                     aria-label="Download Report as CSV"
@@ -94,7 +101,7 @@ window.Vue.onMounted((): void => {
                 </dd>
             </dl>
             <template v-if="selectedTab">
-                <pr-list v-if="selectedTab.type === TabType.LIST" :min-width="minWidth" />
+                <pr-list v-if="selectedTab.type === TabType.LIST" ref="prListEl" :min-width="minWidth" />
                 <pr-table v-else v-model:records-or-points="recordsOrPoints" :min-width="minWidth" />
             </template>
         </div>
