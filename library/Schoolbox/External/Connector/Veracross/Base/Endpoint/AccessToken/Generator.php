@@ -88,6 +88,15 @@ class Generator
 
 
     /**
+     * Authentication params associated with the selected region.
+     * Defaults to DEFAULT_REGION when $region is invalid
+     *
+     * @var array
+     */
+    private array $regionAuth;
+
+
+    /**
      * Constructor.
      *
      * @param string $schoolRoute
@@ -103,6 +112,9 @@ class Generator
         private string $region,
         private bool $deepLog = false,
     ) {
+        /* Choose DEFAULT_REGION if $region is somehow invalid or missing a definition
+         */
+        $this->regionAuth = Domains::AVAILABLE[$this->region]['auth'] ?? Domains::AVAILABLE[Domains::DEFAULT_REGION]['auth'];
     }
 
 
@@ -183,7 +195,7 @@ class Generator
                 $this->log(sprintf(
                     "Generating access token via %s %s...\n",
                     $this->region,
-                    Domains::AVAILABLE[$this->region]['auth'],
+                    $this->regionAuth,
                 ));
 
                 $response = $this->client->request('POST', $endpoint, [
@@ -278,7 +290,7 @@ class Generator
         return new Client([
             'headers' => $headers,
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'base_uri' => Domains::AVAILABLE[$this->region]['auth'],
+            'base_uri' => $this->regionAuth,
             'timeout' => self::DEFAULT_TIMEOUT,
             'http_errors' => false,
         ]);
