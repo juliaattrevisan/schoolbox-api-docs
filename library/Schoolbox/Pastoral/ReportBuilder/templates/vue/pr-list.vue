@@ -49,7 +49,7 @@ window.Vue.onMounted(async (): Promise<void> => {
  * Load all records for printing
  */
 function loadAllRecords(): void {
-    urlParams.set("limit", "50");
+    urlParams.set("limit", "1000");
     watchOnce(payload, async () => {
         // triggers only once - wait for all images to load before printing
         await window.Vue.nextTick();
