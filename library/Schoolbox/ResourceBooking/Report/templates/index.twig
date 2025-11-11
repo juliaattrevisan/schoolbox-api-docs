@@ -214,7 +214,13 @@
                         </td>
                         <td>
                             {% if booking is empty %}
-                                {{ event.getLocation() }}
+                                {% if event.resourceId is empty %}
+                                    {{ event.getLocation() }}
+                                {% else %}
+                                    <a href="{{ routeLookup('resourceItem.read', {id: event.resourceId}) }}">
+                                        {{ event.getLocation() }}
+                                    </a>
+                                {% endif %}
                             {% else %}
                                 <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
                                     {{ booking.getResource().getRoomCode() | default(booking.getResource.getName()) }}
