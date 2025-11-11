@@ -131,8 +131,8 @@ class Controller extends Base
             foreach ($eventList as $event) {
                 // check if any other events clash with us (overlapping time, same resource)
                 $collides = $eventList->filter(function ($otherEvent) use ($event) {
-                    /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $otherEvent */
-                    /* @var \Calendar\Event\Type\ResourceBooking\Event|\Calendar\Event\Type\Timetable\Event $event */
+                    /* @var \Calendar\Event\Type\ResourceBooking\Event | \Calendar\Event\Type\Timetable\Event | \Calendar\Event\Type\SudsTimetable\Event $otherEvent */
+                    /* @var \Calendar\Event\Type\ResourceBooking\Event | \Calendar\Event\Type\Timetable\Event | \Calendar\Event\Type\SudsTimetable\Event $event */
 
                     // fetch the resource IDs (depending on type, we hydrate differently)
                     $eventResourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event) ? $event->getBooking()->getResource()->getId() : $event->getResourceId();
