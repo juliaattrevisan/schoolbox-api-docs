@@ -50,9 +50,11 @@ class Builder
      */
     private function buildAttendanceLink(array $credentials, array $class): string
     {
+        $regionAttendance = Domains::AVAILABLE[$credentials['region']]['attendance'] ?? Domains::AVAILABLE[Domains::DEFAULT_REGION]['attendance'];
+
         return sprintf(
             '%s/%s/%s/class/%s/attendance',
-            Domains::AVAILABLE[$credentials['region']]['attendance'],
+            $regionAttendance,
             $credentials['schoolroute'],
             $credentials['portalaccessname'],
             /* TODO These ids are too easy to mix up: this might be class_id, id, or internal_class_id
