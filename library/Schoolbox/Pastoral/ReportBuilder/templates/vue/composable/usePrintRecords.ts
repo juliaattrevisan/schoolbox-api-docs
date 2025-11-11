@@ -6,7 +6,6 @@
  */
 
 import type { Ref } from "vue";
-import { watchOnce } from "@vueuse/core";
 import { waitForAllImages } from "@js/util/domUtils";
 import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
 
@@ -49,17 +48,21 @@ export function usePrintRecords(
             return;
         }
         // Need to fetch all records first
-        watchOnce(payload, async () => {
-            // triggers only once - wait for all images to load before printing
-            await window.Vue.nextTick();
-            if (containerEl.value) {
-                await waitForAllImages(containerEl.value);
-            }
-            isLoading.value = false;
-            await window.Vue.nextTick();
-            window.print();
-            hasPrinted.value = true;
-        });
+        window.Vue.watch(
+            payload,
+            async () => {
+                // triggers only once - wait for all images to load before printing
+                await window.Vue.nextTick();
+                if (containerEl.value) {
+                    await waitForAllImages(containerEl.value);
+                }
+                isLoading.value = false;
+                await window.Vue.nextTick();
+                window.print();
+                hasPrinted.value = true;
+            },
+            { deep: true, once: true },
+        );
         // Set limit to high number to load all records
         urlParams.set("limit", "1000");
         // Use provided base URL or extract from current URL
