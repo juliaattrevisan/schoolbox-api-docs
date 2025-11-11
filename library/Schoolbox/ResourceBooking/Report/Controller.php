@@ -127,6 +127,7 @@ class Controller extends Base
 
         // if we are only showing clashes, filter the event list now
         $clashesOnlyList = new GenericCollection(EventInterface::class);
+
         if ($clashesOnly) {
             foreach ($eventList as $event) {
                 // check if any other events clash with us (overlapping time, same resource)
@@ -183,8 +184,19 @@ class Controller extends Base
                     $clashesOnlyList->add($collideEvent);
                 }
             }
+
+                // de duplicate the clash list
+                $dupesCheck = [];
+                $eventV2 = new GenericCollection(EventInterface::class);
+                foreach ($clashesOnlyList as $collideEvent) {
+                    $dupe = spl_object_hash($collideEvent);
+                    if (!in_array($dupe, $dupesCheck, true)) {
+                        $dupesCheck[] = $dupe;
+                        $eventV2->add($collideEvent);
+                    }
+                }
             // collisions should overwrite the event list
-            $eventList = $clashesOnlyList;
+            $eventList = $eventV2;
         }
 
         $this->response = $this->responseFromTemplate(
