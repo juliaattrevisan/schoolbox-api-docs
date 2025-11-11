@@ -1,6 +1,7 @@
 {
     frankenphp {
         php_ini expose_php off
+        {$FRANKENPHP_CONFIG}
     }
     metrics
     # Enable automatic HTTPS with self-signed certificates
