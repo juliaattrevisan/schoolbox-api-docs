@@ -1,5 +1,5 @@
 /**
- * The different events that can be dispatched for the activity status page
+ * The different events that can be dispatched for the manage differentiation profiles page
  */
 
 import type { Nested } from "@js/util/queryUtils";

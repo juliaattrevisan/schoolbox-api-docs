@@ -13,10 +13,10 @@ import { SearchParam } from "@js/util/sbx/apiUtils";
 
 /**
  * Composable to handle cursor-based pagination
- * @param url -
+ * @param url - the url being used for the data request
  * @param limit - number of items per page
  * @param metadata - metadata containing pagination information
- * @returns -
+ * @returns - pagination controls and state
  */
 export function useCursorPagination(
     url: Ref<string>,
@@ -32,7 +32,7 @@ export function useCursorPagination(
     currentCursor: Ref<string>;
     hasPaginate: Ref<boolean>;
 } {
-    const cursorList = window.Vue.ref<string[]>([""]); // to distinguish between loading a new table and loading data for the same table
+    const cursorList = window.Vue.ref<string[]>([""]); // tracks cursor positions for pagination navigation
     const cursorIndex = window.Vue.ref(0); // to track the current cursor index
     const currentCursor = window.Vue.computed(() => cursorList.value[cursorIndex.value] || "");
     const hasPaginate = window.Vue.ref<boolean>(false);
@@ -41,10 +41,10 @@ export function useCursorPagination(
     const hasNext = window.Vue.computed(() => pageCount.value > 0 && cursorIndex.value < pageCount.value - 1);
 
     /**
-     * Pagination should currently be reset if sorting on the url changes,
-     * or if the url URL changes in a way that does not include the cursor.
-     * @param oldUrl - the previous url URL
-     * @param newUrl - the new url URL
+     * Pagination should currently be reset if sorting on the URL changes,
+     * or if the URL changes in a way that does not include the cursor.
+     * @param oldUrl - the previous URL
+     * @param newUrl - the new URL
      * @returns - true if pagination should be reset
      */
     function shouldResetPagination(oldUrl: string, newUrl: string): boolean {
