@@ -160,8 +160,11 @@ class Controller extends Base
                             return false;
                         }
 
-                        // only care if the booking is pending, so we can see conflicts (that we need to action)
-                        if ($otherEvent->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
+                        // only care if at least one booking is pending, so we can see conflicts (that we need to action)
+                        if (
+                            $otherEvent->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING &&
+                            $event->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING
+                        ) {
                             return false;
                         }
                     } elseif (
