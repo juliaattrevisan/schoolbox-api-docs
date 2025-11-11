@@ -169,7 +169,7 @@ class Controller extends Base
                         $otherEvent instanceof \Calendar\Event\Type\Timetable\Event
                     ) {
                         // if not booking, then assume its a timetable event
-                        // check if the for the same homepage (class)
+                        // check if timetable is for the same homepage (class)
                         if ($event->getCategoryId() === $otherEvent->getCategoryId()) {
                             return false;
                         }
@@ -180,8 +180,8 @@ class Controller extends Base
                      * we are using the same `startTime + 1` / `endTime - 1` logic here
                      */
                     if (
-                        ($event->getStartTime()->getDateTimeObject()->getTimestamp() + 1 ) <= ($otherEvent->getEndTime()->getDateTimeObject()->getTimestamp() - 1)
-                        && ($event->getEndTime()->getDateTimeObject()->getTimestamp() - 1) >= ($otherEvent->getStartTime()->getDateTimeObject()->getTimestamp() + 1 )
+                        ($event->getStartTime()->getDateTimeObject()->getTimestamp() + 1) <= ($otherEvent->getEndTime()->getDateTimeObject()->getTimestamp() - 1)
+                        && ($event->getEndTime()->getDateTimeObject()->getTimestamp() - 1) >= ($otherEvent->getStartTime()->getDateTimeObject()->getTimestamp() + 1)
                     ) {
                         return true;
                     }
