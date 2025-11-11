@@ -138,7 +138,7 @@ function onPrintSelected(): void {
 
 @media print {
     .f-container {
-        padding: 0 !important; /* give more space for content when printing */
+        padding: 1rem 0 0 0 !important; /* give more space for content when printing */
     }
     .scrollable {
         max-height: none !important; /* Expand scrollable elements to full height in print view */
