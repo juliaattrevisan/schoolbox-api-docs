@@ -1249,9 +1249,17 @@ input.invalid-data:focus {
 body.sbx-body {
     input[type="radio"]:not(.plain) {
         &:has(+ label.block),
-        &:has(+ label.input-toggle),
-        + label.radio-label {
+        &:has(+ label.input-toggle) {
             display: none;
+        }
+
+        & + label.radio-label {
+            padding: 0;
+            margin: 0;
+            &::before,
+            &::after {
+                display: none;
+            }
         }
     }
 }
