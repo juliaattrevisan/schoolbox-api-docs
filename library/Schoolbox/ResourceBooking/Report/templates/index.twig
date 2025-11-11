@@ -223,7 +223,7 @@
                                 {% endif %}
                             {% else %}
                                 <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
-                                    {{ booking.getResource().getRoomCode() | default(booking.getResource.getName()) }}
+                                    {{ booking.getResource().getRoomCode() | default(booking.getResource().getName()) }}
                                 </a>
                             {% endif %}
                         </td>
