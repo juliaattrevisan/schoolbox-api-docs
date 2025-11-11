@@ -14,30 +14,34 @@ interface Props {
     isCloseDisabled?: boolean; // Whether to disable closing the modal
     size?: "m" | "s"; // Size of the modal, 'm' for medium and 's' for small
     showCloseButton?: boolean; // Whether to show the close button
+    hasFocusTrap?: boolean; // Whether to use focus trap within the modal
 }
 const props = withDefaults(defineProps<Props>(), {
     hasBackgroundClick: false,
     isCloseDisabled: false,
     size: "m",
     showCloseButton: true,
+    hasFocusTrap: true,
 });
 
 const modalSize = window.Vue.computed(() => props.size || "m"); // Default size is medium
 const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
-const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
 
-/**
- * Keep focus within the modal when it's open
- */
-window.Vue.watch(isOpen, async (newIsOpen) => {
-    if (newIsOpen) {
-        await window.Vue.nextTick(); // to ensure the modal is rendered before activating the focus trap
-        activate();
-    } else {
-        deactivate();
-    }
-});
+if (props.hasFocusTrap) {
+    const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
+    /**
+     * Keep focus within the modal when it's open
+     */
+    window.Vue.watch(isOpen, async (newIsOpen) => {
+        if (newIsOpen) {
+            await window.Vue.nextTick(); // to ensure the modal is rendered before activating the focus trap
+            activate();
+        } else {
+            deactivate();
+        }
+    });
+}
 
 /**
  * To close the modal

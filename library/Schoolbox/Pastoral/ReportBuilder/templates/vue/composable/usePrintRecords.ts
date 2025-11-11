@@ -55,9 +55,10 @@ export function usePrintRecords(
             if (containerEl.value) {
                 await waitForAllImages(containerEl.value);
             }
+            isLoading.value = false;
+            await window.Vue.nextTick();
             window.print();
             hasPrinted.value = true;
-            isLoading.value = false;
         });
         // Set limit to high number to load all records
         urlParams.set("limit", "1000");
