@@ -127,11 +127,16 @@ const decorator = window.Vue.computed(() => {
  * @returns The formatted mark
  */
 function formatMark(mark: NonNullable<typeof participant.value>["marks"]["published" | "draft"]): string {
-    if (mark.norm === null) {
+    /* Any feedback that used a submission state will potentially have a null normalised mark; but, it will have a
+     * meaningful human-readable mark. This unfortunately might share the same signature as a draft mark and/or a
+     * published feedback with Resubmission Required.
+     */
+    if (mark.hrInstructor === "" && mark.norm === null) {
         return "–";
     }
 
     const relevantMark = mbStore.showDisplayMarks ? mark.hr : mark.hrInstructor;
+
     return relevantMark ?? "–";
 }
 
