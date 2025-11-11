@@ -108,7 +108,7 @@ function onPrintSelected(): void {
             </nav>
         </div>
         <div>
-            <dl v-if="props.tabs.length > 1" class="tabs no-print">
+            <dl v-if="props.tabs.length > 1" class="tabs hide-on-print">
                 <dd
                     v-for="tab in props.tabs"
                     :key="tab.type"
@@ -137,16 +137,12 @@ function onPrintSelected(): void {
 }
 
 @media print {
-    .no-print {
-        display: none;
+    .f-container {
+        padding: 0 !important; /* give more space for content when printing */
     }
     .scrollable {
         max-height: none !important; /* Expand scrollable elements to full height in print view */
         overflow: visible !important; /* Ensure all content is visible */
-    }
-    a {
-        color: #000 !important;
-        text-decoration: none !important;
     }
 }
 </style>

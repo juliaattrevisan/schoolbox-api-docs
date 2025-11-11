@@ -24,7 +24,7 @@ const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
  */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
-urlParams.set("limit", "50");
+urlParams.set("limit", "1000");
 url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
