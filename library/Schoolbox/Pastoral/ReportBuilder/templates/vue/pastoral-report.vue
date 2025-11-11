@@ -118,7 +118,7 @@ function onPrint(): void {
             <template v-if="selectedTab">
                 <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
                     <pr-list v-if="selectedTab.type === TabType.LIST" ref="prListEl" :scrollable-el="scrollableEl" />
-                    <pr-table v-else v-model:records-or-points="recordsOrPoints" :min-width="minWidth" />
+                    <pr-table v-else v-model:records-or-points="recordsOrPoints" />
                 </div>
             </template>
         </div>
