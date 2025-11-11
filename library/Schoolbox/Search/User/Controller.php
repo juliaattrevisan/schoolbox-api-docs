@@ -362,16 +362,23 @@ class Controller extends BaseController
             $contactList = $this->externalUser->getStudentContactList([$student->getExternalId()]);
             foreach ($contactList as $contact) {
                 $main = null;
-                try {
-                    $main = $this->userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);
-                } catch (MapperException $e) {
-                    // noop
+
+                if (null !== $contact['StudentContactID']) {
+                    try {
+                        $main = $this->userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);
+                    } catch (MapperException $e) {
+                        // noop
+                    }
                 }
+
                 $spouse = null;
-                try {
-                    $spouse = $this->userMapper->findByExternalId($contact['StudentContactSpouseID'], Role::PARENT);
-                } catch (MapperException $e) {
-                    // noop
+
+                if (null !== $contact['StudentContactSpouseID']) {
+                    try {
+                        $spouse = $this->userMapper->findByExternalId($contact['StudentContactSpouseID'], Role::PARENT);
+                    } catch (MapperException $e) {
+                        // noop
+                    }
                 }
 
                 /* This is maybe a controversial change
@@ -511,10 +518,13 @@ class Controller extends BaseController
         // scope (e.g. search results, grades).
         $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
 
-
         /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
+         *
+         * Anyway, from the docblocks, it seems that $isPrimaryCarer was supposed to restrict *which parent(s)* could see
+         * emergency contacts. SA-12147 rewrote the whole page so I'm not entirely sure of its history anymore.
          */
-        $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
+        $hasContacts = count($contacts) > 0;
+        $hasEmergencyContacts = $isPrimaryCarer && (count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0);
 
         /* (For all role types) If any of these fail, the tab should never exist */
         $tabConstraintsBase = [
@@ -538,23 +548,32 @@ class Controller extends BaseController
             'contacts'     => true,
         ];
 
+        /* Decide whether the Contacts tab should show for the viewer:
+         *   - the viewee's Hide Contact Details checkbox is unticked
+         *
+         * and:
+         *
+         *   - the viewee must have at least one contact, or
+         *   - the viewee must have at least one emergency contact
+         */
+        $hasContactTab = $student->isShowContacts() && ($hasContacts || $hasEmergencyContacts);
+
         /* (For specific role types) If any of these fail, the tab should never exist */
         $tabConstraintsRoleType = [
             'student' => [
                 /* only a student can view their own profile tabs, this is checked by $tabs already so fall back to true */
                 '_default' => true,
-                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+                'contacts' => $hasContactTab,
             ],
             'parent'  => [
                 /* only parents of a student can view the contacts tab, this is checked by $tabs already so fall back to true */
                 '_default' => true,
-                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+                'contacts' => $hasContactTab,
             ],
             'staff'   => [
                 /* staff can view a student's profile tabs if their role has viewStudentProfile enabled */
                 '_default' => $this->getUser()->getRole()->getViewStudentProfile(),
-                'contacts' => $this->getUser()->getRole()->getViewStudentProfile()
-                    && (($student->isShowContacts() && count($contacts) > 0) || ($isPrimaryCarer && $hasEmergencyContacts)),
+                'contacts' => $this->getUser()->getRole()->getViewStudentProfile() && $hasContactTab,
             ],
         ];
 
@@ -623,6 +642,12 @@ class Controller extends BaseController
                 /* A set of contacts (if any) for this student
                  */
                 'contacts' => $contacts,
+                /* Decide whether the Contact Information island was meant to show
+                 */
+                'hasContacts' => $hasContacts,
+                /* Decide whether the Emergency Contact Information island was meant to show
+                 */
+                'hasEmergencyContacts' => $hasEmergencyContacts,
                 /* Decides if the Geosnapshot button could be accessed
                  */
                 'isGeosnapshotAvailable' => $isGeosnapshotAvailable,

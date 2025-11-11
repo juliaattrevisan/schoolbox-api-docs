@@ -3,6 +3,8 @@
  #
  # showEmails   bool    Spec pattern to decide whether email address is visible
  # showDetails  bool    Spec patternt to decide whether details are visible
+ # @param bool $hasContacts           A bool to indicate whether the Contact Information island was meant to show
+ # @param bool $hasEmergencyContacts  A bool to indicate whether the Emergency Contact Information island was meant to show
  #}
 
 {# Permissions #}
@@ -12,11 +14,6 @@
 {# Leaving isStaff for extended custom templates #}
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
-
-{# Emergency Contact Information. Due to non-normalised in the connectors we had to compile them
- # separately, and specially, in this new customisable payload.
- #}
-{% set hasEmergencyContacts = externalUser.data.roleTypes.tabs.emergencyContacts|length %}
 
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -731,9 +728,9 @@
                     <section class="content">
                         {% block contacts_island %}
                             {% block contacts %}
-                                <h2 class="subheader">Contact Information</h2>
+                                {% if hasContacts %}
+                                    <h2>Contact Information</h2>
 
-                                {% if user.isShowContacts and contacts|length %}
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% for contact in contacts %}
@@ -887,6 +884,7 @@
                                         </ul>
                                     </section>
                                 {% endif %}
+
                             {% endblock contacts %}
                         {% endblock contacts_island %}
 
@@ -896,7 +894,7 @@
                                  # show no header if no emergencies
                                  #}
                                 {% if hasEmergencyContacts %}
-                                    <h2 class="subheader">Emergency Contact Information</h2>
+                                    <h2>Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% set i = 0 %}
