@@ -89,12 +89,12 @@ class Client implements IClient
      */
     public function createResponseStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
-        $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
-        $request = new Request('POST', $url, $this->authHeaders);
+        $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
+        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, true);
         return $this->handleStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ResponseMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
@@ -122,12 +122,12 @@ class Client implements IClient
      */
     public function createChatCompletionStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
-        $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
-        $request = new Request('POST', $url, $this->authHeaders);
+        $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
+        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, true);
         return $this->handleStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ChatCompletionsMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
@@ -192,7 +192,7 @@ class Client implements IClient
             $request,
             [
                 RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::HTTP_ERRORS     => false,
+//                RequestOptions::HTTP_ERRORS     => false,
                 RequestOptions::STREAM          => $stream,
                 RequestOptions::JSON            => $payload,
             ],
@@ -321,24 +321,19 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param RequestInterface       $request    The request to send.
-     * @param array                  $payload    The request body to send.
+     * @param ResponseInterface      $response   The response from the AI provider.
      * @param Log\Model              $log        The log to write to.
      * @param LogHandler\ILogHandler $logHandler The log handler to use for each message.
      * @param int                    $chunkSize  How many bytes to read from each stream iteration.
      * @return iterable<string> Each message in the stream as it's received.
-     * @throws ClientExceptionInterface if the request fails
-     * @throws MapperException          if somehow the log couldn't be saved
+     * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
-        RequestInterface $request,
-        array $payload,
+        ResponseInterface $response,
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
     ): iterable {
-        $response = $this->sendRequest($request, $payload, true);
-
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {
