@@ -32,45 +32,45 @@ class Api implements IApi
      * Sometimes endpoints fail for no obvious reason and trying again seems to work - instead of doing it
      * manually, try insisting programmatically waiting NAP_TIMEOUT seconds between each attempt
      */
-    private const NAP_TIMEOUT = 3;
+    private const int NAP_TIMEOUT = 3;
 
 
     /**
      * Number of times to retry after having NAP_TIMEOUT seconds rest before finally giving up
      */
-    private const NUM_RETRY = 3;
+    private const int NUM_RETRY = 3;
 
 
     /**
      * Request timeout
      */
-    private const DEFAULT_TIMEOUT = 300;
+    private const int DEFAULT_TIMEOUT = 300;
 
 
     /**
      * Maximum number of pages to obtain from an endpoint to safeguard against infinite loops
      *
      */
-    private const MAX_PAYLOADS = 100;
+    private const int MAX_PAYLOADS = 100;
 
 
     /**
      * Try three times before dying
      */
-    private const MAX_CONCURRENCY_RETRIES = 3;
+    private const int MAX_CONCURRENCY_RETRIES = 3;
 
 
     /**
      * Veracross' 3-minute rate limit, expressed as seconds
      */
-    private const RESUME_RETRY_DELAY = 1;
+    private const int RESUME_RETRY_DELAY = 1;
 
 
     /**
      * An extra amount of time to wait between Too Many Requests because veracros is still giving us
      * 429 even after waiting the requisite amount of time.
      */
-    private const RATE_LIMIT_OFFSET = 30;
+    private const int RATE_LIMIT_OFFSET = 30;
 
 
     /**
