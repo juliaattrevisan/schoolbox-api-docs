@@ -97,6 +97,7 @@ $app = new class extends CliTool\App {
             'classes_with_course_implementations' => 'SELECT count(*) FROM folder f WHERE f.id IN (SELECT ci.folder_id FROM course_implementation ci WHERE ci.deleted_at IS NULL) AND f.id IN (SELECT folder_id FROM folder_code)',
             'class_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_folder af on assessment.id = af.assessment_id WHERE assessment.deleted_at IS NULL',
             'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
+            'student_submissions_size' => 'SELECT SUM(filesize) FROM student_submission_file JOIN storage on student_submission_file.hash = storage.hash',
             'student_submissions_worksheet' => 'SELECT COUNT(*) FROM student_submission LEFT join student_submission_file on student_submission.id = student_submission_file.student_submission_id WHERE student_submission.deleted_at IS NULL AND student_submission_file.deleted_at IS NULL AND student_submission_file.is_worksheet = 1',
             'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
             'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
@@ -236,6 +237,7 @@ $app = new class extends CliTool\App {
             'news_comments'      => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
             'news_saveforlater'  => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
             'news_files'         => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
+            'news_files_size'    => 'SELECT SUM(filesize) FROM comms_news_article_file JOIN storage ON comms_news_article_file.storage_id = storage.hash',
             'news_views_staff'   => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "staff"',
             'news_views_parent'  => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "parent"',
             'news_views_student' => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "student"',
@@ -271,6 +273,8 @@ $app = new class extends CliTool\App {
             'pastoral_records_active' => 'SELECT count(*) FROM `pastoral` WHERE (expires_at IS NULL OR expires_at > NOW()) and deleted_at IS NULL',
             'pastoral_records_archived' =>  'SELECT count(*) FROM `pastoral` WHERE expires_at <= NOW() and deleted_at IS NULL',
             'pastoral_points'           => 'SELECT count(*) FROM pastoral WHERE points IS NOT NULL and points != 0 and deleted_at IS NULL',
+            'pastoral_attachments'      => 'SELECT count(*) FROM pastoral_attachment WHERE deleted_at IS NULL',
+            'pastoral_attachment_size' => 'SELECT SUM(filesize) FROM pastoral_attachment JOIN storage ON pastoral_attachment.hash = storage.hash',
 
 
 
@@ -311,9 +315,11 @@ $app = new class extends CliTool\App {
             'storage'           => 'SELECT count(*) FROM `storage`',
             'storage_size'      => 'SELECT sum(filesize) FROM `storage`',
             'files'             => 'SELECT COUNT(*) FROM file WHERE deleted_at IS NULL',
+            'files_size'        => 'SELECT sum(filesize) FROM file JOIN storage ON file.hash = storage.hash',
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
             'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
             'myfile'            => 'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
+            'myfile_size'       => 'SELECT sum(filesize) FROM myFile JOIN storage ON myFile.hash = storage.hash',
             'editor_templates'  => 'SELECT count(*) FROM editor_template WHERE deleted_at IS NULL',
 
             //Learning Moments / Evidence
@@ -323,6 +329,7 @@ $app = new class extends CliTool\App {
             'moment_approved'   => 'SELECT count(*) FROM moment WHERE published_at IS NOT NULL AND rejected_at IS NULL AND deleted_at IS NULL',
             'moment_rejected'   => 'SELECT count(*) FROM moment WHERE submitted_at IS NULL AND published_at IS NULL AND rejected_at IS NOT NULL AND deleted_at IS NULL',
             'moment_evidence'   => 'SELECT count(*) FROM moment_evidence JOIN moment ON moment_evidence.moment_id = moment.id WHERE moment.deleted_at IS NULL',
+            'moment_evidence_size' => 'SELECT SUM(filesize) FROM moment_evidence JOIN storage ON moment_evidence.hash = storage.hash',
             'moment_folder'     => 'SELECT count(*) FROM moment_folder JOIN moment ON moment_folder.moment_id = moment.id WHERE moment.deleted_at IS NULL',
             'moment_tag'        => 'SELECT count(*) FROM moment_tag JOIN moment ON moment_tag.moment_id = moment.id WHERE moment.deleted_at IS NULL',
             'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
