@@ -592,7 +592,10 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
         }
 
         // ...but show the icons for the other states (!!!!?!)
-        &.pending, &.in-progress, &.requires-assistance, &.submitted {
+        &.pending,
+        &.in-progress,
+        &.requires-assistance,
+        &.submitted {
             &:not(.readonly):hover {
                 &:before {
                     visibility: visible;
@@ -642,7 +645,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 .dialog-agent .col-status .progress-tick {
     margin: 0.25rem auto 0 auto;
 }
-
 
 .countdown {
     font-weight: 100;
