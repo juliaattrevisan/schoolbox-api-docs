@@ -155,6 +155,9 @@ class Controller extends Base
                 $count = count($resourceEvents);
                 for ($i = 0; $i < $count; $i++) {
                     $eventA = $resourceEvents[$i];
+                    // cache start and end times
+                    $aStart = $eventA->getStartTime();
+                    $aEnd = $eventA->getEndTime();
                     for ($j = $i + 1; $j < $count; $j++) {
                         $eventB = $resourceEvents[$j];
                         // Only check for status of pending bookings if both are resource bookings
@@ -181,18 +184,14 @@ class Controller extends Base
                             }
                         }
                         /* Check for time overlap (using same logic as before)
-                         * @see \Schoolbox\ResourceBooking\Booking\Validation::getConflictingBookings
-                         * we are using the same `startTime + 1` / `endTime - 1` logic here
                          */
-                        $aStart = $eventA->getStartTime()->getDateTimeObject()->getTimestamp() + 1;
-                        $aEnd = $eventA->getEndTime()->getDateTimeObject()->getTimestamp() - 1;
-                        $bStart = $eventB->getStartTime()->getDateTimeObject()->getTimestamp() + 1;
-                        $bEnd = $eventB->getEndTime()->getDateTimeObject()->getTimestamp() - 1;
-                        if ($aStart <= $bEnd && $aEnd >= $bStart) {
+                        $bStart = $eventB->getStartTime();
+                        $bEnd = $eventB->getEndTime();
+                        if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {
                             // Add both events to the clash list
                             $clashesOnlyList[spl_object_hash($eventA)] = $eventA;
                             $clashesOnlyList[spl_object_hash($eventB)] = $eventB;
-                        } elseif ($bStart > $aEnd) {
+                        } elseif ($bStart->gt($aEnd)) {
                             // Since events are sorted by start time, no further overlaps possible
                             break;
                         }
