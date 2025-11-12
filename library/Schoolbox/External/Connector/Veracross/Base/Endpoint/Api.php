@@ -563,15 +563,6 @@ class Api implements IApi
 
 
     /**
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
-
-    /**
      * Deeper diagnostics
      *
      * @param string $msg
@@ -582,6 +573,15 @@ class Api implements IApi
         if ($this->deepLog) {
             echo $msg;
         }
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
 

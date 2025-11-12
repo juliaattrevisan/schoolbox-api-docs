@@ -68,6 +68,14 @@ interface IApi
 
 
     /**
+     * Optional settings in the Veracross connector.
+     *
+     * @return array
+     */
+    public function getOptions(): array;
+
+
+    /**
      * @return ApiUsage
      */
     public function getUsage(): ApiUsage;
