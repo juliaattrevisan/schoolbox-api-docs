@@ -15,7 +15,7 @@ Data:
 
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
-{% set houseLabel           = houseLabel           ?? "House" %}
+{% set houseLabel           = houseLabel           ?? locale.schoolHouse.proper %}
 {% set showHouseColumn      = showHouseColumn      ?? true %}
 {% set showTutorGroupColumn = showTutorGroupColumn ?? false %}
 {% set showCoreGroupColumn  = showCoreGroupColumn  ?? false %}
