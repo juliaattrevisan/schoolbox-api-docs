@@ -67,7 +67,7 @@ class Api implements IApi
 
 
     /**
-     * An extra amount of time to wait between Too Many Requests because veracros is still giving us
+     * An extra amount of time to wait between Too Many Requests because Veracross is still giving us
      * 429 even after waiting the requisite amount of time.
      */
     private const int RATE_LIMIT_OFFSET = 30;
@@ -103,7 +103,7 @@ class Api implements IApi
 
 
     /**
-     * Cache the decoded credentials here, because other parts of the veracross
+     * Cache the decoded credentials here, because other parts of the Veracross
      * connector needs something from here to build attendance links etc.
      *
      * @var array
