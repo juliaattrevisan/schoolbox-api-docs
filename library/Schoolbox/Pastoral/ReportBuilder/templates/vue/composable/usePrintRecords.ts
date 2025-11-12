@@ -27,7 +27,6 @@ export function usePrintRecords(
     printAllRecords: () => void;
     isLoading: Ref<boolean>;
 } {
-    const hasPrinted = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
 
     /**
@@ -36,25 +35,18 @@ export function usePrintRecords(
      * If not, fetch all records first then print
      */
     function printAllRecords(): void {
-        // print previously selected so we don't re-fetch again
-        if (hasPrinted.value) {
-            window.print();
-            return;
-        }
         // all records are already loaded when there's no metadata or no next cursor so just print
         if (
             (payload.value && payload.value.metadata === undefined) ||
             (payload.value && payload.value.metadata?.cursor.next === null)
         ) {
             window.print();
-            hasPrinted.value = true;
             return;
         }
         // Need to fetch all records first
         window.Vue.watch(
             payload,
             async () => {
-                // triggers only once - wait for all images to load before printing
                 await window.Vue.nextTick();
                 if (containerEl.value) {
                     await waitForAllImages(containerEl.value);
@@ -62,9 +54,8 @@ export function usePrintRecords(
                 isLoading.value = false;
                 await window.Vue.nextTick();
                 window.print();
-                hasPrinted.value = true;
             },
-            { deep: true, once: true },
+            { deep: true, once: true }, // only watch once as we only need to fetch once
         );
         // Set limit to high number to load all records
         urlParams.set("limit", "1000");
