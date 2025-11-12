@@ -174,7 +174,7 @@ class Api implements IApi
             $this->credentials['schoolroute'],
             $this->credentials['clientid'],
             $this->credentials['clientsecret'],
-            $this->credentials['authhost'],
+            $this->credentials['region'],
             $this->deepLog
         );
 

@@ -255,6 +255,9 @@
                 </div>
             </div>
 
+            {# Pre-render all suds control panels for all connectors so you can change, configure and save
+             # all in one step rather than having to intermezzo save
+             #}
             {% include '@adminImportIndex/schoolData/dsn/moduleConfig.twig' with configContext only %}
 
             <div class="small-12 island" id="status-island">
