@@ -12,6 +12,7 @@ use Alaress\Database\Predicate\Builder;
 use DomainException;
 use House;
 use HouseMapper;
+use HouseResidential;
 use HouseResidentialMapper;
 use PDOStatement;
 use Predis\ClientInterface;
@@ -137,7 +138,7 @@ class UserMapper extends Mapper
         $this->hasJoin(
             'userAccess',
             array(
-                'mapper' => '\\Schoolbox\\Permission\\Access\\UserAccessMapper',
+                'mapper' => UserAccessMapper::class,
                 'this_key' => 'id',
                 'other_key' => 'uid',
                 'multiple' => true,
@@ -326,7 +327,7 @@ class UserMapper extends Mapper
                 }
             }
         }
-        $query = $this->getSelectString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
+        $query = $this->getSelectString() . ' ' . $this->getFromString() . ' WHERE ' . $query . ' AND user.deleted_at IS NULL';
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateSelect($statement);
@@ -343,21 +344,24 @@ class UserMapper extends Mapper
             SELECT
                 {$this->getColumnString()}, IF(su.id, 1, 0) as `superuser`,
                 {$this->getJoinColumnString('role', 'g')},
-                {$this->getJoinColumnString('userCampus', 'c')},
                 {$this->getJoinColumnString('schoolHouse', 'h')},
                 {$this->getJoinColumnString('residentialHouse', 'rh')},
-                {$this->getColumnString('lu')},
-                {$this->getJoinColumnString('role', 'lur')},
                 {$this->getJoinColumnString('year', 'lyl')},
                 {$this->getJoinColumnString('portrait', 'portrait')},
                 {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')},
                 {$this->getJoinColumnString('pronoun', 'p')}
-            FROM `user`
+        ";
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM `{$this->getTable()}`
             LEFT JOIN superusers su ON su.id = user.id
-            JOIN {$this->getJoinSql('role', '', 'g', true)}
-            LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
-            LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
-            LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
+            INNER JOIN {$this->getJoinSql('role', '', 'g', true)}
             LEFT JOIN {$this->getJoinSql('year', '', 'lyl', true)}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
             LEFT JOIN {$this->getJoinSql('residentialHouse', '', 'rh')}
@@ -386,55 +390,30 @@ class UserMapper extends Mapper
         foreach ($statement as $row) {
             $userId = $row['id'];
 
-            // Don't override previous hydrations of this user: add to it instead
-            if (!isset($users[$userId])) {
+            /** @var Role $role */
+            $role = $this->hydrateJoin($row, 'role', 'g');
 
-                /** @var Role $role */
-                $role = $this->hydrateJoin($row, 'role', 'g');
+            /** @var YearLevel\Model|null $year */
+            $year = $this->hydrateJoin($row, 'year', 'lyl');
 
-                /** @var YearLevel\Model $year */
-                $year = $this->hydrateJoin($row, 'year', 'lyl');
+            /** @var House|null $schoolHouse **/
+            $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
 
-                /** @var House $schoolHouse **/
-                $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
+            /** @var HouseResidential|null $residentialHouse **/
+            $residentialHouse = $this->hydrateJoin($row, 'residentialHouse', 'rh');
 
-                /** @var \HouseResidential $residentialHouse **/
-                $residentialHouse = $this->hydrateJoin($row, 'residentialHouse', 'rh');
+            /** @var User\Pronoun\Model|null $pronoun **/
+            $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
 
-                /** @var User\Pronoun\Model|null $pronoun **/
-                $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
-
-                $users[$userId] = $this->hydrate($row)
-                    ->setSuperuser($row['superuser'] == 1)
-                    ->setRole($role)
-                    ->setYear($year)
-                    ->setSchoolHouse($schoolHouse)
-                    ->setResidentialHouse($residentialHouse)
-                    ->setLinkedUsers($this->createCollection())
-                    ->setPronoun($pronoun)
-                    ->setCampusCollection($campusMapper->createCollection());
-            }
-
-            $campus = $campusMapper->hydrate($row, 'c');
-
-            /* If the campus object has no id, then it spawned a campus
-             * object from nonexistent data (e.g. a user with no campus)
-             * In this case, the campus object will be totally empty but
-             * still occupy slots in the user's campus collection stack
-             */
-            if ($campus) {
-                // Don't double add
-                $users[$userId]->getCampusCollection()->setOffset($campus->getId(), $campus);
-            }
-
-            $linkedUser = $this->hydrate($row, 'lu');
-
-            if ($linkedUser) {
-                // Don't double add
-                $linkedUser->setRole($this->hydrateJoin($row, 'role', 'lur'));
-
-                $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
-            }
+            $users[$userId] = $this->hydrate($row)
+                ->setSuperuser($row['superuser'] == 1)
+                ->setRole($role)
+                ->setYear($year)
+                ->setSchoolHouse($schoolHouse)
+                ->setResidentialHouse($residentialHouse)
+                ->setLinkedUsers($this->createCollection())
+                ->setPronoun($pronoun)
+                ->setCampusCollection($campusMapper->createCollection());
 
             /* Portrait Image
              */
@@ -448,6 +427,44 @@ class UserMapper extends Mapper
 
                 $portrait->setMimetype($mime);
                 $users[$userId]->setPortrait($portrait);
+            }
+        }
+
+        // Load one-to-many relations in separate queries
+        if (!empty($users)) {
+            // Load campuses
+            $userIds          = array_keys($users);
+            $campusesByUserId = $campusMapper->findForOtherMapper($this, 'userCampus', $userIds);
+            foreach ($users as $userId => $user) {
+                $user->setCampusCollection($campusesByUserId[$userId] ?? $campusMapper->createCollection());
+            }
+
+            // Load linked users
+            // (a custom query is required so that roles only are joined)
+            $findLinkedUsersPb    = $this->getPredicateBuilder()->in('id', $userIds);
+            $findLinkedUsersQuery = $this->getDatabase()->prepare("
+                SELECT
+                    `{$this->getTable()}`.`{$this->getIdentifierColumn()}`,
+                    {$this->getColumnString('lu')},
+                    {$this->getJoinColumnString('role', 'lur')}
+                FROM `{$this->getTable()}`
+                INNER JOIN {$this->getJoinSql('user_link', '', 'lu')}
+                INNER JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
+                WHERE {$findLinkedUsersPb->getWhereIntersect()}
+            ");
+            $findLinkedUsersQuery->execute($findLinkedUsersPb->getParams());
+            foreach ($findLinkedUsersQuery as $row) {
+                $userId     = $row['id'];
+                $linkedUser = $this->hydrate($row, 'lu');
+                if ($linkedUser instanceof User) {
+                    $linkedUserRole = $this->hydrateJoin($row, 'role', 'lur');
+                    if ($linkedUserRole instanceof Role) {
+                        $linkedUser = $linkedUser->setRole($linkedUserRole);
+                    }
+                    if (isset($users[$userId])) {
+                        $users[$userId]->getLinkedUsers()->setOffset($linkedUser->getId(), $linkedUser);
+                    }
+                }
             }
         }
 

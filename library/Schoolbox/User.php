@@ -735,7 +735,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @param HouseResidential $residentialHouse
+     * @param HouseResidential|null $residentialHouse
      * @return self
      */
     public function setResidentialHouse($residentialHouse)
@@ -746,7 +746,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return HouseResidential
+     * @return HouseResidential|null
      */
     public function getResidentialHouse()
     {
