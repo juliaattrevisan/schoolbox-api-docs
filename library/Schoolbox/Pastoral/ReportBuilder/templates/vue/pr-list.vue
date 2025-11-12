@@ -38,7 +38,7 @@ window.Vue.onMounted(async (): Promise<void> => {
     });
     const { bottom } = toRefs(arrivedState);
     window.Vue.watch(bottom, (isAtBottom) => {
-        if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
+        if (isAtBottom && payload.value && payload.value.metadata && payload.value.metadata.cursor.next !== null) {
             urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
             url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
         }

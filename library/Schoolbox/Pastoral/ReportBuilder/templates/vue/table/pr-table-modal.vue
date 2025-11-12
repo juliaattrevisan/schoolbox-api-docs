@@ -25,6 +25,7 @@ const isOpen = window.Vue.ref(false);
 const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeUrl = window.Vue.ref("");
 const scopeUrlParams = new URLSearchParams();
+scopeUrlParams.set("limit", "20");
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(scopeUrl);
 
 /**
@@ -80,7 +81,7 @@ const { arrivedState } = useScroll(modalResultsEl, {
 
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
+    if (isAtBottom && payload.value && payload.value.metadata && payload.value.metadata.cursor.next !== null) {
         scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
         scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
     }
@@ -104,7 +105,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <template v-else-if="selectedHeader !== null">
-            <div ref="containerRef" class="l-flex-col l-gap-m">
+            <div ref="containerRef" class="container l-flex-col l-gap-m">
                 <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
                     <div class="l-flex-col l-gap-s f-no-margins">
                         <h2>{{ title }}</h2>
@@ -163,6 +164,9 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
 }
 
 @media print {
+    .container {
+        padding-top: 1rem; /* to account for the pr-generate-print still possibly being visible due to animating off */
+    }
     .pr-table__records {
         max-height: none !important; /* Expand scrollable elements to full height in print view */
         overflow: visible !important; /* Ensure all content is visible */
