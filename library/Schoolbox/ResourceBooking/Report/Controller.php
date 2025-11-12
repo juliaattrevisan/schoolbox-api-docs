@@ -135,68 +135,70 @@ class Controller extends Base
         // if we are only showing clashes, filter the event list now
         $clashesOnlyList = [];
         if ($clashesOnly) {
+            // Step 1: Group events by resource ID
+            $eventsByResource = [];
             foreach ($eventList as $event) {
-                // check if any other events clash with us (overlapping time, same resource)
-                $collides = $eventList->filter(function ($otherEvent) use ($event) {
-                    /* @var \Calendar\Event\Type\ResourceBooking\Event | \Calendar\Event\Type\Timetable\Event | \Calendar\Event\Type\SudsTimetable\Event $otherEvent */
-                    /* @var \Calendar\Event\Type\ResourceBooking\Event | \Calendar\Event\Type\Timetable\Event | \Calendar\Event\Type\SudsTimetable\Event $event */
-
-                    // fetch the resource IDs (depending on type, we hydrate differently)
-                    $eventResourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event) ? $event->getBooking()->getResource()->getId() : $event->getResourceId();
-                    $otherEventResourceId = ($otherEvent instanceof \Calendar\Event\Type\ResourceBooking\Event) ? $otherEvent->getBooking()->getResource()->getId() : $otherEvent->getResourceId();
-
-                    // must be same resource
-                    if ((int)$eventResourceId !== (int)$otherEventResourceId) {
-                        return false;
-                    }
-
-                    // only check for status of pending bookings if they are resource bookings
-                    if (
-                        $otherEvent instanceof \Calendar\Event\Type\ResourceBooking\Event &&
-                        $event instanceof \Calendar\Event\Type\ResourceBooking\Event
-                    ) {
-                        // skip ourself
-                        if ($otherEvent->getBooking()->getId() === $event->getBooking()->getId()) {
-                            return false;
-                        }
-
-                        // only care if at least one booking is pending, so we can see conflicts (that we need to action)
-                        if (
-                            $otherEvent->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING &&
-                            $event->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING
-                        ) {
-                            return false;
-                        }
-                    } elseif (
-                        $event instanceof \Calendar\Event\Type\Timetable\Event &&
-                        $otherEvent instanceof \Calendar\Event\Type\Timetable\Event
-                    ) {
-                        // if not booking, then assume its a timetable event
-                        // check if timetable is for the same homepage (class)
-                        if ($event->getCategoryId() === $otherEvent->getCategoryId()) {
-                            return false;
-                        }
-                    }
-
-                    /* check for time overlap (for collisions)
-                     * @see \Schoolbox\ResourceBooking\Booking\Validation::getConflictingBookings
-                     * we are using the same `startTime + 1` / `endTime - 1` logic here
-                     */
-                    if (
-                        ($event->getStartTime()->getDateTimeObject()->getTimestamp() + 1) <= ($otherEvent->getEndTime()->getDateTimeObject()->getTimestamp() - 1)
-                        && ($event->getEndTime()->getDateTimeObject()->getTimestamp() - 1) >= ($otherEvent->getStartTime()->getDateTimeObject()->getTimestamp() + 1)
-                    ) {
-                        return true;
-                    }
-
-                    // no collision, safe to ignore
-                    return false;
+                $resourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event)
+                    ? $event->getBooking()->getResource()->getId()
+                    : $event->getResourceId();
+                if (!isset($eventsByResource[$resourceId])) {
+                    $eventsByResource[$resourceId] = [];
+                }
+                $eventsByResource[$resourceId][] = $event;
+            }
+            // Step 2: For each resource, sort events by start time and check for overlaps
+            foreach ($eventsByResource as $resourceEvents) {
+                // Sort by start time
+                usort($resourceEvents, function ($a, $b) {
+                    $aStart = $a->getStartTime()->getDateTimeObject()->getTimestamp();
+                    $bStart = $b->getStartTime()->getDateTimeObject()->getTimestamp();
+                    return $aStart <=> $bStart;
                 });
-                // if we have any collisions, add them to the list
-                foreach ($collides as $collideEvent) {
-                    // de-duplicate, use hash from object
-                    $eventHash = spl_object_hash($collideEvent);
-                    $clashesOnlyList[$eventHash] = $collideEvent;
+                $count = count($resourceEvents);
+                for ($i = 0; $i < $count; $i++) {
+                    $eventA = $resourceEvents[$i];
+                    for ($j = $i + 1; $j < $count; $j++) {
+                        $eventB = $resourceEvents[$j];
+                        // Only check for status of pending bookings if both are resource bookings
+                        if (
+                            $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event &&
+                            $eventB instanceof \Calendar\Event\Type\ResourceBooking\Event
+                        ) {
+                            // skip if same booking
+                            if ($eventA->getBooking()->getId() === $eventB->getBooking()->getId()) {
+                                continue;
+                            }
+                            // only care if the booking is pending, so we can see conflicts (that we need to action)
+                            if ($eventB->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
+                                continue;
+                            }
+                        } elseif (
+                            $eventA instanceof \Calendar\Event\Type\Timetable\Event &&
+                            $eventB instanceof \Calendar\Event\Type\Timetable\Event
+                        ) {
+                            // if not booking, then assume its a timetable event
+                            // check if for the same homepage (class)
+                            if ($eventA->getCategoryId() === $eventB->getCategoryId()) {
+                                continue;
+                            }
+                        }
+                        /* Check for time overlap (using same logic as before)
+                         * @see \Schoolbox\ResourceBooking\Booking\Validation::getConflictingBookings
+                         * we are using the same `startTime + 1` / `endTime - 1` logic here
+                         */
+                        $aStart = $eventA->getStartTime()->getDateTimeObject()->getTimestamp() + 1;
+                        $aEnd = $eventA->getEndTime()->getDateTimeObject()->getTimestamp() - 1;
+                        $bStart = $eventB->getStartTime()->getDateTimeObject()->getTimestamp() + 1;
+                        $bEnd = $eventB->getEndTime()->getDateTimeObject()->getTimestamp() - 1;
+                        if ($aStart <= $bEnd && $aEnd >= $bStart) {
+                            // Add both events to the clash list
+                            $clashesOnlyList[spl_object_hash($eventA)] = $eventA;
+                            $clashesOnlyList[spl_object_hash($eventB)] = $eventB;
+                        } elseif ($bStart > $aEnd) {
+                            // Since events are sorted by start time, no further overlaps possible
+                            break;
+                        }
+                    }
                 }
             }
             // collisions should overwrite the event list
