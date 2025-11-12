@@ -78,6 +78,27 @@ class Profile implements IStrategy
 
 
     /**
+     * Veracross has a user-configurable but somewhat stagnant list of role identifiers which denote whether
+     * students are "current" or "future". It's particularly poorly documented:
+     *
+     * https://api-docs.veracross.com/docs/docs/d50279dec5fd1-list-students
+     *
+     * 1: Student
+     * 7: Future Student
+     * ...heaps of others
+     *
+     * There's a list in SA-21318 comment thread. It's too long to list here.
+     *
+     * Note that schools could potentially reindex this, so it's probably destined to become a configuration var
+     * for Veracross in the control panel but we don't have enough schools to decide that right now.
+     *
+     * TODO Move to dsn
+     */
+    private const ROLE_STUDENT_CURRENT = 1;
+    private const ROLE_STUDENT_FUTURE = 7;
+
+
+    /**
      * How long to wait if we're trying to access a veracross-generated url
      * for profile pics
      */
@@ -201,6 +222,7 @@ class Profile implements IStrategy
 
             $this->importStudents();
         }
+
         /* Import staff profile data
          */
         if ($this->validStrats->isStaffStratEnabled()) {
@@ -268,326 +290,355 @@ class Profile implements IStrategy
          */
         $studentLookupConverter = new ValueListConverter();
 
-        /* Spawn a Generator of paginated payloads
+        /* Use the DSN to figure out which set of students we need
+         * Start with current students + families, and optionally add future students + future families
          */
-        $studentPayloadGenerator = $this->api->retrieve('GET', 'students', self::SCOPE);
+        $payloads = [
+            [
+                'log' => 'Processing current students.',
+                'role' => self::ROLE_STUDENT_CURRENT
+            ]
+        ];
 
-        foreach ($studentPayloadGenerator as $studentPage) {
-            $studentLookup = $studentLookupConverter->generate($studentPage['value_lists']);
+        /* TODO Yoink from the dsn
+         */
+        if ($futureFamilies) {
+            $payloads[] = [
+                [
+                    'log' => 'Processing future students.',
+                    'role' => self::ROLE_STUDENT_FUTURE
+                ]
+            ];
+        }
 
-            foreach ($studentPage['data'] as $student) {
-                $externalId = trim((string)$student['id']);
+        /* Iterate over each set of params
+         */
+        foreach ($payloads as $payload) {
+            $this->log->info($payload['log']);
 
-                /* Only import for specific users
-                 */
-                if (!($this->watcher)->isOnWatchlist($externalId, $this->watchlist)) {
-                    continue;
-                }
+            /* Spawn a Generator of paginated payloads
+             */
+            $studentPayloadGenerator = $this->api->retrieve('GET', 'students', self::SCOPE, [
+                'role' => $payload['role'],
+            ]);
 
-                $academicHouse = $student['house']['name'] ?? '';
-                $boardingStatus = false;
+            foreach ($studentPayloadGenerator as $studentPage) {
+                $studentLookup = $studentLookupConverter->generate($studentPage['value_lists']);
 
-                /* Maybe the campus node exists...not sure if it ALWAYS exists, or just sometimes.
-                 */
-                $campusName = $student['campus']['description'] ?? '';
+                foreach ($studentPage['data'] as $student) {
+                    $externalId = trim((string)$student['id']);
 
-                $dob = trim((string)$student['birthday']);
-                $email = trim((string)$student['email_1']);
-
-                $firstname = trim((string)$student['first_name']);
-                $firstnamePreferred = trim((string)$student['preferred_name']);
-
-                $form = '';
-                $gender = trim((string)$studentLookup['gender'][$student['gender']]);
-                $lastname = trim((string)$student['last_name']);
-                $mobile = '';
-                $photoRedacted = false;
-                $studiesCode = '';
-                $title = '';
-
-                /* $student['homeroom'] is a lookup identifier that might not
-                 * actually exist in the lookup itself; Veracross has automated
-                 * cleanups which could be turned off, leading to orphaned data.
-                 */
-                $tutor = [
-                    'id' => null,
-                    'name' => null
-                ];
-
-                if ($student['homeroom_teacher']['id']) {
-                    $tutor = [
-                        'id' => trim((string)$student['homeroom_teacher']['id']),
-                        'name' => trim((string)$student['homeroom_teacher']['name']),
-                    ];
-                }
-
-                $tutorGroup = trim((string)($studentLookup['homeroom'][$student['homeroom']] ?? ''));
-
-                $username = trim((string)$student['username']);
-                $yearLevel = trim((string)$studentLookup['grade_level'][$student['grade_level']]);
-
-                /* Dates
-                 */
-                $enrolmentDate = trim((string)$student['entry_date']);
-                $leavingDate = trim((string)$student['exit_date']);
-
-                /* Flags
-                 */
-                $esl = (bool)($languageLookup[$externalId] ?? false);
-                $ib = false;
-                $ilp = false;
-
-                /* Alerts
-                 */
-                $comments = $alertLookup[$externalId]['academic_alert'] ?? null;
-
-                /* TODO Find out how a split family is represented in pilot school
-                 *
-                 * $legal might be inferred from relationships:list,
-                 * which provides (bool)legal_custody and (string)custody_status
-                 * The relationships lookup specifically filters to legal_custody 1
-                 * so anyone appearing here is legally allowed to do so
-                 */
-                $legal = $alertLookup[$externalId]['family_alert'] ?? null;
-
-                $medical = $alertLookup[$externalId]['medical_alert'] ?? null;
-                $messages = $alertLookup[$externalId]['general_alert'] ?? null;
-
-                /* From Thad, 7/2/23:
-                 *     "In the U.S., an Advisor is typically a faculty or staff member who meets with
-                 *      the student to monitor their academic success and provide/coordinate support
-                 *      services. Most commonly, we see this in Upper school divisions where this
-                 *      person is the “College Advisor” and is helping the student track their progress
-                 *      toward graduation requirements, apply to colleges/universities, etc."
-                 *
-                 * Not sure whether this is closer to YLC or Form Teacher, but I'll put it here for now
-                 */
-                $formTeacher = [
-                    'id' => null,
-                    'name' => null
-                ];
-
-                if ($student['advisor']['id']) {
-                    $formTeacher = [
-                        'id' => trim((string)$student['advisor']['id']),
-                        'name' => trim((string)$student['advisor']['name'])
-                    ];
-                }
-
-                /* Fish out a staff member via their user code
-                 */
-                $housemaster = [
-                    'id' => null,
-                    'name' => null
-                ];
-
-                /* Fish out special needs
-                 */
-                $specialNeeds = null;
-
-                /* Find out a staff member via their user code
-                 */
-                $yearLevelCoordinator = [
-                    'id' => null,
-                    'name' => null
-                ];
-
-                /* Dates
-                 */
-                $enrolment = $this->findDate($enrolmentDate);
-                $leaving = $this->findDate($leavingDate);
-
-                /* Parents might inadvertently have the same externalId as someone else's
-                 * base profile (e.g. parent has same external id as student)
-                 *
-                 * This is not usually supposed to happen.
-                 * some sis implementations let you have broken data in this way
-                 *
-                 * Try and load a student profile based on external id. If it exists, just reuse
-                 * those pieces. If it doesn't exist, first check if there's an existing base
-                 * profile before making a whole new one (this is how you end up with fk issues)
-                 */
-                try {
-                    $oldStudentProfile = $this->studentProfileMapper->findByExternalId($externalId);
-                    $oldStudentBaseProfile = $oldStudentProfile->getBaseProfile();
-                } catch (Exception $e) {
-                    $oldStudentProfile = $this->studentProfileMapper->createModel();
-
-                    try {
-                        $oldStudentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
-                    } catch (Exception $e) {
-                        $oldStudentBaseProfile = $this->baseProfileMapper->createModel();
+                    /* Only import for specific users
+                     */
+                    if (!($this->watcher)->isOnWatchlist($externalId, $this->watchlist)) {
+                        continue;
                     }
 
-                    $oldStudentProfile->setBaseProfile($oldStudentBaseProfile);
-                }
+                    $academicHouse = $student['house']['name'] ?? '';
+                    $boardingStatus = false;
 
-                $studentBaseProfile = clone $oldStudentBaseProfile;
-                $studentProfile = clone $oldStudentProfile;
-                $studentProfile->setBaseProfile($studentBaseProfile);
+                    /* Maybe the campus node exists...not sure if it ALWAYS exists, or just sometimes.
+                     */
+                    $campusName = $student['campus']['description'] ?? '';
 
-                $studentBaseProfile
-                    ->setExternalId($externalId)
-                    ->setTitle($title)
-                    ->setFirstname($firstname)
-                    ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
+                    $dob = trim((string)$student['birthday']);
+                    $email = trim((string)$student['email_1']);
 
-                /* Find their profile pic and assign it, if applicable
-                 */
-                if ($this->includePhoto) {
-                    $this->importPhoto($studentBaseProfile, $photoLookup);
-                }
+                    $firstname = trim((string)$student['first_name']);
+                    $firstnamePreferred = trim((string)$student['preferred_name']);
 
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $this->profileHandler->saveBaseProfile($studentBaseProfile, $oldStudentBaseProfile);
-                }
+                    $form = '';
+                    $gender = trim((string)$studentLookup['gender'][$student['gender']]);
+                    $lastname = trim((string)$student['last_name']);
+                    $mobile = '';
+                    $photoRedacted = false;
+                    $studiesCode = '';
+                    $title = '';
 
-                /* Smoosh it all together
-                 */
-                $studentProfile
-                    ->setUsername($username)
-                    ->setAlertComment($comments)
-                    ->setAlertLegal($legal)
-                    ->setAlertMedical($medical)
-                    ->setAlertMessage($messages)
-                    ->setCampusName($campusName)
-                    ->setEmail($email)
-                    ->setEnrolmentDate($enrolment)
-                    ->setFormName($form)
-                    ->setFormTeacherId($formTeacher['id'])
-                    ->setFormTeacherName($formTeacher['name'])
-                    ->setGender($gender)
-                    ->setHeadOfHouseId($housemaster['id'])
-                    ->setHeadOfHouseName($housemaster['name'])
-                    ->setHouseName($academicHouse)
-                    ->setLeavingDate($leaving)
-                    ->setMobile($mobile)
-                    ->setPhotoRedacted($photoRedacted)
-                    ->setStudiesCode($studiesCode)
-                    ->setTutorGroup($tutorGroup)
-                    ->setTutorTeacherId($tutor['id'])
-                    ->setTutorTeacherName($tutor['name'])
-                    ->setYearLevel($yearLevel)
-                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
-                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+                    /* $student['homeroom'] is a lookup identifier that might not
+                     * actually exist in the lookup itself; Veracross has automated
+                     * cleanups which could be turned off, leading to orphaned data.
+                     */
+                    $tutor = [
+                        'id' => null,
+                        'name' => null
+                    ];
+
+                    if ($student['homeroom_teacher']['id']) {
+                        $tutor = [
+                            'id' => trim((string)$student['homeroom_teacher']['id']),
+                            'name' => trim((string)$student['homeroom_teacher']['name']),
+                        ];
+                    }
+
+                    $tutorGroup = trim((string)($studentLookup['homeroom'][$student['homeroom']] ?? ''));
+
+                    $username = trim((string)$student['username']);
+                    $yearLevel = trim((string)$studentLookup['grade_level'][$student['grade_level']]);
+
+                    /* Dates
+                     */
+                    $enrolmentDate = trim((string)$student['entry_date']);
+                    $leavingDate = trim((string)$student['exit_date']);
+
+                    /* Flags
+                     */
+                    $esl = (bool)($languageLookup[$externalId] ?? false);
+                    $ib = false;
+                    $ilp = false;
+
+                    /* Alerts
+                     */
+                    $comments = $alertLookup[$externalId]['academic_alert'] ?? null;
+
+                    /* TODO Find out how a split family is represented in pilot school
+                     *
+                     * $legal might be inferred from relationships:list,
+                     * which provides (bool)legal_custody and (string)custody_status
+                     * The relationships lookup specifically filters to legal_custody 1
+                     * so anyone appearing here is legally allowed to do so
+                     */
+                    $legal = $alertLookup[$externalId]['family_alert'] ?? null;
+
+                    $medical = $alertLookup[$externalId]['medical_alert'] ?? null;
+                    $messages = $alertLookup[$externalId]['general_alert'] ?? null;
+
+                    /* From Thad, 7/2/23:
+                     *     "In the U.S., an Advisor is typically a faculty or staff member who meets with
+                     *      the student to monitor their academic success and provide/coordinate support
+                     *      services. Most commonly, we see this in Upper school divisions where this
+                     *      person is the “College Advisor” and is helping the student track their progress
+                     *      toward graduation requirements, apply to colleges/universities, etc."
+                     *
+                     * Not sure whether this is closer to YLC or Form Teacher, but I'll put it here for now
+                     */
+                    $formTeacher = [
+                        'id' => null,
+                        'name' => null
+                    ];
+
+                    if ($student['advisor']['id']) {
+                        $formTeacher = [
+                            'id' => trim((string)$student['advisor']['id']),
+                            'name' => trim((string)$student['advisor']['name'])
+                        ];
+                    }
+
+                    /* Fish out a staff member via their user code
+                     */
+                    $housemaster = [
+                        'id' => null,
+                        'name' => null
+                    ];
+
+                    /* Fish out special needs
+                     */
+                    $specialNeeds = null;
+
+                    /* Find out a staff member via their user code
+                     */
+                    $yearLevelCoordinator = [
+                        'id' => null,
+                        'name' => null
+                    ];
+
+                    /* Dates
+                     */
+                    $enrolment = $this->findDate($enrolmentDate);
+                    $leaving = $this->findDate($leavingDate);
+
+                    /* Parents might inadvertently have the same externalId as someone else's
+                     * base profile (e.g. parent has same external id as student)
+                     *
+                     * This is not usually supposed to happen.
+                     * some sis implementations let you have broken data in this way
+                     *
+                     * Try and load a student profile based on external id. If it exists, just reuse
+                     * those pieces. If it doesn't exist, first check if there's an existing base
+                     * profile before making a whole new one (this is how you end up with fk issues)
+                     */
+                    try {
+                        $oldStudentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                        $oldStudentBaseProfile = $oldStudentProfile->getBaseProfile();
+                    } catch (Exception $e) {
+                        $oldStudentProfile = $this->studentProfileMapper->createModel();
+
+                        try {
+                            $oldStudentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                        } catch (Exception $e) {
+                            $oldStudentBaseProfile = $this->baseProfileMapper->createModel();
+                        }
+
+                        $oldStudentProfile->setBaseProfile($oldStudentBaseProfile);
+                    }
+
+                    $studentBaseProfile = clone $oldStudentBaseProfile;
+                    $studentProfile = clone $oldStudentProfile;
+                    $studentProfile->setBaseProfile($studentBaseProfile);
+
+                    $studentBaseProfile
+                        ->setExternalId($externalId)
+                        ->setTitle($title)
+                        ->setFirstname($firstname)
+                        ->setFirstnamePreferred($firstnamePreferred)
+                        ->setLastname($lastname);
+
+                    /* Find their profile pic and assign it, if applicable
+                     */
+                    if ($this->includePhoto) {
+                        $this->importPhoto($studentBaseProfile, $photoLookup);
+                    }
+
+                    /* Then save it
+                     */
+                    if ($this->perform) {
+                        $this->profileHandler->saveBaseProfile($studentBaseProfile, $oldStudentBaseProfile);
+                    }
+
+                    /* Smoosh it all together
+                     */
+                    $studentProfile
+                        ->setUsername($username)
+                        ->setAlertComment($comments)
+                        ->setAlertLegal($legal)
+                        ->setAlertMedical($medical)
+                        ->setAlertMessage($messages)
+                        ->setCampusName($campusName)
+                        ->setEmail($email)
+                        ->setEnrolmentDate($enrolment)
+                        ->setFormName($form)
+                        ->setFormTeacherId($formTeacher['id'])
+                        ->setFormTeacherName($formTeacher['name'])
+                        ->setGender($gender)
+                        ->setHeadOfHouseId($housemaster['id'])
+                        ->setHeadOfHouseName($housemaster['name'])
+                        ->setHouseName($academicHouse)
+                        ->setLeavingDate($leaving)
+                        ->setMobile($mobile)
+                        ->setPhotoRedacted($photoRedacted)
+                        ->setStudiesCode($studiesCode)
+                        ->setTutorGroup($tutorGroup)
+                        ->setTutorTeacherId($tutor['id'])
+                        ->setTutorTeacherName($tutor['name'])
+                        ->setYearLevel($yearLevel)
+                        ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
+                        ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
+
+                        /**
+                         * Flags
+                         */
+                        ->setBoardingStatus($boardingStatus)
+                        ->setEsl($esl)
+                        ->setIb($ib)
+                        ->setIndividualLearningPlans($ilp)
+                        ->setSpecialNeeds($specialNeeds);
+
+                    /* Date of birth requires special treatment as ADF doesn't deal with nulls well
+                     */
+                    if ($dob) {
+                        $studentProfile
+                            ->setDateOfBirth(new Alaress_Date_Format($dob, 'Y-m-d'));
+                    }
 
                     /**
-                     * Flags
+                     * Emergency Contacts
+                     * ...because we didn't normalise it, I'm hardcoding these
                      */
-                    ->setBoardingStatus($boardingStatus)
-                    ->setEsl($esl)
-                    ->setIb($ib)
-                    ->setIndividualLearningPlans($ilp)
-                    ->setSpecialNeeds($specialNeeds);
+                    if (\count($emergencyContactsLookup[$student['id']] ?? [])) {
+                        if (isset($emergencyContactsLookup[$student['id']][0])) {
+                            $fullname = trim(sprintf(
+                                '%s %s (%s)',
+                                $emergencyContactsLookup[$student['id']][0]['first_name'],
+                                $emergencyContactsLookup[$student['id']][0]['last_name'],
+                                $emergencyContactsLookup[$student['id']][0]['relationship'],
+                            ));
 
-                /* Date of birth requires special treatment as ADF doesn't deal with nulls well
-                 */
-                if ($dob) {
-                    $studentProfile
-                        ->setDateOfBirth(new Alaress_Date_Format($dob, 'Y-m-d'));
-                }
+                            $phone = (new FirstMeaningfulValue())->find([
+                                $emergencyContactsLookup[$student['id']][0]['mobile_phone'],
+                                $emergencyContactsLookup[$student['id']][0]['business_phone'],
+                                $emergencyContactsLookup[$student['id']][0]['home_phone'],
+                            ]);
 
-                /**
-                 * Emergency Contacts
-                 * ...because we didn't normalise it, I'm hardcoding these
-                 */
-                if (\count($emergencyContactsLookup[$student['id']] ?? [])) {
-                    if (isset($emergencyContactsLookup[$student['id']][0])) {
-                        $fullname = trim(sprintf(
-                            '%s %s (%s)',
-                            $emergencyContactsLookup[$student['id']][0]['first_name'],
-                            $emergencyContactsLookup[$student['id']][0]['last_name'],
-                            $emergencyContactsLookup[$student['id']][0]['relationship'],
-                        ));
+                            $studentProfile
+                                ->setEmergencyContactName1($fullname)
+                                ->setEmergencyContactPhone1($phone);
+                        }
 
-                        $phone = (new FirstMeaningfulValue())->find([
-                            $emergencyContactsLookup[$student['id']][0]['mobile_phone'],
-                            $emergencyContactsLookup[$student['id']][0]['business_phone'],
-                            $emergencyContactsLookup[$student['id']][0]['home_phone'],
-                        ]);
+                        if (isset($emergencyContactsLookup[$student['id']][1])) {
+                            $fullname = trim(sprintf(
+                                '%s %s (%s)',
+                                $emergencyContactsLookup[$student['id']][1]['first_name'],
+                                $emergencyContactsLookup[$student['id']][1]['last_name'],
+                                $emergencyContactsLookup[$student['id']][1]['relationship'],
+                            ));
 
+                            $phone = (new FirstMeaningfulValue())->find([
+                                $emergencyContactsLookup[$student['id']][1]['mobile_phone'],
+                                $emergencyContactsLookup[$student['id']][1]['business_phone'],
+                                $emergencyContactsLookup[$student['id']][1]['home_phone'],
+                            ]);
+
+                            $studentProfile
+                                ->setEmergencyContactName2($fullname)
+                                ->setEmergencyContactPhone2($phone);
+                        }
+
+                        if (isset($emergencyContactsLookup[$student['id']][2])) {
+                            $fullname = trim(sprintf(
+                                '%s %s (%s)',
+                                $emergencyContactsLookup[$student['id']][2]['first_name'],
+                                $emergencyContactsLookup[$student['id']][2]['last_name'],
+                                $emergencyContactsLookup[$student['id']][2]['relationship'],
+                            ));
+
+                            $phone = (new FirstMeaningfulValue())->find([
+                                $emergencyContactsLookup[$student['id']][2]['mobile_phone'],
+                                $emergencyContactsLookup[$student['id']][2]['business_phone'],
+                                $emergencyContactsLookup[$student['id']][2]['home_phone'],
+                            ]);
+
+                            $studentProfile
+                                ->setEmergencyContactName3($fullname)
+                                ->setEmergencyContactPhone3($phone);
+                        }
+                    } else {
+                        /* This student doesn't have any emergency contacts anymore
+                         * Clear whatever was there
+                         */
                         $studentProfile
-                            ->setEmergencyContactName1($fullname)
-                            ->setEmergencyContactPhone1($phone);
+                            ->setEmergencyContactName1(null)
+                            ->setEmergencyContactPhone1(null)
+                            ->setEmergencyContactName2(null)
+                            ->setEmergencyContactPhone2(null)
+                            ->setEmergencyContactName3(null)
+                            ->setEmergencyContactPhone3(null);
                     }
 
-                    if (isset($emergencyContactsLookup[$student['id']][1])) {
-                        $fullname = trim(sprintf(
-                            '%s %s (%s)',
-                            $emergencyContactsLookup[$student['id']][1]['first_name'],
-                            $emergencyContactsLookup[$student['id']][1]['last_name'],
-                            $emergencyContactsLookup[$student['id']][1]['relationship'],
-                        ));
-
-                        $phone = (new FirstMeaningfulValue())->find([
-                            $emergencyContactsLookup[$student['id']][1]['mobile_phone'],
-                            $emergencyContactsLookup[$student['id']][1]['business_phone'],
-                            $emergencyContactsLookup[$student['id']][1]['home_phone'],
-                        ]);
-
-                        $studentProfile
-                            ->setEmergencyContactName2($fullname)
-                            ->setEmergencyContactPhone2($phone);
-                    }
-
-                    if (isset($emergencyContactsLookup[$student['id']][2])) {
-                        $fullname = trim(sprintf(
-                            '%s %s (%s)',
-                            $emergencyContactsLookup[$student['id']][2]['first_name'],
-                            $emergencyContactsLookup[$student['id']][2]['last_name'],
-                            $emergencyContactsLookup[$student['id']][2]['relationship'],
-                        ));
-
-                        $phone = (new FirstMeaningfulValue())->find([
-                            $emergencyContactsLookup[$student['id']][2]['mobile_phone'],
-                            $emergencyContactsLookup[$student['id']][2]['business_phone'],
-                            $emergencyContactsLookup[$student['id']][2]['home_phone'],
-                        ]);
-
-                        $studentProfile
-                            ->setEmergencyContactName3($fullname)
-                            ->setEmergencyContactPhone3($phone);
-                    }
-                } else {
-                    /* This student doesn't have any emergency contacts anymore
-                     * Clear whatever was there
+                    /* Log it
                      */
-                    $studentProfile
-                        ->setEmergencyContactName1(null)
-                        ->setEmergencyContactPhone1(null)
-                        ->setEmergencyContactName2(null)
-                        ->setEmergencyContactPhone2(null)
-                        ->setEmergencyContactName3(null)
-                        ->setEmergencyContactPhone3(null);
-                }
+                    $this->log->info(sprintf(
+                        'Adding student profile for %s (%s)',
+                        trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                        $externalId
+                    ));
 
-                /* Log it
-                 */
-                $this->log->info(sprintf(
-                    'Adding student profile for %s (%s)',
-                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
-                    $externalId
-                ));
+                    /* Then save it
+                     */
+                    if ($this->perform) {
+                        $this->profileHandler->saveStudentProfile($studentProfile, $oldStudentProfile);
+                    }
 
-                /* Then save it
-                 */
-                if ($this->perform) {
-                    $this->profileHandler->saveStudentProfile($studentProfile, $oldStudentProfile);
-                }
-
-                /* Add their parents' profile data
-                 */
-                if ($this->validStrats->isFamiliesStratEnabled()) {
-                    $this->importParentsOfStudent(
-                        $externalId,
-                        $studentBaseProfile,
-                        $contactInfoLookup,
-                        $relationshipLookup,
-                        $householdLookup[$student['household_id']] ?? []
-                    );
+                    /* Add their parents' profile data
+                     */
+                    if ($this->validStrats->isFamiliesStratEnabled()) {
+                        $this->importParentsOfStudent(
+                            $externalId,
+                            $studentBaseProfile,
+                            $contactInfoLookup,
+                            $relationshipLookup,
+                            $householdLookup[$student['household_id']] ?? []
+                        );
+                    }
                 }
             }
         }
