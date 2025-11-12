@@ -158,8 +158,16 @@ class Controller extends Base
                     // cache start and end times
                     $aStart = $eventA->getStartTime();
                     $aEnd = $eventA->getEndTime();
+                    $eventAHash = spl_object_hash($eventA);
                     for ($j = $i + 1; $j < $count; $j++) {
                         $eventB = $resourceEvents[$j];
+                        $eventBHash = spl_object_hash($eventB);
+
+                        // skip the same object...
+                        if ($eventAHash === $eventBHash) {
+                            continue;
+                        }
+
                         // Only check for status of pending bookings if both are resource bookings
                         if (
                             $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event &&
@@ -179,7 +187,10 @@ class Controller extends Base
                         ) {
                             // if not booking, then assume its a timetable event
                             // check if for the same homepage (class)
-                            if ($eventA->getCategoryId() === $eventB->getCategoryId()) {
+                            if (
+                                ($eventA->getCategoryId() === $eventB->getCategoryId())
+                                && ($eventA->getCategoryId() !== -1 || $eventB->getCategoryId() !== -1)
+                            ) {
                                 continue;
                             }
                         }
@@ -189,8 +200,8 @@ class Controller extends Base
                         $bEnd = $eventB->getEndTime();
                         if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {
                             // Add both events to the clash list
-                            $clashesOnlyList[spl_object_hash($eventA)] = $eventA;
-                            $clashesOnlyList[spl_object_hash($eventB)] = $eventB;
+                            $clashesOnlyList[$eventAHash] = $eventA;
+                            $clashesOnlyList[$eventBHash] = $eventB;
                         } elseif ($bStart->gt($aEnd)) {
                             // Since events are sorted by start time, no further overlaps possible
                             break;
