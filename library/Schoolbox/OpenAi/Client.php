@@ -73,12 +73,12 @@ class Client implements IClient
      */
     public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
     {
-        $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
-        $request = new Request('POST', $url, $this->authHeaders);
+        $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
+        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, false);
         return $this->handleNonStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ResponseMessage(),
         );
@@ -109,9 +109,9 @@ class Client implements IClient
         $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, false);
         return $this->handleNonStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ChatCompletionsMessage(),
         );
@@ -287,35 +287,18 @@ class Client implements IClient
      * Request a non-streamed response from the AI provider, and handle the
      * logging and exceptions appropriately.
      *
-     * @param RequestInterface       $request    The request to send.
-     * @param array                  $payload    The request body to send.
+     * @param ResponseInterface      $response   The response from the AI provider.
      * @param Log\Model              $log        The log to write to.
      * @param LogHandler\ILogHandler $logHandler The log handler to use for the response.
      * @return ResponseInterface The response from the AI provider.
-     * @throws ClientExceptionInterface if the request fails
-     * @throws JsonException            if somehow the response body couldn't be decoded
-     * @throws MapperException          if somehow the log couldn't be saved
+     * @throws JsonException   if somehow the response body couldn't be decoded
+     * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleNonStreamedResponse(
-        RequestInterface $request,
-        array $payload,
+        ResponseInterface $response,
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
     ): ResponseInterface {
-        try {
-            $response = $this->sendRequest($request, $payload, $log, false);
-        } catch (BadResponseException $e) {
-            $log->setReturnCode($e->getResponse()->getStatusCode())
-                ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
-            throw $e;
-        } catch (ClientExceptionInterface $e) {
-            $log->setReturnCode(null)
-                ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
-            throw $e;
-        }
-
         // Do something with the response:
         // extract the body, and also log it.
         // OpenAI responses to non-streamed requests are a single JSON object
