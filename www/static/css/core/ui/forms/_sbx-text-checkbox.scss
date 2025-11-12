@@ -2,28 +2,8 @@
  * checkbox input
  * Scope: UI Uplift
  */
-:root {
-    --sbx-animation-form-input-change: 100ms;
-}
 
-/* Shared form input focus styles */
-@mixin form-input-focus {
-    background: var(--sbx-color-foreground-primary);
-    border-color: var(--sbx-color-accent);
-    outline: calc(var(--sbx-border-width-normal) + 2px) solid var(--sbx-color-accent);
-    outline-offset: calc(var(--sbx-border-width-normal) + 1px);
-}
-
-/* Shared form input disabled styles */
-@mixin form-input-disabled {
-    background-color: var(--sbx-color-foreground-secondary);
-    color: var(--sbx-color-text-secondary) !important;
-    cursor: not-allowed;
-    pointer-events: auto;
-    & + label {
-        opacity: 1 !important;
-    }
-}
+@use "sbx-form";
 
 /* Base */
 .sbx-body input[type="checkbox"] {
@@ -71,11 +51,11 @@
 
     /* focus / disabled use shared mixins like text input */
     &:focus {
-        @include form-input-focus;
+        @include sbx-form.form-input-focus;
     }
 
     &:disabled {
-        @include form-input-disabled;
+        @include sbx-form.form-input-disabled;
     }
 }
 

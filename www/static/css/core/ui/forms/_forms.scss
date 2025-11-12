@@ -864,8 +864,6 @@ input[type="checkbox"].plain {
     margin: 0;
     min-height: inherit;
 }
-<<<<<<< HEAD
-=======
 
 body:not(.sbx-body) {
     .checklist,
@@ -877,7 +875,6 @@ body:not(.sbx-body) {
     }
 }
 
->>>>>>> fd734b3fbf1 (Updated old UI scopes[SA-21017])
 .checklist .checklist {
     margin-left: 2rem;
 }
@@ -945,33 +942,6 @@ body:not(.sbx-body) {
         @include vaporwave();
     }
 }
-<<<<<<< HEAD
-input[type="radio"]:not(.plain) {
-    @include fancy-check("radio-label");
-    @include vaporwave("input-toggle");
-}
-input[type="checkbox"]:not(.plain) {
-    @include fancy-check("checkbox-label");
-    @include vaporwave("input-toggle");
-}
-
-ul.filters {
-    align-items: center;
-    &:before {
-        display: inline-block;
-        content: "Showing:";
-        margin-right: 8px;
-    }
-    input[type="checkbox"] {
-        @include vaporwave($toggle-width: auto);
-    }
-    li {
-        display: inline-block;
-        margin-bottom: 3px;
-    }
-    label {
-        padding: 0 12px 0 8px;
-=======
 
 input[type="radio"]:not(.plain) {
     @include fancy-check("radio-label");
@@ -1001,7 +971,6 @@ body:not(.sbx-body) {
         label {
             padding: 0 12px 0 8px;
         }
->>>>>>> fd734b3fbf1 (Updated old UI scopes[SA-21017])
     }
 }
 
