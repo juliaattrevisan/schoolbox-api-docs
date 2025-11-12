@@ -150,9 +150,7 @@ class Controller extends Base
             foreach ($eventsByResource as $resourceEvents) {
                 // Sort by start time
                 usort($resourceEvents, function ($a, $b) {
-                    $aStart = $a->getStartTime()->getDateTimeObject()->getTimestamp();
-                    $bStart = $b->getStartTime()->getDateTimeObject()->getTimestamp();
-                    return $aStart <=> $bStart;
+                    return $a->getStartTime()->compare($b->getStartTime());
                 });
                 $count = count($resourceEvents);
                 for ($i = 0; $i < $count; $i++) {
