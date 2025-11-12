@@ -20,6 +20,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -194,7 +195,6 @@ class Client implements IClient
                 $request,
                 [
                     RequestOptions::ALLOW_REDIRECTS => false,
-//                    RequestOptions::HTTP_ERRORS     => false,
                     RequestOptions::STREAM          => $stream,
                     RequestOptions::JSON            => $payload,
                 ],
@@ -203,12 +203,26 @@ class Client implements IClient
             $log->setReturnCode($e->getResponse()->getStatusCode())
                 ->setErrorMessage($e->getMessage());
             $this->logMapper->save($log);
-            throw $e;
+
+            // Extract body from response, and put it in output
+            $responseBody = $e->getResponse()->getBody()->getContents();
+            $responseJson = json_decode($responseBody, true);
+            throw new SchoolboxException(
+                $responseJson['error']['message'] ?? $e->getMessage(),
+                $e->getCode(),
+                $e,
+                $e->getResponse()->getStatusCode(),
+            );
         } catch (ClientExceptionInterface $e) {
             $log->setReturnCode(null)
                 ->setErrorMessage($e->getMessage());
             $this->logMapper->save($log);
-            throw $e;
+            throw new SchoolboxException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e,
+                500,
+            );
         }
     }
 
