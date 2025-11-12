@@ -88,12 +88,12 @@ class Generator
 
 
     /**
-     * Authentication params associated with the selected region.
+     * Authentication url associated with the selected region.
      * Defaults to DEFAULT_REGION when $region is invalid
      *
-     * @var array
+     * @var string
      */
-    private array $regionAuth;
+    private string $regionAuth;
 
 
     /**
