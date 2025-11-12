@@ -1,7 +1,7 @@
 /**
  * Composable to handle printing all records functionality
  * Handles the logic for fetching all records when needed and triggering print
- * This is a bit of a dirty to print 'all' records, pushing the limit to 1000,
+ * This is a bit of a dirty hack to print 'all' records, pushing the limit to 1000,
  * waiting for all records to load and images to render before calling window.print()
  */
 
@@ -41,7 +41,7 @@ export function usePrintRecords(
             window.print();
             return;
         }
-        // all records are already when there's no metadata or no next cursor so just print
+        // all records are already loaded when there's no metadata or no next cursor so just print
         if (
             (payload.value && payload.value.metadata === undefined) ||
             (payload.value && payload.value.metadata?.cursor.next === null)

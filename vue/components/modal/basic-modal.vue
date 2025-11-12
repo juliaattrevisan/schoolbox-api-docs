@@ -18,7 +18,6 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
     hasBackgroundClick: false,
-    isCloseDisabled: false,
     size: "m",
     showCloseButton: true,
     hasFocusTrap: true,
