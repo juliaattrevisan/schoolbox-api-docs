@@ -81,6 +81,7 @@ class DSN implements IDSN
             'clientsecret' => null,
             'portalaccessname' => null,
             'region' => null,
+            'options' => []
         ];
 
         $matches = [];

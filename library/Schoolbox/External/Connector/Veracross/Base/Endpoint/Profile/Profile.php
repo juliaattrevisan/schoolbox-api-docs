@@ -218,8 +218,6 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
-            $this->log->info('Processing students and their parents.');
-
             $this->importStudents();
         }
 
@@ -291,23 +289,21 @@ class Profile implements IStrategy
         $studentLookupConverter = new ValueListConverter();
 
         /* Use the DSN to figure out which set of students we need
-         * Start with current students + families, and optionally add future students + future families
+         * Start with current students + families...
          */
         $payloads = [
             [
-                'log' => 'Processing current students.',
+                'log' => 'Processing current students and their families...',
                 'role' => self::ROLE_STUDENT_CURRENT
             ]
         ];
 
-        /* TODO Yoink from the dsn
+        /* ...and optionally add future students + future families
          */
-        if ($futureFamilies) {
+        if ($this->api->getOptions()['futurefamilies'] ?? false) {
             $payloads[] = [
-                [
-                    'log' => 'Processing future students.',
-                    'role' => self::ROLE_STUDENT_FUTURE
-                ]
+                'log' => 'Processing future students and their families...',
+                'role' => self::ROLE_STUDENT_FUTURE
             ];
         }
 

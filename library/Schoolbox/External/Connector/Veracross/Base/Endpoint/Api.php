@@ -112,6 +112,12 @@ class Api implements IApi
 
 
     /**
+     * @var array
+     */
+    private array $options = [];
+
+
+    /**
      * Constructor.
      *
      * @param string $host
@@ -149,6 +155,10 @@ class Api implements IApi
         /* You need these parts when build attendance links
          */
         $this->credentials = (new Codec\DSN())->decode($dsn);
+
+        /* Remember the optional pieces we offer
+         */
+        $this->options = $this->credentials['options'] ?? [];
 
         /* Enforce slash in the endpoint prefix
          *
@@ -549,6 +559,15 @@ class Api implements IApi
         }
 
         return \GuzzleHttp\Promise\Utils::settle($promises)->wait();
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
 
