@@ -178,7 +178,7 @@ async function onTickClicked(): Promise<void> {
     </div>
     <span
         v-else-if="progressClass"
-        class="no-text progress-tick"
+        class="no-text progress-tick readonly"
         :class="progressClass"
         :style="{ margin: props.noMargin ? '0' : undefined }"
         :title="mouseoverTitle"
