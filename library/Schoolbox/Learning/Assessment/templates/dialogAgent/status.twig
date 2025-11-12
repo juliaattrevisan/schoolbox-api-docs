@@ -1,0 +1,382 @@
+{##
+ # Status screen for Dialog Agents
+ #
+ # Here you can see a strategic overview of people doing their responses and whether they needed help.
+ # Async endpoints fulfil mutations and this polls periodically to get the latest status on responses.
+ #
+ # Note that this deviates from inheriting from assessment/status/status.twig because you'd have to trun off
+ # all the duework-specific stuff.
+ #
+ # @param DialogAgent\Model $assessment         A Dialog Agent assessment instance (synonymous with Discussion)
+ # @param Collection $breadcrumbs               A set of key-value tuples for breadcrumb rendering
+ # @param array $statuses                       A set of (status, metadata) tuples to tell staff about
+ # @param DialogAgent\Scenario\Model $scenario  The scenario that was chosen for $assessment along with its fields etc.
+ #}
+
+<script>
+    // /* TODO REALLY REALLY cheap for now until snake remakes this nicely
+    //  */
+    // setTimeout(function(){
+    //     window.location.reload(1);
+    // }, 7000);
+</script>
+
+<style>
+    table {
+        margin-bottom: 0;
+    }
+
+    table th, table td {
+        border-right: 1px solid #ccc;
+    }
+
+    table th:last-child, table tr td:last-child {
+        border-right: 0;
+    }
+
+    .col-status {
+        width: 6rem;
+        text-align: center;
+    }
+
+    .col-participant {
+        min-width: 13rem;
+    }
+
+    /* so the tot menu isn't shrunk to cell width of 1 button
+     */
+    .dialog-agent .f-dropdown {
+        min-width: 13rem;
+    }
+</style>
+
+{# TODO what is this about #}
+{% set viewCustomParticipationRoute = false %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1 data-test="assessment-status-meta-title">Status of {{ assessment.title }}</h1>
+        </div>
+    </div>
+    <nav>
+        <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
+        {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+
+        {% if modifyRoute %}
+            {% include '@learningAssessment/fragments/modifyLinks.twig' with {
+                assessment: assessment,
+                modifyRoute: modifyRoute,
+                returnUrlName: RETURN_URL.name,
+                returnUrl: RETURN_URL.current,
+            } only %}
+        {% endif %}
+
+        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) %}
+
+        {% if not assessment.isSpecification and viewCustomParticipationRoute %}
+            <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+{# Metadata about the activity #}
+<div class="row">
+    <div class="small-12 large-4 columns">
+        <ul class="meta">
+            {% include '@learning/fragments/meta/dueDate.twig' %}
+            {% include '@learning/fragments/meta/workType.twig' %}
+            {% if not assessment.isSpecification %}
+                {% if readonly ?? false %}
+                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{# Status filters of some kind
+ # This is a far nicer way to build this construct instead of that crazy idea in status.twig superclass
+ # TODO Technical debt: recommend backporting
+ #}
+{% set statusLookup = {
+    'pending': {
+        'label': 'Pending',
+        'value': 'pending',
+        'css': '',
+    },
+    'in-progress': {
+        'label': 'In Progress',
+        'value': 'inprogress',
+        'css': 'in-progress',
+    },
+    'requires-assistance': {
+        'label': 'Requires Assistance',
+        'value': 'requires-assistance',
+        'css': 'requires-assistance',
+    },
+    'submitted': {
+        'label': 'Submitted',
+        'value': 'submitted',
+        'css': 'submitted',
+    },
+} %}
+
+<div class="row">
+    <div class="small-12 columns text-right">
+        <ul class="filters" data-participant-filters id="filters">
+            {% set checked = 'checked="checked"' %}
+
+            {% for key, status in statusLookup %}
+                <li>
+                    <input type="checkbox" id="filter-{{ status.value }}" {{ checked }} data-status="{{ status.value }}" />
+                    <label for="filter-{{ status.value }}">
+                        <span class="progress-tick dialog-agent tiny {{ status.css }}"></span> {{ status.label }}
+                    </label>
+                </li>
+                {% set checked = '' %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{# The Table of Joyful Data #}
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="scrollable">
+                <table class="dialog-agent">
+                <thead>
+                    <tr>
+                        <th class="col-participant">
+                            &nbsp;
+                        </th>
+                        <th class="col-status">
+                            Status
+                        </th>
+                        {% for field in scenario.fields %}
+                            <th>{{ field.title }}</th>
+                        {% endfor %}
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participant in assessment.allParticipants %}
+                        <tr>
+                            <td class="col-participant">
+                                <div class="list-item">
+                                    <div class="small-12 card compact">
+                                        <a href="/search/user/{{ participant.user.id }}">
+                                            <img src="/portrait.php?id={{ participant.user.id }}&size=square64" alt="{{ participant.user.fullname }}">
+                                            <p>
+                                                {{ participant.user.fullname }}
+                                            </p>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="col-status text-center">
+                                {% set title = '' %}
+                                {% set currentStatus = statuses[participant.user.id] %}
+
+                                {# Assistance requested (there's also an rfc variant here if you needed it) #}
+                                {% if currentStatus.meta.assistanceRequestedAt is defined %}
+                                    {% set title = 'Assistance requested at ' ~ currentStatus.meta.assistanceRequestedAt.local %}
+                                {% endif %}
+
+                                {# Submitted (there's also an rfc variant here if you needed it)  #}
+                                {% if currentStatus.meta.submittedAt is defined %}
+                                    {% set title = 'Submitted at ' ~ currentStatus.meta.submittedAt.local ~ ' by ' ~ currentStatus.meta.submittedBy %}
+                                {% endif %}
+
+                                {# A shortcut to their response screen #}
+                                {% set viewRoute = null %}
+                                {% if currentStatus.response %}
+                                    {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
+                                        assessment: assessment,
+                                        assessmentId: assessment.id,
+                                        student: participant.user,
+                                        studentId: participant.user.id,
+                                        response: currentStatus.response,
+                                        responseId: currentStatus.response.id
+                                    } )%}
+                                {% endif %}
+
+                                {% if viewRoute %}
+                                    <a href="{{ viewRoute }}">
+                                        <span class="progress-tick dialog-agent {{ currentStatus.css }}" title="{{ title }}"></span>
+                                    </a>
+                                {% else %}
+                                    <span class="progress-tick dialog-agent {{ currentStatus.css }}" title="{{ title }}"></span>
+                                {% endif %}
+                            </td>
+
+                            {# Scenario Fields evaluated per person by the ai
+                             # I guess we fill these in later when the ai can do the thing
+                             #}
+                            {% set tempData = [
+                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
+                                'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
+                                'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
+                                'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
+                                'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
+                                'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
+                            ] %}
+                            {% for field in scenario.fields %}
+                                <td>
+                                    {# TODO AI Feedback derivation per field per response goes here #}
+                                    {{ random(tempData) }}
+                                </td>
+                            {% endfor %}
+
+                            <td class="actions-small-1">
+                                <nav>
+                                    <sbx-pop-out content-id="response-options-{{ participant.user.id }}"></sbx-pop-out>
+                                </nav>
+                                <ul id="response-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
+                                    {# Summary screen always exists for a person#}
+                                    {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                                        assessment: assessment,
+                                        assessmentId: assessment.id,
+                                        student: participant.user,
+                                        studentId: participant.user.id,
+                                    }) %}
+
+                                    {% if summaryRoute %}
+                                        <li>
+                                            <a href="{{ summaryRoute }}" class="icon-search" title="View {{ locale.dialogAgent.proper }} history">{{ locale.dialogAgent.proper }} History</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {# View a particular response #}
+                                    {% if currentStatus.actions.view %}
+                                        {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                            response: currentStatus.response,
+                                            responseId: currentStatus.response.id
+                                        }) %}
+
+                                        {% if viewRoute %}
+                                            <li>
+                                                <a href="{{ viewRoute }}" class="icon-search" title="View {{ locale.dialogAgent.proper }}" data-action-view="{{ currentStatus.response.id }}">View {{ locale.dialogAgent.proper }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+
+                                    {# SOBO a student #}
+                                    {% if currentStatus.actions.sobo %}
+                                        {% set soboRoute = routeLookupIfAuthorized('learningDialogAgent.postSobo', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-sobo="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
+
+                                                    $.post('{{ soboRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-approve" title="Submit on behalf of {{ participant.user.formatName }}" data-action-sobo="{{ currentStatus.response.id }}">Submit on behalf of {{ participant.user.formatName }}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {# Reset a particular response's contents #}
+                                    {% if currentStatus.actions.reset %}
+                                        {% set resetRoute = routeLookupIfAuthorized('learningDialogAgent.postReset', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-reset="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
+
+                                                    $.post('{{ resetRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-refresh" title="Reset {{ locale.dialogAgent.proper }}" data-action-reset="{{ currentStatus.response.id }}">Reset {{ locale.dialogAgent.proper }}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {# Reopen ("unsubmit") a response #}
+                                    {% if currentStatus.actions.reopen %}
+                                        {% set reopenRoute = routeLookupIfAuthorized('learningDialogAgent.postReopen', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-reopen="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
+
+                                                    $.post('{{ reopenRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-undo" title="Reopen {{ locale.dialogAgent.proper }}" data-action-reopen="{{ currentStatus.response.id }}">Reopen {{ locale.dialogAgent.proper }}</a>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if currentStatus.actions.resolved %}
+                                        {% set assistanceResolvedRoute = routeLookupIfAuthorized('learningDialogAgent.postAssistanceResolve', {
+                                            assessment: assessment,
+                                            assessmentId: assessment.id,
+                                            student: participant.user,
+                                            studentId: participant.user.id,
+                                        }) %}
+                                        <script>
+                                            $(function() {
+                                                $('[data-action-assistance-resolved="{{ currentStatus.response.id }}"]').on('click', function(event) {
+                                                    event.preventDefault();
+
+                                                    $.post('{{ assistanceResolvedRoute }}', { responseId: '{{ currentStatus.response.id }}' }, function(responseText) {
+                                                        window.location.reload();
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                        <li>
+                                            <a class="icon-medical" title="Mark as assisted" data-action-assistance-resolved="{{ currentStatus.response.id }}">Mark as assisted</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+    </div>
+</div>
