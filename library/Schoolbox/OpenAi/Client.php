@@ -92,7 +92,7 @@ class Client implements IClient
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request  = new Request('POST', $url, $this->authHeaders);
-        $response = $this->sendRequest($request, $payload, true);
+        $response = $this->sendRequest($request, $payload, $log, true);
         return $this->handleStreamedResponse(
             $response,
             $log,
@@ -125,7 +125,7 @@ class Client implements IClient
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request  = new Request('POST', $url, $this->authHeaders);
-        $response = $this->sendRequest($request, $payload, true);
+        $response = $this->sendRequest($request, $payload, $log, true);
         return $this->handleStreamedResponse(
             $response,
             $log,
@@ -186,17 +186,30 @@ class Client implements IClient
     private function sendRequest(
         RequestInterface $request,
         array $payload,
+        Log\Model $log,
         bool $stream,
     ): ResponseInterface {
-        return $this->httpClient->send(
-            $request,
-            [
-                RequestOptions::ALLOW_REDIRECTS => false,
-//                RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => $stream,
-                RequestOptions::JSON            => $payload,
-            ],
-        );
+        try {
+            return $this->httpClient->send(
+                $request,
+                [
+                    RequestOptions::ALLOW_REDIRECTS => false,
+//                    RequestOptions::HTTP_ERRORS     => false,
+                    RequestOptions::STREAM          => $stream,
+                    RequestOptions::JSON            => $payload,
+                ],
+            );
+        } catch (BadResponseException $e) {
+            $log->setReturnCode($e->getResponse()->getStatusCode())
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw $e;
+        } catch (ClientExceptionInterface $e) {
+            $log->setReturnCode(null)
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw $e;
+        }
     }
 
     /**
@@ -290,7 +303,7 @@ class Client implements IClient
         LogHandler\ILogHandler $logHandler,
     ): ResponseInterface {
         try {
-            $response = $this->sendRequest($request, $payload, false);
+            $response = $this->sendRequest($request, $payload, $log, false);
         } catch (BadResponseException $e) {
             $log->setReturnCode($e->getResponse()->getStatusCode())
                 ->setErrorMessage($e->getMessage());
