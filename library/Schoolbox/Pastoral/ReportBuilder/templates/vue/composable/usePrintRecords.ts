@@ -41,8 +41,11 @@ export function usePrintRecords(
             window.print();
             return;
         }
-        // all records are already loaded so just print
-        if (payload.value && payload.value.metadata.cursor.next === null) {
+        // all records are already when there's no metadata or no next cursor so just print
+        if (
+            (payload.value && payload.value.metadata === undefined) ||
+            (payload.value && payload.value.metadata?.cursor.next === null)
+        ) {
             window.print();
             hasPrinted.value = true;
             return;

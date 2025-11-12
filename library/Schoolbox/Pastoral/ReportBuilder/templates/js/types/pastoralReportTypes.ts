@@ -145,7 +145,7 @@ export type RecordsPayload = {
     data: {
         results: PastoralRecord[];
     };
-    metadata: Metadata;
+    metadata?: Metadata;
 };
 
 /**
