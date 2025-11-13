@@ -63,7 +63,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
     <basic-modal v-model:is-open="isOpen" has-background-click>
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
-        <div class="l-flex-col l-gap-m">
+        <div v-else class="l-flex-col l-gap-m">
             <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <h2 v-if="props.title">{{ props.title }}</h2>

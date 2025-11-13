@@ -135,7 +135,6 @@ const linkedRecordsMeta = window.Vue.ref<string>("");
 function onLinkedRecordsSelected(profile: Profile): void {
     if (profile._routes?.linkedRecords) {
         linkedRecordsTitle.value = `${profile.student.fullName} - Linked Records`;
-        // linkedRecordsMeta.value = `Student ID: ${profile.student.externalId || profile.student.id}`;
         linkedRecordsUrl.value = profile._routes.linkedRecords;
     }
 }
