@@ -111,47 +111,8 @@
                     {% for participant in assessment.allParticipants %}
                         <tr>
                             <td class="profile-cell">
-                                <div class="small-12 card compact l-mar-s no-pad">
-                                    <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-                                        {% include 'include/portrait.twig' with { user: participant.user, render: 'small' } only %}
-                                        <p>
-                                            {{ participant.user.fullname }}
-                                        </p>
-                                    </a>
-                                </div>
                             </td>
                             <td>
-                                {% set title = '' %}
-                                {% set currentStatus = statuses[participant.user.id] %}
-
-                                {# Assistance requested (there's also an rfc variant here if you needed it) #}
-                                {% if currentStatus.meta.assistanceRequestedAt is defined %}
-                                    {% set title = 'Assistance requested at ' ~ currentStatus.meta.assistanceRequestedAt.local %}
-                                {% endif %}
-
-                                {# Submitted (there's also an rfc variant here if you needed it)  #}
-                                {% if currentStatus.meta.submittedAt is defined %}
-                                    {% set title = 'Submitted at ' ~ currentStatus.meta.submittedAt.local ~ ' by ' ~ currentStatus.meta.submittedBy %}
-                                {% endif %}
-
-                                {# A shortcut to their response screen #}
-                                {% set viewRoute = null %}
-                                {% if currentStatus.response %}
-                                    {% set viewRoute = routeLookupIfAuthorized('learningDialogAgent.getViewResponse', {
-                                        assessment: assessment,
-                                        assessmentId: assessment.id,
-                                        student: participant.user,
-                                        studentId: participant.user.id,
-                                        response: currentStatus.response,
-                                        responseId: currentStatus.response.id
-                                    } )%}
-                                {% endif %}
-
-                                {% if viewRoute %}
-                                    <a href="{{ viewRoute }}" class="progress-tick readonly {{ currentStatus.css }}" title="{{ title }}"></a>
-                                {% else %}
-                                    <span class="progress-tick readonly {{ currentStatus.css }}" title="{{ title }}"></span>
-                                {% endif %}
                             </td>
 
                             {# Scenario Fields evaluated per person by the ai

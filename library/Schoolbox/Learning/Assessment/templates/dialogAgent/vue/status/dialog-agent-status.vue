@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { getRelativeTime } from "@js/util/dateUtils";
 import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserCC } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
-import { STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
+import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
 import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import DasFilters from "./das-filters.vue";
 
@@ -29,6 +30,23 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+/**
+ * Retrieve the title to show for a progress tick for a participant
+ * @param participant The participant to get the title for
+ * @returns The title string
+ */
+function getProgressTickTitle(participant: Props["participants"][number]): string {
+    if (participant.assistanceRequestedAt !== null) {
+        return `Assistance requested ${getRelativeTime(participant.assistanceRequestedAt, true)}`;
+    }
+
+    if (participant.submittedAt !== null) {
+        return `Submitted ${getRelativeTime(participant.submittedAt, true)}`;
+    }
+
+    return STATUS_LABELS[participant.status];
+}
 </script>
 
 <template>
@@ -72,6 +90,8 @@ const props = defineProps<Props>();
                                     :href="participant._routes.view || undefined"
                                     class="progress-tick readonly"
                                     :class="STATUS_TICKS[participant.status]"
+                                    :title="getProgressTickTitle(participant)"
+                                    data-tooltip
                                 />
                             </td>
                         </tr>
