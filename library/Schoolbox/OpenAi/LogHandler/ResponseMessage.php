@@ -45,6 +45,9 @@ class ResponseMessage implements ILogHandler
         try {
             $rawData      = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
             $filteredData = $this->filterResponseForLogging($eventType, $rawData);
+            if (isset($filteredData['response'])) {
+                $filteredData['response'] = $this->filterImageGenerationOutput($filteredData['response']);
+            }
 
             // Override message data before writing it
             $message->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
@@ -70,6 +73,7 @@ class ResponseMessage implements ILogHandler
      */
     public function handleResponse(array $responseData, Log\Model $log): Log\Model
     {
+        $filteredData = $this->filterResponseForLogging(null, $responseData);
         $log = $this->logUsage($responseData, $log);
         return $this->logCompletion($responseData, $log);
     }
@@ -163,16 +167,22 @@ class ResponseMessage implements ILogHandler
             $data['item']['result'] = self::IMAGE_DATA_OMITTED;
         }
 
-        // apparently there is a final final image, lets remove that also
-        if (
-            in_array($eventType, self::EVENT_TYPES_FINISHED)
-            && isset($data['response']['output'])
-            && is_array($data['response']['output'])
-        ) {
-            // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
-            foreach ($data['response']['output'] as $i => $respOutput) {
-                if (isset($respOutput['result'])) {
-                    $data['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
+        return $data;
+    }
+
+    /**
+     * Filter out image generation output from the response data, for storage in
+     * the OpenAI log.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function filterImageGenerationOutput(array $data): array
+    {
+        if (isset($data['output']) && is_array($data['output'])) {
+            foreach ($data['output'] as $i => $respOutput) {
+                if (isset($respOutput['result']) && $respOutput['type'] === 'image_generation_call') {
+                    $data['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
                 }
             }
         }
