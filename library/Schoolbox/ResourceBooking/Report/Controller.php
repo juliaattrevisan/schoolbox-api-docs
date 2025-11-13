@@ -133,6 +133,7 @@ class Controller extends Base
         $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         // if we are only showing clashes, filter the event list now
+        /** @var array<string, EventInterface> $clashesOnlyList */
         $clashesOnlyList = [];
         if ($clashesOnly) {
             // Step 1: Group events by resource ID

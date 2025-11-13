@@ -271,8 +271,8 @@ class EventTest extends TestCase
         int $bStatus,
         bool $expected
     ): void {
-    $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
-    $b = $this->makeResourceBookingEvent($bStart, $bEnd, $bBookingId, $bStatus);
+        $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
+        $b = $this->makeResourceBookingEvent($bStart, $bEnd, $bBookingId, $bStatus);
 
         $this->assertSame($expected, $a->isClash($b));
     }
@@ -361,7 +361,7 @@ class EventTest extends TestCase
         string $timetableClass,
         bool $expected
     ): void {
-    $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
+        $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
         $b = $this->makeEvent($bStart, $bEnd, $timetableClass);
 
         $this->assertSame($expected, $a->isClash($b));
