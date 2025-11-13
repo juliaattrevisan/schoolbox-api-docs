@@ -558,7 +558,8 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             transform: rotate(-135deg);
         }
     }
-    &.reviewed {
+    &.reviewed,
+    &.submitted {
         @extend .icon-approve;
         background-color: $success-color;
         border-radius: $progress-tick-size-regular;
@@ -602,16 +603,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
                 visibility: visible;
                 // counter-rotation
                 transform: rotate(-135deg);
-            }
-        }
-        &.submitted {
-            @extend .icon-approve;
-            background-color: $success-color;
-            border-radius: $progress-tick-size-regular;
-            transform: rotate(360deg);
-            &:before {
-                visibility: visible;
-            }
         }
     }
 }
