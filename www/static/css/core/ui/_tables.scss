@@ -502,6 +502,15 @@ table.attempts-table {
     }
 }
 
+/* often we need a 2nd sticky column, this provides an offset to deal with that */
+.u-sticky-left--first {
+    min-width: var(--sbx-table-u-sticky-width-first, 200px);
+    width: var(--sbx-table-u-sticky-width-first, 200px);
+}
+.u-sticky-left--offset-1 {
+    left: var(--sbx-table-u-sticky-left-offset, 200px);
+}
+
 /* to accommodate an absolute positioned child */
 td:has(.u-td-button) {
     padding: 0; // padding is handled by the button instead

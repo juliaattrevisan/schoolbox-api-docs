@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { UserCC } from "@schoolboxLibrary/types/User";
+
 /**
  * To display a users profile photo,
  * This is pretty much just templates/core/include/portrait.twig, but for use in Vue
@@ -9,7 +11,7 @@ interface Props {
      * User takes precedence over userId and externalId
      * If set to false, it will render the default portrait image
      */
-    user?: { id?: number | null; externalId?: string | number | null } | false;
+    user?: Pick<UserCC, "id" | "externalId"> | false;
     userId?: number;
     externalId?: string;
     /**
@@ -105,7 +107,7 @@ const dimensions = window.Vue.computed(() => {
     if (props.render === "menuMobile") {
         return { width: 72, height: 72 };
     }
-    return {};
+    return { width: undefined, height: undefined };
 });
 
 const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`);

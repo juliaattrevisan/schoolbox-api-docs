@@ -619,6 +619,16 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
+        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+
+        $participantInfo = [];
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $participantInfo[] = [
+                'id' => $participant->getId(),
+                'user' => $userTranslator->convertLinkedUser($participant->getUser()),
+            ];
+        }
+
         /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
          */
 
@@ -633,6 +643,11 @@ class Controller extends Assessment\Controller
                 'assessment' => $assessment,
                 'scenario' => $scenario,
                 'statuses' => (new Status())->generate($assessment),
+                'criteria'   => $scenario->getCriteria()->map(fn(CriteriaModel $criterion) => [
+                    'id' => $criterion->getId(),
+                    'title' => $criterion->getTitle(),
+                ]),
+                'participants' => $participantInfo,
             ]
         );
     }

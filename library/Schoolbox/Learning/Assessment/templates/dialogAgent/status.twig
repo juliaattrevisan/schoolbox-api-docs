@@ -68,7 +68,10 @@
 </div>
 
 <div id="dialog-agent-status-container">
-    <dialog-agent-status>
+    <dialog-agent-status
+        :criteria="{{ criteria|json_encode }}"
+        :participants="{{ participants|json_encode }}"
+    >
         <template #meta>
             <ul class="meta">
                 {% include '@learning/fragments/meta/dueDate.twig' %}
