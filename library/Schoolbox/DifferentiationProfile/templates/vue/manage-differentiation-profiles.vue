@@ -37,7 +37,6 @@ const props = defineProps<{
     route: string;
     pastoralConfig: Config;
     pastoralRoutes: Routes;
-    severityColors: SeverityColors;
 }>();
 
 window.Vue.provide("pastoralConfig", props.pastoralConfig);

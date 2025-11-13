@@ -10,6 +10,7 @@ import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { AdjustmentText, Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import MdpGridCellTextAction from "./mdp-grid-cell-text-action.vue";
 
 const props = defineProps<{
     profile: Profile;
@@ -142,6 +143,7 @@ function onAddText(): void {
         ></media-article>
         <div class="clearfix"></div>
     </div>
+    <mdp-grid-cell-text-action :profile="props.profile" />
 </template>
 
 <style scoped></style>
