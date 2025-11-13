@@ -74,7 +74,8 @@ class ResponseMessage implements ILogHandler
     public function handleResponse(array $responseData, Log\Model $log): Log\Model
     {
         $filteredData = $this->filterResponseForLogging(null, $responseData);
-        $log = $this->logUsage($responseData, $log);
+        $filteredData = $this->filterImageGenerationOutput($filteredData);
+        $log = $this->logUsage($responseData, $log)->setResponse(json_encode($filteredData));
         return $this->logCompletion($responseData, $log);
     }
 
