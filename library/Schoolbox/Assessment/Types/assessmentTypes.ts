@@ -1,3 +1,5 @@
+import type { ProgressTickClass } from "./progressTick";
+
 // All assessment types, as per library/Schoolbox/Learning/Assessment/AssessmentType.php
 export const ACTIVITY_TYPE_PROJECT = "project";
 export const ACTIVITY_TYPE_DIALOG_AGENT = "dialogAgent";
@@ -44,7 +46,7 @@ export type Activity = {
     studentCount: number | null;
     progressTick: {
         postRouteUrl: string | null;
-        progressClass: string | null;
+        progressClass: ProgressTickClass | null;
     } | null;
 };
 

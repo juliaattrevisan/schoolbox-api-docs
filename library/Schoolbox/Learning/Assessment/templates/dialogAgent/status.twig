@@ -67,63 +67,22 @@
     </ul>
 </div>
 
-<div class="row">
-    {# Metadata about the activity #}
-    <div class="small-12 large-4 columns">
-        <ul class="meta">
-            {% include '@learning/fragments/meta/dueDate.twig' %}
-            {% include '@learning/fragments/meta/workType.twig' %}
-            {% if not assessment.isSpecification %}
-                {% if readonly ?? false %}
-                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+<div id="dialog-agent-status-container">
+    <dialog-agent-status>
+        <template #meta>
+            <ul class="meta">
+                {% include '@learning/fragments/meta/dueDate.twig' %}
+                {% include '@learning/fragments/meta/workType.twig' %}
+                {% if not assessment.isSpecification %}
+                    {% if readonly ?? false %}
+                        <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </ul>
-    </div>
-
-    {# Status filters of some kind
-     # This is a far nicer way to build this construct instead of that crazy idea in status.twig superclass
-     # TODO Technical debt: recommend backporting
-     #}
-    {% set statusLookup = {
-        'pending': {
-            'label': 'Pending',
-            'value': 'pending',
-            'css': '',
-        },
-        'in-progress': {
-            'label': 'In Progress',
-            'value': 'inprogress',
-            'css': 'in-progress',
-        },
-        'requires-assistance': {
-            'label': 'Requires Assistance',
-            'value': 'requires-assistance',
-            'css': 'requires-assistance',
-        },
-        'submitted': {
-            'label': 'Submitted',
-            'value': 'submitted',
-            'css': 'submitted',
-        },
-    } %}
-
-    <div class="small-12 large-8 columns text-right">
-        <ul class="filters">
-            {% set checked = 'checked="checked"' %}
-
-            {% for key, status in statusLookup %}
-                <li>
-                    <input type="checkbox" id="filter-{{ status.value }}" {{ checked }} data-status="{{ status.value }}" />
-                    <label for="filter-{{ status.value }}">
-                        <span class="progress-tick tiny {{ status.css }}"></span> {{ status.label }}
-                    </label>
-                </li>
-                {% set checked = '' %}
-            {% endfor %}
-        </ul>
-    </div>
+            </ul>
+        </template>
+    </dialog-agent-status>
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentStatus.js?v={{ config.site_version }}"></script>
 
 {# The Table of Joyful Data #}
 <div class="row">
