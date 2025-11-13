@@ -510,7 +510,9 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     &:before {
         line-height: $progress-tick-size;
     }
-    &.pending {
+    &.pending,
+    &.in-progress,
+    &.requires-assistance {
         border-radius: calc($progress-tick-size / 4);
     }
 }
