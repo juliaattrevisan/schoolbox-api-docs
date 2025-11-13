@@ -170,8 +170,8 @@ function onLinkedRecordsSelected(profile: Profile): void {
             </template>
             <template #Text="{ row, header: columnHeader }">
                 <mdp-grid-cell-text
-                    v-model:text="row[columnHeader.key]"
                     :profile="row as Profile"
+                    :text="row[columnHeader.key] as AdjustmentText | null"
                     :header-key="columnHeader.key"
                 />
             </template>

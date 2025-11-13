@@ -14,12 +14,13 @@ import MdpGridCellTextAction from "./mdp-grid-cell-text-action.vue";
 
 const props = defineProps<{
     profile: Profile;
+    text: AdjustmentText | null;
     headerKey: string;
 }>();
 
-const text = defineModel<AdjustmentText | null>("text", { default: null });
+const currentText = window.Vue.ref<AdjustmentText | null>(props.text);
 
-const initialTextboxContent: string = text.value ?? "";
+const initialTextboxContent: string = currentText.value ?? "";
 
 const editorContent = window.Vue.ref(initialTextboxContent);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
@@ -35,22 +36,24 @@ let editor: InlineEditor;
  */
 function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
-
-    // editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
-    //     store.updateFocusedUnitCell(props.unit.id, props.column, isFocused);
-    // });
-
-    // editor.model.document.on("change", () => {
-    //     store.updateFocusedUnitCell(props.unit.id, props.column, true);
-    //     window.Vue.nextTick()
-    //         .then(() => {
-    //             editorContent.value = editor.getData();
-    //             textboxStore.updateTextboxContent(props.unit.id, props.column, editorContent.value);
-    //         })
-    //         .catch(() => {
-    //             // noop
-    //         });
-    // });
+    // show the empty state again if no text is entered
+    editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
+        if (!isFocused && currentText.value === "") {
+            currentText.value = null;
+        }
+    });
+    // keep the currentText in sync with the editor content
+    editor.model.document.on("change", () => {
+        // store.updateFocusedUnitCell(props.unit.id, props.column, true);
+        window.Vue.nextTick()
+            .then(() => {
+                currentText.value = editor.getData();
+                // textboxStore.updateTextboxContent(props.unit.id, props.column, editorContent.value);
+            })
+            .catch(() => {
+                // noop
+            });
+    });
 
     // const storeTextbox = store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label];
     // if (storeTextbox) {
@@ -78,10 +81,8 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
 async function initEditor(): Promise<void> {
     if (!editorContentEl.value) return;
     if (editorInitialised.value) return;
-
     // Avoid initialising the editor multiple times
     editorInitialised.value = true;
-
     await new Promise((resolve) => {
         useEditor(
             editorContent,
@@ -103,17 +104,14 @@ async function initEditor(): Promise<void> {
  * Focus the editor
  */
 async function focusEditor(): Promise<void> {
-    await initEditor(); // Ensure the editor is initialised before focusing
-
-    // trigger the display of the editor if it was not displayed yet
-    if (text.value === null) {
-        text.value = "";
+    // Ensure the editor is initialised before focusing
+    await initEditor();
+    // to trigger the display of the editor if it was not displayed yet
+    if (currentText.value === null) {
+        currentText.value = "";
     }
-
     await window.Vue.nextTick();
-
     editor.focus();
-
     // to assign the cursor to the end of the editor
     editor.model.change((writer) => {
         const root = editor.model.document.getRoot();
@@ -127,7 +125,6 @@ async function focusEditor(): Promise<void> {
  * When the add text button is clicked.
  */
 function onAddText(): void {
-    // set the text to '' to indicate that the textbox is created?
     void focusEditor();
 }
 
@@ -150,10 +147,10 @@ function onSaveSelected(): void {
 
 <template>
     <div>
-        <empty-state v-if="text === null" icon="icon-textbox">
+        <empty-state v-if="currentText === null" icon="icon-textbox">
             <button @click.prevent="onAddText">Add content to this text area</button>
         </empty-state>
-        <div class="editor-wrapper" :style="{ display: text !== null ? 'block' : 'none' }">
+        <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
             <media-article
                 :id="editorId"
                 ref="editorContentEl"
