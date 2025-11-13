@@ -7,9 +7,10 @@ import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes"
 const props = defineProps<{
     profile: Profile;
     headerKey: string;
+    hasChanged: boolean;
 }>();
 
-const contentIsSaved = window.Vue.ref(true);
+// const contentIsSaved = window.Vue.ref(true);
 const isContentSaving = window.Vue.ref(false);
 const contentIsFocused = window.Vue.ref(false);
 
@@ -54,12 +55,12 @@ function onSaveClicked(): void {
 <template>
     <div class="component-action">
         <section>
-            <button v-if="!contentIsSaved && !isContentSaving" data-role="dirty-indicator" disabled>
+            <button v-if="!props.hasChanged && !isContentSaving" data-role="dirty-indicator" disabled>
                 Changes not saved
             </button>
             <button v-if="isContentSaving" class="button">Saving...</button>
             <button
-                v-else-if="contentIsSaved && !contentIsFocused"
+                v-else-if="props.hasChanged && !contentIsFocused"
                 class="button"
                 :data-test="`mdp-grid-cell-text-action-modify-${props.profile.student.id}-${props.headerKey}`"
                 @click="onModifyClicked"

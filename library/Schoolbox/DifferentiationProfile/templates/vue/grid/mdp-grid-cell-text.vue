@@ -27,6 +27,9 @@ const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
 const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
+const hasChanged = window.Vue.computed(() => {
+    return currentText.value !== props.text;
+});
 // const textboxStore = useUnitPlannerTextboxStore();
 let editor: InlineEditor;
 
@@ -164,6 +167,7 @@ function onSaveSelected(): void {
     <mdp-grid-cell-text-action
         :profile="props.profile"
         :header-key="props.headerKey"
+        :has-changed="hasChanged"
         @modify="onModifySelected"
         @save="onSaveSelected"
     />
