@@ -42,7 +42,6 @@ const props = defineProps<{
 
 window.Vue.provide("pastoralConfig", props.pastoralConfig);
 window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
-window.Vue.provide("severityColors", props.severityColors);
 
 // #region grid data
 

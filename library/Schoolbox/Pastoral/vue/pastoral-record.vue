@@ -5,7 +5,7 @@
 
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import { getDayjsDatetime } from "@js/util/dateUtils";
-import type { PastoralRecord, Routes, Config, SeverityColors } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
+import type { PastoralRecord, Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 
 const props = defineProps<{
     record: PastoralRecord;
@@ -13,7 +13,6 @@ const props = defineProps<{
 
 const routes = window.Vue.inject<Routes>("pastoralRoutes");
 const config = window.Vue.inject<Config>("pastoralConfig");
-const severityColors = window.Vue.inject<SeverityColors>("severityColors");
 </script>
 
 <template>
@@ -33,14 +32,9 @@ const severityColors = window.Vue.inject<SeverityColors>("severityColors");
                 <h3 class="l-flex l-flex--align-center l-gap-s">
                     {{ props.record.student.fullName }}: {{ props.record.heading }}
                     <span
-                        v-if="
-                            config?.pastoralSeverity &&
-                            props.record.severity &&
-                            severityColors &&
-                            severityColors[props.record.severity.id]
-                        "
+                        v-if="config?.pastoralSeverity && props.record.severity"
                         class="circle l-mar--0"
-                        :style="`background-color:${severityColors[props.record.severity.id].back}`"
+                        :style="`background-color:${props.record.severity.color}`"
                         :title="props.record.severity.name"
                     ></span>
                     <sbx-icon

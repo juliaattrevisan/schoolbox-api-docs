@@ -24,6 +24,7 @@ export type Config = {
 type Severity = {
     id: number;
     name: string;
+    color: string;
 };
 
 /**
