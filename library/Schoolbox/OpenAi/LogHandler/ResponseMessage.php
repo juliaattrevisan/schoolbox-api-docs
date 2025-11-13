@@ -78,7 +78,7 @@ class ResponseMessage implements ILogHandler
         // There are 3 possible events that indicate the end of a response
         // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
         if ($isFinishedEvent) {
-            $log = $this->logCompletion($rawData, $log);
+            $log = $this->logCompletion($rawData['response'] ?? [], $log);
         }
         return $log;
     }
@@ -102,9 +102,9 @@ class ResponseMessage implements ILogHandler
     private function logUsage(array $responseData, Log\Model $log): Log\Model
     {
         // Find model and token usage
-        $model        = $responseData['response']['model'] ?? null;
-        $inputTokens  = $responseData['response']['usage']['input_tokens'] ?? null;
-        $outputTokens = $responseData['response']['usage']['output_tokens'] ?? null;
+        $model        = $responseData['model'] ?? null;
+        $inputTokens  = $responseData['usage']['input_tokens'] ?? null;
+        $outputTokens = $responseData['usage']['output_tokens'] ?? null;
         if ($model) {
             $log->setModel($model);
         }
