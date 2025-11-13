@@ -11,6 +11,9 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -26,6 +29,15 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF),
         );
 
+        $hasDifferentiationProfileService = new Rule\All(
+            $isStaff,
+            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+            new Rule\HasServicePermission(
+                UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+                UserAccess::ACCESS_WRITE
+            ),
+        );
+
         /* This /openai/ route is used by Little Robot Dude from the ckeditor
          * directly, to produce its output
          */
@@ -38,6 +50,10 @@ class Module extends BaseModule
         /* Image generation: for OpenAI only
          */
         $this->register('POST', '/image', 'postImage', $isStaff);
+
+        /* Differentiation Profile generation
+         */
+        $this->register('POST', '/differentiation-profile', 'postDifferentiation', $hasDifferentiationProfileService);
     }
 
 
