@@ -173,7 +173,7 @@ class Controller extends Base
                 }
             }
             // collisions should overwrite the event list
-            $eventList = new GenericCollection($clashesOnlyList);
+            $eventList = new GenericCollection(EventInterface::class, $clashesOnlyList);
         }
 
         $this->response = $this->responseFromTemplate(
