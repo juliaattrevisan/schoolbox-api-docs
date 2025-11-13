@@ -17,7 +17,7 @@ use Alaress_Date_Format;
 use Calendar\Event\Type\Day\Event as DayEvent;
 use Calendar\Event\Type\Timetable\Event as TimetableEvent;
 use Calendar\Event\Type\SudsTimetable\Event as SudsTimetableEvent;
-use Calendar\Event\Type\ResourceBooking\Event as RBEvent;
+use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
@@ -196,45 +196,45 @@ class EventTest extends TestCase
                 null,
             ],
             // ResourceBooking vs Timetable/SudsTimetable
-            'rb-vs-timetable-overlap' => [
+            'resourcebooking-vs-timetable-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 09:30:00',
                 '2025-11-13 10:30:00',
-                RBEvent::class,
+                ResourceBookingEvent::class,
                 TimetableEvent::class,
                 true,
                 null,
                 null,
             ],
-            'rb-vs-timetable-non-overlap' => [
+            'resourcebooking-vs-timetable-non-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 10:01:00',
                 '2025-11-13 11:00:00',
-                RBEvent::class,
+                ResourceBookingEvent::class,
                 TimetableEvent::class,
                 false,
                 null,
                 null,
             ],
-            'rb-vs-suds-overlap' => [
+            'resourcebooking-vs-suds-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 09:30:00',
                 '2025-11-13 10:30:00',
-                RBEvent::class,
+                ResourceBookingEvent::class,
                 SudsTimetableEvent::class,
                 true,
                 null,
                 null,
             ],
-            'rb-vs-suds-non-overlap' => [
+            'resourcebooking-vs-suds-non-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 10:01:00',
                 '2025-11-13 11:00:00',
-                RBEvent::class,
+                ResourceBookingEvent::class,
                 SudsTimetableEvent::class,
                 false,
                 null,
@@ -243,9 +243,9 @@ class EventTest extends TestCase
         ];
     }
 
-    private function makeRBEvent(string $start, string $end, int $bookingId, int $statusId): RBEvent
+    private function makeResourceBookingEvent(string $start, string $end, int $bookingId, int $statusId): ResourceBookingEvent
     {
-        $event = new RBEvent();
+        $event = new ResourceBookingEvent();
         $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
         $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
 
@@ -271,8 +271,8 @@ class EventTest extends TestCase
         int $bStatus,
         bool $expected
     ): void {
-        $a = $this->makeRBEvent($aStart, $aEnd, $aBookingId, $aStatus);
-        $b = $this->makeRBEvent($bStart, $bEnd, $bBookingId, $bStatus);
+    $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
+    $b = $this->makeResourceBookingEvent($bStart, $bEnd, $bBookingId, $bStatus);
 
         $this->assertSame($expected, $a->isClash($b));
     }
@@ -350,7 +350,7 @@ class EventTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerRBVsTimetable')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerResourceBookingVsTimetable')]
     public function testResourceBookingVsTimetable(
         string $aStart,
         string $aEnd,
@@ -361,16 +361,16 @@ class EventTest extends TestCase
         string $timetableClass,
         bool $expected
     ): void {
-        $a = $this->makeRBEvent($aStart, $aEnd, $aBookingId, $aStatus);
+    $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
         $b = $this->makeEvent($bStart, $bEnd, $timetableClass);
 
         $this->assertSame($expected, $a->isClash($b));
     }
 
-    public static function providerRBVsTimetable(): array
+    public static function providerResourceBookingVsTimetable(): array
     {
         return [
-            'rb-pending-vs-timetable-overlap' => [
+            'resourcebooking-pending-vs-timetable-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 09:30:00',
@@ -380,7 +380,7 @@ class EventTest extends TestCase
                 TimetableEvent::class,
                 true,
             ],
-            'rb-approved-vs-timetable-overlap' => [
+            'resourcebooking-approved-vs-timetable-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 09:30:00',
@@ -390,7 +390,7 @@ class EventTest extends TestCase
                 TimetableEvent::class,
                 true,
             ],
-            'rb-pending-vs-suds-overlap' => [
+            'resourcebooking-pending-vs-suds-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 09:30:00',
@@ -400,7 +400,7 @@ class EventTest extends TestCase
                 SudsTimetableEvent::class,
                 true,
             ],
-            'rb-approved-vs-timetable-non-overlap' => [
+            'resourcebooking-approved-vs-timetable-non-overlap' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
                 '2025-11-13 10:01:00',
