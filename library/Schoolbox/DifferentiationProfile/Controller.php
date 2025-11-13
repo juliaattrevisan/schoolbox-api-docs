@@ -67,7 +67,7 @@ class Controller extends Base
     {
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
-        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
         $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
 
         $filterPanel = $this->filterFactoryFactory->buildPanel(
@@ -106,7 +106,7 @@ class Controller extends Base
 
     public function getDifferentiationProfileData(): void
     {
-        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
 
         $profileTranslator = new ModelToArray(
             $this->getRouter()->getGenerator(),
