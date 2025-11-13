@@ -1,0 +1,284 @@
+<?php
+
+/**
+ * EventTest
+ *
+ *
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.education/
+ */
+
+// All new classes should use strict typing.
+declare(strict_types=1);
+
+namespace Calendar\Event\Type\Day\Test;
+
+use Alaress_Date_Format;
+use Calendar\Event\Type\Day\Event as DayEvent;
+use Calendar\Event\Type\Timetable\Event as TimetableEvent;
+use Calendar\Event\Type\SudsTimetable\Event as SudsTimetableEvent;
+use Calendar\Event\Type\ResourceBooking\Event as RBEvent;
+use PHPUnit\Framework\TestCase;
+use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
+
+/**
+ * Tests for Day\Event::isClash
+ */
+class EventTest extends TestCase
+{
+    private function makeEvent(string $start, string $end, $class = DayEvent::class)
+    {
+        $event = new $class();
+        $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
+        $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
+        return $event;
+    }
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsClash')]
+    public function testIsClash(
+        string $aStart,
+        string $aEnd,
+        string $bStart,
+        string $bEnd,
+        string $classA,
+        string $classB,
+        bool $expected,
+        ?int $aCategory = null,
+        ?int $bCategory = null
+    ): void {
+        $a = $this->makeEvent($aStart, $aEnd, $classA);
+        $b = $this->makeEvent($bStart, $bEnd, $classB);
+
+        if (!is_null($aCategory)) {
+            $a->setCategoryId($aCategory);
+        }
+        if (!is_null($bCategory)) {
+            $b->setCategoryId($bCategory);
+        }
+
+        $this->assertSame($expected, $a->isClash($b));
+    }
+
+    public static function providerIsClash(): array
+    {
+        return [
+            'overlap-day-events' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                DayEvent::class,
+                DayEvent::class,
+                true,
+                null,
+                null,
+            ],
+            'non-overlap-day-events' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                DayEvent::class,
+                DayEvent::class,
+                false,
+                null,
+                null,
+            ],
+            'timetable-same-category-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                TimetableEvent::class,
+                TimetableEvent::class,
+                false,
+                42,
+                42,
+            ],
+            'suds-same-category-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                SudsTimetableEvent::class,
+                SudsTimetableEvent::class,
+                true,
+                42,
+                42,
+            ],
+            'suds-both-minus1-overlap-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                SudsTimetableEvent::class,
+                SudsTimetableEvent::class,
+                true,
+                -1,
+                -1,
+            ],
+            'suds-different-category-overlap-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                SudsTimetableEvent::class,
+                SudsTimetableEvent::class,
+                true,
+                10,
+                11,
+            ],
+            'suds-non-overlap-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                SudsTimetableEvent::class,
+                SudsTimetableEvent::class,
+                false,
+                10,
+                10,
+            ],
+            // Cross-object comparisons
+            'day-vs-timetable-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                DayEvent::class,
+                TimetableEvent::class,
+                true,
+                null,
+                null,
+            ],
+            'day-vs-timetable-non-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                DayEvent::class,
+                TimetableEvent::class,
+                false,
+                null,
+                null,
+            ],
+            'day-vs-suds-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                DayEvent::class,
+                SudsTimetableEvent::class,
+                true,
+                null,
+                null,
+            ],
+            'timetable-vs-suds-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                TimetableEvent::class,
+                SudsTimetableEvent::class,
+                true,
+                null,
+                null,
+            ],
+            'timetable-vs-suds-non-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                TimetableEvent::class,
+                SudsTimetableEvent::class,
+                false,
+                null,
+                null,
+            ],
+        ];
+    }
+
+    private function makeRBEvent(string $start, string $end, int $bookingId, int $statusId): RBEvent
+    {
+        $event = new RBEvent();
+        $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
+        $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
+
+        $booking = new BookingModel();
+        $booking->setId($bookingId);
+        $status = new BookingStatusModel();
+        $status->setId($statusId);
+        $booking->setStatus($status);
+
+        $event->setBooking($booking);
+        return $event;
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerResourceBookingIsClash')]
+    public function testResourceBookingIsClash(
+        string $aStart,
+        string $aEnd,
+        string $bStart,
+        string $bEnd,
+        int $aBookingId,
+        int $aStatus,
+        int $bBookingId,
+        int $bStatus,
+        bool $expected
+    ): void {
+        $a = $this->makeRBEvent($aStart, $aEnd, $aBookingId, $aStatus);
+        $b = $this->makeRBEvent($bStart, $bEnd, $bBookingId, $bStatus);
+
+        $this->assertSame($expected, $a->isClash($b));
+    }
+
+    public static function providerResourceBookingIsClash(): array
+    {
+        return [
+            'same-booking-id-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                100,
+                BookingStatusModel::STATUS_PENDING,
+                100,
+                BookingStatusModel::STATUS_PENDING,
+                false,
+            ],
+            'b-not-pending-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                101,
+                BookingStatusModel::STATUS_PENDING,
+                102,
+                BookingStatusModel::STATUS_APPROVED,
+                false,
+            ],
+            'b-pending-and-overlap-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                201,
+                BookingStatusModel::STATUS_APPROVED,
+                202,
+                BookingStatusModel::STATUS_PENDING,
+                true,
+            ],
+            'b-pending-but-non-overlap-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                301,
+                BookingStatusModel::STATUS_APPROVED,
+                302,
+                BookingStatusModel::STATUS_PENDING,
+                false,
+            ],
+        ];
+    }
+}
