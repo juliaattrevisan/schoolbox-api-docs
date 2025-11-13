@@ -195,6 +195,51 @@ class EventTest extends TestCase
                 null,
                 null,
             ],
+            // ResourceBooking vs Timetable/SudsTimetable
+            'rb-vs-timetable-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                RBEvent::class,
+                TimetableEvent::class,
+                true,
+                null,
+                null,
+            ],
+            'rb-vs-timetable-non-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                RBEvent::class,
+                TimetableEvent::class,
+                false,
+                null,
+                null,
+            ],
+            'rb-vs-suds-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                RBEvent::class,
+                SudsTimetableEvent::class,
+                true,
+                null,
+                null,
+            ],
+            'rb-vs-suds-non-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                RBEvent::class,
+                SudsTimetableEvent::class,
+                false,
+                null,
+                null,
+            ],
         ];
     }
 
@@ -268,6 +313,28 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 true,
             ],
+            'both-pending-overlap-clash' => [
+                '2025-11-13 08:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                401,
+                BookingStatusModel::STATUS_PENDING,
+                402,
+                BookingStatusModel::STATUS_PENDING,
+                true,
+            ],
+            'both-approved-overlap-no-clash' => [
+                '2025-11-13 08:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                501,
+                BookingStatusModel::STATUS_APPROVED,
+                502,
+                BookingStatusModel::STATUS_APPROVED,
+                false,
+            ],
             'b-pending-but-non-overlap-no-clash' => [
                 '2025-11-13 09:00:00',
                 '2025-11-13 10:00:00',
@@ -277,6 +344,70 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 302,
                 BookingStatusModel::STATUS_PENDING,
+                false,
+            ],
+            // RB vs Timetable cases will be tested separately
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerRBVsTimetable')]
+    public function testResourceBookingVsTimetable(
+        string $aStart,
+        string $aEnd,
+        string $bStart,
+        string $bEnd,
+        int $aBookingId,
+        int $aStatus,
+        string $timetableClass,
+        bool $expected
+    ): void {
+        $a = $this->makeRBEvent($aStart, $aEnd, $aBookingId, $aStatus);
+        $b = $this->makeEvent($bStart, $bEnd, $timetableClass);
+
+        $this->assertSame($expected, $a->isClash($b));
+    }
+
+    public static function providerRBVsTimetable(): array
+    {
+        return [
+            'rb-pending-vs-timetable-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                601,
+                BookingStatusModel::STATUS_PENDING,
+                TimetableEvent::class,
+                true,
+            ],
+            'rb-approved-vs-timetable-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                602,
+                BookingStatusModel::STATUS_APPROVED,
+                TimetableEvent::class,
+                true,
+            ],
+            'rb-pending-vs-suds-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                603,
+                BookingStatusModel::STATUS_PENDING,
+                SudsTimetableEvent::class,
+                true,
+            ],
+            'rb-approved-vs-timetable-non-overlap' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:01:00',
+                '2025-11-13 11:00:00',
+                604,
+                BookingStatusModel::STATUS_APPROVED,
+                TimetableEvent::class,
                 false,
             ],
         ];
