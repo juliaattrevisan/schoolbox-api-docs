@@ -15,7 +15,7 @@
                 <div class="row">
                     <div class="small-12 columns">
                         <label class="required">Batch XML Key</label>
-                        <input type="password" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
+                        <input type="password" autocomplete="new-password" class='required suds-crypto' name="dsn[isams][modules][batchxml][key]" value="{{ modules.batchxml.key ?? ''}}" />
                     </div>
                 </div>
 
@@ -67,7 +67,7 @@
                     </div>
                     <div class="small-12 medium-4 columns">
                         <label>Client Secret</label>
-                        <input type="password" class='suds-crypto' name="dsn[isams][modules][restapi][clientsecret]" value="{{ modules.restapi.clientsecret ?? ''}}" />
+                        <input type="password" autocomplete="new-password" class='suds-crypto' name="dsn[isams][modules][restapi][clientsecret]" value="{{ modules.restapi.clientsecret ?? ''}}" />
                     </div>
                 </div>
 
