@@ -28,6 +28,7 @@ export function usePrintRecords(
     isLoading: Ref<boolean>;
 } {
     const isLoading = window.Vue.ref(false);
+    const LIMIT = 1000;
 
     /**
      * Print all records in the list
@@ -58,7 +59,7 @@ export function usePrintRecords(
             { deep: true, once: true }, // only watch once as we only need to fetch once
         );
         // Set limit to high number to load all records
-        urlParams.set("limit", "1000");
+        urlParams.set("limit", LIMIT.toString());
         // Use provided base URL or extract from current URL
         const targetBaseUrl = baseUrl || url.value.split("?")[0];
         url.value = `${targetBaseUrl}?${urlParams.toString()}`;

@@ -10,7 +10,7 @@ const isLoading = defineModel<boolean>("is-loading", { default: false }); // to 
 
 <template>
     <basic-modal v-model:is-open="isLoading" size="s" :show-close-button="false" :has-focus-trap="false">
-        <div class="container l-flex-col l-flex--center l-gap-s">
+        <div class="container l-flex-col l-flex--center l-gap-s" role="status" aria-live="polite">
             <div class="loader"></div>
             <h3><em>Generating print report, please wait... </em></h3>
         </div>

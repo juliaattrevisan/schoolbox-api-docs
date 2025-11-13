@@ -92,6 +92,7 @@ function onPrintSelected(): void {
                     class="sbx-icon-only-button f-no-margins"
                     aria-label="Print Report Results"
                     title="Print Report Results"
+                    type="button"
                     @click="onPrintSelected"
                 >
                     <sbx-icon name="print" />
