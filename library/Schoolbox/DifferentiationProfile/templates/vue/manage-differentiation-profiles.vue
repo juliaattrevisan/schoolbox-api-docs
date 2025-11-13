@@ -74,7 +74,7 @@ const header = window.Vue.ref<Header[]>([
 // #region grid loading / filtering /  pagination
 
 const url = window.Vue.ref<string>("");
-const LIMIT = 2; // the current set limit for the number of records to fetch at once
+const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const filters = window.Vue.ref<Nested>({});
 const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(url);
 
