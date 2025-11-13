@@ -20,6 +20,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
+use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
@@ -271,6 +272,55 @@ class Controller extends Base
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+    public function postDifferentiation(): void
+    {
+        $this->setAllowBackToTheFuture(false);
+
+        $aiConfig = new Config();
+        $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIFFERENTIATION));
+
+        if ($aiConfig->isEnabled($diffConfig) === false) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem("AI Differentiation is not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
+        $aiSessionId = (string)Uuid::uuid4();
+
+        $agent = new DifferentiationProfileGeneration(
+            $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
+            $diffConfig,
+        );
+
+        try {
+            [$response, $status] = $agent->request(
+                $this->getUser(),
+                $aiSessionId,
+            );
+
+            $this->response = $this->responseAsJson($response)->withStatus($status);
+            return;
+        } catch (\DomainException $e) {
             $returnCode = 404;
 
             $problem = (new ApiProblem($e->getMessage()))
