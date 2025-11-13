@@ -34,11 +34,6 @@
         border-right: 0;
     }
 
-    .col-status {
-        width: 6rem;
-        text-align: center;
-    }
-
     .col-participant {
         min-width: 13rem;
     }
@@ -139,7 +134,7 @@
                 <li>
                     <input type="checkbox" id="filter-{{ status.value }}" {{ checked }} data-status="{{ status.value }}" />
                     <label for="filter-{{ status.value }}">
-                        <span class="progress-tick dialog-agent tiny {{ status.css }}"></span> {{ status.label }}
+                        <span class="progress-tick tiny {{ status.css }}"></span> {{ status.label }}
                     </label>
                 </li>
                 {% set checked = '' %}
@@ -159,7 +154,7 @@
                         <th class="col-participant">
                             &nbsp;
                         </th>
-                        <th class="col-status">
+                        <th>
                             Status
                         </th>
                         {% for field in scenario.fields %}
@@ -185,7 +180,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="col-status text-center">
+                            <td class="l-flex l-flex--justify-center">
                                 {% set title = '' %}
                                 {% set currentStatus = statuses[participant.user.id] %}
 
@@ -213,9 +208,9 @@
                                 {% endif %}
 
                                 {% if viewRoute %}
-                                    <a href="{{ viewRoute }}" class="progress-tick dialog-agent readonly {{ currentStatus.css }}" title="{{ title }}"></a>
+                                    <a href="{{ viewRoute }}" class="progress-tick readonly {{ currentStatus.css }}" title="{{ title }}"></a>
                                 {% else %}
-                                    <span class="progress-tick dialog-agent readonly {{ currentStatus.css }}" title="{{ title }}"></span>
+                                    <span class="progress-tick readonly {{ currentStatus.css }}" title="{{ title }}"></span>
                                 {% endif %}
                             </td>
 

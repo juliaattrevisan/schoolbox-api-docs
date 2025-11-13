@@ -622,13 +622,6 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     }
 }
 
-// Dialog Agent
-// snake please refactor these styles in some reptilian manner
-// Center those icons in the Status column (!?)
-.dialog-agent .col-status .progress-tick {
-    margin: 0.25rem auto 0 auto;
-}
-
 .countdown {
     font-weight: 100;
     font-size: $h1-font-size;
