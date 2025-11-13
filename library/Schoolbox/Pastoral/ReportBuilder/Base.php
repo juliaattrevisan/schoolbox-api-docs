@@ -14,10 +14,9 @@ class Base
 {
     /**
      * Maximum number of results returnable from the cursor at once:
-     * We've updated to 1000 to account for the need to trigger a
-     * print load, where 'all' results are needed.
+     * IMO 20 results is a sensible maximum.
      */
-    public const LIMIT_MAX = 1000;
+    public const LIMIT_MAX = 20;
 
     /**
      * Minimum number of results returnable and should really be more than 0
@@ -68,9 +67,9 @@ class Base
         if (null !== $this->limit) {
             /* Set a maximum number of results should be returned otherwise reject
              */
-            if ($this->limit > self::LIMIT_MAX) {
+            if ($this->limit > static::LIMIT_MAX) {
                 throw new ValueError(
-                    sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit),
+                    sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
                     self::BAD_REQUEST_ERROR_CODE
                 );
             }
