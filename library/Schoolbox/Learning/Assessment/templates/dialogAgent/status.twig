@@ -67,8 +67,8 @@
     </ul>
 </div>
 
-{# Metadata about the activity #}
 <div class="row">
+    {# Metadata about the activity #}
     <div class="small-12 large-4 columns">
         <ul class="meta">
             {% include '@learning/fragments/meta/dueDate.twig' %}
@@ -80,38 +80,36 @@
             {% endif %}
         </ul>
     </div>
-</div>
 
-{# Status filters of some kind
- # This is a far nicer way to build this construct instead of that crazy idea in status.twig superclass
- # TODO Technical debt: recommend backporting
- #}
-{% set statusLookup = {
-    'pending': {
-        'label': 'Pending',
-        'value': 'pending',
-        'css': '',
-    },
-    'in-progress': {
-        'label': 'In Progress',
-        'value': 'inprogress',
-        'css': 'in-progress',
-    },
-    'requires-assistance': {
-        'label': 'Requires Assistance',
-        'value': 'requires-assistance',
-        'css': 'requires-assistance',
-    },
-    'submitted': {
-        'label': 'Submitted',
-        'value': 'submitted',
-        'css': 'submitted',
-    },
-} %}
+    {# Status filters of some kind
+     # This is a far nicer way to build this construct instead of that crazy idea in status.twig superclass
+     # TODO Technical debt: recommend backporting
+     #}
+    {% set statusLookup = {
+        'pending': {
+            'label': 'Pending',
+            'value': 'pending',
+            'css': '',
+        },
+        'in-progress': {
+            'label': 'In Progress',
+            'value': 'inprogress',
+            'css': 'in-progress',
+        },
+        'requires-assistance': {
+            'label': 'Requires Assistance',
+            'value': 'requires-assistance',
+            'css': 'requires-assistance',
+        },
+        'submitted': {
+            'label': 'Submitted',
+            'value': 'submitted',
+            'css': 'submitted',
+        },
+    } %}
 
-<div class="row">
-    <div class="small-12 columns text-right">
-        <ul class="filters" data-participant-filters id="filters">
+    <div class="small-12 large-8 columns text-right">
+        <ul class="filters">
             {% set checked = 'checked="checked"' %}
 
             {% for key, status in statusLookup %}
