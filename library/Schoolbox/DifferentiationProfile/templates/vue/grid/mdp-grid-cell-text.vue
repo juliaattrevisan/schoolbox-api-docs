@@ -14,6 +14,7 @@ import MdpGridCellTextAction from "./mdp-grid-cell-text-action.vue";
 
 const props = defineProps<{
     profile: Profile;
+    headerKey: string;
 }>();
 
 const text = defineModel<AdjustmentText | null>("text", { default: null });
@@ -24,7 +25,7 @@ const editorContent = window.Vue.ref(initialTextboxContent);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
 const editorCreated = window.Vue.ref(false);
-const editorId = `mdp-textbox-${props.profile.student.id}`;
+const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
 // const textboxStore = useUnitPlannerTextboxStore();
 let editor: InlineEditor;
 
@@ -104,12 +105,14 @@ async function initEditor(): Promise<void> {
 async function focusEditor(): Promise<void> {
     await initEditor(); // Ensure the editor is initialised before focusing
 
-    editor.focus();
-
     // trigger the display of the editor if it was not displayed yet
     if (text.value === null) {
         text.value = "";
     }
+
+    await window.Vue.nextTick();
+
+    editor.focus();
 
     // to assign the cursor to the end of the editor
     editor.model.change((writer) => {
@@ -127,23 +130,46 @@ function onAddText(): void {
     // set the text to '' to indicate that the textbox is created?
     void focusEditor();
 }
+
+/**
+ * When the modify button is clicked.
+ */
+function onModifySelected(): void {
+    void focusEditor();
+}
+
+/**
+ * When the save button is clicked.
+ */
+function onSaveSelected(): void {
+    // if (!editorCreated.value) return;
+    // editorContent.value = editor.getData();
+    // text.value = editorContent.value;
+}
 </script>
 
 <template>
-    <empty-state v-if="text === null" icon="icon-textbox">
-        <button @click.prevent="onAddText">Add content to this text area</button>
-    </empty-state>
-    <div class="editor-wrapper" :style="{ display: text !== null ? 'block' : 'none' }">
-        <media-article
-            :id="editorId"
-            ref="editorContentEl"
-            tag="div"
-            class="editor-content"
-            :content="initialTextboxContent"
-        ></media-article>
-        <div class="clearfix"></div>
+    <div>
+        <empty-state v-if="text === null" icon="icon-textbox">
+            <button @click.prevent="onAddText">Add content to this text area</button>
+        </empty-state>
+        <div class="editor-wrapper" :style="{ display: text !== null ? 'block' : 'none' }">
+            <media-article
+                :id="editorId"
+                ref="editorContentEl"
+                tag="div"
+                class="editor-content"
+                :content="initialTextboxContent"
+            ></media-article>
+            <div class="clearfix"></div>
+        </div>
     </div>
-    <mdp-grid-cell-text-action :profile="props.profile" />
+    <mdp-grid-cell-text-action
+        :profile="props.profile"
+        :header-key="props.headerKey"
+        @modify="onModifySelected"
+        @save="onSaveSelected"
+    />
 </template>
 
 <style scoped></style>

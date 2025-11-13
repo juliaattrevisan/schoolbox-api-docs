@@ -169,7 +169,11 @@ function onLinkedRecordsSelected(profile: Profile): void {
                 />
             </template>
             <template #Text="{ row, header: columnHeader }">
-                <mdp-grid-cell-text v-model:text="row[columnHeader.key]" :profile="row as Profile" />
+                <mdp-grid-cell-text
+                    v-model:text="row[columnHeader.key]"
+                    :profile="row as Profile"
+                    :header-key="columnHeader.key"
+                />
             </template>
             <template #Date="{ row, header: columnHeader }">
                 <div class="date-cell">

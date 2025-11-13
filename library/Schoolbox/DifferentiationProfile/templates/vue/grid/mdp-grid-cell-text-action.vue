@@ -6,6 +6,7 @@ import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes"
 
 const props = defineProps<{
     profile: Profile;
+    headerKey: string;
 }>();
 
 const contentIsSaved = window.Vue.ref(true);
@@ -60,7 +61,7 @@ function onSaveClicked(): void {
             <button
                 v-else-if="contentIsSaved && !contentIsFocused"
                 class="button"
-                :data-test="`mdp-grid-cell-text-action-modify-${props.profile.student.id}`"
+                :data-test="`mdp-grid-cell-text-action-modify-${props.profile.student.id}-${props.headerKey}`"
                 @click="onModifyClicked"
             >
                 Modify
@@ -69,7 +70,7 @@ function onSaveClicked(): void {
             <button
                 v-else
                 class="button"
-                :data-test="`mdp-grid-cell-text-action-save-${props.profile.student.id}`"
+                :data-test="`mdp-grid-cell-text-action-save-${props.profile.student.id}-${props.headerKey}`"
                 @mousedown="onSaveClicked"
             >
                 Save
