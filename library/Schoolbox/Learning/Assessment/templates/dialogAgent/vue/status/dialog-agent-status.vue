@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserCC } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import { STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
+import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import DasFilters from "./das-filters.vue";
 
 interface Props {
@@ -11,6 +14,17 @@ interface Props {
     participants: {
         id: number;
         user: UserCC;
+        status: DialogAgentResponseStatus;
+        assistanceRequestedAt: DateRFC3339 | null;
+        submittedAt: DateRFC3339 | null;
+        _routes: {
+            summary?: string | null;
+            view?: string | null;
+            sobo?: string | null;
+            reset?: string | null;
+            reopen?: string | null;
+            resolved?: string | null;
+        };
     }[];
 }
 
@@ -52,7 +66,14 @@ const props = defineProps<Props>();
                                     </a>
                                 </div>
                             </td>
-                            <td class="u-sticky-left u-sticky-left--offset-1"></td>
+                            <td class="u-sticky-left u-sticky-left--offset-1">
+                                <component
+                                    :is="participant._routes.view ? 'a' : 'span'"
+                                    :href="participant._routes.view || undefined"
+                                    class="progress-tick readonly"
+                                    :class="STATUS_TICKS[participant.status]"
+                                />
+                            </td>
                         </tr>
                     </tbody>
                 </table>

@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model as CriteriaModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
@@ -24,6 +25,7 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDat
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -620,12 +622,48 @@ class Controller extends Assessment\Controller
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
         $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+        $statusLookup = new Status();
 
         $participantInfo = [];
         foreach ($assessment->getAllParticipants() as $participant) {
+            $authoritativeResponse = null;
+            if ($participant->getAllResponses()->count()) {
+                /** @var ResponseModel|null $authoritativeResponse */
+                $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
+            }
+
+            /** @var Participant $participant */
+            $status = $statusLookup->calculate($authoritativeResponse);
+
+            $routeParams = [
+                'assessment'   => $assessment,
+                'assessmentId' => $assessment->getId(),
+                'student'      => $participant->getUser(),
+                'studentId'    => $participant->getUser()->getId(),
+            ];
+
+            // TODO: These routes also are possibly meant to pull in info from $status["actions"]
+            $routes = [
+                'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
+                'view' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', array_merge(
+                    $routeParams,
+                    [
+                        'response' => $authoritativeResponse,
+                        'responseId' => $authoritativeResponse->getId(),
+                    ]
+                )) : null,
+                'sobo' => $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParams),
+                'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
+                'reopen' => $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParams),
+                'resolved' => $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParams),
+            ];
+
             $participantInfo[] = [
                 'id' => $participant->getId(),
                 'user' => $userTranslator->convertLinkedUser($participant->getUser()),
+                'status' => $status["status"],
+                'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
+                '_routes' => $routes,
             ];
         }
 
@@ -642,7 +680,7 @@ class Controller extends Assessment\Controller
                 ),
                 'assessment' => $assessment,
                 'scenario' => $scenario,
-                'statuses' => (new Status())->generate($assessment),
+                'statuses' => $statusLookup->generate($assessment),
                 'criteria'   => $scenario->getCriteria()->map(fn(CriteriaModel $criterion) => [
                     'id' => $criterion->getId(),
                     'title' => $criterion->getTitle(),

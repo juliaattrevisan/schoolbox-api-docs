@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 
 use Schoolbox\Learning\Assessment\DialogAgent\Model;
-use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 
 class Status
 {
@@ -57,7 +57,15 @@ class Status
         $stack = [];
 
         foreach ($assessment->getAllParticipants() as $participant) {
-            $stack[$participant->getUser()->getId()] = $this->calculate($assessment, $participant);
+            /* Find an authoritative response for this participant
+            */
+            /** @var ResponseModel|null $authoritativeResponse */
+            $authoritativeResponse = null;
+            if ($participant->getAllResponses()->count()) {
+                $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
+            }
+
+            $stack[$participant->getUser()->getId()] = $this->calculate($authoritativeResponse);
         }
 
         return $stack;
@@ -65,40 +73,19 @@ class Status
 
 
     /**
-     * Decide the current status of a $participant's response and returns that along with the various metadata
+     * Decide the current status of a particular response and returns the various metadata
      * relevant per state which you will probably just arbitrarily render if extant.
      *
      * Returns a set of (status, meta array) tuples.
      *
-     * @param Model $assessment
-     * @param Participant $participant
+     * @param ResponseModel|null $authoritativeResponse
      * @return array
      */
-    private function calculate(Model $assessment, Participant $participant): array
+    public function calculate(?ResponseModel $authoritativeResponse): array
     {
         /* No responses? No trabajo
-         */
-        if (!$participant->getAllResponses()->count()) {
-            return [
-                'status' => self::STATUS_PENDING,
-                'css' => self::CSS_PENDING,
-                'response' => null,
-                'actions' => [
-                    self::ACTION_VIEW => false,
-                    self::ACTION_SOBO => false,
-                    self::ACTION_RESET => false,
-                    self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVED => false
-                ],
-            ];
-        }
-
-        /* Find an authoritative response for this participant
-         */
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $authoritativeResponse */
-        $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
-
-        /* If, for some reason, there isn't an authoritative response, I suppose we're Pending again.
+         *
+         * If, for some reason, there isn't an authoritative response, I suppose we're Pending again.
          * This should never be the case and is meant to be enforced by business logic alone, but there may
          * be a mistake made by us, that lets students have multiple responses but none were authoritative.
          */
@@ -125,10 +112,7 @@ class Status
                 'css' => self::CSS_SUBMITTED,
                 'response' => $authoritativeResponse,
                 'meta' => [
-                    'submittedAt' => [
-                        'local' => $authoritativeResponse->getSubmittedAt()->getLocal(),
-                        'rfc' => $authoritativeResponse->getSubmittedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
-                    ],
+                    'submittedAt' => $authoritativeResponse->getSubmittedAt()->getUsingFormat(DATE_ATOM),
                     'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
                 ],
                 'actions' => [
