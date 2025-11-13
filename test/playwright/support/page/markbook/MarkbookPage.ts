@@ -304,4 +304,86 @@ export default class MarkbookPage {
     async clickShowDraftsCheckbox(): Promise<void> {
         await this.page.locator(MarkbookPage.SELECTOR_SHOW_DRAFTS_CHECKBOX).click();
     }
+
+    /**
+     * update the activity weight in the class mark book page
+     * verify the class average and student grade is updated based on new weight
+     * able to verify one or more students grades
+     * @param assessmentId - The ID of the assessment
+     * @param weight - The new weight to set
+     * @param studentIds - An array of student IDs to verify
+     * @param expectedClassAverage - The expected class average after weight change
+     * @param expectedStudentGrades - An array of expected student grades after weight change
+     */
+    async updateActivityWeightAndVerifyGrades(
+        assessmentId: string | number,
+        weight: string | number,
+        studentIds: Array<string | number>,
+        expectedClassAverage: string,
+        expectedStudentGrades: Array<string>,
+    ): Promise<void> {
+        await this.page.locator(`a.icon-down-arrow`).click();
+        const assessmentCell = this.page.locator(`td[data-assessment="${assessmentId}"]`).first();
+        await assessmentCell.locator("input").first().fill(weight.toString());
+        await this.page.keyboard.press("Enter");
+
+        // Reload the markbook to reflect changes
+        await this.page.reload();
+
+        // Verify class average
+        await expect(this.page.getByTestId("class-average-mark-book-page")).toHaveText(expectedClassAverage);
+
+        // check the grades by passing an array of 1 or more student ids
+        for (let i = 0; i < studentIds.length; i += 1) {
+            const studentId = studentIds[i];
+            const expectedStudentGrade = expectedStudentGrades[i];
+            await expect(this.page.locator(`a[href="/learning/grades/${studentId}/"]`)).toHaveText(
+                expectedStudentGrade,
+            );
+        }
+    }
+
+    /**
+     * Check the grade for one or more students in the mark book page
+     * @param studentIds - An array of student IDs to verify
+     * @param expectedStudentGrades - An array of expected student grades
+     */
+    async verifyStudentGrades(studentIds: Array<string | number>, expectedStudentGrades: Array<string>): Promise<void> {
+        for (let i = 0; i < studentIds.length; i += 1) {
+            const studentId = studentIds[i];
+            const expectedStudentGrade = expectedStudentGrades[i];
+            await expect(this.page.locator(`a[href="/learning/grades/${studentId}/"]`)).toHaveText(
+                expectedStudentGrade,
+            );
+        }
+    }
+
+    /**
+     * Verify that the class overall average is as expected
+     * @param expectedClassAverage - The expected class average
+     */
+    async verifyClassOverallAverage(expectedClassAverage: string): Promise<void> {
+        await expect(this.page.getByTestId("class-average-mark-book-page")).toHaveText(expectedClassAverage);
+    }
+
+    /**
+     * update weight given a list of assessment ids and a list of weights to set
+     * @param assessmentIds - An array of assessment IDs
+     * @param weights - An array of weights to set
+     */
+    async updateMultipleActivityWeights(
+        assessmentIds: Array<string | number>,
+        weights: Array<string | number>,
+    ): Promise<void> {
+        await this.page.locator(`a.icon-down-arrow`).click();
+        for (let i = 0; i < assessmentIds.length; i += 1) {
+            const assessmentId = assessmentIds[i];
+            const weight = weights[i];
+            const assessmentCell = this.page.locator(`td[data-assessment="${assessmentId}"]`).first();
+            await assessmentCell.locator("input").first().fill(weight.toString());
+            await this.page.keyboard.press("Enter");
+        }
+        // Reload the mark book to reflect changes
+        await this.page.reload();
+    }
 }
