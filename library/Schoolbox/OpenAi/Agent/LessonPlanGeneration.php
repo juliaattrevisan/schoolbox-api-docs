@@ -134,21 +134,22 @@ class LessonPlanGeneration
         /* Since we request the fields to be keyed by their title, not ID for AI reasons,
          * translate it back to IDs for frontend sanity
          */
+        $fieldsById = [];
         foreach ($fields as $field) {
             // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
             $fieldKey = $payloadGenerator->getPayloadFieldKey($fields, $field['id']);
             if (isset($newFieldData[$fieldKey])) {
-                $fields[$field['id']] = Scrub::html($newFieldData[$fieldKey]);
+                $fieldsById[$field['id']] = Scrub::html($newFieldData[$fieldKey]);
             }
         }
 
         /* if the AI didn't return anything, then we don't want to send an empty field back
          * just send whatever on earth the AI sent back to us, it'll be wrong... but it'll be something
          */
-        if (empty($fields)) {
-            $fields = $newFieldData;
+        if (empty($fieldsById)) {
+            $fieldsById = $newFieldData;
         }
 
-        return [$fields, 200];
+        return [$fieldsById, 200];
     }
 }

@@ -20,6 +20,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -73,12 +74,12 @@ class Client implements IClient
      */
     public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
     {
-        $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
-        $request = new Request('POST', $url, $this->authHeaders);
+        $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
+        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, false);
         return $this->handleNonStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ResponseMessage(),
         );
@@ -89,12 +90,12 @@ class Client implements IClient
      */
     public function createResponseStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
-        $url     = $this->generateUrl(self::ENDPOINT_RESPONSES);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
-        $request = new Request('POST', $url, $this->authHeaders);
+        $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
+        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, true);
         return $this->handleStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ResponseMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
@@ -109,9 +110,9 @@ class Client implements IClient
         $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
         $request = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, false);
         return $this->handleNonStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ChatCompletionsMessage(),
         );
@@ -122,12 +123,12 @@ class Client implements IClient
      */
     public function createChatCompletionStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
-        $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
-        $request = new Request('POST', $url, $this->authHeaders);
+        $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
+        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, true);
         return $this->handleStreamedResponse(
-            $request,
-            $payload,
+            $response,
             $log,
             new LogHandler\ChatCompletionsMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
@@ -186,17 +187,43 @@ class Client implements IClient
     private function sendRequest(
         RequestInterface $request,
         array $payload,
+        Log\Model $log,
         bool $stream,
     ): ResponseInterface {
-        return $this->httpClient->send(
-            $request,
-            [
-                RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => $stream,
-                RequestOptions::JSON            => $payload,
-            ],
-        );
+        try {
+            return $this->httpClient->send(
+                $request,
+                [
+                    RequestOptions::ALLOW_REDIRECTS => false,
+                    RequestOptions::STREAM          => $stream,
+                    RequestOptions::JSON            => $payload,
+                ],
+            );
+        } catch (BadResponseException $e) {
+            $log->setReturnCode($e->getResponse()->getStatusCode())
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+
+            // Extract body from response, and put it in output
+            $responseBody = $e->getResponse()->getBody()->getContents();
+            $responseJson = json_decode($responseBody, true);
+            throw new SchoolboxException(
+                $responseJson['error']['message'] ?? $e->getMessage(),
+                $e->getCode(),
+                $e,
+                $e->getResponse()->getStatusCode(),
+            );
+        } catch (ClientExceptionInterface $e) {
+            $log->setReturnCode(null)
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw new SchoolboxException(
+                $e->getMessage(),
+                $e->getCode(),
+                $e,
+                500,
+            );
+        }
     }
 
     /**
@@ -274,35 +301,18 @@ class Client implements IClient
      * Request a non-streamed response from the AI provider, and handle the
      * logging and exceptions appropriately.
      *
-     * @param RequestInterface       $request    The request to send.
-     * @param array                  $payload    The request body to send.
+     * @param ResponseInterface      $response   The response from the AI provider.
      * @param Log\Model              $log        The log to write to.
      * @param LogHandler\ILogHandler $logHandler The log handler to use for the response.
      * @return ResponseInterface The response from the AI provider.
-     * @throws ClientExceptionInterface if the request fails
-     * @throws JsonException            if somehow the response body couldn't be decoded
-     * @throws MapperException          if somehow the log couldn't be saved
+     * @throws JsonException   if somehow the response body couldn't be decoded
+     * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleNonStreamedResponse(
-        RequestInterface $request,
-        array $payload,
+        ResponseInterface $response,
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
     ): ResponseInterface {
-        try {
-            $response = $this->sendRequest($request, $payload, false);
-        } catch (BadResponseException $e) {
-            $log->setReturnCode($e->getResponse()->getStatusCode())
-                ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
-            throw $e;
-        } catch (ClientExceptionInterface $e) {
-            $log->setReturnCode(null)
-                ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
-            throw $e;
-        }
-
         // Do something with the response:
         // extract the body, and also log it.
         // OpenAI responses to non-streamed requests are a single JSON object
@@ -321,24 +331,19 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param RequestInterface       $request    The request to send.
-     * @param array                  $payload    The request body to send.
+     * @param ResponseInterface      $response   The response from the AI provider.
      * @param Log\Model              $log        The log to write to.
      * @param LogHandler\ILogHandler $logHandler The log handler to use for each message.
      * @param int                    $chunkSize  How many bytes to read from each stream iteration.
      * @return iterable<string> Each message in the stream as it's received.
-     * @throws ClientExceptionInterface if the request fails
-     * @throws MapperException          if somehow the log couldn't be saved
+     * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
-        RequestInterface $request,
-        array $payload,
+        ResponseInterface $response,
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
     ): iterable {
-        $response = $this->sendRequest($request, $payload, true);
-
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {

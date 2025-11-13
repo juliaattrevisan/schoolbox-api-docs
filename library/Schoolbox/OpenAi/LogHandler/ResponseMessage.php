@@ -40,28 +40,13 @@ class ResponseMessage implements ILogHandler
     public function handleMessage(Message $message, Log\Model $log): Log\Model
     {
         // Prepare the message for logging
-        $eventType       = $message->eventType;
-        $isFinishedEvent = in_array($eventType, self::EVENT_TYPES_FINISHED);
-        $rawData         = [];
+        $eventType = $message->eventType;
+        $rawData   = [];
         try {
-            // Omit partial and completed image data from the output
-            $filteredData = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
-            $rawData      = $filteredData;
-            if ($eventType === 'response.image_generation_call.partial_image' && isset($filteredData['partial_image_b64'])) {
-                $filteredData['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
-            }
-            if ($eventType === 'response.output_item.done' && isset($filteredData['item']['result'])) {
-                $filteredData['item']['result'] = self::IMAGE_DATA_OMITTED;
-            }
-
-            // apparently there is a final final image, lets remove that also
-            if ($isFinishedEvent && isset($filteredData['response']['output']) && is_array($filteredData['response']['output'])) {
-                // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
-                foreach ($filteredData['response']['output'] as $i => $respOutput) {
-                    if (isset($respOutput['result'])) {
-                        $filteredData['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
-                    }
-                }
+            $rawData      = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $filteredData = $this->filterResponseForLogging($eventType, $rawData);
+            if (isset($filteredData['response'])) {
+                $filteredData['response'] = $this->filterImageGenerationOutput($filteredData['response']);
             }
 
             // Override message data before writing it
@@ -77,8 +62,8 @@ class ResponseMessage implements ILogHandler
         // Is this the final event? If so, log its completion status.
         // There are 3 possible events that indicate the end of a response
         // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if ($isFinishedEvent) {
-            $log = $this->logCompletion($rawData, $log);
+        if (in_array($eventType, self::EVENT_TYPES_FINISHED)) {
+            $log = $this->logCompletion($rawData['response'] ?? [], $log);
         }
         return $log;
     }
@@ -88,7 +73,9 @@ class ResponseMessage implements ILogHandler
      */
     public function handleResponse(array $responseData, Log\Model $log): Log\Model
     {
-        $log = $this->logUsage($responseData, $log);
+        $filteredData = $this->filterResponseForLogging(null, $responseData);
+        $filteredData = $this->filterImageGenerationOutput($filteredData);
+        $log = $this->logUsage($responseData, $log)->setResponse(json_encode($filteredData));
         return $this->logCompletion($responseData, $log);
     }
 
@@ -102,9 +89,9 @@ class ResponseMessage implements ILogHandler
     private function logUsage(array $responseData, Log\Model $log): Log\Model
     {
         // Find model and token usage
-        $model        = $responseData['response']['model'] ?? null;
-        $inputTokens  = $responseData['response']['usage']['input_tokens'] ?? null;
-        $outputTokens = $responseData['response']['usage']['output_tokens'] ?? null;
+        $model        = $responseData['model'] ?? null;
+        $inputTokens  = $responseData['usage']['input_tokens'] ?? null;
+        $outputTokens = $responseData['usage']['output_tokens'] ?? null;
         if ($model) {
             $log->setModel($model);
         }
@@ -161,5 +148,45 @@ class ResponseMessage implements ILogHandler
 
         $log->setReturnCode($log->getReturnCode() ?? 200);
         return $log;
+    }
+
+    /**
+     * Filter out unwanted fields from the response data, for storage in the
+     * OpenAI log.
+     *
+     * @param string|null $eventType
+     * @param array       $data
+     * @return array
+     */
+    private function filterResponseForLogging(?string $eventType, array $data): array
+    {
+        // Omit partial and completed image data from the output
+        if ($eventType === 'response.image_generation_call.partial_image' && isset($data['partial_image_b64'])) {
+            $data['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
+        }
+        if ($eventType === 'response.output_item.done' && isset($data['item']['result'])) {
+            $data['item']['result'] = self::IMAGE_DATA_OMITTED;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Filter out image generation output from the response data, for storage in
+     * the OpenAI log.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function filterImageGenerationOutput(array $data): array
+    {
+        if (isset($data['output']) && is_array($data['output'])) {
+            foreach ($data['output'] as $i => $respOutput) {
+                if (isset($respOutput['result']) && $respOutput['type'] === 'image_generation_call') {
+                    $data['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
+                }
+            }
+        }
+        return $data;
     }
 }
