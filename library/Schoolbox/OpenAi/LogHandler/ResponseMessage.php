@@ -40,29 +40,11 @@ class ResponseMessage implements ILogHandler
     public function handleMessage(Message $message, Log\Model $log): Log\Model
     {
         // Prepare the message for logging
-        $eventType       = $message->eventType;
-        $isFinishedEvent = in_array($eventType, self::EVENT_TYPES_FINISHED);
-        $rawData         = [];
+        $eventType = $message->eventType;
+        $rawData   = [];
         try {
-            // Omit partial and completed image data from the output
-            $filteredData = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
-            $rawData      = $filteredData;
-            if ($eventType === 'response.image_generation_call.partial_image' && isset($filteredData['partial_image_b64'])) {
-                $filteredData['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
-            }
-            if ($eventType === 'response.output_item.done' && isset($filteredData['item']['result'])) {
-                $filteredData['item']['result'] = self::IMAGE_DATA_OMITTED;
-            }
-
-            // apparently there is a final final image, lets remove that also
-            if ($isFinishedEvent && isset($filteredData['response']['output']) && is_array($filteredData['response']['output'])) {
-                // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
-                foreach ($filteredData['response']['output'] as $i => $respOutput) {
-                    if (isset($respOutput['result'])) {
-                        $filteredData['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
-                    }
-                }
-            }
+            $rawData      = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $filteredData = $this->filterResponseForLogging($eventType, $rawData);
 
             // Override message data before writing it
             $message->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
@@ -77,7 +59,7 @@ class ResponseMessage implements ILogHandler
         // Is this the final event? If so, log its completion status.
         // There are 3 possible events that indicate the end of a response
         // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if ($isFinishedEvent) {
+        if (in_array($eventType, self::EVENT_TYPES_FINISHED)) {
             $log = $this->logCompletion($rawData['response'] ?? [], $log);
         }
         return $log;
@@ -161,5 +143,39 @@ class ResponseMessage implements ILogHandler
 
         $log->setReturnCode($log->getReturnCode() ?? 200);
         return $log;
+    }
+
+    /**
+     * Filter out unwanted fields from the response data, for storage in the
+     * OpenAI log.
+     *
+     * @param string|null $eventType
+     * @param array       $data
+     * @return array
+     */
+    private function filterResponseForLogging(?string $eventType, array $data): array
+    {
+        // Omit partial and completed image data from the output
+        if ($eventType === 'response.image_generation_call.partial_image' && isset($data['partial_image_b64'])) {
+            $data['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
+        }
+        if ($eventType === 'response.output_item.done' && isset($data['item']['result'])) {
+            $data['item']['result'] = self::IMAGE_DATA_OMITTED;
+        }
+
+        // apparently there is a final final image, lets remove that also
+        if (
+            in_array($eventType, self::EVENT_TYPES_FINISHED)
+            && isset($data['response']['output'])
+            && is_array($data['response']['output'])
+        ) {
+            // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
+            foreach ($data['response']['output'] as $i => $respOutput) {
+                if (isset($respOutput['result'])) {
+                    $data['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
+                }
+            }
+        }
+        return $data;
     }
 }
