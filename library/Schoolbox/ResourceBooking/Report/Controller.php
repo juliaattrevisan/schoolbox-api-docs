@@ -17,7 +17,7 @@ use Alaress\Web\Controller\Base;
 use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
 use Schoolbox\GenericCollection;
-use Schoolbox\ResourceBooking\Booking\Status\Model as StatusModel;
+use Calendar\Event\Type\Day\Event as Event;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\ResourceBooking\Item\Mapper;
@@ -133,11 +133,11 @@ class Controller extends Base
         $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
 
         // if we are only showing clashes, filter the event list now
-        /** @var array<string, EventInterface> $clashesOnlyList */
+        /** @var array<string, Event> $clashesOnlyList */
         $clashesOnlyList = [];
         if ($clashesOnly) {
             // Step 1: Group events by resource ID
-            /** @var array<int|string, EventInterface[]> $eventsByResource */
+            /** @var array<int|string, Event[]> $eventsByResource */
             $eventsByResource = [];
             foreach ($eventList as $event) {
                 $resourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event)
