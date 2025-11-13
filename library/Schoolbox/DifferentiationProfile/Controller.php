@@ -227,7 +227,7 @@ class Controller extends Base
             WHERE p.student_id = :studentId
             AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
             AND p.deleted_at IS NULL
-            AND p.expires_at IS NULL
+            AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
         ";
 
         $params = [
