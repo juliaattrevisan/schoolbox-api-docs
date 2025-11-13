@@ -36,7 +36,7 @@ class ModelToArray
                     'id' => $student->getYear()->getId(),
                     'name' => $student->getYear()->getName(),
                 ] : null,
-                '_routes' => [
+                '_links' => [
                     'profile' => $this->getRouteIfAuthorized(
                         'searchUser.getProfile',
                         ['userId' => $student->getId()],
