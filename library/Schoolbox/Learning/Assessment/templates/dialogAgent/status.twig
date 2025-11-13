@@ -160,7 +160,7 @@
                                     </a>
                                 </div>
                             </td>
-                            <td class="l-flex l-flex--justify-center">
+                            <td>
                                 {% set title = '' %}
                                 {% set currentStatus = statuses[participant.user.id] %}
 
@@ -208,7 +208,9 @@
                             {% for field in scenario.fields %}
                                 <td>
                                     {# TODO AI Feedback derivation per field per response goes here #}
-                                    {{ random(tempData) }}
+                                    {% for data in tempData|shuffle|slice(0, random(0, tempData|length)) %}
+                                        {{ data }}
+                                    {% endfor %}
                                 </td>
                             {% endfor %}
 
