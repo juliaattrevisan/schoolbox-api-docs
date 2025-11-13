@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\Filter\Mapper;
 use Schoolbox\L10n\RosettaStone;
@@ -21,9 +22,11 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsM
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
 use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
+use Schoolbox\User;
 use Twig\Error\Error;
 use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 
 class Controller extends Base
 {
@@ -50,6 +53,8 @@ class Controller extends Base
         private \Schoolbox\Filter\Mapper $filterMapper,
         private \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper,
         private DifferentiationProfileMapper $mapper,
+        private PastoralMapper $pastoralMapper,
+        private \Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray $pastoralTranslator,
     ) {
     }
 
@@ -62,7 +67,7 @@ class Controller extends Base
     {
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
-        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
         $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
 
         $filterPanel = $this->filterFactoryFactory->buildPanel(
@@ -101,11 +106,12 @@ class Controller extends Base
 
     public function getDifferentiationProfileData(): void
     {
-        $adminConfigs         = $this->differentiationProfileConfigMapper->findAll();
+        $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
 
         $profileTranslator = new ModelToArray(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
+            $this->getUser(),
             $adminConfigs,
         );
 
@@ -196,6 +202,59 @@ class Controller extends Base
                 'cursor' => [
                     'next'    => $next,
                     'current' => $current,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Get linked pastoral records for a student that contribute to differentiation profile
+     *
+     * @return void
+     */
+    public function getLinkedPastoralRecords(?int $studentId): void
+    {
+        if (null === $studentId) {
+            $this->sendJsonError('student id is missing.', 400);
+            return;
+        }
+
+        $query = "
+            SELECT p.id
+            FROM pastoral p
+            LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+            LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
+            WHERE p.student_id = :studentId
+            AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+            AND p.deleted_at IS NULL
+            AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
+        ";
+
+        $params = [
+            'studentId' => $studentId,
+        ];
+        $pastoralIds = $this->pastoralMapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
+
+        $cursor = new MapperCursor(
+            $this->pastoralMapper,
+            $this->mapper::DEFAULT_LIMIT,
+            /* Sort the pastoral records by the most recently created first
+             */
+            ['created_at' => PastoralMapper::SORT_ORDER_DESC],
+            $this->pastoralMapper->getPredicateBuilder()
+                ->in('id', $pastoralIds)
+        );
+
+        $data = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+        $this->response = $this->responseAsJson([
+            'data' => [
+                'results' => $data->map($this->pastoralTranslator),
+            ],
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'next'    => $cursor->next($data),
+                    'current' => $cursor->current($data),
                 ],
             ],
         ]);

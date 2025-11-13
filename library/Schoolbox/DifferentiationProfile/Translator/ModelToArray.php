@@ -8,6 +8,7 @@ use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\Admin\DifferentiationProfiles\Model as Config;
+use Schoolbox\User;
 
 class ModelToArray
 {
@@ -16,6 +17,7 @@ class ModelToArray
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
+        protected User $currentUser,
         private Collection $profileConfig,
     ) {
     }
@@ -34,6 +36,18 @@ class ModelToArray
                     'id' => $student->getYear()->getId(),
                     'name' => $student->getYear()->getName(),
                 ] : null,
+                '_links' => [
+                    'profile' => $this->getRouteIfAuthorized(
+                        'searchUser.getProfile',
+                        ['userId' => $student->getId()],
+                    ),
+                ],
+            ],
+            '_routes' => [
+                'linkedRecords' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.getLinkedPastoralRecords',
+                    ['studentId' => $student->getId()],
+                ),
             ],
             'created_at'            => $model->getCreatedAt()?->getLocalShort(),
             'updated_at'            => $model->getUpdatedAt()?->getLocalShort(),

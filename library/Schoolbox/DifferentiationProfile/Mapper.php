@@ -128,6 +128,12 @@ class Mapper extends BaseMapper
 
         $pb->isNull('differentiation_profiles.deleted_at');
 
+        $pb->any(
+            $this->getPredicateBuilder()
+            ->isNull('p.expires_at')
+            ->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
+        );
+
         if (!empty($cursorParams)) {
             $pb = $this->applyCursor(
                 $pb,
@@ -165,8 +171,7 @@ class Mapper extends BaseMapper
                 INNER JOIN userAccess ua ON sc.campus = ua.sid AND ua.service = :service AND ua.type >= :accessLevel AND ua.uid = :viewerId
                 LEFT JOIN differentiation_profiles_adjustment_category ac ON differentiation_profiles.adjustment_category = ac.id
                 LEFT JOIN differentiation_profiles_adjustment_level al ON differentiation_profiles.adjustment_level = al.id
-                WHERE p.expires_at IS NULL
-                AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+                WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
                 AND {$where}
                 GROUP BY p.student_id, s.lastname, s.chosen_name
                 {$orderBy}
@@ -244,7 +249,7 @@ class Mapper extends BaseMapper
     {
         return "
             FROM differentiation_profiles
-            RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL
+            RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
             INNER JOIN user s ON p.student_id = s.id AND s.deleted_at IS NULL
             LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
             LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
