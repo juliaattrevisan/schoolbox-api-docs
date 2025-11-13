@@ -48,20 +48,16 @@ window.Vue.provide("severityColors", props.severityColors);
 
 const header = window.Vue.ref<Header[]>([
     { id: 0, title: "Student", width: 250, isFixed: true, isSortable: true, key: "student", type: HeaderType.USER },
-    ...props.header
-        .filter((h) => h.is_enabled)
-        .map((h) => ({
-            id: h.id,
-            key: h.name,
-            type:
-                h.name === "adjustment_category" || h.name === "adjustment_level"
-                    ? HeaderType.ADJUSTMENT
-                    : HeaderType.TEXT,
-            title: h.terminology,
-            width: 400,
-            isFixed: false,
-            isSortable: false,
-        })),
+    ...props.header.map((h) => ({
+        id: h.id,
+        key: h.name,
+        type:
+            h.name === "adjustment_category" || h.name === "adjustment_level" ? HeaderType.ADJUSTMENT : HeaderType.TEXT,
+        title: h.terminology,
+        width: 400,
+        isFixed: false,
+        isSortable: false,
+    })),
     {
         id: Math.max(0, ...props.header.map((h) => h.id)) + 1,
         key: "updated_at",
