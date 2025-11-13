@@ -626,14 +626,38 @@ class Controller extends Assessment\Controller
 
         $participantInfo = [];
         foreach ($assessment->getAllParticipants() as $participant) {
+            /** @var Participant $participant */
+
             $authoritativeResponse = null;
             if ($participant->getAllResponses()->count()) {
                 /** @var ResponseModel|null $authoritativeResponse */
                 $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
             }
 
-            /** @var Participant $participant */
             $status = $statusLookup->calculate($authoritativeResponse);
+
+            /* The frontend expects a {} for an empty record, so use a stdClass */
+            $feedback = new \stdClass();
+
+            /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
+             */
+            // if ($authoritativeResponse !== null) {
+            $tempFeedback = [
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
+                'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
+                'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
+                'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
+                'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
+                'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
+            ];
+
+            foreach ($scenario->getCriteria() as $criterion) {
+                shuffle($tempFeedback);
+                $selected = array_slice($tempFeedback, 0, rand(0, count($tempFeedback)));
+                $feedback->{$criterion->getId()} = join(' ', $selected);
+            }
+            // }
+
 
             $routeParams = [
                 'assessment'   => $assessment,
@@ -663,12 +687,10 @@ class Controller extends Assessment\Controller
                 'user' => $userTranslator->convertLinkedUser($participant->getUser()),
                 'status' => $status["status"],
                 'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
+                'feedback' => $feedback,
                 '_routes' => $routes,
             ];
         }
-
-        /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
-         */
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',

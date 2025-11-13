@@ -110,31 +110,6 @@
                 <tbody>
                     {% for participant in assessment.allParticipants %}
                         <tr>
-                            <td class="profile-cell">
-                            </td>
-                            <td>
-                            </td>
-
-                            {# Scenario Fields evaluated per person by the ai
-                             # I guess we fill these in later when the ai can do the thing
-                             #}
-                            {% set tempData = [
-                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
-                                'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
-                                'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
-                                'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
-                                'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
-                                'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
-                            ] %}
-                            {% for field in scenario.fields %}
-                                <td>
-                                    {# TODO AI Feedback derivation per field per response goes here #}
-                                    {% for data in tempData|shuffle|slice(0, random(0, tempData|length)) %}
-                                        {{ data }}
-                                    {% endfor %}
-                                </td>
-                            {% endfor %}
-
                             <td class="actions-small-1">
                                 <nav>
                                     <sbx-pop-out content-id="response-options-{{ participant.user.id }}"></sbx-pop-out>

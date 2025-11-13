@@ -7,17 +7,20 @@ import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAg
 import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import DasFilters from "./das-filters.vue";
 
+type DialogAgentScenarioCriteria = {
+    id: string;
+    title: string;
+};
+
 interface Props {
-    criteria: {
-        id: string;
-        title: string;
-    }[];
+    criteria: DialogAgentScenarioCriteria[];
     participants: {
         id: number;
         user: UserCC;
         status: DialogAgentResponseStatus;
         assistanceRequestedAt: DateRFC3339 | null;
         submittedAt: DateRFC3339 | null;
+        feedback: Record<DialogAgentScenarioCriteria["id"], string>;
         _routes: {
             summary?: string | null;
             view?: string | null;
@@ -93,6 +96,9 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                                     :title="getProgressTickTitle(participant)"
                                     data-tooltip
                                 />
+                            </td>
+                            <td v-for="field in props.criteria" :key="field.id">
+                                {{ participant.feedback[field.id] || "" }}
                             </td>
                         </tr>
                     </tbody>
