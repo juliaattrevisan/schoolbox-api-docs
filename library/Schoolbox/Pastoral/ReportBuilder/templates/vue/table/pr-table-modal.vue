@@ -155,7 +155,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
             </div>
         </template>
     </basic-modal>
-    <pr-generate-print v-model:is-loading="isLoadingPrint" />
+    <pr-generate-print v-model:is-loading="isLoadingPrint" :load-error="loadError" />
 </template>
 
 <style scoped>

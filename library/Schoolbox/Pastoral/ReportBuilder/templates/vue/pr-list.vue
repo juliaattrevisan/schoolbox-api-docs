@@ -82,7 +82,7 @@ defineExpose({ printAllRecords });
             <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />
         </template>
     </div>
-    <pr-generate-print v-model:is-loading="isLoadingPrint" />
+    <pr-generate-print v-model:is-loading="isLoadingPrint" :load-error="loadError" />
 </template>
 
 <style scoped></style>
