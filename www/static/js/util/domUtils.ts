@@ -351,8 +351,8 @@ export function addMarks(toMark: string, wordList: string[], allowPartialMatches
 }
 
 /**
- * Wait for all images to load before showing print dialog
- * @param containerEl - the container element to search for images within
+ * Wait for all images to load
+ * @param containerEl - the container element to search for images in
  */
 export async function waitForAllImages(containerEl: HTMLElement | null): Promise<void> {
     await window.Vue.nextTick();
@@ -374,6 +374,12 @@ export async function waitForAllImages(containerEl: HTMLElement | null): Promise
             };
             img.addEventListener("load", onLoad);
             img.addEventListener("error", onLoad);
+            // Immediately check if the image has already loaded after attaching listeners
+            if (img.complete) {
+                img.removeEventListener("load", onLoad);
+                img.removeEventListener("error", onLoad);
+                resolve();
+            }
         });
     });
     // Wait for all unloaded images to finish loading
