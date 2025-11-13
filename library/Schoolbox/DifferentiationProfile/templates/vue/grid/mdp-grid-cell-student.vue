@@ -29,15 +29,14 @@ function onLinkedRecordsSelected(): void {
         <div class="l-flex-row l-flex--no-wrap l-gap-m">
             <user-photo :user="props.user" render="small" />
             <div class="l-flex-col l-flex--justify-center f-no-margins">
-                <!-- <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
-                {{ props.user.lastName }},
-                {{ props.user.preferredName || props.user.firstName }}
-            </a>
-            <template v-else>
-                {{ props.user.lastName }},
-                {{ props.user.preferredName || props.user.firstName }}
-            </template> -->
-                {{ props.user.fullName }}
+                <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
+                    {{ props.user.lastName }},
+                    {{ props.user.givenName }}
+                </a>
+                <template v-else>
+                    {{ props.user.lastName }},
+                    {{ props.user.givenName }}
+                </template>
             </div>
         </div>
         <button v-if="props.profile._routes?.linkedRecords" class="button" @click="onLinkedRecordsSelected">
