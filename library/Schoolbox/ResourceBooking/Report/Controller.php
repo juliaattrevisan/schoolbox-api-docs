@@ -123,8 +123,8 @@ class Controller extends Base
         );
 
         /*
-         * we may be editing this list, so temp var it
-         * explicitly set the types of events, as buildFromResourceCollection only returns these types
+         * $eventList may be edited (if only looking for clashes), so cache that,
+         * and we only have specific types provided from buildFromResourceCollection explicitly set the types of events
          * \Calendar\Event\Type\ResourceBooking\Event
          * \Calendar\Event\Type\Timetable\Event
          * \Calendar\Event\Type\SudsTimetable\Event
@@ -157,9 +157,7 @@ class Controller extends Base
                 $count = count($resourceEvents);
                 for ($i = 0; $i < $count; $i++) {
                     $eventA = $resourceEvents[$i];
-                    // cache start and end times
-                    $aStart = $eventA->getStartTime();
-                    $aEnd = $eventA->getEndTime();
+
                     $eventAHash = spl_object_hash($eventA);
                     for ($j = $i + 1; $j < $count; $j++) {
                         $eventB = $resourceEvents[$j];

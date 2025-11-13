@@ -446,8 +446,8 @@ class Event extends EventBase
 
     /**
      * Determine if this event clashes with another event
-     * if its the same event, return false
-     * if both are resource bookings, only care if the other is pending
+     * if it's the same event, return false
+     * if both are resource bookings, only care if $eventB is pending
      *
      * @param self $eventB
      * @return bool
@@ -455,7 +455,7 @@ class Event extends EventBase
     public function isClash(self $eventB): bool
     {
         $eventA = $this;
-        // cache start and end times
+        // cache start/end times and event hashes
         $aStart = $eventA->getStartTime();
         $aEnd = $eventA->getEndTime();
         $eventAHash = spl_object_hash($eventA);
@@ -492,7 +492,7 @@ class Event extends EventBase
                 return false;
             }
         }
-        // Check for time overlap (using same logic as before)
+        // Check for time overlap
         $bStart = $eventB->getStartTime();
         $bEnd = $eventB->getEndTime();
         if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {

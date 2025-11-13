@@ -27,6 +27,14 @@ use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
  */
 class EventTest extends TestCase
 {
+    /**
+     * Helper to make an event of specified class
+     *
+     * @param string $start
+     * @param string $end
+     * @param $class
+     * @return DayEvent|mixed
+     */
     private function makeEvent(string $start, string $end, $class = DayEvent::class)
     {
         $event = new $class();
@@ -34,6 +42,46 @@ class EventTest extends TestCase
         $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
         return $event;
     }
+
+    /**
+     * Helper to make a ResourceBookingEvent with specified booking ID and status
+     *
+     * @param string $start
+     * @param string $end
+     * @param int $bookingId
+     * @param int $statusId
+     * @return ResourceBookingEvent
+     */
+    private function makeResourceBookingEvent(string $start, string $end, int $bookingId, int $statusId): ResourceBookingEvent
+    {
+        $event = new ResourceBookingEvent();
+        $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
+        $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
+
+        $booking = new BookingModel();
+        $booking->setId($bookingId);
+        $status = new BookingStatusModel();
+        $status->setId($statusId);
+        $booking->setStatus($status);
+
+        $event->setBooking($booking);
+        return $event;
+    }
+
+    /**
+     * Test Event clashes, not specifically ResourceBooking or SudsTimetable/Timetable events, just date/times, and maybe category IDs
+     *
+     * @param string $aStart
+     * @param string $aEnd
+     * @param string $bStart
+     * @param string $bEnd
+     * @param string $classA
+     * @param string $classB
+     * @param bool $expected
+     * @param int|null $aCategory
+     * @param int|null $bCategory
+     * @return void
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerIsClash')]
     public function testIsClash(
         string $aStart,
@@ -63,15 +111,15 @@ class EventTest extends TestCase
     {
         return [
             'overlap-day-events' => [
-                '2025-11-13 09:00:00',
-                '2025-11-13 10:00:00',
-                '2025-11-13 09:30:00',
-                '2025-11-13 10:30:00',
-                DayEvent::class,
-                DayEvent::class,
-                true,
-                null,
-                null,
+                '2025-11-13 09:00:00', // aStart
+                '2025-11-13 10:00:00', // aEnd
+                '2025-11-13 09:30:00', // bStart
+                '2025-11-13 10:30:00', // bEnd
+                DayEvent::class, // classA
+                DayEvent::class, // classB
+                true, // clash expected
+                null, // aCategory
+                null, // bCategory
             ],
             'non-overlap-day-events' => [
                 '2025-11-13 09:00:00',
@@ -114,8 +162,8 @@ class EventTest extends TestCase
                 SudsTimetableEvent::class,
                 SudsTimetableEvent::class,
                 true,
-                -1,
-                -1,
+                -1, // category -1 is the unset category id
+                -1, // category -1 is the unset category id
             ],
             'suds-different-category-overlap-clash' => [
                 '2025-11-13 09:00:00',
@@ -243,22 +291,20 @@ class EventTest extends TestCase
         ];
     }
 
-    private function makeResourceBookingEvent(string $start, string $end, int $bookingId, int $statusId): ResourceBookingEvent
-    {
-        $event = new ResourceBookingEvent();
-        $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
-        $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
-
-        $booking = new BookingModel();
-        $booking->setId($bookingId);
-        $status = new BookingStatusModel();
-        $status->setId($statusId);
-        $booking->setStatus($status);
-
-        $event->setBooking($booking);
-        return $event;
-    }
-
+    /**
+     * Test ResourceBooking vs ResourceBooking clashes
+     *
+     * @param string $aStart
+     * @param string $aEnd
+     * @param string $bStart
+     * @param string $bEnd
+     * @param int $aBookingId
+     * @param int $aStatus
+     * @param int $bBookingId
+     * @param int $bStatus
+     * @param bool $expected
+     * @return void
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerResourceBookingIsClash')]
     public function testResourceBookingIsClash(
         string $aStart,
@@ -281,15 +327,15 @@ class EventTest extends TestCase
     {
         return [
             'same-booking-id-no-clash' => [
-                '2025-11-13 09:00:00',
-                '2025-11-13 10:00:00',
-                '2025-11-13 09:30:00',
-                '2025-11-13 10:30:00',
-                100,
-                BookingStatusModel::STATUS_PENDING,
-                100,
-                BookingStatusModel::STATUS_PENDING,
-                false,
+                '2025-11-13 09:00:00', // aStart
+                '2025-11-13 10:00:00', // aEnd
+                '2025-11-13 09:30:00', // bStart
+                '2025-11-13 10:30:00', // bEnd
+                100, // aBookingId
+                BookingStatusModel::STATUS_PENDING, // aStatus
+                100, // bBookingId
+                BookingStatusModel::STATUS_PENDING, // bStatus
+                false, // clash expected
             ],
             'b-not-pending-no-clash' => [
                 '2025-11-13 09:00:00',
@@ -350,6 +396,19 @@ class EventTest extends TestCase
         ];
     }
 
+    /**
+     * Specifically test ResourceBookingEvent vs TimetableEvent/SudsTimetableEvent clashes
+     *
+     * @param string $aStart
+     * @param string $aEnd
+     * @param string $bStart
+     * @param string $bEnd
+     * @param int $aBookingId
+     * @param int $aStatus
+     * @param string $timetableClass
+     * @param bool $expected
+     * @return void
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerResourceBookingVsTimetable')]
     public function testResourceBookingVsTimetable(
         string $aStart,
@@ -371,14 +430,14 @@ class EventTest extends TestCase
     {
         return [
             'resourcebooking-pending-vs-timetable-overlap' => [
-                '2025-11-13 09:00:00',
-                '2025-11-13 10:00:00',
-                '2025-11-13 09:30:00',
-                '2025-11-13 10:30:00',
-                601,
-                BookingStatusModel::STATUS_PENDING,
-                TimetableEvent::class,
-                true,
+                '2025-11-13 09:00:00', // aStart
+                '2025-11-13 10:00:00', // aEnd
+                '2025-11-13 09:30:00', // bStart
+                '2025-11-13 10:30:00', // bEnd
+                601, // aBookingId
+                BookingStatusModel::STATUS_PENDING, // aStatus
+                TimetableEvent::class, // timetableClass
+                true, // clash expected
             ],
             'resourcebooking-approved-vs-timetable-overlap' => [
                 '2025-11-13 09:00:00',
