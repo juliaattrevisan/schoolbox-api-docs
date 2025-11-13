@@ -492,15 +492,14 @@ class Event extends EventBase
                 return false;
             }
         }
-        /* Check for time overlap (using same logic as before)
-            */
+        // Check for time overlap (using same logic as before)
         $bStart = $eventB->getStartTime();
         $bEnd = $eventB->getEndTime();
         if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {
             // Add both events to the clash list
             return true;
         } elseif ($bStart->gt($aEnd)) {
-            // Since events are sorted by start time, no further overlaps possible
+            // No overlap: event B starts after event A ends
             return false;
         }
         return false;

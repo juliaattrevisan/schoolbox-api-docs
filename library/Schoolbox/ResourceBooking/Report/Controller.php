@@ -137,6 +137,7 @@ class Controller extends Base
         $clashesOnlyList = [];
         if ($clashesOnly) {
             // Step 1: Group events by resource ID
+            /** @var array<int|string, EventInterface[]> $eventsByResource */
             $eventsByResource = [];
             foreach ($eventList as $event) {
                 $resourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event)
@@ -164,7 +165,7 @@ class Controller extends Base
                         $eventB = $resourceEvents[$j];
                         if ($eventA->isClash($eventB)) {
                             $eventBHash = spl_object_hash($eventB);
-                            // Add both events to the clash list}
+                            // Add both events to the clash list
                             $clashesOnlyList[$eventAHash] = $eventA;
                             $clashesOnlyList[$eventBHash] = $eventB;
                         }
@@ -172,7 +173,7 @@ class Controller extends Base
                 }
             }
             // collisions should overwrite the event list
-            $eventList = $clashesOnlyList;
+            $eventList = new GenericCollection($clashesOnlyList);
         }
 
         $this->response = $this->responseFromTemplate(
