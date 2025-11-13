@@ -161,50 +161,11 @@ class Controller extends Base
                     $eventAHash = spl_object_hash($eventA);
                     for ($j = $i + 1; $j < $count; $j++) {
                         $eventB = $resourceEvents[$j];
-                        $eventBHash = spl_object_hash($eventB);
-
-                        // skip the same object...
-                        if ($eventAHash === $eventBHash) {
-                            continue;
-                        }
-
-                        // Only check for status of pending bookings if both are resource bookings
-                        if (
-                            $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event &&
-                            $eventB instanceof \Calendar\Event\Type\ResourceBooking\Event
-                        ) {
-                            // skip if same booking
-                            if ($eventA->getBooking()->getId() === $eventB->getBooking()->getId()) {
-                                continue;
-                            }
-                            // only care if the booking is pending, so we can see conflicts (that we need to action)
-                            if ($eventB->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
-                                continue;
-                            }
-                        } elseif (
-                            $eventA instanceof \Calendar\Event\Type\Timetable\Event &&
-                            $eventB instanceof \Calendar\Event\Type\Timetable\Event
-                        ) {
-                            // if not booking, then assume its a timetable event
-                            // check if for the same homepage (class)
-                            if (
-                                ($eventA->getCategoryId() === $eventB->getCategoryId())
-                                && ($eventA->getCategoryId() !== -1 || $eventB->getCategoryId() !== -1)
-                            ) {
-                                continue;
-                            }
-                        }
-                        /* Check for time overlap (using same logic as before)
-                         */
-                        $bStart = $eventB->getStartTime();
-                        $bEnd = $eventB->getEndTime();
-                        if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {
-                            // Add both events to the clash list
+                        if ($eventA->isClash($eventB)) {
+                            $eventBHash = spl_object_hash($eventB);
+                            // Add both events to the clash list}
                             $clashesOnlyList[$eventAHash] = $eventA;
                             $clashesOnlyList[$eventBHash] = $eventB;
-                        } elseif ($bStart->gt($aEnd)) {
-                            // Since events are sorted by start time, no further overlaps possible
-                            break;
                         }
                     }
                 }

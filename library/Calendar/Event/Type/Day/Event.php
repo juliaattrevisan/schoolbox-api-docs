@@ -16,6 +16,7 @@ namespace Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\ResourceBooking\Booking\Status\Model as StatusModel;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 
 class Event extends EventBase
@@ -441,5 +442,67 @@ class Event extends EventBase
             self::RENDER_FORMAT_VCAL => Renderer\VObject::class,
             self::RENDER_FORMAT_CSV  => Renderer\Csv::class,
         ];
+    }
+
+    /**
+     * Determine if this event clashes with another event
+     * if its the same event, return false
+     * if both are resource bookings, only care if the other is pending
+     *
+     * @param self $eventB
+     * @return bool
+     */
+    public function isClash(self $eventB): bool
+    {
+        $eventA = $this;
+        // cache start and end times
+        $aStart = $eventA->getStartTime();
+        $aEnd = $eventA->getEndTime();
+        $eventAHash = spl_object_hash($eventA);
+        $eventBHash = spl_object_hash($eventB);
+
+        // skip the same object...
+        if ($eventAHash === $eventBHash) {
+            return false;
+        }
+
+        // Only check for status of pending bookings if both are resource bookings
+        if (
+            $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event &&
+            $eventB instanceof \Calendar\Event\Type\ResourceBooking\Event
+        ) {
+            // skip if same booking
+            if ($eventA->getBooking()->getId() === $eventB->getBooking()->getId()) {
+                return false;
+            }
+            // only care if the booking is pending, so we can see conflicts (that we need to action)
+            if ($eventB->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
+                return false;
+            }
+        } elseif (
+            $eventA instanceof \Calendar\Event\Type\Timetable\Event &&
+            $eventB instanceof \Calendar\Event\Type\Timetable\Event
+        ) {
+            // if not booking, then assume its a timetable event
+            // check if for the same homepage (class)
+            if (
+                ($eventA->getCategoryId() === $eventB->getCategoryId())
+                && ($eventA->getCategoryId() !== -1 || $eventB->getCategoryId() !== -1)
+            ) {
+                return false;
+            }
+        }
+        /* Check for time overlap (using same logic as before)
+            */
+        $bStart = $eventB->getStartTime();
+        $bEnd = $eventB->getEndTime();
+        if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {
+            // Add both events to the clash list
+            return true;
+        } elseif ($bStart->gt($aEnd)) {
+            // Since events are sorted by start time, no further overlaps possible
+            return false;
+        }
+        return false;
     }
 }
