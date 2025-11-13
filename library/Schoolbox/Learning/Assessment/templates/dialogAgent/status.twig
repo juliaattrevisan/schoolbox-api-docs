@@ -34,9 +34,6 @@
         border-right: 0;
     }
 
-    .col-participant {
-        min-width: 13rem;
-    }
 
     /* so the tot menu isn't shrunk to cell width of 1 button
      */
@@ -151,9 +148,7 @@
                 <table class="dialog-agent">
                 <thead>
                     <tr>
-                        <th class="col-participant">
-                            &nbsp;
-                        </th>
+                        <th></th>
                         <th>
                             Status
                         </th>
@@ -168,16 +163,14 @@
                 <tbody>
                     {% for participant in assessment.allParticipants %}
                         <tr>
-                            <td class="col-participant">
-                                <div class="list-item">
-                                    <div class="small-12 card compact">
-                                        <a href="/search/user/{{ participant.user.id }}">
-                                            <img src="/portrait.php?id={{ participant.user.id }}&size=square64" alt="{{ participant.user.fullname }}">
-                                            <p>
-                                                {{ participant.user.fullname }}
-                                            </p>
-                                        </a>
-                                    </div>
+                            <td class="profile-cell">
+                                <div class="small-12 card compact l-mar-s no-pad">
+                                    <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                                        {% include 'include/portrait.twig' with { user: participant.user, render: 'small' } only %}
+                                        <p>
+                                            {{ participant.user.fullname }}
+                                        </p>
+                                    </a>
                                 </div>
                             </td>
                             <td class="l-flex l-flex--justify-center">
