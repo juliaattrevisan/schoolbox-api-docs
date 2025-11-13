@@ -28,6 +28,8 @@ export default class MarkbookPage {
 
     static readonly SELECTOR_SHOW_DRAFTS_CHECKBOX = `label[for="show-drafts"]`;
 
+    static readonly DATA_TEST_MARKBOOK_CLASS_AVERAGE = "markbook-class-average-expander";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -322,10 +324,11 @@ export default class MarkbookPage {
         expectedClassAverage: string,
         expectedStudentGrades: Array<string>,
     ): Promise<void> {
-        await this.page.locator(`a.icon-down-arrow`).click();
+        await this.page.getByTestId(MarkbookPage.DATA_TEST_MARKBOOK_CLASS_AVERAGE).click();
         const assessmentCell = this.page.locator(`td[data-assessment="${assessmentId}"]`).first();
         await assessmentCell.locator("input").first().fill(weight.toString());
         await this.page.keyboard.press("Enter");
+        await this.page.locator(`div[data-test-is-success="true"]`).isVisible();
 
         // Reload the markbook to reflect changes
         await this.page.reload();
@@ -375,13 +378,14 @@ export default class MarkbookPage {
         assessmentIds: Array<string | number>,
         weights: Array<string | number>,
     ): Promise<void> {
-        await this.page.locator(`a.icon-down-arrow`).click();
+        await this.page.getByTestId(MarkbookPage.DATA_TEST_MARKBOOK_CLASS_AVERAGE).click();
         for (let i = 0; i < assessmentIds.length; i += 1) {
             const assessmentId = assessmentIds[i];
             const weight = weights[i];
             const assessmentCell = this.page.locator(`td[data-assessment="${assessmentId}"]`).first();
             await assessmentCell.locator("input").first().fill(weight.toString());
             await this.page.keyboard.press("Enter");
+            await this.page.locator(`div[data-test-is-success="true"]`).isVisible();
         }
         // Reload the mark book to reflect changes
         await this.page.reload();

@@ -22,6 +22,7 @@ const mbStore = useMarkbookStore();
                 href="#"
                 :class="mbStore.showAverages ? 'icon-up-arrow' : 'icon-down-arrow'"
                 title="Show additional metrics"
+                data-test="markbook-class-average-expander"
                 @click="mbStore.showAverages = !mbStore.showAverages"
             ></a>
             Class Average

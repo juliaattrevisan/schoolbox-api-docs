@@ -1,4 +1,4 @@
-import { test } from "@schoolboxTest/playwright/support/integrations";
+import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/MarkbookPage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
@@ -106,6 +106,7 @@ test.describe("Markbook activity weight sync between mark books and activity mod
             await markbookPage.clickAssessmentDropdownItem(dueWorkId.toString(), "modify");
             await assessmentFormPage.setWeight(100);
             await assessmentFormPage.update();
+            await expect(page.getByTestId("panel-apply-filters-button")).toBeVisible();
 
             tester.isGoingTo("check the student and overall grade is reflected in the class mark book");
             await markbookPage.verifyStudentGrades([studentMarioId, studentJamalId], ["C+", "C+"]);
@@ -117,13 +118,14 @@ test.describe("Markbook activity weight sync between mark books and activity mod
             await markbookPage.verifyStudentGrades([studentMarioId, studentJamalId], ["C+", "C+"]);
 
             tester.isGoingTo(
-                "navigate to the quiz modify page, update the due work activity weight and check the class average and student grade in the mark books",
+                "navigate to the quiz modify page, update the quiz activity weight and check the class average and student grade in the mark books",
             );
             await markbookPage.gotoClassMarkbook(classId.toString());
             await markbookPage.openAssessmentDropdown(quizId.toString());
             await markbookPage.clickAssessmentDropdownItem(quizId.toString(), "modify");
             await assessmentFormPage.setWeight(0);
             await assessmentFormPage.update();
+            await expect(page.getByTestId("panel-apply-filters-button")).toBeVisible();
 
             tester.isGoingTo("check the student grade is reflected in the class mark book");
             await markbookPage.verifyStudentGrades([studentJamalId, studentMarioId], ["C+", "B+"]);
