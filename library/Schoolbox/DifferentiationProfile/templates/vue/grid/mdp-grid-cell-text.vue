@@ -30,6 +30,8 @@ const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
 const hasChanged = window.Vue.computed(() => {
     return currentText.value !== props.text;
 });
+const isSaving = window.Vue.ref(false);
+const isFocused = window.Vue.ref(false);
 // const textboxStore = useUnitPlannerTextboxStore();
 let editor: InlineEditor;
 
@@ -40,42 +42,25 @@ let editor: InlineEditor;
 function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
     // show the empty state again if no text is entered
-    editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
-        if (!isFocused && currentText.value === "") {
+    editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
+        isFocused.value = $isFocused;
+        if (!isFocused.value && currentText.value === "") {
             currentText.value = null;
         }
     });
     // keep the currentText in sync with the editor content
     editor.model.document.on("change", () => {
-        // store.updateFocusedUnitCell(props.unit.id, props.column, true);
         window.Vue.nextTick()
             .then(() => {
                 currentText.value = editor.getData();
-                // textboxStore.updateTextboxContent(props.unit.id, props.column, editorContent.value);
             })
             .catch(() => {
                 // noop
             });
     });
-
-    // const storeTextbox = store.units.find((unit) => unit.id === props.unit.id)?.textboxes.items[props.column.label];
-    // if (storeTextbox) {
-    //     storeTextbox.body = editor.getData();
-    // }
-
     editorCreated.value = true;
-
     // Fix the balloon toolbar position
     setTimeout(() => editor.ui.update());
-
-    // If the editor was focused initially, we need to update the store
-    // window.Vue.nextTick(() => {
-    //     if (editor.ui.focusTracker.isFocused) {
-    //         store.updateFocusedUnitCell(props.unit.id, props.column, true);
-    //     }
-    // }).catch(() => {
-    //     // noop
-    // });
 }
 
 /**
@@ -168,6 +153,8 @@ function onSaveSelected(): void {
         :profile="props.profile"
         :header-key="props.headerKey"
         :has-changed="hasChanged"
+        :is-saving="isSaving"
+        :is-focused="isFocused"
         @modify="onModifySelected"
         @save="onSaveSelected"
     />
