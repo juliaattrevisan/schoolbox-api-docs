@@ -22,6 +22,7 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsM
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
 use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Twig\Error\Error;
 use Schoolbox\Filter\IFactoryFactory;
@@ -233,17 +234,31 @@ class Controller extends Base
      *
      * @param User $student
      * @return void
+     * @throws Exception
      */
     public function postDifferentiationProfileData(User $student): void
     {
         $post = $this->requestPost;
 
+        $id = $post->getInt('id');
+
+        /* Look for the existing differentiation profile record if an ID is provided
+         */
+        if (null !== $id) {
+            try {
+                $model = $this->mapper->findById($id);
+            } catch (\Exception $e) {
+                $this->sendJsonError('Differentiation profile record not found.', 404);
+                return;
+            }
+        } else {
+            $model = $this->mapper->createModel()
+                ->setStudent($student);
+        }
+
         try {
             /** @var Model $model */
-            $model = $this->mapper->createModel();
             $model
-                ->setId($post->getInt('id'))
-                ->setStudent($student)
                 ->setAdjustmentLevel($post->getInt('adjustment_level'))
                 ->setAdjustmentCategory($post->getInt('adjustment_category'))
                 ->setOverview($post->get('overview'))
