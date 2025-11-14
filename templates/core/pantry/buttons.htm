@@ -174,6 +174,85 @@
 
 <div class="row">
     <div class="small-12 island">
+        <h2 class="subheader" id="progress-tick">Progress Ticks</h2>
+
+        <table id="progress-tick-table">
+            <thead>
+                <tr>
+                    <th>class</th>
+                    <th>normal</th>
+                    <th>readonly</th>
+                    <th>small</th>
+                    <th>tiny</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>incomplete</td>
+                    <td><a class="no-text progress-tick incomplete"></a></td>
+                    <td><span class="no-text progress-tick incomplete readonly"></span></td>
+                    <td><a class="no-text progress-tick incomplete small"></a></td>
+                    <td><a class="no-text progress-tick incomplete tiny"></a></td>
+                </tr>
+                <tr>
+                    <td>failed</td>
+                    <td><a class="no-text progress-tick failed"></a></td>
+                    <td><span class="no-text progress-tick failed readonly"></span></td>
+                    <td><a class="no-text progress-tick failed small"></a></td>
+                    <td><a class="no-text progress-tick failed tiny"></a></td>
+                </tr>
+                <tr>
+                    <td>pending</td>
+                    <td><a class="no-text progress-tick pending"></a></td>
+                    <td><span class="no-text progress-tick pending readonly"></span></td>
+                    <td><a class="no-text progress-tick pending small"></a></td>
+                    <td><a class="no-text progress-tick pending tiny"></a></td>
+                </tr>
+                <tr>
+                    <td>reviewed/submitted</td>
+                    <td><a class="no-text progress-tick reviewed"></a></td>
+                    <td><span class="no-text progress-tick reviewed readonly"></span></td>
+                    <td><a class="no-text progress-tick reviewed small"></a></td>
+                    <td><a class="no-text progress-tick reviewed tiny"></a></td>
+                </tr>
+                <tr>
+                    <td>in-progress</td>
+                    <td><a class="no-text progress-tick in-progress"></a></td>
+                    <td><span class="no-text progress-tick in-progress readonly"></span></td>
+                    <td><a class="no-text progress-tick in-progress small"></a></td>
+                    <td><a class="no-text progress-tick in-progress tiny"></a></td>
+                </tr>
+                <tr>
+                    <td>requires-assistance</td>
+                    <td><a class="no-text progress-tick requires-assistance"></a></td>
+                    <td><span class="no-text progress-tick requires-assistance readonly"></span></td>
+                    <td><a class="no-text progress-tick requires-assistance small"></a></td>
+                    <td><a class="no-text progress-tick requires-assistance tiny"></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            $(function () {
+                const transitionsNormal = ["incomplete", "pending", "reviewed", "failed"];
+                const transitionDialogAgent = ["incomplete", "in-progress", "requires-assistance", "submitted"];
+
+                document.querySelectorAll("#progress-tick-table a.progress-tick").forEach((el) => {
+                    el.addEventListener("click", () => {
+                        const transitions = el.classList.contains("dialog-agent") ? transitionDialogAgent : transitionsNormal;
+                        const currentIndex = transitions.findIndex((status) => el.classList.contains(status));
+                        el.classList.remove(...transitions);
+
+                        const nextIndex = (currentIndex + 1) % transitions.length;
+                        el.classList.add(transitions[nextIndex]);
+                    });
+                });
+            });
+        </script>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
         <h2 class="subheader" id="filters">Filters</h2>
         <ul class="filters">
             <li>
