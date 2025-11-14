@@ -362,13 +362,12 @@ class Module extends BaseModule
     {
         return new Rule\LazyCallback(
             fn() => new Rule\Callback(function (array $params) use ($action): void {
-                $status = (new DialogAgent\Response\Lookup\Status())->calculate($params['response']);
+                $status = (new DialogAgent\Response\Lookup\Status())->calculate($params['response'] ?? null);
 
                 if (!$status['actions'][$action]) {
                     throw new Forbidden(sprintf(
-                        'Action "%s" is not allowed for response %s',
+                        'Action "%s" is not allowed',
                         $action,
-                        $params['response']->getId()
                     ));
                 }
             })
