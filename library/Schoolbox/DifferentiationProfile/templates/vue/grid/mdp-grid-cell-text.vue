@@ -9,19 +9,20 @@ import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
-import type { AdjustmentText, Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { AdjustmentText, Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import { useMdpSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellTextAction from "./mdp-grid-cell-text-action.vue";
 
 const props = defineProps<{
     profile: Profile;
-    text: AdjustmentText | null;
-    headerKey: string;
+    text: AdjustmentText;
+    headerKey: ProfileTextKeys;
 }>();
 
-const currentText = window.Vue.ref<AdjustmentText | null>(props.text);
+const mdpSaveStore = useMdpSaveStore();
 
+const currentText = window.Vue.ref<AdjustmentText>(props.text);
 const initialTextboxContent: string = currentText.value ?? "";
-
 const editorContent = window.Vue.ref(initialTextboxContent);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorInitialised = window.Vue.ref(false);
@@ -128,9 +129,10 @@ function onModifySelected(): void {
  * When the save button is clicked.
  */
 function onSaveSelected(): void {
-    // if (!editorCreated.value) return;
-    // editorContent.value = editor.getData();
-    // text.value = editorContent.value;
+    if (!editorCreated.value) return;
+    const { profile } = props;
+    profile[props.headerKey] = currentText.value;
+    void mdpSaveStore.save(profile);
 }
 </script>
 

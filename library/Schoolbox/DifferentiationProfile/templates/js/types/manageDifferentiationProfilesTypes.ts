@@ -78,6 +78,14 @@ export type Profile = {
 };
 
 /**
+ * Type for keys that correspond to editable text fields in Profile
+ */
+export type ProfileTextKeys = keyof Pick<
+    Profile,
+    "overview" | "interests_strengths" | "needs_challenges" | "strategies_adjustments" | "goals"
+>;
+
+/**
  * The expected query parameters
  */
 export type QueryParams = {

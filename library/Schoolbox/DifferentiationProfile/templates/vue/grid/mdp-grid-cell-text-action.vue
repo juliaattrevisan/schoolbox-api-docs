@@ -2,11 +2,11 @@
 /**
  * The component for the action buttons for a textbox cell
  */
-import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     profile: Profile;
-    headerKey: string;
+    headerKey: ProfileTextKeys;
     hasChanged: boolean;
     isSaving: boolean;
     isFocused: boolean;
