@@ -79,23 +79,8 @@ class Status
             ];
         }
 
-        /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
-         */
-        if (null === $authoritativeResponse->getSessionId()) {
-            return [
-                'status' => self::STATUS_INCOMPLETE,
-                'actions' => [
-                    self::ACTION_VIEW => false,
-                    self::ACTION_SOBO => false,
-                    self::ACTION_RESET => false,
-                    self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVED => false,
-                ],
-            ];
-        }
-
-        /* A session identifier exists but not yet submitted: participant is still doing the stuff
-         * and maybe needs help
+        /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
+         * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
          *
          * If assistance was requested and the response is still in progress, send a special status
          */
@@ -108,6 +93,21 @@ class Status
                     self::ACTION_RESET => true,
                     self::ACTION_REOPEN => false,
                     self::ACTION_RESOLVED => true,
+                ],
+            ];
+        }
+
+        /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
+         */
+        if (null === $authoritativeResponse->getSessionId()) {
+            return [
+                'status' => self::STATUS_INCOMPLETE,
+                'actions' => [
+                    self::ACTION_VIEW => false,
+                    self::ACTION_SOBO => false,
+                    self::ACTION_RESET => false,
+                    self::ACTION_REOPEN => false,
+                    self::ACTION_RESOLVED => false,
                 ],
             ];
         }
