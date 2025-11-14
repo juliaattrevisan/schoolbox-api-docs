@@ -47,14 +47,6 @@ class Event implements ISoftDeletable
     public const VARIANT_BOOKING  = 'booking';
 
     /**
-     * Event Source
-     *
-     * Events (in the DB) are one of two options: "calendar" (normal events) or "booking" (resource bookings)
-     */
-    public const SOURCE_CALENDAR = 'calendar';
-    public const SOURCE_RESOURCE_BOOKING = 'booking';
-
-    /**
      * Event Levels
      */
     public const ACCESS_PERSONAL = 1;
@@ -140,17 +132,6 @@ class Event implements ISoftDeletable
      * @var string
      */
     private $variant = self::VARIANT_EVENT;
-
-//    /**
-//     * The Source of the event.
-//     *
-//     * Currently there are two sources of event that are saved in the db:
-//     * * `self::SOURCE_CALENDAR`: standard calendar events
-//     * * `self::SOURCE_RESOURCE_BOOKING`: resource booking events
-//     *
-//     * @var string
-//     */
-//    private $source = self::SOURCE_CALENDAR;
 
     /**
      * Title of the event
@@ -1095,23 +1076,4 @@ class Event implements ISoftDeletable
         $this->showAttendees = $showAttendees;
         return $this;
     }
-//
-//    /**
-//     * @return string|null
-//     */
-//    public function getSource(): ?string
-//    {
-//
-//        return $this->source;
-//    }
-//
-//    /**
-//     * @param string|null $source
-//     * @return $this
-//     */
-//    public function setSource(?string $source): self
-//    {
-//        $this->source = $source;
-//        return $this;
-//    }
 }
