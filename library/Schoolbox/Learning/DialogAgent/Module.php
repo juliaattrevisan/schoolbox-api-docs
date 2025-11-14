@@ -180,7 +180,10 @@ class Module extends BaseModule
         /* Resets a dialog agent for a particular person. This creates a new authoritative response instance,
          * setting all other responses to non-authoritative, basically letting students start afresh.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reset", 'postReset', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/reset", 'postReset', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_RESET)
+        ), $preloadParticipant);
     }
 
 
