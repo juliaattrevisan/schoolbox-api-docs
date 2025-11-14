@@ -28,6 +28,15 @@ class differentiationProfileModelToArrayTest extends TestCase
     private Generator $routeGenerator;
     private Authorizer $authorizer;
 
+    private const int ADJUSTMENT_CATEGORY_ID_1 = 1;
+    private const int ADJUSTMENT_CATEGORY_ID_2 = 2;
+    private const int ADJUSTMENT_CATEGORY_ID_3 = 3;
+    private const int ADJUSTMENT_CATEGORY_ID_4 = 4;
+    private const int ADJUSTMENT_LEVEL_ID_1 = 1;
+    private const int ADJUSTMENT_LEVEL_ID_2 = 2;
+    private const int ADJUSTMENT_LEVEL_ID_3 = 3;
+    private const int ADJUSTMENT_LEVEL_ID_4 = 4;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -127,8 +136,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(1)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(1)
-                    ->setAdjustmentLevel(2)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_1)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_1)
                     ->setOverview('This is an overview.')
                     ->setInterestsStrengths('Interests and strengths details.')
                     ->setNeedsChallenges('Needs and challenges details.')
@@ -148,8 +157,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 1,
                     'student'                => $userResponse,
-                    'adjustment_category'    => 1,
-                    'adjustment_level'       => 2,
+                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_1,
+                    'adjustment_level'       => self::ADJUSTMENT_LEVEL_ID_1,
                     'overview'               => 'This is an overview.',
                     'interests_strengths'    => 'Interests and strengths details.',
                     'needs_challenges'       => 'Needs and challenges details.',
@@ -197,8 +206,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(3)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(3)
-                    ->setAdjustmentLevel(4)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_2)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_2)
                     ->setOverview('This overview should not appear.')
                     ->setInterestsStrengths('These interests should not appear.')
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC'), $locale)),
@@ -209,8 +218,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 3,
                     'student'                => $userResponse,
-                    'adjustment_category'    => 3,
-                    'adjustment_level'       => 4,
+                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_2,
+                    'adjustment_level'       => self::ADJUSTMENT_LEVEL_ID_2,
                     'created_at'             => '01/02/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -222,8 +231,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(4)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(5)
-                    ->setAdjustmentLevel(6)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_3)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_3)
                     ->setOverview('Visible overview.')
                     ->setGoals('Visible goals.')
                     ->setInterestsStrengths('Hidden interests.')
@@ -251,8 +260,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(5)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(7)
-                    ->setAdjustmentLevel(8)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_4)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_4)
                     ->setOverview('This should not be visible.')
                     ->setInterestsStrengths('This should not be visible.')
                     ->setNeedsChallenges('This should not be visible.')
@@ -266,8 +275,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 5,
                     'student'                => $userResponse,
-                    'adjustment_category'    => 7,
-                    'adjustment_level'       => 8,
+                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_4,
+                    'adjustment_level'       => self::ADJUSTMENT_LEVEL_ID_4,
                     'created_at'             => '01/04/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -279,8 +288,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(6)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(9)
-                    ->setAdjustmentLevel(10)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_3)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_4)
                     ->setOverview('Nothing should be visible.')
                     ->setInterestsStrengths('Nothing should be visible.')
                     ->setNeedsChallenges('Nothing should be visible.')
@@ -302,8 +311,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(7)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(11)
-                    ->setAdjustmentLevel(12)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_3)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_CATEGORY_ID_2)
                     ->setOverview('Hidden overview.')
                     ->setInterestsStrengths('Visible interests and strengths.')
                     ->setNeedsChallenges('Visible needs and challenges.')
@@ -333,8 +342,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(8)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(13)
-                    ->setAdjustmentLevel(14)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_1)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_3)
                     ->setOverview('Only this overview is visible.')
                     ->setInterestsStrengths('Hidden.')
                     ->setNeedsChallenges('Hidden.')
@@ -359,8 +368,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(9)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(15)
-                    ->setAdjustmentLevel(16)
+                    ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_4)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_2)
                     ->setOverview('Visible overview.')
                     ->setInterestsStrengths('Hidden interests.')
                     ->setNeedsChallenges('Visible needs.')
@@ -377,7 +386,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 9,
                     'student'                => $userResponse,
-                    'adjustment_category'    => 15,
+                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_4,
                     'overview'               => 'Visible overview.',
                     'needs_challenges'       => 'Visible needs.',
                     'goals'                  => 'Visible goals.',
