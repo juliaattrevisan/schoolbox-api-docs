@@ -73,6 +73,7 @@ export type Profile = {
     deleted_at: string | null;
     _routes: {
         linkedRecords?: string;
+        edit?: string;
     };
 };
 
