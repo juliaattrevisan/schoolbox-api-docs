@@ -2,10 +2,5 @@
 
 -- resource booking events, should be 'booking'
 update event
-set source = 'booking'
+set variant = 'booking'
 where id in (select event_id from schoolbox.resource_booking);
-
--- all other events should be 'calendar'
-update event
-set source = 'calendar'
-where source is null;

@@ -44,6 +44,7 @@ class Event implements ISoftDeletable
      */
     public const VARIANT_EVENT = 'event';
     public const VARIANT_TASK  = 'task';
+    public const VARIANT_BOOKING  = 'booking';
 
     /**
      * Event Source
@@ -140,16 +141,16 @@ class Event implements ISoftDeletable
      */
     private $variant = self::VARIANT_EVENT;
 
-    /**
-     * The Source of the event.
-     *
-     * Currently there are two sources of event that are saved in the db:
-     * * `self::SOURCE_CALENDAR`: standard calendar events
-     * * `self::SOURCE_RESOURCE_BOOKING`: resource booking events
-     *
-     * @var string
-     */
-    private $source = self::SOURCE_CALENDAR;
+//    /**
+//     * The Source of the event.
+//     *
+//     * Currently there are two sources of event that are saved in the db:
+//     * * `self::SOURCE_CALENDAR`: standard calendar events
+//     * * `self::SOURCE_RESOURCE_BOOKING`: resource booking events
+//     *
+//     * @var string
+//     */
+//    private $source = self::SOURCE_CALENDAR;
 
     /**
      * Title of the event
@@ -820,7 +821,7 @@ class Event implements ISoftDeletable
     public function setVariant(?string $variant): self
     {
         // Why doesn't PHP have enumerated types yet?
-        if (!in_array($variant, [self::VARIANT_EVENT, self::VARIANT_TASK], true)) {
+        if (!in_array($variant, [self::VARIANT_EVENT, self::VARIANT_TASK, self::VARIANT_BOOKING], true)) {
             throw new OutOfBoundsException(
                 sprintf('Class must be one of the `%s::VARIANT_*` constants', __CLASS__)
             );

@@ -319,7 +319,7 @@ class Calendar extends DeprecatedModel
 
         // default to hide resource bookings unless explicitly allowed
         if (true !== ($filter['allowResources'] ?? false)) {
-            $filter_query[] = "event.source = 'calendar' ";
+            $filter_query[] = "event.variant != '" . EventModel::VARIANT_BOOKING . "'";
         }
 
         $filter_query = implode(' AND ', $filter_query);
