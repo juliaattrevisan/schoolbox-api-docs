@@ -118,19 +118,123 @@ $app = new class extends CliTool\App{
             $msg        = unserialize($uncompress);
             if ($msg instanceof TriggerInterface) {
                 $event = $msg->getEvent();
-                if ($event instanceof CrudEventInterface) {
-                    $action      = $event->getAction();
-                    $mapperClass = get_class($event->getMapper());
-                    $modelClass  = get_class($event->getObject());
-                    $id          = $event->getMapper()->getModelProperty($event->getObject(), $event->getMapper()->getIdentifier());
-
-                    // Is this output?
+                if (!$event instanceof CrudEventInterface) {
+                    $this->getLogger()->warning(sprintf("Key %s event does not contain a %s instance: skipping", $key, CrudEventInterface::class));
+                    continue;
                 }
-                $msg->getTimestamp();
             } else {
                 $this->getLogger()->warning(sprintf("Key %s does not contain a %s instance: skipping", $key, TriggerInterface::class));
+                continue;
+            }
+
+            if ($this->checkData($args, $regexMode, $msg, $event)) {
+                if ($outputHash) {
+                    $keyParts = explode(':', $key);
+                    printf("%s\n", implode(':', array_slice($keyParts, -1)));
+                }
+                $this->getLogger()->info(
+                    sprintf(
+                        'Found %s: %s (%s #%s)',
+                        $key,
+                        $event->getAction(),
+                        get_class($event->getObject()),
+                        $event->getMapper()->getModelProperty($event->getObject(), $event->getMapper()->getIdentifier()),
+                    )
+                );
+
+                if ($this->perform()) {
+                    $redis->del($key);
+                }
+                ++$acks;
             }
         }
+
+        if ($acks == 0) {
+            $this->getLogger()->info("No matching triggers found!");
+        } elseif ($this->perform()) {
+            $this->getLogger()->info("$acks triggers matched and removed");
+        } else {
+            $this->getLogger()->info("$acks triggers matched, no action taken run with -p to delete");
+        }
+    }
+
+    /**
+     * @param array $args
+     * @param bool  $regexMode
+     * @param array $msg
+     * @return bool
+     */
+    private function checkData(array $args, bool $regexMode, TriggerInterface $msg, CrudEventInterface $event): bool
+    {
+        $success = true;
+        if (isset($args['topic'])) {
+            $topicSuccess = false;
+            foreach ($msg['topics'] as $topic) {
+                if ($this->checkStr($regexMode, $args['topic'], $topic)) {
+                    $topicSuccess = true;
+                    break;
+                }
+            }
+            $success = $topicSuccess;
+        }
+
+        if (isset($args['action'])) {
+            $success = $this->checkStr($regexMode, $args['action'], $event->getAction());
+        }
+
+        if (isset($args['mapper'])) {
+            $success = $success && $this->checkStr($regexMode, $args['mapper'], get_class($event->getMapper()));
+        }
+
+        if (isset($args['model'])) {
+            $success = $success && $this->checkStr($regexMode, $args['model'], get_class($event->getObject()));
+        }
+
+        if (isset($args['id'])) {
+            $success = $success && $args['model'] == $event->getMapper()->getModelProperty(
+                $event->getObject(),
+                $event->getMapper()->getIdentifier(),
+            );
+        }
+
+        if (isset($args['start'])) {
+            $success = $success && $this->checkTime(true, $args['start'], $msg->getTimestamp());
+        }
+
+        if (isset($args['end'])) {
+            $success = $success && $this->checkTime(false, $args['end'], $msg->getTimestamp());
+        }
+
+        return $success;
+    }
+
+    /**
+     * @param bool   $regexMode
+     * @param string $test
+     * @param string $text
+     * @return bool
+     */
+    private function checkStr(bool $regexMode, string $test, string $text): bool
+    {
+        if ($regexMode) {
+            return (bool)preg_match("`$test`", $text);
+        }
+        return stripos($text, $test) !== false;
+    }
+
+
+    /**
+     * @param bool $before
+     * @param int  $test
+     * @param int  $time
+     * @return bool
+     */
+    private function checkTime(bool $before, int $test, int $time): bool
+    {
+        if ($before) {
+            return $test <= $time;
+        }
+        return $test >= $time;
     }
 };
 
