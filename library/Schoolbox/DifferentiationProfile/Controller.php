@@ -256,11 +256,67 @@ class Controller extends Base
                 ->setStudent($student);
         }
 
+        $adjustment_level = $post->get('adjustment_level');
+        if (!is_array($adjustment_level) && null !== $adjustment_level) {
+            $this->sendJsonError('Adjustment level must be an array.', 400);
+            return;
+        }
+
+        $adjustment_category = $post->get('adjustment_category');
+        if (!is_array($adjustment_category) && null !== $adjustment_category) {
+            $this->sendJsonError('Adjustment category must be an array.', 400);
+            return;
+        }
+
+        /* Validate text field lengths
+         */
+        $maxLength = \Schoolbox\Column\Base::TEXT_MAX_LENGTH;
+        $goals = $post->get('goals');
+        if (null !== $goals && strlen($goals) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Goals field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $overview = $post->get('overview');
+        if (null !== $overview && strlen($overview) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Overview field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $strategies_adjustments = $post->get('strategies_adjustments');
+        if (null !== $strategies_adjustments && strlen($strategies_adjustments) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Strategies and Adjustments field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $needs_challenges = $post->get('needs_challenges');
+        if (null !== $needs_challenges && strlen($needs_challenges) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Needs and Challenges field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $interests_strengths = $post->get('interests_strengths');
+        if (null !== $interests_strengths && strlen($interests_strengths) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Interests and Strengths field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+
         try {
             /** @var Model $model */
             $model
-                ->setAdjustmentLevel($post->getInt('adjustment_level'))
-                ->setAdjustmentCategory($post->getInt('adjustment_category'))
+                ->setAdjustmentLevel($adjustment_level ? implode(',', $adjustment_level) : null)
+                ->setAdjustmentCategory($adjustment_category ? implode(',', $adjustment_category) : null)
                 ->setOverview($post->get('overview'))
                 ->setGoals($post->get('goals'))
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))

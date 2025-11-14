@@ -20,8 +20,8 @@ class Model implements ISoftDeletable
     use ModelTraits\DeletedAtDate;
 
 //    private int $student_id;
-    private ?int $adjustment_category = null;
-    private ?int $adjustment_level = null;
+    private ?string $adjustment_category = null;
+    private ?string $adjustment_level = null;
     private ?string $overview = null;
     private ?string $interests_strengths = null;
     private ?string $needs_challenges = null;
@@ -78,9 +78,9 @@ class Model implements ISoftDeletable
     /**
      * Get adjustment category
      *
-     * @return int|null
+     * @return string|null
      */
-    public function getAdjustmentCategory(): ?int
+    public function getAdjustmentCategory(): ?string
     {
         return $this->adjustment_category;
     }
@@ -88,10 +88,10 @@ class Model implements ISoftDeletable
     /**
      * Set adjustment category
      *
-     * @param int|null $adjustment_category
+     * @param string|null $adjustment_category
      * @return self
      */
-    public function setAdjustmentCategory(?int $adjustment_category): self
+    public function setAdjustmentCategory(?string $adjustment_category): self
     {
         $this->adjustment_category = $adjustment_category;
         return $this;
@@ -100,9 +100,9 @@ class Model implements ISoftDeletable
     /**
      * Get adjustment level
      *
-     * @return int|null
+     * @return string|null
      */
-    public function getAdjustmentLevel(): ?int
+    public function getAdjustmentLevel(): ?string
     {
         return $this->adjustment_level;
     }
@@ -110,10 +110,10 @@ class Model implements ISoftDeletable
     /**
      * Set adjustment level
      *
-     * @param int|null $adjustment_level
+     * @param string|null $adjustment_level
      * @return self
      */
-    public function setAdjustmentLevel(?int $adjustment_level): self
+    public function setAdjustmentLevel(?string $adjustment_level): self
     {
         $this->adjustment_level = $adjustment_level;
         return $this;
