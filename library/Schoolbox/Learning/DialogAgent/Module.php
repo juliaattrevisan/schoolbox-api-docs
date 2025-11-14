@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\DialogAgent;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -21,6 +22,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -155,7 +157,10 @@ class Module extends BaseModule
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{responseId:\d+}", 'postAssistanceResolve', $canWrite, $preloadParticipantAndResponse);
+        $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{responseId:\d+}", 'postAssistanceResolve', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_RESOLVE)
+        ), $preloadParticipantAndResponse);
 
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
          * with details about who did the sobo
@@ -328,6 +333,33 @@ class Module extends BaseModule
                     },
                 ),
             )
+        );
+    }
+
+
+    /**
+     * Decide if the desired action $action can be conducted for $params['response'] instance.
+     *
+     * This allows you to ask the $router if you can get to a place without having to directly interact with the
+     * Status class and having to interpret its output struct manually
+     *
+     * @param string $action
+     * @return Rule\IAuthorizationRule
+     */
+    private function buildRuleCanAction(string $action): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params) use ($action): void {
+                $status = (new DialogAgent\Response\Lookup\Status())->calculate($params['response']);
+
+                if (!$status['actions'][$action]) {
+                    throw new Forbidden(sprintf(
+                        'Action "%s" is not allowed for response %s',
+                        $action,
+                        $params['response']->getId()
+                    ));
+                }
+            })
         );
     }
 

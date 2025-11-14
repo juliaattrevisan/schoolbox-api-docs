@@ -15,6 +15,16 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 class Status
 {
     /**
+     * Consts correlating to available endpoints
+     */
+    public const string ACTION_VIEW = 'view';
+    public const string ACTION_SOBO = 'sobo';
+    public const string ACTION_RESET = 'reset';
+    public const string ACTION_REOPEN = 'reopen';
+    public const string ACTION_RESOLVE = 'resolve';
+
+
+    /**
      * Consts correlating to the status enum used by frontend world
      * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
      */
@@ -22,16 +32,6 @@ class Status
     private const string STATUS_IN_PROGRESS = 'in-progress';
     private const string STATUS_REQUIRES_ASSISTANCE = 'requires-assistance';
     private const string STATUS_SUBMITTED = 'submitted';
-
-
-    /**
-     * Consts correlating to available endpoints
-     */
-    private const string ACTION_VIEW = 'view';
-    private const string ACTION_SOBO = 'sobo';
-    private const string ACTION_RESET = 'reset';
-    private const string ACTION_REOPEN = 'reopen';
-    private const string ACTION_RESOLVED = 'resolved';
 
 
     /**
@@ -59,7 +59,7 @@ class Status
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVED => false,
+                    self::ACTION_RESOLVE => false,
                 ],
             ];
         }
@@ -74,7 +74,7 @@ class Status
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => true,
-                    self::ACTION_RESOLVED => false,
+                    self::ACTION_RESOLVE => false,
                 ],
             ];
         }
@@ -92,7 +92,7 @@ class Status
                     self::ACTION_SOBO => true,
                     self::ACTION_RESET => true,
                     self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVED => true,
+                    self::ACTION_RESOLVE => true,
                 ],
             ];
         }
@@ -107,7 +107,7 @@ class Status
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVED => false,
+                    self::ACTION_RESOLVE => false,
                 ],
             ];
         }
@@ -121,7 +121,7 @@ class Status
                 self::ACTION_SOBO => true,
                 self::ACTION_RESET => true,
                 self::ACTION_REOPEN => false,
-                self::ACTION_RESOLVED => false,
+                self::ACTION_RESOLVE => false,
             ],
         ];
     }
