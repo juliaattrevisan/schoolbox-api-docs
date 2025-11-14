@@ -2,7 +2,8 @@
 import { getRelativeTime } from "@js/util/dateUtils";
 import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserCC } from "@schoolboxLibrary/types/User";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserLink from "@schoolboxVue/components/user/user-link.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
 import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import DasFilters from "./das-filters.vue";
@@ -81,10 +82,10 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                         <tr v-for="participant in props.participants" :key="participant.id">
                             <td class="profile-cell u-sticky-left u-sticky-left--first">
                                 <div class="small-12 card compact l-mar-s no-pad">
-                                    <a :href="`/search/user/${participant.id}`" title="View Profile">
+                                    <user-link :user="participant.user">
                                         <user-photo :user="participant.user" render="small" />
                                         <p>{{ participant.user.fullName }}</p>
-                                    </a>
+                                    </user-link>
                                 </div>
                             </td>
                             <td class="u-sticky-left u-sticky-left--offset-1">

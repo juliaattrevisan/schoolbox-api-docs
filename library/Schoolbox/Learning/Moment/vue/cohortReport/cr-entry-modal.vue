@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { CohortReportModalType, useCohortReportModalStore } from "./store/cohortReportModalStore";
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { getGradient } from "@js/util/cssUtils";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbStudentGradeCell from "./mb-student-grade-cell.vue";
 import type { MarkbookClassImplStudent } from "./types/payload";

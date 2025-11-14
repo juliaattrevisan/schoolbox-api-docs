@@ -5,7 +5,7 @@ import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/Se
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";

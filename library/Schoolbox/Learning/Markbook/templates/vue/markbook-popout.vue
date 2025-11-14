@@ -19,7 +19,7 @@ import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import SmallCard from "@schoolboxVue/components/card/small-card.vue";
 import PopOutMenuItem from "@schoolboxVue/components/menu/pop-out-menu-item.vue";
 import PopOutMenuDivider from "@schoolboxVue/components/menu/pop-out-menu-divider.vue";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookPopoutSelectedCellInfo, MarkbookClassImplActivityParticipant } from "./types/payload";
 

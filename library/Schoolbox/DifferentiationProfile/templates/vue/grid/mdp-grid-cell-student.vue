@@ -4,7 +4,7 @@
  */
 
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{

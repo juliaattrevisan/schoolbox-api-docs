@@ -8,7 +8,7 @@ import type { Ref } from "vue";
 import { Chart } from "highcharts-vue";
 import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type {
     TableHeader,
