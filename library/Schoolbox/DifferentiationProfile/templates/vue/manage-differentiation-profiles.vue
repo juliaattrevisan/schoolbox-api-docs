@@ -13,22 +13,21 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
-import type { Routes, Config, SeverityColors } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
+import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type {
     MDPHeader,
-    Header,
     AdjustmentType,
     AdjustmentText,
     Payload,
     Profile,
 } from "../js/types/manageDifferentiationProfilesTypes";
-import { HeaderType } from "../js/types/manageDifferentiationProfilesTypes";
 import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
 import { ON_FILTER_CHANGE } from "../js/MDPEvents";
 import { useLoadData } from "./composable/useLoadData";
+import { useMDPStore } from "./store/mdpStore";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -42,32 +41,8 @@ const props = defineProps<{
 window.Vue.provide("pastoralConfig", props.pastoralConfig);
 window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 
-// #region grid data
-
-const header = window.Vue.ref<Header[]>([
-    { id: 0, title: "Student", width: 250, isFixed: true, isSortable: true, key: "student", type: HeaderType.USER },
-    ...props.header.map((h) => ({
-        id: h.id,
-        key: h.name,
-        type:
-            h.name === "adjustment_category" || h.name === "adjustment_level" ? HeaderType.ADJUSTMENT : HeaderType.TEXT,
-        title: h.terminology,
-        width: 400,
-        isFixed: false,
-        isSortable: false,
-    })),
-    {
-        id: Math.max(0, ...props.header.map((h) => h.id)) + 1,
-        key: "updated_at",
-        type: HeaderType.DATE,
-        title: "Last updated",
-        width: 200,
-        isFixed: false,
-        isSortable: true,
-    },
-]);
-
-// #endregion grid data
+const store = useMDPStore();
+store.init(props.header, props.adjustmentCategories, props.adjustmentLevels);
 
 // #region grid loading / filtering /  pagination
 
@@ -154,7 +129,7 @@ function onLinkedRecordsSelected(profile: Profile): void {
         </p>
     </empty-state>
     <template v-else-if="hasRows && payload">
-        <mdp-grid :header="header" :rows="payload.data.profiles" :is-loading="isMoreLoading">
+        <mdp-grid :header="store.header" :rows="payload.data.profiles" :is-loading="isMoreLoading">
             <template #User="{ row, header: columnHeader }">
                 <mdp-grid-cell-student
                     :user="row[columnHeader.key] as User"
