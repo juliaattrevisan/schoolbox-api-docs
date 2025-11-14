@@ -71,6 +71,14 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             [Event::VARIANT_EVENT, Event::VARIANT_TASK,]
         );
 
+        $this->uses(
+            'source',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            'source',
+            [Event::SOURCE_CALENDAR, Event::SOURCE_RESOURCE_BOOKING,]
+        );
+
         $this->hasJoin('owner', array(
             'mapper'    => UserMapper::class,
             'this_key'  => 'owner',
