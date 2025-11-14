@@ -1,4 +1,22 @@
 import type { User } from "@schoolboxLibrary/types/User";
+import type { Metadata } from "@js/util/sbx/apiUtils";
+
+/**
+ * Routes for the Pastoral
+ */
+export type Routes = {
+    getStudentRecord: string; // to get a specific pastoral record for a student
+    getReportTags?: string; // to only display the selected tag within the report
+};
+
+/**
+ * Configuration object for pastoral settings
+ */
+export type Config = {
+    pastoralPointEnabled: boolean;
+    pastoralActionEnable: boolean;
+    pastoralSeverity: boolean;
+};
 
 /**
  * Pastoral event severity
@@ -6,6 +24,15 @@ import type { User } from "@schoolboxLibrary/types/User";
 type Severity = {
     id: number;
     name: string;
+};
+
+/**
+ * Severity colors configuration
+ */
+export type SeverityColors = {
+    [severityId: number]: {
+        back: string;
+    };
 };
 
 /**
@@ -45,6 +72,16 @@ type PastoralComment = {
     createdAt: string;
     body: string;
     private: boolean;
+};
+
+/**
+ * The expected payload for a Pastoral records load.
+ */
+export type RecordsPayload = {
+    data: {
+        results: PastoralRecord[];
+    };
+    metadata: Metadata;
 };
 
 /**

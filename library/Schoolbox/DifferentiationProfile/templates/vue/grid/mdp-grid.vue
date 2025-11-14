@@ -3,7 +3,6 @@
  * To display a grid-like display
  */
 
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { Header } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
@@ -35,8 +34,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
                     {{ item.title }}
                 </div>
             </div>
-            <loading-table v-if="props.isLoading" :rows="5" :only-body="true" row-height="5rem" />
-            <template v-else>
+            <template v-if="!props.isLoading">
                 <div
                     v-for="(row, index) in props.rows"
                     :key="index"
