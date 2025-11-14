@@ -172,7 +172,10 @@ class Module extends BaseModule
 
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{responseId:\d+}", 'postReopen', $canWrite, $preloadParticipantAndResponse);
+        $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{responseId:\d+}", 'postReopen', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_REOPEN)
+        ), $preloadParticipantAndResponse);
 
         /* Resets a dialog agent for a particular person. This creates a new authoritative response instance,
          * setting all other responses to non-authoritative, basically letting students start afresh.
