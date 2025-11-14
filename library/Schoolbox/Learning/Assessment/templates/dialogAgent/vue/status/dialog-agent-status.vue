@@ -103,7 +103,10 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                             </td>
                             <td class="actions-small-1">
                                 <nav>
-                                    <sbx-pop-out :content-id="`response-options-${participant.user.id}`"></sbx-pop-out>
+                                    <sbx-pop-out
+                                        :content-id="`response-options-${participant.user.id}`"
+                                        move-to="#dialog-agent-status-dropdown-container"
+                                    ></sbx-pop-out>
                                 </nav>
                                 <ul
                                     :id="`response-options-${participant.user.id}`"
@@ -135,6 +138,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                     </tbody>
                 </table>
             </div>
+            <div id="dialog-agent-status-dropdown-container"></div>
         </div>
     </div>
 </template>
