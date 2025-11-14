@@ -101,6 +101,36 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                             <td v-for="field in props.criteria" :key="field.id">
                                 {{ participant.feedback[field.id] || "" }}
                             </td>
+                            <td class="actions-small-1">
+                                <nav>
+                                    <sbx-pop-out :content-id="`response-options-${participant.user.id}`"></sbx-pop-out>
+                                </nav>
+                                <ul
+                                    :id="`response-options-${participant.user.id}`"
+                                    class="f-dropdown"
+                                    data-dropdown-content
+                                >
+                                    <li v-if="participant._routes.view">
+                                        <a
+                                            :href="participant._routes.view"
+                                            class="icon-task"
+                                            :title="`View ${locale.dialogAgent.proper()}`"
+                                        >
+                                            View {{ locale.dialogAgent.proper() }}
+                                        </a>
+                                    </li>
+                                    <li v-if="participant._routes.summary">
+                                        <a
+                                            :href="participant._routes.summary"
+                                            class="icon-history"
+                                            :title="`${locale.dialogAgent.proper()} history`"
+                                        >
+                                            {{ locale.dialogAgent.proper() }} History
+                                        </a>
+                                    </li>
+                                    <!-- TODO -->
+                                </ul>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
