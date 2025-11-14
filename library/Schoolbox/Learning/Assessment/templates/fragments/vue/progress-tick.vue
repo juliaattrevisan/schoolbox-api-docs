@@ -3,7 +3,6 @@
  * This mimics the rendering and form logic of progressTick.twig/jquery.progressTickForm.js
  *
  * TODO: upgrade this to support dialog agent and normal transitions in a more flexible way
- * TODO: readonly class exists
  */
 
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
