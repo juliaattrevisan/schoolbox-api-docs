@@ -695,7 +695,8 @@ class Controller extends Assessment\Controller
         }
 
         $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
-        $statusLookup = new Status();
+        $responseLinksTranslator = new Response\Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
 
         $aImplsPayload = [];
         foreach ($aImpls as $aImpl) {
@@ -715,7 +716,6 @@ class Controller extends Assessment\Controller
                     $authoritativeResponse = $aImpl->getAuthoritativeResponse($participant, true);
                 }
 
-                $status = $statusLookup->calculate($authoritativeResponse);
 
                 /* The frontend expects a {} for an empty record, so use a stdClass */
                 $feedback = new \stdClass();
@@ -747,29 +747,15 @@ class Controller extends Assessment\Controller
                     'studentId'    => $participant->getUser()->getId(),
                 ];
 
-                $routeParamsResponse = array_merge($routeParams, [
-                    'response'   => $authoritativeResponse,
-                    'responseId' => $authoritativeResponse?->getId(),
-                ]);
-
-                // TODO: These routes also are possibly meant to pull in info from $status["actions"], but that should ideally occur in the module if possible
-                $routes = [
-                    'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
-                    'view' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', $routeParamsResponse) : null,
-                    'sobo' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParamsResponse) : null,
-                    'reset' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParamsResponse) : null,
-                    'reopen' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse) : null,
-                    'resolved' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse) : null,
-                ];
-
                 $participantPayload[] = [
                     'id' => $participant->getUser()->getId(),
                     'user' => $userTranslator->convertLinkedUser($participant->getUser()),
-                    'status' => $status["status"],
-                    'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
-                    'submittedAt' => $authoritativeResponse?->getSubmittedAt()?->toRfc3339String(),
+                    'response' => $authoritativeResponse ? $responseTranslator->__invoke($authoritativeResponse) : null,
                     'feedback' => $feedback,
-                    '_routes' => $routes,
+                    '_routes' => [
+                        'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
+                        'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
+                    ],
                 ];
             }
 

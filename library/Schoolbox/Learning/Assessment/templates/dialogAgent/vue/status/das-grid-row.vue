@@ -3,6 +3,7 @@ import { getRelativeTime } from "@js/util/dateUtils";
 import UserLink from "@schoolboxVue/components/user/user-link.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
+import { getResponseStatus } from "./dialogAgentStatusTypes";
 import type { DialogAgentParticipant, DialogAgentScenarioCriteria } from "./dialogAgentStatusTypes";
 import DasActions from "./das-actions.vue";
 
@@ -19,15 +20,19 @@ const props = defineProps<Props>();
  * @returns The title string
  */
 function getProgressTickTitle(participant: DialogAgentParticipant): string {
-    if (participant.assistanceRequestedAt !== null) {
-        return `Assistance requested ${getRelativeTime(participant.assistanceRequestedAt, true)}`;
+    if (participant.response === null) {
+        return getResponseStatus(null);
     }
 
-    if (participant.submittedAt !== null) {
-        return `Submitted ${getRelativeTime(participant.submittedAt, true)}`;
+    if (participant.response.assistanceRequestedAt !== null) {
+        return `Assistance requested ${getRelativeTime(participant.response.assistanceRequestedAt, true)}`;
     }
 
-    return STATUS_LABELS[participant.status];
+    if (participant.response.submittedAt !== null) {
+        return `Submitted ${getRelativeTime(participant.response.submittedAt, true)}`;
+    }
+
+    return STATUS_LABELS[participant.response.status];
 }
 </script>
 
@@ -40,13 +45,16 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
                     <h3 class="l-mar-xl--right">{{ participant.user.fullName }}</h3>
                 </user-link>
                 <p>
-                    <span class="progress-tick tiny no-text readonly" :class="STATUS_TICKS[participant.status]" />
+                    <span
+                        class="progress-tick tiny no-text readonly"
+                        :class="STATUS_TICKS[getResponseStatus(participant.response)]"
+                    />
                     <span
                         class="meta"
                         :title="getProgressTickTitle(participant)"
                         :data-tooltip="getProgressTickTitle(participant) || undefined"
                     >
-                        {{ STATUS_LABELS[participant.status] }}
+                        {{ STATUS_LABELS[getResponseStatus(participant.response)] }}
                     </span>
                 </p>
             </div>
@@ -62,7 +70,7 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
         <td class="u-sticky-left u-sticky-left--offset-1 u-border-right actions-small-1">
             <span
                 class="progress-tick readonly l-mar-s--top"
-                :class="STATUS_TICKS[participant.status]"
+                :class="STATUS_TICKS[getResponseStatus(participant.response)]"
                 :title="getProgressTickTitle(participant)"
                 :data-tooltip="getProgressTickTitle(participant) || undefined"
             />

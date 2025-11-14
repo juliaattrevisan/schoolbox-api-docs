@@ -13,13 +13,13 @@ const props = defineProps<Props>();
  * When the user clicks on "Submit on behalf of"
  */
 async function onSobo(): Promise<void> {
-    if (!props.participant._routes.sobo) return;
+    if (!props.participant.response?._routes.sobo) return;
 
     const toastContext = `on behalf of ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Submitting ${toastContext}`);
     const response = await apiRequest({
         method: "POST",
-        url: props.participant._routes.sobo,
+        url: props.participant.response._routes.sobo,
     });
 
     toast.timeout({
@@ -51,13 +51,13 @@ async function onReset(): Promise<void> {
  * When the user clicks on "Reopen"
  */
 async function onReopen(): Promise<void> {
-    if (!props.participant._routes.reopen) return;
+    if (!props.participant.response?._routes.reopen) return;
 
     const toastContext = `${locale.dialogAgent.proper()} for ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Reopening ${toastContext}...`);
     const response = await apiRequest({
         method: "POST",
-        url: props.participant._routes.reopen,
+        url: props.participant.response._routes.reopen,
     });
 
     toast.timeout({
@@ -70,13 +70,13 @@ async function onReopen(): Promise<void> {
  * When the user clicks on "Mark as assisted"
  */
 async function onMarkAsAssisted(): Promise<void> {
-    if (!props.participant._routes.resolved) return;
+    if (!props.participant.response?._routes.resolved) return;
 
     const toastContext = `${props.participant.user.fullName} as assisted`;
     const toast = window.sbProps.toastActivate(`Marking ${toastContext}...`);
     const response = await apiRequest({
         method: "POST",
-        url: props.participant._routes.resolved,
+        url: props.participant.response._routes.resolved,
     });
 
     toast.timeout({
@@ -87,8 +87,8 @@ async function onMarkAsAssisted(): Promise<void> {
 </script>
 
 <template>
-    <li v-if="props.participant._routes.view">
-        <a :href="props.participant._routes.view" class="icon-view">
+    <li v-if="props.participant.response?._routes.view">
+        <a :href="props.participant.response._routes.view" class="icon-view">
             {{ `View ${locale.dialogAgent.proper()}` }}
         </a>
     </li>
@@ -97,7 +97,7 @@ async function onMarkAsAssisted(): Promise<void> {
             {{ `${locale.dialogAgent.proper()} History` }}
         </a>
     </li>
-    <li v-if="props.participant._routes.sobo">
+    <li v-if="props.participant.response?._routes.sobo">
         <button class="icon-approve" @click="onSobo">
             {{ `Submit on behalf of ${props.participant.user.fullName}` }}
         </button>
@@ -107,12 +107,12 @@ async function onMarkAsAssisted(): Promise<void> {
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
-    <li v-if="props.participant._routes.reopen">
+    <li v-if="props.participant.response?._routes.reopen">
         <button class="icon-undo" @click="onReopen">
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
-    <li v-if="props.participant._routes.resolved">
+    <li v-if="props.participant.response?._routes.resolved">
         <button class="icon-medical" @click="onMarkAsAssisted">
             {{ `Mark as assisted` }}
         </button>

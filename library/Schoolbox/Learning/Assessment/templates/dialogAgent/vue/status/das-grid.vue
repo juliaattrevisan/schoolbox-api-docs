@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
+import { getResponseStatus } from "./dialogAgentStatusTypes";
 import type { DialogAgentParticipant, DialogAgentScenarioCriteria } from "./dialogAgentStatusTypes";
 import DasGridRow from "./das-grid-row.vue";
 
@@ -12,7 +13,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const filteredParticipants = window.Vue.computed(() => {
-    return props.participants.filter((participant) => props.filters[participant.status]);
+    return props.participants.filter((participant) => props.filters[getResponseStatus(participant.response)]);
 });
 </script>
 
