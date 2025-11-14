@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { fromEntriesOf } from "@js/util/arrayUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
@@ -23,9 +24,19 @@ const props = defineProps<Props>();
 
 const collapsedImpls = window.Vue.ref<number[]>([]);
 
+const participantSearchFilter = window.Vue.ref<string>("");
 const filters = window.Vue.ref<Record<DialogAgentResponseStatus, boolean>>(
     fromEntriesOf(Object.values(DialogAgentResponseStatus).map((status) => [status, true])),
 );
+
+/**
+ * Reset all filters to show everything again
+ */
+function resetFilters(): void {
+    for (const status of Object.values(DialogAgentResponseStatus)) {
+        filters.value[status] = true;
+    }
+}
 
 /**
  * Toggle the collapsed state of an assessment implementation
@@ -54,7 +65,15 @@ function toggleCollapse(aImplId: number): void {
         </div>
     </div>
 
+    <!-- Search -->
+    <div class="row">
+        <div class="small-12 columns">
+            <input v-model="participantSearchFilter" type="search" placeholder="Search for a student" />
+        </div>
+    </div>
+
     <div id="dialog-agent-status-dropdown-container"></div>
+    <!-- Grid for each implementation -->
     <div v-for="aImpl in props.aImpls" :key="aImpl.id" class="component-container">
         <div v-if="props.isSpecification" class="row">
             <div class="small-12 columns">
@@ -78,16 +97,23 @@ function toggleCollapse(aImplId: number): void {
                 </div>
             </div>
         </div>
-        <!-- TODO: EMPTY STATE -->
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-show="!collapsedImpls.includes(aImpl.id)" class="row">
                 <div class="small-12 island">
-                    <section>
-                        <das-grid :criteria="props.criteria" :participants="aImpl.participants" :filters="filters" />
-                    </section>
+                    <das-grid
+                        :criteria="props.criteria"
+                        :participants="aImpl.participants"
+                        :filters="filters"
+                        :participant-search-filter="participantSearchFilter"
+                        @reset-filters="resetFilters"
+                    />
                 </div>
             </div>
         </Transition>
+    </div>
+    <div v-if="props.aImpls.length === 0" class="empty-state">
+        <i class="icon-dialog-agent"></i>
+        <p>This {{ locale.activity.singular() }} has no students participating.</p>
     </div>
 </template>
 
