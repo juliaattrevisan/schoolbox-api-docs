@@ -15,7 +15,7 @@ use Schoolbox\UserMapper;
 class RecordList extends Base implements TabTypeInterface, ICursor
 {
     public const LIMIT_DEFAULT = 50; // increase from 20 so records linked to recent notifications are more likely to be included in the initial load
-    public const LIMIT_MAX = 50;
+    public const LIMIT_MAX = 1000; // We've updated to 1000 to account for the need to trigger a print load, where 'all' results are needed.
     public const REQUIRE_TYPE_SUBTYPE_EXPLICITLY = false;
     public function __construct(
         protected Helper $helper,
