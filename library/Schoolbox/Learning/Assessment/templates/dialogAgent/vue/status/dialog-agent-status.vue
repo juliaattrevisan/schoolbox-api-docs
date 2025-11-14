@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { getRelativeTime } from "@js/util/dateUtils";
 import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserCC } from "@schoolboxLibrary/types/User";
@@ -75,7 +76,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                             <th class="u-sticky-left u-sticky-left--first"></th>
                             <th class="u-sticky-left u-sticky-left--offset-1">Status</th>
                             <th v-for="field in props.criteria" :key="field.id" class="field-col">{{ field.title }}</th>
-                            <th>Actions</th>
+                            <th class="u-sticky-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,10 +99,10 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                                     data-tooltip
                                 />
                             </td>
-                            <td v-for="field in props.criteria" :key="field.id">
+                            <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">
                                 {{ participant.feedback[field.id] || "" }}
                             </td>
-                            <td class="actions-small-1">
+                            <td class="u-sticky-right actions-small-1">
                                 <nav>
                                     <sbx-pop-out
                                         :content-id="`response-options-${participant.user.id}`"
