@@ -197,10 +197,8 @@ class Mapper extends BaseMapper
             if ($model->getUser() && $model->getUser()->isStaffWithPastoralAccess()) {
                 return true;
             }
-            $role = $model->getRole() ?: ($model->getUser() ? $model->getUser()->getRole() : null);
-            if ($role) {
-                return !in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) || $role->getAccessPastoral();
-            }
+            /** @var ?Role $role */
+            $role = $model->getRole() ?: ($model->getUser()?->getRole());
 
             /** Checking if the parent and student access are enabled or not */
             if ($model->getRoleType() === Role::PARENT || $role?->isParent()) {
@@ -211,6 +209,10 @@ class Mapper extends BaseMapper
                 if (!$config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
                     return false;
                 }
+            }
+
+            if ($role) {
+                return !in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) || $role->getAccessPastoral();
             }
             return true;
         };
