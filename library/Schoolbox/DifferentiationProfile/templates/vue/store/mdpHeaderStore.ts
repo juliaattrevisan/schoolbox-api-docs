@@ -1,28 +1,19 @@
 /**
- * To hold the key data for the MDP editor
+ * To hold the header data for the MDP editor
  */
 
 import { defineStore } from "pinia";
-import type {
-    MDPHeader,
-    Header,
-    AdjustmentType,
-    AdjustmentText,
-    Payload,
-    Profile,
-} from "../../js/types/manageDifferentiationProfilesTypes";
+import type { MDPHeader, Header } from "../../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 
-export const useMDPStore = defineStore(`mdpStore`, () => {
+export const useMdpHeaderStore = defineStore(`mdpHeaderStore`, () => {
     const header = window.Vue.ref<Header[]>([]);
-    const adjustmentCategories = window.Vue.ref<AdjustmentType[]>([]);
-    const adjustmentLevels = window.Vue.ref<AdjustmentType[]>([]);
 
     /**
-     * set the headers for the grid,
-     * @param $header - the headers to set
+     * store any passed through properties
+     * @param $header - the headers for the grid
      */
-    function setHeaders($header: MDPHeader[]): void {
+    function init($header: MDPHeader[]): void {
         header.value = [
             {
                 id: 0,
@@ -57,26 +48,8 @@ export const useMDPStore = defineStore(`mdpStore`, () => {
         ];
     }
 
-    /**
-     * store any passed through properties
-     * @param $header - the headers for the grid
-     * @param $adjustmentCategories - the adjustment categories
-     * @param $adjustmentLevels - the adjustment levels
-     */
-    function init(
-        $header: MDPHeader[],
-        $adjustmentCategories: AdjustmentType[],
-        $adjustmentLevels: AdjustmentType[],
-    ): void {
-        setHeaders($header);
-        adjustmentCategories.value = $adjustmentCategories;
-        adjustmentLevels.value = $adjustmentLevels;
-    }
-
     return {
         header,
-        adjustmentCategories,
-        adjustmentLevels,
         init,
     };
 });

@@ -1,7 +1,10 @@
+import { createPinia } from "pinia";
 import ManageDifferentiationProfiles from "./manage-differentiation-profiles.vue";
 
 window.Vue.createApp({
     components: {
         ManageDifferentiationProfiles,
     },
-}).mount("#manage-differentiation-profiles-container");
+})
+    .use(createPinia())
+    .mount("#manage-differentiation-profiles-container");

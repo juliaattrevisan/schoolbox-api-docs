@@ -5,9 +5,6 @@
 
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
-import type { Nested } from "@js/util/queryUtils";
-import { SearchParam } from "@js/util/sbx/apiUtils";
-import { getKeyValuePairs } from "@js/util/queryUtils";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
@@ -25,9 +22,8 @@ import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
-import { ON_FILTER_CHANGE } from "../js/MDPEvents";
-import { useLoadData } from "./composable/useLoadData";
-import { useMDPStore } from "./store/mdpStore";
+import { useMdpHeaderStore } from "./store/mdpHeaderStore";
+import { useMdpRowsStore } from "./store/mdpRowsStore";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -41,59 +37,10 @@ const props = defineProps<{
 window.Vue.provide("pastoralConfig", props.pastoralConfig);
 window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 
-const store = useMDPStore();
-store.init(props.header, props.adjustmentCategories, props.adjustmentLevels);
-
-// #region grid loading / filtering /  pagination
-
-const url = window.Vue.ref<string>("");
-const LIMIT = 20; // the current set limit for the number of records to fetch at once
-const filters = window.Vue.ref<Nested>({});
-const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(url);
-
-/**
- * Adds filter search parameters to the given URLSearchParams object.
- * @param $searchParams - The URLSearchParams object to modify.
- * @param $filters - The filters to apply.
- */
-function addFilterSearchParams($searchParams: URLSearchParams, $filters: Nested): void {
-    const keyValuePairs = getKeyValuePairs({ filter_selection: $filters });
-    const map = new Map(Object.entries(keyValuePairs));
-    map.forEach((value, key) => {
-        $searchParams.append(key, value);
-    });
-}
-
-/**
- * Listen for filter changes and reload data accordingly
- */
-window.Vue.onMounted(() => {
-    document.addEventListener(ON_FILTER_CHANGE, (event) => {
-        filters.value = event.detail.selectedFilters;
-        const newUrl = new URL(props.route, window.location.origin);
-        const searchParams = new URLSearchParams();
-        addFilterSearchParams(searchParams, filters.value);
-        searchParams.set("limit", LIMIT.toString());
-        newUrl.search = searchParams.toString();
-        url.value = newUrl.toString();
-    });
-});
-
-/**
- * Handle previous/next page button clicks
- * @param cursor - the cursor to use for the previous/next page
- */
-function onPaginate(cursor: string): void {
-    const newUrl = new URL(props.route, window.location.origin);
-    const searchParams = new URLSearchParams();
-    addFilterSearchParams(searchParams, filters.value);
-    searchParams.set("limit", LIMIT.toString());
-    searchParams.set(SearchParam.CURSOR as string, cursor);
-    newUrl.search = searchParams.toString();
-    url.value = newUrl.toString();
-}
-
-// #endregion grid loading / filtering /  pagination
+const headerStore = useMdpHeaderStore();
+headerStore.init(props.header);
+const rowsStore = useMdpRowsStore();
+rowsStore.init(props.route);
 
 // #region linked records selected
 
@@ -116,20 +63,24 @@ function onLinkedRecordsSelected(profile: Profile): void {
 </script>
 
 <template>
-    <div v-if="isNewLoading" class="c-island l-pad-m">
+    <div v-if="rowsStore.isNewLoading" class="c-island l-pad-m">
         <div class="loader"></div>
     </div>
-    <div v-else-if="loadError" class="c-island l-pad-m">
-        <data-load-error data-title="record" :further-info="loadError" />
+    <div v-else-if="rowsStore.loadError" class="c-island l-pad-m">
+        <data-load-error data-title="record" :further-info="rowsStore.loadError" />
     </div>
-    <empty-state v-else-if="isEmpty" icon="icon-learning-support">
+    <empty-state v-else-if="rowsStore.isEmpty" icon="icon-learning-support">
         <p>
             No {{ locale.differentiationProfile.translate(true, true) }} exist. They will appear here once records have
             been linked.
         </p>
     </empty-state>
-    <template v-else-if="hasRows && payload">
-        <mdp-grid :header="store.header" :rows="payload.data.profiles" :is-loading="isMoreLoading">
+    <template v-else-if="rowsStore.hasRows && rowsStore.payload">
+        <mdp-grid
+            :header="headerStore.header"
+            :rows="rowsStore.payload.data.profiles"
+            :is-loading="rowsStore.isMoreLoading"
+        >
             <template #User="{ row, header: columnHeader }">
                 <mdp-grid-cell-student
                     :user="row[columnHeader.key] as User"
@@ -140,7 +91,9 @@ function onLinkedRecordsSelected(profile: Profile): void {
             <template #Adjustment="{ row, header: columnHeader }">
                 <mdp-grid-cell-adjustment
                     :adjustment="row[columnHeader.key] as AdjustmentType[]"
-                    :options="columnHeader.key === 'adjustment_category' ? adjustmentCategories : adjustmentLevels"
+                    :options="
+                        columnHeader.key === 'adjustment_category' ? props.adjustmentCategories : props.adjustmentLevels
+                    "
                 />
             </template>
             <template #Text="{ row, header: columnHeader }">
@@ -157,14 +110,14 @@ function onLinkedRecordsSelected(profile: Profile): void {
                 </div>
             </template>
         </mdp-grid>
-        <loading-table v-if="isMoreLoading" :rows="5" row-height="3rem" />
+        <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
         <cursor-pagination
-            :url="url"
-            :metadata="(payload as Payload).metadata"
-            :limit="LIMIT"
-            :is-loading="isNewLoading || isMoreLoading"
-            @previous="onPaginate"
-            @next="onPaginate"
+            :url="rowsStore.url"
+            :metadata="(rowsStore.payload as Payload).metadata"
+            :limit="rowsStore.limit"
+            :is-loading="rowsStore.isNewLoading || rowsStore.isMoreLoading"
+            @previous="rowsStore.onPaginate"
+            @next="rowsStore.onPaginate"
         />
     </template>
     <pastoral-records-modal v-model:url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
