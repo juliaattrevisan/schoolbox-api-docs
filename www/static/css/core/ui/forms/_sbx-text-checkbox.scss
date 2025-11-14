@@ -6,7 +6,8 @@
 @use "sbx-form";
 
 /* Base */
-.sbx-body input[type="checkbox"] {
+.sbx-body input[type="checkbox"],
+.sbx-body .VueTables input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none; // remove native styles
     background-color: var(--sbx-color-foreground-primary);
@@ -16,14 +17,14 @@
     cursor: pointer;
     display: inline-grid;
     height: 1.875rem;
-    width: 1.875rem;
     line-height: 1;
+    margin: 0 0 0.5rem 0;
     min-height: auto;
     opacity: 1;
     place-content: center;
     position: static;
     transform: translateY(-0.075em);
-    margin: 0 0 0.5rem 0;
+    width: 1.875rem;
 
     &:hover:not(:disabled) {
         // no reduced contrast on hover
@@ -57,33 +58,7 @@
     &:disabled {
         @include sbx-form.form-input-disabled;
     }
-}
-
-/* Intermediate state */
-.sbx-body .sbx-input-checkbox--intermediate[type="checkbox"]::before {
-    clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
-    transform: scale(1);
-}
-
-/* Error state */
-.sbx-body .sbx-input-checkbox--error[type="checkbox"] {
-    border: var(--sbx-border-width-normal) solid var(--sbx-color-alert);
-    border-radius: var(--sbx-border-radius-normal);
-}
-
-/* Label next to checkbox */
-.sbx-body .sbx-input-checkbox[type="checkbox"] + label {
-    cursor: pointer;
-    display: inline-block;
-    margin: 0;
-    vertical-align: baseline;
-}
-
-/* Inline container used in the story */
-.sbx .inline-checkbox-container {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sbx-size-s);
-    flex-direction: row !important;
-    justify-content: flex-start;
+    & + label {
+        vertical-align: text-bottom;
+    }
 }
