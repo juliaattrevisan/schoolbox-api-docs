@@ -73,37 +73,36 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                 <table>
                     <thead>
                         <tr>
-                            <th class="u-sticky-left u-sticky-left--first u-border-right"></th>
+                            <th class="u-sticky-left u-sticky-left--first"></th>
+                            <th class="u-sticky-left u-sticky-left--offset-1 u-border-right">Status</th>
                             <th v-for="field in props.criteria" :key="field.id" class="field-col">{{ field.title }}</th>
+                            <th class="u-sticky-right u-border-left">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="participant in props.participants" :key="participant.id">
-                            <td
-                                class="u-sticky-left u-sticky-left--first u-border-right actions-small-1"
-                                style="padding-bottom: 0"
-                            >
-                                <div class="small-12 card">
+                            <td class="profile-cell u-sticky-left u-sticky-left--first">
+                                <div class="small-12 card compact l-mar-s no-pad">
                                     <user-link :user="participant.user">
                                         <user-photo :user="participant.user" render="small" />
-                                        <h3>{{ participant.user.fullName }}</h3>
+                                        <p>{{ participant.user.fullName }}</p>
                                     </user-link>
-                                    <p>
-                                        <span
-                                            class="meta"
-                                            :title="getProgressTickTitle(participant)"
-                                            :data-tooltip="getProgressTickTitle(participant) || undefined"
-                                        >
-                                            <span
-                                                class="progress-tick no-text tiny readonly"
-                                                :class="STATUS_TICKS[participant.status]"
-                                            ></span>
-                                            <span>
-                                                {{ STATUS_LABELS[participant.status] }}
-                                            </span>
-                                        </span>
-                                    </p>
                                 </div>
+                            </td>
+                            <td class="u-sticky-left u-sticky-left--offset-1 u-border-right">
+                                <component
+                                    :is="participant._routes.view ? 'a' : 'span'"
+                                    :href="participant._routes.view || undefined"
+                                    class="progress-tick readonly"
+                                    :class="STATUS_TICKS[participant.status]"
+                                    :title="getProgressTickTitle(participant)"
+                                    :data-tooltip="getProgressTickTitle(participant) || undefined"
+                                />
+                            </td>
+                            <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">
+                                {{ participant.feedback[field.id] || "" }}
+                            </td>
+                            <td class="u-sticky-right u-border-left actions-small-1">
                                 <nav>
                                     <sbx-pop-out
                                         :content-id="`response-options-${participant.user.id}`"
@@ -136,10 +135,6 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                                     <!-- TODO -->
                                 </ul>
                             </td>
-
-                            <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">
-                                {{ participant.feedback[field.id] || "" }}
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -151,7 +146,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
 
 <style scoped lang="scss">
 .dialog-agent-grid {
-    --sbx-table-u-sticky-width-first: 16.5rem;
+    --sbx-table-u-sticky-width-first: 12.5rem;
     max-height: 90vh;
 
     .field-col {
