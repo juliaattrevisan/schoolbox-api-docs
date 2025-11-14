@@ -18,6 +18,9 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -90,6 +93,10 @@ class Controller extends Assessment\Controller
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param EditorTemplateHelper $editorTemplateHelper
@@ -115,6 +122,10 @@ class Controller extends Assessment\Controller
         protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
         private EditorTemplateHelper $editorTemplateHelper
@@ -138,6 +149,12 @@ class Controller extends Assessment\Controller
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
             $dialogAgentScenarioMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
             editorTemplateHelper: $editorTemplateHelper
         );
     }
@@ -665,75 +682,105 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
+        $aImpls = new \Schoolbox\GenericCollection(Model::class);
+
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if (!$assessment->isSpecification()) {
+            $aImpls->add($assessment);
+        } else {
+            foreach ($this->getUnitAssessments($assessment) as $unitAssessment) {
+                /** @var Model $unitAssessment */
+                $aImpls->add($unitAssessment);
+            }
+        }
+
         $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
         $statusLookup = new Status();
 
-        $participantPayload = [];
-        foreach ($assessment->getAllParticipants() as $participant) {
-            /** @var Participant $participant */
+        $aImplsPayload = [];
+        foreach ($aImpls as $aImpl) {
+            $participantPayload = [];
 
-            $authoritativeResponse = null;
-            if ($participant->getAllResponses()->count()) {
-                /** @var ResponseModel|null $authoritativeResponse */
-                $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
-            }
+            foreach ($aImpl->getAllParticipants() as $participant) {
+                /** @var Participant $participant */
 
-            $status = $statusLookup->calculate($authoritativeResponse);
+                /* Are they excluded? ignore them */
+                if ($participant->isExcluded()) {
+                    continue;
+                }
 
-            /* The frontend expects a {} for an empty record, so use a stdClass */
-            $feedback = new \stdClass();
+                $authoritativeResponse = null;
+                if ($participant->getAllResponses()->count()) {
+                    /** @var ResponseModel|null $authoritativeResponse */
+                    $authoritativeResponse = $aImpl->getAuthoritativeResponse($participant, true);
+                }
 
-            /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
-             */
-            if ($authoritativeResponse !== null && null !== $authoritativeResponse->getSubmittedAt()) { // also maybe if it's been submitted?
-                $tempFeedback = [
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
-                    'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
-                    'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
-                    'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
-                    'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
-                    'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
+                $status = $statusLookup->calculate($authoritativeResponse);
+
+                /* The frontend expects a {} for an empty record, so use a stdClass */
+                $feedback = new \stdClass();
+
+                /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
+                */
+                if ($authoritativeResponse !== null && null !== $authoritativeResponse->getSubmittedAt()) { // also maybe if it's been submitted?
+                    $tempFeedback = [
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
+                        'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
+                        'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
+                        'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
+                        'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
+                        'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
+                    ];
+
+                    foreach ($scenario->getCriteria() as $criterion) {
+                        shuffle($tempFeedback);
+                        $start = rand(0, 5);
+                        $selected = array_slice($tempFeedback, $start, $start + rand(0, 5 - $start));
+                        $feedback->{$criterion->getId()} = join(' ', $selected);
+                    }
+                }
+
+                $routeParams = [
+                    'assessment'   => $aImpl,
+                    'assessmentId' => $aImpl->getId(),
+                    'student'      => $participant->getUser(),
+                    'studentId'    => $participant->getUser()->getId(),
                 ];
 
-                foreach ($scenario->getCriteria() as $criterion) {
-                    shuffle($tempFeedback);
-                    $start = rand(0, 5);
-                    $selected = array_slice($tempFeedback, $start, $start + rand(0, 5 - $start));
-                    $feedback->{$criterion->getId()} = join(' ', $selected);
-                }
+                // TODO: These routes also are possibly meant to pull in info from $status["actions"]
+                $routes = [
+                    'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
+                    'view' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', array_merge(
+                        $routeParams,
+                        [
+                            'response' => $authoritativeResponse,
+                            'responseId' => $authoritativeResponse->getId(),
+                        ]
+                    )) : null,
+                    'sobo' => $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParams),
+                    'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
+                    'reopen' => $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParams),
+                    'resolved' => $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParams),
+                ];
+
+                $participantPayload[] = [
+                    'id' => $participant->getId(),
+                    'user' => $userTranslator->convertLinkedUser($participant->getUser()),
+                    'status' => $status["status"],
+                    'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
+                    'submittedAt' => $authoritativeResponse?->getSubmittedAt()?->toRfc3339String(),
+                    'feedback' => $feedback,
+                    '_routes' => $routes,
+                ];
             }
 
-            $routeParams = [
-                'assessment'   => $assessment,
-                'assessmentId' => $assessment->getId(),
-                'student'      => $participant->getUser(),
-                'studentId'    => $participant->getUser()->getId(),
-            ];
-
-            // TODO: These routes also are possibly meant to pull in info from $status["actions"]
-            $routes = [
-                'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
-                'view' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', array_merge(
-                    $routeParams,
-                    [
-                        'response' => $authoritativeResponse,
-                        'responseId' => $authoritativeResponse->getId(),
-                    ]
-                )) : null,
-                'sobo' => $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParams),
-                'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
-                'reopen' => $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParams),
-                'resolved' => $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParams),
-            ];
-
-            $participantPayload[] = [
-                'id' => $participant->getId(),
-                'user' => $userTranslator->convertLinkedUser($participant->getUser()),
-                'status' => $status["status"],
-                'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
-                'submittedAt' => $authoritativeResponse?->getSubmittedAt()?->toRfc3339String(),
-                'feedback' => $feedback,
-                '_routes' => $routes,
+            $aImplsPayload[] = [
+                'id' => $aImpl->getId(),
+                'folder' => [
+                    'id' => $aImpl->getBaseContext()->getFolder()->getId(),
+                    'title' => $aImpl->getBaseContext()->getFolder()->getTitle(),
+                ],
+                'participants' => $participantPayload,
             ];
         }
 
@@ -746,12 +793,11 @@ class Controller extends Assessment\Controller
                     ]
                 ),
                 'assessment' => $assessment,
-                'scenario' => $scenario,
                 'criteria'   => $scenario->getCriteria()->map(fn(CriteriaModel $criterion) => [
                     'id' => $criterion->getId(),
                     'title' => $criterion->getTitle(),
                 ]),
-                'participants' => $participantPayload,
+                'aImpls' => $aImplsPayload,
             ]
         );
     }

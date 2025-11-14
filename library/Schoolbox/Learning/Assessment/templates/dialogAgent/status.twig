@@ -9,8 +9,8 @@
  #
  # @param DialogAgent\Model $assessment         A Dialog Agent assessment instance (synonymous with Discussion)
  # @param Collection $breadcrumbs               A set of key-value tuples for breadcrumb rendering
- # @param array $statuses                       A set of (status, metadata) tuples to tell staff about
- # @param DialogAgent\Scenario\Model $scenario  The scenario that was chosen for $assessment along with its fields etc.
+ # @param array $criteria                       The criteria for the current scenario
+ # @param array $aImpls                         Assessment implementations with associated participants
  #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -51,7 +51,8 @@
 <div id="dialog-agent-status-container">
     <dialog-agent-status
         :criteria="{{ criteria|json_encode }}"
-        :participants="{{ participants|json_encode }}"
+        :a-impls="{{ aImpls|json_encode }}"
+        {% if assessment.isSpecification %}is-specification{% endif %}
     >
         <template #meta>
             <ul class="meta">
