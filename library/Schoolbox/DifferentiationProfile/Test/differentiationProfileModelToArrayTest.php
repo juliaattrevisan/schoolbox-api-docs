@@ -28,14 +28,14 @@ class differentiationProfileModelToArrayTest extends TestCase
     private Generator $routeGenerator;
     private Authorizer $authorizer;
 
-    private const int ADJUSTMENT_CATEGORY_ID_1 = 1;
-    private const int ADJUSTMENT_CATEGORY_ID_2 = 2;
-    private const int ADJUSTMENT_CATEGORY_ID_3 = 3;
-    private const int ADJUSTMENT_CATEGORY_ID_4 = 4;
-    private const int ADJUSTMENT_LEVEL_ID_1 = 1;
-    private const int ADJUSTMENT_LEVEL_ID_2 = 2;
-    private const int ADJUSTMENT_LEVEL_ID_3 = 3;
-    private const int ADJUSTMENT_LEVEL_ID_4 = 4;
+    private const string ADJUSTMENT_CATEGORY_ID_1 = "1";
+    private const string ADJUSTMENT_CATEGORY_ID_2 = "1,2";
+    private const string ADJUSTMENT_CATEGORY_ID_3 = "3,4";
+    private const string ADJUSTMENT_CATEGORY_ID_4 = "4,1";
+    private const string ADJUSTMENT_LEVEL_ID_1 = "1";
+    private const string ADJUSTMENT_LEVEL_ID_2 = "2,4";
+    private const string ADJUSTMENT_LEVEL_ID_3 = "3,1";
+    private const string ADJUSTMENT_LEVEL_ID_4 = "4,5";
 
     protected function setUp(): void
     {
@@ -100,6 +100,7 @@ class differentiationProfileModelToArrayTest extends TestCase
 
         $routes = [
             'linkedRecords' => null,
+            'edit' => null,
         ];
 
         return [
