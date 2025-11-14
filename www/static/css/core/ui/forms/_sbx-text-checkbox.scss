@@ -62,3 +62,8 @@
         vertical-align: text-bottom;
     }
 }
+/* indeterminate state */
+.sbx-body .indeterminate[type="checkbox"]::before {
+    clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
+    transform: scale(1);
+}
