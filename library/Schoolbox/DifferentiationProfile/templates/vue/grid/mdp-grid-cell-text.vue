@@ -100,6 +100,7 @@ async function focusEditor(): Promise<void> {
     }
     await window.Vue.nextTick();
     editor.focus();
+    isFocused.value = true;
     // to assign the cursor to the end of the editor
     editor.model.change((writer) => {
         const root = editor.model.document.getRoot();
