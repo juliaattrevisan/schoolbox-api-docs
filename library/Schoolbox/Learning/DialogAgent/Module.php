@@ -101,7 +101,7 @@ class Module extends BaseModule
                 throw new NotFound();
             }
 
-            /* You can't request assistance on a non-authoritative response: you're not doing that one anymore
+            /* You can't operate on a non-authoritative response: you're not doing that one anymore
              */
             if (!$response->getAuthoritative()) {
                 throw new NotFound();
@@ -155,7 +155,7 @@ class Module extends BaseModule
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/resolve", 'postAssistanceResolve', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{responseId:\d+}", 'postAssistanceResolve', $canWrite, $preloadParticipantAndResponse);
 
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
          * with details about who did the sobo

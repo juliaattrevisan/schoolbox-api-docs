@@ -292,49 +292,14 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User $student
+     * @param Response $response
      * @return void
-     * @throws Deleted
-     * @throws Exception
-     * @throws \Alaress\Web\Controller\Exception
      */
-    public function postAssistanceResolve(IAssessable $assessment, User $student): void
+    public function postAssistanceResolve(IAssessable $assessment, User $student, Response $response): void
     {
-        /* No response id, somehow: malformed post request.
-         */
-        if ('' === trim((string)$this->requestPost->get('responseId'))) {
-            $this->sendError('Response not found.', [], 404);
-            return;
-        }
+        $response->setAssistanceRequestedAt(null);
 
-        /* See if the response id requested actually exists
-         */
-        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-            ->equals('id', (int)$this->requestPost->get('responseId'))
-            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-            ->equals('learner_id', $student->getId())
-            ->equals('authoritative', true)
-            ->isNull('submitted_by')
-            ->isNull('submitted_at');
-
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
-        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-
-        /* You cannot resolve a request for assistance for a response if::
-         *     - response is non-authoritative
-         *     - response is already submitted
-         *     - this response id isn't theirs to change
-         *     - this response has been repurposed illegally by messing around in the url
-         */
-        if (null === $existingResponse) {
-            $this->sendError('You cannot resolve assistance for this discussion activity.');
-            return;
-        }
-
-        /* Mutate the field as one might expect
-         */
-        $existingResponse->setAssistanceRequestedAt(null);
-
-        $this->dialogAgentResponseMapper->save($existingResponse);
+        $this->dialogAgentResponseMapper->save($response);
 
         /* TODO snake async payload response in some reptilian manner
          */
