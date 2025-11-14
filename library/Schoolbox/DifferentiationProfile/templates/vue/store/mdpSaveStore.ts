@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
 export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
     const isSaving = window.Vue.ref(false);
@@ -11,10 +12,14 @@ export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
 
     /**
      * Save the given student row
-     * @param $student - the student object for the row
+     * @param profile - the profile to save
      */
-    async function save(): Promise<void> {
+    async function save(profile: Profile): Promise<void> {
         if (isSaving.value) {
+            return;
+        }
+        if (profile._routes.edit === undefined) {
+            loadError.value = "Edit route is undefined";
             return;
         }
         const toast = window.sbProps.toastActivate("Saving...");
@@ -22,12 +27,9 @@ export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
             isSaving.value = true;
             loadError.value = null;
             const response = await apiRequest({
-                url: props.postRoute,
+                url: profile._routes.edit,
                 method: "POST",
-                body: {
-                    enabled: data.value.featureToggle.enabled ? 1 : 0,
-                    modules: data.value.modules,
-                },
+                body: profile,
             });
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
