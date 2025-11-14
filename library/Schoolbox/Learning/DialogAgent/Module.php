@@ -149,7 +149,10 @@ class Module extends BaseModule
 
         /* View a response (readonly mode)
          */
-        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', $canViewSummary, $preloadParticipant);
+        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', new Rule\All(
+            $canViewSummary,
+            $this->buildRuleCanAction(Status::ACTION_VIEW)
+        ), $preloadParticipant);
 
         /* Student requests assistance for a particular response
          */
