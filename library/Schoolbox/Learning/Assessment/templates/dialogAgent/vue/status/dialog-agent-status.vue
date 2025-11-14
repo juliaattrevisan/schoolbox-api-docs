@@ -1,37 +1,15 @@
 <script setup lang="ts">
-import locale from "@js/terminology/rosettaStone";
 import { getRelativeTime } from "@js/util/dateUtils";
-import type { DateRFC3339 } from "@js/util/dateUtils";
-import type { UserCC } from "@schoolboxLibrary/types/User";
 import UserLink from "@schoolboxVue/components/user/user-link.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
-import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
+import type { DialogAgentParticipant, DialogAgentScenarioCriteria } from "./dialogAgentStatusTypes";
+import DasActions from "./das-actions.vue";
 import DasFilters from "./das-filters.vue";
-
-type DialogAgentScenarioCriteria = {
-    id: string;
-    title: string;
-};
 
 interface Props {
     criteria: DialogAgentScenarioCriteria[];
-    participants: {
-        id: number;
-        user: UserCC;
-        status: DialogAgentResponseStatus;
-        assistanceRequestedAt: DateRFC3339 | null;
-        submittedAt: DateRFC3339 | null;
-        feedback: Record<DialogAgentScenarioCriteria["id"], string>;
-        _routes: {
-            summary?: string | null;
-            view?: string | null;
-            sobo?: string | null;
-            reset?: string | null;
-            reopen?: string | null;
-            resolved?: string | null;
-        };
-    }[];
+    participants: DialogAgentParticipant[];
 }
 
 const props = defineProps<Props>();
@@ -120,25 +98,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                                     class="f-dropdown"
                                     data-dropdown-content
                                 >
-                                    <li v-if="participant._routes.view">
-                                        <a
-                                            :href="participant._routes.view"
-                                            class="icon-task"
-                                            :title="`View ${locale.dialogAgent.proper()}`"
-                                        >
-                                            View {{ locale.dialogAgent.proper() }}
-                                        </a>
-                                    </li>
-                                    <li v-if="participant._routes.summary">
-                                        <a
-                                            :href="participant._routes.summary"
-                                            class="icon-history"
-                                            :title="`${locale.dialogAgent.proper()} history`"
-                                        >
-                                            {{ locale.dialogAgent.proper() }} History
-                                        </a>
-                                    </li>
-                                    <!-- TODO -->
+                                    <das-actions :participant="participant" />
                                 </ul>
                             </td>
                             <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">
