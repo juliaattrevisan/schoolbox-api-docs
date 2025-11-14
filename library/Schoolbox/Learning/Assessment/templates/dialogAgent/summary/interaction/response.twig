@@ -47,13 +47,16 @@
         <ul class="action-list">
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="card small-12">
+                    <div class="card small-12 {% if not currentInteraction.isSubmitted %}draftSubmission{% endif %}">
                         {% if url %}
                         <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
                             {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
                             <p>
                                 {% if currentInteraction.isSubmitted %}
+                                    Submission
+                                {% else %}
+                                    Draft Submission
                                 {% endif %}
                                 by {{ participant.user.fullname }}
                             </p>
