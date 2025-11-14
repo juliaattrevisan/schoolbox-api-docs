@@ -508,7 +508,7 @@ table.attempts-table {
     width: var(--sbx-table-u-sticky-width-first, 200px);
 }
 .u-sticky-left--offset-1 {
-    left: var(--sbx-table-u-sticky-left-offset, 200px);
+    left: var(--sbx-table-u-sticky-width-first, 200px);
 }
 
 /* make a table <th> sticky on the right */
