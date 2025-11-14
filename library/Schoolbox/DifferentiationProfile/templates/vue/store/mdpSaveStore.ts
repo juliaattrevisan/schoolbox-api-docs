@@ -3,53 +3,46 @@
  */
 
 import { defineStore } from "pinia";
-import type { MDPHeader, Header } from "../../js/types/manageDifferentiationProfilesTypes";
-import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 
 export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
-    const header = window.Vue.ref<Header[]>([]);
+    const isSaving = window.Vue.ref(false);
+    const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
     /**
-     * store any passed through properties
-     * @param $header - the headers for the grid
+     * Save the given student row
+     * @param $student - the student object for the row
      */
-    function init($header: MDPHeader[]): void {
-        header.value = [
-            {
-                id: 0,
-                title: "Student",
-                width: 250,
-                isFixed: true,
-                isSortable: true,
-                key: "student",
-                type: HeaderType.USER,
-            },
-            ...$header.map((h) => ({
-                id: h.id,
-                key: h.name,
-                type:
-                    h.name === "adjustment_category" || h.name === "adjustment_level"
-                        ? HeaderType.ADJUSTMENT
-                        : HeaderType.TEXT,
-                title: h.terminology,
-                width: 400,
-                isFixed: false,
-                isSortable: false,
-            })),
-            {
-                id: Math.max(0, ...$header.map((h) => h.id)) + 1,
-                key: "updated_at",
-                type: HeaderType.DATE,
-                title: "Last updated",
-                width: 200,
-                isFixed: false,
-                isSortable: true,
-            },
-        ];
+    async function save(): Promise<void> {
+        if (isSaving.value) {
+            return;
+        }
+        const toast = window.sbProps.toastActivate("Saving...");
+        try {
+            isSaving.value = true;
+            loadError.value = null;
+            const response = await apiRequest({
+                url: props.postRoute,
+                method: "POST",
+                body: {
+                    enabled: data.value.featureToggle.enabled ? 1 : 0,
+                    modules: data.value.modules,
+                },
+            });
+            if (!response.success) {
+                throw new Error(response.message || "Failed to save");
+            }
+            toast.timeout({ text: "Differentiation profiles successfully updated" });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+            loadError.value = errorMessage;
+            toast.timeout({ text: errorMessage, isSuccess: false });
+        } finally {
+            isSaving.value = false;
+        }
     }
 
     return {
-        header,
-        init,
+        save,
     };
 });
