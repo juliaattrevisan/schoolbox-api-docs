@@ -36,7 +36,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'title:', 'topic:', 'href:', 'start:', 'end:', 'instance-id:', 'output-hash'];
+        return ['help', 'title:', 'topic:', 'action:', 'href:', 'start:', 'end:', 'instance-id:', 'output-hash'];
     }
 
     /** @inheritDoc */
@@ -62,6 +62,10 @@ $app = new class extends CliTool\App{
 
         if ($this->getOpt('topic:')) {
             $args['topic'] = $this->getOpt('topic:');
+        }
+
+        if ($this->getOpt('action:')) {
+            $args['action'] = $this->getOpt('action:');
         }
 
         if ($this->getOpt('href:')) {
@@ -176,6 +180,10 @@ $app = new class extends CliTool\App{
             $success = $topicSuccess;
         }
 
+        if (isset($args['action'])) {
+            $success = $this->checkStr($regexMode, $args['action'], $msg['action']);
+        }
+
         if (isset($args['title'])) {
             $success = $this->checkStr($regexMode, $args['title'], $msg['title']['plain']);
         }
@@ -249,6 +257,9 @@ Options:
         If set, delete notifications that contain this in the title text of the notification
     --topic
         If set, delete notifications that contain this in their topic
+    --action
+        If set, delete notifications that have this action.
+        Valid values: send, retract-single, retract-all
     --href
         If set, delete notifications that have this URL
     --start
