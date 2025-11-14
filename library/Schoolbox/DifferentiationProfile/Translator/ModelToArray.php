@@ -48,6 +48,13 @@ class ModelToArray
                     'differentiationProfiles.getLinkedPastoralRecords',
                     ['studentId' => $student->getId()],
                 ),
+                'edit' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.postDifferentiationProfileData',
+                    [
+                        'student' => $student,
+                        'studentId' => $student->getId()
+                    ],
+                ),
             ],
             'created_at'            => $model->getCreatedAt()?->getLocalShort(),
             'updated_at'            => $model->getUpdatedAt()?->getLocalShort(),
