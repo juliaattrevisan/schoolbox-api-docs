@@ -21,8 +21,8 @@ const filteredParticipants = window.Vue.computed(() => {
         <table>
             <thead>
                 <tr>
-                    <th class="u-sticky-left u-sticky-left--first"></th>
-                    <th class="u-sticky-left u-sticky-left--offset-1 u-border-right"></th>
+                    <th class="u-sticky-left u-sticky-left--first u-border-right"></th>
+                    <th class="u-sticky-left u-sticky-left--offset-1 u-border-right">Status</th>
                     <th v-for="field in props.criteria" :key="field.id" class="field-col">{{ field.title }}</th>
                 </tr>
             </thead>
@@ -33,7 +33,6 @@ const filteredParticipants = window.Vue.computed(() => {
                     :participant="participant"
                     :criteria="props.criteria"
                 />
-
             </tbody>
         </table>
     </div>
@@ -46,11 +45,6 @@ const filteredParticipants = window.Vue.computed(() => {
 
     .field-col {
         min-width: 18rem;
-    }
-
-    /* force the nav's to be the width of the cell */
-    .u-sticky-left--offset-1 {
-        width: 50px;
     }
 }
 </style>

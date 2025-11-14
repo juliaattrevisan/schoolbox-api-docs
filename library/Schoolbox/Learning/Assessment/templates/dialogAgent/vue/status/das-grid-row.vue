@@ -33,13 +33,14 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
 
 <template>
     <tr>
-        <td class="u-sticky-left u-sticky-left--first actions-small-1" style="padding-bottom: 0">
+        <td class="u-sticky-left u-sticky-left--first u-border-right actions-small-1" style="padding-bottom: 0">
             <div class="small-12 card">
                 <user-link :user="participant.user">
                     <user-photo :user="participant.user" render="small" />
                     <h3 class="l-mar-xl--right">{{ participant.user.fullName }}</h3>
                 </user-link>
                 <p>
+                    <span class="progress-tick tiny no-text readonly" :class="STATUS_TICKS[participant.status]" />
                     <span
                         class="meta"
                         :title="getProgressTickTitle(participant)"
@@ -50,25 +51,21 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
                 </p>
             </div>
             <nav>
-                <span
-                    class="progress-tick readonly l-mar-m--top l-mar-s--right"
-                    :class="STATUS_TICKS[participant.status]"
-                    :title="getProgressTickTitle(participant)"
-                    :data-tooltip="getProgressTickTitle(participant) || undefined"
+                <sbx-pop-out
+                    :content-id="`response-options-${participant.user.id}`"
+                    move-to="#dialog-agent-status-dropdown-container"
+                    is-close-on-content-click
                 />
             </nav>
         </td>
 
         <td class="u-sticky-left u-sticky-left--offset-1 u-border-right actions-small-1">
-            <nav>
-                <div class="l-mar-s--top l-pad-xs--top">
-                    <sbx-pop-out
-                        :content-id="`response-options-${participant.user.id}`"
-                        move-to="#dialog-agent-status-dropdown-container"
-                        is-close-on-content-click
-                    />
-                </div>
-            </nav>
+            <span
+                class="progress-tick readonly l-mar-s--top"
+                :class="STATUS_TICKS[participant.status]"
+                :title="getProgressTickTitle(participant)"
+                :data-tooltip="getProgressTickTitle(participant) || undefined"
+            />
             <ul :id="`response-options-${participant.user.id}`" class="f-dropdown" data-dropdown-content>
                 <das-actions :participant="participant" />
             </ul>
