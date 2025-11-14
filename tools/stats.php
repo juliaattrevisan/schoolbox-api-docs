@@ -114,6 +114,7 @@ $app = new class extends CliTool\App {
             'course_due_work'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assess.availability = "assess" AND assessment.deleted_at IS NULL',
             'course_tasks'      => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN task ON assessment.id = task.assessment_id WHERE assessment.deleted_at IS NULL',
+            'course_lti'        => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_projects'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN project ON assessment.id = project.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_framework'  => 'SELECT count(*) FROM courseTemplates WHERE deleted_at IS NULL',
             'assessments'       => 'SELECT count(*) FROM assessment WHERE deleted_at IS NULL',
