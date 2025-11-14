@@ -78,6 +78,7 @@ function toggleCollapse(aImplId: number): void {
                 </div>
             </div>
         </div>
+        <!-- TODO: EMPTY STATE -->
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-show="!collapsedImpls.includes(aImpl.id)" class="row">
                 <div class="small-12 island">
