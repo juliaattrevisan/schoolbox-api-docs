@@ -36,7 +36,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'title:', 'href:', 'start:', 'end:', 'instance-id:'];
+        return ['help', 'title:', 'topic:', 'href:', 'start:', 'end:', 'instance-id:', 'output-hash'];
     }
 
     /** @inheritDoc */
@@ -58,6 +58,10 @@ $app = new class extends CliTool\App{
 
         if ($this->getOpt('title:')) {
             $args['title'] = $this->getOpt('title:');
+        }
+
+        if ($this->getOpt('topic:')) {
+            $args['topic'] = $this->getOpt('topic:');
         }
 
         if ($this->getOpt('href:')) {
@@ -87,6 +91,7 @@ $app = new class extends CliTool\App{
      */
     private function checkRedis($args, $regexMode): void
     {
+        $outputHash = $this->getOpt('output-hash');
         $redis = Redis::getStorageClientInstance();
         $decorator = new Decorator();
 
@@ -122,6 +127,10 @@ $app = new class extends CliTool\App{
             $msgArray['title']['plain'] = $decorator->renderTitleAsPlaintext($notification);
 
             if ($this->checkData($args, $regexMode, $msgArray)) {
+                if ($outputHash) {
+                    $keyParts = explode(':', $key);
+                    printf("%s\n", implode(':', array_slice($keyParts, -2)));
+                }
                 $this->getLogger()->info(sprintf(
                     'Found %s %s: %s (%s)',
                     $msgArray['namespace'],
@@ -155,6 +164,17 @@ $app = new class extends CliTool\App{
     private function checkData(array $args, bool $regexMode, array $msg): bool
     {
         $success = true;
+
+        if (isset($args['topic'])) {
+            $topicSuccess = false;
+            foreach ($msg['topics'] as $topic) {
+                if ($this->checkStr($regexMode, $args['topic'], $topic)) {
+                    $topicSuccess = true;
+                    break;
+                }
+            }
+            $success = $topicSuccess;
+        }
 
         if (isset($args['title'])) {
             $success = $this->checkStr($regexMode, $args['title'], $msg['title']['plain']);
@@ -227,6 +247,8 @@ Options:
         * the first instance defined for this system, if INSTANCE_ID is not set
     --title
         If set, delete notifications that contain this in the title text of the notification
+    --topic
+        If set, delete notifications that contain this in their topic
     --href
         If set, delete notifications that have this URL
     --start
@@ -235,6 +257,10 @@ Options:
         Only notifications delivered before this time will be matched
     -r
         If present, title and href will be treated as preg expression strings and matches done as regexps
+    --output-hash
+        If present, also output each msg's hash to stdout.
+        This can then be piped to `read-msgdata.php` to view the full message dump:
+        `scalpel.php --output-hash ... | read-msgdata.php`
     -p, --perform
         Without this flag, tool will not delete messages
 ";
