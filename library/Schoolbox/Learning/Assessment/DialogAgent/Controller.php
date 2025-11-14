@@ -624,7 +624,7 @@ class Controller extends Assessment\Controller
         $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
         $statusLookup = new Status();
 
-        $participantInfo = [];
+        $participantPayload = [];
         foreach ($assessment->getAllParticipants() as $participant) {
             /** @var Participant $participant */
 
@@ -641,7 +641,7 @@ class Controller extends Assessment\Controller
 
             /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
              */
-            // if ($authoritativeResponse !== null) {
+            // if ($authoritativeResponse !== null) { // also maybe if it's been submitted?
             $tempFeedback = [
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
                 'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
@@ -682,11 +682,12 @@ class Controller extends Assessment\Controller
                 'resolved' => $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParams),
             ];
 
-            $participantInfo[] = [
+            $participantPayload[] = [
                 'id' => $participant->getId(),
                 'user' => $userTranslator->convertLinkedUser($participant->getUser()),
                 'status' => $status["status"],
                 'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
+                'submittedAt' => $authoritativeResponse?->getSubmittedAt()?->toRfc3339String(),
                 'feedback' => $feedback,
                 '_routes' => $routes,
             ];
@@ -702,12 +703,11 @@ class Controller extends Assessment\Controller
                 ),
                 'assessment' => $assessment,
                 'scenario' => $scenario,
-                'statuses' => $statusLookup->generate($assessment),
                 'criteria'   => $scenario->getCriteria()->map(fn(CriteriaModel $criterion) => [
                     'id' => $criterion->getId(),
                     'title' => $criterion->getTitle(),
                 ]),
-                'participants' => $participantInfo,
+                'participants' => $participantPayload,
             ]
         );
     }

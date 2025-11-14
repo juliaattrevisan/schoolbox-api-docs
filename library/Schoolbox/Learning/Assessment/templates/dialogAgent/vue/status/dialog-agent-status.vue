@@ -96,7 +96,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                                     class="progress-tick readonly"
                                     :class="STATUS_TICKS[participant.status]"
                                     :title="getProgressTickTitle(participant)"
-                                    data-tooltip
+                                    :data-tooltip="getProgressTickTitle(participant) || undefined"
                                 />
                             </td>
                             <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">

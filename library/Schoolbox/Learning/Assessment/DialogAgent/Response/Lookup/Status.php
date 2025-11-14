@@ -10,30 +10,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 
-use Schoolbox\Learning\Assessment\DialogAgent\Model;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 
 class Status
 {
     /**
-     * Consts correlating to a nice phrase to say in frontend world
+     * Consts correlating to the status enum used by frontend world
+     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
      */
-    private const string STATUS_PENDING = 'Pending';
-    private const string STATUS_IN_PROGRESS = 'In Progress';
-    private const string STATUS_REQUIRES_ASSISTANCE = 'Requires Assistance';
-    private const string STATUS_SUBMITTED = 'Submitted';
-
-
-    /**
-     * Consts correlating to progress tick cosmetics, as defined in _content.scss where I've already left
-     * a note for snake to please refactor these styles in some reptilian manner
-     *
-     * Note that CSS_PENDING is '' because that defaults to an empty grey cube
-     */
-    private const string CSS_PENDING = '';
-    private const string CSS_IN_PROGRESS = 'in-progress';
-    private const string CSS_REQUIRES_ASSISTANCE = 'requires-assistance';
-    private const string CSS_SUBMITTED = 'submitted';
+    private const string STATUS_INCOMPLETE = 'incomplete';
+    private const string STATUS_IN_PROGRESS = 'in-progress';
+    private const string STATUS_REQUIRES_ASSISTANCE = 'requires-assistance';
+    private const string STATUS_SUBMITTED = 'submitted';
 
 
     /**
@@ -44,32 +32,6 @@ class Status
     private const string ACTION_RESET = 'reset';
     private const string ACTION_REOPEN = 'reopen';
     private const string ACTION_RESOLVED = 'resolved';
-
-
-    /**
-     * Returns a set of (user id, status) tuples for a given assessment
-     *
-     * @param Model $assessment  A fully hydrated assessment with participants and responses etc.
-     * @return array
-     */
-    public function generate(Model $assessment): array
-    {
-        $stack = [];
-
-        foreach ($assessment->getAllParticipants() as $participant) {
-            /* Find an authoritative response for this participant
-            */
-            /** @var ResponseModel|null $authoritativeResponse */
-            $authoritativeResponse = null;
-            if ($participant->getAllResponses()->count()) {
-                $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
-            }
-
-            $stack[$participant->getUser()->getId()] = $this->calculate($authoritativeResponse);
-        }
-
-        return $stack;
-    }
 
 
     /**
@@ -91,9 +53,7 @@ class Status
          */
         if (null === $authoritativeResponse) {
             return [
-                'status' => self::STATUS_PENDING,
-                'css' => self::CSS_PENDING,
-                'response' => null,
+                'status' => self::STATUS_INCOMPLETE,
                 'actions' => [
                     self::ACTION_VIEW => false,
                     self::ACTION_SOBO => false,
@@ -109,12 +69,6 @@ class Status
         if (null !== $authoritativeResponse->getSubmittedAt()) {
             return [
                 'status' => self::STATUS_SUBMITTED,
-                'css' => self::CSS_SUBMITTED,
-                'response' => $authoritativeResponse,
-                'meta' => [
-                    'submittedAt' => $authoritativeResponse->getSubmittedAt()->getUsingFormat(DATE_ATOM),
-                    'submittedBy' => $authoritativeResponse->getSubmittedBy()->formatName(),
-                ],
                 'actions' => [
                     self::ACTION_VIEW => true,
                     self::ACTION_SOBO => false,
@@ -125,13 +79,11 @@ class Status
             ];
         }
 
-        /* No session identifier yet; participant hasn't sent their first message to ai services
+        /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
          */
         if (null === $authoritativeResponse->getSessionId()) {
             return [
-                'status' => self::STATUS_PENDING,
-                'css' => self::CSS_PENDING,
-                'response' => null,
+                'status' => self::STATUS_INCOMPLETE,
                 'actions' => [
                     self::ACTION_VIEW => false,
                     self::ACTION_SOBO => false,
@@ -150,14 +102,6 @@ class Status
         if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
             return [
                 'status' => self::STATUS_REQUIRES_ASSISTANCE,
-                'css' => self::CSS_REQUIRES_ASSISTANCE,
-                'response' => $authoritativeResponse,
-                'meta' => [
-                    'assistanceRequestedAt' => [
-                        'local' => $authoritativeResponse->getAssistanceRequestedAt()->getLocal(),
-                        'rfc' => $authoritativeResponse->getAssistanceRequestedAt()->getUsingFormat(\Alaress_Date_Format::FORMAT_RFC3339_W3C),
-                    ],
-                ],
                 'actions' => [
                     self::ACTION_VIEW => true,
                     self::ACTION_SOBO => true,
@@ -172,8 +116,6 @@ class Status
          */
         return [
             'status' => self::STATUS_IN_PROGRESS,
-            'css' => self::CSS_IN_PROGRESS,
-            'response' => $authoritativeResponse,
             'actions' => [
                 self::ACTION_VIEW => true,
                 self::ACTION_SOBO => true,
