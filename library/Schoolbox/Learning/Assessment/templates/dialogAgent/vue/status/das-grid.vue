@@ -1,13 +1,19 @@
 <script setup lang="ts">
+import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import type { DialogAgentParticipant, DialogAgentScenarioCriteria } from "./dialogAgentStatusTypes";
 import DasGridRow from "./das-grid-row.vue";
 
 interface Props {
     criteria: DialogAgentScenarioCriteria[];
     participants: DialogAgentParticipant[];
+    filters: Record<DialogAgentResponseStatus, boolean>;
 }
 
 const props = defineProps<Props>();
+
+const filteredParticipants = window.Vue.computed(() => {
+    return props.participants.filter((participant) => props.filters[participant.status]);
+});
 </script>
 
 <template>
@@ -22,7 +28,7 @@ const props = defineProps<Props>();
             </thead>
             <tbody>
                 <das-grid-row
-                    v-for="participant in props.participants"
+                    v-for="participant in filteredParticipants"
                     :key="participant.id"
                     :participant="participant"
                     :criteria="props.criteria"

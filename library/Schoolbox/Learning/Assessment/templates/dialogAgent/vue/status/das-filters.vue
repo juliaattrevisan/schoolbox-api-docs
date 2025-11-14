@@ -3,13 +3,9 @@
  * Filters to select which dialog agent statuses to show
  */
 
-import { fromEntriesOf } from "@js/util/arrayUtils";
 import { DialogAgentResponseStatus, STATUS_TICKS, STATUS_LABELS } from "@schoolboxAssessment/Types/dialogAgent";
 
-// TODO: this should be somewhere else (so that it's actually usable)
-const filters = window.Vue.ref<Record<DialogAgentResponseStatus, boolean>>(
-    fromEntriesOf(Object.values(DialogAgentResponseStatus).map((status) => [status, true])),
-);
+const filters = defineModel<Record<DialogAgentResponseStatus, boolean>>("filters", { required: true });
 </script>
 
 <template>

@@ -23,6 +23,10 @@ const props = defineProps<Props>();
 
 const collapsedImpls = window.Vue.ref<number[]>([]);
 
+const filters = window.Vue.ref<Record<DialogAgentResponseStatus, boolean>>(
+    fromEntriesOf(Object.values(DialogAgentResponseStatus).map((status) => [status, true])),
+);
+
 /**
  * Toggle the collapsed state of an assessment implementation
  * @param aImplId The assessment implementation ID to toggle
@@ -46,7 +50,7 @@ function toggleCollapse(aImplId: number): void {
 
         <!-- Status filters -->
         <div class="small-12 large-8 columns text-right">
-            <das-filters />
+            <das-filters v-model:filters="filters" />
         </div>
     </div>
 
@@ -78,7 +82,7 @@ function toggleCollapse(aImplId: number): void {
             <div v-show="!collapsedImpls.includes(aImpl.id)" class="row">
                 <div class="small-12 island">
                     <section>
-                        <das-grid :criteria="props.criteria" :participants="aImpl.participants" />
+                        <das-grid :criteria="props.criteria" :participants="aImpl.participants" :filters="filters" />
                     </section>
                 </div>
             </div>
