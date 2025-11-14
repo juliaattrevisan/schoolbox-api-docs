@@ -747,24 +747,23 @@ class Controller extends Assessment\Controller
                     'studentId'    => $participant->getUser()->getId(),
                 ];
 
-                // TODO: These routes also are possibly meant to pull in info from $status["actions"]
+                $routeParamsResponse = array_merge($routeParams, [
+                    'response'   => $authoritativeResponse,
+                    'responseId' => $authoritativeResponse?->getId(),
+                ]);
+
+                // TODO: These routes also are possibly meant to pull in info from $status["actions"], but that should ideally occur in the module if possible
                 $routes = [
                     'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
-                    'view' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', array_merge(
-                        $routeParams,
-                        [
-                            'response' => $authoritativeResponse,
-                            'responseId' => $authoritativeResponse->getId(),
-                        ]
-                    )) : null,
-                    'sobo' => $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParams),
-                    'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
-                    'reopen' => $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParams),
-                    'resolved' => $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParams),
+                    'view' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', $routeParamsResponse) : null,
+                    'sobo' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParamsResponse) : null,
+                    'reset' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParamsResponse) : null,
+                    'reopen' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse) : null,
+                    'resolved' => $authoritativeResponse ? $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse) : null,
                 ];
 
                 $participantPayload[] = [
-                    'id' => $participant->getId(),
+                    'id' => $participant->getUser()->getId(),
                     'user' => $userTranslator->convertLinkedUser($participant->getUser()),
                     'status' => $status["status"],
                     'assistanceRequestedAt' => $authoritativeResponse?->getAssistanceRequestedAt()?->toRfc3339String(),
