@@ -20,6 +20,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -64,6 +65,56 @@ class Module extends BaseModule
             return $this->preloadAssessmentAndStudent($params);
         };
 
+        /* Preload a participant+response via (assessment id, student id, response id) tuple,
+         * returning an (assessment, student, response) tuple.
+         *
+         * This seems pretty long-winded for some reason: there might have been an easier way to ensure ownership
+         */
+        $preloadParticipantAndResponse = function ($params) {
+            $tuple = $this->preloadAssessmentAndStudent($params);
+
+            /** @var DialogAgent\Model $assessment */
+            $assessment = $tuple['assessment'];
+
+            /** @var User $student */
+            $student = $tuple['student'];
+
+            /* Ensure that the provided $responseId actually belongs to the student
+             */
+            $participant = $assessment->getParticipantIfExtant($student);
+
+            /* This person has been excluded from the assessment or is no longer participating
+             */
+            if (null === $participant) {
+                throw new NotFound();
+            }
+
+            /* Explore $participant's responses to find an identifier that exists for them.
+             * If one doesn't exist, they're requesting someone else's response id
+             */
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
+            $response = $participant->getAllResponses()->getBy('id', $params['responseId']);
+
+            /* responseId doesn't belong to the participant (or maybe wasn't hydrated properly)
+             */
+            if (null === $response) {
+                throw new NotFound();
+            }
+
+            /* You can't request assistance on a non-authoritative response: you're not doing that one anymore
+             */
+            if (!$response->getAuthoritative()) {
+                throw new NotFound();
+            }
+
+            /* Add this response to the tuple we previously obtained and return that:
+             * a matching response exists for this person
+             */
+            $tuple['response'] = $response;
+
+            return $tuple;
+        };
+
         /* Shortcuts to Authorization Rule constructs
          */
         $isSuper = $this->getAuthRule('isSuperuser');
@@ -87,8 +138,8 @@ class Module extends BaseModule
 
         /* Create a dialog agent's configuration
          */
-        $this->register('GET', "/{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
-        $this->register('POST', "/{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
+        $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
         /* Resume a response
          */
@@ -100,7 +151,7 @@ class Module extends BaseModule
 
         /* Student requests assistance for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/assistance", 'postAssistanceRequest', $canSubmit, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{responseId:\d+}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
          */
