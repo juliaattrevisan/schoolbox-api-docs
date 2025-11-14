@@ -325,7 +325,11 @@ class Controller extends Base
 
             $this->mapper->save($model);
 
-            $this->response = $this->responseEmpty(200);
+            $this->response = $this->responseAsJson(
+                [
+                    "id" => $model->getId(),
+                ]
+            )->withStatus(200);
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
         }
