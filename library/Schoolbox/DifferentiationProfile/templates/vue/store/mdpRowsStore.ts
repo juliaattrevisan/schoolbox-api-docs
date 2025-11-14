@@ -3,10 +3,12 @@
  */
 
 import { defineStore } from "pinia";
+import type { User } from "@schoolboxLibrary/types/User";
 import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import { ON_FILTER_CHANGE } from "../../js/MDPEvents";
+import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useLoadData } from "../composable/useLoadData";
 
 export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
@@ -67,6 +69,33 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
         url.value = newUrl.toString();
     }
 
+    /**
+     * Get the row for the given student
+     * @param student - the student to get the row for
+     */
+    function getRow(student: User): Profile | undefined {
+        if (payload.value === null || payload.value.data.profiles.length === 0) {
+            return undefined;
+        }
+        return payload.value.data.profiles.find((profile) => profile.student.id === student.id) || undefined;
+    }
+
+    /**
+     * Update the row for the given student
+     * @param student
+     * @param row
+     * @returns
+     */
+    function setRow(student: User, row: Profile): void {
+        if (payload.value === null || payload.value.data.profiles.length === 0) {
+            return;
+        }
+        const index = payload.value.data.profiles.findIndex((profile) => profile.student.id === student.id);
+        if (index !== -1) {
+            payload.value.data.profiles[index] = row;
+        }
+    }
+
     return {
         url,
         limit,
@@ -78,5 +107,7 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
         loadError,
         init,
         onPaginate,
+        getRow,
+        setRow,
     };
 });
