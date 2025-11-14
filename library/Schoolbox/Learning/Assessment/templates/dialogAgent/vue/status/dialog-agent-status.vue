@@ -74,9 +74,9 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                     <thead>
                         <tr>
                             <th class="u-sticky-left u-sticky-left--first"></th>
-                            <th class="u-sticky-left u-sticky-left--offset-1">Status</th>
+                            <th class="u-sticky-left u-sticky-left--offset-1 u-border-right">Status</th>
                             <th v-for="field in props.criteria" :key="field.id" class="field-col">{{ field.title }}</th>
-                            <th class="u-sticky-right">Actions</th>
+                            <th class="u-sticky-right u-border-left">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -89,7 +89,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                                     </user-link>
                                 </div>
                             </td>
-                            <td class="u-sticky-left u-sticky-left--offset-1">
+                            <td class="u-sticky-left u-sticky-left--offset-1 u-border-right">
                                 <component
                                     :is="participant._routes.view ? 'a' : 'span'"
                                     :href="participant._routes.view || undefined"
@@ -102,7 +102,7 @@ function getProgressTickTitle(participant: Props["participants"][number]): strin
                             <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">
                                 {{ participant.feedback[field.id] || "" }}
                             </td>
-                            <td class="u-sticky-right actions-small-1">
+                            <td class="u-sticky-right u-border-left actions-small-1">
                                 <nav>
                                     <sbx-pop-out
                                         :content-id="`response-options-${participant.user.id}`"
