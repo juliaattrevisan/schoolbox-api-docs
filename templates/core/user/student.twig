@@ -391,6 +391,10 @@
                                 getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
                                     'learningBadgeAward.getSetAsGoalForSelfForm'
                                 ) }}',
+                                getAwardAsAchievementForm: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getAwardAsAchievementForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
                                 getFeed: '{{ routeLookupIfAuthorized(
                                     'learningMomentFeed.getFeedForUser',
                                     {user: user, userId: user.id}
