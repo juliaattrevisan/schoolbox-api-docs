@@ -389,6 +389,15 @@ class Controller extends Assessment\Controller
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
 
+        /**
+         * If there is an existing unsubmitted response and resume it if there is one,
+         * otherwise create a new response
+         * @var ResponseModel|null $existingResponse
+         */
+        $existingResponse = $participant?->findMostRecentDraftResponse();
+
+        // TODO: i'll likely need this to create a blank response here if one doesn't exist already but TBC in the chat ticket
+
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
@@ -398,7 +407,7 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'student' => $student,
             'participant' => $participant,
-            'existingResponse' => null,
+            'existingResponse' => $existingResponse,
             'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
@@ -424,6 +433,9 @@ class Controller extends Assessment\Controller
      */
     public function getResumeResponse(IAssessable $assessment, User $student): void
     {
+        // TODO: i'm not too sure how actually necessary this is, getCreateResponseForm should be enough??
+        // when would you ever want two draft responses and to be able to resume either one...
+
         /** @var null|Participant $participant */
         $participant = $assessment->getParticipantIfExtant($student);
 
@@ -514,22 +526,54 @@ class Controller extends Assessment\Controller
             if (null === $response) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
             }
+
+            // TODO: you shouldn't be able to edit a submitted response, but I think this would let you at the moment
         } else {
+            // TODO: this would allow for multiple draft responses, which is probably not what we want
+            // instead, perhaps it should validate that the response you *should* be editing is the one you're actually editing?
+            // i.e. the same logic as getCreateResponseForm's existingResponse lookup, as theoretically you should never have two drafts
+
             $response = $this->dialogAgentResponseMapper->createModel()
                 ->setSubmittedOnBehalfOf($student)
+                ->setCreatedBy($this->getUser()->getId())
                 ->setCreatedAt(\Alaress_Date_Format::now());
+        }
+
+        /** @var null|Participant $participant */
+        $participant = $assessment->getParticipantIfExtant($student);
+
+        /* If this is the only response for this participant, make it authoritative
+         * otherwise you end up with draft responses but none are counted as the one that matters
+         * and places such as the status page will assume that there isn't any response in progress
+         */
+        $otherResponses = $participant->getAllResponses()->filter(fn($resp) => $resp->getId() !== $response->getId());
+        if ($otherResponses->count() === 0) {
+            $response->setAuthoritative(true);
         }
 
         /* TODO populate with whatever snake did
          */
         $response->setAssessable($assessment)
+            ->setUpdatedBy($this->getUser()->getId())
             ->setUpdatedAt(\Alaress_Date_Format::now());
+
+        // TODO TEMPORARY, the session ID should actually be delt with only by the backend since it should be able to track it by the response ID
+        // When we recieve a request to send a message, it needs to:
+        // - find the response by ID (unless it's already done by the module, or we're just using this endpoint)
+        // - if there is no session ID yet, create one and store it against the response BUT DON'T SAVE YET, a foreign key constraint will fail if the AI log doesn't have that ID yet...
+        // - send the message to the AI and log against the session ID
+        // - once the AI has responded, save the response. This is also where you'll probably change "startedAt" and update updatedAt again I guess, also dealing with duration somehow before all this
+        $response->setSessionId($this->requestPost->get('sessionId'));
 
         $this->dialogAgentResponseMapper->save($response);
 
         /* TODO this probably isn't tne nicest way to generate a redirected url
          *  There *has* to be a cleaner way than this, esp. since returnUrl is a const in the Redirect
          *  class itself, but is magically being written here.
+         *
+         * Also if this is intended as final submission, we'd need to mark it as submitted.
+         * However, I most expect this will be both for messaging the AI (i.e. each message you send) as well as final submission
+         * Hence, it probably doesn't even need to redirect (or shouldn't) until final submission, or let the frontend deal with that?
          */
         $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
@@ -641,23 +685,23 @@ class Controller extends Assessment\Controller
 
             /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
              */
-            // if ($authoritativeResponse !== null) { // also maybe if it's been submitted?
-            $tempFeedback = [
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
-                'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
-                'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
-                'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
-                'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
-                'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
-            ];
+            if ($authoritativeResponse !== null && null !== $authoritativeResponse->getSubmittedAt()) { // also maybe if it's been submitted?
+                $tempFeedback = [
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
+                    'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
+                    'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
+                    'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
+                    'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
+                    'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
+                ];
 
-            foreach ($scenario->getCriteria() as $criterion) {
-                shuffle($tempFeedback);
-                $selected = array_slice($tempFeedback, 0, rand(0, count($tempFeedback)));
-                $feedback->{$criterion->getId()} = join(' ', $selected);
+                foreach ($scenario->getCriteria() as $criterion) {
+                    shuffle($tempFeedback);
+                    $start = rand(0, 5);
+                    $selected = array_slice($tempFeedback, $start, $start + rand(0, 5 - $start));
+                    $feedback->{$criterion->getId()} = join(' ', $selected);
+                }
             }
-            // }
-
 
             $routeParams = [
                 'assessment'   => $assessment,

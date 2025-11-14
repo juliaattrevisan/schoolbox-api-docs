@@ -136,6 +136,7 @@ class Model extends AbstractAssessment
         }
 
         /* TODO Maybe something about activity duration should be in here...?
+         * I think so... also whether you can create a new response depending on existing responses
          */
 
         return true;

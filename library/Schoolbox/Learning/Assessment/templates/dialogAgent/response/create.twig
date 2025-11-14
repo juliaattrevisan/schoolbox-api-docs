@@ -26,6 +26,26 @@
             {% else %}
                 start it!
             {% endif %}
+
+            <form method="post" action="{{ routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
+                assessmentId: assessment.id,
+                assessment: assessment,
+                studentId: student.id,
+                student: student
+            }) }}">
+                {% if existingResponse %}
+                    <label for="responseId">Response ID</label>
+                    <input name="responseId" value="{{ existingResponse.id }}" />
+
+                    <label for="sessionId">AI Session ID</label>
+                    <p class="meta">NOTE: This is temporary and does nothing right now, the frontend won't define this in the future</p>
+                    <input name="sessionId" value="{{ existingResponse.sessionId }}" />
+                {% endif %}
+
+                <button type="submit" class="button primary">
+                    Submit Response
+                </button>
+            </form>
         </section>
     </div>
 </div>
