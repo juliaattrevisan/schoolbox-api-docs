@@ -595,7 +595,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         ';
 
         if ($excludeResourceBookings) {
-            $query .= ' AND resource_booking.id IS NULL ';
+            $query .= " AND event.source = 'calendar' ";
         }
 
         $statement = $this->database->prepare($query);
