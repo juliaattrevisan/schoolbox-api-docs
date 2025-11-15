@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import locale from "@js/terminology/rosettaStone";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
 export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
@@ -34,7 +35,7 @@ export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
             }
-            toast.timeout({ text: "Differentiation profiles successfully updated" });
+            toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
             loadError.value = errorMessage;
