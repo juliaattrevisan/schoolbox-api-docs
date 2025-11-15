@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
- * The component for the action buttons for a textbox cell
+ * The component for the action buttons for a text cell
  */
-import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     profile: Profile;
-    headerKey: ProfileTextKeys;
+    headerKey: ProfileKeys;
     hasChanged: boolean;
     isSaving: boolean;
     isFocused: boolean;

@@ -15,7 +15,8 @@ import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRe
 import type {
     MDPHeader,
     AdjustmentType,
-    AdjustmentText,
+    ProfileAdjustmentKeys,
+    ProfileTextKeys,
     Payload,
     Profile,
 } from "../js/types/manageDifferentiationProfilesTypes";
@@ -91,7 +92,9 @@ function onLinkedRecordsSelected(profile: Profile): void {
             </template>
             <template #Adjustment="{ row, header: columnHeader }">
                 <mdp-grid-cell-adjustment
-                    :adjustment="row[columnHeader.key] as AdjustmentType[]"
+                    :profile="row as Profile"
+                    :header-key="columnHeader.key as ProfileAdjustmentKeys"
+                    :adjustments="row[columnHeader.key] as number[]"
                     :options="
                         columnHeader.key === 'adjustment_category' ? props.adjustmentCategories : props.adjustmentLevels
                     "
@@ -100,8 +103,8 @@ function onLinkedRecordsSelected(profile: Profile): void {
             <template #Text="{ row, header: columnHeader }">
                 <mdp-grid-cell-text
                     :profile="row as Profile"
-                    :text="row[columnHeader.key] as AdjustmentText | null"
-                    :header-key="columnHeader.key"
+                    :header-key="columnHeader.key as ProfileTextKeys"
+                    :text="row[columnHeader.key] as string | null"
                 />
             </template>
             <template #Date="{ row, header: columnHeader }">

@@ -9,19 +9,18 @@ import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
-import type { AdjustmentText, Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useMdpSaveStore } from "../store/mdpSaveStore";
-import MdpGridCellTextAction from "./mdp-grid-cell-text-action.vue";
+import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 
 const props = defineProps<{
     profile: Profile;
-    text: AdjustmentText;
     headerKey: ProfileTextKeys;
+    text: string | null;
 }>();
 
 const mdpSaveStore = useMdpSaveStore();
-
-const currentText = window.Vue.ref<AdjustmentText>(props.text);
+const currentText = window.Vue.ref<string | null>(props.text);
 const initialTextboxContent: string = currentText.value ?? "";
 const editorContent = window.Vue.ref(initialTextboxContent);
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
@@ -112,6 +111,16 @@ async function focusEditor(): Promise<void> {
 }
 
 /**
+ * When the modify button is clicked.
+ */
+function onContainerSelected(): void {
+    if (currentText.value === null) {
+        return;
+    }
+    void focusEditor();
+}
+
+/**
  * When the add text button is clicked.
  */
 function onAdd(): void {
@@ -122,9 +131,6 @@ function onAdd(): void {
  * When the modify button is clicked.
  */
 function onModify(): void {
-    if (currentText.value === null) {
-        return;
-    }
     void focusEditor();
 }
 
@@ -140,7 +146,7 @@ function onSave(): void {
 </script>
 
 <template>
-    <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onModify">
+    <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onContainerSelected">
         <empty-state v-if="currentText === null" icon="icon-textbox">
             <button @click.prevent="onAdd">Add content to this text area</button>
         </empty-state>
@@ -155,7 +161,7 @@ function onSave(): void {
             <div class="clearfix"></div>
         </div>
     </div>
-    <mdp-grid-cell-text-action
+    <mdp-grid-cell-action
         :profile="props.profile"
         :header-key="props.headerKey"
         :has-changed="hasChanged"
