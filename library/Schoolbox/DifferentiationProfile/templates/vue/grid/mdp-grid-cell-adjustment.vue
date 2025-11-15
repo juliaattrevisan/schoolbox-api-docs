@@ -16,19 +16,18 @@ const props = defineProps<{
 }>();
 
 const mdpSaveStore = useMdpSaveStore();
-// const hasChanged = window.Vue.computed(() => {
-//     return currentText.value !== props.text;
-// });
-const hasChanged = window.Vue.ref(false);
+const selectedAdjustments = window.Vue.ref<number[]>(props.adjustments ?? []);
+const hasChanged = window.Vue.computed(() => {
+    return selectedAdjustments.value.join(",") !== (props.adjustments ?? []).join(",");
+});
 const isSaving = window.Vue.ref(false);
 const isFocused = window.Vue.ref(false);
-const selectedAdjustments = window.Vue.ref<number[]>(props.adjustments ?? []);
 
 /**
  * When the add adjustment button is clicked.
  */
 function onAdd(): void {
-    // open modal
+    isFocused.value = true;
 }
 
 /**
@@ -41,18 +40,21 @@ function onModify(): void {
 /**
  * When the save button is clicked.
  */
-function onSave(): void {
+async function onSave(): Promise<void> {
+    isSaving.value = true;
     const { profile } = props;
-    profile[props.headerKey] = selectedAdjustments.value;
-    void mdpSaveStore.save(profile);
+    profile[props.headerKey] = selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null;
+    await mdpSaveStore.save(profile);
+    isFocused.value = false;
+    isSaving.value = false;
 }
 </script>
 
 <template>
     <div>
         <div v-if="isFocused">
-            <fieldset class="checklist">
-                <legend>Adjustments</legend>
+            <div class="checklist l-pad-s">
+                <legend class="t-visually-hidden">Adjustments for {{ props.profile.student.givenName }}</legend>
                 <ul class="option-list">
                     <li v-for="option in options" :key="option.id">
                         <input
@@ -65,7 +67,7 @@ function onSave(): void {
                         }}</label>
                     </li>
                 </ul>
-            </fieldset>
+            </div>
         </div>
         <empty-state v-else-if="adjustments === null" icon="icon-list">
             <button @click.prevent="onAdd">Add adjustment</button>
