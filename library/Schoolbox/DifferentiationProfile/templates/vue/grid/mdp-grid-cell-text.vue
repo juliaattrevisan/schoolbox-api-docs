@@ -114,21 +114,24 @@ async function focusEditor(): Promise<void> {
 /**
  * When the add text button is clicked.
  */
-function onAddText(): void {
+function onAdd(): void {
     void focusEditor();
 }
 
 /**
  * When the modify button is clicked.
  */
-function onModifySelected(): void {
+function onModify(): void {
+    if (currentText.value === null) {
+        return;
+    }
     void focusEditor();
 }
 
 /**
  * When the save button is clicked.
  */
-function onSaveSelected(): void {
+function onSave(): void {
     if (!editorCreated.value) return;
     const { profile } = props;
     profile[props.headerKey] = currentText.value;
@@ -137,9 +140,9 @@ function onSaveSelected(): void {
 </script>
 
 <template>
-    <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onModifySelected">
+    <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onModify">
         <empty-state v-if="currentText === null" icon="icon-textbox">
-            <button @click.prevent="onAddText">Add content to this text area</button>
+            <button @click.prevent="onAdd">Add content to this text area</button>
         </empty-state>
         <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
             <media-article
@@ -158,8 +161,8 @@ function onSaveSelected(): void {
         :has-changed="hasChanged"
         :is-saving="isSaving"
         :is-focused="isFocused"
-        @modify="onModifySelected"
-        @save="onSaveSelected"
+        @modify="onModify"
+        @save="onSave"
     />
 </template>
 

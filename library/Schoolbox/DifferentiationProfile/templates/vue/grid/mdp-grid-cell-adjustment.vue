@@ -3,7 +3,7 @@
  * Display adjustment levels, either Adjustment Category or Adjustment Level
  */
 
-import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { AdjustmentType } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
@@ -11,18 +11,46 @@ const props = defineProps<{
     options: AdjustmentType[];
 }>();
 
-const selected = window.Vue.ref<AdjustmentType[]>([]);
+/**
+ * When the add adjustment button is clicked.
+ */
+function onAdd(): void {
+    // open modal
+}
+
+/**
+ * When the modify button is clicked.
+ */
+function onModify(): void {
+    // open modal
+}
 </script>
 
 <template>
-    <div class="l-pad-s">
-        <search-select
-            v-model:selected="selected"
-            :default-results="props.options"
-            :show-input="false"
-            :is-single-select="false"
-        />
+    <div>
+        <empty-state v-if="adjustment === null" icon="icon-list">
+            <button @click.prevent="onAdd">Add adjustment</button>
+        </empty-state>
+        <!-- <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
+            <media-article
+                :id="editorId"
+                ref="editorContentEl"
+                tag="div"
+                class="editor-content"
+                :content="initialTextboxContent"
+            ></media-article>
+            <div class="clearfix"></div>
+        </div> -->
     </div>
+    <!-- <mdp-grid-cell-text-action
+        :profile="props.profile"
+        :header-key="props.headerKey"
+        :has-changed="hasChanged"
+        :is-saving="isSaving"
+        :is-focused="isFocused"
+        @modify="onModify"
+        @save="onSaveSelected"
+    /> -->
 </template>
 
 <style scoped></style>
