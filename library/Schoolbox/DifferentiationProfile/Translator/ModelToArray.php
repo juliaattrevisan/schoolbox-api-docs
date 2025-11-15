@@ -75,7 +75,20 @@ class ModelToArray
          */
         $config = $this->profileConfig->reduce(function (array $carry, Config $config) use ($model, $configKey) {
             if (array_key_exists($config->getName(), $configKey)) {
-                $carry[$config->getName()] = $model->{$configKey[$config->getName()]}();
+                $value = $model->{$configKey[$config->getName()]}();
+
+                // Convert comma-delimited strings to arrays for adjustment fields
+                if (in_array($config->getName(), ['adjustment_category', 'adjustment_level'])) {
+                    if ($value === null) {
+                        $carry[$config->getName()] = null;
+                    } elseif (empty($value)) {
+                        $carry[$config->getName()] = [];
+                    } else {
+                        $carry[$config->getName()] = array_map('intval', explode(',', $value));
+                    }
+                } else {
+                    $carry[$config->getName()] = $value;
+                }
             }
             return $carry;
         }, []);
