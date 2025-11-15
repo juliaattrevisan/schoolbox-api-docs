@@ -108,7 +108,7 @@ function onLinkedRecordsSelected(profile: Profile): void {
                 />
             </template>
             <template #Date="{ row, header: columnHeader }">
-                <div class="date-cell">
+                <div class="l-pad-s">
                     <!-- Custom date display -->
                     {{ row[columnHeader.key] ? new Date(row[columnHeader.key] as string).toLocaleDateString() : "" }}
                 </div>
