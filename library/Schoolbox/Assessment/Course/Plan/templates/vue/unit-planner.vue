@@ -4,6 +4,7 @@
  */
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
+import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
 import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
@@ -14,7 +15,6 @@ import UpAddUnitsModal from "./up-add-units-modal.vue";
 import UpDeleteUnitModal from "./up-delete-unit-modal.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
-import UpUnitCellTextboxContentPlaceholder from "./up-unit-cell-textbox-content-placeholder.vue";
 import UpCurriculum from "./up-curriculum.vue";
 import ActivitiesListDeleteModal from "./activities-list/activities-list-delete-modal.vue";
 
@@ -156,9 +156,7 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <up-unit-cell-textbox-content-placeholder
-        v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)"
-    />
+    <dummy-inline-editor v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)" />
     <up-header
         :course-title="props.courseTitle"
         :course-id="store.courseId"

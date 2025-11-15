@@ -137,7 +137,7 @@ function onSaveSelected(): void {
 </script>
 
 <template>
-    <div>
+    <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onModifySelected">
         <empty-state v-if="currentText === null" icon="icon-textbox">
             <button @click.prevent="onAddText">Add content to this text area</button>
         </empty-state>
@@ -168,6 +168,7 @@ function onSaveSelected(): void {
     padding-bottom: 2px;
     z-index: var(--sbx-depth-default);
 }
+
 .editor-content {
     border: 0 !important;
     padding: 8px !important;

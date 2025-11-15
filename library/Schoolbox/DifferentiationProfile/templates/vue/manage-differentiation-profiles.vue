@@ -9,6 +9,7 @@ import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
+import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
 import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type {
@@ -121,6 +122,7 @@ function onLinkedRecordsSelected(profile: Profile): void {
         />
     </template>
     <pastoral-records-modal v-model:url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
+    <dummy-inline-editor />
 </template>
 
 <style scoped></style>
