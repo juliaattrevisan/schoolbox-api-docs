@@ -1,4 +1,4 @@
-import type { User } from "@schoolboxLibrary/types/User";
+import type { UserCC } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { Nested } from "@js/util/queryUtils";
 
@@ -8,7 +8,7 @@ import type { Nested } from "@js/util/queryUtils";
 export type MDPHeader = {
     id: number;
     key: string;
-    type: string;
+    type: HeaderType;
     name: string;
     module: string;
     title: string;
@@ -60,7 +60,7 @@ export type AdjustmentText = string | null;
  */
 export type Profile = {
     id: number | null;
-    student: User;
+    student: UserCC;
     adjustment_category: number[] | null;
     adjustment_level: number[] | null;
     overview: string | null;

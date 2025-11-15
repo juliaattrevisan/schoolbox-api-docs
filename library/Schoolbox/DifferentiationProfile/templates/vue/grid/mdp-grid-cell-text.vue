@@ -34,7 +34,6 @@ const hasChanged = window.Vue.computed(() => {
 });
 const isSaving = window.Vue.ref(false);
 const isFocused = window.Vue.ref(false);
-// const textboxStore = useUnitPlannerTextboxStore();
 let editor: InlineEditor;
 
 /**
@@ -145,10 +144,13 @@ function onSave(): void {
     profile[props.headerKey] = currentText.value;
     void mdpSaveStore.save(profile);
 }
+
+const currentCursor = window.Vue.computed(() => (currentText !== null ? "text" : "default"));
+const currentHeight = window.Vue.computed(() => `${250}px`);
 </script>
 
 <template>
-    <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onContainerSelected">
+    <div class="cell-container" @click="onContainerSelected">
         <empty-state v-if="currentText === null" icon="icon-textbox">
             <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
         </empty-state>
@@ -174,12 +176,20 @@ function onSave(): void {
     />
 </template>
 
-<style>
+<style scoped>
+.cell-container {
+    cursor: v-bind(currentCursor);
+    display: flex;
+    height: v-bind(currentHeight);
+}
+
 .editor-wrapper {
     padding-bottom: 2px;
     z-index: var(--sbx-depth-default);
 }
+</style>
 
+<style>
 .editor-content {
     border: 0 !important;
     padding: 8px !important;
