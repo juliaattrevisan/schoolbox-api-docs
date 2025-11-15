@@ -145,12 +145,15 @@ function onSave(): void {
     void mdpSaveStore.save(profile);
 }
 
-const currentCursor = window.Vue.computed(() => (currentText !== null ? "text" : "default"));
 const currentHeight = window.Vue.computed(() => `${250}px`);
 </script>
 
 <template>
-    <div class="cell-container" @click="onContainerSelected">
+    <div
+        class="l-flex"
+        :style="{ cursor: currentText !== null ? 'text' : 'default', height: currentHeight }"
+        @click="onContainerSelected"
+    >
         <empty-state v-if="currentText === null" icon="icon-textbox">
             <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
         </empty-state>
@@ -176,20 +179,13 @@ const currentHeight = window.Vue.computed(() => `${250}px`);
     />
 </template>
 
-<style scoped>
-.cell-container {
-    cursor: v-bind(currentCursor);
-    display: flex;
-    height: v-bind(currentHeight);
-}
-
+<style>
 .editor-wrapper {
     padding-bottom: 2px;
+    width: 100%;
     z-index: var(--sbx-depth-default);
 }
-</style>
 
-<style>
 .editor-content {
     border: 0 !important;
     padding: 8px !important;

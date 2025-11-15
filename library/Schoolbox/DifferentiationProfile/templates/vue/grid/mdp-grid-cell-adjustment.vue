@@ -55,7 +55,7 @@ const currentHeight = window.Vue.computed(() => `${250}px`);
 </script>
 
 <template>
-    <div class="cell-container">
+    <div class="l-flex" :style="{ height: currentHeight }">
         <div v-if="isFocused">
             <div class="checklist l-pad-s">
                 <legend class="t-visually-hidden">
@@ -98,9 +98,4 @@ const currentHeight = window.Vue.computed(() => `${250}px`);
     />
 </template>
 
-<style scoped>
-.cell-container {
-    display: flex;
-    height: v-bind(currentHeight);
-}
-</style>
+<style scoped></style>
