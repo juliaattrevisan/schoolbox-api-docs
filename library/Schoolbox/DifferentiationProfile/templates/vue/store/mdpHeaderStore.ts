@@ -48,8 +48,19 @@ export const useMdpHeaderStore = defineStore(`mdpHeaderStore`, () => {
         ];
     }
 
+    /**
+     * Return the title for a given key
+     * @param key - the key to find
+     * @returns the title or null if not found
+     */
+    function getTitleByKey(key: string): string | null {
+        const found = header.value.find((h) => h.key === key);
+        return found ? found.title : null;
+    }
+
     return {
         header,
         init,
+        getTitleByKey,
     };
 });

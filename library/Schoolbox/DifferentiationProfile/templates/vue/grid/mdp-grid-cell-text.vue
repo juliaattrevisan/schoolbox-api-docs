@@ -10,6 +10,7 @@ import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import { useMdpHeaderStore } from "../store/mdpHeaderStore";
 import { useMdpSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 
@@ -19,6 +20,7 @@ const props = defineProps<{
     text: string | null;
 }>();
 
+const mdpHeaderStore = useMdpHeaderStore();
 const mdpSaveStore = useMdpSaveStore();
 const currentText = window.Vue.ref<string | null>(props.text);
 const initialTextboxContent: string = currentText.value ?? "";
@@ -148,7 +150,7 @@ function onSave(): void {
 <template>
     <div :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onContainerSelected">
         <empty-state v-if="currentText === null" icon="icon-textbox">
-            <button @click.prevent="onAdd">Add content to this text area</button>
+            <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
         </empty-state>
         <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
             <media-article

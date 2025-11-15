@@ -5,6 +5,7 @@
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { Profile, ProfileAdjustmentKeys, AdjustmentType } from "../../js/types/manageDifferentiationProfilesTypes";
+import { useMdpHeaderStore } from "../store/mdpHeaderStore";
 import { useMdpSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 
@@ -15,6 +16,7 @@ const props = defineProps<{
     options: AdjustmentType[];
 }>();
 
+const mdpHeaderStore = useMdpHeaderStore();
 const mdpSaveStore = useMdpSaveStore();
 const selectedAdjustments = window.Vue.ref<number[]>(props.adjustments ?? []);
 const hasChanged = window.Vue.computed(() => {
@@ -54,7 +56,10 @@ async function onSave(): Promise<void> {
     <div>
         <div v-if="isFocused">
             <div class="checklist l-pad-s">
-                <legend class="t-visually-hidden">Adjustments for {{ props.profile.student.givenName }}</legend>
+                <legend class="t-visually-hidden">
+                    {{ mdpHeaderStore.getTitleByKey(props.headerKey) }} for {{ props.profile.student.givenName }}
+                    {{ props.profile.student.lastName }}
+                </legend>
                 <ul class="option-list">
                     <li v-for="option in options" :key="option.id">
                         <input
@@ -70,7 +75,7 @@ async function onSave(): Promise<void> {
             </div>
         </div>
         <empty-state v-else-if="adjustments === null" icon="icon-list">
-            <button @click.prevent="onAdd">Add adjustment</button>
+            <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
         </empty-state>
         <div v-else class="l-pad-s">
             <ul>
