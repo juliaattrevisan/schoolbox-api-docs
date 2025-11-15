@@ -163,4 +163,20 @@ function onSaveSelected(): void {
     />
 </template>
 
-<style scoped></style>
+<style>
+.editor-wrapper {
+    padding-bottom: 2px;
+    z-index: var(--sbx-depth-default);
+}
+.editor-content {
+    border: 0 !important;
+    padding: 8px !important;
+    z-index: auto !important; /* so any content inside the editor sits within the cell and doesn't sit above the View more button */
+}
+
+/* Specificity to override the CKEditor border, we handle it in the parent vue component instead */
+.editor-content.ck.ck-content.ck-editor__editable.ck-focused,
+.ck.ck-editor__main .ck-source-editing-area textarea:focus {
+    border: 0 !important;
+}
+</style>
