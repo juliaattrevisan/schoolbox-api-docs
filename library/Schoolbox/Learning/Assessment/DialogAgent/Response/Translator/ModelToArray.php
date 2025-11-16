@@ -35,7 +35,6 @@ class ModelToArray
     {
         $status = (new Lookup\Status())->calculate($response);
 
-        // TODO: These routes also are possibly meant to pull in info from $status["actions"], but that should ideally occur in the module if possible
         $routes = $this->linkTranslator->__invoke($response);
 
         return [
@@ -43,7 +42,7 @@ class ModelToArray
             'status' => $status["status"],
             'assistanceRequestedAt' => $response->getAssistanceRequestedAt()?->toRfc3339String(),
             'submittedAt' => $response->getSubmittedAt()?->toRfc3339String(),
-            '_routes' => $routes
+            '_routes' => $routes,
         ];
     }
 }
