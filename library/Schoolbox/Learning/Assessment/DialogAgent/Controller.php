@@ -556,8 +556,7 @@ class Controller extends Assessment\Controller
                 ->setCreatedAt(\Alaress_Date_Format::now());
         }
 
-        /** @var null|Participant $participant */
-        $participant = $assessment->getParticipantIfExtant($student);
+        $participant = $assessment->getParticipant($student);
 
         /* If this is the only response for this participant, make it authoritative
          * otherwise you end up with draft responses but none are counted as the one that matters
