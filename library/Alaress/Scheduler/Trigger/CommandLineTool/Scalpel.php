@@ -136,8 +136,13 @@ DESCRIPTION
 
     Please ensure you do a dry run before you run the script as this is unrecoverable.
 
-    Note that at the time of creating a message trigger, the notification subsystem has not yet created the actual
-    message to be delivered. This means that the following information is as yet unknown:
+    Note that a message trigger contains the following:
+    * when a message should be sent
+    * who triggered the event for sending messages
+    * the object to which the message relates (in particular, its class and ID)
+
+    At the time of creating a message trigger, the message itself does not exist: this means that the following
+    information is as yet unknown:
     * the recipients of the message
     * any content of the message: e.g. its topic, href, title, body, etc.
     * the mechanism via which the message will be delivered
