@@ -123,6 +123,14 @@ DESCRIPTION
 
     Please ensure you do a dry run before you run the script as this is unrecoverable.
 
+    Note that at the time of creating a message trigger, the notification subsystem has not yet created the actual
+    message to be delivered. This means that the following information is as yet unknown:
+    * the recipients of the message
+    * any content of the message: e.g. its topic, href, title, body, etc.
+    * the mechanism via which the message will be delivered
+    * whether the message is an actual message to be sent, or a retraction of a message which has been scheduled for
+      delivery but not yet actually delivered
+
 OPTIONS
     -h, --help              Print this help text and exit
     -p                      perform: *without* this flag, this tool will only do a dry run, outputting what would be
@@ -132,9 +140,8 @@ OPTIONS
                             If not set, falls back to:
                             * the INSTANCE_ID environment variable
                             * the first instance defined for this system, if INSTANCE_ID is not set
-    --action={action}       If set, delete triggers with this action.
-                            Values differ between different notifiers, but will always match a value in table column
-                            `msg_source.key`.
+    --action={action}       If set, delete triggers which were triggered by this action.
+                            Should match one of the following: create, update, delete.
     --mapper={mapper}       If set, delete triggers whose event's mapper matches this class name.
     --model={model}         If set, delete triggers whose event's model matches this class name.
     --id={id}               If set, delete triggers whose event's ID matches this value.
@@ -149,7 +156,7 @@ OPTIONS
                             * a timestamp
                             * a relative date value understandable by `strtotime`
     -r                      If present, action, mapper and model will be matched as regular expressions.
-    --output-hash           If present, also output each msg's hash to stdout.
+    --output-hash           If present, also output each trigger's hash to stdout.
                             This can then be piped to other tools.
 
 HELP;
