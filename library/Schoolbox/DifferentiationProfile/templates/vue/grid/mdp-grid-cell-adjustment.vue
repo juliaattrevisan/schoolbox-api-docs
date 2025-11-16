@@ -55,7 +55,10 @@ const currentHeight = window.Vue.computed(() => `${250}px`);
 </script>
 
 <template>
-    <div class="l-flex" :style="{ height: currentHeight }">
+    <div
+        class="cell-container"
+        :style="{ height: currentHeight, border: isFocused ? '1px solid var(--form-border-color)' : 'none' }"
+    >
         <div v-if="isFocused">
             <div class="checklist l-pad-s">
                 <legend class="t-visually-hidden">
@@ -98,4 +101,9 @@ const currentHeight = window.Vue.computed(() => `${250}px`);
     />
 </template>
 
-<style scoped></style>
+<style scoped>
+.cell-container {
+    display: flex;
+    overflow-y: auto;
+}
+</style>
