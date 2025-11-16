@@ -681,15 +681,16 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
-        $aImpls = new \Schoolbox\GenericCollection(Model::class);
+        /** All implementations if $assessment is a spec, or $assessment itself if it's already one */
+        $implementations = new \Schoolbox\GenericCollection(Model::class);
 
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
-        if (!$assessment->isSpecification()) {
-            $aImpls->add($assessment);
+        if ($assessment->isImplementation()) {
+            $implementations->add($assessment);
         } else {
             foreach ($this->getUnitAssessments($assessment) as $unitAssessment) {
                 /** @var Model $unitAssessment */
-                $aImpls->add($unitAssessment);
+                $implementations->add($unitAssessment);
             }
         }
 
@@ -697,11 +698,11 @@ class Controller extends Assessment\Controller
         $responseLinksTranslator = new Response\Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
 
-        $aImplsPayload = [];
-        foreach ($aImpls as $aImpl) {
+        $assessmentsPayload = [];
+        foreach ($implementations as $implementation) {
             $participantPayload = [];
 
-            foreach ($aImpl->getAllParticipants() as $participant) {
+            foreach ($implementation->getAllParticipants() as $participant) {
                 /** @var Participant $participant */
 
                 /* Are they excluded? ignore them */
@@ -712,7 +713,7 @@ class Controller extends Assessment\Controller
                 $authoritativeResponse = null;
                 if ($participant->getAllResponses()->count()) {
                     /** @var ResponseModel|null $authoritativeResponse */
-                    $authoritativeResponse = $aImpl->getAuthoritativeResponse($participant, true);
+                    $authoritativeResponse = $implementation->getAuthoritativeResponse($participant, true);
                 }
 
 
@@ -740,8 +741,8 @@ class Controller extends Assessment\Controller
                 }
 
                 $routeParams = [
-                    'assessment'   => $aImpl,
-                    'assessmentId' => $aImpl->getId(),
+                    'assessment'   => $implementation,
+                    'assessmentId' => $implementation->getId(),
                     'student'      => $participant->getUser(),
                     'studentId'    => $participant->getUser()->getId(),
                 ];
@@ -758,11 +759,11 @@ class Controller extends Assessment\Controller
                 ];
             }
 
-            $aImplsPayload[] = [
-                'id' => $aImpl->getId(),
+            $assessmentsPayload[] = [
+                'id' => $implementation->getId(),
                 'folder' => [
-                    'id' => $aImpl->getBaseContext()->getFolder()->getId(),
-                    'title' => $aImpl->getBaseContext()->getFolder()->getTitle(),
+                    'id' => $implementation->getBaseContext()->getFolder()->getId(),
+                    'title' => $implementation->getBaseContext()->getFolder()->getTitle(),
                 ],
                 'participants' => $participantPayload,
             ];
@@ -781,7 +782,7 @@ class Controller extends Assessment\Controller
                     'id' => $criterion->getId(),
                     'title' => $criterion->getTitle(),
                 ]),
-                'aImpls' => $aImplsPayload,
+                'assessments' => $assessmentsPayload,
             ]
         );
     }

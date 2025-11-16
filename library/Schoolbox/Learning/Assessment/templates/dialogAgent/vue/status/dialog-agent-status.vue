@@ -9,7 +9,7 @@ import DasGrid from "./das-grid.vue";
 
 interface Props {
     criteria: DialogAgentScenarioCriteria[];
-    aImpls: {
+    assessments: {
         id: number;
         folder: {
             id: number;
@@ -40,12 +40,12 @@ function resetFilters(): void {
 
 /**
  * Toggle the collapsed state of an assessment implementation
- * @param aImplId The assessment implementation ID to toggle
+ * @param assessmentId The assessment implementation ID to toggle
  */
-function toggleCollapse(aImplId: number): void {
-    const index = collapsedImpls.value.indexOf(aImplId);
+function toggleCollapse(assessmentId: number): void {
+    const index = collapsedImpls.value.indexOf(assessmentId);
     if (index === -1) {
-        collapsedImpls.value.push(aImplId);
+        collapsedImpls.value.push(assessmentId);
     } else {
         collapsedImpls.value.splice(index, 1);
     }
@@ -74,23 +74,23 @@ function toggleCollapse(aImplId: number): void {
 
     <div id="dialog-agent-status-dropdown-container"></div>
     <!-- Grid for each implementation -->
-    <div v-for="aImpl in props.aImpls" :key="aImpl.id" class="component-container">
+    <div v-for="assessment in props.assessments" :key="assessment.id" class="component-container">
         <div v-if="props.isSpecification" class="row">
             <div class="small-12 columns">
                 <div class="component-titlebar">
                     <div class="actions-small-1">
                         <div class="list-item">
                             <h2>
-                                <a :href="`/homepage/${aImpl.folder.id}`">{{ aImpl.folder.title }}</a>
+                                <a :href="`/homepage/${assessment.folder.id}`">{{ assessment.folder.title }}</a>
                             </h2>
                         </div>
                         <nav>
                             <a
                                 href="#"
                                 class="collapse"
-                                :class="collapsedImpls.includes(aImpl.id) ? 'icon-down-arrow' : 'icon-up-arrow'"
+                                :class="collapsedImpls.includes(assessment.id) ? 'icon-down-arrow' : 'icon-up-arrow'"
                                 title="Expand/collapse content"
-                                @click="toggleCollapse(aImpl.id)"
+                                @click="toggleCollapse(assessment.id)"
                             ></a>
                         </nav>
                     </div>
@@ -98,11 +98,11 @@ function toggleCollapse(aImplId: number): void {
             </div>
         </div>
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-            <div v-show="!collapsedImpls.includes(aImpl.id)" class="row">
+            <div v-show="!collapsedImpls.includes(assessment.id)" class="row">
                 <div class="small-12 island">
                     <das-grid
                         :criteria="props.criteria"
-                        :participants="aImpl.participants"
+                        :participants="assessment.participants"
                         :filters="filters"
                         :participant-search-filter="participantSearchFilter"
                         @reset-filters="resetFilters"
@@ -111,7 +111,7 @@ function toggleCollapse(aImplId: number): void {
             </div>
         </Transition>
     </div>
-    <div v-if="props.aImpls.length === 0" class="empty-state">
+    <div v-if="props.assessments.length === 0" class="empty-state">
         <i class="icon-dialog-agent"></i>
         <p>This {{ locale.activity.singular() }} has no students participating.</p>
     </div>
