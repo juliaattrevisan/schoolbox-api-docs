@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 
 use Schoolbox\API\Translator\AbstractLinks;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 
 /**
  * Dialog Agent Response Links
@@ -39,10 +40,10 @@ class Links extends AbstractLinks
             'responseId'   => $response->getId(),
         ];
 
-        $translation['view'] = $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', $routeParamsResponse);
-        $translation['sobo'] = $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParamsResponse);
-        $translation['reopen'] = $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse);
-        $translation['resolved'] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse);
+        $translation[Status::ACTION_VIEW] = $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', $routeParamsResponse);
+        $translation[Status::ACTION_SOBO] = $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParamsResponse);
+        $translation[Status::ACTION_REOPEN] = $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse);
+        $translation[Status::ACTION_RESOLVE] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse);
 
         return $translation;
     }

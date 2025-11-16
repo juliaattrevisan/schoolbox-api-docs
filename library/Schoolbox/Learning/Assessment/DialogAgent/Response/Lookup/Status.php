@@ -16,6 +16,7 @@ class Status
 {
     /**
      * Consts correlating to available endpoints
+     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
      */
     public const string ACTION_VIEW = 'view';
     public const string ACTION_SOBO = 'sobo';

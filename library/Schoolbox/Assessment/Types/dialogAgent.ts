@@ -1,6 +1,18 @@
 import { ProgressTickClass } from "./progressTick";
 
 /**
+ * The possible actions that can be done on a response
+ * @see /library/Schoolbox/Learning/Assessment/DialogAgent/Response/Lookup/Status.php
+ */
+export enum DialogAgentResponseAction {
+    ACTION_VIEW = "view",
+    ACTION_SOBO = "sobo",
+    ACTION_REOPEN = "reopen",
+    ACTION_RESOLVE = "resolve",
+    ACTION_RESET = "reset", // reset is done per participant, not per response
+}
+
+/**
  * A representation of the current status a response should show as,
  * this usually correlates to what the progress tick should show alongside a given response
  * @see /library/Schoolbox/Learning/Assessment/DialogAgent/Response/Lookup/Status.php
