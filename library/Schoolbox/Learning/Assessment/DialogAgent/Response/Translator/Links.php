@@ -33,10 +33,10 @@ class Links extends AbstractLinks
         $routeParamsResponse = [
             'assessment'   => $assessment,
             'assessmentId' => $assessment->getId(),
-            'student'    => $response->getSubmittedOnBehalfOf(),
+            'student'      => $response->getSubmittedOnBehalfOf(),
             'studentId'    => $response->getSubmittedOnBehalfOf()->getId(),
-            'response'   => $response,
-            'responseId' => $response->getId(),
+            'response'     => $response,
+            'responseId'   => $response->getId(),
         ];
 
         $translation['view'] = $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', $routeParamsResponse);
