@@ -7,9 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Scheduler\Trigger;
+namespace Alaress\Scheduler\Trigger\CommandLineTool;
 
 use Alaress\Redis;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
@@ -20,7 +21,7 @@ use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
  * This script is used to remove message triggers from the system PERMANENTLY.
  * It will search the entire trigger message list and delete any records it matches.
  */
-class CommandLineTool extends CliTool\App
+class Scalpel extends CliTool\App
 {
     /**
      * Print help

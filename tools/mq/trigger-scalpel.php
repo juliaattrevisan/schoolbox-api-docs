@@ -6,14 +6,14 @@
  * @link      https://schoolbox.education/
  */
 
-use Alaress\Scheduler\Trigger\CommandLineTool;
+use Alaress\Scheduler\Trigger\CommandLineTool\Scalpel;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\Kernel;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Kernel(
-    new CommandLineTool(),
+    new Scalpel(),
     [
         CliKernelAbstract::OPTION_ERRORS => E_ALL,
         CliKernelAbstract::OPTION_LEVEL  => Monolog\Logger::INFO
