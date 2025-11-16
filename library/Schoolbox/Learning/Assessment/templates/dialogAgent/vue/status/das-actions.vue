@@ -70,13 +70,13 @@ async function onReopen(): Promise<void> {
  * When the user clicks on "Mark as assisted"
  */
 async function onMarkAsAssisted(): Promise<void> {
-    if (!props.participant.response?._routes.resolved) return;
+    if (!props.participant.response?._routes.resolve) return;
 
     const toastContext = `${props.participant.user.fullName} as assisted`;
     const toast = window.sbProps.toastActivate(`Marking ${toastContext}...`);
     const response = await apiRequest({
         method: "POST",
-        url: props.participant.response._routes.resolved,
+        url: props.participant.response._routes.resolve,
     });
 
     toast.timeout({
@@ -112,7 +112,7 @@ async function onMarkAsAssisted(): Promise<void> {
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
-    <li v-if="props.participant.response?._routes.resolved">
+    <li v-if="props.participant.response?._routes.resolve">
         <button class="icon-medical" @click="onMarkAsAssisted">
             {{ `Mark as assisted` }}
         </button>
