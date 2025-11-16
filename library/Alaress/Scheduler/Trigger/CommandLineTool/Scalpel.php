@@ -14,6 +14,7 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
+use Schoolbox\User;
 
 /**
  * Command-line tool for searching and removing trigger messages.
@@ -40,6 +41,11 @@ class Scalpel extends CliTool\App
     private const OPT_LONG_INSTANCE_ID = 'instance-id:';
 
     /**
+     * --effector={effector}: match triggers created by this user ID
+     */
+    private const OPT_LONG_EFFECTOR = 'effector:';
+
+    /**
      * --action={action}: match triggers with this action
      */
     private const OPT_LONG_ACTION = 'action:';
@@ -55,9 +61,14 @@ class Scalpel extends CliTool\App
     private const OPT_LONG_MODEL = 'model:';
 
     /**
-     * --id={id}: match triggers with this ID
+     * --id={id}: match triggers whose model has this ID
      */
     private const OPT_LONG_ID = 'id:';
+
+    /**
+     * --label={label}: match triggers with this label
+     */
+    private const OPT_LONG_LABEL = 'label:';
 
     /**
      * --start={date}: only match triggers scheduled after this date
@@ -93,10 +104,12 @@ class Scalpel extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_INSTANCE_ID,
+            self::OPT_LONG_EFFECTOR,
             self::OPT_LONG_ACTION,
             self::OPT_LONG_MAPPER,
             self::OPT_LONG_MODEL,
             self::OPT_LONG_ID,
+            self::OPT_LONG_LABEL,
             self::OPT_LONG_START,
             self::OPT_LONG_END,
             self::OPT_LONG_OUTPUT_HASH,
@@ -140,11 +153,15 @@ OPTIONS
                             If not set, falls back to:
                             * the INSTANCE_ID environment variable
                             * the first instance defined for this system, if INSTANCE_ID is not set
+    --effector={effector}   If set, delete triggers which were triggered by a user with this ID.
     --action={action}       If set, delete triggers which were triggered by this action.
                             Should match one of the following: create, update, delete.
     --mapper={mapper}       If set, delete triggers whose event's mapper matches this class name.
     --model={model}         If set, delete triggers whose event's model matches this class name.
     --id={id}               If set, delete triggers whose event's ID matches this value.
+    --label={label}         If set, delete triggers with this label.
+                            Values differ dependent on notifiers, but will always match a value in table column
+                            `msg_namespace.slug`.
     --start={date}          Only triggers scheduled after this date will be matched.
                             If provided, must be supplied as one of:
                             * a "YYYY-MM-DD HH:MM:SS" date
@@ -173,7 +190,7 @@ HELP;
         }
 
         $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID) ?: INSTANCE_ID;
-        $regexMode = (bool)$this->getOpt(self::OPT_SHORT_REGEX);
+        $regexMode  = (bool)$this->getOpt(self::OPT_SHORT_REGEX);
         $outputHash = (bool)$this->getOpt(self::OPT_LONG_OUTPUT_HASH);
 
         // Get Redis instance
@@ -260,6 +277,10 @@ HELP;
     {
         $criteria = [];
 
+        if ($effector = $this->getOpt(self::OPT_LONG_EFFECTOR)) {
+            $criteria['effector'] = $effector;
+        }
+
         if ($action = $this->getOpt(self::OPT_LONG_ACTION)) {
             $criteria['action'] = $action;
         }
@@ -274,6 +295,10 @@ HELP;
 
         if ($id = $this->getOpt(self::OPT_LONG_ID)) {
             $criteria['id'] = $id;
+        }
+
+        if ($label = $this->getOpt(self::OPT_LONG_LABEL)) {
+            $criteria['label'] = $label;
         }
 
         if ($start = $this->getOpt(self::OPT_LONG_START)) {
@@ -315,6 +340,10 @@ HELP;
             $success = $topicSuccess;
         }
 
+        if (isset($criteria['effector'])) {
+            $success = $success && $event->getEffector() instanceof User && $criteria['effector'] == $event->getEffector()->getId();
+        }
+
         if (isset($criteria['action'])) {
             $success = $success && $this->matchString($regexMode, $criteria['action'], $event->getAction());
         }
@@ -332,6 +361,10 @@ HELP;
                 $event->getObject(),
                 $event->getMapper()->getIdentifierColumn(),
             );
+        }
+
+        if (isset($criteria['label'])) {
+            $success = $success && $this->matchString($regexMode, $criteria['label'], $trigger->getLabel());
         }
 
         if (isset($criteria['start'])) {
