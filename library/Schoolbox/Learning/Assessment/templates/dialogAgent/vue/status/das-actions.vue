@@ -67,20 +67,20 @@ async function onReopen(): Promise<void> {
 }
 
 /**
- * When the user clicks on "Mark as assisted"
+ * When the user clicks on "Resolve Assistance Request"
  */
-async function onMarkAsAssisted(): Promise<void> {
+async function onResolve(): Promise<void> {
     if (!props.participant.response?._routes.resolve) return;
 
-    const toastContext = `${props.participant.user.fullName} as assisted`;
-    const toast = window.sbProps.toastActivate(`Marking ${toastContext}...`);
+    const toastContext = `assistance request from ${props.participant.user.fullName}`;
+    const toast = window.sbProps.toastActivate(`Resolving ${toastContext}...`);
     const response = await apiRequest({
         method: "POST",
         url: props.participant.response._routes.resolve,
     });
 
     toast.timeout({
-        text: response.success ? `Marked ${toastContext}` : `Failed to mark ${toastContext}`,
+        text: response.success ? `Resolved ${toastContext}` : `Failed to resolve ${toastContext}`,
         isSuccess: response.success,
     });
 }
@@ -113,8 +113,8 @@ async function onMarkAsAssisted(): Promise<void> {
         </button>
     </li>
     <li v-if="props.participant.response?._routes.resolve">
-        <button class="icon-medical" @click="onMarkAsAssisted">
-            {{ `Mark as assisted` }}
+        <button class="icon-medical" @click="onResolve">
+            {{ `Resolve Assistance Request` }}
         </button>
     </li>
 </template>
