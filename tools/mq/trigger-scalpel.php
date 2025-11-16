@@ -127,7 +127,7 @@ $app = new class extends CliTool\App{
                 continue;
             }
 
-            if ($this->checkData($args, $regexMode, $msg, $event)) {
+            if ($this->checkData($args, $regexMode, $msg)) {
                 if ($outputHash) {
                     $keyParts = explode(':', $key);
                     printf("%s\n", implode(':', array_slice($keyParts, -1)));
@@ -159,13 +159,21 @@ $app = new class extends CliTool\App{
     }
 
     /**
-     * @param array $args
-     * @param bool  $regexMode
-     * @param array $msg
+     * Check whether the given message matches the arguments.
+     *
+     * @param array              $args      The search arguments.
+     * @param bool               $regexMode Match on regular expression?
+     * @param TriggerInterface   $msg       The trigger to match against.
      * @return bool
      */
-    private function checkData(array $args, bool $regexMode, TriggerInterface $msg, CrudEventInterface $event): bool
+    private function checkData(array $args, bool $regexMode, TriggerInterface $msg): bool
     {
+        // Exit early if event isn't the type that can be checked
+        $event = $msg->getEvent();
+        if (!$event instanceof CrudEventInterface) {
+            return false;
+        }
+
         $success = true;
         if (isset($args['topic'])) {
             $topicSuccess = false;
@@ -235,6 +243,49 @@ $app = new class extends CliTool\App{
             return $test <= $time;
         }
         return $test >= $time;
+    }
+
+    /**
+     * Print a help message of available options
+     */
+    private function printHelp(): void
+    {
+        echo "
+This script is used to remove message triggers from the system PERMANENTLY. It will search the entire trigger message
+list and delete any records it matches. To avoid unnecessary damage specify as many parameters as possible to limit
+the search space. Please ensure you do a dry run before you run the script as this is unrecoverable.
+
+Usage: trigger-scalpel.php [--title='posted by'] [--href='/news/483'] [--start='2021-02-02 10:00am'] [--end='2021-02-02 14:00'] [-p]
+
+Options:
+    -h, --help
+        Print help message and exit.
+    --instance-id
+        If set, match triggers from this instance.
+        If not set, falls back to:
+        * the INSTANCE_ID environment variable
+        * the first instance defined for this system, if INSTANCE_ID is not set
+    --action
+        If set, delete triggers with this action.
+        Values differ between different notifiers, but will always match a value in table column `msg_source.key`.
+    --mapper
+        If set, delete triggers whose event's mapper matches this class name.
+    --model
+        If set, delete triggers whose event's model matches this class name.
+    --id
+        If set, delete triggers whose event's ID matches this value.
+    --start
+        Only triggers scheduled after this date will be matched.
+    --end
+        Only triggers scheduled before this time will be matched.
+    -r
+        If present, mapper and model class names will be matched as regular expressions.
+    --output-hash
+        If present, also output each msg's hash to stdout.
+        This can then be piped to other tools.
+    -p, --perform
+        Without this flag, tool will not delete triggers.
+";
     }
 };
 
