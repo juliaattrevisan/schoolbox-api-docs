@@ -93,7 +93,13 @@ class Exporter
                  */
                 'title' => $assessment->getTitle(),
                 'description' => $assessment->getDescription(),
-                'workType' => $assessment->getWorkType()->getName(),
+                /* A soft-deleted work type won't be hydrated from the swamp; setting this to null will cause the
+                 * receiving instance to assign the first available worktype. It's not apparent whether preserving a
+                 * deleted worktype was intended (this just perpetuates the problem) or assigning the first available
+                 * worktype was acceptable. This null coalesce is the least change required to be operational in master.
+                 * Hydrating a soft-deleted worktype from the swamp has bigger implications for the app.
+                 */
+                'workType' => $assessment->getWorkType()?->getName(),
                 'dates' => [
                     'publishAt' => $assessment->getPublishAt()?->getDatabase(),
                     'openAt' => $assessment->getOpenAt()?->getDatabase(),
