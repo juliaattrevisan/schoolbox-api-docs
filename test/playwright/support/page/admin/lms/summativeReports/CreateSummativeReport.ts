@@ -1,0 +1,174 @@
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+export default class CreateSummativeReport {
+    private tester: AcceptanceTester;
+
+    private page: Page;
+
+    static readonly URL = "/adminv2/summative-report/create";
+
+    static readonly TITLE = "input#report-title";
+
+    static readonly SUMMARY_TOGGLE = `label[for="report-include-summary"]`;
+
+    static readonly CLASS_TOGGLE = `label[for="report-include-class"]`;
+
+    static readonly ENABLE_SUMMARY_CURRICULUM_PROGRESSION = `label[for="report-summary-enable-vic-progression"]`;
+
+    static readonly SUMMARY_CURRICULUM_PROGRESSION_TITLE = "input#report-summary-vic-progression-title";
+
+    static readonly ENABLE_CLASS_CURRICULUM_PROGRESSION = `label[for="report-class-enable-vic-progression"]`;
+
+    static readonly CLASS_CURRICULUM_PROGRESSION_TITLE = "input#report-class-vic-progression-title";
+
+    static readonly BUTTON_SAVE = `input[value="Save"]`;
+
+    static readonly TITLE_ERROR = "#report-title-error";
+
+    static readonly PERIODS_ERROR = "#report-terms-error";
+
+    static readonly STUDENTS_ERROR = "#report-year-levels-error";
+
+    static readonly SUMMARY_CURRICULUM_PROGRESSION_TITLE_ERROR = "#report-summary-vic-progression-title-error";
+
+    static readonly CLASS_CURRICULUM_PROGRESSION_TITLE_ERROR = "#report-class-vic-progression-title-error";
+
+    constructor(tester: AcceptanceTester, page: Page) {
+        this.tester = tester;
+        this.page = page;
+    }
+    /**
+     * Navigates to the create summative report page
+     */
+
+    async goto(): Promise<void> {
+        await this.page.goto(CreateSummativeReport.URL);
+    }
+
+    /**
+     * click the save button
+     */
+    async clickSaveButton(): Promise<void> {
+        await this.page.click(CreateSummativeReport.BUTTON_SAVE);
+    }
+
+    /**
+     * fill in the title field
+     * @param { string } title - The title to fill in
+     */
+
+    async fillTitleField(title: string): Promise<void> {
+        await this.page.fill(CreateSummativeReport.TITLE, title);
+    }
+
+    /**
+     * fill the introductory message field
+     * @param message - The message to fill in
+     */
+    async fillIntroductoryMessageField(message: string): Promise<void> {
+        await this.tester.fillCKEditorById("report-introduction", message);
+    }
+
+    /**
+     * fill in the periods field
+     * @param period - The period to fill in
+     */
+    async fillPeriodsField(period: string): Promise<void> {
+        await this.page.locator(`input[id="report-terms-selectized"]`).click();
+        await this.page.keyboard.type(period, { delay: 500 });
+        await this.page.locator("[data-selectable]").first().filter({ hasText: period }).click();
+    }
+
+    /**
+     * fill in the campus field
+     * @param campus - The campus to fill in
+     */
+    async fillCampusField(campus: string): Promise<void> {
+        await this.page.locator(`input[id="report-campuses-selectized"]`).click();
+        await this.page.keyboard.type(campus, { delay: 500 });
+        await this.page.locator("[data-selectable]").last().filter({ hasText: campus }).click();
+    }
+
+    /**
+     * fill the student selection field
+     * @param studentSelection - The student selection to fill in
+     */
+    async fillStudentSelectionField(studentSelection: string): Promise<void> {
+        await this.page.locator(`input[id="report-students-selectized"]`).click();
+        await this.page.keyboard.type(studentSelection, { delay: 500 });
+        await this.page.keyboard.press("Enter");
+        // await this.page.locator("[data-selectable]").first().filter({ hasText: studentSelection }).click();
+    }
+
+    /**
+     * toggle the summary inclusion
+     */
+    async toggleSummaryInclusion(): Promise<void> {
+        await this.page.click(CreateSummativeReport.SUMMARY_TOGGLE);
+    }
+
+    /**
+     * toggle the class inclusion
+     */
+    async toggleClassInclusion(): Promise<void> {
+        await this.page.click(CreateSummativeReport.CLASS_TOGGLE);
+    }
+
+    /**
+     * check the summary curriculum progression
+     */
+    async toggleSummaryCurriculumProgression(): Promise<void> {
+        await this.page.click(CreateSummativeReport.ENABLE_SUMMARY_CURRICULUM_PROGRESSION);
+    }
+
+    /**
+     * check the class curriculum progression
+     */
+    async toggleClassCurriculumProgression(): Promise<void> {
+        await this.page.click(CreateSummativeReport.ENABLE_CLASS_CURRICULUM_PROGRESSION);
+    }
+
+    /**
+     * fill in the summary curriculum progression title
+     * @param title - The title to fill in
+     */
+    async fillSummaryCurriculumProgressionTitle(title: string): Promise<void> {
+        await this.page.fill(CreateSummativeReport.SUMMARY_CURRICULUM_PROGRESSION_TITLE, title);
+    }
+
+    /**
+     * fill in the class curriculum progression title
+     * @param title - The title to fill in
+     */
+    async fillClassCurriculumProgressionTitle(title: string): Promise<void> {
+        await this.page.fill(CreateSummativeReport.CLASS_CURRICULUM_PROGRESSION_TITLE, title);
+    }
+
+    /**
+     * check the mandatory field error messages are presented
+     */
+    async checkMandatoryFieldErrorMessagesArePresented(): Promise<void> {
+        await expect(this.page.locator(CreateSummativeReport.TITLE_ERROR)).toBeVisible();
+        await expect(this.page.locator(CreateSummativeReport.TITLE_ERROR)).toContainText(
+            "Please enter a title (max length 100 characters)",
+        );
+        await expect(this.page.locator(CreateSummativeReport.PERIODS_ERROR)).toBeVisible();
+        await expect(this.page.locator(CreateSummativeReport.PERIODS_ERROR)).toContainText(
+            "Please select at least one academic period",
+        );
+        await expect(this.page.locator(CreateSummativeReport.STUDENTS_ERROR)).toBeVisible();
+        await expect(this.page.locator(CreateSummativeReport.STUDENTS_ERROR)).toContainText(
+            "Please enter at least one Student Selection",
+        );
+        await expect(this.page.locator(CreateSummativeReport.SUMMARY_CURRICULUM_PROGRESSION_TITLE_ERROR)).toBeVisible();
+        await expect(this.page.locator(CreateSummativeReport.SUMMARY_CURRICULUM_PROGRESSION_TITLE_ERROR)).toContainText(
+            "This field is required.",
+        );
+        await expect(this.page.locator(CreateSummativeReport.CLASS_CURRICULUM_PROGRESSION_TITLE_ERROR)).toBeVisible();
+        await expect(this.page.locator(CreateSummativeReport.CLASS_CURRICULUM_PROGRESSION_TITLE_ERROR)).toContainText(
+            "This field is required.",
+        );
+    }
+}
