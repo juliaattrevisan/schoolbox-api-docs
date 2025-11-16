@@ -241,10 +241,9 @@ HELP;
 
                 $logger->info(
                     sprintf(
-                        'Found %s: %s (%s #%s)',
+                        'Found %s: (%s #%s)',
                         $key,
-                        $event->getAction(),
-                        get_class($event->getObject()),
+                        $msg->getIdString(),
                         $event->getMapper()->getModelProperty($event->getObject(), $event->getMapper()->getIdentifierColumn()),
                     )
                 );
