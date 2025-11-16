@@ -138,7 +138,7 @@ $app = new class extends CliTool\App{
                         $key,
                         $event->getAction(),
                         get_class($event->getObject()),
-                        $event->getMapper()->getModelProperty($event->getObject(), $event->getMapper()->getIdentifier()),
+                        $event->getMapper()->getModelProperty($event->getObject(), $event->getMapper()->getIdentifierColumn()),
                     )
                 );
 
@@ -193,7 +193,7 @@ $app = new class extends CliTool\App{
         if (isset($args['id'])) {
             $success = $success && $args['model'] == $event->getMapper()->getModelProperty(
                 $event->getObject(),
-                $event->getMapper()->getIdentifier(),
+                $event->getMapper()->getIdentifierColumn(),
             );
         }
 
