@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent;
 
+use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
@@ -64,9 +65,6 @@ class ImageGeneration
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
         return $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
-
-        // TODO add some method for extracting output text from the response:
-        //      it'll need to be a listener on the client
     }
 
     /**
@@ -108,18 +106,37 @@ class ImageGeneration
         );
     }
 
+    /**
+     * Callback method for message stream.
+     *
+     * If this message is a finished response, then extract the output text out
+     * of it and add it to the log.
+     *
+     * @param Message   $message
+     * @param Log\Model $log
+     * @return void
+     */
     private function listenForOutputText(Message $message, Log\Model $log): void
     {
         if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
-            // Extract text
-            $decodedMessage = json_decode($message->data, true);
+            $outputTextParts = [];
+            try {
+                $decodedMessage = json_decode($message->data, true, flags: JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                // Not JSON: nothing can be done.
+                // Could always inspect the full stream data to figure it out?
+            }
             foreach (($decodedMessage['response']['output']) ?? [] as $output) {
                 foreach (($output['content'] ?? []) as $content) {
-                    if ($content['type'] === 'output_text') {
-                        $log->setOutputText($content['text']);
+                    if ($content['type'] === 'output_text' && isset($content['text'])) {
+                        $outputTextParts[] = $content['text'];
                     }
                 }
             }
+            $outputText = !empty($outputTextParts)
+                ? implode("\n\n", $outputTextParts)
+                : null;
+            $log->setOutputText($outputText);
         }
     }
 }
