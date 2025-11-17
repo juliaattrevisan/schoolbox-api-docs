@@ -41,6 +41,8 @@ class Mapper extends BaseMapper
         $this->uses('prompt', self::TYPE_STRING);
         $this->uses('input_tokens', self::TYPE_INTEGER);
         $this->uses('output_tokens', self::TYPE_INTEGER);
+        $this->uses('input_text', self::TYPE_STRING);
+        $this->uses('output_text', self::TYPE_STRING);
         $this->uses('model', self::TYPE_STRING);
         $this->uses('endpoint', self::TYPE_STRING);
         $this->uses('feature', self::TYPE_STRING);
