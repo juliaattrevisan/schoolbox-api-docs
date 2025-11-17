@@ -29,13 +29,17 @@ interface Props {
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
+// State to keep track of the final upload process
+const uploadLoading = window.Vue.ref<boolean>(false);
+const uploadError = window.Vue.ref<string | null>(null);
+
 window.Vue.onMounted(() => {
     acStore.init(props.generateRoute);
 });
 </script>
 
 <template>
-    <div v-if="acStore.uploadLoading" class="ab-pane">
+    <div v-if="uploadLoading" class="ab-pane">
         <h2>Uploading Image</h2>
         <div class="loader"></div>
     </div>
@@ -60,13 +64,13 @@ window.Vue.onMounted(() => {
             :prompt-attributes="props.promptAttributes"
             :ai-session-id="props.aiSessionId"
         />
-        <div v-if="acStore.uploadError !== null" class="alert-box alert l-mar--0">
+        <div v-if="uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
-            {{ acStore.uploadError }}
+            {{ uploadError }}
         </div>
         <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
-    <ig-actions />
+    <ig-actions v-model:uploadLoading="uploadLoading" v-model:uploadError="uploadError" />
 </template>
 
 <style scoped lang="scss">

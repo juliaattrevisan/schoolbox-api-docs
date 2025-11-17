@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
-import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
-import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
+import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AgentChatFeedMessage, AgentChatResponseInProgress } from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
@@ -15,10 +14,6 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
     /** When allowing selection of a particular entry (such as in the image generator), the selected entry */
     const selectedFeedEntry = window.Vue.ref<AgentChatFeedMessage["entryKey"] | null>(null);
-
-    // State to keep track of the final upload process
-    const uploadLoading = window.Vue.ref(false);
-    const uploadError = window.Vue.ref<string | null>(null);
 
     /**
      * Initialise the store
@@ -198,34 +193,27 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      * Show a lightbox with all the images in the feed
      * @param entryKey - The entry key that should be selected initially
      */
-    function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): void {
-        const slides = feed.value
-            .map((item) => {
-                // only show final images
-                if (item.type !== "response" || item.status !== "success" || !item.image) {
-                    return null;
+    async function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): Promise<void> {
+        // only show successful responses that contain images
+        const finalFeedItems = feed.value.filter((item) => item.type === "response" && item.status === "success");
+
+        const slides: GalleryItem[] = [];
+        let selectedIndex = 0;
+
+        for (const item of finalFeedItems) {
+            if (item.image) {
+                slides.push({ src: `data:${item.image.mime};base64,${item.image.b64}` });
+
+                if (item.entryKey === entryKey) {
+                    selectedIndex = slides.length - 1;
                 }
+            }
+        }
 
-                return {
-                    key: item.entryKey,
-                    src: `data:${item.image.mime};base64,${item.image.b64}`,
-                };
-            })
-            .filter((item) => item !== null);
-
-        document.dispatchEvent(
-            new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
-                detail: {
-                    targetKey: `ac-feed-lightbox`,
-                    options: {
-                        dynamic: true,
-                        dynamicEl: slides.map((item): GalleryItem => ({ src: item.src })),
-                        index: slides.findIndex((slide) => slide.key === entryKey),
-                    },
-                    onCreated: (gallery) => gallery.openGallery(),
-                },
-            }),
-        );
+        const lightbox = await createLightbox("ac-feed-lightbox", slides, {
+            index: selectedIndex,
+        });
+        lightbox.openGallery();
     }
 
     return {
@@ -237,8 +225,6 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,
-        uploadLoading,
-        uploadError,
         spawnLightbox,
     };
 });

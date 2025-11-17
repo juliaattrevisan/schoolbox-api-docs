@@ -6,6 +6,10 @@
 import { uploadFileToStorage } from "@js/resource/resourceUtils";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 
+// State to keep track of the final upload process
+const uploadLoading = defineModel<boolean>("uploadLoading", { default: false });
+const uploadError = defineModel<string | null>("uploadError", { default: null });
+
 const acStore = useAgentChatStore();
 
 /**
@@ -38,8 +42,8 @@ async function uploadImage(): Promise<void> {
         throw new Error("Selected feed item does not have a valid image");
     }
 
-    acStore.uploadLoading = true;
-    acStore.uploadError = null;
+    uploadLoading.value = true;
+    uploadError.value = null;
 
     const bstr = atob(selectedFeedItem.image.b64);
     const bytes = new Uint8Array(bstr.length);
@@ -50,9 +54,9 @@ async function uploadImage(): Promise<void> {
     const file = new File([bytes], selectedFeedItem.image.name, { type: selectedFeedItem.image.mime });
     const resource = await uploadFileToStorage(file);
 
-    acStore.uploadLoading = false;
+    uploadLoading.value = false;
     if (resource.success === false) {
-        acStore.uploadError = resource.message;
+        uploadError.value = resource.message;
         return;
     }
 
@@ -69,11 +73,7 @@ async function uploadImage(): Promise<void> {
 <template>
     <div class="component-action">
         <section>
-            <button
-                class="button"
-                :disabled="acStore.selectedFeedEntry === null || acStore.uploadLoading"
-                @click="uploadImage"
-            >
+            <button class="button" :disabled="acStore.selectedFeedEntry === null || uploadLoading" @click="uploadImage">
                 Upload
             </button>
             <button class="button cancel" role="button" @click="closeModal">Cancel</button>
