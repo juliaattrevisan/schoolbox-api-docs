@@ -48,9 +48,8 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
         isFocused.value = $isFocused;
         // Update focus state in the store to enable auto-growing height
-        if (typeof rowsStore.updateFocusedProfileCell === "function") {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
-            rowsStore.updateFocusedProfileCell(props.profile.student.id, props.headerKey, $isFocused);
+        if (typeof rowsStore.updateFocusedCell === "function") {
+            rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
         }
         if (!isFocused.value && currentText.value === "") {
             currentText.value = null;
@@ -59,9 +58,8 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     // keep the currentText in sync with the editor content
     editor.model.document.on("change", () => {
         // Ensure cell is marked as focused when content changes
-        if (typeof rowsStore.updateFocusedProfileCell === "function") {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
-            rowsStore.updateFocusedProfileCell(props.profile.student.id, props.headerKey, true);
+        if (typeof rowsStore.updateFocusedCell === "function") {
+            rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         }
         window.Vue.nextTick()
             .then(() => {
@@ -77,9 +75,8 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
 
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
-        if (editor.ui.focusTracker.isFocused && typeof rowsStore.updateFocusedProfileCell === "function") {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
-            rowsStore.updateFocusedProfileCell(props.profile.student.id, props.headerKey, true);
+        if (editor.ui.focusTracker.isFocused && typeof rowsStore.updateFocusedCell === "function") {
+            rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         }
     }).catch(() => {
         // noop
@@ -174,9 +171,6 @@ const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionHeight = window.Vue.ref(0);
 
 /**
- *
- */
-/**
  * Whether the content of the cell is focused
  */
 const contentIsFocused = window.Vue.computed(() => {
@@ -203,13 +197,9 @@ function updateContentHeight(): void {
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
 
     // We don't want the placeholder to override the actual known content heights
-    if (typeof rowsStore.setProfileContentHeight === "function") {
+    if (typeof rowsStore.setContentHeight === "function") {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
-        rowsStore.setProfileContentHeight(
-            props.profile,
-            props.headerKey,
-            contentHeight.value + componentActionHeight.value,
-        );
+        rowsStore.setContentHeight(props.profile, props.headerKey, contentHeight.value + componentActionHeight.value);
     }
 }
 
@@ -243,7 +233,7 @@ function onContentClicked(event: MouseEvent): void {
  * Whether to show the view more gradient and button
  */
 const showViewMoreGradient = window.Vue.computed(() => {
-    const displayHeights = rowsStore.profileRowDisplayHeights;
+    const displayHeights = rowsStore.rowDisplayHeights;
     if (!displayHeights) return false;
     const displayHeight = displayHeights[props.profile.student.id];
     if (!displayHeight) return false;
@@ -282,18 +272,16 @@ window.Vue.onMounted(() => {
 const animationDuration = window.Vue.ref("0.3s");
 
 // #endregion Cell height and view more handling
-
-// Expose isEmpty for parent component
-defineExpose({
-    isEmpty: contentIsEmpty,
-});
 </script>
 
 <template>
     <div
         class="grid-cell"
+        :class="{
+            'grid-cell--content-focused': contentIsFocused,
+        }"
         :style="{
-            height: `${(rowsStore as any).profileRowDisplayHeights?.[props.profile.student.id] || 250}px`,
+            height: `${(rowsStore as any).rowDisplayHeights?.[props.profile.student.id] || 250}px`,
             cursor: contentIsEmpty ? 'pointer' : 'text',
         }"
         @click.prevent="onContentClicked"
@@ -344,11 +332,18 @@ defineExpose({
 </template>
 
 <style lang="scss">
+@import "@css/core/base/_variables.scss";
+
 .grid-cell {
     overflow: clip; // Use clip to avoid focus scrolling the cell content
     position: relative;
     text-overflow: ellipsis;
     transition: height v-bind(animationDuration) ease;
+    &--content-focused {
+        .content-container-fixed .content-overlay {
+            border: 1px solid $form-border-color !important;
+        }
+    }
 }
 
 .content-container-fixed {

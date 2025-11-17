@@ -18,7 +18,6 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
     const filters = window.Vue.ref<Nested>({});
     const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(url);
 
-    // MDP Grid cell height management - adapted from unitPlannerStore
     const unexpandedRowHeight: number = 250; // The default unexpanded height of a row, in px
     const profileContentHeights = window.Vue.ref<Record<number, Record<string, number>>>({});
     const viewMoreProfileIDs = window.Vue.ref<number[]>([]);
@@ -76,33 +75,6 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
     }
 
     /**
-     * Get the row for the given student
-     * @param student - the student to get the row for
-     */
-    function getRow(student: User): Profile | undefined {
-        if (payload.value === null || payload.value.data.profiles.length === 0) {
-            return undefined;
-        }
-        return payload.value.data.profiles.find((profile) => profile.student.id === student.id) || undefined;
-    }
-
-    /**
-     * Update the row for the given student
-     * @param student
-     * @param row
-     * @returns
-     */
-    function setRow(student: User, row: Profile): void {
-        if (payload.value === null || payload.value.data.profiles.length === 0) {
-            return;
-        }
-        const index = payload.value.data.profiles.findIndex((profile) => profile.student.id === student.id);
-        if (index !== -1) {
-            payload.value.data.profiles[index] = row;
-        }
-    }
-
-    /**
      * Toggle the view more (expanded) state of a profile row
      * @param profileId - the id of the profile to toggle
      */
@@ -121,11 +93,10 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
      * @param headerKey - the header key to set the content height for
      * @param height - the height to set
      */
-    function setProfileContentHeight(profile: Profile, headerKey: ProfileTextKeys, height: number): void {
+    function setContentHeight(profile: Profile, headerKey: ProfileTextKeys, height: number): void {
         if (profileContentHeights.value[profile.student.id] === undefined) {
             profileContentHeights.value[profile.student.id] = {};
         }
-
         profileContentHeights.value[profile.student.id][headerKey] = Math.max(height, unexpandedRowHeight);
     }
 
@@ -135,18 +106,16 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
      * @param headerKey - the header key to update the focus state for
      * @param isFocused - whether the cell is focused
      */
-    function updateFocusedProfileCell(profileId: number, headerKey: ProfileTextKeys, isFocused: boolean): void {
+    function updateFocusedCell(profileId: number, headerKey: ProfileTextKeys, isFocused: boolean): void {
         if (isFocused) {
             if (focusedProfileCells.value[profileId] === undefined) {
                 focusedProfileCells.value[profileId] = [];
             }
-
             focusedProfileCells.value[profileId].push(headerKey);
         } else {
             if (focusedProfileCells.value[profileId] === undefined) {
                 return;
             }
-
             focusedProfileCells.value[profileId] = focusedProfileCells.value[profileId].filter((h) => h !== headerKey);
             if (focusedProfileCells.value[profileId].length === 0) {
                 delete focusedProfileCells.value[profileId];
@@ -162,13 +131,11 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
      * - Whether the profile row is in a "View More" state
      * @returns { Record<number, Record<string, number>> } - a record of profile ID to a record of header key to minimum display height
      */
-    const profileCellMinDisplayHeights = window.Vue.computed<Record<number, Record<string, number>>>(() => {
+    const cellMinDisplayHeights = window.Vue.computed<Record<number, Record<string, number>>>(() => {
         const cellMinHeights: Record<number, Record<string, number>> = {};
-
         if (payload.value?.data?.profiles) {
             payload.value.data.profiles.forEach((profile) => {
                 const isViewMore = viewMoreProfileIDs.value.includes(profile.student.id);
-
                 cellMinHeights[profile.student.id] = Object.fromEntries(
                     Object.entries(profileContentHeights.value[profile.student.id] || {}).map(
                         ([headerKey, contentHeight]) => {
@@ -181,7 +148,6 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
                 );
             });
         }
-
         return cellMinHeights;
     });
 
@@ -189,11 +155,10 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
      * The display height of each profile row, based on the maximum of the minimum display heights of each cell inside
      * @returns { Record<number, number> } - a record of profile ID to display height
      */
-    const profileRowDisplayHeights = window.Vue.computed<Record<number, number>>(() => {
+    const rowDisplayHeights = window.Vue.computed<Record<number, number>>(() => {
         return Object.fromEntries(
-            Object.entries(profileCellMinDisplayHeights.value).map(([profileId, cellHeights]) => {
+            Object.entries(cellMinDisplayHeights.value).map(([profileId, cellHeights]) => {
                 const maxCellHeight = Math.max(...Object.values(cellHeights));
-
                 if (maxCellHeight < 0) {
                     return [profileId, unexpandedRowHeight];
                 }
@@ -213,15 +178,13 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
         loadError,
         init,
         onPaginate,
-        getRow,
-        setRow,
         unexpandedRowHeight,
         profileContentHeights,
         viewMoreProfileIDs,
         focusedProfileCells,
         toggleViewMore,
-        setProfileContentHeight,
-        updateFocusedProfileCell,
-        profileRowDisplayHeights,
+        setContentHeight,
+        updateFocusedCell,
+        rowDisplayHeights,
     };
 });
