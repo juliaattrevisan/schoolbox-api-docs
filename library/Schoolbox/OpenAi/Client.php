@@ -126,8 +126,12 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createChatCompletionStream(array $payload, Log\Model $log, ?int $chunkSize = null): iterable
-    {
+    public function createChatCompletionStream(
+        array $payload,
+        Log\Model $log,
+        ?int $chunkSize = null,
+        ?callable $streamListener = null,
+    ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
