@@ -112,28 +112,33 @@ body {
     }
 }
 
-/* Old Css */
-
+// Component Container Styles
 #component-layout .component-container {
-    border-radius: var(--sbx-border-radius-normal);
     border: 1px solid var(--sbx-color-foreground-secondary);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: var(--sbx-border-radius-normal);
+    box-shadow: var(--sbx-shadow-m);
 
-    & .row > .columns > .component-titlebar {
-        border-top-left-radius: var(--sbx-border-radius-normal);
-        border-top-right-radius: var(--sbx-border-radius-normal);
-    }
+    & .component-action {
+        padding: 0.5rem 0;
 
-    & .row > .island section:last-child {
-        border-bottom-left-radius: var(--sbx-border-radius-normal);
-        border-bottom-right-radius: var(--sbx-border-radius-normal);
+        & > section {
+            border: none;
+            padding: 0.3rem 0.8rem;
+
+            & .button {
+                background-color: var(--sbx-color-accent);
+                border-radius: var(--sbx-border-radius-normal);
+                margin-inline-end: 0.5rem;
+                padding-inline: 1rem;
+            }
+        }
     }
 
     & .component-titlebar {
-        padding: 0.5rem 1rem;
+        border-color: var(--sbx-color-foreground-secondary);
         border-style: solid;
         border-width: 0 0 1px 0;
-        border-color: var(--sbx-color-foreground-secondary);
+        padding: 0.5rem 1rem;
         transition: border-bottom 200ms linear;
 
         &.meta {
@@ -141,9 +146,6 @@ body {
 
             & a {
                 color: var(--sbx-color-accent);
-
-                &::before {
-                }
             }
         }
 
@@ -153,20 +155,14 @@ body {
         }
     }
 
-    & .component-action {
-        padding: 0.5rem 0;
+    & .row > .columns > .component-titlebar {
+        border-top-left-radius: var(--sbx-border-radius-normal);
+        border-top-right-radius: var(--sbx-border-radius-normal);
+    }
 
-        & > section {
-            padding: 0.3rem 0.8rem;
-            border: none;
-
-            & .button {
-                background-color: var(--bg-primary);
-                margin-inline-end: 0.5rem;
-                border-radius: var(--sbx-border-radius-normal);
-                padding-inline: 1rem;
-            }
-        }
+    & .row > .island section:last-child {
+        border-bottom-left-radius: var(--sbx-border-radius-normal);
+        border-bottom-right-radius: var(--sbx-border-radius-normal);
     }
 
     & .row:first-child:has(+ .row[data-collapse-state="collapsed"]) .component-titlebar {
