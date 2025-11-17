@@ -9,22 +9,14 @@
  # @param Participant $participant        A participant instance for $student, if extant
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param array $response                 Info about the response that we are creating/resuming
- # @param string $errorMessage            A system flash message that at some point, can spawn (can't remember when)
  # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
  # @param string $returnUrl               A redirect destination
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<div class="row" data-assessment-status>
+<div class="row">
     <div class="small-12 island">
-
-        {% if errorMessage %}
-        <noscript>
-            <div class="alert-box alert">{{ errorMessage }}</div>
-        </noscript>
-        {% endif %}
-
         <h1>{{ assessment.title }}</h1>
     </div>
 </div>

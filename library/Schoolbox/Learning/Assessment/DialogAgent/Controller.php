@@ -395,10 +395,6 @@ class Controller extends Assessment\Controller
          */
         $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
 
-        // For some reason I can't use get/setFlash?
-        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
-        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-
         /* Prepare a redirection url
          */
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
@@ -437,7 +433,6 @@ class Controller extends Assessment\Controller
                 'aiSessionId' => $existingResponse?->getSessionId() ?? (string)Uuid::uuid4(),
                 'assistanceRequestedAt' => $existingResponse?->getAssistanceRequestedAt() ?? null,
             ],
-            'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
         ];
@@ -490,10 +485,6 @@ class Controller extends Assessment\Controller
          */
         $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
 
-        // For some reason I can't use get/setFlash?
-        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
-        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-
         /* Prepare a redirection url
          */
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
@@ -513,7 +504,6 @@ class Controller extends Assessment\Controller
             'student' => $student,
             'participant' => $participant,
             'existingResponse' => $existingResponse,
-            'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
         ];

@@ -220,10 +220,6 @@ class Controller extends Base
          */
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
 
-        // For some reason I can't use get/setFlash?
-        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
-        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-
         /* Prepare a redirection url
          */
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
@@ -241,7 +237,6 @@ class Controller extends Base
             'student' => $student,
             'participant' => $participant,
             'existingResponse' => $existingResponse,
-            'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
         ];
