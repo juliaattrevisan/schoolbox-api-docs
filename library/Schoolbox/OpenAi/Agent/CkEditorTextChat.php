@@ -53,12 +53,10 @@ class CkEditorTextChat
         array $payload,
         string $aiSessionId,
     ): iterable {
-        return $this->client->createChatCompletionStream(
-            $this->buildPayload($payload),
-            $user,
-            Helper::FEATURE_CHAT,
-            $aiSessionId,
-        );
+        // Need to inspect payload to figure out what the actual input text was!
+        $payload = $this->buildPayload($payload);
+        $log     = $this->client->createLog($payload, null, $user, Helper::FEATURE_CHAT, $aiSessionId);
+        return $this->client->createChatCompletionStream($payload, $log);
     }
 
     /**

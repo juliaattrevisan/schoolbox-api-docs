@@ -105,10 +105,10 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createChatCompletion(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
+    public function createChatCompletion(array $payload, Log\Model $log): ResponseInterface
     {
         $url     = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
-        $log     = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $log      = $log->setEndpoint($url->__toString());
         $request = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, false);
         return $this->handleNonStreamedResponse(
@@ -121,10 +121,10 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createChatCompletionStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
+    public function createChatCompletionStream(array $payload, Log\Model $log, ?int $chunkSize = null): iterable
     {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
-        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
         return $this->handleStreamedResponse(

@@ -36,9 +36,9 @@ interface IClient
      * Call the create model response API, and receive a standard HTTP response:
      * * https://platform.openai.com/docs/api-reference/responses/create
      *
-     * @param array       $payload The request body to send.
-     * @param Log\Model   $log     The log to write to: will be updated with the response data,
-     *                             so that this call may be identified in logs.
+     * @param array     $payload The request body to send.
+     * @param Log\Model $log     The log to write to: will be updated with the response data,
+     *                           so that this call may be identified in logs.
      * @return ResponseInterface The response from the AI provider.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
@@ -62,37 +62,25 @@ interface IClient
      * Call the create chat completion API, and receive a standard HTTP response:
      * * https://platform.openai.com/docs/api-reference/chat/create
      *
-     * @param array       $payload
-     * @param User        $user
-     * @param string      $feature
-     * @param string|null $aiSessionId
+     * @param array     $payload The request body to send.
+     * @param Log\Model $log     The log to write to: will be updated with the response data,
+     *                           so that this call may be identified in logs.
      * @return ResponseInterface
      */
-    public function createChatCompletion(
-        array $payload,
-        User $user,
-        string $feature,
-        ?string $aiSessionId = null,
-    ): ResponseInterface;
+    public function createChatCompletion(array $payload, Log\Model $log): ResponseInterface;
 
     /**
      * Call the create chat completion API, and receive a stream:
      * * https://platform.openai.com/docs/api-reference/chat-streaming/streaming
      *
-     * @param array       $payload
-     * @param User        $user
-     * @param string      $feature
-     * @param string|null $aiSessionId
-     * @param int|null    $chunkSize
+     * @param array     $payload   The request body to send.
+     * @param Log\Model $log       The log to write to: will be updated with the response data,
+     *                             so that this call may be identified in logs.
+     * @param int|null  $chunkSize If provided, read this many bytes for each stream iteration:
+     *                             otherwise, allow the client itself to decide.
      * @return iterable
      */
-    public function createChatCompletionStream(
-        array $payload,
-        User $user,
-        string $feature,
-        ?string $aiSessionId = null,
-        ?int $chunkSize = null,
-    ): iterable;
+    public function createChatCompletionStream(array $payload, Log\Model $log, ?int $chunkSize = null): iterable;
 
     /**
      * Create a log object, which will then be passed into this client's
