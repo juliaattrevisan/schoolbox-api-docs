@@ -22,6 +22,7 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsM
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
 use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Twig\Error\Error;
 use Schoolbox\Filter\IFactoryFactory;
@@ -156,55 +157,21 @@ class Controller extends Base
         $current = $cursor->current($profiles);
         $next = $cursor->next($profiles);
 
-//
-//        $idFinder       = Filter\Filters\DifferentiationProfile\IdFinder::getInstance($this->filterMapper, $this->mapper);
-//        $profileIds       = $idFinder->findIdsByFilters($dynamicFilters, $this->getUser());
-//
-//        if (count($profileIds) > 0) {
-//            $cursor = new MapperCursor(
-//                $this->mapper,
-//                20,
-//                [
-//                    's.lastname' => $this->mapper::SORT_ORDER_ASC,
-//                    's.chosen_name' => $this->mapper::SORT_ORDER_ASC,
-//                ],
-//                $this->mapper->getPredicateBuilder()
-//                             ->in('s.id', $profileIds)
-//                            ->any(
-//                                $this->mapper->getPredicateBuilder()->isTrue(
-//                                    'lpt.contribute_differentiation_profile',
-//                                )->isTrue(
-//                                    'lps.contribute_differentiation_profile',
-//                                )
-//                            )
-//            );
-//            $profiles = $cursor->retrieveResults($this->requestPost['cursor'] ?? null);
-//            $data = $profiles->map(
-//                fn(Model $profile) => call_user_func($profileTranslator, $profile)
-//            );
-//            $count   = $cursor->retrieveResultCount();
-//            $next    = $cursor->next($profiles);
-//            $current = $cursor->current($profiles);
-//        } else {
-//            $data = [];
-//            $count = 0;
-//            $next = null;
-//            $current = null;
-//        }
-
         $payload = [
             'profiles'             => $data,
         ];
-        $this->response = $this->responseAsJson([
-            'data' => $payload,
-            'metadata' => [
-                'count'  => $count,
-                'cursor' => [
-                    'next'    => $next,
-                    'current' => $current,
+        $this->response = $this->responseAsJson(
+            [
+                'data' => $payload,
+                'metadata' => [
+                    'count'  => $count,
+                    'cursor' => [
+                        'next'    => $next,
+                        'current' => $current,
+                    ],
                 ],
-            ],
-        ]);
+            ]
+        );
     }
 
     /**
@@ -230,7 +197,7 @@ class Controller extends Base
             AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
         ";
 
-        $params = [
+        $params      = [
             'studentId' => $studentId,
         ];
         $pastoralIds = $this->pastoralMapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
@@ -242,21 +209,129 @@ class Controller extends Base
              */
             ['created_at' => PastoralMapper::SORT_ORDER_DESC],
             $this->pastoralMapper->getPredicateBuilder()
-                ->in('id', $pastoralIds)
+                                 ->in('id', $pastoralIds)
         );
 
-        $data = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
-        $this->response = $this->responseAsJson([
-            'data' => [
-                'results' => $data->map($this->pastoralTranslator),
-            ],
-            'metadata' => [
-                'count'  => $cursor->retrieveResultCount(),
-                'cursor' => [
-                    'next'    => $cursor->next($data),
-                    'current' => $cursor->current($data),
+        $data           = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+        $this->response = $this->responseAsJson(
+            [
+                'data'     => [
+                    'results' => $data->map($this->pastoralTranslator),
                 ],
-            ],
-        ]);
+                'metadata' => [
+                    'count'  => $cursor->retrieveResultCount(),
+                    'cursor' => [
+                        'next'    => $cursor->next($data),
+                        'current' => $cursor->current($data),
+                    ],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Save differentiation profile data
+     *
+     * @param User $student
+     * @return void
+     * @throws Exception
+     */
+    public function postDifferentiationProfileData(User $student): void
+    {
+        $post = $this->requestPost;
+
+        $id = $post->getInt('id');
+
+        /* Look for the existing differentiation profile record if an ID is provided
+         */
+        if (null !== $id) {
+            try {
+                $model = $this->mapper->findById($id);
+            } catch (\Exception $e) {
+                $this->sendJsonError('Differentiation profile record not found.', 404);
+                return;
+            }
+        } else {
+            $model = $this->mapper->createModel()
+                ->setStudent($student);
+        }
+
+        $adjustment_level = $post->get('adjustment_level');
+        if (!is_array($adjustment_level) && null !== $adjustment_level) {
+            $this->sendJsonError('Adjustment level must be an array.', 400);
+            return;
+        }
+
+        $adjustment_category = $post->get('adjustment_category');
+        if (!is_array($adjustment_category) && null !== $adjustment_category) {
+            $this->sendJsonError('Adjustment category must be an array.', 400);
+            return;
+        }
+
+        /* Validate text field lengths
+         */
+        $maxLength = \Schoolbox\Column\Base::TEXT_MAX_LENGTH;
+        $goals = $post->get('goals');
+        if (null !== $goals && strlen($goals) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Goals field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $overview = $post->get('overview');
+        if (null !== $overview && strlen($overview) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Overview field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $strategies_adjustments = $post->get('strategies_adjustments');
+        if (null !== $strategies_adjustments && strlen($strategies_adjustments) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Strategies and Adjustments field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $needs_challenges = $post->get('needs_challenges');
+        if (null !== $needs_challenges && strlen($needs_challenges) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Needs and Challenges field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+        $interests_strengths = $post->get('interests_strengths');
+        if (null !== $interests_strengths && strlen($interests_strengths) > $maxLength) {
+            $this->sendJsonError(
+                sprintf('Interests and Strengths field exceeds the maximum allowed length of %d characters.', $maxLength),
+                400
+            );
+            return;
+        }
+
+        try {
+            /** @var Model $model */
+            $model
+                ->setAdjustmentLevel($adjustment_level ? implode(',', $adjustment_level) : null)
+                ->setAdjustmentCategory($adjustment_category ? implode(',', $adjustment_category) : null)
+                ->setOverview($post->get('overview'))
+                ->setGoals($post->get('goals'))
+                ->setStrategiesAdjustments($post->get('strategies_adjustments'))
+                ->setNeedsChallenges($post->get('needs_challenges'))
+                ->setInterestsStrengths($post->get('interests_strengths'));
+
+            $this->mapper->save($model);
+
+            $this->response = $this->responseAsJson(
+                [
+                    "id" => $model->getId(),
+                ]
+            )->withStatus(200);
+        } catch (\Exception $e) {
+            $this->sendJsonError('Failed to save differentiation profile data.', 500);
+        }
     }
 }

@@ -18,12 +18,15 @@ use Alaress\Web\Controller\Base;
 use http\Exception\UnexpectedValueException;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelsMapper;
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -57,14 +60,35 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '/manage', 'manageDifferentiationProfiles', $getPerms);
-        $this->register('GET', '/list', 'getDifferentiationProfileData', $getPerms);
+        $this->register(self::METHOD_GET, '/manage', 'manageDifferentiationProfiles', $getPerms);
+        $this->register(self::METHOD_GET, '/list', 'getDifferentiationProfileData', $getPerms);
         $this->register(
-            'GET',
+            self::METHOD_GET,
             '/linkedRecords/{studentId}',
             'getLinkedPastoralRecords',
             $getPerms,
         );
+        $this->register(
+            self::METHOD_POST,
+            '/edit/{studentId}',
+            'postDifferentiationProfileData',
+            $getPerms,
+            \Closure::fromCallable([$this, 'preloadStudent'])
+        );
+    }
+
+    private function preloadStudent(array $params): array
+    {
+        if (\array_key_exists('student', $params)) {
+            $student = ($params['student']);
+        } else {
+            try {
+                $student = $this->getMapperFactory()->get(UserMapper::class)->findById($params['studentId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw new NotFound('Student not found.', 404, $e);
+            }
+        }
+        return ['student' => $student];
     }
 
     /**
