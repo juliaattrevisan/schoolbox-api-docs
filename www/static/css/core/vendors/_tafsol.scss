@@ -85,11 +85,9 @@ body {
 }
 
 #left-off-canvas-toggle {
-    top: 1rem;
     left: 1rem;
-    border-top-left-radius: var(--sbx-border-radius-normal);
-    border-bottom-left-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
+    top: 1rem;
 }
 
 #header-search-input {
@@ -2076,5 +2074,9 @@ body {
     padding: 0.75rem !important; // Removed container padding
 }
 
+#left-off-canvas-toggle {
+    border-top-left-radius: var(--sbx-border-radius-normal);
+    border-bottom-left-radius: var(--sbx-border-radius-normal);
+}
 **
 */
