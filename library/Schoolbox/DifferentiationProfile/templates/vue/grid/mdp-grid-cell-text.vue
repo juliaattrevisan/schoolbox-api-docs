@@ -35,8 +35,17 @@ const hasChanged = window.Vue.computed(() => {
     return currentText.value !== props.text;
 });
 const isSaving = window.Vue.ref(false);
-const isFocused = window.Vue.ref(false);
 let editor: InlineEditor;
+
+// #region Editor setup
+
+/**
+ * Whether the content of the cell is focused
+ */
+const isContentFocused = window.Vue.computed(() => {
+    const store = rowsStore as unknown as { focusedCells?: Record<number, string[]> };
+    return (store.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+});
 
 /**
  * When a new editor is created
@@ -46,12 +55,11 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
     // show the empty state again if no text is entered
     editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
-        isFocused.value = $isFocused;
         // Update focus state in the store to enable auto-growing height
         if (typeof rowsStore.updateFocusedCell === "function") {
             rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
         }
-        if (!isFocused.value && currentText.value === "") {
+        if (!isContentFocused.value && currentText.value === "") {
             currentText.value = null;
         }
     });
@@ -120,7 +128,6 @@ async function focusEditor(): Promise<void> {
     }
     await window.Vue.nextTick();
     editor.focus();
-    isFocused.value = true;
     // to assign the cursor to the end of the editor
     editor.model.change((writer) => {
         const root = editor.model.document.getRoot();
@@ -154,54 +161,24 @@ function onSave(): void {
     void saveStore.save(profile);
 }
 
-// #region Cell height and view more handling
+// #endregion Editor setup
 
-/**
- * The main container around this cell's content component
- * Used to measure the height of the content
- */
+// #region cell height and view more handling
+
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const contentHeight = window.Vue.ref(0);
-
-/**
- * The main container around this cell's action component
- * Used to measure the height of the component action
- */
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionHeight = window.Vue.ref(0);
 
 /**
- * Whether the content of the cell is focused
- */
-const contentIsFocused = window.Vue.computed(() => {
-    const store = rowsStore as unknown as { focusedProfileCells?: Record<number, string[]> };
-    return (store.focusedProfileCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
-});
-
-/**
  * Whether the content of the cell is empty (and not focused)
  */
-const contentIsEmpty = window.Vue.computed(() => {
+const isContentEmpty = window.Vue.computed(() => {
     // If this cell is focused, treat it as not empty
-    if (contentIsFocused.value) return false;
-
+    if (isContentFocused.value) return false;
     // Otherwise, check if we have actual content
     return currentText.value === null;
 });
-
-/**
- * Update the content height in the store when the content height changes
- */
-function updateContentHeight(): void {
-    contentHeight.value = contentEl.value?.offsetHeight || 0;
-    componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-
-    // We don't want the placeholder to override the actual known content heights
-    if (typeof rowsStore.setContentHeight === "function") {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
-        rowsStore.setContentHeight(props.profile, props.headerKey, contentHeight.value + componentActionHeight.value);
-    }
-}
 
 /**
  * When the content is clicked
@@ -209,7 +186,6 @@ function updateContentHeight(): void {
  */
 function onContentClicked(event: MouseEvent): void {
     if (contentEl.value === null || !event.target) return;
-
     // If the target is not the contentEl, a child of the contentEl, or its parent (the cell),
     // then the click wasn't on the content, and instead on the view more button or component action.
     if (
@@ -219,12 +195,10 @@ function onContentClicked(event: MouseEvent): void {
     ) {
         return;
     }
-
     // if the cell is already focused, there's no need to re-focus it
-    if (contentIsFocused.value) {
+    if (isContentFocused.value) {
         return;
     }
-
     // Focus the editor
     void focusEditor();
 }
@@ -246,9 +220,18 @@ const showViewMoreGradient = window.Vue.computed(() => {
  */
 const showViewMoreInner = window.Vue.computed(() => {
     // Don't show view more button when cell is focused (auto-growing)
-    if (contentIsFocused.value) return false;
+    if (isContentFocused.value) return false;
     return showViewMoreGradient.value;
 });
+
+/**
+ * Update the content height in the store when the content height changes
+ */
+function updateContentHeight(): void {
+    contentHeight.value = contentEl.value?.offsetHeight || 0;
+    componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
+    rowsStore.setContentHeight(props.profile, props.headerKey, contentHeight.value + componentActionHeight.value);
+}
 
 /**
  * To detect when the dimensions of the cell changes,
@@ -271,18 +254,18 @@ window.Vue.onMounted(() => {
 
 const animationDuration = window.Vue.ref("0.3s");
 
-// #endregion Cell height and view more handling
+// #endregion cell height and view more handling
 </script>
 
 <template>
     <div
         class="grid-cell"
         :class="{
-            'grid-cell--content-focused': contentIsFocused,
+            'grid-cell--content-focused': isContentFocused,
         }"
         :style="{
             height: `${(rowsStore as any).rowDisplayHeights?.[props.profile.student.id] || 250}px`,
-            cursor: contentIsEmpty ? 'pointer' : 'text',
+            cursor: isContentEmpty ? 'pointer' : 'text',
         }"
         @click.prevent="onContentClicked"
     >
@@ -299,7 +282,7 @@ const animationDuration = window.Vue.ref("0.3s");
             </div>
         </div>
         <div class="content-container-fixed">
-            <div v-if="!contentIsEmpty" class="content-overlay">
+            <div v-if="!isContentEmpty" class="content-overlay">
                 <div class="show-more-container" :data-visible="showViewMoreGradient">
                     <button
                         :data-test="`mdp-grid-view-more-button-${props.profile.student.id}-${props.headerKey}`"
@@ -322,7 +305,7 @@ const animationDuration = window.Vue.ref("0.3s");
                     :header-key="props.headerKey"
                     :has-changed="hasChanged"
                     :is-saving="isSaving"
-                    :is-focused="isFocused"
+                    :is-focused="isContentFocused"
                     @modify="onModify"
                     @save="onSave"
                 />

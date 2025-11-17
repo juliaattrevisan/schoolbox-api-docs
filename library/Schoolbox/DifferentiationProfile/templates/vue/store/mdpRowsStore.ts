@@ -21,7 +21,7 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
     const unexpandedRowHeight: number = 250; // The default unexpanded height of a row, in px
     const profileContentHeights = window.Vue.ref<Record<number, Record<string, number>>>({});
     const viewMoreProfileIDs = window.Vue.ref<number[]>([]);
-    const focusedProfileCells = window.Vue.ref<Record<number, string[]>>({});
+    const focusedCells = window.Vue.ref<Record<number, string[]>>({});
 
     /**
      * Adds filter search parameters to the given URLSearchParams object.
@@ -108,17 +108,17 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
      */
     function updateFocusedCell(profileId: number, headerKey: ProfileTextKeys, isFocused: boolean): void {
         if (isFocused) {
-            if (focusedProfileCells.value[profileId] === undefined) {
-                focusedProfileCells.value[profileId] = [];
+            if (focusedCells.value[profileId] === undefined) {
+                focusedCells.value[profileId] = [];
             }
-            focusedProfileCells.value[profileId].push(headerKey);
+            focusedCells.value[profileId].push(headerKey);
         } else {
-            if (focusedProfileCells.value[profileId] === undefined) {
+            if (focusedCells.value[profileId] === undefined) {
                 return;
             }
-            focusedProfileCells.value[profileId] = focusedProfileCells.value[profileId].filter((h) => h !== headerKey);
-            if (focusedProfileCells.value[profileId].length === 0) {
-                delete focusedProfileCells.value[profileId];
+            focusedCells.value[profileId] = focusedCells.value[profileId].filter((h) => h !== headerKey);
+            if (focusedCells.value[profileId].length === 0) {
+                delete focusedCells.value[profileId];
             }
         }
     }
@@ -140,7 +140,7 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
                     Object.entries(profileContentHeights.value[profile.student.id] || {}).map(
                         ([headerKey, contentHeight]) => {
                             if (isViewMore) return [headerKey, contentHeight];
-                            if (focusedProfileCells.value[profile.student.id]?.includes(headerKey))
+                            if (focusedCells.value[profile.student.id]?.includes(headerKey))
                                 return [headerKey, contentHeight];
                             return [headerKey, unexpandedRowHeight];
                         },
@@ -181,7 +181,7 @@ export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
         unexpandedRowHeight,
         profileContentHeights,
         viewMoreProfileIDs,
-        focusedProfileCells,
+        focusedCells,
         toggleViewMore,
         setContentHeight,
         updateFocusedCell,
