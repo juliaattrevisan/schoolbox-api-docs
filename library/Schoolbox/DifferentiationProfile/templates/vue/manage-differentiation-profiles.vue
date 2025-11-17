@@ -109,8 +109,8 @@ function onLinkedRecordsSelected(profile: Profile): void {
             </template>
             <template #Date="{ row, header: columnHeader }">
                 <div class="l-pad-s">
-                    <!-- Custom date display -->
-                    {{ row[columnHeader.key] ? new Date(row[columnHeader.key] as string).toLocaleDateString() : "" }}
+                    <!-- Just a basic display -->
+                    {{ row[columnHeader.key] ? (row[columnHeader.key] as string) : "" }}
                 </div>
             </template>
         </mdp-grid>
