@@ -356,10 +356,19 @@ span:has(~ .gradient-0) {
 }
 
 .empty-state {
-    background-color: #fff;
+    background-color: #fff; // white background for empty state
     color: var(--sbx-color-accent);
 
     & a {
+        font-weight: 600;
+    }
+
+    & i {
+        color: var(--sbx-color-accent) !important;
+    }
+
+    & p {
+        color: grey; // grey text for empty state description?
         font-weight: 600;
     }
 
@@ -1055,20 +1064,6 @@ input[type="radio"] + .block {
         border-radius: calc(var(--sbx-border-radius-normal) / 3);
     }
 }
-
-.empty-state {
-    background-color: #fff;
-
-    & i {
-        color: var(--sbx-color-accent) !important;
-    }
-
-    & p {
-        font-weight: 600;
-        color: grey;
-    }
-}
-
 .reveal-modal {
     border-radius: var(--sbx-border-radius-normal);
     & .buttons {
