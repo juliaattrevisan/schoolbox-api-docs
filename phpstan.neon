@@ -17,6 +17,7 @@ parameters:
 rules:
     - Alaress\PhpStan\Rule\PhpUnitTestName
     - Alaress\PhpStan\Rule\ForbidBacktickOperator
+    - Alaress\PhpStan\Rule\EnforcePortablePhpShebangLine
 services:
     -
         class: Alaress\PhpStan\Rule\PhpUnitTestName

@@ -76,9 +76,6 @@ EOF
 COPY ./usr/bin/* /usr/bin/
 COPY ./usr/local/bin/* /usr/local/bin/
 
-# Cheat by linking /usr/local/bin/php to /usr/bin/php:
-# all of our scripts have shebang lines referencing that.
-RUN ln -s /usr/local/bin/php /usr/bin/php
 # Copy configuration files
 COPY ./config/php/*.ini /usr/local/etc/php/conf.d/
 COPY ./config/php/${ENV}/*.ini /usr/local/etc/php/conf.d/

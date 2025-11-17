@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 /**
@@ -60,11 +60,11 @@ $app = new class extends CliTool\App {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 Updates pastoral records where access has been incorrectly set. Non-deleted pastoral_access records
-set to Teachers/Deny will be upgraded to Teachers/General. 
+set to Teachers/Deny will be upgraded to Teachers/General.
 
 Existing pastoral_access records are backed up into _pastoral_access after the first Perform.
 Subsequent runs won't reinitialise this table. You'll have to do that manually if you want
-to reuse this tool in the future. 
+to reuse this tool in the future.
 
 HELP;
             exit;
@@ -112,8 +112,8 @@ HELP;
              * https://stackoverflow.com/questions/5307164/execute-insert-if-table-is-empty
              */
             $db->executeQuery('
-                INSERT INTO _pastoral_access 
-                SELECT * FROM pastoral_access 
+                INSERT INTO _pastoral_access
+                SELECT * FROM pastoral_access
                 WHERE NOT EXISTS (SELECT * FROM _pastoral_access)
             ');
 

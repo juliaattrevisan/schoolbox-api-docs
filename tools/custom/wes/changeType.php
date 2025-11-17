@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
