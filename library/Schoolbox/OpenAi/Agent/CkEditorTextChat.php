@@ -135,11 +135,45 @@ class CkEditorTextChat
                     $log->setOutputText($log->getOutputText() . $content);
                 }
             }
+            return;
         } catch (UnexpectedValueException) {
             // Not valid data: nothing can be done.
             // However the stream may return a `[DONE]` event:
             // that needs to be handled, and used to convert the content into
             // plain text (it's HTML)
+        }
+
+        if ($message->data === '[DONE]') {
+            // The stream has finished:
+            // make a best effort to convert HTML to plain text.
+            // This assumes that the output:
+            // * is actually Markdown
+            // * contains actual HTML within ```html``` blocks
+
+            // First up, remove the markdown wrappers:
+            // assume anything within is HTML
+            // If there's no markdown: assume the whole thing is HTML
+            $htmlParts = [];
+            if (preg_match_all('/```html(?P<html>.*?)```/s', $log->getOutputText(), $matches)) {
+                $htmlParts = $matches['html'];
+            } else {
+                $htmlParts[] = $log->getOutputText();
+            }
+
+            // Now, for each HTML part: get its text only
+            $outputTextParts = [];
+            foreach ($htmlParts as $html) {
+                // Then: use HTML2Text to remove all tags and header content
+                $htmlToText = new \Html2Text\Html2Text($html);
+                $html = $htmlToText->getText();
+                $outputTextParts[] = $html;
+            }
+
+            // Finally: reconstitute the output text
+            $outputText = !empty($outputTextParts)
+                ? implode("\n\n", $outputTextParts)
+                : null;
+            $log->setOutputText($outputText);
         }
     }
 }
