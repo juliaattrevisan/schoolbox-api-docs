@@ -24,12 +24,14 @@ export type ImageGeneratorApiPayload = {
  * Generate an image using the image generation API
  * @param url - The endpoint to fetch
  * @param body - The data to send in the request
+ * @param signal - AbortSignal to cancel the request if needed
  * @param onMessage - The callback to handle each message from the server
  * @returns The response from the fetch
  */
 export async function generateImage(
     url: string,
     body: ImageGeneratorApiPayload,
+    signal: AbortSignal | null,
     onMessage: (response: ApiBaseResponse<ResponseStreamEvent>) => void,
 ): Promise<ApiBaseResponse<ResponseCompletedEvent>> {
     return sseApiRequest<ResponseStreamEvent, ResponseCompletedEvent, ImageGeneratorApiPayload>({
@@ -38,5 +40,6 @@ export async function generateImage(
         body,
         onMessage,
         finalEventName,
+        signal: signal || undefined,
     });
 }

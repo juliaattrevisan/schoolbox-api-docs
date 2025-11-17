@@ -101,8 +101,10 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         };
 
         let hasErrored = false;
-        const response = await generateImage(generateRoute.value, payload, (message) => {
+        const abortController = new AbortController();
+        const response = await generateImage(generateRoute.value, payload, abortController.signal, (message) => {
             if (message.success === false) {
+                /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
                 hasErrored = true;
                 feed.value.push({
                     type: "response",
@@ -112,10 +114,13 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                     message: message.message,
                 });
                 activeGeneration.value = null;
+                abortController.abort();
                 return;
             }
 
             if (activeGeneration.value === null) {
+                /** The generation was stopped before the stream fully stopped and we recieved something extra, ignore it  */
+                abortController.abort();
                 return;
             }
 
