@@ -218,6 +218,9 @@ body {
 }
 
 .editPanel {
+    // light shade of accent color for edit panel background
+    background-color: color-mix(in srgb, var(--sbx-color-accent) 10%, #fff);
+
     &
         :where(
             .icon-modify,
@@ -230,13 +233,19 @@ body {
         ) {
         aspect-ratio: unset;
         width: auto;
-        &:hover {
-            background-color: var(--sbx-color-accent) !important;
-        }
+
         &::before {
             color: var(--sbx-color-accent-text) !important;
         }
+
+        &:hover {
+            background-color: var(--sbx-color-accent) !important;
+        }
     }
+}
+
+.editPanel.socialstream-new-post {
+    background-color: transparent;
 }
 
 .icon-delete {
@@ -1191,10 +1200,6 @@ input[type="radio"] + .block {
     }
 }
 
-.editPanel.socialstream-new-post {
-    background-color: transparent;
-}
-
 .side-nav {
     border-radius: var(--sbx-border-radius-normal);
     border: var(--border);
@@ -1884,10 +1889,6 @@ label .feed .mini.unit-heading {
             }
         }
     }
-}
-
-.editPanel {
-    background-color: color-mix(in srgb, var(--sbx-color-accent) 10%, #fff);
 }
 
 button.load-more,
