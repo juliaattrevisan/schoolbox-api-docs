@@ -11,6 +11,8 @@ import { ON_FILTER_CHANGE } from "../../js/MDPEvents";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useLoadData } from "../composable/useLoadData";
 
+export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
+
 export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
     const route = window.Vue.ref<string>("");
     const url = window.Vue.ref<string>("");

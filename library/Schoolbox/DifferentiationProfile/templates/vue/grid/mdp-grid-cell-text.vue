@@ -11,7 +11,7 @@ import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useMdpHeaderStore } from "../store/mdpHeaderStore";
-import { useMdpRowsStore } from "../store/mdpRowsStore";
+import { useMdpRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
 import { useMdpSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
@@ -25,20 +25,20 @@ const props = defineProps<{
 const headerStore = useMdpHeaderStore();
 const rowsStore = useMdpRowsStore();
 const saveStore = useMdpSaveStore();
-const currentText = window.Vue.ref<string | null>(props.text);
-const initialTextboxContent: string = currentText.value ?? "";
-const editorContent = window.Vue.ref(initialTextboxContent);
-const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
-const editorInitialised = window.Vue.ref(false);
-const editorCreated = window.Vue.ref(false);
-const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
-const hasChanged = window.Vue.computed(() => {
-    return currentText.value !== props.text;
-});
-const isSaving = window.Vue.ref(false);
-let editor: InlineEditor;
+const contentEl = window.Vue.ref<HTMLElement | null>(null);
+const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
+const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations in seconds
 
-// #region Editor setup
+// #region creating and managing the editor
+
+const currentText = window.Vue.ref<string | null>(props.text);
+const editorContent = window.Vue.ref(currentText.value ?? "");
+const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
+const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
+let editor: InlineEditor;
+const isEditorInitialised = window.Vue.ref(false);
+const isEditorCreated = window.Vue.ref(false);
+const isSaving = window.Vue.ref(false);
 
 /**
  * Whether the content of the cell is focused
@@ -49,27 +49,39 @@ const isContentFocused = window.Vue.computed(() => {
 });
 
 /**
+ * Whether the content of the cell is empty (and not focused)
+ */
+const isContentEmpty = window.Vue.computed(() => {
+    // If this cell is focused, treat it as not empty
+    if (isContentFocused.value) return false;
+    // Otherwise, check if we have actual content
+    return currentText.value === null;
+});
+
+const hasContentChanged = window.Vue.computed(() => currentText.value !== props.text); // to display 'unsaved changes' state
+
+/**
  * When a new editor is created
  * @param event - the editor created event data
  */
 function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
-    // show the empty state again if no text is entered
     editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
         // Update focus state in the store to enable auto-growing height
         if (typeof rowsStore.updateFocusedCell === "function") {
             rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
         }
+        // Show the empty state again if no text is entered
         if (!isContentFocused.value && currentText.value === "") {
             currentText.value = null;
         }
     });
-    // keep the currentText in sync with the editor content
     editor.model.document.on("change", () => {
         // Ensure cell is marked as focused when content changes
         if (typeof rowsStore.updateFocusedCell === "function") {
             rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         }
+        // keep the currentText in sync with the editor content
         window.Vue.nextTick()
             .then(() => {
                 currentText.value = editor.getData();
@@ -78,10 +90,9 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
                 // noop
             });
     });
-    editorCreated.value = true;
+    isEditorCreated.value = true;
     // Fix the balloon toolbar position
     setTimeout(() => editor.ui.update());
-
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
         if (editor.ui.focusTracker.isFocused && typeof rowsStore.updateFocusedCell === "function") {
@@ -97,9 +108,9 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
  */
 async function initEditor(): Promise<void> {
     if (!editorContentEl.value) return;
-    if (editorInitialised.value) return;
+    if (isEditorInitialised.value) return;
     // Avoid initialising the editor multiple times
-    editorInitialised.value = true;
+    isEditorInitialised.value = true;
     await new Promise((resolve) => {
         useEditor(
             editorContent,
@@ -139,50 +150,7 @@ async function focusEditor(): Promise<void> {
 }
 
 /**
- * When the add text button is clicked.
- */
-function onAdd(): void {
-    void focusEditor();
-}
-
-/**
- * When the modify button is clicked.
- */
-function onModify(): void {
-    void focusEditor();
-}
-
-/**
- * When the save button is clicked.
- */
-function onSave(): void {
-    if (!editorCreated.value) return;
-    const { profile } = props;
-    profile[props.headerKey] = currentText.value;
-    void saveStore.save(profile);
-}
-
-// #endregion Editor setup
-
-// #region cell height and view more handling
-
-const contentEl = window.Vue.ref<HTMLElement | null>(null);
-const contentHeight = window.Vue.ref(0);
-const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
-const componentActionHeight = window.Vue.ref(0);
-
-/**
- * Whether the content of the cell is empty (and not focused)
- */
-const isContentEmpty = window.Vue.computed(() => {
-    // If this cell is focused, treat it as not empty
-    if (isContentFocused.value) return false;
-    // Otherwise, check if we have actual content
-    return currentText.value === null;
-});
-
-/**
- * When the content is clicked
+ * When the content is clicked check if we need to focus the editor
  * @param event - the click event
  */
 function onContentClicked(event: MouseEvent): void {
@@ -203,6 +171,20 @@ function onContentClicked(event: MouseEvent): void {
     // Focus the editor
     void focusEditor();
 }
+
+/**
+ * When the add/modify button is clicked.
+ */
+function onModify(): void {
+    void focusEditor();
+}
+
+// #endregion creating and managing the editor
+
+// #region calculating cell height
+
+const contentHeight = window.Vue.ref(0);
+const componentActionHeight = window.Vue.ref(0);
 
 /**
  * Update the content height in the store when the content height changes
@@ -232,9 +214,17 @@ window.Vue.onMounted(() => {
     setTimeout(updateContentHeight, 0);
 });
 
-const animationDuration = window.Vue.ref("0.3s");
+// #endregion calculating cell height
 
-// #endregion cell height and view more handling
+/**
+ * When the save button is clicked.
+ */
+function onSave(): void {
+    if (!isEditorCreated.value) return;
+    const { profile } = props;
+    profile[props.headerKey] = currentText.value;
+    void saveStore.save(profile);
+}
 </script>
 
 <template>
@@ -256,7 +246,7 @@ const animationDuration = window.Vue.ref("0.3s");
                     ref="editorContentEl"
                     tag="div"
                     class="editor-content"
-                    :content="initialTextboxContent"
+                    :content="editorContent"
                 ></media-article>
                 <div class="clearfix"></div>
             </div>
@@ -273,14 +263,14 @@ const animationDuration = window.Vue.ref("0.3s");
             </div>
             <div v-else class="content-overlay empty-state no-print">
                 <empty-state icon="icon-textbox">
-                    <button @click.prevent="onAdd">Add {{ headerStore.getTitleByKey(props.headerKey) }}</button>
+                    <button @click.prevent="onModify">Add {{ headerStore.getTitleByKey(props.headerKey) }}</button>
                 </empty-state>
             </div>
             <div ref="componentActionEl">
                 <mdp-grid-cell-action
                     :profile="props.profile"
                     :header-key="props.headerKey"
-                    :has-changed="hasChanged"
+                    :has-changed="hasContentChanged"
                     :is-saving="isSaving"
                     :is-focused="isContentFocused"
                     @modify="onModify"
