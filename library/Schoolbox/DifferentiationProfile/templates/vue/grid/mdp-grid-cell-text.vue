@@ -47,12 +47,22 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     // show the empty state again if no text is entered
     editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
         isFocused.value = $isFocused;
+        // Update focus state in the store to enable auto-growing height
+        if (typeof rowsStore.updateFocusedProfileCell === "function") {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
+            rowsStore.updateFocusedProfileCell(props.profile.student.id, props.headerKey, $isFocused);
+        }
         if (!isFocused.value && currentText.value === "") {
             currentText.value = null;
         }
     });
     // keep the currentText in sync with the editor content
     editor.model.document.on("change", () => {
+        // Ensure cell is marked as focused when content changes
+        if (typeof rowsStore.updateFocusedProfileCell === "function") {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
+            rowsStore.updateFocusedProfileCell(props.profile.student.id, props.headerKey, true);
+        }
         window.Vue.nextTick()
             .then(() => {
                 currentText.value = editor.getData();
@@ -64,6 +74,16 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     editorCreated.value = true;
     // Fix the balloon toolbar position
     setTimeout(() => editor.ui.update());
+
+    // If the editor was focused initially, we need to update the store
+    window.Vue.nextTick(() => {
+        if (editor.ui.focusTracker.isFocused && typeof rowsStore.updateFocusedProfileCell === "function") {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
+            rowsStore.updateFocusedProfileCell(props.profile.student.id, props.headerKey, true);
+        }
+    }).catch(() => {
+        // noop
+    });
 }
 
 /**
@@ -156,7 +176,22 @@ const componentActionHeight = window.Vue.ref(0);
 /**
  *
  */
+/**
+ * Whether the content of the cell is focused
+ */
+const contentIsFocused = window.Vue.computed(() => {
+    const store = rowsStore as unknown as { focusedProfileCells?: Record<number, string[]> };
+    return (store.focusedProfileCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+});
+
+/**
+ * Whether the content of the cell is empty (and not focused)
+ */
 const contentIsEmpty = window.Vue.computed(() => {
+    // If this cell is focused, treat it as not empty
+    if (contentIsFocused.value) return false;
+
+    // Otherwise, check if we have actual content
     return currentText.value === null;
 });
 
@@ -167,19 +202,48 @@ function updateContentHeight(): void {
     contentHeight.value = contentEl.value?.offsetHeight || 0;
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
 
-    rowsStore.setProfileContentHeight(
-        props.profile,
-        props.headerKey,
-        contentHeight.value + componentActionHeight.value,
-    );
+    // We don't want the placeholder to override the actual known content heights
+    if (typeof rowsStore.setProfileContentHeight === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Store method exists but types need refresh
+        rowsStore.setProfileContentHeight(
+            props.profile,
+            props.headerKey,
+            contentHeight.value + componentActionHeight.value,
+        );
+    }
+}
+
+/**
+ * When the content is clicked
+ * @param event - the click event
+ */
+function onContentClicked(event: MouseEvent): void {
+    if (contentEl.value === null || !event.target) return;
+
+    // If the target is not the contentEl, a child of the contentEl, or its parent (the cell),
+    // then the click wasn't on the content, and instead on the view more button or component action.
+    if (
+        !contentEl.value.contains(event.target as Node) &&
+        event.target !== contentEl.value &&
+        event.target !== contentEl.value.parentElement
+    ) {
+        return;
+    }
+
+    // if the cell is already focused, there's no need to re-focus it
+    if (contentIsFocused.value) {
+        return;
+    }
+
+    // Focus the editor
+    void focusEditor();
 }
 
 /**
  * Whether to show the view more gradient and button
  */
 const showViewMoreGradient = window.Vue.computed(() => {
-    const store = rowsStore as unknown as { profileRowDisplayHeights?: Record<number, number> };
-    const displayHeights = store.profileRowDisplayHeights;
+    const displayHeights = rowsStore.profileRowDisplayHeights;
     if (!displayHeights) return false;
     const displayHeight = displayHeights[props.profile.student.id];
     if (!displayHeight) return false;
@@ -188,8 +252,11 @@ const showViewMoreGradient = window.Vue.computed(() => {
 
 /**
  * Whether to show the view more button
+ * Only show when content exceeds height AND cell is not focused
  */
 const showViewMoreInner = window.Vue.computed(() => {
+    // Don't show view more button when cell is focused (auto-growing)
+    if (contentIsFocused.value) return false;
     return showViewMoreGradient.value;
 });
 
@@ -215,12 +282,21 @@ window.Vue.onMounted(() => {
 const animationDuration = window.Vue.ref("0.3s");
 
 // #endregion Cell height and view more handling
+
+// Expose isEmpty for parent component
+defineExpose({
+    isEmpty: contentIsEmpty,
+});
 </script>
 
 <template>
     <div
         class="grid-cell"
-        :style="{ height: `${(rowsStore as any).profileRowDisplayHeights?.[props.profile.student.id] || 250}px` }"
+        :style="{
+            height: `${(rowsStore as any).profileRowDisplayHeights?.[props.profile.student.id] || 250}px`,
+            cursor: contentIsEmpty ? 'pointer' : 'text',
+        }"
+        @click.prevent="onContentClicked"
     >
         <div ref="contentEl">
             <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
@@ -277,6 +353,7 @@ const animationDuration = window.Vue.ref("0.3s");
 
 .content-container-fixed {
     bottom: 0;
+    cursor: default;
     display: flex;
     flex-direction: column;
     height: 100%;
