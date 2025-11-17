@@ -95,12 +95,10 @@ class LessonPlanGeneration
             $additionalContext,
             $generateForField,
         );
-        $response = $this->client->createResponse(
-            $payload,
-            $user,
-            Helper::FEATURE_LESSONPLAN,
-            $aiSessionId,
-        );
+
+        // No meaningful input text, so don't send it to the AI.
+        $log      = $this->client->createLog($payload, null, $user, Helper::FEATURE_LESSONPLAN, $aiSessionId);
+        $response = $this->client->createResponse($payload, $log);
 
         // This response used to need special handling of its return, because it
         // was not guaranteed to be valid JSON.

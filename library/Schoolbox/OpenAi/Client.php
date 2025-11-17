@@ -72,10 +72,10 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
+    public function createResponse(array $payload, Log\Model $log): ResponseInterface
     {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
-        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, false);
         return $this->handleNonStreamedResponse(
