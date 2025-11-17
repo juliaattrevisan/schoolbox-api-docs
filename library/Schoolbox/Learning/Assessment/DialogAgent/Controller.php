@@ -627,7 +627,7 @@ class Controller extends Assessment\Controller
          * If the dialog agent was only updated, use the parent logic to determine the redirect instead
          */
         if ($isCreate) {
-            $redirect = $this->routeGenerator->generate('learningAssessment.getSummary', [
+            $redirect = $this->routeGenerator->generate('learningDialogAgent.getUpdateForm', [
                 'assessmentId' => $assessment->getId(),
                 'studentId' => $this->getUser()->getId()
             ]);
