@@ -58,19 +58,11 @@ class ImageGeneration
         ?string $imageUrl = null,
         ?string $previousResponseId = null,
     ): iterable {
-        return $this->client->createResponseStream(
-            $this->buildPayload(
-                $prompt,
-                $size,
-                $style,
-                $imageUrl,
-                $previousResponseId,
-            ),
-            $user,
-            Helper::FEATURE_IMAGE,
-            $sessionId,
-            8192,
-        );
+        $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
+        $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
+        return $this->client->createResponseStream($payload, $log, 8192);
+
+        // TODO add some method for extracting output text from the response
     }
 
     /**

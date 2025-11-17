@@ -88,10 +88,10 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createResponseStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
+    public function createResponseStream(array $payload, Log\Model $log, ?int $chunkSize = null): iterable
     {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
-        $log      = $this->generateLog($user, $feature, $aiSessionId, $url, $payload);
+        $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
         return $this->handleStreamedResponse(
@@ -133,6 +133,34 @@ class Client implements IClient
             new LogHandler\ChatCompletionsMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createLog(
+        array $payload,
+        ?string $inputText = null,
+        ?User $user = null,
+        ?string $feature = null,
+        ?string $aiSessionId = null,
+    ): Log\Model {
+        /** @noinspection PhpUnhandledExceptionInspection - this will never throw */
+        $log = $this->logMapper->createModel()
+            ->setPrompt(json_encode($payload));
+        if (isset($inputText)) {
+            $log = $log->setInputText($inputText);
+        }
+        if (isset($user)) {
+            $log = $log->setUser($user);
+        }
+        if (isset($feature)) {
+            $log = $log->setFeature($feature);
+        }
+        if (isset($aiSessionId)) {
+            $log = $log->setSessionId($aiSessionId);
+        }
+        return $log;
     }
 
     /**
