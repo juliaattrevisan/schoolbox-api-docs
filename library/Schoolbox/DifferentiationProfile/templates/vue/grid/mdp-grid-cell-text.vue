@@ -144,36 +144,124 @@ function onSave(): void {
     profile[props.headerKey] = currentText.value;
     void mdpSaveStore.save(profile);
 }
+
+/**
+ *
+ */
+const contentIsEmpty = window.Vue.computed(() => {
+    return currentText.value === null;
+});
+
+const currentHeight = window.Vue.ref(250);
+const animationDuration = window.Vue.ref("0.3s");
 </script>
 
 <template>
-    <div class="l-flex" :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onContainerSelected">
-        <empty-state v-if="currentText === null" icon="icon-textbox">
-            <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
-        </empty-state>
-        <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
-            <media-article
-                :id="editorId"
-                ref="editorContentEl"
-                tag="div"
-                class="editor-content"
-                :content="initialTextboxContent"
-            ></media-article>
-            <div class="clearfix"></div>
+    <div class="grid-cell" :style="{ height: `${currentHeight}px` }">
+        <div ref="contentEl">
+            <div class="editor-wrapper" :style="{ display: currentText !== null ? 'block' : 'none' }">
+                <media-article
+                    :id="editorId"
+                    ref="editorContentEl"
+                    tag="div"
+                    class="editor-content"
+                    :content="initialTextboxContent"
+                ></media-article>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="content-container-fixed">
+            <div v-if="!contentIsEmpty" class="content-overlay">
+                <div class="show-more-container" :data-visible="showViewMoreGradient">
+                    <button
+                        :data-test="`unit-planner-view-more-button-${props.unit.id}-${props.column.type}`"
+                        :data-visible="showViewMoreInner"
+                        :tabindex="showViewMoreInner ? 0 : -1"
+                        @click.prevent="store.toggleViewMore(props.unit.id)"
+                    >
+                        View More
+                    </button>
+                </div>
+            </div>
+            <div v-else class="content-overlay empty-state no-print">
+                <empty-state icon="icon-textbox">
+                    <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
+                </empty-state>
+            </div>
+            <div ref="componentActionEl">
+                <mdp-grid-cell-action
+                    :profile="props.profile"
+                    :header-key="props.headerKey"
+                    :has-changed="hasChanged"
+                    :is-saving="isSaving"
+                    :is-focused="isFocused"
+                    @modify="onModify"
+                    @save="onSave"
+                />
+            </div>
         </div>
     </div>
-    <mdp-grid-cell-action
-        :profile="props.profile"
-        :header-key="props.headerKey"
-        :has-changed="hasChanged"
-        :is-saving="isSaving"
-        :is-focused="isFocused"
-        @modify="onModify"
-        @save="onSave"
-    />
 </template>
 
-<style>
+<style scoped lang="scss">
+.grid-cell {
+    overflow: clip; // Use clip to avoid focus scrolling the cell content
+    position: relative;
+    text-overflow: ellipsis;
+    transition: height v-bind(animationDuration) ease;
+}
+
+.content-container-fixed {
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: end;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    z-index: calc(var(--sbx-depth-default) + 1); // Always appear above the content
+
+    .content-overlay {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: end;
+        margin-bottom: 0;
+        width: 100%;
+
+        &.empty-state {
+            justify-content: center;
+            pointer-events: all;
+        }
+    }
+
+    .show-more-container {
+        background: linear-gradient(0deg, #fff 0%, #fff0 100%);
+        display: flex;
+        justify-content: end;
+        opacity: 0;
+        transition: opacity 0.3s;
+
+        &[data-visible="true"] {
+            opacity: 1;
+        }
+
+        button {
+            margin: 5px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+
+            &[data-visible="true"] {
+                opacity: 1;
+                pointer-events: all;
+            }
+        }
+    }
+}
+
 .editor-wrapper {
     padding-bottom: 2px;
     width: 100%;
