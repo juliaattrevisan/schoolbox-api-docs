@@ -362,6 +362,15 @@ class Module extends BaseModule
     {
         return new Rule\LazyCallback(
             fn() => new Rule\Callback(function (array $params) use ($action): void {
+                /* Accommodate a special case for resetting the dialog agent for a particular person
+                 *
+                 * This is always available to conduct upon a person since it operates on their entire response
+                 * history rather than an individula response instance
+                 */
+                if (Status::ACTION_RESET === $action) {
+                    return;
+                }
+
                 $status = (new DialogAgent\Response\Lookup\Status())->calculate($params['response'] ?? null);
 
                 if (!$status['actions'][$action]) {
