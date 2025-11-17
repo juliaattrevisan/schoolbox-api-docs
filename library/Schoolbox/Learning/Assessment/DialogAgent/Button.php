@@ -157,7 +157,7 @@ class Button
                 /* If there are no responses at all, button says "Begin"
                  * You're about to make the first one and the first one is always authoritative.
                  */
-                $route = 'learningDialogAgent.getCreateResponseForm';
+                $route = 'learningAssessment.getCreateResponseForm';
 
                 $params = [
                     'assessment' => $assessment,
