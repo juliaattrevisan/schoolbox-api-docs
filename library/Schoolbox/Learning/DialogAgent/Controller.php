@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
@@ -323,8 +324,14 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        /* TODO snake async payload response in some reptilian manner
-         */
+        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
+
+        $this->response = $this->responseAsJson([
+            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
+            'response' => $responseTranslator->__invoke($response),
+        ])->withStatus(200);
     }
 
 
