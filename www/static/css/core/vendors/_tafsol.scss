@@ -315,33 +315,16 @@ span:has(~ .gradient-0) {
 
 .gradient-0 {
     background-color: color-mix(in srgb, currentColor, transparent 90%);
-    padding: 4px 10px;
     border-radius: var(--sbx-border-radius-normal);
+    padding: 4px 10px;
     width: fit-content;
 }
 
+// The class home page Three dot Menu styles
 #tab-control {
     background-color: var(--card-bg);
-    border-radius: calc(var(--sbx-border-radius-normal) * 0.4);
+    border-radius: var(--sbx-border-radius-normal);
     padding: 0.5rem;
-
-    & .separator {
-        border-radius: var(--sbx-border-radius-normal);
-        color: var(--sbx-color-accent);
-        background-color: var(--bg-primary);
-    }
-
-    & li {
-        border-radius: var(--sbx-border-radius-normal);
-
-        &:hover {
-            background-color: #efefef;
-        }
-
-        & a {
-            background-color: transparent;
-        }
-    }
 
     & .category {
         min-width: unset;
@@ -351,6 +334,24 @@ span:has(~ .gradient-0) {
         display: grid;
         gap: 1rem;
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    & .separator {
+        background-color: var(--bg-primary);
+        border-radius: var(--sbx-border-radius-normal);
+        color: var(--sbx-color-accent);
+    }
+
+    & li {
+        border-radius: var(--sbx-border-radius-normal);
+
+        & a {
+            background-color: transparent;
+        }
+
+        &:hover {
+            background-color: #efefef;
+        }
     }
 }
 
