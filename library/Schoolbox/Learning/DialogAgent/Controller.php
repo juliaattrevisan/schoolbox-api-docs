@@ -376,6 +376,8 @@ class Controller extends Base
             ->setAssessable($assessment)
             ->setDialogAgent($this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId()))
             ->setSubmittedOnBehalfOf($student)
+            ->setCreatedBy($student->getId())
+            ->setUpdatedBy($student->getId())
             ->setAuthoritative(true);
 
         $this->dialogAgentResponseMapper->save($newResponse);
