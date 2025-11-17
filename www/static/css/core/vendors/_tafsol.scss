@@ -248,10 +248,12 @@ body {
     background-color: transparent;
 }
 
+// Delete icon specific styles
 .icon-delete {
-    border: 1px solid red;
     background-color: transparent;
+    border: 1px solid red;
     color: red !important;
+
     &:before {
         color: red !important;
     }
