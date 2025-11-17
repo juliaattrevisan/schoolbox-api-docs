@@ -170,16 +170,17 @@ body {
     }
 }
 
+// add component and edit column buttons on home styles
 #add-component,
 #edit-column {
     background-color: var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
-    width: 2rem;
+    color: var(--sbx-color-accent-text);
+    display: inline-block;
     height: 2rem;
     line-height: 2;
     margin-inline-start: 0.5rem;
-    color: var(--sbx-color-accent-text);
-    display: inline-block;
+    width: 2rem;
 }
 
 [content-id="tab-control"] {
@@ -193,21 +194,24 @@ body {
 .icon-reply,
 .icon-forum,
 .icon-download {
-    background-color: transparent !important;
-    border-radius: 50%;
-    border: 1px solid var(--sbx-color-accent);
-    height: 40px;
-    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    background-color: transparent !important;
+    border: 1px solid var(--sbx-color-accent);
+    border-radius: 50%;
     color: var(--sbx-color-accent) !important;
+    display: inline-flex;
+    height: 40px;
+    justify-content: center;
     line-height: 2.3;
+
     &::before {
         color: var(--sbx-color-accent) !important;
     }
+
     &:hover {
         background-color: transparent !important;
     }
+
     &:not(:last-child) {
         margin-inline-end: 4px;
     }
