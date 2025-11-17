@@ -282,14 +282,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
-        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
-        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
-
-        $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
-            'response' => $responseTranslator->__invoke($response),
-        ])->withStatus(200);
+        $this->translatePayload($response);
     }
 
 
@@ -308,14 +301,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
-        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
-        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
-
-        $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
-            'response' => $responseTranslator->__invoke($response),
-        ])->withStatus(200);
+        $this->translatePayload($response);
     }
 
 
@@ -336,14 +322,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
-        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
-        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
-
-        $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
-            'response' => $responseTranslator->__invoke($response),
-        ])->withStatus(200);
+        $this->translatePayload($response);
     }
 
 
@@ -364,14 +343,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
-        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
-        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
-
-        $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
-            'response' => $responseTranslator->__invoke($response),
-        ])->withStatus(200);
+        $this->translatePayload($response);
     }
 
 
@@ -408,13 +380,25 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($newResponse);
 
+        $this->translatePayload($newResponse);
+    }
+
+
+    /**
+     * Returns a json payload conversion of $response
+     *
+     * @param Response $response
+     * @return void
+     */
+    private function translatePayload(Response $response): void
+    {
         $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
         $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
 
         $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($newResponse->getSubmittedOnBehalfOf()),
-            'response' => $responseTranslator->__invoke($newResponse),
+            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
+            'response' => $responseTranslator->__invoke($response),
         ])->withStatus(200);
     }
 }
