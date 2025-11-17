@@ -136,6 +136,9 @@ DESCRIPTION
 
     Please ensure you do a dry run before you run the script as this is unrecoverable.
 
+    If this script is used to actually remove message triggers, the schedule daemon must be restarted in order for
+    changes to take effect. This is because the scheduler stores the trigger in its internal cache.
+
     Note that a message trigger contains the following:
     * when a message should be sent
     * who triggered the event for sending messages
@@ -265,6 +268,7 @@ HELP;
             $logger->info("No matching triggers found!");
         } elseif ($this->perform()) {
             $logger->info("$matchCount triggers matched and removed");
+            $logger->info("In order for this trigger to be removed from the schedule, the schedule daemon must be restarted");
         } else {
             $logger->info("$matchCount triggers matched, no action taken (run with -p to delete)");
         }
