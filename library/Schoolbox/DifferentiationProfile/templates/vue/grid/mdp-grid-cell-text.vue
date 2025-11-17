@@ -267,7 +267,7 @@ const animationDuration = window.Vue.ref("0.3s");
     </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .grid-cell {
     overflow: clip; // Use clip to avoid focus scrolling the cell content
     position: relative;
