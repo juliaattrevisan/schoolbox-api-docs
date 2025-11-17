@@ -152,7 +152,7 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', new Rule\All(
             $canViewSummary,
             $this->buildRuleCanAction(Status::ACTION_VIEW)
-        ), $preloadParticipant);
+        ), $preloadParticipantAndResponse);
 
         /* Student requests assistance for a particular response
          */
