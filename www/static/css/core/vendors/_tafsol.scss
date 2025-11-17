@@ -3,19 +3,32 @@
 /* Tafsol Custom Styles - Updated to use Schoolbox Design System Variables */
 
 :root {
-    --border: var(--sbx-border-width-normal) solid var(--sbx-color-foreground-secondary);
     --card-bg: #ffffff; // white card background
     --ff-primary: "Figtree", sans-serif;
 }
 body {
-    --accent-foreground: var(--sbx-color-accent);
-    --form-border-color: var(--sbx-color-accent);
-    --ck-border-radius: calc(var(--sbx-border-radius-normal) / 2);
-    --ck-color-toolbar-border: var(--sbx-color-accent);
-    --left-head-font: var(--sbx-color-accent);
-    font-family: var(--ff-primary) !important;
-    background-color: #ffffff;
+    // Override body background to use lighter shade of accent color
+    background: var(--body-background);
+    --body-background: hsla(
+        var(--body-background-h),
+        var(--body-background-s),
+        var(--body-background-l),
+        var(--body-background-a)
+    );
 
+    --body-background-a: 1;
+    --body-background-h: 204;
+    --body-background-l: 98%;
+    --body-background-s: 49%;
+
+    --ck-border-radius: var(--sbx-border-radius-normal);
+    --ck-color-toolbar-border: var(--sbx-color-accent);
+
+    font-family: var(--ff-primary) !important;
+
+    --left-head-font: var(--sbx-color-accent);
+
+    // to prevent barcode font override
     & *:not(.barcode-39) {
         font-family: var(--ff-primary) !important;
     }
@@ -632,7 +645,7 @@ article:has(img) p > img {
         white-space: nowrap;
 
         .active &:not([data-test^="homepage-component-palette-tab"]) {
-            border-bottom: 3px solid var(--accent-foreground) !important;
+            border-bottom: 3px solid var(--sbx-color-accent) !important;
         }
     }
 }
@@ -686,9 +699,9 @@ article:has(img) p > img {
         padding: 1rem;
         border-bottom: 0;
 
-        :not(#unit-planner-container):has(&) {
+        /*:not(#unit-planner-container):has(&) {
             background-color: transparent;
-        }
+        }*/ //Remoned because we cannont use id selector in design system files
     }
 
     & .button,
@@ -726,7 +739,7 @@ article:has(img) p > img {
         & .article-read-more {
             text-decoration: underline;
             font-size: 1rem;
-            text-decoration-color: var(--accent-foreground) !important;
+            text-decoration-color: var(--sbx-color-accent) !important;
         }
     }
 }
@@ -1993,9 +2006,10 @@ a.source-select.icon-folder.placeholder {
     border-radius: 0.6rem;
 }
 
-section.main {
+/*section.main {
     background-color: white;
 }
+    */ //Removed the white background from main section to allow for design system bg color to show through
 
 section.banner.content img {
     border-radius: 0.6rem;
@@ -2041,15 +2055,26 @@ section {
 /*
 **
  Brand & primary action - updated to Schoolbox design system variables
-
+:root{
 --sbx-color-accent: var(--sbx-color-accent); // Removed and used --sbx-color-accent directly
 --bg-primary: #eefbff; // I don't think we need this anymore
 --border-color: var(--sbx-color-foreground-secondary); // updated to Schoolbox design system variable
+--border: var(--sbx-border-width-normal) solid var(--sbx-color-foreground-secondary);
 --border-radius: var(--sbx-border-radius-normal); // Removed and used --sbx-border-radius-normal directly
 --content-ui-foreground: var(--sbx-color-accent); //  Removed and used --sbx-color-accent directly
 --gradient-primary: linear-gradient(90deg, #001691 0%, #0077b6 70%); // Removed gradient as we have --navigation-background for it now
 --shadow: 0 4 8px rgba(0, 0, 0, 0.15); // Replaced with sbx-shadow-m
 --text-color-inverted: var(--sbx-color-accent-text); // Removed and replaced with --sbx-color-accent-text
 --text-color: var(--sbx-color-text-primary); // Replaced with direct usage of --sbx-color-text-primary
+}
+
+body {
+    //--accent-foreground: var(--sbx-color-accent); // Replaced with direct usage of --sbx-color-accent
+    //--form-border-color: var(--sbx-color-accent); // Don't need this variable anymore
+    //background-color: #ffffff; // This is overridden in this file
+
+}
+
+
 **
 */
