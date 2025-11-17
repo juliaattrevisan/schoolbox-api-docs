@@ -38,47 +38,48 @@ body {
     margin: 1rem;
 
     & .tab-bar {
-        border-radius: var(--sbx-border-radius-normal);
         background-image: var(--gradient-primary);
+        border-radius: var(--sbx-border-radius-normal);
     }
     & .top-menu li a:hover {
         border-radius: var(--sbx-border-radius-normal);
     }
 }
 
+// Notifications styles
 #notifications {
-    top: 1rem;
-    right: 1rem;
-    border-top-right-radius: var(--sbx-border-radius-normal);
-    border-bottom-right-radius: var(--sbx-border-radius-normal);
-    overflow: hidden;
-    display: flex;
     align-items: center;
+    border-bottom-right-radius: var(--sbx-border-radius-normal);
+    border-top-right-radius: var(--sbx-border-radius-normal);
+    display: flex;
+    overflow: hidden;
     padding: 1rem;
     padding-inline-end: 2rem;
+    right: 1rem;
+    top: 1rem;
     width: auto;
 
     & #notification-toggle {
+        align-items: center;
         background-color: var(--card-bg);
-        height: 2rem;
-        width: 2rem;
         border-radius: var(--sbx-border-radius-normal);
         display: flex;
-        align-items: center;
+        height: 2rem;
+        width: 2rem;
 
         &::before {
             color: #000000;
             height: 100%;
-            width: 100%;
             line-height: 1.9;
+            width: 100%;
         }
 
         & span {
-            position: absolute;
-            font-size: 8px;
-            top: -8px;
-            right: -8px;
             background-color: red;
+            font-size: 8px;
+            position: absolute;
+            right: -8px;
+            top: -8px;
         }
     }
 }
