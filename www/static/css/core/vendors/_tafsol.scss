@@ -92,20 +92,20 @@ body {
 
 #header-search-input {
     & button {
-        background-color: transparent;
+        background-color: transparent; // Removed button background for search input on header
     }
 }
 
 #profile-drop {
-    margin-inline-end: 1rem;
+    background-color: var(--card-bg);
+    border-radius: var(--sbx-border-radius-normal);
     height: 3rem;
-    width: 3rem;
-    top: 50%;
-    transform: translateY(-50%);
-    border-radius: calc(var(--sbx-border-radius-normal) * 2);
+    margin-inline-end: 1rem;
     overflow: hidden;
     padding: 0.5rem;
-    background-color: var(--card-bg);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
 
     & img {
         border-radius: var(--sbx-border-radius-normal);
