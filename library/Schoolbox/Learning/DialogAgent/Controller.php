@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
@@ -281,8 +282,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        /* TODO snake async payload response in some reptilian manner
-         */
+        $this->translatePayload($response);
     }
 
 
@@ -301,8 +301,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        /* TODO snake async payload response in some reptilian manner
-         */
+        $this->translatePayload($response);
     }
 
 
@@ -323,8 +322,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        /* TODO snake async payload response in some reptilian manner
-         */
+        $this->translatePayload($response);
     }
 
 
@@ -345,8 +343,7 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        /* TODO snake async payload response in some reptilian manner
-         */
+        $this->translatePayload($response);
     }
 
 
@@ -379,11 +376,31 @@ class Controller extends Base
             ->setAssessable($assessment)
             ->setDialogAgent($this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId()))
             ->setSubmittedOnBehalfOf($student)
+            ->setCreatedBy($student->getId())
+            ->setUpdatedBy($student->getId())
             ->setAuthoritative(true);
 
         $this->dialogAgentResponseMapper->save($newResponse);
 
-        /* TODO snake async payload response in some reptilian manner
-         */
+        $this->translatePayload($newResponse);
+    }
+
+
+    /**
+     * Returns a json payload conversion of $response
+     *
+     * @param Response $response
+     * @return void
+     */
+    private function translatePayload(Response $response): void
+    {
+        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
+
+        $this->response = $this->responseAsJson([
+            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
+            'response' => $responseTranslator->__invoke($response),
+        ])->withStatus(200);
     }
 }
