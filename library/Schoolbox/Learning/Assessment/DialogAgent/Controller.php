@@ -374,7 +374,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * This is where students will create their dialog agent discussion stuffs
+     * This is where students will create or resume their dialog agent discussion stuffs
      *
      * @param IAssessable $assessment
      * @param User $student
@@ -433,77 +433,6 @@ class Controller extends Assessment\Controller
                 'aiSessionId' => $existingResponse?->getSessionId() ?? (string)Uuid::uuid4(),
                 'assistanceRequestedAt' => $existingResponse?->getAssistanceRequestedAt() ?? null,
             ],
-            'readonly' => $isInteractionLocked,
-            'returnUrl' => $returnUrl,
-        ];
-
-        $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response/create.twig',
-            $data
-        );
-    }
-
-
-    /**
-     * Resume an unsubmitted response
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     * @throws Deleted
-     * @throws Error
-     * @throws Exception
-     * @throws RouteNotFound
-     */
-    public function getResumeResponse(IAssessable $assessment, User $student): void
-    {
-        // TODO: i'm not too sure how actually necessary this is, getCreateResponseForm should be enough??
-        // when would you ever want two draft responses and to be able to resume either one...
-
-        /** @var null|Participant $participant */
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
-         * button which goes to that particular response so students can continue it.
-         *
-         * Otherwise create a new response.
-         */
-        $existingResponse = null;
-
-        if ($participant) {
-            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-                ->equals('learner_id', $participant->getUser()->getId())
-                ->isNull('submitted_by')
-                ->isNull('submitted_at');
-
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-        }
-
-        // Is the page being displayed in readonly mode?
-        /* TODO Are students allowed to visit this after the activity is closed?
-         */
-        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
-
-        /* Prepare a redirection url
-         */
-        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
-        } else {
-            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
-        }
-
-        // TODO: update these accordingly to match the above, or remove getResumeResponse entirely
-        $data = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    sprintf('Create Response for %s', $assessment->getTitle()),
-                ]
-            ),
-            'assessment' => $assessment,
-            'student' => $student,
-            'participant' => $participant,
-            'existingResponse' => $existingResponse,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
         ];

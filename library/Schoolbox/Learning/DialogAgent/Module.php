@@ -146,10 +146,6 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
         $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
-        /* Resume a response
-         */
-        $this->register('GET', "{$assRoute}/{$studentParam}/resume", 'getResumeResponse', $canSubmit, $preloadParticipant);
-
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(

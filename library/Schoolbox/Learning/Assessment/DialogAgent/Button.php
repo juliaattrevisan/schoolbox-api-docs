@@ -187,13 +187,11 @@ class Button
                         'label' => self::LABEL_RESUME,
                         'responseId' => $authoritativeResponse->getId(),
                         'enabled' => true,
-                        'url' => $this->routeGenerator->generate('learningDialogAgent.getResumeResponse', [
+                        'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
                             'assessment' => $assessment,
                             'assessmentId' => $assessment->getId(),
                             'student' => $participant->getUser(),
                             'studentId' => $participant->getUser()->getId(),
-                            'response' => $authoritativeResponse,
-                            'responseId' => $authoritativeResponse->getId()
                         ]),
                     ];
                 }
