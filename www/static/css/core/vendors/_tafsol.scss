@@ -34,10 +34,6 @@ body {
     }
 }
 
-#container {
-    padding: 0.75rem !important;
-}
-
 #hybrid-bar {
     margin: 1rem;
 
@@ -2075,6 +2071,9 @@ body {
 
 }
 
+#container {
+    padding: 0.75rem !important; // Removed container padding
+}
 
 **
 */
