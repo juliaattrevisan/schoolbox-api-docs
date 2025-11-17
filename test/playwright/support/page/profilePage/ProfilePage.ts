@@ -17,6 +17,20 @@ export default class ProfilePage {
 
     static readonly DATA_TEST_PROFILE_BUTTONS = "profile-buttons";
 
+    static readonly DATA_TEST_SHARE_LEARNING_MOMENT_BUTTON = "learning-moment-evidence-share";
+
+    static readonly DATA_TEST_SET_GOALS_BUTTON = "a.goals.icon-goal";
+
+    static readonly SELECTOR_AWARD_ACHIEVEMENTS_BUTTON = "a.icon-achievement";
+
+    static readonly SELECTOR_LEARNING_MOMENTS_FILTER = 'label[for="filter-learningMoments"]';
+
+    static readonly SELECTOR_GOALS_FILTER = 'label[for="filter-goals"]';
+
+    static readonly SELECTOR_ACHIEVEMENTS_FILTER = 'label[for="filter-achievements"]';
+
+    static readonly SELECTOR_FEEDBACK_FILTER = 'label[for="filter-feedback"]';
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -151,5 +165,34 @@ export default class ProfilePage {
     async checkImagePresence(userId: string | number): Promise<void> {
         const imageSrc = await this.page.locator("img.full-width").getAttribute("src");
         expect(imageSrc).toContain(`id=${userId}`);
+    }
+
+    /**
+     * Verify if Share Learning Moments, Set Goals and Award Achievements buttons are visible on profile page
+     */
+    async checkProfileActionButtonsVisible(): Promise<void> {
+        const shareLearningMomentButton = this.page.getByTestId(ProfilePage.DATA_TEST_SHARE_LEARNING_MOMENT_BUTTON);
+        const setGoalsButton = this.page.locator(ProfilePage.DATA_TEST_SET_GOALS_BUTTON);
+        const awardAchievementsButton = this.page.locator(ProfilePage.SELECTOR_AWARD_ACHIEVEMENTS_BUTTON);
+
+        await expect(shareLearningMomentButton).toBeVisible();
+        await expect(setGoalsButton).toBeVisible();
+        await expect(awardAchievementsButton).toBeVisible();
+    }
+
+    /**
+     * Verify if filters are visible on profile page
+     * Learning Moments, Goals, Achievements, Feedback filters
+     */
+    async checkFiltersAreVisible(): Promise<void> {
+        const learningMomentsFilter = this.page.locator(ProfilePage.SELECTOR_LEARNING_MOMENTS_FILTER);
+        const goalsFilter = this.page.locator(ProfilePage.SELECTOR_GOALS_FILTER);
+        const achievementsFilter = this.page.locator(ProfilePage.SELECTOR_ACHIEVEMENTS_FILTER);
+        const feedbackFilter = this.page.locator(ProfilePage.SELECTOR_FEEDBACK_FILTER);
+
+        await expect(learningMomentsFilter).toBeVisible();
+        await expect(goalsFilter).toBeVisible();
+        await expect(achievementsFilter).toBeVisible();
+        await expect(feedbackFilter).toBeVisible();
     }
 }
