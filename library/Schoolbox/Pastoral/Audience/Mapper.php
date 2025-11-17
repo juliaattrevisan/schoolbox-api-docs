@@ -10,6 +10,7 @@ namespace Schoolbox\Pastoral\Audience;
 use Closure;
 use PDO;
 use PDOStatement;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -190,11 +191,26 @@ class Mapper extends BaseMapper
      */
     public function getPermissionCallback(): Closure
     {
-        return static function (Model $model) {
+        $config = $this->getConfigLoader();
+
+        return static function (Model $model) use ($config): bool {
             if ($model->getUser() && $model->getUser()->isStaffWithPastoralAccess()) {
                 return true;
             }
-            $role = $model->getRole() ?: ($model->getUser() ? $model->getUser()->getRole() : null);
+            /** @var ?Role $role */
+            $role = $model->getRole() ?: ($model->getUser()?->getRole());
+
+            /** Checking if the parent and student access are enabled or not */
+            if ($model->getRoleType() === Role::PARENT || $role?->isParent()) {
+                if (!$config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED)) {
+                    return false;
+                }
+            } else if ($model->getRoleType() === Role::STUDENT || $role?->isStudent()) {
+                if (!$config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED)) {
+                    return false;
+                }
+            }
+
             if ($role) {
                 return !in_array(Role::PERMISSION_ACCESS_PASTORAL, Role::VALID_PERMISSIONS[$role->getType()]) || $role->getAccessPastoral();
             }
