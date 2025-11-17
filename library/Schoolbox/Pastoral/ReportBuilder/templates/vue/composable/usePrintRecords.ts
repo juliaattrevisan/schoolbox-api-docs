@@ -7,7 +7,7 @@
 
 import type { Ref } from "vue";
 import { waitForAllImages } from "@js/util/domUtils";
-import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
+import { ViewUrlParam, type RecordsPayload } from "../../js/types/pastoralReportTypes";
 
 /**
  * @param url - The URL ref for fetching records
@@ -44,6 +44,10 @@ export function usePrintRecords(
             window.print();
             return;
         }
+        // from here we assume next cursor exists otherwise we would have printed already
+        if (payload.value === null || payload.value.metadata?.cursor.next === null) {
+            return;
+        }
         // Need to fetch all records first
         window.Vue.watch(
             payload,
@@ -58,8 +62,9 @@ export function usePrintRecords(
             },
             { deep: true, once: true }, // only watch once as we only need to fetch once
         );
+        urlParams.set(ViewUrlParam.CURSOR, payload.value.metadata?.cursor.next as string);
         // Set limit to high number to load all records
-        urlParams.set("limit", LIMIT.toString());
+        urlParams.set(ViewUrlParam.LIMIT, LIMIT.toString());
         // Use provided base URL or extract from current URL
         const targetBaseUrl = baseUrl || url.value.split("?")[0];
         url.value = `${targetBaseUrl}?${urlParams.toString()}`;
