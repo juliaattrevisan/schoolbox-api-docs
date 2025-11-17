@@ -508,6 +508,7 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     min-width: $progress-tick-size;
     min-height: $progress-tick-size;
     &:before {
+        font-size: calc($progress-tick-size / 2);
         line-height: $progress-tick-size;
     }
     &.pending,
