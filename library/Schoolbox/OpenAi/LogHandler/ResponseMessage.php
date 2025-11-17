@@ -26,7 +26,7 @@ class ResponseMessage implements ILogHandler
      * There are 3 possible events that indicate the end of a response: see
      * https://platform.openai.com/docs/api-reference/responses-streaming/response.
      */
-    private const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete', 'error'];
+    public const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete', 'error'];
 
     /**
      * When an image is omitted from the request/response: replace the image
@@ -57,6 +57,9 @@ class ResponseMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+        if (is_callable($streamListener)) {
+            $streamListener($message, $log);
+        }
         if (isset($rawData['response'])) {
             // Handle information about the response
             $log = $this->logUsage($rawData['response'], $log);

@@ -12,8 +12,11 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
+use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use Schoolbox\User;
 
 /**
@@ -60,7 +63,7 @@ class ImageGeneration
     ): iterable {
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
-        return $this->client->createResponseStream($payload, $log, 8192);
+        return $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
 
         // TODO add some method for extracting output text from the response:
         //      it'll need to be a listener on the client
@@ -103,5 +106,20 @@ class ImageGeneration
             $imageUrl,
             $previousResponseId,
         );
+    }
+
+    private function listenForOutputText(Message $message, Log\Model $log): void
+    {
+        if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
+            // Extract text
+            $decodedMessage = json_decode($message->data, true);
+            foreach (($decodedMessage['response']['output']) ?? [] as $output) {
+                foreach (($output['content'] ?? []) as $content) {
+                    if ($content['type'] === 'output_text') {
+                        $log->setOutputText($content['text']);
+                    }
+                }
+            }
+        }
     }
 }
