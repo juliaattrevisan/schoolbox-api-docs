@@ -3,34 +3,16 @@
 /* Tafsol Custom Styles - Updated to use Schoolbox Design System Variables */
 
 :root {
-    // Brand & primary action - updated to Schoolbox design system variables
-    --action-color: var(--sbx-color-accent); // accent blue
-
-    --bg-primary: #eefbff;
-
-    --border: 1px solid var(--border-color);
-    --border-color: #e5e7eb;
-    --border-radius: var(--sbx-border-radius-normal); // normal border radius
-
-    --card-bg: #ffffff;
-
-    --content-ui-foreground: var(--sbx-color-accent); // accent blue
-
+    --border: var(--sbx-border-width-normal) solid var(--sbx-color-foreground-secondary);
+    --card-bg: #ffffff; // white card background
     --ff-primary: "Figtree", sans-serif;
-
-    //--gradient-primary: linear-gradient(90deg, #001691 0%, #0077b6 70%); // Removed gradient as we have --navigation-background for it now
-
-    --shadow: 0 4 8px rgba(0, 0, 0, 0.15); // Box shadow medium
-
-    --text-color: var(--sbx-color-text-primary); // primary text color
-    --text-color-inverted: var(--sbx-color-accent-text); // accent text color
 }
 body {
-    --accent-foreground: var(--action-color);
-    --form-border-color: var(--action-color);
-    --ck-border-radius: calc(var(--border-radius) / 2);
-    --ck-color-toolbar-border: var(--action-color);
-    --left-head-font: var(--action-color);
+    --accent-foreground: var(--sbx-color-accent);
+    --form-border-color: var(--sbx-color-accent);
+    --ck-border-radius: calc(var(--sbx-border-radius-normal) / 2);
+    --ck-color-toolbar-border: var(--sbx-color-accent);
+    --left-head-font: var(--sbx-color-accent);
     font-family: var(--ff-primary) !important;
     background-color: #ffffff;
 
@@ -47,19 +29,19 @@ body {
     margin: 1rem;
 
     & .tab-bar {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         background-image: var(--gradient-primary);
     }
     & .top-menu li a:hover {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
 
 #notifications {
     top: 1rem;
     right: 1rem;
-    border-top-right-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
+    border-top-right-radius: var(--sbx-border-radius-normal);
+    border-bottom-right-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -71,7 +53,7 @@ body {
         background-color: var(--card-bg);
         height: 2rem;
         width: 2rem;
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         display: flex;
         align-items: center;
 
@@ -95,8 +77,8 @@ body {
 #left-off-canvas-toggle {
     top: 1rem;
     left: 1rem;
-    border-top-left-radius: var(--border-radius);
-    border-bottom-left-radius: var(--border-radius);
+    border-top-left-radius: var(--sbx-border-radius-normal);
+    border-bottom-left-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
 }
 
@@ -112,45 +94,45 @@ body {
     width: 3rem;
     top: 50%;
     transform: translateY(-50%);
-    border-radius: calc(var(--border-radius) * 2);
+    border-radius: calc(var(--sbx-border-radius-normal) * 2);
     overflow: hidden;
     padding: 0.5rem;
     background-color: var(--card-bg);
 
     & img {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
 
 /* Old Css */
 
 #component-layout .component-container {
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
+    border-radius: var(--sbx-border-radius-normal);
+    border: 1px solid var(--sbx-color-foreground-secondary);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 
     & .row > .columns > .component-titlebar {
-        border-top-left-radius: var(--border-radius);
-        border-top-right-radius: var(--border-radius);
+        border-top-left-radius: var(--sbx-border-radius-normal);
+        border-top-right-radius: var(--sbx-border-radius-normal);
     }
 
     & .row > .island section:last-child {
-        border-bottom-left-radius: var(--border-radius);
-        border-bottom-right-radius: var(--border-radius);
+        border-bottom-left-radius: var(--sbx-border-radius-normal);
+        border-bottom-right-radius: var(--sbx-border-radius-normal);
     }
 
     & .component-titlebar {
         padding: 0.5rem 1rem;
         border-style: solid;
         border-width: 0 0 1px 0;
-        border-color: var(--border-color);
+        border-color: var(--sbx-color-foreground-secondary);
         transition: border-bottom 200ms linear;
 
         &.meta {
             border-bottom: 0;
 
             & a {
-                color: var(--action-color);
+                color: var(--sbx-color-accent);
 
                 &::before {
                 }
@@ -173,7 +155,7 @@ body {
             & .button {
                 background-color: var(--bg-primary);
                 margin-inline-end: 0.5rem;
-                border-radius: var(--border-radius);
+                border-radius: var(--sbx-border-radius-normal);
                 padding-inline: 1rem;
             }
         }
@@ -186,13 +168,13 @@ body {
 
 #add-component,
 #edit-column {
-    background-color: var(--action-color);
-    border-radius: var(--border-radius);
+    background-color: var(--sbx-color-accent);
+    border-radius: var(--sbx-border-radius-normal);
     width: 2rem;
     height: 2rem;
     line-height: 2;
     margin-inline-start: 0.5rem;
-    color: var(--text-color-inverted);
+    color: var(--sbx-color-accent-text);
     display: inline-block;
 }
 
@@ -209,15 +191,15 @@ body {
 .icon-download {
     background-color: transparent !important;
     border-radius: 50%;
-    border: 1px solid var(--action-color);
+    border: 1px solid var(--sbx-color-accent);
     height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--action-color) !important;
+    color: var(--sbx-color-accent) !important;
     line-height: 2.3;
     &::before {
-        color: var(--action-color) !important;
+        color: var(--sbx-color-accent) !important;
     }
     &:hover {
         background-color: transparent !important;
@@ -241,10 +223,10 @@ body {
         aspect-ratio: unset;
         width: auto;
         &:hover {
-            background-color: var(--action-color) !important;
+            background-color: var(--sbx-color-accent) !important;
         }
         &::before {
-            color: var(--text-color-inverted) !important;
+            color: var(--sbx-color-accent-text) !important;
         }
     }
 }
@@ -273,9 +255,9 @@ body {
     aspect-ratio: unset;
     border: none;
     justify-content: start;
-    color: var(--content-ui-foreground) !important;
+    color: var(--sbx-color-accent) !important;
     &:before {
-        color: var(--content-ui-foreground) !important;
+        color: var(--sbx-color-accent) !important;
     }
 }
 
@@ -308,17 +290,17 @@ nav:has(
     & li {
         width: 100% !important;
         margin: 0 !important;
-        border-radius: calc(var(--border-radius) * 0.3);
+        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
         padding: 0.5rem;
         padding-bottom: 0.5rem !important;
 
         & .title {
             width: calc(100% - 1rem);
             bottom: 0.5rem;
-            border-radius: calc(var(--border-radius) * 0.2);
+            border-radius: calc(var(--sbx-border-radius-normal) * 0.2);
             font-size: 1rem !important;
             background-color: color-mix(in srgb, var(--card-bg) 80%, transparent) !important;
-            color: var(--text-color) !important;
+            color: var(--sbx-color-text-primary) !important;
         }
 
         & a {
@@ -342,23 +324,23 @@ span:has(~ .gradient-0) {
 .gradient-0 {
     background-color: color-mix(in srgb, currentColor, transparent 90%);
     padding: 4px 10px;
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     width: fit-content;
 }
 
 #tab-control {
     background-color: var(--card-bg);
-    border-radius: calc(var(--border-radius) * 0.4);
+    border-radius: calc(var(--sbx-border-radius-normal) * 0.4);
     padding: 0.5rem;
 
     & .separator {
-        border-radius: var(--border-radius);
-        color: var(--action-color);
+        border-radius: var(--sbx-border-radius-normal);
+        color: var(--sbx-color-accent);
         background-color: var(--bg-primary);
     }
 
     & li {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
 
         &:hover {
             background-color: #efefef;
@@ -382,14 +364,14 @@ span:has(~ .gradient-0) {
 
 .empty-state {
     background-color: #fff;
-    color: var(--action-color);
+    color: var(--sbx-color-accent);
 
     & a {
         font-weight: 600;
     }
 
     & [class^="icon-"] {
-        color: var(--action-color);
+        color: var(--sbx-color-accent);
     }
 }
 
@@ -435,7 +417,7 @@ span:has(~ .gradient-0) {
     }
 
     & img {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         /*     float: unset; */
         margin: unset;
         margin-inline-end: 0.5rem;
@@ -444,12 +426,12 @@ span:has(~ .gradient-0) {
 
 .card {
     & img {
-        border-radius: calc(var(--border-radius) / 2);
+        border-radius: calc(var(--sbx-border-radius-normal) / 2);
     }
     & .card-feature-image img {
         aspect-ratio: 16/12;
         object-fit: cover;
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
 
@@ -474,7 +456,7 @@ article:has(img) p > img {
         content: "";
         width: 2px;
         height: 300px;
-        background-color: var(--border-color);
+        background-color: var(--sbx-color-foreground-secondary);
         position: absolute;
         display: block;
         left: 52px;
@@ -526,7 +508,7 @@ article:has(img) p > img {
         top: 1rem;
         left: 1rem;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: calc(var(--border-radius) * 0.3);
+        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
     }
 }
 
@@ -535,23 +517,23 @@ article:has(img) p > img {
         top: 1rem;
         right: 1rem;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: calc(var(--border-radius) * 0.3);
+        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
 
         #right-menu-dock,
         .settings-button {
-            color: var(--action-color);
+            color: var(--sbx-color-accent);
         }
 
         & #notification-toggle-full {
             background-color: var(--bg-primary) !important;
-            color: var(--action-color);
+            color: var(--sbx-color-accent);
         }
     }
 }
 
 .left-off-canvas-menu ul.off-canvas-list li a,
 .left-off-canvas-menu ul.off-canvas-list li a:hover {
-    color: var(--text-color) !important;
+    color: var(--sbx-color-text-primary) !important;
 }
 
 #side-menu,
@@ -559,12 +541,12 @@ article:has(img) p > img {
 #side-menu-mysubjects,
 #side-menu-mylinks {
     & h3 {
-        border-bottom: 1px solid var(--border-color);
-        color: var(--action-color) !important;
+        border-bottom: 1px solid var(--sbx-color-foreground-secondary);
+        color: var(--sbx-color-accent) !important;
         padding-inline: 0.5rem;
 
         & a {
-            color: var(--action-color) !important;
+            color: var(--sbx-color-accent) !important;
             border-radius: 0px !important;
             background-color: transparent !important;
             padding-inline: 0.5rem;
@@ -573,9 +555,9 @@ article:has(img) p > img {
 }
 
 .Component_Dashboard_TimetableController {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     background-color: var(--card-bg);
-    box-shadow: var(--shadow);
+    box-shadow: var(--sbx-shadow-m);
     overflow: hidden;
     border: var(--border);
 
@@ -586,13 +568,13 @@ article:has(img) p > img {
     & .timetable-period-active,
     & .timetable-subject-active {
         border: none !important;
-        background-color: color-mix(in srgb, var(--action-color), transparent 90%);
+        background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 90%);
         position: relative;
         height: 100%;
 
         &::after {
             content: "";
-            background-color: var(--action-color);
+            background-color: var(--sbx-color-accent);
             width: 4px;
             height: 100%;
             position: absolute;
@@ -605,7 +587,7 @@ article:has(img) p > img {
     & .timetable th,
     & .timetable-small td,
     & .timetable-small th {
-        border-color: var(--border-color);
+        border-color: var(--sbx-color-foreground-secondary);
 
         &:not(:last-child) {
             border-left: 0px;
@@ -630,9 +612,9 @@ article:has(img) p > img {
 
 #news-component {
     border: var(--border);
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
-    box-shadow: var(--shadow);
+    box-shadow: var(--sbx-shadow-m);
 }
 
 .tabs {
@@ -659,7 +641,7 @@ article:has(img) p > img {
     flex-direction: column;
     & .tab-title:first-child {
         & a {
-            border-top-left-radius: var(--border-radius);
+            border-top-left-radius: var(--sbx-border-radius-normal);
         }
     }
 }
@@ -673,7 +655,7 @@ article:has(img) p > img {
 .island {
     & .subheader {
         font-weight: 600;
-        color: var(--text-color);
+        color: var(--sbx-color-text-primary);
         text-transform: capitalize;
         font-size: 1.5rem;
     }
@@ -692,7 +674,7 @@ article:has(img) p > img {
         display: flex;
         flex-wrap: wrap;
         & .tile {
-            border-radius: var(--border-radius);
+            border-radius: var(--sbx-border-radius-normal);
             box-shadow: 5px -5px 5px rgba(0, 0, 0, 0.1);
         }
     }
@@ -711,10 +693,10 @@ article:has(img) p > img {
 
     & .button,
     & button {
-        background-color: var(--action-color);
-        color: var(--text-color-inverted);
+        background-color: var(--sbx-color-accent);
+        color: var(--sbx-color-accent-text);
         padding-inline: 14px;
-        border-radius: calc(var(--border-radius) / 2);
+        border-radius: calc(var(--sbx-border-radius-normal) / 2);
     }
     & a {
         &:not(:last-child) {
@@ -728,7 +710,7 @@ article:has(img) p > img {
     column-gap: 1rem;
 
     & img {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         object-fit: cover;
     }
 
@@ -753,14 +735,14 @@ article:has(img) p > img {
     font-style: normal;
 
     & span:last-child a {
-        color: var(--text-color);
+        color: var(--sbx-color-text-primary);
     }
 }
 
 .Schoolbox_Paperly_Component_Dashboard_Controller {
     & #paperly-dashboard-component-container {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
     }
 
     & .flex-list {
@@ -768,16 +750,16 @@ article:has(img) p > img {
         gap: 0.5rem;
 
         & a {
-            background-color: var(--action-color);
-            color: var(--text-color-inverted);
-            border-radius: calc(var(--border-radius) / 2);
+            background-color: var(--sbx-color-accent);
+            color: var(--sbx-color-accent-text);
+            border-radius: calc(var(--sbx-border-radius-normal) / 2);
         }
     }
 }
 
 .Schoolbox_Calendar_Component_Dashboard_Controller {
     & #calendar-12 {
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         border: var(--border);
         overflow: hidden;
 
@@ -786,18 +768,18 @@ article:has(img) p > img {
         }
 
         & .fc-list-day-text {
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
         }
     }
 }
 
 .Component_Dashboard_SlideshowController {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
 
     & .swiper-button-next,
     & .swiper-button-prev {
-        background-color: color-mix(in srgb, var(--text-color-inverted), transparent);
+        background-color: color-mix(in srgb, var(--sbx-color-accent-text), transparent);
         width: 40px;
         height: 40px;
         font-size: 1rem;
@@ -812,7 +794,7 @@ article:has(img) p > img {
             width: 14px;
             height: 18px;
             font-size: 0.8rem;
-            color: var(--text-color-inverted);
+            color: var(--sbx-color-accent-text);
         }
     }
 
@@ -824,7 +806,7 @@ article:has(img) p > img {
 .Component_Dashboard_RecentSubmissionsController {
     & .information-list {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
 
         & .list-item:not(:last-child) {
             border-bottom: var(--border);
@@ -861,7 +843,7 @@ article:has(img) p > img {
 
 .subheader {
     font-family: var(--ff-primary);
-    color: var(--text-color);
+    color: var(--sbx-color-text-primary);
     text-transform: capitalize;
     font-weight: 600;
 }
@@ -869,9 +851,9 @@ article:has(img) p > img {
 .sub-nav {
     & a,
     & .active {
-        background-color: var(--action-color) !important;
-        border-radius: calc(var(--border-radius) / 3);
-        color: var(--text-color-inverted) !important;
+        background-color: var(--sbx-color-accent) !important;
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
+        color: var(--sbx-color-accent-text) !important;
         padding-inline: 1rem !important;
     }
 }
@@ -882,21 +864,21 @@ input[type="submit"],
 .buttons a,
 button[data-action],
 .component-action button {
-    background-color: var(--action-color) !important;
-    border-radius: calc(var(--border-radius) / 3) !important;
-    color: var(--text-color-inverted) !important;
+    background-color: var(--sbx-color-accent) !important;
+    border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+    color: var(--sbx-color-accent-text) !important;
     padding-inline: 1rem !important;
     text-transform: capitalize !important;
     &:hover {
         background-color: #3679a6 !important;
     }
     &::before {
-        color: var(--text-color-inverted) !important;
+        color: var(--sbx-color-accent-text) !important;
     }
 }
 
 .buttons button {
-    border-radius: calc(var(--border-radius) / 3) !important;
+    border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
 }
 
 .buttons {
@@ -911,7 +893,7 @@ button[data-action],
 
     & .active a {
         font-weight: 600;
-        border-color: var(--action-color);
+        border-color: var(--sbx-color-accent);
         border-bottom-width: 3px !important;
     }
 }
@@ -924,13 +906,13 @@ button[data-action],
 
         &.active {
             & a {
-                background-color: var(--action-color) !important;
-                color: var(--text-color-inverted) !important;
+                background-color: var(--sbx-color-accent) !important;
+                color: var(--sbx-color-accent-text) !important;
             }
         }
 
         & a {
-            border-radius: calc(var(--border-radius) / 3) !important;
+            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
             padding-inline: 0.8rem !important;
             padding-block: 0.4rem !important;
         }
@@ -977,12 +959,12 @@ button[data-action],
 
 .filters {
     & label {
-        border-radius: calc(var(--border-radius) / 3);
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
     }
 }
 
 .checklist-container {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
 
     & label:last-of-type {
@@ -998,32 +980,32 @@ button[data-action],
         @media screen and (max-width: 40em) {
             border-bottom-right-radius: 0 !important;
             border-bottom-left-radius: 0 !important;
-            border-top-right-radius: calc(var(--border-radius) / 3) !important;
-            border-top-left-radius: calc(var(--border-radius) / 3) !important;
+            border-top-right-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+            border-top-left-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
         }
     }
 
     & a {
-        border-radius: calc(var(--border-radius) / 2);
+        border-radius: calc(var(--sbx-border-radius-normal) / 2);
         border-top-left-radius: 0 !important;
         border-bottom-left-radius: 0 !important;
-        background-color: var(--action-color);
-        color: var(--text-color-inverted);
+        background-color: var(--sbx-color-accent);
+        color: var(--sbx-color-accent-text);
 
         @media screen and (max-width: 40em) {
             border-top-left-radius: 0 !important;
             border-top-right-radius: 0 !important;
-            border-bottom-left-radius: calc(var(--border-radius) / 3) !important;
-            border-bottom-right-radius: calc(var(--border-radius) / 3) !important;
+            border-bottom-left-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+            border-bottom-right-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
         }
     }
 }
 
 /* .component-container:not(.no-margin) { */
-/* 	border-radius: var(--border-radius); */
+/* 	border-radius: var(--sbx-border-radius-normal); */
 /* 	overflow: hidden; */
 /* 	border: var(--border); */
-/* 	box-shadow: var(--shadow); */
+/* 	box-shadow: var(--sbx-shadow-m); */
 /* } */
 
 .component-titlebar {
@@ -1032,27 +1014,27 @@ button[data-action],
 
 .c-chips {
     & label {
-        border-radius: calc(var(--border-radius) / 3) !important;
+        border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
     }
 }
 
 .switch {
     & label {
-        border-radius: calc(var(--border-radius) / 3);
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
 
         &::after {
-            border-radius: calc(var(--border-radius) / 4);
+            border-radius: calc(var(--sbx-border-radius-normal) / 4);
         }
     }
 }
 
 .button-block,
 input[type="radio"] + .block {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
 }
 
 .dzone {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
 }
 
 .reviewed.label,
@@ -1064,20 +1046,20 @@ input[type="radio"] + .block {
 .neutral.label,
 .label.highlight,
 .label.filter {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
 }
 
 .alert-box,
 .alert-box-icon {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
 }
 
 .progress {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
     overflow: hidden;
 
     & .meter {
-        border-radius: calc(var(--border-radius) / 3);
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
     }
 }
 
@@ -1085,7 +1067,7 @@ input[type="radio"] + .block {
     background-color: #fff;
 
     & i {
-        color: var(--action-color) !important;
+        color: var(--sbx-color-accent) !important;
     }
 
     & p {
@@ -1095,22 +1077,22 @@ input[type="radio"] + .block {
 }
 
 .reveal-modal {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     & .buttons {
         gap: 1rem;
         & li:first-child {
             & button,
             & a {
                 background-color: transparent !important;
-                color: var(--action-color) !important;
-                border: 1px solid var(--action-color);
+                color: var(--sbx-color-accent) !important;
+                border: 1px solid var(--sbx-color-accent);
             }
         }
         & li:last-child {
             & button,
             & a {
-                background-color: var(--action-color);
-                border: 1px solid var(--action-color);
+                background-color: var(--sbx-color-accent);
+                border: 1px solid var(--sbx-color-accent);
             }
         }
     }
@@ -1120,19 +1102,19 @@ input[type="radio"] + .block {
 }
 
 .tooltip {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
 }
 
 .sortable-card {
     & img {
-        border-radius: calc(var(--border-radius) / 3);
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
     }
 }
 
 .selector {
     & label::before,
     & label::after {
-        border-radius: calc(var(--border-radius) / 4);
+        border-radius: calc(var(--sbx-border-radius-normal) / 4);
     }
 }
 
@@ -1182,21 +1164,21 @@ input[type="radio"] + .block {
 
     & .accordion-navigation {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         overflow: hidden;
 
         & > a {
-            background-color: color-mix(in srgb, var(--action-color) 80%, transparent);
-            color: var(--text-color-inverted);
+            background-color: color-mix(in srgb, var(--sbx-color-accent) 80%, transparent);
+            color: var(--sbx-color-accent-text);
 
             &:hover {
-                background-color: var(--action-color);
+                background-color: var(--sbx-color-accent);
             }
         }
 
         & > a[aria-expanded="true"] {
-            background-color: color-mix(in srgb, var(--action-color) 100%, transparent);
-            color: var(--text-color-inverted);
+            background-color: color-mix(in srgb, var(--sbx-color-accent) 100%, transparent);
+            color: var(--sbx-color-accent-text);
         }
     }
 }
@@ -1206,7 +1188,7 @@ input[type="radio"] + .block {
 }
 
 .side-nav {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     border: var(--border);
     overflow: hidden;
     & li:not(:last-child) {
@@ -1221,14 +1203,14 @@ input[type="radio"] + .block {
                 button.submit
             ):not(.show-ckeditor-button) {
             font-weight: 600;
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
         }
         &
             > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                 button.submit
             ):not(.show-ckeditor-button) {
             padding-block: 1rem;
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
             font-family: var(--ff-primary);
         }
     }
@@ -1257,15 +1239,15 @@ input[type="radio"] + .block {
     & nav {
         float: none;
         & a {
-            border-radius: calc(var(--border-radius) / 3);
+            border-radius: calc(var(--sbx-border-radius-normal) / 3);
             background-color: transparent;
-            border: 1px solid var(--action-color);
+            border: 1px solid var(--sbx-color-accent);
             margin-bottom: 0;
             min-height: unset !important;
             padding-block: 0.43rem;
             &[disabled] {
                 background-color: transparent;
-                border: 1px solid var(--action-color);
+                border: 1px solid var(--sbx-color-accent);
             }
         }
     }
@@ -1285,24 +1267,24 @@ input[type="radio"] + .block {
 }
 
 .v-card {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
 
     & > a .card-class-image {
-        border-top-right-radius: var(--border-radius);
-        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--sbx-border-radius-normal);
+        border-top-left-radius: var(--sbx-border-radius-normal);
         overflow: hidden;
     }
 
     & .card-content {
         & .list-item {
             & h3 a {
-                color: var(--text-color);
+                color: var(--sbx-color-text-primary);
                 font-weight: 600;
                 font-family: var(--ff-primary);
             }
 
             & p {
-                color: color-mix(in srgb, var(--text-color) 70%, transparent);
+                color: color-mix(in srgb, var(--sbx-color-text-primary) 70%, transparent);
                 font-weight: 600;
             }
         }
@@ -1310,9 +1292,9 @@ input[type="radio"] + .block {
 }
 
 .c-search-page__filters {
-    box-shadow: var(--shadow);
+    box-shadow: var(--sbx-shadow-m);
     height: fit-content;
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     border: var(--border);
     overflow: hidden;
     & .c-island:not(.filter) {
@@ -1320,11 +1302,11 @@ input[type="radio"] + .block {
     }
     & [data-test="search-select-creator"] {
         & .results-container .results {
-            border-radius: calc(var(--border-radius) / 3) !important;
+            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
         }
     }
     & .checklist[data-v-3721f532] {
-        border-radius: calc(var(--border-radius) / 3);
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
     }
 }
 
@@ -1332,28 +1314,28 @@ input[type="radio"] + .block {
     & .l-flex-col.l-gap-m {
         & > .l-flex-col {
             border: var(--border);
-            border-radius: var(--border-radius);
+            border-radius: var(--sbx-border-radius-normal);
             border-width: 0.06rem;
             & .c-card {
-                border-radius: var(--border-radius);
+                border-radius: var(--sbx-border-radius-normal);
             }
             & button[data-test^="sp-results-sub-results"] {
                 margin-bottom: 0;
-                background-color: color-mix(in srgb, var(--action-color), transparent);
-                color: var(--text-color-inverted);
+                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent);
+                color: var(--sbx-color-accent-text);
             }
         }
         & .c-card--border-end {
-            border-color: var(--border-color);
+            border-color: var(--sbx-color-foreground-secondary);
         }
         & .c-card--child {
             border-inline-start-width: 2px;
             background-color: transparent;
         }
         & > [data-test="sp-results-load-more-button"] {
-            border-radius: calc(var(--border-radius) / 3) !important;
-            background-color: var(--action-color);
-            color: var(--text-color-inverted);
+            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+            background-color: var(--sbx-color-accent);
+            color: var(--sbx-color-accent-text);
         }
     }
     & sbx-pop-out {
@@ -1364,13 +1346,13 @@ input[type="radio"] + .block {
 
 .f-dropdown {
     background-color: #fff;
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .island > .no-pad {
     & > .profile {
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
+        border-radius: var(--sbx-border-radius-normal);
+        box-shadow: var(--sbx-shadow-m);
         border: var(--border);
         background-color: #fff;
     }
@@ -1379,7 +1361,7 @@ input[type="radio"] + .block {
     }
     & .profile {
         & .columns:has(img) {
-            border-radius: var(--border-radius);
+            border-radius: var(--sbx-border-radius-normal);
             overflow: hidden;
         }
         & dd,
@@ -1392,7 +1374,7 @@ input[type="radio"] + .block {
     &:has(.profile-tabs.tabs-content) {
         border: var(--border);
         background-color: #fff;
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         margin-inline: 16px;
         width: calc(100% - 32px);
         & dl {
@@ -1410,11 +1392,11 @@ input[type="radio"] + .block {
                         margin-top: 1rem;
 
                         & a {
-                            background-color: color-mix(in srgb, var(--action-color), transparent 95%);
+                            background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 95%);
                             padding-block: 2rem;
-                            border-radius: var(--border-radius);
+                            border-radius: var(--sbx-border-radius-normal);
                             &:hover {
-                                background-color: color-mix(in srgb, var(--action-color), transparent 0%);
+                                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 0%);
                             }
                         }
                     }
@@ -1429,12 +1411,12 @@ input[type="radio"] + .block {
 }
 
 .load-more.expand {
-    border-radius: calc(var(--border-radius) / 3);
+    border-radius: calc(var(--sbx-border-radius-normal) / 3);
 }
 
 .activity-feed {
     & .grade {
-        border-radius: calc(var(--border-radius) / 3);
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
         margin: 8px;
     }
 }
@@ -1451,34 +1433,34 @@ table.rubric .feed th[colspan],
 .Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .feed .fc-list-heading-main,
 .feed label .mini.unit-heading,
 label .feed .mini.unit-heading {
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--sbx-border-radius-normal);
+    border-top-right-radius: var(--sbx-border-radius-normal);
 }
 
 .fc {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     border: var(--border);
     & .fc-button-group {
         display: flex;
         gap: 0.5rem;
         & button {
-            border-radius: calc(var(--border-radius) / 3) !important;
+            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
             padding-inline: 1rem;
             &.fc-quickSwitchButton-button {
                 background-color: transparent !important;
-                border: 1px solid var(--action-color);
+                border: 1px solid var(--sbx-color-accent);
                 & a {
                     background-color: transparent !important;
                 }
             }
             &.fc-customToday-button {
-                background-color: var(--action-color);
-                color: var(--text-color-inverted);
+                background-color: var(--sbx-color-accent);
+                color: var(--sbx-color-accent-text);
             }
             &.fc-customPrev-button,
             &.fc-customNext-button {
-                border-radius: calc(var(--border-radius) / 3);
-                border: 1px solid var(--action-color);
+                border-radius: calc(var(--sbx-border-radius-normal) / 3);
+                border: 1px solid var(--sbx-color-accent);
                 background-color: transparent;
                 & a {
                     background-color: transparent !important;
@@ -1501,13 +1483,13 @@ label .feed .mini.unit-heading {
             ) {
             border-radius: 0 !important;
             background-color: transparent !important;
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
             &:hover {
-                color: var(--text-color) !important;
+                color: var(--sbx-color-text-primary) !important;
             }
         }
         & .fc-button-active {
-            color: var(--text-color) !important;
+            color: var(--sbx-color-text-primary) !important;
             position: relative;
             overflow: visible;
             &::before {
@@ -1515,7 +1497,7 @@ label .feed .mini.unit-heading {
                 position: absolute;
                 width: 100%;
                 height: 2px;
-                background-color: var(--action-color);
+                background-color: var(--sbx-color-accent);
                 bottom: -18px;
                 left: 0;
             }
@@ -1526,7 +1508,7 @@ label .feed .mini.unit-heading {
     }
 
     & .fc-event {
-        border-radius: calc(var(--border-radius) / 4);
+        border-radius: calc(var(--sbx-border-radius-normal) / 4);
     }
     & .fc-daygrid-day-events {
         margin-inline: 0.5rem;
@@ -1547,7 +1529,7 @@ label .feed .mini.unit-heading {
 .Component_Dashboard_ChildSubjectController {
     & .row {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         padding-block-start: 1rem;
         margin-bottom: 1rem;
     }
@@ -1560,21 +1542,21 @@ label .feed .mini.unit-heading {
 .component-tabs {
     & .tabs {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         border-bottom: 0;
     }
     & .tabs-content {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         border-top: 0;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         & > .content li {
             box-shadow: none !important;
             & [data-component-palette] {
-                border-radius: var(--border-radius);
+                border-radius: var(--sbx-border-radius-normal);
                 padding: 1rem 2rem;
             }
         }
@@ -1590,27 +1572,27 @@ label .feed .mini.unit-heading {
     }
     & #notification-toggle-full {
         background-color: transparent;
-        color: var(--action-color);
+        color: var(--sbx-color-accent);
     }
     & :where(#right-menu-dock, #notification-toggle-full, .icon-settings) {
-        color: var(--action-color);
+        color: var(--sbx-color-accent);
     }
 }
 
 .checklist.events {
     & li label {
-        border-radius: calc(var(--border-radius) / 4);
+        border-radius: calc(var(--sbx-border-radius-normal) / 4);
     }
 }
 
 .scrollable:has(> .timetable) {
     &:has(.no-hover) {
         border: var(--border);
-        border-radius: var(--border-radius);
+        border-radius: var(--sbx-border-radius-normal);
         border-color: #dde5ec;
         border-width: 2px;
         & .timetable {
-            border-radius: var(--border-radius);
+            border-radius: var(--sbx-border-radius-normal);
         }
     }
     & .timetable {
@@ -1621,10 +1603,10 @@ label .feed .mini.unit-heading {
 }
 
 .c-header-search__results {
-    border-top-right-radius: calc(var(--border-radius) / 2);
-    border-top-left-radius: calc(var(--border-radius) / 2);
-    border-bottom-right-radius: calc(var(--border-radius) / 2);
-    border-bottom-left-radius: calc(var(--border-radius) / 2);
+    border-top-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+    border-top-left-radius: calc(var(--sbx-border-radius-normal) / 2);
+    border-bottom-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+    border-bottom-left-radius: calc(var(--sbx-border-radius-normal) / 2);
     .c-card--border-end {
         div {
             border-color: #eceef1;
@@ -1633,15 +1615,15 @@ label .feed .mini.unit-heading {
             border-bottom: 0;
         }
         &:nth-child(even) {
-            background-color: color-mix(in srgb, var(--action-color) 5%, #fff);
+            background-color: color-mix(in srgb, var(--sbx-color-accent) 5%, #fff);
         }
         & h3 {
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
             font-weight: 600;
         }
         & .meta {
             & a {
-                color: var(--text-color);
+                color: var(--sbx-color-text-primary);
                 font-size: 12px !important;
             }
         }
@@ -1653,29 +1635,29 @@ label .feed .mini.unit-heading {
         }
     }
     & .icon-search {
-        border-top-right-radius: calc(var(--border-radius) / 2);
-        border-top-left-radius: calc(var(--border-radius) / 2);
-        border-bottom-right-radius: calc(var(--border-radius) / 2);
-        border-bottom-left-radius: calc(var(--border-radius) / 2);
-        background-color: color-mix(in srgb, var(--action-color), #fff 80%);
-        color: var(--action-color);
+        border-top-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+        border-top-left-radius: calc(var(--sbx-border-radius-normal) / 2);
+        border-bottom-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+        border-bottom-left-radius: calc(var(--sbx-border-radius-normal) / 2);
+        background-color: color-mix(in srgb, var(--sbx-color-accent), #fff 80%);
+        color: var(--sbx-color-accent);
         padding-block: 1rem;
         font-size: 12px;
         font-weight: 600;
     }
     & .l-flex-col {
-        border-top-right-radius: calc(var(--border-radius) / 2);
-        border-top-left-radius: calc(var(--border-radius) / 2);
-        border-bottom-right-radius: calc(var(--border-radius) / 2);
-        border-bottom-left-radius: calc(var(--border-radius) / 2);
+        border-top-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+        border-top-left-radius: calc(var(--sbx-border-radius-normal) / 2);
+        border-bottom-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+        border-bottom-left-radius: calc(var(--sbx-border-radius-normal) / 2);
         & .c-card:first-child {
-            border-top-right-radius: calc(var(--border-radius) / 2);
-            border-top-left-radius: calc(var(--border-radius) / 2);
+            border-top-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+            border-top-left-radius: calc(var(--sbx-border-radius-normal) / 2);
         }
         & + .l-flex-col {
             & .icon-search {
-                border-bottom-right-radius: calc(var(--border-radius) / 2);
-                border-bottom-left-radius: calc(var(--border-radius) / 2);
+                border-bottom-right-radius: calc(var(--sbx-border-radius-normal) / 2);
+                border-bottom-left-radius: calc(var(--sbx-border-radius-normal) / 2);
                 border-top-right-radius: 0 !important;
                 border-top-left-radius: 0 !important;
             }
@@ -1685,27 +1667,27 @@ label .feed .mini.unit-heading {
 
 .grid {
     border: var(--border);
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     & li {
         box-shadow: none;
         padding: 0.5rem !important;
         & h3 {
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
             font-weight: 800;
         }
     }
 }
 
 #account-content {
-    border-radius: var(--border-radius);
+    border-radius: var(--sbx-border-radius-normal);
     & .separator {
-        color: var(--action-color);
+        color: var(--sbx-color-accent);
         background-color: #eee !important;
         border-bottom: var(--border);
         font-weight: 600;
     }
     & [class^="icon"] {
-        color: var(--text-color);
+        color: var(--sbx-color-text-primary);
         font-weight: 500;
         font-size: 14px;
         line-height: 1.2;
@@ -1719,13 +1701,13 @@ label .feed .mini.unit-heading {
         padding-inline: 0.8rem;
         border-bottom: var(--border);
         & p {
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
             &:not(.meta) {
                 font-weight: 800;
             }
         }
         & img {
-            border-radius: var(--border-radius);
+            border-radius: var(--sbx-border-radius-normal);
         }
     }
 }
@@ -1754,8 +1736,8 @@ label .feed .mini.unit-heading {
         }
     }
     border: 1px solid #dbe3ea;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
+    border-radius: var(--sbx-border-radius-normal);
+    box-shadow: var(--sbx-shadow-m);
     & section {
         background-color: transparent;
     }
@@ -1780,12 +1762,12 @@ label .feed .mini.unit-heading {
             & button {
                 &[id$="preview"] {
                     background-color: transparent;
-                    color: var(--action-color) !important;
-                    border: 2px solid var(--action-color);
+                    color: var(--sbx-color-accent) !important;
+                    border: 2px solid var(--sbx-color-accent);
                 }
                 &[id$="submit"] {
-                    background-color: var(--action-color);
-                    border: 2px solid var(--action-color);
+                    background-color: var(--sbx-color-accent);
+                    border: 2px solid var(--sbx-color-accent);
                 }
             }
         }
@@ -1799,10 +1781,10 @@ label .feed .mini.unit-heading {
     .button-block {
         border: 0;
         & i {
-            color: var(--action-color);
+            color: var(--sbx-color-accent);
         }
         &:not(i) {
-            color: var(--text-color);
+            color: var(--sbx-color-text-primary);
             font-weight: 600;
         }
     }
@@ -1812,10 +1794,10 @@ label .feed .mini.unit-heading {
 }
 
 .row:has(> #filter_panel) {
-    border-top-left-radius: var(--border-radius);
-    border-top-right-radius: var(--border-radius);
+    border-top-left-radius: var(--sbx-border-radius-normal);
+    border-top-right-radius: var(--sbx-border-radius-normal);
     border: var(--border);
-    box-shadow: var(--shadow);
+    box-shadow: var(--sbx-shadow-m);
     background-color: #fff;
     & #filter_panel {
         padding-inline: 0;
@@ -1832,8 +1814,8 @@ label .feed .mini.unit-heading {
             & .no-pad {
                 padding: 1rem !important;
                 border-bottom: var(--border);
-                border-top-left-radius: var(--border-radius);
-                border-top-right-radius: var(--border-radius);
+                border-top-left-radius: var(--sbx-border-radius-normal);
+                border-top-right-radius: var(--sbx-border-radius-normal);
             }
             & .filter-component {
                 border: 0 !important;
@@ -1856,7 +1838,7 @@ label .feed .mini.unit-heading {
             }
             & .selected-item {
                 background-color: #f7fafc;
-                border-radius: calc(var(--border-radius) / 2);
+                border-radius: calc(var(--sbx-border-radius-normal) / 2);
                 &:not(:last-child) {
                     margin-bottom: 0.5rem;
                 }
@@ -1871,8 +1853,8 @@ label .feed .mini.unit-heading {
     & + #report_content {
         border: var(--border);
         border-top: 0;
-        border-bottom-left-radius: var(--border-radius);
-        border-bottom-right-radius: var(--border-radius);
+        border-bottom-left-radius: var(--sbx-border-radius-normal);
+        border-bottom-right-radius: var(--sbx-border-radius-normal);
         padding-inline: 0;
         & .island {
             padding-inline: 0;
@@ -1889,15 +1871,15 @@ label .feed .mini.unit-heading {
             }
             & .button[data-assessment-due-at-unix] {
                 background-color: transparent !important;
-                color: var(--action-color) !important;
-                border: 1px solid var(--action-color);
+                color: var(--sbx-color-accent) !important;
+                border: 1px solid var(--sbx-color-accent);
             }
         }
     }
 }
 
 .editPanel {
-    background-color: color-mix(in srgb, var(--action-color) 10%, #fff);
+    background-color: color-mix(in srgb, var(--sbx-color-accent) 10%, #fff);
 }
 
 button.load-more,
@@ -1979,7 +1961,7 @@ ul#tabs-sub-6 > li {
     }
     & li:not(:last-child) {
         /* Added :not(:last-child) so the final element doesn't get a bottom border */
-        border-bottom: 1px solid var(--border-color); /* The separator is now visible */
+        border-bottom: 1px solid var(--sbx-color-foreground-secondary); /* The separator is now visible */
     }
     & li:last-child {
         border-bottom: none; /* Explicitly ensure the very last item in the list has no border */
@@ -2054,3 +2036,20 @@ section {
     border-radius: 0.6rem;
     overflow: hidden;
 }
+
+/* Removed styles from original tafsol */
+/*
+**
+ Brand & primary action - updated to Schoolbox design system variables
+
+--sbx-color-accent: var(--sbx-color-accent); // Removed and used --sbx-color-accent directly
+--bg-primary: #eefbff; // I don't think we need this anymore
+--border-color: var(--sbx-color-foreground-secondary); // updated to Schoolbox design system variable
+--border-radius: var(--sbx-border-radius-normal); // Removed and used --sbx-border-radius-normal directly
+--content-ui-foreground: var(--sbx-color-accent); //  Removed and used --sbx-color-accent directly
+--gradient-primary: linear-gradient(90deg, #001691 0%, #0077b6 70%); // Removed gradient as we have --navigation-background for it now
+--shadow: 0 4 8px rgba(0, 0, 0, 0.15); // Replaced with sbx-shadow-m
+--text-color-inverted: var(--sbx-color-accent-text); // Removed and replaced with --sbx-color-accent-text
+--text-color: var(--sbx-color-text-primary); // Replaced with direct usage of --sbx-color-text-primary
+**
+*/
