@@ -38,7 +38,7 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
 
 <template>
     <tr>
-        <td class="u-sticky-left u-sticky-left--first u-border-right actions-small-1" style="padding-bottom: 0">
+        <td class="u-sticky-left u-sticky-left--first u-border-right actions-small-1">
             <div class="small-12 card">
                 <user-link :user="participant.user">
                     <user-photo :user="participant.user" render="small" />
@@ -84,4 +84,12 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
     </tr>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+/**
+ * This to avoids extra padding showing up on the first column
+ * due to the user photo inside the card having some negative margin schenanigans
+ */
+tr td:first-of-type {
+    padding-bottom: 0;
+}
+</style>
