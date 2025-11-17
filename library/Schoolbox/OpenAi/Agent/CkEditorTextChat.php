@@ -55,7 +55,13 @@ class CkEditorTextChat
     ): iterable {
         // Need to inspect payload to figure out what the actual input text was!
         $payload = $this->buildPayload($payload);
-        $log     = $this->client->createLog($payload, null, $user, Helper::FEATURE_CHAT, $aiSessionId);
+        $log     = $this->client->createLog(
+            $payload,
+            $this->extractUserInput($payload),
+            $user,
+            Helper::FEATURE_CHAT,
+            $aiSessionId,
+        );
         return $this->client->createChatCompletionStream($payload, $log);
     }
 
@@ -84,5 +90,22 @@ class CkEditorTextChat
             );
         }
         return $payload;
+    }
+
+    /**
+     * Extract the actual user input from the payload.
+     *
+     * @param array $payload
+     * @return string|null
+     */
+    private function extractUserInput(array $payload): ?string
+    {
+        foreach (($payload['messages'] ?? []) as $message) {
+            $role = $message['role'] ?? '';
+            if ($role === 'user' && isset($message['content'])) {
+                return $message['content'];
+            }
+        }
+        return null;
     }
 }
