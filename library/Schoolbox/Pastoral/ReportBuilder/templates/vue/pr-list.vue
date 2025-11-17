@@ -8,21 +8,16 @@ import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
-import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
+import PrGeneratePrint from "./pr-generate-print.vue";
 import { useLoadRecords } from "./composable/useLoadRecords";
+import { usePrintRecords } from "./composable/usePrintRecords";
 import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
-    minWidth: number;
+    scrollableEl: HTMLDivElement | null;
 }>();
 
 const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
-
-/**
- * Keep the container below the height of the viewport
- */
-const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, props.minWidth);
 
 /**
  * Load the initial records
@@ -36,21 +31,36 @@ const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRe
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
  */
-const { arrivedState } = useScroll(scrollableEl, {
-    offset: { bottom: 30 },
+window.Vue.onMounted(async (): Promise<void> => {
+    await window.Vue.nextTick();
+    const { arrivedState } = useScroll(props.scrollableEl, {
+        offset: { bottom: 30 },
+    });
+    const { bottom } = toRefs(arrivedState);
+    window.Vue.watch(bottom, (isAtBottom) => {
+        if (isAtBottom && payload.value && payload.value.metadata && payload.value.metadata.cursor.next !== null) {
+            urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
+            url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
+        }
+    });
 });
 
-const { bottom } = toRefs(arrivedState);
-window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
-        urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
-    }
-});
+/**
+ * Print all records in the list
+ */
+const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
+const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
+    url,
+    urlParams,
+    payload,
+    containerEl,
+    selectedTab?.value._links.view,
+);
+defineExpose({ printAllRecords });
 </script>
 
 <template>
-    <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="pr-list">
+    <div ref="containerRef" data-test="pr-list">
         <div v-if="isNewLoad && isNewLoading" class="c-island l-pad-m" data-test="pr-list-loading">
             <div class="loader"></div>
         </div>
@@ -72,6 +82,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
             <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />
         </template>
     </div>
+    <pr-generate-print v-model:is-loading="isLoadingPrint" :load-error="loadError" />
 </template>
 
 <style scoped></style>

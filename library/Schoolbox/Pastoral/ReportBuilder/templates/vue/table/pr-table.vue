@@ -10,17 +10,12 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { TablePayload, TableHeader, SelectedCell, RowKeys, Tab } from "../../js/types/pastoralReportTypes";
 import { TabType, ViewUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
-import { useMaxScrollableHeight } from "../composable/useMaxScrollableHeight";
 import PrEmpty from "../pr-empty.vue";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
-
-const props = defineProps<{
-    minWidth: number;
-}>();
 
 // #region sticky total/trend table columns for bigger screens
 
@@ -136,9 +131,6 @@ function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]):
 
 // #endregion
 
-const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, props.minWidth);
-
 /**
  * Reset the table load to ensure the correct endpoint is set
  */
@@ -156,60 +148,53 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
-        <div ref="containerRef" class="pr-table-container">
-            <div
-                ref="scrollableRef"
-                class="table-container scrollable"
-                :style="{ maxHeight: maxScrollableHeight }"
-                data-test="pr-table"
-            >
-                <table class="pr-table">
-                    <pr-table-header
-                        v-model:records-or-points="recordsOrPoints"
+        <div ref="containerRef" class="pr-table-container hide-on-print" data-test="pr-table-container">
+            <table class="pr-table">
+                <pr-table-header
+                    v-model:records-or-points="recordsOrPoints"
+                    :headers="(payload as TablePayload).data.tableHeaders"
+                    :sort-by="sortBy"
+                    :order="order"
+                    :is-first-column-sticky="isFirstColumnSticky"
+                    :is-total-sticky="isTotalSticky"
+                    :is-trend-sticky="isTrendSticky"
+                    @sort="onSort"
+                />
+                <!-- Skeleton loading state when switching between records/rows and sorting -->
+                <loading-table v-if="isMoreLoading" :only-body="true" />
+                <tbody v-else>
+                    <!-- Total row -->
+                    <pr-table-total-row
                         :headers="(payload as TablePayload).data.tableHeaders"
-                        :sort-by="sortBy"
-                        :order="order"
+                        :row-data="(payload as TablePayload).data.totalRow"
+                        :records-or-points="recordsOrPoints"
                         :is-first-column-sticky="isFirstColumnSticky"
                         :is-total-sticky="isTotalSticky"
                         :is-trend-sticky="isTrendSticky"
-                        @sort="onSort"
+                        @cell-select="onTotalCellSelect"
                     />
-                    <!-- Skeleton loading state when switching between records/rows and sorting -->
-                    <loading-table v-if="isMoreLoading" :only-body="true" />
-                    <tbody v-else>
-                        <!-- Total row -->
-                        <pr-table-total-row
-                            :headers="(payload as TablePayload).data.tableHeaders"
-                            :row-data="(payload as TablePayload).data.totalRow"
-                            :records-or-points="recordsOrPoints"
-                            :is-first-column-sticky="isFirstColumnSticky"
-                            :is-total-sticky="isTotalSticky"
-                            :is-trend-sticky="isTrendSticky"
-                            @cell-select="onTotalCellSelect"
-                        />
-                        <!-- All other rows -->
-                        <pr-table-row
-                            v-for="(row, index) in (payload as TablePayload).data.rows"
-                            :key="`row-${index}`"
-                            :headers="(payload as TablePayload).data.tableHeaders"
-                            :row-data="row"
-                            :records-or-points="recordsOrPoints"
-                            :is-first-column-sticky="isFirstColumnSticky"
-                            :is-total-sticky="isTotalSticky"
-                            :is-trend-sticky="isTrendSticky"
-                            @cell-select="onRowCellSelect"
-                        />
-                    </tbody>
-                </table>
-                <pr-table-footer
-                    :url="viewUrl"
-                    :metadata="(payload as TablePayload).metadata"
-                    :limit="LIMIT"
-                    :is-loading="isNewLoading || isMoreLoading"
-                    @previous="onPaginate"
-                    @next="onPaginate"
-                />
-            </div>
+                    <!-- All other rows -->
+                    <pr-table-row
+                        v-for="(row, index) in (payload as TablePayload).data.rows"
+                        :key="`row-${index}`"
+                        :headers="(payload as TablePayload).data.tableHeaders"
+                        :row-data="row"
+                        :records-or-points="recordsOrPoints"
+                        :is-first-column-sticky="isFirstColumnSticky"
+                        :is-total-sticky="isTotalSticky"
+                        :is-trend-sticky="isTrendSticky"
+                        @cell-select="onRowCellSelect"
+                    />
+                </tbody>
+            </table>
+            <pr-table-footer
+                :url="viewUrl"
+                :metadata="(payload as TablePayload).metadata"
+                :limit="LIMIT"
+                :is-loading="isNewLoading || isMoreLoading"
+                @previous="onPaginate"
+                @next="onPaginate"
+            />
         </div>
     </template>
     <!-- fall back to just an empty state if all else fails -->
@@ -220,6 +205,7 @@ window.Vue.onMounted(() => {
 <style scoped lang="scss">
 .pr-table-container {
     container-type: inline-size;
+    overflow: auto;
 }
 .pr-table {
     width: 100%;

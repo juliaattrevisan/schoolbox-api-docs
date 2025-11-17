@@ -10,7 +10,9 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { TableHeader, SelectedCell, Tab } from "../../js/types/pastoralReportTypes";
 import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
+import { usePrintRecords } from "../composable/usePrintRecords";
 import PrRecord from "../pr-record.vue";
+import PrGeneratePrint from "../pr-generate-print.vue";
 
 const props = defineProps<{
     selectedCell: SelectedCell | null;
@@ -51,7 +53,8 @@ window.Vue.watch(
             scopeUrlParams.delete(ScopeUrlParam.CURSOR as string); // Clear the cursor to start fresh
             // now start setting the new ones
             scopeUrlParams.set(ScopeUrlParam.COLUMN as string, selectedHeader.value.key);
-            scopeUrlParams.set(ScopeUrlParam.SELECTED as string, props.recordsOrPoints); // to only show records with points when points toggled
+            scopeUrlParams.set(ScopeUrlParam.SELECTED as string, props.recordsOrPoints); // set whether to show records or points
+            scopeUrlParams.set(ScopeUrlParam.LIMIT as string, "20"); // set initial pagination limit for modal records
             if (newCell.rowKeys !== undefined) {
                 // loop through the RowKeys object and set any any params that are provided
                 Object.entries(newCell.rowKeys as Record<string, number>).forEach(([key, value]) => {
@@ -78,11 +81,23 @@ const { arrivedState } = useScroll(modalResultsEl, {
 
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
+    if (isAtBottom && payload.value && payload.value.metadata && payload.value.metadata.cursor.next !== null) {
         scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
         scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
     }
 });
+
+/**
+ * Print all records in the list modal
+ */
+const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
+const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
+    scopeUrl,
+    scopeUrlParams,
+    payload,
+    containerEl,
+    selectedTab?.value._links.scope,
+);
 </script>
 
 <template>
@@ -90,7 +105,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <template v-else-if="selectedHeader !== null">
-            <div class="l-flex-col l-gap-m">
+            <div ref="containerRef" class="container l-flex-col l-gap-m">
                 <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
                     <div class="l-flex-col l-gap-s f-no-margins">
                         <h2>{{ title }}</h2>
@@ -100,13 +115,25 @@ window.Vue.watch(bottom, (isAtBottom) => {
                             </template>
                         </p>
                     </div>
-                    <a
-                        v-if="selectedTab?._links.scopeExport"
-                        :href="scopeExportUrl()"
-                        aria-label="Download related records as CSV"
-                        title="Download related records as CSV"
-                        ><sbx-icon name="download"
-                    /></a>
+                    <nav class="l-flex-row l-flex--align-center f-no-margins">
+                        <button
+                            class="sbx-icon-only-button f-no-margins"
+                            aria-label="Print Report Results"
+                            title="Print Report Results"
+                            type="button"
+                            @click="printAllRecords"
+                        >
+                            <sbx-icon name="print" />
+                        </button>
+                        <a
+                            v-if="selectedTab?._links.scopeExport"
+                            class="sbx-icon-only-button f-no-margins"
+                            :href="scopeExportUrl()"
+                            aria-label="Download related records as CSV"
+                            title="Download related records as CSV"
+                            ><sbx-icon name="download"
+                        /></a>
+                    </nav>
                 </div>
                 <div ref="modalResultsRef" class="pr-table__records">
                     <div class="l-flex-col l-gap-s">
@@ -128,11 +155,22 @@ window.Vue.watch(bottom, (isAtBottom) => {
             </div>
         </template>
     </basic-modal>
+    <pr-generate-print v-model:is-loading="isLoadingPrint" :load-error="loadError" />
 </template>
 
 <style scoped>
 .pr-table__records {
     max-height: 650px;
     overflow-y: auto;
+}
+
+@media print {
+    .container {
+        padding-top: 1rem; /* to account for the pr-generate-print still possibly being visible due to animating off */
+    }
+    .pr-table__records {
+        max-height: none !important; /* Expand scrollable elements to full height in print view */
+        overflow: visible !important; /* Ensure all content is visible */
+    }
 }
 </style>

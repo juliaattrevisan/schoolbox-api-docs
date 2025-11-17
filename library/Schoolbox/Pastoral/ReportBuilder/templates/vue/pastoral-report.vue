@@ -7,6 +7,7 @@ import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./table/pr-table.vue";
+import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
 
 const props = defineProps<{
     title: string;
@@ -18,8 +19,8 @@ const props = defineProps<{
     severityColors: SeverityColors;
 }>();
 
-// Create reactive state
 const selectedTab = window.Vue.ref<Tab | null>(null);
+const prListEl = window.Vue.useTemplateRef<InstanceType<typeof PrList>>("prListEl");
 const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
 const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
@@ -33,6 +34,12 @@ window.Vue.provide("routes", props.routes);
 window.Vue.provide("localePastoral", props.localePastoral);
 window.Vue.provide("showSeverity", props.showSeverity);
 window.Vue.provide("severityColors", props.severityColors);
+
+/**
+ * Keep the container below the height of the viewport
+ */
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth);
 
 /**
  * Handle tab selection and update URL without adding to browser history
@@ -66,14 +73,33 @@ window.Vue.onMounted((): void => {
         selectedTab.value = firstTab;
     }
 });
+
+/**
+ * Print the records in the list view
+ */
+function onPrintSelected(): void {
+    prListEl.value?.printAllRecords();
+}
 </script>
 
 <template>
     <div class="l-flex-col l-gap-m">
         <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
-            <nav v-if="selectedTab?._links.export">
+            <nav class="l-flex-row l-flex--align-center f-no-margins">
+                <button
+                    v-if="selectedTab?.type === TabType.LIST"
+                    class="sbx-icon-only-button f-no-margins"
+                    aria-label="Print Report Results"
+                    title="Print Report Results"
+                    type="button"
+                    @click="onPrintSelected"
+                >
+                    <sbx-icon name="print" />
+                </button>
                 <a
+                    v-if="selectedTab?._links.export"
+                    class="sbx-icon-only-button f-no-margins"
                     :href="`${selectedTab._links.export}?selected=${recordsOrPoints}`"
                     aria-label="Download Report as CSV"
                     title="Download Report as CSV"
@@ -83,7 +109,7 @@ window.Vue.onMounted((): void => {
             </nav>
         </div>
         <div>
-            <dl v-if="props.tabs.length > 1" class="tabs">
+            <dl v-if="props.tabs.length > 1" class="tabs hide-on-print">
                 <dd
                     v-for="tab in props.tabs"
                     :key="tab.type"
@@ -94,8 +120,10 @@ window.Vue.onMounted((): void => {
                 </dd>
             </dl>
             <template v-if="selectedTab">
-                <pr-list v-if="selectedTab.type === TabType.LIST" :min-width="minWidth" />
-                <pr-table v-else v-model:records-or-points="recordsOrPoints" :min-width="minWidth" />
+                <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
+                    <pr-list v-if="selectedTab.type === TabType.LIST" ref="prListEl" :scrollable-el="scrollableEl" />
+                    <pr-table v-else v-model:records-or-points="recordsOrPoints" />
+                </div>
             </template>
         </div>
     </div>
@@ -107,5 +135,15 @@ window.Vue.onMounted((): void => {
     --sbx-pr-table-row-hover-colour: #f4f3f3;
     --sbx-pr-table-first-header-width: 250px;
     --sbx-pr-table-total-header-width: 110px;
+}
+
+@media print {
+    .f-container {
+        padding: 1rem 0 0 0 !important; /* give more space for content when printing */
+    }
+    .scrollable {
+        max-height: none !important; /* Expand scrollable elements to full height in print view */
+        overflow: visible !important; /* Ensure all content is visible */
+    }
 }
 </style>

@@ -349,3 +349,39 @@ export function addMarks(toMark: string, wordList: string[], allowPartialMatches
     });
     return marked;
 }
+
+/**
+ * Wait for all images to load
+ * @param containerEl - the container element to search for images in
+ */
+export async function waitForAllImages(containerEl: HTMLElement | null): Promise<void> {
+    await window.Vue.nextTick();
+    // Find all images in the container
+    const images = containerEl?.querySelectorAll("img") || [];
+    // Filter to only images that are not already loaded
+    const unloadedImages = Array.from(images).filter((img) => {
+        // Image is considered loaded if it's complete AND has dimensions (successful load)
+        // OR if it's complete and has no src (empty image)
+        return !(img.complete && (img.naturalWidth > 0 || !img.src));
+    });
+    // Only create promises for images that still need to load
+    const imagePromises = unloadedImages.map((img) => {
+        return new Promise<void>((resolve) => {
+            const onLoad = (): void => {
+                img.removeEventListener("load", onLoad);
+                img.removeEventListener("error", onLoad);
+                resolve();
+            };
+            img.addEventListener("load", onLoad);
+            img.addEventListener("error", onLoad);
+            // Immediately check if the image has already loaded after attaching listeners
+            if (img.complete) {
+                img.removeEventListener("load", onLoad);
+                img.removeEventListener("error", onLoad);
+                resolve();
+            }
+        });
+    });
+    // Wait for all unloaded images to finish loading
+    await Promise.all(imagePromises);
+}

@@ -81,13 +81,9 @@ const severityColors = window.Vue.inject<SeverityColors>("severityColors");
                 <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
                 <p v-if="props.record.tags.length > 0" class="spaced">
                     <template v-for="tag in props.record.tags" :key="tag.id">
-                        <a
-                            class="neutral label hide-on-print"
-                            :href="routes?.getReportTags.replace('{tagId}', tag.id.toString())"
-                        >
+                        <a class="neutral label" :href="routes?.getReportTags.replace('{tagId}', tag.id.toString())">
                             {{ tag.name }}
                         </a>
-                        <b class="show-for-print"> {{ tag.name }}</b>
                     </template>
                 </p>
             </div>

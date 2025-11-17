@@ -92,7 +92,7 @@ export function useLoadRecords(url: Ref<string>): {
      */
     window.Vue.watch(url, (newUrl, oldUrl) => {
         if (url.value !== "" && newUrl !== oldUrl) {
-            isNewLoad.value = isSignificantUrlChange(oldUrl, newUrl, ["cursor"]);
+            isNewLoad.value = isSignificantUrlChange(oldUrl, newUrl, ["cursor", "limit"]);
             void load();
         }
     });

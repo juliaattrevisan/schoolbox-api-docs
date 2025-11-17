@@ -145,7 +145,7 @@ export type RecordsPayload = {
     data: {
         results: PastoralRecord[];
     };
-    metadata: Metadata;
+    metadata?: Metadata;
 };
 
 /**
@@ -156,6 +156,7 @@ export enum ScopeUrlParam {
     ROW = "row",
     CURSOR = "cursor",
     SELECTED = "selected",
+    LIMIT = "limit",
 }
 
 /**
