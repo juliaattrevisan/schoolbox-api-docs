@@ -48,15 +48,22 @@ interface IClient
      * Call the create model response API, and receive a stream:
      * * https://platform.openai.com/docs/api-reference/responses-streaming
      *
-     * @param array     $payload   The request body to send.
-     * @param Log\Model $log       The log to write to: will be updated with the response data,
-     *                             so that this call may be identified in logs.
-     * @param int|null  $chunkSize If provided, read this many bytes for each stream iteration:
-     *                             otherwise, allow the client itself to decide.
+     * @param array         $payload        The request body to send.
+     * @param Log\Model     $log            The log to write to: will be updated with the response data,
+     *                                      so that this call may be identified in logs.
+     * @param int|null      $chunkSize      If provided, read this many bytes for each stream iteration:
+     *                                      otherwise, allow the client itself to decide.
+     * @param callable|null $streamListener A function to call for each event in the stream, as it is received:
+     *                                      this may be used to update `$log` with further information.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
-    public function createResponseStream(array $payload, Log\Model $log, ?int $chunkSize = null): iterable;
+    public function createResponseStream(
+        array $payload,
+        Log\Model $log,
+        ?int $chunkSize = null,
+        ?callable $streamListener = null,
+    ): iterable;
 
     /**
      * Call the create chat completion API, and receive a standard HTTP response:

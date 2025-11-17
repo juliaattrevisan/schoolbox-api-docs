@@ -88,8 +88,12 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createResponseStream(array $payload, Log\Model $log, ?int $chunkSize = null): iterable
-    {
+    public function createResponseStream(
+        array $payload,
+        Log\Model $log,
+        ?int $chunkSize = null,
+        ?callable $streamListener = null,
+    ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
@@ -99,6 +103,7 @@ class Client implements IClient
             $log,
             new LogHandler\ResponseMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
+            $streamListener,
         );
     }
 
@@ -332,10 +337,11 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param ResponseInterface      $response   The response from the AI provider.
-     * @param Log\Model              $log        The log to write to.
-     * @param LogHandler\ILogHandler $logHandler The log handler to use for each message.
-     * @param int                    $chunkSize  How many bytes to read from each stream iteration.
+     * @param ResponseInterface      $response       The response from the AI provider.
+     * @param Log\Model              $log            The log to write to.
+     * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
+     * @param int                    $chunkSize      How many bytes to read from each stream iteration.
+     * @param callable|null          $streamListener A function to call for each event in the stream, as it is received.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
@@ -344,6 +350,7 @@ class Client implements IClient
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
+        ?callable $streamListener = null,
     ): iterable {
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
@@ -356,7 +363,7 @@ class Client implements IClient
                 // Update the log, and save it:
                 // even if that raises an exception, still save the log
                 try {
-                    $logHandler->handleMessage($message, $log);
+                    $logHandler->handleMessage($message, $log, $streamListener);
                 } finally {
                     $this->logMapper->save($log);
                 }

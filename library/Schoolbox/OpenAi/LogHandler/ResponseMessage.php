@@ -37,7 +37,7 @@ class ResponseMessage implements ILogHandler
     /**
      * Handle the message by stripping image data when writing to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log): Log\Model
+    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
     {
         // Prepare the message for logging
         $eventType = $message->eventType;

@@ -62,7 +62,8 @@ class ImageGeneration
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
         return $this->client->createResponseStream($payload, $log, 8192);
 
-        // TODO add some method for extracting output text from the response
+        // TODO add some method for extracting output text from the response:
+        //      it'll need to be a listener on the client
     }
 
     /**
