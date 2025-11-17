@@ -259,6 +259,7 @@ body {
     }
 }
 
+// Side menu and dropdown specific styles
 :is(.side-menu-heading-link, .f-dropdown)
     :where(
         .icon-modify,
@@ -269,12 +270,13 @@ body {
         .icon-forum,
         .icon-download
     ) {
-    width: auto;
-    height: auto;
     aspect-ratio: unset;
     border: none;
-    justify-content: start;
     color: var(--sbx-color-accent) !important;
+    height: auto;
+    justify-content: start;
+    width: auto;
+
     &:before {
         color: var(--sbx-color-accent) !important;
     }
@@ -291,41 +293,12 @@ nav:has(
             [data-action="modify"]
         )
     ) {
-    top: 0rem !important;
     right: 0.5rem !important;
+    top: 0rem !important;
 }
 
 .list-item:has(.card) + nav {
     padding-top: 0.3rem;
-}
-
-#tileList-50 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-inline: 1rem;
-    margin-top: 1rem;
-
-    & li {
-        width: 100% !important;
-        margin: 0 !important;
-        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
-        padding: 0.5rem;
-        padding-bottom: 0.5rem !important;
-
-        & .title {
-            width: calc(100% - 1rem);
-            bottom: 0.5rem;
-            border-radius: calc(var(--sbx-border-radius-normal) * 0.2);
-            font-size: 1rem !important;
-            background-color: color-mix(in srgb, var(--card-bg) 80%, transparent) !important;
-            color: var(--sbx-color-text-primary) !important;
-        }
-
-        & a {
-            left: 0;
-        }
-    }
 }
 
 h3:has(+ .gradient-0) {
@@ -2080,6 +2053,35 @@ body {
 #left-off-canvas-toggle {
     border-top-left-radius: var(--sbx-border-radius-normal);
     border-bottom-left-radius: var(--sbx-border-radius-normal);
+}
+
+#tileList-50 { // Removed because this is a specific id selector
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-inline: 1rem;
+    margin-top: 1rem;
+
+    & li {
+        width: 100% !important;
+        margin: 0 !important;
+        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
+        padding: 0.5rem;
+        padding-bottom: 0.5rem !important;
+
+        & .title {
+            width: calc(100% - 1rem);
+            bottom: 0.5rem;
+            border-radius: calc(var(--sbx-border-radius-normal) * 0.2);
+            font-size: 1rem !important;
+            background-color: color-mix(in srgb, var(--card-bg) 80%, transparent) !important;
+            color: var(--sbx-color-text-primary) !important;
+        }
+
+        & a {
+            left: 0;
+        }
+    }
 }
 **
 */
