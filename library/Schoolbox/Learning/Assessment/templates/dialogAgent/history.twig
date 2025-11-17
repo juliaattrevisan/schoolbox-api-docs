@@ -33,11 +33,11 @@
                             type: 'DELETE'
                         })
                         .done(function () {
-                            {# successful: reload the page to show the changed content -#}
+                            {# /* successful: reload the page to show the changed content */ -#}
                             window.location.reload();
                         })
                         .fail(function () {
-                            {# i'll drink to that! -#}
+                            {# /* i'll drink to that! */ -#}
                             $toast.toastTimeout({
                                 text: 'Could not delete this interaction',
                                 css: 'pop alert'

@@ -1,4 +1,6 @@
 <script>
+import { getRelativeTime } from "@js/util/dateUtils";
+
 /* eslint-disable eslint-comments/disable-enable-pair -- see below */
 /* eslint-disable eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
@@ -27,6 +29,7 @@ export default {
     props: {
         /**
          * The date-time to display in this relative time input.
+         * RFC3339 formatted string
          */
         datetime: {
             required: true,
@@ -93,33 +96,7 @@ export default {
             return this.dayjsDatetime.format(this.absoluteDateFormat);
         },
         relativeDate() {
-            let now = dayjs();
-
-            // Full diff format (e.g. hours, minutes, seconds):
-            // just output whatever the dayJS diff would output, which is the
-            // most significant component of the diff.
-            if (this.fullDiff) {
-                return dayjs.duration(this.dayjsDatetime.diff(now)).humanize(true);
-            }
-
-            // Standard diff format:
-            // Just output days, with "today", "yesterday" or "tomorrow" if
-            // appropriate.
-            let dayDiff = this.dayjsDatetime.diff(now.startOf("d"), "d");
-
-            /* We determine a relative time equivalence based on how different
-             * $datetime was, compared to today. Anything outside the (-1, 1) range
-             * gets a non-relative format
-             */
-            if (dayDiff === 0) {
-                return "today";
-            } else if (dayDiff === -1) {
-                return "yesterday";
-            } else if (dayDiff === 1) {
-                return "tomorrow";
-            } else {
-                return dayjs.duration(dayDiff, "d").humanize(true);
-            }
+            return getRelativeTime(this.datetime, this.fullDiff);
         },
     },
 

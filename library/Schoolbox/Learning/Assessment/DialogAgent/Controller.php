@@ -11,12 +11,16 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model as CriteriaModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -24,6 +28,7 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDat
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -88,6 +93,10 @@ class Controller extends Assessment\Controller
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
      * @param EditorTemplateHelper $editorTemplateHelper
@@ -113,6 +122,10 @@ class Controller extends Assessment\Controller
         protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
         private EditorTemplateHelper $editorTemplateHelper
@@ -136,6 +149,12 @@ class Controller extends Assessment\Controller
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
             $dialogAgentScenarioMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
             editorTemplateHelper: $editorTemplateHelper
         );
     }
@@ -387,6 +406,15 @@ class Controller extends Assessment\Controller
             $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
 
+        /**
+         * If there is an existing unsubmitted response and resume it if there is one,
+         * otherwise create a new response
+         * @var ResponseModel|null $existingResponse
+         */
+        $existingResponse = $participant?->findMostRecentDraftResponse();
+
+        // TODO: i'll likely need this to create a blank response here if one doesn't exist already but TBC in the chat ticket
+
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
@@ -396,7 +424,7 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'student' => $student,
             'participant' => $participant,
-            'existingResponse' => null,
+            'existingResponse' => $existingResponse,
             'errorMessage' => $errorMessage,
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
@@ -422,6 +450,9 @@ class Controller extends Assessment\Controller
      */
     public function getResumeResponse(IAssessable $assessment, User $student): void
     {
+        // TODO: i'm not too sure how actually necessary this is, getCreateResponseForm should be enough??
+        // when would you ever want two draft responses and to be able to resume either one...
+
         /** @var null|Participant $participant */
         $participant = $assessment->getParticipantIfExtant($student);
 
@@ -512,22 +543,53 @@ class Controller extends Assessment\Controller
             if (null === $response) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
             }
+
+            // TODO: you shouldn't be able to edit a submitted response, but I think this would let you at the moment
         } else {
+            // TODO: this would allow for multiple draft responses, which is probably not what we want
+            // instead, perhaps it should validate that the response you *should* be editing is the one you're actually editing?
+            // i.e. the same logic as getCreateResponseForm's existingResponse lookup, as theoretically you should never have two drafts
+
             $response = $this->dialogAgentResponseMapper->createModel()
                 ->setSubmittedOnBehalfOf($student)
+                ->setCreatedBy($this->getUser()->getId())
                 ->setCreatedAt(\Alaress_Date_Format::now());
+        }
+
+        $participant = $assessment->getParticipant($student);
+
+        /* If this is the only response for this participant, make it authoritative
+         * otherwise you end up with draft responses but none are counted as the one that matters
+         * and places such as the status page will assume that there isn't any response in progress
+         */
+        $otherResponses = $participant->getAllResponses()->filter(fn($resp) => $resp->getId() !== $response->getId());
+        if ($otherResponses->count() === 0) {
+            $response->setAuthoritative(true);
         }
 
         /* TODO populate with whatever snake did
          */
         $response->setAssessable($assessment)
+            ->setUpdatedBy($this->getUser()->getId())
             ->setUpdatedAt(\Alaress_Date_Format::now());
+
+        // TODO TEMPORARY, the session ID should actually be delt with only by the backend since it should be able to track it by the response ID
+        // When we recieve a request to send a message, it needs to:
+        // - find the response by ID (unless it's already done by the module, or we're just using this endpoint)
+        // - if there is no session ID yet, create one and store it against the response BUT DON'T SAVE YET, a foreign key constraint will fail if the AI log doesn't have that ID yet...
+        // - send the message to the AI and log against the session ID
+        // - once the AI has responded, save the response. This is also where you'll probably change "startedAt" and update updatedAt again I guess, also dealing with duration somehow before all this
+        $response->setSessionId($this->requestPost->get('sessionId'));
 
         $this->dialogAgentResponseMapper->save($response);
 
         /* TODO this probably isn't tne nicest way to generate a redirected url
          *  There *has* to be a cleaner way than this, esp. since returnUrl is a const in the Redirect
          *  class itself, but is magically being written here.
+         *
+         * Also if this is intended as final submission, we'd need to mark it as submitted.
+         * However, I most expect this will be both for messaging the AI (i.e. each message you send) as well as final submission
+         * Hence, it probably doesn't even need to redirect (or shouldn't) until final submission, or let the frontend deal with that?
          */
         $this->response = $this->redirectFound(
             $this->routeGenerator->generate(
@@ -619,8 +681,93 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         $scenario = $this->dialogAgentScenarioMapper->findById($assessment->getScenarioId());
 
-        /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
-         */
+        /** All implementations if $assessment is a spec, or $assessment itself if it's already one */
+        $implementations = new \Schoolbox\GenericCollection(Model::class);
+
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if ($assessment->isImplementation()) {
+            $implementations->add($assessment);
+        } else {
+            foreach ($this->getUnitAssessments($assessment) as $unitAssessment) {
+                /** @var Model $unitAssessment */
+                $implementations->add($unitAssessment);
+            }
+        }
+
+        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+        $responseLinksTranslator = new Response\Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
+
+        $assessmentsPayload = [];
+        foreach ($implementations as $implementation) {
+            $participantPayload = [];
+
+            foreach ($implementation->getAllParticipants() as $participant) {
+                /** @var Participant $participant */
+
+                /* Are they excluded? ignore them */
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+
+                $authoritativeResponse = null;
+                if ($participant->getAllResponses()->count()) {
+                    /** @var ResponseModel|null $authoritativeResponse */
+                    $authoritativeResponse = $implementation->getAuthoritativeResponse($participant, true);
+                }
+
+
+                /* The frontend expects a {} for an empty record, so use a stdClass */
+                $feedback = new \stdClass();
+
+                /* TODO Bolt on the feedback-per-cell from the ai that would normally exist here
+                */
+                if ($authoritativeResponse !== null && null !== $authoritativeResponse->getSubmittedAt()) { // also maybe if it's been submitted?
+                    $tempFeedback = [
+                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nunc dolor, facilisis quis nisl quis, fermentum suscipit odio. Suspendisse tempor luctus feugiat.',
+                        'Ut aliquet eu sapien eget scelerisque. Donec et lobortis turpis. Etiam nec libero at risus cursus congue a a urna. Vestibulum tincidunt, nunc in tempus semper.',
+                        'Urna dolor accumsan leo, eget iaculis erat erat at felis. Quisque et porttitor lorem. Vestibulum elit diam, ornare sed tempus ultricies, condimentum in sem',
+                        'Fusce blandit volutpat porta. Mauris semper justo et lorem lobortis, malesuada mattis velit dapibus. Ut blandit sodales ligula, ut congue justo ornare ac. Phasellus mollis turpis at erat pulvinar.',
+                        'Fermentum consequat quam congue. Donec ut elit libero. Donec sit amet mauris facilisis, luctus justo in, sodales nisl. Nulla sem lacus, facilisis quis scelerisque ut, rhoncus a magna',
+                        'Fusce eu ligula dui. Ut lacus lacus, vulputate sit amet velit sed, efficitur faucibus quam. Cras id augue molestie, semper purus vel, blandit diam.',
+                    ];
+
+                    foreach ($scenario->getCriteria() as $criterion) {
+                        shuffle($tempFeedback);
+                        $start = rand(0, 5);
+                        $selected = array_slice($tempFeedback, $start, $start + rand(0, 5 - $start));
+                        $feedback->{$criterion->getId()} = join(' ', $selected);
+                    }
+                }
+
+                $routeParams = [
+                    'assessment'   => $implementation,
+                    'assessmentId' => $implementation->getId(),
+                    'student'      => $participant->getUser(),
+                    'studentId'    => $participant->getUser()->getId(),
+                ];
+
+                $participantPayload[] = [
+                    'id' => $participant->getUser()->getId(),
+                    'user' => $userTranslator->convertLinkedUser($participant->getUser()),
+                    'response' => $authoritativeResponse ? $responseTranslator->__invoke($authoritativeResponse) : null,
+                    'feedback' => $feedback,
+                    '_routes' => [
+                        'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
+                        'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
+                    ],
+                ];
+            }
+
+            $assessmentsPayload[] = [
+                'id' => $implementation->getId(),
+                'folder' => [
+                    'id' => $implementation->getBaseContext()->getFolder()->getId(),
+                    'title' => $implementation->getBaseContext()->getFolder()->getTitle(),
+                ],
+                'participants' => $participantPayload,
+            ];
+        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/dialogAgent/status.twig',
@@ -631,8 +778,11 @@ class Controller extends Assessment\Controller
                     ]
                 ),
                 'assessment' => $assessment,
-                'scenario' => $scenario,
-                'statuses' => (new Status())->generate($assessment),
+                'criteria'   => $scenario->getCriteria()->map(fn(CriteriaModel $criterion) => [
+                    'id' => $criterion->getId(),
+                    'title' => $criterion->getTitle(),
+                ]),
+                'assessments' => $assessmentsPayload,
             ]
         );
     }

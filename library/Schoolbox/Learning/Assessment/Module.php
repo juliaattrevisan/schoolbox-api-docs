@@ -995,6 +995,10 @@ class Module extends BaseModule
                     $dialogAgentDataModelMapper,
                     $dialogAgentScenarioMapper,
                     $this->injector->get('dialogAgentResponseDataSource'),
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     editorTemplateHelper: new EditorTemplateHelper(

@@ -4,7 +4,7 @@ import type { StorageFile } from "@js/resource/resourceUtils";
 import { openFilePreview } from "@js/preview/previewUtils";
 import { createLightbox, getStorageGallerySlides } from "@js/image-lightbox/imageLightboxEvent";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
-import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";

@@ -508,9 +508,12 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
     min-width: $progress-tick-size;
     min-height: $progress-tick-size;
     &:before {
+        font-size: calc($progress-tick-size / 2);
         line-height: $progress-tick-size;
     }
-    &.pending {
+    &.pending,
+    &.in-progress,
+    &.requires-assistance {
         border-radius: calc($progress-tick-size / 4);
     }
 }
@@ -548,6 +551,11 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             display: none;
         }
     }
+
+    /**
+     * Progress Tick States
+     * See /library/Schoolbox/Assessment/Types/progressTick.ts for usage and associated enum
+     */
     &.pending {
         @extend .icon-approve;
         background-color: $warning-color;
@@ -558,7 +566,8 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             transform: rotate(-135deg);
         }
     }
-    &.reviewed {
+    &.reviewed,
+    &.submitted {
         @extend .icon-approve;
         background-color: $success-color;
         border-radius: $progress-tick-size-regular;
@@ -581,69 +590,26 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
             line-height: 0.85;
         }
     }
-    // Dialog Agent
-    // snake please refactor these styles in some reptilian manner
-    &.dialog-agent {
-        // hide the tick on the pending square (!?)
-        &:not(.readonly):hover {
-            &:before {
-                visibility: hidden;
-            }
-        }
-
-        // ...but show the icons for the other states (!!!!?!)
-        &.pending,
-        &.in-progress,
-        &.requires-assistance,
-        &.submitted {
-            &:not(.readonly):hover {
-                &:before {
-                    visibility: visible;
-                }
-            }
-        }
-
-        &.pending {
-            @extend .icon-collapse;
-            background-color: $base;
-        }
-        &.in-progress {
-            @extend .icon-time-value;
-            background-color: #0c78cf;
+    &.in-progress {
+        @extend .icon-time-value;
+        background-color: #0c78cf;
+        transform: rotate(-135deg);
+        &:before {
+            visibility: visible;
+            // counter-rotation
             transform: rotate(135deg);
-            &:before {
-                visibility: visible;
-                // counter-rotation
-                transform: rotate(-135deg);
-            }
-        }
-        &.requires-assistance {
-            @extend .icon-alert;
-            background-color: $warning-color;
-            transform: rotate(135deg);
-            &:before {
-                visibility: visible;
-                // counter-rotation
-                transform: rotate(-135deg);
-            }
-        }
-        &.submitted {
-            @extend .icon-approve;
-            background-color: $success-color;
-            border-radius: $progress-tick-size-regular;
-            transform: rotate(360deg);
-            &:before {
-                visibility: visible;
-            }
         }
     }
-}
-
-// Dialog Agent
-// snake please refactor these styles in some reptilian manner
-// Center those icons in the Status column (!?)
-.dialog-agent .col-status .progress-tick {
-    margin: 0.25rem auto 0 auto;
+    &.requires-assistance {
+        @extend .icon-alert;
+        background-color: $warning-color;
+        transform: rotate(135deg);
+        &:before {
+            visibility: visible;
+            // counter-rotation
+            transform: rotate(-135deg);
+        }
+    }
 }
 
 .countdown {

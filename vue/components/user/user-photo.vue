@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { User, UserAuthor } from "@schoolboxLibrary/types/User";
+
 /**
  * To display a users profile photo,
  * This is pretty much just templates/core/include/portrait.twig, but for use in Vue
@@ -9,7 +11,7 @@ interface Props {
      * User takes precedence over userId and externalId
      * If set to false, it will render the default portrait image
      */
-    user?: { id?: number | null; externalId?: string | number | null } | false;
+    user?: Pick<UserAuthor, "id"> | Pick<User, "id" | "externalId"> | Pick<User, "externalId"> | false;
     userId?: number;
     externalId?: string;
     /**
@@ -49,7 +51,7 @@ const resolvedUserId = window.Vue.computed(() => {
     if (props.user === false) return 0;
 
     // We always prefer to use the user.id
-    if (props.user.id != null) return props.user.id;
+    if (props.user && "id" in props.user && props.user.id != null) return props.user.id;
 
     // But failing that, we should try the user.externalId next
     return undefined;
@@ -62,7 +64,7 @@ const resolvedExternalId = window.Vue.computed(() => {
     }
 
     // Prefer to take the externalId from the `user` object
-    if (props.user && props.user.externalId) {
+    if (props.user && "externalId" in props.user && props.user.externalId) {
         return props.user.externalId;
     }
 
@@ -105,7 +107,7 @@ const dimensions = window.Vue.computed(() => {
     if (props.render === "menuMobile") {
         return { width: 72, height: 72 };
     }
-    return {};
+    return { width: undefined, height: undefined };
 });
 
 const srcBase = window.Vue.computed(() => `/portrait.php?${userParameter.value}`);

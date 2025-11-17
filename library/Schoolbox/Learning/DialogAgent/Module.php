@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\DialogAgent;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -20,6 +21,8 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -64,6 +67,56 @@ class Module extends BaseModule
             return $this->preloadAssessmentAndStudent($params);
         };
 
+        /* Preload a participant+response via (assessment id, student id, response id) tuple,
+         * returning an (assessment, student, response) tuple.
+         *
+         * This seems pretty long-winded for some reason: there might have been an easier way to ensure ownership
+         */
+        $preloadParticipantAndResponse = function ($params) {
+            $tuple = $this->preloadAssessmentAndStudent($params);
+
+            /** @var DialogAgent\Model $assessment */
+            $assessment = $tuple['assessment'];
+
+            /** @var User $student */
+            $student = $tuple['student'];
+
+            /* Ensure that the provided $responseId actually belongs to the student
+             */
+            $participant = $assessment->getParticipantIfExtant($student);
+
+            /* This person has been excluded from the assessment or is no longer participating
+             */
+            if (null === $participant) {
+                throw new NotFound();
+            }
+
+            /* Explore $participant's responses to find an identifier that exists for them.
+             * If one doesn't exist, they're requesting someone else's response id
+             */
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
+            $response = $participant->getAllResponses()->getBy('id', $params['responseId']);
+
+            /* responseId doesn't belong to the participant (or maybe wasn't hydrated properly)
+             */
+            if (null === $response) {
+                throw new NotFound();
+            }
+
+            /* You can't operate on a non-authoritative response: you're not doing that one anymore
+             */
+            if (!$response->getAuthoritative()) {
+                throw new NotFound();
+            }
+
+            /* Add this response to the tuple we previously obtained and return that:
+             * a matching response exists for this person
+             */
+            $tuple['response'] = $response;
+
+            return $tuple;
+        };
+
         /* Shortcuts to Authorization Rule constructs
          */
         $isSuper = $this->getAuthRule('isSuperuser');
@@ -87,8 +140,8 @@ class Module extends BaseModule
 
         /* Create a dialog agent's configuration
          */
-        $this->register('GET', "/{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
-        $this->register('POST', "/{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
+        $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
         /* Resume a response
          */
@@ -96,29 +149,44 @@ class Module extends BaseModule
 
         /* View a response (readonly mode)
          */
-        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', $canViewSummary, $preloadParticipant);
+        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', new Rule\All(
+            $canViewSummary,
+            $this->buildRuleCanAction(Status::ACTION_VIEW)
+        ), $preloadParticipantAndResponse);
 
         /* Student requests assistance for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/assistance", 'postAssistanceRequest', $canSubmit, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{responseId:\d+}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/resolve", 'postAssistanceResolve', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{responseId:\d+}", 'postAssistanceResolve', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_RESOLVE)
+        ), $preloadParticipantAndResponse);
 
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
          * with details about who did the sobo
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/sobo", 'postSobo', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/sobo/{responseId:\d+}", 'postSobo', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_SOBO)
+        ), $preloadParticipantAndResponse);
 
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reopen", 'postReopen', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{responseId:\d+}", 'postReopen', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_REOPEN)
+        ), $preloadParticipantAndResponse);
 
         /* Resets a dialog agent for a particular person. This creates a new authoritative response instance,
          * setting all other responses to non-authoritative, basically letting students start afresh.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reset", 'postReset', $canWrite, $preloadParticipant);
+        $this->register('POST', "{$assRoute}/{$studentParam}/reset", 'postReset', new Rule\All(
+            $canWrite,
+            $this->buildRuleCanAction(Status::ACTION_RESET)
+        ), $preloadParticipant);
     }
 
 
@@ -277,6 +345,41 @@ class Module extends BaseModule
                     },
                 ),
             )
+        );
+    }
+
+
+    /**
+     * Decide if the desired action $action can be conducted for $params['response'] instance.
+     *
+     * This allows you to ask the $router if you can get to a place without having to directly interact with the
+     * Status class and having to interpret its output struct manually
+     *
+     * @param string $action
+     * @return Rule\IAuthorizationRule
+     */
+    private function buildRuleCanAction(string $action): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params) use ($action): void {
+                /* Accommodate a special case for resetting the dialog agent for a particular person
+                 *
+                 * This is always available to conduct upon a person since it operates on their entire response
+                 * history rather than an individula response instance
+                 */
+                if (Status::ACTION_RESET === $action) {
+                    return;
+                }
+
+                $status = (new DialogAgent\Response\Lookup\Status())->calculate($params['response'] ?? null);
+
+                if (!$status['actions'][$action]) {
+                    throw new Forbidden(sprintf(
+                        'Action "%s" is not allowed',
+                        $action,
+                    ));
+                }
+            })
         );
     }
 

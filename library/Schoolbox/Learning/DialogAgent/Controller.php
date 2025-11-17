@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
@@ -271,48 +272,14 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User $student
+     * @param Response $response
      * @return void
-     * @throws Deleted
-     * @throws Exception
-     * @throws \Alaress\Web\Controller\Exception
      */
-    public function postAssistanceRequest(IAssessable $assessment, User $student): void
+    public function postAssistanceRequest(IAssessable $assessment, User $student, Response $response): void
     {
-        /* No response id, somehow: malformed post request.
-         */
-        if ('' === trim((string)$this->requestPost->get('responseId'))) {
-            $this->sendError('Response not found.', [], 404);
-            return;
-        }
+        $response->setAssistanceRequestedAt(\Alaress_Date_Format::now());
 
-        /* See if the response id requested actually exists
-         */
-        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-            ->equals('id', (int)$this->requestPost->get('responseId'))
-            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-            ->equals('learner_id', $student->getId())
-            ->equals('authoritative', true)
-            ->isNull('submitted_by')
-            ->isNull('submitted_at');
-
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
-        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-
-        /* $student cannot request help for a response if:
-         *     - response is already submitted
-         *     - this response id isn't theirs to change
-         *     - this response has been repurposed illegally by messing around in the url
-         */
-        if (null === $existingResponse) {
-            $this->sendError('You cannot request assistance for this discussion activity.');
-            return;
-        }
-
-        /* Mutate the field as one might expect
-         */
-        $existingResponse->setAssistanceRequestedAt(\Alaress_Date_Format::now());
-
-        $this->dialogAgentResponseMapper->save($existingResponse);
+        $this->dialogAgentResponseMapper->save($response);
 
         /* TODO snake async payload response in some reptilian manner
          */
@@ -325,49 +292,14 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User $student
+     * @param Response $response
      * @return void
-     * @throws Deleted
-     * @throws Exception
-     * @throws \Alaress\Web\Controller\Exception
      */
-    public function postAssistanceResolve(IAssessable $assessment, User $student): void
+    public function postAssistanceResolve(IAssessable $assessment, User $student, Response $response): void
     {
-        /* No response id, somehow: malformed post request.
-         */
-        if ('' === trim((string)$this->requestPost->get('responseId'))) {
-            $this->sendError('Response not found.', [], 404);
-            return;
-        }
+        $response->setAssistanceRequestedAt(null);
 
-        /* See if the response id requested actually exists
-         */
-        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-            ->equals('id', (int)$this->requestPost->get('responseId'))
-            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-            ->equals('learner_id', $student->getId())
-            ->equals('authoritative', true)
-            ->isNull('submitted_by')
-            ->isNull('submitted_at');
-
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
-        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-
-        /* You cannot resolve a request for assistance for a response if::
-         *     - response is non-authoritative
-         *     - response is already submitted
-         *     - this response id isn't theirs to change
-         *     - this response has been repurposed illegally by messing around in the url
-         */
-        if (null === $existingResponse) {
-            $this->sendError('You cannot resolve assistance for this discussion activity.');
-            return;
-        }
-
-        /* Mutate the field as one might expect
-         */
-        $existingResponse->setAssistanceRequestedAt(null);
-
-        $this->dialogAgentResponseMapper->save($existingResponse);
+        $this->dialogAgentResponseMapper->save($response);
 
         /* TODO snake async payload response in some reptilian manner
          */
@@ -379,52 +311,39 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User $student
+     * @param Response $response
      * @return void
-     * @throws Deleted
-     * @throws Exception
-     * @throws \Alaress\Web\Controller\Exception
      */
-    public function postSobo(IAssessable $assessment, User $student): void
+    public function postSobo(IAssessable $assessment, User $student, Response $response): void
     {
-        /* No response id, somehow: malformed post request.
-         */
-        if ('' === trim((string)$this->requestPost->get('responseId'))) {
-            $this->sendError('Response not found.', [], 404);
-            return;
-        }
-
-        /* See if the response id requested actually exists
-         */
-        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-            ->equals('id', (int)$this->requestPost->get('responseId'))
-            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-            ->equals('learner_id', $student->getId())
-            ->equals('authoritative', true)
-            ->isNull('submitted_by')
-            ->isNull('submitted_at');
-
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
-        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-
-        /* You cannot sobo a student's response if:
-         *     - response is non-authoritative
-         *     - response is already submitted
-         *     - this response id isn't theirs to change
-         *     - this response has been repurposed illegally by messing around in the url
-         */
-        if (null === $existingResponse) {
-            $this->sendError('You cannot resolve assistance for this discussion activity.');
-            return;
-        }
-
-        /* Mutate the fields as one might expect
-         */
-        $existingResponse
+        $response
             ->setSubmittedAt(\Alaress_Date_Format::now())
             ->setSubmittedOnBehalfOf($student)
             ->setSubmittedBy($this->getUser());
 
-        $this->dialogAgentResponseMapper->save($existingResponse);
+        $this->dialogAgentResponseMapper->save($response);
+
+        /* TODO snake async payload response in some reptilian manner
+         */
+    }
+
+
+    /**
+     * Reopening a dialog agent for a particular student basically means "unsubmit this student's authoritative response"
+     * The responseId provided must be the student's authoritative response for it to be reopened.
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Response $response
+     * @return void
+     */
+    public function postReopen(IAssessable $assessment, User $student, Response $response): void
+    {
+        $response
+            ->setSubmittedAt(null)
+            ->setSubmittedBy(null);
+
+        $this->dialogAgentResponseMapper->save($response);
 
         /* TODO snake async payload response in some reptilian manner
          */
@@ -463,60 +382,6 @@ class Controller extends Base
             ->setAuthoritative(true);
 
         $this->dialogAgentResponseMapper->save($newResponse);
-
-        /* TODO snake async payload response in some reptilian manner
-         */
-    }
-
-
-    /**
-     * Reopening a dialog agent for a particular student basically means "unsubmit this student's authoritative response"
-     * The responseId provided must be the student's authoritative response for it to be reopened.
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     * @throws Deleted
-     * @throws Exception
-     * @throws \Alaress\Web\Controller\Exception
-     */
-    public function postReopen(IAssessable $assessment, User $student): void
-    {
-        /* No response id, somehow: malformed post request.
-         */
-        if ('' === trim((string)$this->requestPost->get('responseId'))) {
-            $this->sendError('Response not found.', [], 404);
-            return;
-        }
-
-        /* See if the response id requested actually exists
-         */
-        $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-            ->equals('id', (int)$this->requestPost->get('responseId'))
-            ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-            ->equals('learner_id', $student->getId())
-            ->equals('authoritative', true);
-
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $existingResponse */
-        $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-
-        /* You cannot reopen a response if:
-         *     - response is non-authoritative
-         *     - this response id isn't theirs to change
-         *     - this response has been repurposed illegally by messing around in the url
-         */
-        if (null === $existingResponse) {
-            $this->sendError('You cannot reopen this discussion activity.');
-            return;
-        }
-
-        /* Mutate the field as one might expect
-         */
-        $existingResponse
-            ->setSubmittedAt(null)
-            ->setSubmittedBy(null);
-
-        $this->dialogAgentResponseMapper->save($existingResponse);
 
         /* TODO snake async payload response in some reptilian manner
          */

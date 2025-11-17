@@ -486,7 +486,7 @@ table.attempts-table {
     border-right: 1px solid var(--body-background);
 }
 
-/* make a table <th> sticky */
+/* make a table <th> sticky on the left */
 .u-sticky-left {
     background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
     left: 0;
@@ -500,6 +500,23 @@ table.attempts-table {
     &:hover {
         background-color: #f4f3f3; /* to help legibility */
     }
+}
+
+/* often we need a 2nd sticky column, this provides an offset to deal with that */
+.u-sticky-left--first {
+    min-width: var(--sbx-table-u-sticky-width-first, 200px);
+    width: var(--sbx-table-u-sticky-width-first, 200px);
+}
+.u-sticky-left--offset-1 {
+    left: var(--sbx-table-u-sticky-width-first, 200px);
+}
+
+/* make a table <th> sticky on the right */
+.u-sticky-right {
+    background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+    right: 0;
+    position: sticky;
+    z-index: var(--sbx-depth-ui-sticky);
 }
 
 /* to accommodate an absolute positioned child */

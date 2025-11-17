@@ -1,9 +1,12 @@
 <script setup lang="ts">
 /**
  * This mimics the rendering and form logic of progressTick.twig/jquery.progressTickForm.js
+ *
+ * TODO: upgrade this to support dialog agent and normal transitions in a more flexible way
  */
 
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import { ProgressTickClass } from "@schoolboxAssessment/Types/progressTick";
 
 /**
  * Transitions
@@ -28,10 +31,10 @@ const STATUS_VALUES = {
  * Convert a transition status to a progress class
  * This is mainly here since props.progressTick only gives us a class
  */
-const STATUS_TO_CLASS: Record<keyof typeof TRANSITIONS_DEFAULT, typeof progressClass.value> = {
-    incomplete: "incomplete",
-    selfAssessed: "pending",
-    teacherAssessed: "reviewed",
+const STATUS_TO_CLASS: Record<keyof typeof TRANSITIONS_DEFAULT, ProgressTickClass> = {
+    incomplete: ProgressTickClass.INCOMPLETE,
+    selfAssessed: ProgressTickClass.PENDING,
+    teacherAssessed: ProgressTickClass.REVIEWED,
 } as const;
 
 interface Props {
@@ -84,11 +87,11 @@ const progressTickStatus = window.Vue.computed(() => {
     }
 
     switch (progressClass.value) {
-        case "incomplete":
+        case ProgressTickClass.INCOMPLETE:
             return "incomplete";
-        case "pending":
+        case ProgressTickClass.PENDING:
             return "selfAssessed";
-        case "reviewed":
+        case ProgressTickClass.REVIEWED:
             return "teacherAssessed";
         default:
             return "incomplete";
@@ -104,13 +107,13 @@ const mouseoverTitle = window.Vue.computed(() => {
     }
 
     switch (props.progressTick.progressClass) {
-        case "incomplete":
+        case ProgressTickClass.INCOMPLETE:
             return "Incomplete";
-        case "pending":
+        case ProgressTickClass.PENDING:
             return postRouteUrl.value ? "Self-assessed" : "Awaiting Feedback";
-        case "failed":
+        case ProgressTickClass.FAILED:
             return postRouteUrl.value ? undefined : "Resubmission Required";
-        case "reviewed":
+        case ProgressTickClass.REVIEWED:
             return "Completed";
         default:
             return undefined;
@@ -178,7 +181,7 @@ async function onTickClicked(): Promise<void> {
     </div>
     <span
         v-else-if="progressClass"
-        class="no-text progress-tick"
+        class="no-text progress-tick readonly"
         :class="progressClass"
         :style="{ margin: props.noMargin ? '0' : undefined }"
         :title="mouseoverTitle"
