@@ -43,6 +43,9 @@ class ChatCompletionsMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+        if (is_callable($streamListener)) {
+            $streamListener($message, $log);
+        }
 
         // Otherwise, handle the data from the message as if it were a response
         $this->handleResponse($rawData, $log);

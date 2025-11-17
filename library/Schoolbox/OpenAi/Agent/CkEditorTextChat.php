@@ -11,8 +11,11 @@ namespace Schoolbox\OpenAi\Agent;
 
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Agent for generating text chat responses via OpenAI, for CKEditor's AI
@@ -62,7 +65,7 @@ class CkEditorTextChat
             Helper::FEATURE_CHAT,
             $aiSessionId,
         );
-        return $this->client->createChatCompletionStream($payload, $log);
+        return $this->client->createChatCompletionStream($payload, $log, streamListener: $this->listenForOutputText(...));
     }
 
     /**
@@ -107,5 +110,36 @@ class CkEditorTextChat
             }
         }
         return null;
+    }
+
+    /**
+     * Callback method for message stream.
+     *
+     * If this message is a finished response, then extract the output text out
+     * of it and add it to the log.
+     *
+     * @param Message   $message
+     * @param Log\Model $log
+     * @return void
+     */
+    private function listenForOutputText(Message $message, Log\Model $log): void
+    {
+        // Chat completions only returns chunked output, and never returns a
+        // summary.
+        // Need to reconstitute output text from the chunks.
+        try {
+            $decodedMessage = $message->getDataAsArray();
+            foreach (($decodedMessage['choices'] ?? []) as $choice) {
+                $content = $choice['delta']['content'] ?? null;
+                if (isset($content)) {
+                    $log->setOutputText($log->getOutputText() . $content);
+                }
+            }
+        } catch (UnexpectedValueException) {
+            // Not valid data: nothing can be done.
+            // However the stream may return a `[DONE]` event:
+            // that needs to be handled, and used to convert the content into
+            // plain text (it's HTML)
+        }
     }
 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent;
 
-use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
@@ -19,6 +18,7 @@ use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Agent for generating images via OpenAI.
@@ -121,9 +121,9 @@ class ImageGeneration
         if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
             $outputTextParts = [];
             try {
-                $decodedMessage = json_decode($message->data, true, flags: JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                // Not JSON: nothing can be done.
+                $decodedMessage = $message->getDataAsArray();
+            } catch (UnexpectedValueException) {
+                // Not valid data: nothing can be done.
                 // Could always inspect the full stream data to figure it out?
             }
             foreach (($decodedMessage['response']['output']) ?? [] as $output) {

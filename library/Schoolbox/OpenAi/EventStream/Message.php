@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\EventStream;
 
+use JsonException;
+use UnexpectedValueException;
+
 /**
  * Class representation of a message from an event stream.
  *
@@ -99,5 +102,24 @@ class Message
         }
         $fields[] = sprintf('data: %s', $this->data);
         return implode("\n", $fields) . "\n\n";
+    }
+
+    /**
+     * Retrieve this message's data as an array, if possible.
+     *
+     * @return array
+     * @throws UnexpectedValueException if the data is not JSON, or doesn't decode to an array
+     */
+    public function getDataAsArray(): array
+    {
+        try {
+            $data = json_decode($this->data, true, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            throw new UnexpectedValueException('Message data is not valid JSON', 0, $e);
+        }
+        if (!is_array($data)) {
+            throw new UnexpectedValueException('Message data is not an array');
+        }
+        return $data;
     }
 }
