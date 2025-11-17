@@ -14,6 +14,7 @@ import { useMdpHeaderStore } from "../store/mdpHeaderStore";
 import { useMdpRowsStore } from "../store/mdpRowsStore";
 import { useMdpSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
+import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
 
 const props = defineProps<{
     profile: Profile;
@@ -204,27 +205,6 @@ function onContentClicked(event: MouseEvent): void {
 }
 
 /**
- * Whether to show the view more gradient and button
- */
-const showViewMoreGradient = window.Vue.computed(() => {
-    const displayHeights = rowsStore.rowDisplayHeights;
-    if (!displayHeights) return false;
-    const displayHeight = displayHeights[props.profile.student.id];
-    if (!displayHeight) return false;
-    return contentHeight.value + componentActionHeight.value > displayHeight;
-});
-
-/**
- * Whether to show the view more button
- * Only show when content exceeds height AND cell is not focused
- */
-const showViewMoreInner = window.Vue.computed(() => {
-    // Don't show view more button when cell is focused (auto-growing)
-    if (isContentFocused.value) return false;
-    return showViewMoreGradient.value;
-});
-
-/**
  * Update the content height in the store when the content height changes
  */
 function updateContentHeight(): void {
@@ -283,16 +263,13 @@ const animationDuration = window.Vue.ref("0.3s");
         </div>
         <div class="content-container-fixed">
             <div v-if="!isContentEmpty" class="content-overlay">
-                <div class="show-more-container" :data-visible="showViewMoreGradient">
-                    <button
-                        :data-test="`mdp-grid-view-more-button-${props.profile.student.id}-${props.headerKey}`"
-                        :data-visible="showViewMoreInner"
-                        :tabindex="showViewMoreInner ? 0 : -1"
-                        @click.prevent="rowsStore.toggleViewMore(props.profile.student.id)"
-                    >
-                        View More
-                    </button>
-                </div>
+                <mdp-grid-cell-show-more
+                    :profile="props.profile"
+                    :header-key="props.headerKey"
+                    :content-height="contentHeight"
+                    :component-action-height="componentActionHeight"
+                    :is-content-focused="isContentFocused"
+                />
             </div>
             <div v-else class="content-overlay empty-state no-print">
                 <empty-state icon="icon-textbox">
@@ -353,30 +330,6 @@ const animationDuration = window.Vue.ref("0.3s");
         &.empty-state {
             justify-content: center;
             pointer-events: all;
-        }
-    }
-
-    .show-more-container {
-        background: linear-gradient(0deg, #fff 0%, #fff0 100%);
-        display: flex;
-        justify-content: end;
-        opacity: 0;
-        transition: opacity 0.3s;
-
-        &[data-visible="true"] {
-            opacity: 1;
-        }
-
-        button {
-            margin: 5px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-
-            &[data-visible="true"] {
-                opacity: 1;
-                pointer-events: all;
-            }
         }
     }
 }
