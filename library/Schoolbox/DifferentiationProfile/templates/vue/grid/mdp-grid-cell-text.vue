@@ -144,16 +144,10 @@ function onSave(): void {
     profile[props.headerKey] = currentText.value;
     void mdpSaveStore.save(profile);
 }
-
-const currentHeight = window.Vue.computed(() => `${250}px`);
 </script>
 
 <template>
-    <div
-        class="l-flex"
-        :style="{ cursor: currentText !== null ? 'text' : 'default', height: currentHeight }"
-        @click="onContainerSelected"
-    >
+    <div class="l-flex" :style="{ cursor: currentText !== null ? 'text' : 'default' }" @click="onContainerSelected">
         <empty-state v-if="currentText === null" icon="icon-textbox">
             <button @click.prevent="onAdd">Add {{ mdpHeaderStore.getTitleByKey(props.headerKey) }}</button>
         </empty-state>

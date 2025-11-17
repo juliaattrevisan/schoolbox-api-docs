@@ -50,15 +50,10 @@ async function onSave(): Promise<void> {
     isFocused.value = false;
     isSaving.value = false;
 }
-
-const currentHeight = window.Vue.computed(() => `${250}px`);
 </script>
 
 <template>
-    <div
-        class="cell-container"
-        :style="{ height: currentHeight, border: isFocused ? '1px solid var(--form-border-color)' : 'none' }"
-    >
+    <div class="cell-container" :style="{ border: isFocused ? '1px solid var(--form-border-color)' : 'none' }">
         <div v-if="isFocused">
             <div class="checklist l-pad-s">
                 <legend class="t-visually-hidden">
@@ -104,6 +99,5 @@ const currentHeight = window.Vue.computed(() => `${250}px`);
 <style scoped>
 .cell-container {
     display: flex;
-    overflow-y: auto;
 }
 </style>

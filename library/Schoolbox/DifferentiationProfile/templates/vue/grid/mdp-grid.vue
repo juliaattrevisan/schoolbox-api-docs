@@ -11,6 +11,8 @@ const props = defineProps<{
     isLoading: boolean;
 }>();
 
+const animationDuration = `0.5s`;
+
 /**
  * Generate the grid template columns based on the header widths
  */
@@ -45,8 +47,10 @@ const gridTemplateColumns = window.Vue.computed(() => {
                         v-for="item in props.header"
                         :key="item.id"
                         :class="{
+                            'mdp-grid__cell': true,
                             'fixed-left': item.isFixed,
                         }"
+                        :style="{ height: `250px` }"
                     >
                         <!-- Use dynamic slot based on header type, fallback to default content -->
                         <slot :name="item.type" :row="row" :header="item" :row-index="index">
@@ -91,6 +95,13 @@ const gridTemplateColumns = window.Vue.computed(() => {
         padding: 0.625rem;
         white-space: nowrap;
     }
+}
+
+.mdp-grid__cell {
+    overflow: clip; // Use clip to avoid focus scrolling the cell content
+    position: relative;
+    text-overflow: ellipsis;
+    transition: height v-bind(animationDuration) ease;
 }
 
 .fixed-top.fixed-left {
