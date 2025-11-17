@@ -104,7 +104,7 @@ class RedisCache implements ICache
             $amqpPayload = json_encode([$itemKey, $context]);
             $mq->publish(
                 $amqpPayload,
-                $queueName,
+                Broker::QUEUE,
                 [
                     'exchange'   => '',
                     'expiration' => $ttl,
@@ -114,7 +114,7 @@ class RedisCache implements ICache
             ++$i;
         }
 
-        $this->log->info("Restored $i events");
+        $this->log->debug("Restored $i events");
 
         return (bool)$i;
     }
