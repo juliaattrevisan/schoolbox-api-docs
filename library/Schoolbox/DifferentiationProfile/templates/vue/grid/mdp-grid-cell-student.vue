@@ -6,21 +6,20 @@
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import { useLinkedRecordsStore } from "../store/mdpLinkedRecordsStore";
 
 const props = defineProps<{
     user: User;
     profile: Profile;
 }>();
 
-const emit = defineEmits<{
-    linkedRecordsSelect: [profile: Profile];
-}>();
+const linkedRecordsStore = useLinkedRecordsStore();
 
 /**
  * When the linked records button is clicked
  */
 function onLinkedRecordsSelected(): void {
-    emit("linkedRecordsSelect", props.profile);
+    linkedRecordsStore.select(props.profile);
 }
 </script>
 

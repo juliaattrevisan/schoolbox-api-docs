@@ -27,6 +27,7 @@ import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useRowsStore } from "./store/mdpRowsStore";
+import { useLinkedRecordsStore } from "./store/mdpLinkedRecordsStore";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -44,6 +45,7 @@ const headerStore = useHeaderStore();
 headerStore.init(props.header);
 const rowsStore = useRowsStore();
 rowsStore.init(props.route);
+const linkedRecordsStore = useLinkedRecordsStore();
 
 /**
  * Keep the container below the height of the viewport
@@ -53,25 +55,6 @@ const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
 const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
     document.getElementById("filter_panel"),
 ]);
-
-// #region linked records selected
-
-const linkedRecordsUrl = window.Vue.ref<string>("");
-const linkedRecordsTitle = window.Vue.ref<string>("");
-const linkedRecordsMeta = window.Vue.ref<string>("");
-
-/**
- * When linked records is selected for a profile
- * @param profile - the profile to view linked records for
- */
-function onLinkedRecordsSelected(profile: Profile): void {
-    if (profile._routes?.linkedRecords) {
-        linkedRecordsTitle.value = `${profile.student.fullName} - Linked Records`;
-        linkedRecordsUrl.value = profile._routes.linkedRecords;
-    }
-}
-
-// #endregion linked records selected
 </script>
 
 <template>
@@ -95,11 +78,7 @@ function onLinkedRecordsSelected(profile: Profile): void {
                 :is-loading="rowsStore.isMoreLoading"
             >
                 <template #User="{ row, header: columnHeader }">
-                    <mdp-grid-cell-student
-                        :user="row[columnHeader.key] as User"
-                        :profile="row as Profile"
-                        @linked-records-select="onLinkedRecordsSelected"
-                    />
+                    <mdp-grid-cell-student :user="row[columnHeader.key] as User" :profile="row as Profile" />
                 </template>
                 <template #Adjustment="{ row, header: columnHeader }">
                     <mdp-grid-cell-adjustment
@@ -140,7 +119,11 @@ function onLinkedRecordsSelected(profile: Profile): void {
             />
         </div>
     </template>
-    <pastoral-records-modal v-model:url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
+    <pastoral-records-modal
+        v-model:url="linkedRecordsStore.url"
+        :title="linkedRecordsStore.title"
+        :meta="linkedRecordsStore.meta"
+    />
     <dummy-inline-editor />
 </template>
 
