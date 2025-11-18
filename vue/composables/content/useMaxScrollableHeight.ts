@@ -9,11 +9,13 @@ import type { Ref } from "vue";
  * Provides reactive maximum scrollable height calculation for table containers.
  * @param scrollableEl - Ref to the scrollable HTML element
  * @param minWidth - Optional width in px to disable max height on small screens
+ * @param extraElements - Optional array of extra elements to observe to trigger height recalculation
  * @returns maxScrollableHeight - reactive ref containing the calculated max height as a CSS string
  */
 export function useMaxScrollableHeight(
     scrollableEl: Ref<HTMLElement | null>,
     minWidth?: number,
+    extraElements?: (Element | null)[],
 ): {
     maxScrollableHeight: Ref<string>;
 } {
@@ -24,6 +26,7 @@ export function useMaxScrollableHeight(
      * Set the max height to allow the table to sit within the browser window
      */
     function setScrollableHeight(): void {
+        console.warn("Setting scrollable height");
         const containerEl = document.querySelector("#container");
         if (minWidth && containerEl && containerEl.getBoundingClientRect().width <= minWidth) {
             maxScrollableHeight.value = "none";
@@ -49,6 +52,13 @@ export function useMaxScrollableHeight(
         const containerEl = document.querySelector("#container");
         if (containerEl) {
             resizeObserver.value.observe(containerEl);
+        }
+        if (extraElements) {
+            extraElements.forEach((el) => {
+                if (el) {
+                    resizeObserver.value?.observe(el);
+                }
+            });
         }
         // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
         setScrollableHeight();

@@ -50,7 +50,9 @@ rowsStore.init(props.route);
  */
 const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth);
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
+    document.getElementById("filter_panel"),
+]);
 
 // #region linked records selected
 
