@@ -283,7 +283,6 @@ test.describe("Course import tests", () => {
         })) as string;
 
         await page.locator(`label[for=import-${importId}]`).click();
-        // await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
 
         tester.isGoingTo("click export the selected classes button");
         await page.click("input[type=submit]");
@@ -295,7 +294,6 @@ test.describe("Course import tests", () => {
 
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).click();
-        //   await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
 
         tester.isGoingTo("click export the selected classes button");
         await page.click("input[type=submit]");
@@ -308,8 +306,6 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).click();
 
-        // await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
-
         tester.isGoingTo("click export the selected classes button");
         await page.click("input[type=submit]");
 
@@ -321,7 +317,6 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).click();
 
-        // await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
         await page.locator("#confirm-dialog-confirm-button").click();
         await expect(page.locator("#confirm-dialog-confirm-button")).not.toBeVisible();
         tester.isGoingTo("set a new due date for the lesson plan");
@@ -340,7 +335,6 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("tick the checkbox");
         await page.locator(`label[for=import-${importId}]`).click();
 
-        //   await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
         await page.locator("#confirm-dialog-confirm-button").click();
         await expect(page.locator("#confirm-dialog-confirm-button")).not.toBeVisible();
 
