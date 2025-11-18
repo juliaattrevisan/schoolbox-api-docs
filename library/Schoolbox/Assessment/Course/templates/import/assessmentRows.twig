@@ -154,8 +154,10 @@
                         assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                     } only %}
 
-                    {#open date is relevant when accepting responses#}
-                    {% if acceptingResponses %}
+                    {# Dialog Agents have a weird 3-field setup totally alien to everything else
+                     # This means it must receive special treatment - it disobeys the pattern we set up here
+                     #}
+                    {% if assessment is dialogAgent %}
                         {% include '@course/import/date.twig' with {
                             assessmentDate: assessment.openAt,
                             unitDate: unitImpl.openDate,
@@ -165,37 +167,79 @@
                             dateSyncEnd: 'due',
                             assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                         } only %}
-                    {% else %}
-                        <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
-                    {% endif %}
 
-                    {#due date is always relevant#}
-                    {% include '@course/import/date.twig' with {
-                        assessmentDate: assessment.dueAt,
-                        unitDate: defaultDueDate,
-                        endOfDay: true,
-                        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                        dateLabel: (assessment is lessonPlan ? locale.translate('lessonPlan', false, true): 'Due'),
-                        dateProperty: 'due',
-                        dateSyncStart: dueSyncStart,
-                        dateSyncEnd: dueSyncEnd,
-                        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
-                    } only %}
-
-                    {#close (late) date is relevant when accepting responses#}
-                    {% if acceptingResponses %}
+                        {# Despite being labelled "Close" it behaves like a "Due" date #}
                         {% include '@course/import/date.twig' with {
-                            assessmentDate: assessment.closeAt,
-                            unitDate: unitImpl.dueDate.endOfDay,
+                            assessmentDate: assessment.dueAt,
+                            unitDate: defaultDueDate,
                             endOfDay: true,
                             inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                            dateProperty: 'close',
-                            dateSyncStart: 'due',
-                            dateLabel: 'Late',
+                            dateLabel: 'Close',
+                            dateProperty: 'due',
+                            dateSyncStart: dueSyncStart,
+                            dateSyncEnd: dueSyncEnd,
                             assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                         } only %}
+
+                        {# Somewhere this should be enforced to be the same as Due Date, in the backend...
+                         # but otherwise, doesn't matter - I guess it can close whenever
+                         #}
+                        <div style="display:none">
+                            {% include '@course/import/date.twig' with {
+                                assessmentDate: assessment.closeAt,
+                                unitDate: unitImpl.dueDate.endOfDay,
+                                endOfDay: true,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: 'close',
+                                dateSyncStart: 'due',
+                                dateLabel: 'Late',
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
+                            } only %}
+                        </div>
                     {% else %}
-                        <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+                        {#open date is relevant when accepting responses#}
+                        {% if acceptingResponses %}
+                            {% include '@course/import/date.twig' with {
+                                assessmentDate: assessment.openAt,
+                                unitDate: unitImpl.openDate,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: 'open',
+                                dateSyncStart: 'publish',
+                                dateSyncEnd: 'due',
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
+                            } only %}
+                        {% else %}
+                            <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+                        {% endif %}
+
+                        {#due date is always relevant#}
+                        {% include '@course/import/date.twig' with {
+                            assessmentDate: assessment.dueAt,
+                            unitDate: defaultDueDate,
+                            endOfDay: true,
+                            inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                            dateLabel: (assessment is lessonPlan ? locale.translate('lessonPlan', false, true): 'Due'),
+                            dateProperty: 'due',
+                            dateSyncStart: dueSyncStart,
+                            dateSyncEnd: dueSyncEnd,
+                            assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
+                        } only %}
+
+                        {#close (late) date is relevant when accepting responses#}
+                        {% if acceptingResponses %}
+                            {% include '@course/import/date.twig' with {
+                                assessmentDate: assessment.closeAt,
+                                unitDate: unitImpl.dueDate.endOfDay,
+                                endOfDay: true,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: 'close',
+                                dateSyncStart: 'due',
+                                dateLabel: 'Late',
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
+                            } only %}
+                        {% else %}
+                            <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+                        {% endif %}
                     {% endif %}
                 </div>
 
