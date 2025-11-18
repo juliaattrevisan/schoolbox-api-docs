@@ -10,6 +10,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
+import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
 import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type {
@@ -43,6 +44,13 @@ const headerStore = useHeaderStore();
 headerStore.init(props.header);
 const rowsStore = useRowsStore();
 rowsStore.init(props.route);
+
+/**
+ * Keep the container below the height of the viewport
+ */
+const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth);
 
 // #region linked records selected
 
@@ -78,53 +86,57 @@ function onLinkedRecordsSelected(profile: Profile): void {
         </p>
     </empty-state>
     <template v-else-if="rowsStore.hasRows && rowsStore.payload">
-        <mdp-grid
-            :header="headerStore.header"
-            :rows="rowsStore.payload.data.profiles"
-            :is-loading="rowsStore.isMoreLoading"
-        >
-            <template #User="{ row, header: columnHeader }">
-                <mdp-grid-cell-student
-                    :user="row[columnHeader.key] as User"
-                    :profile="row as Profile"
-                    @linked-records-select="onLinkedRecordsSelected"
-                />
-            </template>
-            <template #Adjustment="{ row, header: columnHeader }">
-                <mdp-grid-cell-adjustment
-                    :profile="row as Profile"
-                    :header-key="columnHeader.key as ProfileAdjustmentKeys"
-                    :adjustments="row[columnHeader.key] as number[]"
-                    :options="
-                        columnHeader.key === 'adjustment_category' ? props.adjustmentCategories : props.adjustmentLevels
-                    "
-                />
-            </template>
-            <template #Text="{ row, header: columnHeader }">
-                <!-- ignore is added below to avoid the brackets being removed from :text, which causes a vue/no-deprecated-filter warning *_* -->
-                <!-- prettier-ignore -->
-                <mdp-grid-cell-text
+        <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
+            <mdp-grid
+                :header="headerStore.header"
+                :rows="rowsStore.payload.data.profiles"
+                :is-loading="rowsStore.isMoreLoading"
+            >
+                <template #User="{ row, header: columnHeader }">
+                    <mdp-grid-cell-student
+                        :user="row[columnHeader.key] as User"
+                        :profile="row as Profile"
+                        @linked-records-select="onLinkedRecordsSelected"
+                    />
+                </template>
+                <template #Adjustment="{ row, header: columnHeader }">
+                    <mdp-grid-cell-adjustment
+                        :profile="row as Profile"
+                        :header-key="columnHeader.key as ProfileAdjustmentKeys"
+                        :adjustments="row[columnHeader.key] as number[]"
+                        :options="
+                            columnHeader.key === 'adjustment_category'
+                                ? props.adjustmentCategories
+                                : props.adjustmentLevels
+                        "
+                    />
+                </template>
+                <template #Text="{ row, header: columnHeader }">
+                    <!-- ignore is added below to avoid the brackets being removed from :text, which causes a vue/no-deprecated-filter warning *_* -->
+                    <!-- prettier-ignore -->
+                    <mdp-grid-cell-text
                     :profile="row as Profile"
                     :header-key="columnHeader.key as ProfileTextKeys"
                     :text="(row[columnHeader.key] as string | null)"
                 />
-            </template>
-            <template #Date="{ row, header: columnHeader }">
-                <div class="l-pad-s">
-                    <!-- Just a basic display -->
-                    {{ row[columnHeader.key] ? (row[columnHeader.key] as string) : "" }}
-                </div>
-            </template>
-        </mdp-grid>
-        <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
-        <cursor-pagination
-            :url="rowsStore.url"
-            :metadata="(rowsStore.payload as Payload).metadata"
-            :limit="rowsStore.limit"
-            :is-loading="rowsStore.isNewLoading || rowsStore.isMoreLoading"
-            @previous="rowsStore.onPaginate"
-            @next="rowsStore.onPaginate"
-        />
+                </template>
+                <template #Date="{ row, header: columnHeader }">
+                    <div class="l-pad-s">
+                        <!-- Just a basic display -->
+                        {{ row[columnHeader.key] ? (row[columnHeader.key] as string) : "" }}
+                    </div>
+                </template>
+            </mdp-grid>
+            <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
+            <cursor-pagination
+                :url="rowsStore.url"
+                :metadata="(rowsStore.payload as Payload).metadata"
+                :limit="rowsStore.limit"
+                :is-loading="rowsStore.isNewLoading || rowsStore.isMoreLoading"
+                @previous="rowsStore.onPaginate"
+                @next="rowsStore.onPaginate"
+            />
+        </div>
     </template>
     <pastoral-records-modal v-model:url="linkedRecordsUrl" :title="linkedRecordsTitle" :meta="linkedRecordsMeta" />
     <dummy-inline-editor />
