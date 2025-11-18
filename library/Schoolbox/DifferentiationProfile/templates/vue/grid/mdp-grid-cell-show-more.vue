@@ -4,12 +4,12 @@
  * Displays a gradient overlay and "View More" button when content exceeds the display height
  */
 
-import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useRowsStore } from "../store/mdpRowsStore";
 
 const props = defineProps<{
     profile: Profile;
-    headerKey: ProfileTextKeys;
+    headerKey: ProfileKeys;
     contentHeight: number;
     componentActionHeight: number;
     isContentFocused: boolean;

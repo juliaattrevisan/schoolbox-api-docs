@@ -29,7 +29,7 @@ const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations in seconds
 
-// #region creating and managing the editor
+// #region modifying the text content with CKEditor
 
 const currentText = window.Vue.ref<string | null>(props.text);
 const editorContent = window.Vue.ref(currentText.value ?? "");
@@ -68,9 +68,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
     editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
         // Update focus state in the store to enable auto-growing height
-        if (typeof rowsStore.updateFocusedCell === "function") {
-            rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
-        }
+        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
         // Show the empty state again if no text is entered
         if (!isContentFocused.value && currentText.value === "") {
             currentText.value = null;
@@ -78,9 +76,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     });
     editor.model.document.on("change", () => {
         // Ensure cell is marked as focused when content changes
-        if (typeof rowsStore.updateFocusedCell === "function") {
-            rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
-        }
+        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         // keep the currentText in sync with the editor content
         window.Vue.nextTick()
             .then(() => {
@@ -95,9 +91,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     setTimeout(() => editor.ui.update());
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
-        if (editor.ui.focusTracker.isFocused && typeof rowsStore.updateFocusedCell === "function") {
-            rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
-        }
+        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
     }).catch(() => {
         // noop
     });
@@ -179,7 +173,7 @@ function onModify(): void {
     void focusEditor();
 }
 
-// #endregion creating and managing the editor
+// #endregion modifying the text content with CKEditor
 
 // #region calculating cell height
 
@@ -234,7 +228,7 @@ function onSave(): void {
             'grid-cell--content-focused': isContentFocused,
         }"
         :style="{
-            height: `${(rowsStore as any).rowDisplayHeights?.[props.profile.student.id] || 250}px`,
+            height: `${rowsStore.rowDisplayHeights?.[props.profile.student.id]}px`,
             cursor: isContentEmpty ? 'pointer' : 'text',
         }"
         @click.prevent="onContentClicked"
@@ -308,7 +302,6 @@ function onSave(): void {
     position: absolute;
     width: 100%;
     z-index: calc(var(--sbx-depth-default) + 1); // Always appear above the content
-
     .content-overlay {
         display: flex;
         flex-direction: column;
@@ -316,7 +309,6 @@ function onSave(): void {
         justify-content: end;
         margin-bottom: 0;
         width: 100%;
-
         &.empty-state {
             justify-content: center;
             pointer-events: all;
