@@ -29,6 +29,7 @@ class Mapper extends BaseMapper
         $this->hasTable('lti_assessment');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('guid', self::TYPE_STRING, self::COLUMN_UUID);
         $this->joins(
             'assessment_id',
             AssessmentMapper::class,
