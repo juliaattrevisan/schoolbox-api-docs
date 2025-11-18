@@ -10,6 +10,9 @@ CREATE TABLE lti_line_item
     tag               VARCHAR(255) NULL,
     start_date        DATETIME NULL,
     end_date          DATETIME NULL,
+    created_at        DATETIME NOT NULL,
+    updated_at        DATETIME NOT NULL,
+    deleted_at        DATETIME NULL,
     CONSTRAINT lti_line_item_lti_assessment_id_fk
         FOREIGN KEY (lti_assessment_id) REFERENCES lti_assessment (id)
 );
