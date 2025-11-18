@@ -10,6 +10,7 @@ import { useRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
 import { useSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
+import { useContentHeight } from "./composable/useContentHeight";
 
 const props = defineProps<{
     profile: Profile;
@@ -24,6 +25,17 @@ const saveStore = useSaveStore();
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations in seconds
+
+/**
+ * To update the height of the cell based on content and action heights
+ * and provide these heights for the 'View more' functionality
+ */
+const { contentHeight, componentActionHeight } = useContentHeight(
+    props.profile,
+    props.headerKey,
+    contentEl,
+    componentActionEl,
+);
 
 // #region modifying the selected adjustments
 
@@ -59,41 +71,6 @@ function onModify(): void {
 }
 
 // #endregion modifying the selected adjustments
-
-// #region calculating cell height
-
-const contentHeight = window.Vue.ref(0);
-const componentActionHeight = window.Vue.ref(0);
-
-/**
- * Update the content height in the store when the content height changes
- */
-function updateContentHeight(): void {
-    contentHeight.value = contentEl.value?.offsetHeight || 0;
-    componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-    rowsStore.setContentHeight(props.profile, props.headerKey, contentHeight.value + componentActionHeight.value);
-}
-
-/**
- * To detect when the dimensions of the cell changes,
- * like when a different tab is selected
- */
-function initResizeObserver(): void {
-    const resizeObserver = new ResizeObserver(() => updateContentHeight());
-    resizeObserver.observe(contentEl.value as HTMLElement);
-}
-
-/**
- * When the component is mounted, initialise the resize observer
- * and update the content height after a tick to ensure the content is rendered
- */
-window.Vue.onMounted(() => {
-    initResizeObserver();
-    // Wait a tick to ensure the content has been rendered before measuring its height
-    setTimeout(updateContentHeight, 0);
-});
-
-// #endregion calculating cell height
 
 /**
  * When the save button is clicked.
