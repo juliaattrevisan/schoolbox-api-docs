@@ -281,7 +281,8 @@ test.describe("Course import tests", () => {
         const importId = (await db.grabFromDatabase("course_unit_implementation", "id", {
             course_implementation_id: courseImplementationId,
         })) as string;
-        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+
+        await page.locator(`label[for=import-${importId}]`).click();
 
         tester.isGoingTo("click export the selected classes button");
         await page.click("input[type=submit]");
@@ -292,7 +293,7 @@ test.describe("Course import tests", () => {
         await unitPlanner.clickExportToClass(146);
 
         tester.isGoingTo("tick the checkbox");
-        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+        await page.locator(`label[for=import-${importId}]`).click();
 
         tester.isGoingTo("click export the selected classes button");
         await page.click("input[type=submit]");
@@ -303,7 +304,7 @@ test.describe("Course import tests", () => {
         await unitPlanner.clickExportToClass(151);
 
         tester.isGoingTo("tick the checkbox");
-        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+        await page.locator(`label[for=import-${importId}]`).click();
 
         tester.isGoingTo("click export the selected classes button");
         await page.click("input[type=submit]");
@@ -314,7 +315,8 @@ test.describe("Course import tests", () => {
         await unitPlanner.clickExportToClass(lessonPlanId);
 
         tester.isGoingTo("tick the checkbox");
-        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+        await page.locator(`label[for=import-${importId}]`).click();
+
         await page.locator("#confirm-dialog-confirm-button").click();
         await expect(page.locator("#confirm-dialog-confirm-button")).not.toBeVisible();
         tester.isGoingTo("set a new due date for the lesson plan");
@@ -331,7 +333,8 @@ test.describe("Course import tests", () => {
         await unitPlanner.clickExportToClass(projectId);
 
         tester.isGoingTo("tick the checkbox");
-        await page.locator(`label[for=import-${importId}]`).dispatchEvent("click"); // Must dispatch as click() can't directly target the ::before pseudo-element
+        await page.locator(`label[for=import-${importId}]`).click();
+
         await page.locator("#confirm-dialog-confirm-button").click();
         await expect(page.locator("#confirm-dialog-confirm-button")).not.toBeVisible();
 
