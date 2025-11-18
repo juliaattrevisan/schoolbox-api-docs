@@ -80,9 +80,9 @@ const config = window.Vue.inject<Config>("pastoralConfig");
                         >
                             {{ tag.name }}
                         </a>
-                        <template v-else>
+                        <span v-else class="neutral label hide-on-print">
                             {{ tag.name }}
-                        </template>
+                        </span>
                         <b class="show-for-print"> {{ tag.name }}</b>
                     </template>
                 </p>
