@@ -969,7 +969,7 @@ button[data-action],
     }
 
     &:hover {
-        background-color: var(--sbx-color-accent-hover) !important;
+        background-color: var(--sbx-color-accent) !important;
     }
 }
 
@@ -1139,102 +1139,74 @@ input[type="radio"] + .block {
 .neutral.label,
 .label.highlight,
 .label.filter {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .alert-box,
 .alert-box-icon {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
+}
+.alert-box .close,
+.eotc-status .close,
+.alert-box-icon .close {
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .progress {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
 
     & .meter {
-        border-radius: calc(var(--sbx-border-radius-normal) / 3);
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
+
+// Modal styles
 .reveal-modal {
     border-radius: var(--sbx-border-radius-normal);
+
     & .buttons {
         gap: 1rem;
+
         & li:first-child {
-            & button,
-            & a {
+            & a,
+            & button {
                 background-color: transparent !important;
+                border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
                 color: var(--sbx-color-accent) !important;
-                border: 1px solid var(--sbx-color-accent);
             }
         }
+
         & li:last-child {
-            & button,
-            & a {
+            & a,
+            & button {
                 background-color: var(--sbx-color-accent);
                 border: 1px solid var(--sbx-color-accent);
             }
         }
     }
+
     .buttons-container {
         margin-left: 0 !important;
     }
 }
 
 .tooltip {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .sortable-card {
     & img {
-        border-radius: calc(var(--sbx-border-radius-normal) / 3);
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
 
 .selector {
     & label::before,
     & label::after {
-        border-radius: calc(var(--sbx-border-radius-normal) / 4);
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
-
-/* .card { */
-/* 	:not(.switch-user) & { */
-/* 		display: grid; */
-/* 		grid-template-columns: 4rem 1fr; */
-/* 		grid-template-rows: auto auto; */
-/* 		gap: 0; */
-/* 		column-gap: 0.5rem; */
-/* 		align-items: center; */
-/* 		float: none; */
-/* 		padding-block: 1rem; */
-/**/
-/* 		& img { */
-/* 			grid-row: 1/3; */
-/* 			grid-column: 1/2; */
-/* 			left: 0; */
-/* 			top: 50%; */
-/* 			position: absolute; */
-/* 			float: none; */
-/* 			margin: 0; */
-/* 			border-radius: 50%; */
-/* 			aspect-ratio: 1/1; */
-/* 			object-fit: cover; */
-/* 			margin-block: auto; */
-/* 			transform: translateY(-50%); */
-/* 			margin: 0 !important; */
-/* 		} */
-/**/
-/* 		& a { */
-/* 			grid-column: 2/3; */
-/* 			grid-row: 1/2; */
-/* 		} */
-/**/
-/* 		&>p { */
-/* 			grid-row: 2/3; */
-/* 			grid-column: 2/3; */
-/* 		} */
-/* 	} */
-/* } */
 
 .accordion {
     & .accordion-navigation:not(:last-child) {
@@ -2100,6 +2072,46 @@ body {
     .component-titlebar {
     Or .component-titlebar.ai-style-change-1 if you want to be more specific
 }
+
+ .card { // It was commented out in original tafsol
+/* 	:not(.switch-user) & { */
+/* 		display: grid; */
+/* 		grid-template-columns: 4rem 1fr; */
+/* 		grid-template-rows: auto auto; */
+/* 		gap: 0; */
+/* 		column-gap: 0.5rem; */
+/* 		align-items: center; */
+/* 		float: none; */
+/* 		padding-block: 1rem; */
+/**/
+/* 		& img { */
+/* 			grid-row: 1/3; */
+/* 			grid-column: 1/2; */
+/* 			left: 0; */
+/* 			top: 50%; */
+/* 			position: absolute; */
+/* 			float: none; */
+/* 			margin: 0; */
+/* 			border-radius: 50%; */
+/* 			aspect-ratio: 1/1; */
+/* 			object-fit: cover; */
+/* 			margin-block: auto; */
+/* 			transform: translateY(-50%); */
+/* 			margin: 0 !important; */
+/* 		} */
+/**/
+/* 		& a { */
+/* 			grid-column: 2/3; */
+/* 			grid-row: 1/2; */
+/* 		} */
+/**/
+/* 		&>p { */
+/* 			grid-row: 2/3; */
+/* 			grid-column: 2/3; */
+/* 		} */
+/* 	} */
+/* }
+
 
 **
 */
