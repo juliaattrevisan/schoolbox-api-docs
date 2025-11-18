@@ -13,8 +13,10 @@ use Alaress\Web\Controller\Base as BaseController;
 use Component_ControllerAbstract;
 use JsonException;
 use League\OAuth2\Server\ResourceServer;
+use OAT\Library\Lti1p3Ags\Service\LineItem\LineItemServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
@@ -177,6 +179,7 @@ class Controller extends BaseController
             $folder,
             $componentCustomClaims,
             $this->getUser(),
+            null,
         );
         $additionalClaims[] = $this->buildLaunchPresentationClaim($tool, $component);
         $message            = $messageBuilder->buildLtiResourceLinkLaunchRequest(
@@ -243,7 +246,7 @@ class Controller extends BaseController
             null,
             null,
             $this->buildRoles($folder),
-            $this->buildAdditionalClaims($folder, null, null),
+            $this->buildAdditionalClaims($folder, null, null, $this->requestQuery->get('lineItemGuid')),
         );
 
         $this->setAllowBackToTheFuture(false);
@@ -327,13 +330,19 @@ class Controller extends BaseController
      * * a context claim for the folder itself
      * * a platform instance claim for the Schoolbox instance
      *
-     * @param Folder     $folder
-     * @param array|null $customClaims If provided, use these custom claims
-     * @param User|null  $user         If provided, add user to custom claims
+     * @param Folder      $folder
+     * @param array|null  $customClaims If provided, use these custom claims
+     * @param User|null   $user         If provided, add user to custom claims
+     * @param string|null $lineItemGuid If provided: a GUID which identifies the place to which the LTI tool may post
+     *                                  line items to.
      * @return array<MessagePayloadClaimInterface>
      */
-    private function buildAdditionalClaims(Folder $folder, ?array $customClaims, ?User $user): array
-    {
+    private function buildAdditionalClaims(
+        Folder $folder,
+        ?array $customClaims,
+        ?User $user,
+        ?string $lineItemGuid,
+    ): array {
         $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
 
         // Claim about the context
@@ -370,6 +379,21 @@ class Controller extends BaseController
         $customClaim = $customClaimFactory->build($customClaims);
         if (isset($customClaim)) {
             $claims[] = $customClaim;
+        }
+
+        // Line items claim, if GUID is provided
+        if (isset($lineItemGuid)) {
+            $agsClaim = new AgsClaim(
+                [LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM],
+                (string)(clone $baseUrl)
+                    ->withPath(
+                        $this->routeGenerator->generate(
+                            'ltiPlatformLineItem.postLineItemForGuid',
+                            ['guid' => $lineItemGuid],
+                        ),
+                    ),
+            );
+            $claims[] = $agsClaim;
         }
 
         return $claims;
