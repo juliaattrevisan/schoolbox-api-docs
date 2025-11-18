@@ -55,7 +55,7 @@ interface IClient
      *                                      otherwise, allow the client itself to decide.
      * @param callable|null $streamListener A function to call for each event in the stream, as it is received:
      *                                      this may be used to update `$log` with further information.
-     * @return iterable<string> Each message in the stream as it's received.
+     * @return iterable<EventStream\Message> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
     public function createResponseStream(

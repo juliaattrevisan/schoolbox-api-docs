@@ -347,7 +347,7 @@ class Client implements IClient
      * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
      * @param int                    $chunkSize      How many bytes to read from each stream iteration.
      * @param callable|null          $streamListener A function to call for each event in the stream, as it is received.
-     * @return iterable<string> Each message in the stream as it's received.
+     * @return iterable<EventStream\Message> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
@@ -363,7 +363,7 @@ class Client implements IClient
             foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
-                yield $message->__toString();
+                yield clone $message; // clone as the logHandler may modify it
 
                 // Update the log, and save it:
                 // even if that raises an exception, still save the log
@@ -385,9 +385,10 @@ class Client implements IClient
             $log = $logHandler->handleResponse($responseJson, $log);
             $this->logMapper->save($log);
 
+            // TODO: is this actually going to show an error state to the frontend??
             // Convert it to a single message I guess, if finalising the log
             // didn't raise an exception?
-            yield new EventStream\Message($responseBody)->__toString();
+            yield new EventStream\Message($responseBody);
         }
     }
 }

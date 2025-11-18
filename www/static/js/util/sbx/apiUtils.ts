@@ -88,14 +88,21 @@ interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undef
     signal?: AbortSignal;
 }
 
-export type SseMessageCallback<TMessageData> = (data: ApiBaseResponse<TMessageData>) => void;
+export type SseMessageEvent<TEventName extends string = string, TMessageData = unknown> = {
+    eventName: TEventName | undefined;
+    data: ApiBaseResponse<TMessageData>;
+};
 
-interface SseApiRequestOptions<TMessageData, TBody extends ApiRequestBodyBase | undefined = undefined>
-    extends ApiRequestOptions<TBody> {
+export type SseMessageCallback<TMessageEvent extends SseMessageEvent> = (event: TMessageEvent) => void;
+
+interface SseApiRequestOptions<
+    TMessageEvent extends SseMessageEvent,
+    TBody extends ApiRequestBodyBase | undefined = undefined,
+> extends ApiRequestOptions<TBody> {
     /**
      * The callback to handle each message from the server
      */
-    onMessage: SseMessageCallback<TMessageData>;
+    onMessage: SseMessageCallback<TMessageEvent>;
     /**
      * The expected type of the final response
      * This will determine when the stream terminates and should have the final response included
@@ -302,24 +309,27 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
  * Validates that the response matches our expected format
  * API errors should follow RFC 9457 "API Problem", sending an event with the name "error" will be treated like this
  * Requires the final message to match options.finalEventName, which will terminate the stream
- * @template TMessageData - The type of the response from the server for each message
+ * @template TMessageEvent - The type of the response from the server for each message event
  * @template TResponseData - The type of the response from the server for the final message
  * @template TBody - The type of the request body
  * @param options - Options for the API request
  * @returns - A typed response from the server including a success state
  */
 export async function sseApiRequest<
-    TMessageData,
+    TMessageEvent extends SseMessageEvent,
     TResponseData,
     TBody extends ApiRequestBodyBase | undefined = undefined,
->(options: SseApiRequestOptions<TMessageData, TBody>): Promise<ApiBaseResponse<TResponseData>> {
+>(options: SseApiRequestOptions<TMessageEvent, TBody>): Promise<ApiBaseResponse<TResponseData>> {
     const request = buildRequest("text/event-stream", options);
 
     let response: Response;
     try {
         response = await request;
     } catch (e) {
-        console.error("Failed to make API request", e, options);
+        if (!isAbortError(e)) {
+            // we only want to log non-abort errors
+            console.error("Failed to make API request", e, options);
+        }
         const failureResponse: ApiBaseResponseUnknownFailure = {
             success: false,
             responseStatus: 0,
@@ -374,14 +384,20 @@ export async function sseApiRequest<
                     break;
                 }
 
-                const parsedData = parseResponse<TMessageData>(data, response.status, contentType, eventName);
+                const parsedData: TMessageEvent["data"] = parseResponse<unknown>(
+                    data,
+                    response.status,
+                    contentType,
+                    eventName,
+                );
 
                 // If the parsed data indicates a failure, set it as the final response for now but let the stream keep going
                 if (parsedData.success === false) {
                     finalResponseData = data;
                 }
 
-                options.onMessage(parsedData);
+                const event = { eventName, data: parsedData } satisfies SseMessageEvent;
+                options.onMessage(event as TMessageEvent);
             }
         }
 

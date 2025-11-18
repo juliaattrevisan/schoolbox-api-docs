@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent;
 
 use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\EventStream\AgentChatMessageEventType;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use Schoolbox\User;
@@ -25,6 +27,15 @@ use UnexpectedValueException;
  */
 class ImageGeneration
 {
+    /**
+     * The following event types indicate that the response API has finished
+     * processing.
+     *
+     * There are 3 possible events that indicate the end of a response: see
+     * https://platform.openai.com/docs/api-reference/responses-streaming/response.
+     */
+    private const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete', 'error'];
+
     /**
      * Constructor
      *
@@ -50,7 +61,7 @@ class ImageGeneration
      *                                        Should match a value of `ImageStyle`.
      * @param string|null $imageUrl           If provided: a URL to use as an example for the image.
      * @param string|null $previousResponseId If provided: the ID of a previous request made to OpenAI.
-     * @return iterable
+     * @return iterable<string>
      * @throws ClientExceptionInterface
      */
     public function requestStream(
@@ -64,7 +75,188 @@ class ImageGeneration
     ): iterable {
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
-        return $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
+
+        // TODO: Hmm.. I swear I had issues always using large chunks with it being slow for deltas
+        $stream = $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
+
+        /**
+         * The response ID associated to the OpenAI request once we receive it.
+         * Used by the frontend to track the response and continue the conversation
+         */
+        $responseId = null;
+
+        // TODO: perhaps use something similar to ILogHandler instead of doing this here
+        // TODO: NOTE: This is just a basic clone of our current logic moved all to the backend, needs to be properly refined
+        /** @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts */
+        foreach ($stream as $message) {
+            $eventType = $message->eventType;
+            $data   = [];
+            try {
+                $data = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                // TODO: handle this error correctly (ApiProblem), there's likely no point in continuing
+                return;
+            }
+
+            if (\in_array($eventType, self::EVENT_TYPES_FINISHED)) {
+                // TODO: should this fully stop the stream after receiving this? There shouldn't be anything meaningful to continue with... only case is if we want extra logs for errors
+
+                /**
+                 * Event type 'error' is a special case, it likely won't be accompanied by the usual OpenAI response structure
+                 */
+                if ('error' === $eventType) {
+                    $errorMessage = $data['response']['message'] ?? 'An unknown error occurred';
+                    throw new SchoolboxException($errorMessage, 500);
+                }
+
+                /**
+                 * If something went wrong on the openAI side, it'll send us an 'error' key
+                 * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+                 * If we get this, send on the human-readable message to the user
+                 */
+                if ($data['error'] ?? null) {
+                    $returnCode = 500;
+                    $errorMessage = $data['response']['error']['message'] ?? '';
+                    // TODO: Does this correctly raise an ApiProblem in the stream?
+                    throw new SchoolboxException($errorMessage, $returnCode);
+                }
+
+                /**
+                 * Did we recieve an incomplete response? i.e. max output tokens reached?
+                 * If so, send those details on so we have some idea of why it failed
+                 * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+                 */
+                $status = $data['response']['status'] ?? null;
+                if ('response.completed' !== $eventType || 'completed' !== $status) {
+                    $returnCode = 500;
+
+                    $title = \sprintf('Failed to generate a response: %s', $status ?? 'unknown');
+
+                    /* there may be some extra details about why it was incomplete */
+                    $incompleteMessage = $data['response']['incomplete_details']['reason'] ?? null;
+                    if ($incompleteMessage) {
+                        $title .= \sprintf(' (%s)', $incompleteMessage);
+                    }
+
+                    throw new SchoolboxException($title, $returnCode);
+                }
+
+                /**
+                 * Final event (response.completed), so let's assume we got a good response
+                 * It may still be a refusal, or lack what we require (such as an image for image generation)
+                 */
+
+                /**
+                 * An array of content items generated by the model.
+                 * The length and order of items in the `output` array is dependent on the model's response
+                 * so we must filter them to find exactly what we need next
+                 */
+                $responseOutput = $data['response']['output'] ?? [];
+
+                /* Find the final image and message output from the response, we currently only accept one of each per request */
+                $outputImageCalls = array_filter($responseOutput, fn($item) => $item['type'] === 'image_generation_call');
+                $outputMessageCalls = array_filter($responseOutput, fn($item) => $item['type'] === 'message');
+
+                $imageBase64 = array_values($outputImageCalls)[0]['result'] ?? null;
+                $outputContent = array_values(array_values($outputMessageCalls)[0]['content'])[0] ?? null;
+
+                if (null === $outputContent) {
+                    /**
+                     * Getting here would be really weird, it would require OpenAI's structure to fail us...
+                     * possibly should be handled more gracefully
+                     */
+                    throw new SchoolboxException('No output content found in response', 500);
+                }
+
+                if ('refusal' === $outputContent['type']) {
+                    /* The AI refused to generate what we asked of it likely due to OpenAI's moderation system, we can't do anything about that */
+                    throw new SchoolboxException($outputContent['refusal'], 400);
+                }
+
+                // TODO: This only applies for image generation, if this logic is split out further then it needs to be tweaked to optional for that area.
+                if (null === $imageBase64) {
+                    /**
+                     * No output image? probably a refusal in the form of text
+                     * This could occur on the Image Generator if the system prompt specifically disallows
+                     * certain subjects and tells the AI to not generate an image and only respond with text.
+                     *
+                     * It will look like a completely valid response, just without an image.
+                     */
+
+                    // TODO: For image generation requests, this is considered a failure - anywhere else it may be valid, so we need to handle that correctly (i.e. just continue on)
+
+                    throw new SchoolboxException($outputContent['text'], 400);
+                }
+
+                /* The frontend expects a type of 'complete' for the final message, it will then terminate the stream */
+                $agentChatMessage = new Message(
+                    json_encode([
+                        'responseId' => $responseId ?? $data['response']['id'] ?? null,
+                        'image' => self::translateImageData($imageBase64),
+                        'message' => $outputContent['text'] ?? '',
+                    ], JSON_THROW_ON_ERROR),
+                    AgentChatMessageEventType::COMPLETE->value
+                );
+                yield $agentChatMessage->__toString();
+
+                /* we're done here, the rest of the stream is irrelevant and won't be listened to */
+                return;
+            }
+
+            /** intermediate event, convert to our standardised format if it's something we care about */
+
+            /** @var Message|null $agentChatMessage */
+            $agentChatMessage = null;
+
+            if ('response.created' === $data['type']) {
+                /** Usually the first message we will receive from the AI, take note of the response ID so we can re-use it later */
+                $responseId = $data['response']['id'] ?? null;
+
+                $agentChatMessage = new Message(
+                    json_encode(['responseId' => $responseId], JSON_THROW_ON_ERROR),
+                    AgentChatMessageEventType::CREATED->value
+                );
+            } else if ('response.image_generation_call.partial_image' === $data['type']) {
+                /** Partial image was generated, this helps the user see progress and not just a loading spinner for ages */
+                $imageBase64 = $data['partial_image_b64'] ?? null;
+
+                if (null === $imageBase64) {
+                    /** Weird, no image data? ignore it I guess */
+                    continue;
+                }
+
+                $agentChatMessage = new Message(
+                    json_encode([
+                        'responseId' => $responseId,
+                        'image' => self::translateImageData($imageBase64),
+                    ], JSON_THROW_ON_ERROR),
+                    AgentChatMessageEventType::PARTIAL_IMAGE->value
+                );
+            } else if ('response.output_text.delta' === $data['type']) {
+                /** A delta of text output from the AI, will be appended to the current message to show the user that something is happening */
+                $textDelta = $data['delta'] ?? null;
+
+                if (null === $textDelta) {
+                    /** Weird, no text delta ? ignore it I guess */
+                    continue;
+                }
+
+                $agentChatMessage = new Message(
+                    json_encode([
+                        'responseId' => $responseId,
+                        'delta' => $textDelta,
+                    ], JSON_THROW_ON_ERROR),
+                    AgentChatMessageEventType::DELTA->value
+                );
+            }
+
+            /** send on the message if it's a valid intermediate event, otherwise ignore it */
+            if (null === $agentChatMessage) {
+                continue;
+            }
+
+            yield $agentChatMessage->__toString();
+        }
     }
 
     /**
@@ -138,5 +330,22 @@ class ImageGeneration
                 : null;
             $log->setOutputText($outputText);
         }
+    }
+
+    /**
+     * Translate a base64 image into an array expected by the frontend for agent chat messages
+     * @param string $base64Image
+     * @return array
+     * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/agentChatTypes.ts AgentChatImage
+     */
+    private static function translateImageData(string $base64Image): array
+    {
+        /* currently we always expect a PNG back from the AI, so assume it is */
+        // TODO: this should actually be linked to ImageGeneration::IMAGE_OUTPUT_FORMAT in some way I guess
+        return [
+            'b64' => $base64Image,
+            'name' => 'image.png',
+            'mime' => 'image/png',
+        ];
     }
 }
