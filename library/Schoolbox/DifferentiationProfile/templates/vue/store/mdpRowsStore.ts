@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import type { User } from "@schoolboxLibrary/types/User";
 import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";

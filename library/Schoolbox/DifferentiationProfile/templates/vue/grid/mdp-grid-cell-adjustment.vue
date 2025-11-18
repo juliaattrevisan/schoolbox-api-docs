@@ -5,8 +5,8 @@
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { Profile, ProfileAdjustmentKeys, AdjustmentType } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useHeaderStore } from "../store/headerStore";
-import { useSaveStore } from "../store/saveStore";
+import { useHeaderStore } from "../store/mdpHeaderStore";
+import { useSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 
 const props = defineProps<{

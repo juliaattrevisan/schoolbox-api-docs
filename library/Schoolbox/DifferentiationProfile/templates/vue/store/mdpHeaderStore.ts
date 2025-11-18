@@ -32,7 +32,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                         ? HeaderType.ADJUSTMENT
                         : HeaderType.TEXT,
                 title: h.terminology,
-                width: 400,
+                width: h.name === "adjustment_category" || h.name === "adjustment_level" ? 300 : 500,
                 isFixed: false,
                 isSortable: false,
             })),
@@ -41,7 +41,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 key: "updated_at",
                 type: HeaderType.DATE,
                 title: "Last updated",
-                width: 200,
+                width: 150,
                 isFixed: false,
                 isSortable: true,
             },
