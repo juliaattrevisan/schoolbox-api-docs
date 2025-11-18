@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Display text cell for a student in the MDP grid
+ * Display text cell for a student in the MDP grid, allowing editing via CKEditor.
  */
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";

@@ -101,10 +101,12 @@ function onLinkedRecordsSelected(profile: Profile): void {
                 />
             </template>
             <template #Text="{ row, header: columnHeader }">
+                <!-- ignore is added below to avoid the brackets being removed from :text, which causes a vue/no-deprecated-filter warning *_* -->
+                <!-- prettier-ignore -->
                 <mdp-grid-cell-text
                     :profile="row as Profile"
                     :header-key="columnHeader.key as ProfileTextKeys"
-                    :text="row[columnHeader.key] as string | null"
+                    :text="(row[columnHeader.key] as string | null)"
                 />
             </template>
             <template #Date="{ row, header: columnHeader }">

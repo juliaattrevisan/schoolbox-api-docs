@@ -7,7 +7,7 @@ import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import { ON_FILTER_CHANGE } from "../../js/MDPEvents";
-import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useLoadData } from "../composable/useLoadData";
 
 export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
@@ -94,7 +94,7 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
      * @param headerKey - the header key to set the content height for
      * @param height - the height to set
      */
-    function setContentHeight(profile: Profile, headerKey: ProfileTextKeys, height: number): void {
+    function setContentHeight(profile: Profile, headerKey: ProfileKeys, height: number): void {
         if (profileContentHeights.value[profile.student.id] === undefined) {
             profileContentHeights.value[profile.student.id] = {};
         }
@@ -107,7 +107,7 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
      * @param headerKey - the header key to update the focus state for
      * @param isFocused - whether the cell is focused
      */
-    function updateFocusedCell(profileId: number, headerKey: ProfileTextKeys, isFocused: boolean): void {
+    function updateFocusedCell(profileId: number, headerKey: ProfileKeys, isFocused: boolean): void {
         if (isFocused) {
             if (focusedCells.value[profileId] === undefined) {
                 focusedCells.value[profileId] = [];
