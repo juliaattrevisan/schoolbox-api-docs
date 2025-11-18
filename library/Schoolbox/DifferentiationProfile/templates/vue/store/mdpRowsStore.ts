@@ -1,5 +1,6 @@
 /**
- * To hold the row data for the MDP editor
+ * Manages the loading of row data as well as the current height states of each row and cell
+ * and their expanded/collapsed states.
  */
 
 import { defineStore } from "pinia";

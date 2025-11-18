@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The component for the action buttons for a text cell
+ * Actions for when a grid cell can be modified and saved.
  */
 import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 

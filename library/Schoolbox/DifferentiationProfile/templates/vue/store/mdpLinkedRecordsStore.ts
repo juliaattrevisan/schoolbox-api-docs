@@ -1,5 +1,5 @@
 /**
- * To hold the header data for the MDP editor
+ * To display the pastoral records linked to a students differentiation profile
  */
 
 import { defineStore } from "pinia";

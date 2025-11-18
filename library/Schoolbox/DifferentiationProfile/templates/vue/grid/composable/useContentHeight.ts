@@ -1,5 +1,6 @@
 /**
- *
+ * Composable to track when the content height changes
+ * so the grid row height can be updated accordingly
  */
 
 import type { Ref } from "vue";
@@ -7,13 +8,12 @@ import type { Profile, ProfileKeys } from "../../../js/types/manageDifferentiati
 import { useRowsStore } from "../../store/mdpRowsStore";
 
 /**
- *
+ * Tracks the content height and component action height of a grid cell
  * @param profile - The profile object
  * @param headerKey - The key of the profile header
  * @param contentEl - The ref to the content element
  * @param componentActionEl - The ref to the component action element
  * @returns contentHeight, componentActionHeight - The heights of the content and component action elements
- *
  */
 export function useContentHeight(
     profile: Profile,
