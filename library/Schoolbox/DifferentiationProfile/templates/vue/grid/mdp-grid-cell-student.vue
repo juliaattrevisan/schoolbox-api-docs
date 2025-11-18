@@ -38,9 +38,14 @@ function onLinkedRecordsSelected(): void {
                 </template>
             </div>
         </div>
-        <button v-if="props.profile._routes?.linkedRecords" class="button" @click="onLinkedRecordsSelected">
+        <button
+            v-if="props.profile._routes?.linkedRecords"
+            class="button f-no-margins"
+            @click="onLinkedRecordsSelected"
+        >
             View Linked Records
         </button>
+        <button class="button icon-ai f-no-margins" @click="onLinkedRecordsSelected">Generate with AI</button>
     </div>
 </template>
 
