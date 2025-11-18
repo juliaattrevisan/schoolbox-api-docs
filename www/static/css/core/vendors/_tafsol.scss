@@ -297,10 +297,6 @@ nav:has(
     top: 0rem !important;
 }
 
-.list-item:has(.card) + nav {
-    padding-top: 0.3rem;
-}
-
 h3:has(+ .gradient-0) {
     margin-bottom: 0.5rem;
 }
@@ -379,147 +375,179 @@ span:has(~ .gradient-0) {
 
 .information-list,
 .action-list {
-    & [data-test="student-section-records-pastoral-record"]:not(:last-child) {
-        margin-bottom: 0.5rem;
-    }
     & li {
         border-bottom: none;
     }
-}
 
-.information-list .card.small-12:not(.wrap-down):has(img),
-.action-list .card.small-12:not(.wrap-down):has(img) {
-    /*   display: grid; */
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    align-items: center;
-    align-content: center;
-    position: relative;
-    gap: 0.5rem;
-
-    & > p.meta {
-        grid-row: 2/3;
-        grid-column: 2/3;
-        align-self: end;
+    & li:last-child {
+        border-bottom: none; /* Explicitly ensure the very last item in the list has no border */
     }
 
-    & a:has(img) :where(h1, h2, h3, h4, h5, h6, p):not(:has(.pipe)) {
-        /*     position: absolute; */
-        margin-block: auto;
-        left: 0;
-        top: 50%;
-        /*     transform: translateY(-100%); */
+    & li:not(:last-child) {
+        /* Added :not(:last-child) so the final element doesn't get a bottom border */
+        border-bottom: 1px solid var(--sbx-color-foreground-secondary); /* The separator is now visible */
+    }
+}
+
+.information-list .small-12.card.wrap-down {
+    column-gap: 1rem;
+    float: none;
+
+    & article {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        & .article-read-more {
+            font-size: 1rem;
+            text-decoration: underline;
+            text-decoration-color: var(--sbx-color-accent) !important;
+        }
+
+        & :not(div.article-read-more) {
+            margin-bottom: auto;
+        }
+    }
+
+    & img {
+        border-radius: var(--sbx-border-radius-normal);
+        object-fit: cover;
+    }
+}
+
+.information-list .card.small-12:not(.wrap-down):has(img), // I am not sure about this selector, please check
+.action-list .card.small-12:not(.wrap-down):has(img) {
+    align-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    position: relative;
+
+    & > p.meta {
+        align-self: end;
         grid-column: 2/3;
-        align-self: center;
-        height: 25px;
+        grid-row: 2/3;
     }
 
     & a:has(img) {
         grid-row: span 2;
     }
 
+    & a:has(img) :where(h1, h2, h3, h4, h5, h6, p):not(:has(.pipe)) {
+        align-self: center;
+        grid-column: 2/3;
+        height: 25px;
+        left: 0;
+        margin-block: auto;
+        top: 50%;
+    }
+
     & img {
         border-radius: var(--sbx-border-radius-normal);
-        /*     float: unset; */
         margin: unset;
         margin-inline-end: 0.5rem;
     }
 }
 
 .card {
+    & .card-feature-image img {
+        aspect-ratio: 16/12;
+        border-radius: var(--sbx-border-radius-normal);
+        object-fit: cover;
+    }
+
     & img {
         border-radius: calc(var(--sbx-border-radius-normal) / 2);
     }
-    & .card-feature-image img {
-        aspect-ratio: 16/12;
-        object-fit: cover;
-        border-radius: var(--sbx-border-radius-normal);
-    }
 }
 
-article:has(img) a > img {
-    max-width: 300px;
-    width: 100%;
-    object-fit: cover;
-    object-position: center top;
+.card.compact.small-12 {
+    padding-left: 0;
+    padding-right: 0;
 }
 
+.list-item:has(.card) + nav {
+    padding-top: 0.3rem;
+}
+
+article:has(img) a > img, // Adjust image styles within articles
 article:has(img) p > img {
     max-width: 300px;
-    width: 100%;
     object-fit: cover;
     object-position: center top;
+    width: 100%;
 }
 
 :not(article) + .discussion {
     overflow: hidden;
 
     &::before {
-        content: "";
-        width: 2px;
-        height: 300px;
         background-color: var(--sbx-color-foreground-secondary);
-        position: absolute;
+        content: "";
         display: block;
+        height: 300px;
         left: 52px;
+        position: absolute;
         transform: translateX(-50%);
+        width: 2px;
     }
 }
 
-.discussion .reply,
+.discussion .reply, //discussion thread styles
 .discussion .child,
 .threaded .reply,
 .threaded .child {
-    border-top: none;
     border-left: 0;
-}
+    border-top: none;
 
-.discussion .reply,
-.discussion .child,
-.threaded .reply,
-.threaded .child {
     & .card {
-        & p {
-            margin-bottom: 0;
-            grid-row: span 2;
+        & img {
+            margin-inline-end: 0;
+            width: 2.5rem;
         }
 
-        & img {
-            width: 2.5rem;
-            margin-inline-end: 0;
+        & p {
+            grid-row: span 2;
+            margin-bottom: 0;
         }
     }
 }
 
+// Left menu styles when left menu is not open
 .off-canvas-wrap.move-right :not(.left-open) {
+    & #left-menu {
+        border-radius: var(--sbx-border-radius-normal);
+        box-shadow: var(--sbx-shadow-m);
+        left: 1rem;
+        top: 1rem;
+    }
+
     & .left-submenu {
         width: 17.25rem;
+
         & .back {
             border-bottom: var(--border);
+
             & a {
                 height: auto !important;
                 line-height: 4;
             }
         }
     }
+
     & nav:has(.off-canvas-list) {
         padding: 0.5rem;
     }
-
-    & #left-menu {
-        top: 1rem;
-        left: 1rem;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
-    }
 }
 
+// Notifications menu styles when left menu is not open
 .off-canvas-wrap.move-left :not(.left-open) {
     & #msgs {
-        top: 1rem;
+        border-radius: var(--sbx-border-radius-normal);
+        box-shadow: var(--sbx-shadow-m);
         right: 1rem;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: calc(var(--sbx-border-radius-normal) * 0.3);
+        top: 1rem;
 
         #right-menu-dock,
         .settings-button {
@@ -538,6 +566,7 @@ article:has(img) p > img {
     color: var(--sbx-color-text-primary) !important;
 }
 
+// Side menu headings styles
 #side-menu,
 #side-menu-mygroups,
 #side-menu-mysubjects,
@@ -556,12 +585,13 @@ article:has(img) p > img {
     }
 }
 
+// Timetable component styles
 .Component_Dashboard_TimetableController {
-    border-radius: var(--sbx-border-radius-normal);
     background-color: var(--card-bg);
+    border: var(--border);
+    border-radius: var(--sbx-border-radius-normal);
     box-shadow: var(--sbx-shadow-m);
     overflow: hidden;
-    border: var(--border);
 
     & .subheader {
         margin-left: 8px;
@@ -569,19 +599,19 @@ article:has(img) p > img {
 
     & .timetable-period-active,
     & .timetable-subject-active {
-        border: none !important;
         background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 90%);
-        position: relative;
+        border: none !important;
         height: 100%;
+        position: relative;
 
         &::after {
-            content: "";
             background-color: var(--sbx-color-accent);
-            width: 4px;
+            content: "";
             height: 100%;
-            position: absolute;
             left: 0;
+            position: absolute;
             top: 0;
+            width: 4px;
         }
     }
 
@@ -591,13 +621,13 @@ article:has(img) p > img {
     & .timetable-small th {
         border-color: var(--sbx-color-foreground-secondary);
 
-        &:not(:last-child) {
+        &:last-child {
             border-left: 0px;
+            border-right: 0px;
             border-top: 0px;
         }
 
-        &:last-child {
-            border-right: 0px;
+        &:not(:last-child) {
             border-left: 0px;
             border-top: 0px;
         }
@@ -703,32 +733,6 @@ article:has(img) p > img {
     & a {
         &:not(:last-child) {
             margin-inline-end: 8px;
-        }
-    }
-}
-
-.information-list .small-12.card.wrap-down {
-    float: none;
-    column-gap: 1rem;
-
-    & img {
-        border-radius: var(--sbx-border-radius-normal);
-        object-fit: cover;
-    }
-
-    & article {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-
-        & :not(div.article-read-more) {
-            margin-bottom: auto;
-        }
-
-        & .article-read-more {
-            text-decoration: underline;
-            font-size: 1rem;
-            text-decoration-color: var(--sbx-color-accent) !important;
         }
     }
 }
@@ -1934,31 +1938,12 @@ ul#tabs-sub-6 > li {
     box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1) !important;
 }
 
-.information-list,
-.action-list {
-    & [data-test="student-section-records-pastoral-record"]:not(:last-child) {
-        margin-bottom: 0.5rem;
-    }
-    & li:not(:last-child) {
-        /* Added :not(:last-child) so the final element doesn't get a bottom border */
-        border-bottom: 1px solid var(--sbx-color-foreground-secondary); /* The separator is now visible */
-    }
-    & li:last-child {
-        border-bottom: none; /* Explicitly ensure the very last item in the list has no border */
-    }
-}
-
 .l-flex-row.l-flex--no-wrap.l-gap-m img {
     border-radius: 0.6rem; /* You can adjust the pixel value for the desired roundness */
 }
 
 .pastoral-action-date-and-user img {
     border-radius: 0.6rem; /* You can adjust the pixel value for the desired roundness */
-}
-
-.card.compact.small-12 {
-    padding-left: 0;
-    padding-right: 0;
 }
 
 button.show-ckeditor-button {
@@ -2079,5 +2064,11 @@ body {
         }
     }
 }
+
+.information-list, // Removed styles from original tafsol as it is specific to only a certain page
+.action-list {
+    & [data-test="student-section-records-pastoral-record"]:not(:last-child) {
+        margin-bottom: 0.5rem;
+    }
 **
 */
