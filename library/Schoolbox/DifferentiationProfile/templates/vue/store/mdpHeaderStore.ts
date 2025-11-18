@@ -24,6 +24,15 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 key: "student",
                 type: HeaderType.USER,
             },
+            {
+                id: Math.max(0, ...$header.map((h) => h.id)) + 1,
+                key: "updated_at",
+                type: HeaderType.DATE,
+                title: "Last updated",
+                width: 150,
+                isFixed: false,
+                isSortable: true,
+            },
             ...$header.map((h) => ({
                 id: h.id,
                 key: h.name,
@@ -36,15 +45,6 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 isFixed: false,
                 isSortable: false,
             })),
-            {
-                id: Math.max(0, ...$header.map((h) => h.id)) + 1,
-                key: "updated_at",
-                type: HeaderType.DATE,
-                title: "Last updated",
-                width: 150,
-                isFixed: false,
-                isSortable: true,
-            },
         ];
     }
 
