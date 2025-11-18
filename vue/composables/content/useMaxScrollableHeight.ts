@@ -26,7 +26,6 @@ export function useMaxScrollableHeight(
      * Set the max height to allow the table to sit within the browser window
      */
     function setScrollableHeight(): void {
-        console.warn("Setting scrollable height");
         const containerEl = document.querySelector("#container");
         if (minWidth && containerEl && containerEl.getBoundingClientRect().width <= minWidth) {
             maxScrollableHeight.value = "none";
