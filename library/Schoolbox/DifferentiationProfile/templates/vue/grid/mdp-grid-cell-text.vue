@@ -185,6 +185,20 @@ function onModify(): void {
     void focusEditor();
 }
 
+/**
+ * Watch for external changes to the text prop and update the editor content accordingly
+ */
+window.Vue.watch(
+    () => props.text,
+    (newText) => {
+        if (newText === currentText.value) {
+            return;
+        }
+        currentText.value = newText;
+        editorContent.value = newText ?? "";
+    },
+);
+
 // #endregion modifying the text content with CKEditor
 
 /**
