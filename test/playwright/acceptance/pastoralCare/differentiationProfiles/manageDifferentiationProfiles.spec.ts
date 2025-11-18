@@ -79,8 +79,8 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
             const container = page.getByTestId("manage-differentiation-profiles-container");
-            const marioIzzo = container.getByText("Mario Izzo");
-            const msPenelopeLi = container.getByText("Ms Penelope Li");
+            const marioIzzo = container.getByText("Izzo, Mario");
+            const msPenelopeLi = container.getByText("Li, Penelope");
             await expect(marioIzzo).toBeVisible();
             await expect(msPenelopeLi).toBeVisible();
         } finally {
@@ -115,10 +115,10 @@ test.describe("Manage Differentiation Profiles", () => {
             await page.getByTestId("panel-apply-filters-button").click();
             await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out
             await page.waitForLoadState("load"); // Waits for full page reload
-            tester.isGoingTo("Verify that Ms Jana Reed and Mr Leon Reed are visible");
+            tester.isGoingTo("Verify that Jana Reed and Leon Reed are visible");
             const container = page.getByTestId("manage-differentiation-profiles-container");
-            const msJanaReed = container.getByText("Ms Jana Reed");
-            const mrLeonReed = container.getByText("Mr Leon Reed");
+            const msJanaReed = container.getByText("Reed, Jana");
+            const mrLeonReed = container.getByText("Reed, Leon");
             await expect(msJanaReed).toBeVisible();
             await expect(mrLeonReed).toBeVisible();
         } finally {

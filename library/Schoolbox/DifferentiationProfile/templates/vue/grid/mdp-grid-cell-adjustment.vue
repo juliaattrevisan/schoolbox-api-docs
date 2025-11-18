@@ -183,11 +183,11 @@ async function onSave(): Promise<void> {
     position: relative;
     text-overflow: ellipsis;
     transition: height v-bind(animationDuration) ease;
-    // &--content-focused {
-    //     .content-container-fixed .content-overlay {
-    //         border: 1px solid var(--form-border-color) !important;
-    //     }
-    // }
+    &--content-focused {
+        .content-container-fixed .content-overlay {
+            border: 1px solid var(--form-border-color) !important;
+        }
+    }
 }
 
 .content-container-fixed {
