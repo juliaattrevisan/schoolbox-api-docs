@@ -142,6 +142,19 @@ class Controller extends BaseController
     }
 
     /**
+     * LTI get line items endpoint: gets all line items with the given GUID.
+     *
+     * @param string $guid
+     *
+     * @api   GET /lti-platform/line-item/guid/{guid}
+     * @since 25.1
+     */
+    public function getLineItemsForGuid(string $guid): void
+    {
+        throw new NotFound();
+    }
+
+    /**
      * LTI create line item endpoint: creates a new line item with the given
      * GUID.
      *
