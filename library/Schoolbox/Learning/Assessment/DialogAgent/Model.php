@@ -13,6 +13,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -316,6 +317,33 @@ class Model extends AbstractAssessment
             throw new \DomainException('', ErrorMapper::ERROR_ASSESSMENT_CLOSED);
         }
     }
+
+    /**
+     * Used for Course Export.
+     *
+     * Copy implementation back to assessment along with any activity-specific fields beyond the ones
+     * already pre-defined in AbstractAssessment's overwrite()
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+
+        /* Specific to Dialog Agents activity
+         */
+        $this->setDuration($source->getDuration());
+        $this->setScenarioId($source->getScenarioId());
+
+        /* The configuration of the dialog agent activity itself
+         */
+        $this->setHelpfulness($source->getHelpfulness());
+        $this->setLanguage($source->getLanguage());
+        $this->setUseDifferentiationProfile($source->getUseDifferentiationProfile());
+        $this->setOpeningMessage($source->getOpeningMessage());
+        $this->setRules($source->getRules());
+
+        return $this;
+    }
+
 
 
     /* Getters/Setters
