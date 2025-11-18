@@ -1057,7 +1057,7 @@ button[data-action],
 
 input[type="checkbox"]:not(.plain) + label::after,
 input[type="checkbox"]:not(.plain) + label::before {
-    border-radius: var(--sbx-border-radius-normal) !important;
+    border-radius: var(--sbx-border-radius-full) !important;
 }
 
 .checklist-container {
@@ -1098,33 +1098,36 @@ input[type="checkbox"]:not(.plain) + label::before {
     }
 }
 
+// Component titlebar styles
 .component-titlebar {
     border-bottom: var(--border);
+    border-top-left-radius: 0.6rem;
+    border-top-right-radius: 0.6rem;
 }
 
 .c-chips {
     & label {
-        border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+        border-radius: var(--sbx-border-radius-normal) !important;
     }
 }
 
 .switch {
     & label {
-        border-radius: calc(var(--sbx-border-radius-normal) / 3);
+        border-radius: var(--sbx-border-radius-normal);
 
         &::after {
-            border-radius: calc(var(--sbx-border-radius-normal) / 4);
+            border-radius: var(--sbx-border-radius-full);
         }
     }
 }
 
 .button-block,
 input[type="radio"] + .block {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .dzone {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .reviewed.label,
@@ -2010,12 +2013,6 @@ section {
     position: relative;
 }
 
-.component-titlebar {
-    /* Or .component-titlebar.ai-style-change-1 if you want to be more specific */
-    border-top-left-radius: 0.6rem;
-    border-top-right-radius: 0.6rem;
-}
-
 #toaster {
     border-radius: 0.6rem;
     overflow: hidden;
@@ -2099,6 +2096,9 @@ body {
  	overflow: hidden;
  	border: var(--border);
  	box-shadow: var(--sbx-shadow-m);
+}
+    .component-titlebar {
+    Or .component-titlebar.ai-style-change-1 if you want to be more specific
 }
 
 **
