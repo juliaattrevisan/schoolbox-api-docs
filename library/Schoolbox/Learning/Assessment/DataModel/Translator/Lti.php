@@ -66,7 +66,8 @@ class Lti implements IAssessmentTypeTranslator
             ->setCustomFields($domainObject->getCustomFields())
             ->setLineItemResourceId($domainObject->getLineItemResourceId())
             ->setLineItemScoreMaximum($domainObject->getLineItemScoreMaximum())
-            ->setMarkVisibility($domainObject->getMarkVisibility());
+            ->setMarkVisibility($domainObject->getMarkVisibility())
+            ->setGuid($domainObject->getGuid());
     }
 
     /**
@@ -85,6 +86,7 @@ class Lti implements IAssessmentTypeTranslator
             ->setCustomFields($dataModel->getCustomFields())
             ->setLineItemResourceId($dataModel->getLineItemResourceId())
             ->setLineItemScoreMaximum($dataModel->getLineItemScoreMaximum())
-            ->setMarkVisibility($dataModel->getMarkVisibility());
+            ->setMarkVisibility($dataModel->getMarkVisibility())
+            ->setGuid($dataModel->getGuid());
     }
 }
