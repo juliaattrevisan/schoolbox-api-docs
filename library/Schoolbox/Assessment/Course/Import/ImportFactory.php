@@ -20,6 +20,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
@@ -137,26 +138,27 @@ class ImportFactory
 
         $query = "
             SELECT
-                us.id                        AS 'us.id',
-                usf.name                     AS 'usf.name',
-                sa.id                        AS 'sa.id',
-                sa.title                     AS 'sa.title',
-                sa.default_open_span         AS 'sa.default_open_span',
-                sa.sequence                  AS 'sa.sequence',
-                sa.work_type_id              AS 'sa.work_type_id',
-                sa.deleted_at                AS 'sa.deleted_at',
-                lwt.name                     AS 'lwt.name',
-                sdw.assessment_id            AS 'sdw.id',
-                sdw.accept_submission        AS 'sdw.accept_submission',
-                sdw.multi_submission         AS 'sdw.multi_submission',
-                sqz.assessment_id            AS 'sqz.id',
-                sqz.learnosity_reference     AS 'sqz.learnosity_reference',
-                sqz.learnosity_job_reference AS 'sqz.learnosity_job_reference',
-                sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
-                stk.assessment_id            AS 'stk.id',
-                spr.assessment_id            AS 'spr.id',
-                slt.assessment_id            AS 'slt.id',
-                specLessonPlan.assessment_id AS 'specLessonPlan.id'
+                us.id                         AS 'us.id',
+                usf.name                      AS 'usf.name',
+                sa.id                         AS 'sa.id',
+                sa.title                      AS 'sa.title',
+                sa.default_open_span          AS 'sa.default_open_span',
+                sa.sequence                   AS 'sa.sequence',
+                sa.work_type_id               AS 'sa.work_type_id',
+                sa.deleted_at                 AS 'sa.deleted_at',
+                lwt.name                      AS 'lwt.name',
+                sdw.assessment_id             AS 'sdw.id',
+                sdw.accept_submission         AS 'sdw.accept_submission',
+                sdw.multi_submission          AS 'sdw.multi_submission',
+                sqz.assessment_id             AS 'sqz.id',
+                sqz.learnosity_reference      AS 'sqz.learnosity_reference',
+                sqz.learnosity_job_reference  AS 'sqz.learnosity_job_reference',
+                sqz.learnosity_job_status     AS 'sqz.learnosity_job_status',
+                stk.assessment_id             AS 'stk.id',
+                spr.assessment_id             AS 'spr.id',
+                slt.assessment_id             AS 'slt.id',
+                specLessonPlan.assessment_id  AS 'specLessonPlan.id',
+                specDialogAgent.assessment_id AS 'specDialogAgent.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -168,6 +170,7 @@ class ImportFactory
             LEFT JOIN project spr ON spr.assessment_id = sa.id
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
+            LEFT JOIN dialog_agent specDialogAgent ON specDialogAgent.assessment_id = sa.id
         ";
 
         $pb = new Builder($this->database->getQuoter(), '');
@@ -397,7 +400,8 @@ class ImportFactory
                 itk.assessment_id AS 'itk.id',
                 ipr.assessment_id AS 'ipr.id',
                 ilt.assessment_id AS 'ilt.id',
-                implLessonPlan.assessment_id AS 'implLessonPlan.id'
+                implLessonPlan.assessment_id AS 'implLessonPlan.id',
+                implDialogAgent.assessment_id AS 'implDialogAgent.id'
             FROM course_unit_implementation ui
             JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
@@ -410,6 +414,7 @@ class ImportFactory
             LEFT JOIN project ipr ON ipr.assessment_id = ia.id
             LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan ON implLessonPlan.assessment_id = ia.id
+            LEFT JOIN dialog_agent implDialogAgent ON implDialogAgent.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
         $pbOuter2 = new Builder($this->database->getQuoter(), '');
@@ -521,7 +526,8 @@ class ImportFactory
                 sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
                 stk.assessment_id     AS 'stk.id',
                 slt.assessment_id     AS 'slt.id',
-                specLessonPlan.assessment_id AS 'specLessonPlan.id'
+                specLessonPlan.assessment_id AS 'specLessonPlan.id',
+                specDialogAgent.assessment_id AS 'specDialogAgent.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment sa           ON sa.id = pa.assessment_id
@@ -532,6 +538,7 @@ class ImportFactory
             LEFT JOIN task stk           ON stk.assessment_id = sa.id
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
+            LEFT JOIN dialog_agent specDialogAgent ON specDialogAgent.assessment_id = sa.id
         ";
 
         $pb    = new Builder($this->database->getQuoter(), '');
@@ -610,7 +617,8 @@ class ImportFactory
                 iqz.assessment_id     AS 'iqz.id',
                 itk.assessment_id     AS 'itk.id',
                 ilt.assessment_id     AS 'ilt.id',
-                implLessonPlan.assessment_id AS 'implLessonPlan.id'
+                implLessonPlan.assessment_id AS 'implLessonPlan.id',
+                implDialogAgent.assessment_id AS 'implDialogAgent.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment ia           ON ia.id = pa.assessment_id
@@ -621,6 +629,7 @@ class ImportFactory
             LEFT JOIN task itk           ON itk.assessment_id = ia.id
             LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan ON implLessonPlan.assessment_id = ia.id
+            LEFT JOIN dialog_agent implDialogAgent ON implDialogAgent.assessment_id = ia.id
         ";
 
         $pb    = new Builder($this->database->getQuoter(), '');
@@ -841,6 +850,8 @@ class ImportFactory
              * as a Project). Not sure if this was by design or by accident.
              */
             $assessmentSpec = new LessonPlan();
+        } elseif ($row['specDialogAgent.id']) {
+            $assessmentSpec = new DialogAgent();
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
         } else {
@@ -903,6 +914,8 @@ class ImportFactory
             $assessmentImpl = new LtiAssessment();
         } elseif ($row['implLessonPlan.id']) {
             $assessmentImpl = new LessonPlan();
+        } elseif ($row['implDialogAgent.id']) {
+            $assessmentImpl = new DialogAgent();
         } elseif ($row['ipr.id']) { // Project needs to be checked at last, as this is not set for an assessment in a project
             $assessmentImpl = new Project();
         } else {
