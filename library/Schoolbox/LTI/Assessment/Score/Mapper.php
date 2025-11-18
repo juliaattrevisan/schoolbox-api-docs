@@ -13,6 +13,7 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
+use Schoolbox\LTI\LineItem\Mapper as LTILineItemMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -62,6 +63,15 @@ class Mapper extends BaseMapper
             null,
             null,
             'lti_assessment',
+        );
+        $this->joins(
+            'lti_line_item_id',
+            LTILineItemMapper::class,
+            'id',
+            null,
+            null,
+            null,
+            'lti_line_item',
         );
         $this->joins(
             'student_id',
