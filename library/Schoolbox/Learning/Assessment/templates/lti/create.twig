@@ -2,6 +2,8 @@
 
 <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
 
+<input type="hidden" name="guid" value="{{ assessment.guid }}" />
+
 <fieldset>
     {# ----------------------------------------------------------- #}
     {# Title #}
@@ -62,7 +64,12 @@
                             label="{{ tool.name }}"
                             data-launch-url="{{ tool.launchUrl ?? '' }}"
                             data-tool-selector-url="{{ tool.deepLinkingUrl
-                                ? routeLookup('ltiPlatformContext.getGenerateDeepLinkingRequestForFolder', {toolId: tool.id, folderId: context.baseContext.folder.id})
+                                ? (
+                                    routeLookup(
+                                        'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
+                                        {toolId: tool.id, folderId: context.baseContext.folder.id}
+                                    ) ~ '?guid=' ~ assessment.guid
+                                )
                                 : ''
                             }}"
                             {{ assessment.ltiTool.id is defined and tool.id == assessment.ltiTool.id ? 'selected="selected"' : '' }}>{{ tool.name }}</option>
