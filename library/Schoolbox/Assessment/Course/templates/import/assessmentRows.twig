@@ -168,6 +168,8 @@
                             assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                         } only %}
 
+                        <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+
                         {# Despite being labelled "Close" it behaves like a "Due" date #}
                         {% include '@course/import/date.twig' with {
                             assessmentDate: assessment.dueAt,
