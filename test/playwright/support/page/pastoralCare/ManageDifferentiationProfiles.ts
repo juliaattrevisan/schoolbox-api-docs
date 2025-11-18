@@ -2,7 +2,7 @@
  * Utility class for manage differentiation profiles page
  */
 
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
@@ -17,9 +17,9 @@ export default class ManageDifferentiationProfiles {
 
     static readonly DATA_TEST_TERMINOLOGY_HEADER = "differentiation-profiles-header-Terminology";
 
-    static readonly DATA_TEST_MODIFY_BUTTON = "mdp-grid-cell-text-action-modify-{studentId}-{fieldKey}";
+    static readonly DATA_TEST_MODIFY_BUTTON = "mdp-grid-cell-action-modify-{studentId}-{fieldKey}";
 
-    static readonly DATA_TEST_SAVE_BUTTON = "mdp-grid-cell-text-action-save-{studentId}-{fieldKey}";
+    static readonly DATA_TEST_SAVE_BUTTON = "mdp-grid-cell-action-save-{studentId}-{fieldKey}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -94,5 +94,8 @@ export default class ManageDifferentiationProfiles {
                 ).replace("{fieldKey}", fieldKey),
             )
             .click();
+        this.tester.isGoingTo("Verify that the text is saved correctly");
+        const successToast = this.page.getByText("Differentiation Profile successfully updated");
+        await expect(successToast).toBeVisible();
     }
 }
