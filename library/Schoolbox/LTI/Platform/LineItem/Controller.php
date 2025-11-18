@@ -140,4 +140,32 @@ class Controller extends BaseController
         $server             = new ServiceServer($validator, $handler);
         $this->response = $server->handle($request);
     }
+
+    /**
+     * LTI create line item endpoint: creates a new line item with the given
+     * GUID.
+     *
+     * @param string $guid
+     *
+     * @api   POST /lti-platform/line-item/guid/{guid}
+     * @since 25.1
+     */
+    public function postLineItemForGuid(string $guid): void
+    {
+        throw new NotFound();
+    }
+
+    /**
+     * LTI create score endpoint: creates a new score for this line item with
+     * the given GUID.
+     *
+     * @param string $guid
+     *
+     * @api   POST /lti-platform/line-item/guid/{guid}/scores
+     * @since 25.1
+     */
+    public function postScorePublishForGuid(string $guid): void
+    {
+        throw new NotFound();
+    }
 }
