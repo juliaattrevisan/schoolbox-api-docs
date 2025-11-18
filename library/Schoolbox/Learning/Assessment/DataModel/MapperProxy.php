@@ -1544,7 +1544,11 @@ class MapperProxy
 
             $lessonPlanMapper->delete($subModel);
         } elseif ($subModel instanceof DialogAgent\Model) {
-            /* TODO I think this is how it was envisaged to work?
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\Model instance
+             */
+            $this->baseMapper->delete($dataModel);
+
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model instance
              */
             DialogAgent\Mapper::getInstance()->delete($subModel);
         } else {
