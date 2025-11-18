@@ -24,8 +24,8 @@ import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
-import { useMdpHeaderStore } from "./store/mdpHeaderStore";
-import { useMdpRowsStore } from "./store/mdpRowsStore";
+import { useHeaderStore } from "./store/mdpHeaderStore";
+import { useRowsStore } from "./store/mdpRowsStore";
 
 const props = defineProps<{
     header: MDPHeader[];
@@ -39,9 +39,9 @@ const props = defineProps<{
 window.Vue.provide("pastoralConfig", props.pastoralConfig);
 window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 
-const headerStore = useMdpHeaderStore();
+const headerStore = useHeaderStore();
 headerStore.init(props.header);
-const rowsStore = useMdpRowsStore();
+const rowsStore = useRowsStore();
 rowsStore.init(props.route);
 
 // #region linked records selected

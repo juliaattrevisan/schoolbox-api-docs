@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { MDPHeader, Header } from "../../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 
-export const useMdpHeaderStore = defineStore(`mdpHeaderStore`, () => {
+export const useHeaderStore = defineStore(`headerStore`, () => {
     const header = window.Vue.ref<Header[]>([]);
 
     /**

@@ -5,7 +5,7 @@
  */
 
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useMdpRowsStore } from "../store/mdpRowsStore";
+import { useRowsStore } from "../store/mdpRowsStore";
 
 const props = defineProps<{
     profile: Profile;
@@ -15,7 +15,7 @@ const props = defineProps<{
     isContentFocused: boolean;
 }>();
 
-const rowsStore = useMdpRowsStore();
+const rowsStore = useRowsStore();
 
 /**
  * Whether to show the view more gradient and button

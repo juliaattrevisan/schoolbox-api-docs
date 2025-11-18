@@ -13,7 +13,7 @@ import { useLoadData } from "../composable/useLoadData";
 
 export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
 
-export const useMdpRowsStore = defineStore(`mdpRowsStore`, () => {
+export const useRowsStore = defineStore(`rowsStore`, () => {
     const route = window.Vue.ref<string>("");
     const url = window.Vue.ref<string>("");
     const limit = 20; // the current set limit for the number of records to fetch at once

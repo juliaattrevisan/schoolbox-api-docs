@@ -10,9 +10,9 @@ import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useMdpHeaderStore } from "../store/mdpHeaderStore";
-import { useMdpRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
-import { useMdpSaveStore } from "../store/mdpSaveStore";
+import { useHeaderStore } from "../store/mdpHeaderStore";
+import { useRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
+import { useSaveStore } from "../store/mdpSaveStore";
 import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
 
@@ -22,9 +22,9 @@ const props = defineProps<{
     text: string | null;
 }>();
 
-const headerStore = useMdpHeaderStore();
-const rowsStore = useMdpRowsStore();
-const saveStore = useMdpSaveStore();
+const headerStore = useHeaderStore();
+const rowsStore = useRowsStore();
+const saveStore = useSaveStore();
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
 const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations in seconds

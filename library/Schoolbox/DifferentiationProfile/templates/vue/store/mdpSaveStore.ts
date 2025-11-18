@@ -7,7 +7,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
-export const useMdpSaveStore = defineStore(`mdpSaveStore`, () => {
+export const useSaveStore = defineStore(`saveStore`, () => {
     const isSaving = window.Vue.ref(false);
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
