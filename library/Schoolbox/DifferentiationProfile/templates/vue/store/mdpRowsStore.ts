@@ -161,7 +161,7 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         return Object.fromEntries(
             Object.entries(cellMinDisplayHeights.value).map(([profileId, cellHeights]) => {
                 const maxCellHeight = Math.max(...Object.values(cellHeights));
-                if (maxCellHeight < 0) {
+                if (Object.values(cellHeights).length === 0) {
                     return [profileId, unexpandedRowHeight];
                 }
                 return [profileId, maxCellHeight];

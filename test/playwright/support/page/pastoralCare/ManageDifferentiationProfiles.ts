@@ -81,7 +81,7 @@ export default class ManageDifferentiationProfiles {
     }
 
     /**
-     * Click a modify button
+     * Click a save button
      * @param studentId - The ID of the student
      * @param fieldKey - The key of the field
      */
