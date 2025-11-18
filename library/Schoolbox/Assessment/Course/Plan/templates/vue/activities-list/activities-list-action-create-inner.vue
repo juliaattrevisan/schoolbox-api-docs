@@ -64,6 +64,15 @@ const props = defineProps<Props>();
                 {{ locale.lessonPlan.proper() }}
             </a>
         </li>
+        <li>
+            <a
+                :href="getReturnUrl(`${props.createRoute}?type=dialogAgent`)"
+                class="icon-dialog-agent"
+                :data-test="`unit-planner-create-dialog-agent-${props.contentId}`"
+            >
+                {{ locale.dialogAgent.proper() }}
+            </a>
+        </li>
     </ul>
 </template>
 
