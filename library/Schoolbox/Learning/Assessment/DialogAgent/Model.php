@@ -328,6 +328,7 @@ class Model extends AbstractAssessment
     {
         parent::overwrite($source);
 
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Model $source */
         /* Specific to Dialog Agents activity
          */
         $this->setDuration($source->getDuration());
@@ -343,7 +344,6 @@ class Model extends AbstractAssessment
 
         return $this;
     }
-
 
 
     /* Getters/Setters
