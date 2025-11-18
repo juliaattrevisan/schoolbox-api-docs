@@ -1221,6 +1221,35 @@ class Mapper extends BaseMapper
         }
     }
 
+    public function findByContributionDifferentiationProfile(int $studentId): Collection
+    {
+        $pb = $this->getPredicateBuilder();
+
+        $pb->any(
+            $this->getPredicateBuilder()
+                 ->equals('c.contribute_differentiation_profile', 1)
+                 ->equals('t.contribute_differentiation_profile', 1)
+        );
+
+        $pb->any(
+            $this->getPredicateBuilder()
+            ->isNull('pastoral.expires_at')
+            ->greaterThan('pastoral.expires_at', new Alaress_Date_Format()->getDatabaseDate())
+        );
+
+        $pb->equals('s.id', $studentId);
+
+        $records = $this->findByPredicates($pb);
+
+        /* Hydrate attachments
+         */
+        return $records->map(fn(Model $record) =>
+            $record->setAttachments(
+                $this->getJoinMapper('attachments')
+                     ->findByColumn('pastoral_id', $record->getId())
+            ));
+    }
+
     /**
      * @inheritDoc
      */

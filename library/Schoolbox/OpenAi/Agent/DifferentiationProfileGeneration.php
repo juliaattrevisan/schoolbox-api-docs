@@ -10,9 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent;
 
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\Collection;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\Pastoral\Model;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
+use Smalot\PdfParser\Parser;
 
 class DifferentiationProfileGeneration
 {
@@ -25,18 +29,25 @@ class DifferentiationProfileGeneration
     public function __construct(
         private IClient $client,
         private array $config,
+        private FilesystemProxy $filesystemProxy,
+        private Parser $pdfParser,
     ) {
     }
 
     public function request(
         User $user,
+        Collection $pastoralRecords,
         ?string $aiSessionId = null,
     ): array {
+
+        $attachments = $this->generateFilePrompts($pastoralRecords);
+
         $payloadGenerator = new \Schoolbox\Editor\OpenAI\Payload\DifferentiationProfile(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
+            trim($attachments)
         );
 
         $payload = $payloadGenerator->generate();
@@ -67,5 +78,27 @@ class DifferentiationProfileGeneration
             return [$data['output'] ?? null, 500];
         }
         return [$fieldData, 200];
+    }
+
+    private function generateFilePrompts(Collection $pastoralRecords): string
+    {
+        $processed = $pastoralRecords->map(
+            fn (Model $record) =>
+                ($record->getBodyPublic() ?? '') . "\n\n" .
+                $record->getAttachments()->reduce(
+                    function (string $carry, \Schoolbox\Pastoral\Attachment\Model $attachment) {
+                        if (!$attachment->getMimetype()->isPDF() || $attachment->isDeleted()) {
+                            return $carry;
+                        }
+
+                        $carry .= $this->pdfParser->parseContent(
+                                $this->filesystemProxy->read($attachment)
+                            )->getText() . "\n\n";
+                        return $carry;
+                    },
+                    ''
+                )
+        );
+        return implode("\n", $processed->getAll());
     }
 }

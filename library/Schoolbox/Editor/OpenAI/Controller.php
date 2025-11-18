@@ -24,6 +24,9 @@ use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Smalot\PdfParser\Parser;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -42,6 +45,8 @@ class Controller extends Base
      */
     public function __construct(
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private PastoralMapper $pastoralMapper,
+        private FilesystemProxy $filesystemProxy,
         private ClientFactory $clientFactory,
     ) {
     }
@@ -307,14 +312,33 @@ class Controller extends Base
 
         $aiSessionId = (string)Uuid::uuid4();
 
+        $studentId = $this->requestPost->get('studentId');
+        if (!$studentId) {
+            $returnCode = 400;
+
+            $problem = (new ApiProblem("Student Id is required."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
+        $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
+
         $agent = new DifferentiationProfileGeneration(
             $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
             $diffConfig,
+            $this->filesystemProxy,
+            new Parser(),
         );
 
         try {
             [$response, $status] = $agent->request(
                 $this->getUser(),
+                $records,
                 $aiSessionId,
             );
 

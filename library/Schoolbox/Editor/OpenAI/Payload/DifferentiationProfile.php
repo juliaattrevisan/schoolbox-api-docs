@@ -120,6 +120,7 @@ class DifferentiationProfile
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $systemPrompt,
+        private string $documentContent,
     ) {
     }
     public function generate(): array
@@ -143,6 +144,13 @@ class DifferentiationProfile
             ]
         );
 
+        $userPrompt = strtr(
+            self::PROMPT_USER_PERSONA,
+            [
+                '[ILP_DOCUMENT_CONTENT]' => $this->documentContent,
+            ]
+        );
+
         $payload = [
             'model' => $model,
             'temperature' => self::TEMPERATURE,
@@ -155,7 +163,7 @@ class DifferentiationProfile
                 ],
                 [
                     'role' => 'user',
-                    'content' => self::PROMPT_USER_PERSONA,
+                    'content' => $userPrompt,
                 ],
             ],
             'stream' => false,

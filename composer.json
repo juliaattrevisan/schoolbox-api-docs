@@ -125,7 +125,8 @@
         "symfony/cache": "^7.2",
         "psr/simple-cache": "^3.0",
         "clue/redis-react": "^2.8",
-        "php-debugbar/php-debugbar": "^2.2"
+        "php-debugbar/php-debugbar": "^2.2",
+        "smalot/pdfparser": "^2.12"
     },
     "autoload-dev": {
       "psr-4": {
