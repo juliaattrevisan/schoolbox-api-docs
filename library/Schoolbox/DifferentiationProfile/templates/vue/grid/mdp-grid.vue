@@ -3,7 +3,7 @@
  * To display a grid-like display
  */
 
-import type { Header } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Header, Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     header: Header[];
@@ -46,6 +46,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
                     :class="{
                         'fixed-left': item.isFixed,
                     }"
+                    :data-test="`mdp-grid-row-cell-${(row as Profile).student.id}-${item.key}`"
                 >
                     <!-- Use dynamic slot based on header type, fallback to default content -->
                     <slot :name="item.type" :row="row" :header="item" :row-index="index">

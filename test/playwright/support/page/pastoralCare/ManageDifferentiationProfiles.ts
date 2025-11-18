@@ -17,6 +17,10 @@ export default class ManageDifferentiationProfiles {
 
     static readonly DATA_TEST_TERMINOLOGY_HEADER = "differentiation-profiles-header-Terminology";
 
+    static readonly DATA_TEST_MODIFY_BUTTON = "mdp-grid-cell-text-action-modify-{studentId}-{fieldKey}";
+
+    static readonly DATA_TEST_SAVE_BUTTON = "mdp-grid-cell-text-action-save-{studentId}-{fieldKey}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -57,5 +61,38 @@ export default class ManageDifferentiationProfiles {
         await manageRecordSettings.gotoAwardAchievement();
         await manageRecordSettings.clickApplyToDifferentiationProfiles();
         await manageRecordSettings.clickSave();
+    }
+
+    /**
+     * Click a modify button
+     * @param studentId - The ID of the student
+     * @param fieldKey - The key of the field
+     */
+    async clickModifyButton(studentId: number, fieldKey: string): Promise<void> {
+        await this.page
+            .getByTestId(
+                ManageDifferentiationProfiles.DATA_TEST_MODIFY_BUTTON.replace(
+                    "{studentId}",
+                    studentId.toString(),
+                ).replace("{fieldKey}", fieldKey),
+            )
+            .click();
+        await this.page.waitForTimeout(500); // Wait for the textbox to be focused
+    }
+
+    /**
+     * Click a modify button
+     * @param studentId - The ID of the student
+     * @param fieldKey - The key of the field
+     */
+    async clickSaveButton(studentId: number, fieldKey: string): Promise<void> {
+        await this.page
+            .getByTestId(
+                ManageDifferentiationProfiles.DATA_TEST_SAVE_BUTTON.replace(
+                    "{studentId}",
+                    studentId.toString(),
+                ).replace("{fieldKey}", fieldKey),
+            )
+            .click();
     }
 }
