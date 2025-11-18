@@ -36,6 +36,8 @@ export const useSaveStore = defineStore(`saveStore`, () => {
                 throw new Error(response.message || "Failed to save");
             }
             toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
+            // the date in the format of for example 24/05/2024
+            profile.updated_at = window.dayjs(new Date()).format("DD/MM/YYYY");
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
             loadError.value = errorMessage;
