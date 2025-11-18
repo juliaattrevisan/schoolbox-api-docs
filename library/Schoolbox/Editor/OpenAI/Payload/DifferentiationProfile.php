@@ -15,6 +15,7 @@ class DifferentiationProfile
 
     /**
      * System prompt for the new student profile extraction tool.
+     * [CONFIG_OPENAI_DIFFERENTIATION_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
      */
     private const PROMPT_SYSTEM_PERSONA = "
         You are an expert teacher who is highly skilled and educated on the management, creation and interpretation of Individual learning plans which aim to improve the overall learning outcomes of students and ensure that their learning needs are considered. Your primary task is to review a provided learning plan document (which may be referred to as an Individual Learning Plan, Individual Education Plan, or Additional Needs plan etc) and extract the key key essential and actionable information for teachers to know and use when differentiating learning for that specific student. The information extracted will be compiled into a learner profile or differentiation profile, communicating to a teacher, all the essential information required for effective differentiation for the student. Your final response must be a single JSON object.
@@ -44,6 +45,7 @@ class DifferentiationProfile
         8. If a section is not present in the document or you cannot find clear data that aligns with a requested field's description, the corresponding JSON field MUST be an empty string (\"\").
         9. The final output MUST be a single, valid JSON object and nothing else.
         10. You MUST use the exact Field names (e.g., 'overview', 'interests_strengths') provided in the User Prompt as the JSON keys, maintaining case-sensitivity.
+        [CONFIG_OPENAI_DIFFERENTIATION_SYSTEM_PROMPT]
     ";
 
     /**
@@ -117,6 +119,7 @@ class DifferentiationProfile
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
+        private string $systemPrompt,
     ) {
     }
     public function generate(): array
@@ -131,6 +134,15 @@ class DifferentiationProfile
             $model = $this->openAiDeploymentId;
         }
 
+        /* Replacing the token with the config setting defined prompt
+         */
+        $systemPrompt = strtr(
+            self::PROMPT_SYSTEM_PERSONA,
+            [
+                '[CONFIG_OPENAI_DIFFERENTIATION_SYSTEM_PROMPT]' => $this->systemPrompt,
+            ]
+        );
+
         $payload = [
             'model' => $model,
             'temperature' => self::TEMPERATURE,
@@ -139,7 +151,7 @@ class DifferentiationProfile
             'input' => [
                 [
                     'role' => 'system',
-                    'content' => self::PROMPT_SYSTEM_PERSONA,
+                    'content' => $systemPrompt,
                 ],
                 [
                     'role' => 'user',

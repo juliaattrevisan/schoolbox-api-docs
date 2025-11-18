@@ -36,6 +36,7 @@ class DifferentiationProfileGeneration
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
             trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
         );
 
         $payload = $payloadGenerator->generate();
