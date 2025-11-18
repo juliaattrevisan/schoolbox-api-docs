@@ -88,7 +88,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     });
     editor.model.document.on("change", () => {
         // Ensure cell is marked as focused when content changes
-        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
+        // rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         // keep the currentText in sync with the editor content
         window.Vue.nextTick()
             .then(() => {
@@ -196,6 +196,9 @@ window.Vue.watch(
         }
         currentText.value = newText;
         editorContent.value = newText ?? "";
+        if (isEditorCreated.value) {
+            editor.setData(editorContent.value);
+        }
     },
 );
 
