@@ -1054,7 +1054,6 @@ button[data-action],
         border-radius: var(--sbx-border-radius-normal);
     }
 }
-
 input[type="checkbox"]:not(.plain) + label::after,
 input[type="checkbox"]:not(.plain) + label::before {
     border-radius: var(--sbx-border-radius-full) !important;
@@ -1208,11 +1207,8 @@ input[type="radio"] + .block {
     }
 }
 
+// Accordion styles
 .accordion {
-    & .accordion-navigation:not(:last-child) {
-        margin-bottom: 1rem !important;
-    }
-
     & .accordion-navigation {
         border: var(--border);
         border-radius: var(--sbx-border-radius-normal);
@@ -1232,37 +1228,46 @@ input[type="radio"] + .block {
             color: var(--sbx-color-accent-text);
         }
     }
+
+    & .accordion-navigation:not(:last-child) {
+        margin-bottom: 1rem !important;
+    }
 }
 
 .side-nav {
-    border-radius: var(--sbx-border-radius-normal);
     border: var(--border);
+    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
-    & li:not(:last-child) {
-        border-bottom: var(--border);
-    }
+
     & li {
         &.active > a {
             border-left-width: 4px;
         }
+
         &.active
             > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                 button.submit
             ):not(.show-ckeditor-button) {
-            font-weight: 600;
             color: var(--sbx-color-text-primary);
+            font-weight: 600;
         }
+
         &
             > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
                 button.submit
             ):not(.show-ckeditor-button) {
-            padding-block: 1rem;
             color: var(--sbx-color-text-primary);
             font-family: var(--ff-primary);
+            padding-block: 1rem;
         }
+    }
+
+    & li:not(:last-child) {
+        border-bottom: var(--border);
     }
 }
 
+// Search page styles
 .context-switch {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -1300,34 +1305,16 @@ input[type="radio"] + .block {
     }
 }
 
-.v-card-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-    gap: 1rem;
-    &::before,
-    &::after {
-        content: none !important;
-    }
-    & > div {
-        margin: 0 !important;
-    }
-}
-
+// Card styles
 .v-card {
     border-radius: var(--sbx-border-radius-normal);
-
-    & > a .card-class-image {
-        border-top-right-radius: var(--sbx-border-radius-normal);
-        border-top-left-radius: var(--sbx-border-radius-normal);
-        overflow: hidden;
-    }
 
     & .card-content {
         & .list-item {
             & h3 a {
                 color: var(--sbx-color-text-primary);
-                font-weight: 600;
                 font-family: var(--ff-primary);
+                font-weight: 600;
             }
 
             & p {
@@ -1336,24 +1323,48 @@ input[type="radio"] + .block {
             }
         }
     }
+
+    & > a .card-class-image {
+        border-top-left-radius: var(--sbx-border-radius-normal);
+        border-top-right-radius: var(--sbx-border-radius-normal);
+        overflow: hidden;
+    }
+}
+.v-card-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+
+    &::before,
+    &::after {
+        content: none !important;
+    }
+
+    & > div {
+        margin: 0 !important;
+    }
 }
 
 .c-search-page__filters {
+    border: var(--border);
+    border-radius: var(--sbx-border-radius-normal);
     box-shadow: var(--sbx-shadow-m);
     height: fit-content;
-    border-radius: var(--sbx-border-radius-normal);
-    border: var(--border);
     overflow: hidden;
+
     & .c-island:not(.filter) {
         border-bottom: var(--border);
     }
+
+    & .checklist {
+        // removed [data-v-3721f532] as we cannot use it in global css
+        border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    }
+
     & [data-test="search-select-creator"] {
         & .results-container .results {
-            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+            border-radius: var(--sbx-border-radius-normal) !important;
         }
-    }
-    & .checklist[data-v-3721f532] {
-        border-radius: calc(var(--sbx-border-radius-normal) / 3);
     }
 }
 
