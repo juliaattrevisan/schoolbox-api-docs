@@ -116,7 +116,13 @@ class Controller extends Base
             $adminConfigs,
         );
 
-        $request             = $this->requestQuery['filter_selection'] ?: [];
+        $request             = $this->requestQuery['filter_selection'] ?? [];
+
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
+
         $page                = \Schoolbox\Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
         $codec               = new \Schoolbox\Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
 
