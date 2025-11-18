@@ -598,10 +598,10 @@ class Subnav
                     ],
                     '/adminv2/filters/differentiation-profiles/differentiationProfile' => [
                         'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_DIFFERENTIATION_PROFILE),
-                        'visible'     => (
-                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_DIFFERENTIATION_PROFILE)
-                        ),
-                        'description' => 'Configure the default and available filter options on the class rubric markbook.',
+                        'visible'     =>
+                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
+                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                        'description' => 'Configure the default and available filter options on the differentiation profiles.',
                     ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
