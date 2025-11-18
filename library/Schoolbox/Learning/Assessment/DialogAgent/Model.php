@@ -331,16 +331,15 @@ class Model extends AbstractAssessment
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Model $source */
         /* Specific to Dialog Agents activity
          */
-        $this->setDuration($source->getDuration());
-        $this->setScenarioId($source->getScenarioId());
-
-        /* The configuration of the dialog agent activity itself
-         */
-        $this->setHelpfulness($source->getHelpfulness());
-        $this->setLanguage($source->getLanguage());
-        $this->setUseDifferentiationProfile($source->getUseDifferentiationProfile());
-        $this->setOpeningMessage($source->getOpeningMessage());
-        $this->setRules($source->getRules());
+        $this->setDuration($source->getDuration())
+            ->setScenarioId($source->getScenarioId())
+            /* The configuration of the dialog agent activity itself
+             */
+            ->setHelpfulness($source->getHelpfulness())
+            ->setLanguage($source->getLanguage())
+            ->setUseDifferentiationProfile($source->getUseDifferentiationProfile())
+            ->setOpeningMessage($source->getOpeningMessage())
+            ->setRules($source->getRules());
 
         return $this;
     }
