@@ -118,4 +118,11 @@ interface IClient
         ?string $feature = null,
         ?string $aiSessionId = null,
     ): Log\Model;
+
+    /**
+     * Save a log object.
+     *
+     * @param Log\Model $log
+     */
+    public function saveLog(Log\Model $log): void;
 }

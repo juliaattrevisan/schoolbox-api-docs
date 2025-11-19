@@ -76,6 +76,7 @@ class ImageGeneration
         ?string $previousResponseId = null,
     ): iterable {
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
+        // TODO: Should $prompt (what ends up being logged as inputText) contain the other parameters such as the style you selected too? or are we okay with loosing that info
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
 
         // TODO: what happens to random errors thrown from within here? do they end up as ApiProblem's correctly?
@@ -133,6 +134,7 @@ class ImageGeneration
                 ];
 
                 $log->setOutputText(json_encode($event, JSON_THROW_ON_ERROR));
+                $this->client->saveLog($log);
 
                 // TODO: This basically overrides whatever ResponseMessage::logCompletion thought the final status was, we are a lot more informed here than over there...
                 // perhaps this needs to be revised to set those states properly?

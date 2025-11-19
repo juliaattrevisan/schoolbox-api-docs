@@ -174,6 +174,14 @@ class Client implements IClient
     }
 
     /**
+     * @inheritdoc
+     */
+    public function saveLog(Log\Model $log): void
+    {
+        $this->logMapper->save($log);
+    }
+
+    /**
      * Generate the URL to which a request to an OpenAI-compatible AI provider
      * should be sent.
      *
@@ -213,7 +221,7 @@ class Client implements IClient
         } catch (BadResponseException $e) {
             $log->setReturnCode($e->getResponse()->getStatusCode())
                 ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
+            $this->saveLog($log);
 
             // Extract body from response, and put it in output
             $responseBody = $e->getResponse()->getBody()->getContents();
@@ -227,7 +235,7 @@ class Client implements IClient
         } catch (ClientExceptionInterface $e) {
             $log->setReturnCode(null)
                 ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
+            $this->saveLog($log);
             throw new SchoolboxException(
                 $e->getMessage(),
                 $e->getCode(),
@@ -332,7 +340,7 @@ class Client implements IClient
         $responseBody = $response->getBody()->getContents();
         $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $log = $logHandler->handleResponse($responseJson, $log);
-        $this->logMapper->save($log);
+        $this->saveLog($log);
 
         // Restore the body in its streamable glory
         return $response->withBody(Utils::streamFor($responseBody));
@@ -370,20 +378,20 @@ class Client implements IClient
                 try {
                     $logHandler->handleMessage($message, $log, $streamListener);
                 } finally {
-                    $this->logMapper->save($log);
+                    $this->saveLog($log);
                 }
             }
 
             // If nothing happened: set a default return code, and save log
             $log->setReturnCode($log->getReturnCode() ?? 200);
-            $this->logMapper->save($log);
+            $this->saveLog($log);
         } else {
             // This is probably an error, so just finalise the log with whatever
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
             $log = $logHandler->handleResponse($responseJson, $log);
-            $this->logMapper->save($log);
+            $this->saveLog($log);
 
             // TODO: is this actually going to show an error state to the frontend??
             // Convert it to a single message I guess, if finalising the log
