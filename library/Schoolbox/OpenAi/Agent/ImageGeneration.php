@@ -128,7 +128,7 @@ class ImageGeneration
                  * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
                  */
                 $event = [
-                    'eventName' => $message->eventType,
+                    'eventType' => $message->eventType,
                     'data' => $message->getDataAsArray(),
                 ];
 

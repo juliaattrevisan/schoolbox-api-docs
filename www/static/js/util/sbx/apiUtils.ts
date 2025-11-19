@@ -88,8 +88,8 @@ interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undef
     signal?: AbortSignal;
 }
 
-export type SseMessageEvent<TEventName extends string = string, TMessageData = unknown> = {
-    eventName: TEventName | undefined;
+export type SseMessageEvent<TEventType extends string = string, TMessageData = unknown> = {
+    eventType: TEventType | undefined;
     data: ApiBaseResponse<TMessageData>;
 };
 
@@ -109,7 +109,7 @@ interface SseApiRequestOptions<
      * If the request terminates without this, an error will be returned
      * @default "complete"
      */
-    finalEventName?: string;
+    finalEventType?: string;
 }
 
 /**
@@ -184,14 +184,14 @@ async function buildRequest(
  * @param text - The response from the server as a string
  * @param status - The HTTP status code of the response
  * @param contentType - The content type of the response (e.g. "application/json")
- * @param eventName - When parsing a text/event-stream, the event name that is associated with the data
+ * @param eventType - When parsing a text/event-stream, the event type that is associated with the data
  * @returns - The parsed response, always extending ApiBaseResponse
  */
 function parseResponse<TResponseData>(
     text: string,
     status: number,
     contentType: string = "",
-    eventName?: string,
+    eventType?: string,
 ): ApiBaseResponse<TResponseData> {
     let responseJSON: TResponseData;
 
@@ -243,7 +243,7 @@ function parseResponse<TResponseData>(
 
     /* Is this not a successful response? If so, it theoretically should be following RFC 9457 "API Problem" */
     const validStatus = status >= 200 && status < 300;
-    if (!validStatus || eventName === "error") {
+    if (!validStatus || eventType === "error") {
         const failureResponse: ApiBaseResponseFailure = {
             success: false,
             message: "An unexpected error occurred",
@@ -307,8 +307,8 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
 /**
  * Generic function to make an API request to the server
  * Validates that the response matches our expected format
- * API errors should follow RFC 9457 "API Problem", sending an event with the name "error" will be treated like this
- * Requires the final message to match options.finalEventName, which will terminate the stream
+ * API errors should follow RFC 9457 "API Problem", sending an event with the type "error" will be treated like this
+ * Requires the final message to match options.finalEventType, which will terminate the stream
  * @template TMessageEvent - The type of the response from the server for each message event
  * @template TResponseData - The type of the response from the server for the final message
  * @template TBody - The type of the request body
@@ -376,9 +376,9 @@ export async function sseApiRequest<
         for (let i = 0; i < events.length - 1; i += 1) {
             const rawEvent = events[i].trim();
             if (rawEvent) {
-                const { eventName, data } = parseSseEvent(rawEvent);
+                const { eventType, data } = parseSseEvent(rawEvent);
 
-                if (eventName === (options.finalEventName ?? "complete")) {
+                if (eventType === (options.finalEventType ?? "complete")) {
                     // If the server sends the final event, close the stream
                     finalResponseData = data;
                     break;
@@ -388,7 +388,7 @@ export async function sseApiRequest<
                     data,
                     response.status,
                     contentType,
-                    eventName,
+                    eventType,
                 );
 
                 // If the parsed data indicates a failure, set it as the final response for now but let the stream keep going
@@ -396,7 +396,7 @@ export async function sseApiRequest<
                     finalResponseData = data;
                 }
 
-                const event = { eventName, data: parsedData } satisfies SseMessageEvent;
+                const event = { eventType, data: parsedData } satisfies SseMessageEvent;
                 options.onMessage(event as TMessageEvent);
             }
         }

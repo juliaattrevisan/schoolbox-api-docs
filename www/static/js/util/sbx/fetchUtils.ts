@@ -25,24 +25,24 @@ export async function extractErrorMessage(response: Response): Promise<string> {
  * Parse an SSE event chunk
  * Typically an event chunk includes an event: line and data: line
  * @param rawEvent - The chunk to parse
- * @returns The parsed event name and data
+ * @returns The parsed event type and data
  */
-export function parseSseEvent(rawEvent: string): { eventName: string | undefined; data: string } {
-    let eventName: string | undefined;
+export function parseSseEvent(rawEvent: string): { eventType: string | undefined; data: string } {
+    let eventType: string | undefined;
     const dataLines: string[] = [];
 
     const lines = rawEvent.split("\n");
     lines.forEach((line) => {
         if (line.startsWith("event:")) {
-            if (eventName) {
-                console.warn("Multiple event names in SSE chunk, using the last one");
+            if (eventType) {
+                console.warn("Multiple event types in SSE chunk, using the last one");
             }
-            eventName = line.replace("event:", "").trim();
+            eventType = line.replace("event:", "").trim();
         } else if (line.startsWith("data:")) {
             dataLines.push(line.replace("data:", "").trim());
         }
         // Could handle other SSE fields here (e.g. "id:", "retry:") if needed
     });
 
-    return { eventName, data: dataLines.join("\n") };
+    return { eventType, data: dataLines.join("\n") };
 }

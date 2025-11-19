@@ -80,7 +80,7 @@ export async function generateImage(
         method: "POST",
         body,
         onMessage,
-        finalEventName: AgentChatMessageEventType.COMPLETE,
+        finalEventType: AgentChatMessageEventType.COMPLETE,
         signal: signal || undefined,
     });
 }
