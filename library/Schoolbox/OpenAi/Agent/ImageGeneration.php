@@ -131,6 +131,7 @@ class ImageGeneration
      * @param string|null &$responseId A reference to the response ID to set when we receive it so it can be reused between calls
      * @return ?Message A new Message object corresponding to one of the AgentChatMessageEventType cases
      * @throws SchoolboxException if an error occurs during processing, such as a refusal or incomplete response
+     * @throws UnexpectedValueException if the message data is not valid JSON or cannot be decoded
      * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
      */
     private function handleStreamMessage(Message $rawMessage, ?string &$responseId = null): ?Message
@@ -138,13 +139,7 @@ class ImageGeneration
         // TODO: NOTE: This is just a basic clone of our current logic moved all to the backend, needs to be properly refined
 
         $eventType = $rawMessage->eventType;
-        $data   = [];
-        try {
-            $data = json_decode($rawMessage->data, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            // TODO: handle this error correctly (ApiProblem), there's likely no point in continuing
-            return null;
-        }
+        $data = $rawMessage->getDataAsArray();
 
         if (\in_array($eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
             /**
@@ -163,7 +158,6 @@ class ImageGeneration
             if ($data['response']['error'] ?? null) {
                 $returnCode = 500;
                 $errorMessage = $data['response']['error']['message'] ?? '';
-                // TODO: Does this correctly raise an ApiProblem in the stream?
                 throw new SchoolboxException($errorMessage, $returnCode);
             }
 
@@ -211,7 +205,7 @@ class ImageGeneration
                  * Getting here would be really weird, it would require OpenAI's structure to fail us...
                  * possibly should be handled more gracefully
                  */
-                throw new SchoolboxException('No output content found in response', 500);
+                throw new UnexpectedValueException('No output content found in response');
             }
 
             if ('refusal' === $outputContent['type']) {
@@ -348,6 +342,7 @@ class ImageGeneration
      */
     private function listenForOutputText(Message $message, Log\Model $log): void
     {
+        // TODO: this is way too early in the chain to be doing the right thing yet...
         if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
             $outputTextParts = [];
             try {
