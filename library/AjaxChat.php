@@ -229,13 +229,13 @@ class AjaxChat
         /** @var Component_ConfigDefinition $definition */
         foreach ($this->config as $definition) {
             // this should be 1:1 relation, so return only the first instance of this definition
-            /** @var Component_Config $confI */
+            /** @var Component_Config|null $confI  */
             $confI = Component_ConfigMapper::getInstance()->findByColumnList(array(
                     'component_config_definition_id' => $definition->getId(),
                     'component_instance_id'          => $this->componentID
                 ))->first();
 
-            if (!$confI->getId()) {
+            if (!$confI?->getId()) {
                 $confI = new Component_Config();
                 $confI->setConfigDefinitionId($definition->getId());
                 $confI->setInstanceId($this->componentID);
