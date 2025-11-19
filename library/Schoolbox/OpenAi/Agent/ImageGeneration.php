@@ -114,7 +114,7 @@ class ImageGeneration
                  * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
                  * If we get this, send on the human-readable message to the user
                  */
-                if ($data['error'] ?? null) {
+                if ($data['response']['error'] ?? null) {
                     $returnCode = 500;
                     $errorMessage = $data['response']['error']['message'] ?? '';
                     // TODO: Does this correctly raise an ApiProblem in the stream?
