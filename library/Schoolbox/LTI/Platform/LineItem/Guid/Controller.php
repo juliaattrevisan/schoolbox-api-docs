@@ -35,6 +35,7 @@ use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
+use Schoolbox\Url\Factory;
 
 /**
  * LTI Platform controller for line items.
@@ -163,13 +164,19 @@ class Controller extends BaseController
         throw new NotFound();
     }
 
+    /**
+     * Create a repository for line items with the given GUID.
+     *
+     * @param string $guid
+     * @return LineItemRepositoryInterface
+     */
     private function createRepository(string $guid): LineItemRepositoryInterface
     {
         return new Repository(
             $guid,
             $this->lineItemMapper,
             $this->routeGenerator,
-            $this->getRouter()->getMatcher()
+            new Factory($this->getConfigLoader())->buildFullyQualified(),
         );
     }
 

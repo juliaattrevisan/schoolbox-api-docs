@@ -12,11 +12,14 @@ namespace Schoolbox\LTI\Platform\LineItem\Guid;
 use Alaress_Date_Format;
 use Aura\Router\Generator;
 use Aura\Router\Matcher;
+use Aura\Router\RouterContainer;
+use GuzzleHttp\Psr7\ServerRequest;
 use OAT\Library\Lti1p3Ags\Model\LineItem as LtiLineItem;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollection;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\LTI\LineItem as SchoolboxLineItem;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Uri;
@@ -32,38 +35,25 @@ class Repository implements LineItemRepositoryInterface
      * @param string                   $guid           The GUID for the assessment this line item belongs to.
      * @param SchoolboxLineItem\Mapper $lineItemMapper Line item mapper, for persisting and fetching line items.
      * @param Generator                $routeGenerator Route generator: used to create line item identifiers.
-     * @param Matcher                  $routeMatcher   Route matcher: used to parse line item identifiers.
+     * @param UriInterface             $baseUrl        Base URL used when building the line item's identifier.
      */
     public function __construct(
         private string $guid,
         private SchoolboxLineItem\Mapper $lineItemMapper,
         private Generator $routeGenerator,
-        private Matcher $routeMatcher,
+        private UriInterface $baseUrl,
     ) {
     }
 
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
-//        // Line item identifier will be a URL: extract the ID and GUID from it
-//        $url  = new Uri($lineItemIdentifier);
-//        $path = $url->getPath();
-//
-//        $dummyRoute = $this->routeGenerator->generate(
-//            'ltiPlatformLineItemGuid.getLineItemForGuidAndLineItem',
-//            [
-//                'id'   => 0,
-//                'guid' => 'xxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-//            ],
-//        );
-//
-//        // Map this to a route
-//        $url->getPath();
-//        $assessmentId = $this->ltiAssessment->getId();
-//        $route        = $this->routeContainer->getMatcher()->match($url->getPath());
-//            'ltiPlatformLineItemGuid.getLineItemForGuidAndLineItem',
-//            ['id' => ],
-//        );
-        // TODO: Implement find() method.
+        $lineItem = $this->lineItemMapper->findByColumnList([
+            'guid'           => $this->guid,
+            'identifier_url' => $lineItemIdentifier,
+        ])->first();
+        if ($lineItem) {
+            return $this->convertModelToLineItem($lineItem);
+        }
         return null;
     }
 
@@ -142,7 +132,10 @@ class Repository implements LineItemRepositoryInterface
         $this->lineItemMapper->save($lineItemModel);
 
         // Now the line item has an ID, its identifier can be set?
-        return $lineItem->setIdentifier($this->buildIdentifier($lineItemModel));
+        $lineItemModel = $lineItemModel->setIdentifierUrl($this->buildIdentifier($lineItemModel));
+        $this->lineItemMapper->save($lineItemModel);
+
+        return $lineItem->setIdentifier($lineItemModel->getIdentifierUrl());
     }
 
     /**
@@ -153,7 +146,10 @@ class Repository implements LineItemRepositoryInterface
      */
     public function delete(string $lineItemIdentifier): void
     {
-        // TODO: Implement delete() method.
+        $this->lineItemMapper->deleteByColumnList([
+            'guid'           => $this->guid,
+            'identifier_url' => $lineItemIdentifier,
+        ]);
     }
 
     /**
@@ -187,12 +183,16 @@ class Repository implements LineItemRepositoryInterface
     private function buildIdentifier(SchoolboxLineItem\Model $lineItemModel): string
     {
         /** @noinspection PhpUnhandledExceptionInspection - Aura\Router\Exception\RouteNotFound is never thrown */
-        return $this->routeGenerator->generate(
-            'ltiPlatformLineItemGuid.getLineItemForGuidAndLineItem',
-            [
-                'id'   => $lineItemModel->getId(),
-                'guid' => $lineItemModel->getLtiAssessmentGuid(),
-            ],
-        );
+        return $this->baseUrl
+            ->withPath(
+                $this->routeGenerator->generate(
+                    'ltiPlatformLineItemGuid.getLineItemForGuidAndLineItem',
+                    [
+                        'id'   => $lineItemModel->getId(),
+                        'guid' => $lineItemModel->getLtiAssessmentGuid(),
+                    ],
+                )
+            )
+            ->__toString();
     }
 }

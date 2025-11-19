@@ -3,6 +3,7 @@ CREATE TABLE lti_line_item
     id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     lti_assessment_id   INT UNSIGNED NULL,
     lti_assessment_guid UUID NULL,
+    identifier_url      VARCHAR(255) NULL,
     label               VARCHAR(255) NULL,
     score_maximum       FLOAT UNSIGNED NULL,
     resource_id         VARCHAR(255) NULL,

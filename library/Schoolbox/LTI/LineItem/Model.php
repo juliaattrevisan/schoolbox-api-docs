@@ -54,6 +54,11 @@ class Model implements ISoftDeletable
     private ?string $ltiAssessmentGuid = null;
 
     /**
+     * The URL which is used to locate this line item.
+     */
+    private ?string $identifierUrl = null;
+
+    /**
      * Human-readable label for the line item.
      */
     private ?string $label = null;
@@ -103,6 +108,24 @@ class Model implements ISoftDeletable
     public function setLtiAssessmentGuid(?string $ltiAssessmentGuid): self
     {
         $this->ltiAssessmentGuid = $ltiAssessmentGuid;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIdentifierUrl(): ?string
+    {
+        return $this->identifierUrl;
+    }
+
+    /**
+     * @param string|null $identifierUrl
+     * @return $this
+     */
+    public function setIdentifierUrl(?string $identifierUrl): self
+    {
+        $this->identifierUrl = $identifierUrl;
         return $this;
     }
 

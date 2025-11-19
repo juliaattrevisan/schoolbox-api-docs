@@ -43,6 +43,9 @@ class Mapper extends BaseMapper
         // LTI assessment GUID: an identifier for the future LTI assessment
         $this->uses('lti_assessment_guid', self::TYPE_STRING, self::COLUMN_UUID);
 
+        // Identifier URL: used on the tool's end to identify the line item
+        $this->uses('identifier_url', self::TYPE_STRING);
+
         $this->uses('label', self::TYPE_STRING);
         $this->uses('score_maximum', self::TYPE_DECIMAL);
         $this->uses('resource_id', self::TYPE_STRING);
