@@ -1374,28 +1374,30 @@ input[type="radio"] + .block {
             border: var(--border);
             border-radius: var(--sbx-border-radius-normal);
             border-width: 0.06rem;
-            & .c-card {
-                border-radius: var(--sbx-border-radius-normal);
-            }
+
             & button[data-test^="sp-results-sub-results"] {
-                margin-bottom: 0;
                 background-color: color-mix(in srgb, var(--sbx-color-accent), transparent);
                 color: var(--sbx-color-accent-text);
+                margin-bottom: 0;
             }
         }
+
         & .c-card--border-end {
             border-color: var(--sbx-color-foreground-secondary);
         }
+
         & .c-card--child {
-            border-inline-start-width: 2px;
             background-color: transparent;
+            border-inline-start-width: 2px;
         }
+
         & > [data-test="sp-results-load-more-button"] {
-            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
             background-color: var(--sbx-color-accent);
+            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
             color: var(--sbx-color-accent-text);
         }
     }
+
     & sbx-pop-out {
         border-radius: 50%;
         overflow: hidden;
@@ -1408,15 +1410,16 @@ input[type="radio"] + .block {
 }
 
 .load-more.expand {
-    border-radius: calc(var(--sbx-border-radius-normal) / 3);
+    border-radius: var(--sbx-border-radius-normal);
 }
 
 .activity-feed {
     & .grade {
-        border-radius: calc(var(--sbx-border-radius-normal) / 3);
+        border-radius: var(--sbx-border-radius-normal);
         margin: 8px;
     }
 }
+
 .feed .subheader,
 .feed h1.mini,
 .feed h2.mini,
@@ -1424,51 +1427,70 @@ input[type="radio"] + .block {
 .feed h4.mini,
 .feed h5.mini,
 .feed h6.mini,
-.feed table.rubric th[colspan],
-table.rubric .feed th[colspan],
+.feed label .mini.unit-heading,
 .feed .Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .fc-list-heading-main,
 .Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .feed .fc-list-heading-main,
-.feed label .mini.unit-heading,
+.feed table.rubric th[colspan],
+table.rubric .feed th[colspan],
 label .feed .mini.unit-heading {
     border-top-left-radius: var(--sbx-border-radius-normal);
     border-top-right-radius: var(--sbx-border-radius-normal);
 }
 
 .fc {
-    border-radius: var(--sbx-border-radius-normal);
     border: var(--border);
+    border-radius: var(--sbx-border-radius-normal);
+
     & .fc-button-group {
         display: flex;
         gap: 0.5rem;
+
         & button {
-            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
+            border-radius: var(--sbx-border-radius-normal) !important;
             padding-inline: 1rem;
-            &.fc-quickSwitchButton-button {
-                background-color: transparent !important;
+
+            &.fc-customNext-button,
+            &.fc-customPrev-button {
+                background-color: transparent;
                 border: 1px solid var(--sbx-color-accent);
+                border-radius: var(--sbx-border-radius-normal);
+
                 & a {
                     background-color: transparent !important;
                 }
             }
+
             &.fc-customToday-button {
                 background-color: var(--sbx-color-accent);
                 color: var(--sbx-color-accent-text);
             }
-            &.fc-customPrev-button,
-            &.fc-customNext-button {
-                border-radius: calc(var(--sbx-border-radius-normal) / 3);
+
+            &.fc-quickSwitchButton-button {
+                background-color: transparent !important;
                 border: 1px solid var(--sbx-color-accent);
-                background-color: transparent;
+
                 & a {
                     background-color: transparent !important;
                 }
             }
         }
-    }
-    & .fc-toolbar-title {
-        font-weight: 600;
-    }
-    & .fc-button-group {
+
+        & .fc-button-active {
+            color: var(--sbx-color-text-primary) !important;
+            overflow: visible;
+            position: relative;
+
+            &::before {
+                background-color: var(--sbx-color-accent);
+                bottom: -18px;
+                content: "";
+                height: 2px;
+                left: 0;
+                position: absolute;
+                width: 100%;
+            }
+        }
+
         &
             > .fc-button:where(
                 [title="Filters"],
@@ -1478,38 +1500,27 @@ label .feed .mini.unit-heading {
                 [title="Export"],
                 [title="Week view"]
             ) {
-            border-radius: 0 !important;
             background-color: transparent !important;
+            border-radius: 0 !important;
             color: var(--sbx-color-text-primary);
+
             &:hover {
                 color: var(--sbx-color-text-primary) !important;
             }
         }
-        & .fc-button-active {
-            color: var(--sbx-color-text-primary) !important;
-            position: relative;
-            overflow: visible;
-            &::before {
-                content: "";
-                position: absolute;
-                width: 100%;
-                height: 2px;
-                background-color: var(--sbx-color-accent);
-                bottom: -18px;
-                left: 0;
-            }
-        }
-    }
-    & .fc-daygrid-day-events {
-        margin-inline: 8px;
     }
 
-    & .fc-event {
-        border-radius: calc(var(--sbx-border-radius-normal) / 4);
-    }
     & .fc-daygrid-day-events {
         margin-inline: 0.5rem;
         width: calc(100% - 1rem);
+    }
+
+    & .fc-event {
+        border-radius: var(--sbx-border-radius-normal);
+    }
+
+    & .fc-toolbar-title {
+        font-weight: 600;
     }
 }
 
