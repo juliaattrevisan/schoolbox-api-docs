@@ -55,13 +55,6 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         $scoreModel = $this->setStudentInScoreModel($score, $scoreModel);
         $scoreModel = $this->setLtiAssessmentInScoreModel($scoreModel);
         $this->assertNoMoreRecentPreviousScore($scoreModel);
-
-        // Response/feedback status: determine from grading/activity progress,
-        // and previous score.
-        $scoreModel = $scoreModel
-            ->setIsResponse($scoreModel->determineResponseStatus())
-            ->setIsFeedback($scoreModel->determineFeedbackStatus());
-
         $this->ltiScoreMapper->save($scoreModel);
         return $score;
     }
@@ -92,7 +85,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         $comment = "<p>$comment</p>";
 
         // The easy stuff
-        return $this->ltiScoreMapper->createModel()
+        $scoreModel = $this->ltiScoreMapper->createModel()
             ->setScoreGiven($score->getScoreGiven())
             ->setScoreMaximum($score->getScoreMaximum() ?? $this->ltiAssessment->getLineItemScoreMaximum())
             ->setComment($comment)
@@ -102,6 +95,11 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             ->setGradingProgress($score->getGradingProgressStatus())
             ->setActivityProgress($score->getActivityProgressStatus())
             ->setMarkingUser(null);
+
+        // Response/feedback status: determine from grading/activity progress.
+        return $scoreModel
+            ->setIsResponse($scoreModel->determineResponseStatus())
+            ->setIsFeedback($scoreModel->determineFeedbackStatus());
     }
 
     /**
