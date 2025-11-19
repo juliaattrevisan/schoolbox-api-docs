@@ -43,18 +43,10 @@ class ModelToArray
         $translation = [
             'id' => $log->getId(),
             'sessionId' => $log->getSessionId(),
+            'feature' => $log->getFeature(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $this->userTranslator->__invoke($log->getUser()),
             'data' => $logData,
-            'prompt' => $log->getPrompt(),
-            'inputTokens' => $log->getInputTokens(),
-            'outputTokens' => $log->getOutputTokens(),
-            'model' => $log->getModel(),
-            'endpoint' => $log->getEndpoint(),
-            'feature' => $log->getFeature(),
-            'response' => $log->getResponse(),
-            'returnCode' => $log->getReturnCode(),
-            'errorMessage' => $log->getErrorMessage(),
         ];
 
         return $translation;
