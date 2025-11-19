@@ -26,6 +26,14 @@ use Schoolbox\Url\Uri;
  */
 class Repository implements LineItemRepositoryInterface
 {
+    /**
+     * Constructor
+     *
+     * @param string                   $guid           The GUID for the assessment this line item belongs to.
+     * @param SchoolboxLineItem\Mapper $lineItemMapper Line item mapper, for persisting and fetching line items.
+     * @param Generator                $routeGenerator Route generator: used to create line item identifiers.
+     * @param Matcher                  $routeMatcher   Route matcher: used to parse line item identifiers.
+     */
     public function __construct(
         private string $guid,
         private SchoolboxLineItem\Mapper $lineItemMapper,
@@ -148,6 +156,13 @@ class Repository implements LineItemRepositoryInterface
         // TODO: Implement delete() method.
     }
 
+    /**
+     * Helper function for converting a line item model to the LTI library's
+     * format.
+     *
+     * @param SchoolboxLineItem\Model $lineItemModel
+     * @return LineItemInterface
+     */
     private function convertModelToLineItem(SchoolboxLineItem\Model $lineItemModel): LineItemInterface
     {
         return new LtiLineItem\LineItem(
