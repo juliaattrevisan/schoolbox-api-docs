@@ -388,7 +388,7 @@ class Controller extends BaseController
                 (string)(clone $baseUrl)
                     ->withPath(
                         $this->routeGenerator->generate(
-                            'ltiPlatformLineItem.postLineItemForGuid',
+                            'ltiPlatformLineItemGuid.postLineItemForGuid',
                             ['guid' => $lineItemGuid],
                         ),
                     ),

@@ -16,6 +16,7 @@ use Schoolbox\LTI\Consumer\Module as LtiConsumer;
 use Schoolbox\LTI\Platform\Module as LtiPlatform;
 use Schoolbox\LTI\Platform\Context\Module as LtiPlatformContext;
 use Schoolbox\LTI\Platform\LineItem\Module as LtiPlatformLineItem;
+use Schoolbox\LTI\Platform\LineItem\Guid\Module as LtiPlatformLineItemGuid;
 
 class LTI extends ModuleLoader
 {
@@ -31,5 +32,6 @@ class LTI extends ModuleLoader
         $this->loadModule($di, LtiPlatform::class, "/lti-platform");
         $this->loadModule($di, LtiPlatformContext::class, "/lti-platform/context");
         $this->loadModule($di, LtiPlatformLineItem::class, "/lti-platform/line-item");
+        $this->loadModule($di, LtiPlatformLineItemGuid::class, "/lti-platform/line-item/guid");
     }
 }
