@@ -45,11 +45,17 @@ class Repository implements LineItemRepositoryInterface
     ) {
     }
 
+    /**
+     * Find a single line item.
+     *
+     * @param string $lineItemIdentifier
+     * @return LineItemInterface|null
+     */
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
         $lineItem = $this->lineItemMapper->findByColumnList([
-            'guid'           => $this->guid,
-            'identifier_url' => $lineItemIdentifier,
+            'lti_assessment_guid' => $this->guid,
+            'identifier_url'      => $lineItemIdentifier,
         ])->first();
         if ($lineItem) {
             return $this->convertModelToLineItem($lineItem);
@@ -147,8 +153,8 @@ class Repository implements LineItemRepositoryInterface
     public function delete(string $lineItemIdentifier): void
     {
         $this->lineItemMapper->deleteByColumnList([
-            'guid'           => $this->guid,
-            'identifier_url' => $lineItemIdentifier,
+            'lti_assessment_guid' => $this->guid,
+            'identifier_url'      => $lineItemIdentifier,
         ]);
     }
 
