@@ -105,7 +105,7 @@ class ImageGeneration
                  * Event type 'error' is a special case, it likely won't be accompanied by the usual OpenAI response structure
                  */
                 if ('error' === $eventType) {
-                    $errorMessage = $data['response']['message'] ?? 'An unknown error occurred';
+                    $errorMessage = $data['error']['message'] ?? 'An unknown error occurred';
                     throw new SchoolboxException($errorMessage, 500);
                 }
 
