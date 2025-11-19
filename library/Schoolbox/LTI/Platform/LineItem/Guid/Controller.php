@@ -22,6 +22,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
+use Schoolbox\LTI\LineItem;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
 use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
@@ -85,10 +86,11 @@ class Controller extends BaseController
      * LTI get line items endpoint: gets all line items with the given GUID.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#container-request-filters
      *
-     * @param string $guid
-     *
      * @api   GET /lti-platform/line-item/guid/{guid}
      * @since 25.1
+     *
+     * @param string $guid
+     * @return void
      */
     public function getLineItemsForGuid(string $guid): void
     {
@@ -100,10 +102,11 @@ class Controller extends BaseController
      * GUID.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#creating-a-new-line-item
      *
-     * @param string $guid
-     *
      * @api   POST /lti-platform/line-item/guid/{guid}
      * @since 25.1
+     *
+     * @param string $guid
+     * @return void
      */
     public function postLineItemForGuid(string $guid): void
     {
@@ -114,11 +117,14 @@ class Controller extends BaseController
      * LTI get line item endpoint.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
-     * @param string $guid
-     * @param string $id
+     * @api   GET /lti-platform/line-item/guid/{guid}/{id}
+     * @since 25.1
+     *
+     * @param string         $guid
+     * @param LineItem\Model $lineItem
      * @return void
      */
-    public function getLineItemForGuidAndId(string $guid, string $id): void
+    public function getLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
         throw new NotFound();
     }
@@ -127,11 +133,14 @@ class Controller extends BaseController
      * LTI update line item endpoint.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
-     * @param string $guid
-     * @param string $id
+     * @api   PUT /lti-platform/line-item/guid/{guid}/{id}
+     * @since 25.1
+     *
+     * @param string         $guid
+     * @param LineItem\Model $lineItem
      * @return void
      */
-    public function putLineItemForGuidAndId(string $guid, string $id): void
+    public function putLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
         throw new NotFound();
     }
@@ -140,11 +149,14 @@ class Controller extends BaseController
      * LTI delete line item endpoint.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
-     * @param string $guid
-     * @param string $id
+     * @api   DELETE /lti-platform/line-item/guid/{guid}/{id}
+     * @since 25.1
+     *
+     * @param string         $guid
+     * @param LineItem\Model $lineItem
      * @return void
      */
-    public function deleteLineItemForGuidAndId(string $guid, string $id): void
+    public function deleteLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
         throw new NotFound();
     }
@@ -154,12 +166,13 @@ class Controller extends BaseController
      * the given GUID.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#score-publish-service
      *
-     * @param string $guid
-     *
-     * @api   POST /lti-platform/line-item/guid/{guid}/scores
+     * @api   POST /lti-platform/line-item/guid/{guid}/{id}/scores
      * @since 25.1
+     *
+     * @param string         $guid
+     * @param LineItem\Model $lineItem
      */
-    public function postScorePublishForGuid(string $guid): void
+    public function postScorePublishForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
         throw new NotFound();
     }

@@ -11,13 +11,14 @@ namespace Schoolbox\LTI\Platform\LineItem\Guid;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
-use Schoolbox\LTI\Assessment\Score\Mapper as LtiAssessmentScoreMapper;
+use Schoolbox\LTI\Assessment;
+use Schoolbox\LTI\LineItem;
 
 /**
- * LTI Platform sub-module for line items.
+ * LTI Platform sub-module for line items identified by a GUID.
  *
- * The standard line item for LTI assessments is the assessment itself.
+ * For line items identified by a GUID: that GUID corresponds to a row in
+ * `lti_line_item`.
  */
 class Module extends BaseModule
 {
@@ -31,23 +32,63 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+        // Line items container routes
         $this->register(
             self::METHOD_GET,
             '/{guid}',
             'getLineItemsForGuid',
         );
-
         $this->register(
             self::METHOD_POST,
             '/{guid}',
             'postLineItemForGuid',
         );
 
+        // Line item routes
+        $this->register(
+            self::METHOD_GET,
+            '/{guid}/{id}',
+            'getLineItemForGuidAndLineItem',
+            null,
+            $this->preloadLineItem(...),
+        );
+        $this->register(
+            self::METHOD_PUT,
+            '/{guid}/{id}',
+            'putLineItemForGuidAndLineItem',
+            null,
+            $this->preloadLineItem(...),
+        );
+        $this->register(
+            self::METHOD_DELETE,
+            '/{guid}/{id}',
+            'deleteLineItemForGuidAndLineItem',
+            null,
+            $this->preloadLineItem(...),
+        );
+
+        // Score publish route
         $this->register(
             self::METHOD_POST,
-            '/{guid}/scores',
-            'postScorePublishForGuid',
+            '/{guid}/{id}/scores',
+            'postScorePublishForGuidAndLineItem',
+            null,
+            $this->preloadLineItem(...),
         );
+    }
+
+    /**
+     * Preload the line item for the given ID.
+     *
+     * @param array $params
+     * @return array
+     */
+    private function preloadLineItem(array $params): array
+    {
+        $lineItemMapper = $this->getMapperFactory()->get(LineItem\Mapper::class);
+        return [
+            'lineItem' => $lineItemMapper->findById($params['id']),
+        ];
     }
 
     /**
