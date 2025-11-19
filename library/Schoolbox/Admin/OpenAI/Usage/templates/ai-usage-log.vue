@@ -232,10 +232,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 
     <div class="row">
-        <div
-            class="small-12 columns l-mar-m--bottom"
-            :class="{ 'medium-6': selectedSessionId !== null || sessionLoadError !== null, island: isLoading }"
-        >
+        <div class="small-12 medium-6 columns l-mar-m--bottom" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -244,33 +241,20 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 <div class="loader"></div>
             </section>
 
-            <div v-else-if="usageSessions.length > 0" class="scrollable">
+            <div v-else-if="usageSessions.length > 0">
                 <table>
                     <thead>
                         <tr>
-                            <th></th>
                             <th>Date</th>
                             <th>Feature</th>
                             <th>User</th>
-                            <th>&nbsp;</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <tr v-for="session in usageSessions" :key="session.id">
-                            <td>
-                                <div v-if="session.sessionId" class="selector">
-                                    <input
-                                        :id="`chk-${session.id}`"
-                                        type="radio"
-                                        name="ai-usage-session"
-                                        :checked="session.id.toString() === selectedSessionId?.toString() || undefined"
-                                        :disabled="!session._routes.getLog || undefined"
-                                        @change="() => openSessionDetails(session)"
-                                    />
-                                    <label :for="`chk-${session.id}`" class="radio-label no-margin"></label>
-                                </div>
-                            </td>
                             <td>
                                 {{ formatSessionDate(session) }}
                             </td>
@@ -286,8 +270,16 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td v-if="200 !== session.returnCode">Error</td>
-                            <td v-else>&nbsp;</td>
+                            <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
+                            <td class="actions-small-1">
+                                <nav v-if="session.sessionId && session._routes.getLog">
+                                    <a
+                                        class="icon-eye"
+                                        :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"
+                                        @click="() => openSessionDetails(session)"
+                                    ></a>
+                                </nav>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -299,11 +291,11 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 @page-change="changePage"
             />
         </div>
-        <div v-if="selectedSessionId !== null || sessionLoadError !== null" class="small-12 medium-6 island">
+        <div class="small-12 medium-6 island">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else>
+            <section v-else-if="selectedSessionId !== null || sessionLoadError !== null">
                 <div v-if="selectedSessionInfo === null" class="loader"></div>
                 <template v-else>
                     <div class="card small-12">
