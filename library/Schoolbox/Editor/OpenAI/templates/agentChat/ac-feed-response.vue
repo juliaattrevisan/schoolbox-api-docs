@@ -19,7 +19,12 @@ const radioId = window.Vue.computed(() => {
 });
 
 const imageSrc = window.Vue.computed(() => {
-    if ("image" in props.message && props.message.image) {
+    if ("image" in props.message && props.message.image !== null) {
+        if (props.message.image === false) {
+            /** an image was generated, but this is a restored AI log where it was omitted */
+            return false;
+        }
+
         return `data:${props.message.image.mime};base64,${props.message.image.b64}`;
     }
     return null;
@@ -66,7 +71,10 @@ const imageSrc = window.Vue.computed(() => {
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
-            <p class="l-mar--0-bottom ac-feed-message-content" :class="{ 'l-mar-s--top': imageSrc }">
+            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar--0">
+                <i class="icon-image"></i>
+            </div>
+            <p class="l-mar--0-bottom ac-feed-message-content" :class="{ 'l-mar-s--top': imageSrc !== null }">
                 {{ props.message.message }}
             </p>
         </div>
@@ -81,6 +89,11 @@ const imageSrc = window.Vue.computed(() => {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    .ac-img-omitted {
+        max-width: 200px;
+        width: 100%;
     }
 
     &.ac-feed-response-success img {
