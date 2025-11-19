@@ -337,6 +337,12 @@ class Module extends BaseModule
                     $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
                     $student = $userMapper->findWithSubjects($params['studentId']);
+
+                    // Only students can have pastoral records
+                    if (!$student->getRole()->isStudent()) {
+                        throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    }
+
                     $this->getRelationshipHydrator()->loadTeachers([$student]);
                     $this->getRelationshipHydrator()->loadParents([$student]);
 
