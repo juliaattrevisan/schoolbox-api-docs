@@ -12,6 +12,7 @@ namespace Schoolbox\LTI\Platform\LineItem\Guid;
 
 use Alaress\Web\Controller\Base as BaseController;
 use League\OAuth2\Server\ResourceServer;
+use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -94,6 +95,7 @@ class Controller extends BaseController
      */
     public function getLineItemsForGuid(string $guid): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#list-line-items-service-endpoint
         throw new NotFound();
     }
 
@@ -110,6 +112,7 @@ class Controller extends BaseController
      */
     public function postLineItemForGuid(string $guid): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#create-line-item-service-endpoint
         throw new NotFound();
     }
 
@@ -126,6 +129,7 @@ class Controller extends BaseController
      */
     public function getLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
         throw new NotFound();
     }
 
@@ -142,6 +146,7 @@ class Controller extends BaseController
      */
     public function putLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
         throw new NotFound();
     }
 
@@ -158,6 +163,7 @@ class Controller extends BaseController
      */
     public function deleteLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#delete-line-item-service-endpoint
         throw new NotFound();
     }
 
@@ -174,6 +180,7 @@ class Controller extends BaseController
      */
     public function postScorePublishForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/score/platform.md
         throw new NotFound();
     }
 }

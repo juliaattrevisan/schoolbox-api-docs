@@ -11,7 +11,6 @@ namespace Schoolbox\LTI\Platform\LineItem\Guid;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\LTI\Assessment;
 use Schoolbox\LTI\LineItem;
 
 /**
