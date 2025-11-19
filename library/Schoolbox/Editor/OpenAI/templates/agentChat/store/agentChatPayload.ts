@@ -55,6 +55,7 @@ type AgentChatApiResponseCompleted = {
     image: AgentChatImage | null;
 };
 
+/** @see /library/Schoolbox/OpenAi/Agent/ImageGeneration.php */
 type AgentChatApiMessageEvent =
     | SseMessageEvent<AgentChatMessageEventType.CREATED, { responseId: string }>
     | SseMessageEvent<AgentChatMessageEventType.PARTIAL_IMAGE, { responseId: string; image: AgentChatImage }>

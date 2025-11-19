@@ -29,6 +29,16 @@ use UnexpectedValueException;
 class ImageGeneration
 {
     /**
+     * The following AgentChatMessageEventType events indicate the end of a response
+     * and when we should finalise the log and stop sending more messages to the frontend.
+     */
+    private const array AGENT_CHAT_EVENT_TYPES_FINISHED = [
+        AgentChatMessageEventType::COMPLETE->value,
+        AgentChatMessageEventType::ERROR->value,
+    ];
+
+
+    /**
      * Constructor
      *
      * @param IClient $client An AI provider client: needs to point to the Responses endpoint of the client
@@ -70,7 +80,7 @@ class ImageGeneration
 
         // TODO: what happens to random errors thrown from within here? do they end up as ApiProblem's correctly?
         // TODO: Hmm.. I swear I had issues always using large chunks with it being slow for deltas
-        $stream = $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
+        $stream = $this->client->createResponseStream($payload, $log, 8192);
 
         /**
          * The response ID associated to the OpenAI request once we receive it.
@@ -108,19 +118,31 @@ class ImageGeneration
             /**
              * on a COMPLETE or ERROR event, there's nothing more to meaningfully continue with.
              * We should stop processing now to avoid further random messages being sent to the frontend
+             *
+             * This is also where the final output text can be extracted for restoring the conversation later
              */
-            if (
-                \in_array($message->eventType, [
-                    AgentChatMessageEventType::COMPLETE->value,
-                    AgentChatMessageEventType::ERROR->value
-                ], true)
-            ) {
-                break;
+            if (\in_array($message->eventType, self::AGENT_CHAT_EVENT_TYPES_FINISHED, true)) {
+                /**
+                 * This indicates the final output for the response, it can be restored later in this exact format
+                 * WARNING: If you were to change this structure, old conversations may not restore correctly unless migrated
+                 * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
+                 */
+                $event = [
+                    'eventName' => $message->eventType,
+                    'data' => $message->getDataAsArray(),
+                ];
+
+                $log->setOutputText(json_encode($event, JSON_THROW_ON_ERROR));
+
+                // TODO: This basically overrides whatever ResponseMessage::logCompletion thought the final status was, we are a lot more informed here than over there...
+                // perhaps this needs to be revised to set those states properly?
+                return;
             }
         }
+
+        /** Reached the end of the stream without receiving a final event, something went wrong... */
+        // TODO: What to do in this scenario? either just leave it and the frontend will detect an early end already, or send a specific error message?
     }
-
-
 
 
     /**
@@ -330,40 +352,6 @@ class ImageGeneration
         );
     }
 
-    /**
-     * Callback method for message stream.
-     *
-     * If this message is a finished response, then extract the output text out
-     * of it and add it to the log.
-     *
-     * @param Message   $message
-     * @param Log\Model $log
-     * @return void
-     */
-    private function listenForOutputText(Message $message, Log\Model $log): void
-    {
-        // TODO: this is way too early in the chain to be doing the right thing yet...
-        if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
-            $outputTextParts = [];
-            try {
-                $decodedMessage = $message->getDataAsArray();
-            } catch (UnexpectedValueException) {
-                // Not valid data: nothing can be done.
-                // Could always inspect the full stream data to figure it out?
-            }
-            foreach (($decodedMessage['response']['output']) ?? [] as $output) {
-                foreach (($output['content'] ?? []) as $content) {
-                    if ($content['type'] === 'output_text' && isset($content['text'])) {
-                        $outputTextParts[] = $content['text'];
-                    }
-                }
-            }
-            $outputText = !empty($outputTextParts)
-                ? implode("\n\n", $outputTextParts)
-                : null;
-            $log->setOutputText($outputText);
-        }
-    }
 
     /**
      * Translate a base64 image into an array expected by the frontend for agent chat messages
