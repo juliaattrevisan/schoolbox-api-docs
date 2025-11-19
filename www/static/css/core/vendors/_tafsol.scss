@@ -1702,36 +1702,44 @@ label .feed .mini.unit-heading {
     }
 }
 
+// Account content styles
 #account-content {
     border-radius: var(--sbx-border-radius-normal);
+
     & .separator {
-        color: var(--sbx-color-accent);
         background-color: #eee !important;
         border-bottom: var(--border);
+        color: var(--sbx-color-accent);
         font-weight: 600;
     }
+
     & [class^="icon"] {
         color: var(--sbx-color-text-primary);
-        font-weight: 500;
         font-size: 14px;
+        font-weight: 500;
         line-height: 1.2;
+
         li:has(&) {
             border-bottom: var(--border) !important;
             padding-block: 0.4rem;
         }
     }
+
     & li.user {
+        border-bottom: var(--border);
         padding-block: 0.8rem;
         padding-inline: 0.8rem;
-        border-bottom: var(--border);
+
+        & img {
+            border-radius: var(--sbx-border-radius-normal);
+        }
+
         & p {
             color: var(--sbx-color-text-primary);
+
             &:not(.meta) {
                 font-weight: 800;
             }
-        }
-        & img {
-            border-radius: var(--sbx-border-radius-normal);
         }
     }
 }
@@ -1739,56 +1747,44 @@ label .feed .mini.unit-heading {
 #createForm,
 #assessmentForm,
 #formPastoral {
-    &#formPastoral {
-        padding-inline: 0;
-        & .tabs {
-            padding-inline: 1rem;
-        }
-        & .subheader {
-            padding-inline: 1rem;
-        }
-        & .buttons {
-            padding-inline: 1rem;
-        }
-        & #visibility-section {
-            padding-inline: 1rem;
-            & .icon-delete {
-                &::before {
-                    padding-right: 0;
-                }
-            }
-        }
-    }
     border: 1px solid #dbe3ea;
     border-radius: var(--sbx-border-radius-normal);
     box-shadow: var(--sbx-shadow-m);
+
     & section {
         background-color: transparent;
     }
+
     & .content {
         border-width: 1px;
     }
+
     & .selectize-control:has(+ button) {
         & .selectize-input {
-            border-top-right-radius: 0;
             border-bottom-right-radius: 0;
+            border-top-right-radius: 0;
         }
+
         & + button {
-            border-top-left-radius: 0 !important;
             border-bottom-left-radius: 0 !important;
+            border-top-left-radius: 0 !important;
             margin-bottom: 0;
         }
     }
+
     & #create-form-actions {
         padding: 1rem;
+
         & .buttons {
             gap: 1rem;
+
             & button {
                 &[id$="preview"] {
                     background-color: transparent;
-                    color: var(--sbx-color-accent) !important;
                     border: 2px solid var(--sbx-color-accent);
+                    color: var(--sbx-color-accent) !important;
                 }
+
                 &[id$="submit"] {
                     background-color: var(--sbx-color-accent);
                     border: 2px solid var(--sbx-color-accent);
@@ -1796,108 +1792,157 @@ label .feed .mini.unit-heading {
             }
         }
     }
+
+    &#formPastoral {
+        padding-inline: 0;
+
+        & .buttons {
+            padding-inline: 1rem;
+        }
+
+        & .subheader {
+            padding-inline: 1rem;
+        }
+
+        & .tabs {
+            padding-inline: 1rem;
+        }
+
+        & #visibility-section {
+            padding-inline: 1rem;
+
+            & .icon-delete {
+                &::before {
+                    padding-right: 0;
+                }
+            }
+        }
+    }
 }
 
 .reveal-modal.no-pad {
-    .tabs {
-        padding-inline: 1.5rem;
-    }
     .button-block {
         border: 0;
+
         & i {
             color: var(--sbx-color-accent);
         }
+
         &:not(i) {
             color: var(--sbx-color-text-primary);
             font-weight: 600;
         }
     }
+
+    .tabs {
+        padding-inline: 1.5rem;
+    }
+
     & .checklist-container {
         margin-bottom: 1rem;
     }
 }
 
 .row:has(> #filter_panel) {
+    background-color: #fff;
+    border: var(--border);
     border-top-left-radius: var(--sbx-border-radius-normal);
     border-top-right-radius: var(--sbx-border-radius-normal);
-    border: var(--border);
     box-shadow: var(--sbx-shadow-m);
-    background-color: #fff;
+
     & #filter_panel {
         padding-inline: 0;
-        & section {
-            display: flex;
-            flex-direction: column;
-            background-color: transparent;
-            & div:first-child {
-                order: 2;
-            }
-            & div:last-child {
-                order: 1;
-            }
-            & .no-pad {
-                padding: 1rem !important;
-                border-bottom: var(--border);
-                border-top-left-radius: var(--sbx-border-radius-normal);
-                border-top-right-radius: var(--sbx-border-radius-normal);
-            }
-            & .filter-component {
-                border: 0 !important;
-            }
-            & .filter-dropdown.flex-list {
-                gap: 1rem;
-            }
-        }
-        & .filter-interaction {
-            padding-bottom: 1.5rem;
-            border: 0 !important;
-        }
+
         & .applied-filter-tab {
             & .label {
                 margin-bottom: 0.5rem;
             }
+
             & .label,
             & .selected-item {
                 padding-block: 1rem !important;
             }
+
             & .selected-item {
                 background-color: #f7fafc;
                 border-radius: calc(var(--sbx-border-radius-normal) / 2);
+
                 &:not(:last-child) {
                     margin-bottom: 0.5rem;
                 }
             }
         }
+
+        & .filter-interaction {
+            border: 0 !important;
+            padding-bottom: 1.5rem;
+        }
+
+        & .filter-dropdown.flex-list {
+            gap: 1rem;
+        }
+
+        & .filter-component {
+            border: 0 !important;
+        }
+
         & .label.filter .close,
         & .filter.fillgap .close {
             top: 50%;
             transform: translateY(-50%);
         }
+
+        & section {
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+
+            & div:first-child {
+                order: 2;
+            }
+
+            & div:last-child {
+                order: 1;
+            }
+
+            & .no-pad {
+                border-bottom: var(--border);
+                border-top-left-radius: var(--sbx-border-radius-normal);
+                border-top-right-radius: var(--sbx-border-radius-normal);
+                padding: 1rem !important;
+            }
+        }
     }
+
     & + #report_content {
         border: var(--border);
-        border-top: 0;
         border-bottom-left-radius: var(--sbx-border-radius-normal);
         border-bottom-right-radius: var(--sbx-border-radius-normal);
+        border-top: 0;
         padding-inline: 0;
-        & .island {
-            padding-inline: 0;
-        }
-        & .subheader {
-            padding-inline: 1rem;
-        }
-        & section[data-assessment]:not(:last-child) {
-            border-bottom: var(--border);
-        }
+
         & .information-list {
             & li:not(:last-child) {
                 margin-bottom: 0.5rem;
             }
+
             & .button[data-assessment-due-at-unix] {
                 background-color: transparent !important;
-                color: var(--sbx-color-accent) !important;
                 border: 1px solid var(--sbx-color-accent);
+                color: var(--sbx-color-accent) !important;
             }
+        }
+
+        & .island {
+            padding-inline: 0;
+        }
+
+        & .subheader {
+            padding-inline: 1rem;
+        }
+
+        & section[data-assessment]:not(:last-child) {
+            border-bottom: var(--border);
         }
     }
 }
@@ -1993,11 +2038,6 @@ a.source-select.icon-folder.placeholder {
 .modal__container.modal__container--m {
     border-radius: 0.6rem;
 }
-
-/*section.main {
-    background-color: white;
-}
-    */ //Removed the white background from main section to allow for design system bg color to show through
 
 section.banner.content img {
     border-radius: 0.6rem;
@@ -2161,6 +2201,9 @@ body {
     }
 }
 
+section.main {
+    background-color: white;
+} //Removed the white background from main section to allow for design system bg color to show through
 
 **
 */
