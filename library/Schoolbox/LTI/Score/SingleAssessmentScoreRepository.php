@@ -51,6 +51,54 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
      */
     public function save(ScoreInterface $score): ScoreInterface
     {
+        $scoreModel = $this->createScoreModel($score);
+        $scoreModel = $this->setStudentInScoreModel($score, $scoreModel);
+        $scoreModel = $this->setLtiAssessmentInScoreModel($scoreModel);
+
+        // Find the most recent previous score
+        /** @var LtiScoreModel|null $previousLtiScore */
+        $previousLtiScore = $this->ltiScoreMapper->findByColumnList(
+            [
+                'lti_assessment_id' => $this->ltiAssessment->getId(),
+                'student_id'        => $scoreModel->getStudent()->getId(),
+            ],
+            [
+                'order' => ['submitted_at' => 'desc'],
+                'limit' => 1,
+            ]
+        )->first();
+
+        // Don't save anything if the most recent previous score is more
+        // recent than, or the same time as, the current score.
+        if ($previousLtiScore && $previousLtiScore->getSubmittedAt()->gte($scoreModel->getSubmittedAt())) {
+            throw new OutOfBoundsException(
+                sprintf(
+                    'User id "%s" has a more recent score for assessment #%d',
+                    $scoreModel->getStudent()->getId(),
+                    $this->ltiAssessment->getId(),
+                )
+            );
+        }
+
+        // Response/feedback status: determine from grading/activity progress,
+        // and previous score.
+        $scoreModel = $scoreModel
+            ->setIsResponse($scoreModel->determineResponseStatus())
+            ->setIsFeedback($scoreModel->determineFeedbackStatus());
+
+        $this->ltiScoreMapper->save($scoreModel);
+        return $score;
+    }
+
+    /**
+     * Create a new score model from the LTI library's score object.
+     *
+     * @param ScoreInterface $score The LTI library's score object.
+     * @return LtiScoreModel
+     * @throws MapperException
+     */
+    private function createScoreModel(ScoreInterface $score): LtiScoreModel
+    {
         /* Assuming LTI comments always get sent to us in plaintext, now that we render it
          * as rich text, convert this comment to HTML as if it were typed in a rich text editor...
          *
@@ -68,7 +116,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         $comment = "<p>$comment</p>";
 
         // The easy stuff
-        $scoreModel = $this->ltiScoreMapper->createModel()
+        return $this->ltiScoreMapper->createModel()
             ->setScoreGiven($score->getScoreGiven())
             ->setScoreMaximum($score->getScoreMaximum() ?? $this->ltiAssessment->getLineItemScoreMaximum())
             ->setComment($comment)
@@ -78,52 +126,6 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             ->setGradingProgress($score->getGradingProgressStatus())
             ->setActivityProgress($score->getActivityProgressStatus())
             ->setMarkingUser(null);
-        $scoreModel = $this->setStudentInScoreModel($score, $scoreModel);
-        $student    = $scoreModel->getStudent();
-
-        // Assessment: load from mapper
-        try {
-            $ltiAssessmentDataModel = $this->ltiAssessmentMapper->findOneByColumn('assessment_id', $this->ltiAssessment->getId());
-        } catch (MapperException $e) {
-            throw new OutOfBoundsException(
-                sprintf('Assessment with ID #%d could not be found', $this->ltiAssessment->getId())
-            );
-        }
-        $scoreModel = $scoreModel->setLtiAssessment($ltiAssessmentDataModel);
-
-        // Find the most recent previous score
-        /** @var LtiScoreModel|null $previousLtiScore */
-        $previousLtiScore = $this->ltiScoreMapper->findByColumnList(
-            [
-                'lti_assessment_id' => $ltiAssessmentDataModel->getId(),
-                'student_id'        => $student->getId(),
-            ],
-            [
-                'order' => ['submitted_at' => 'desc'],
-                'limit' => 1,
-            ]
-        )->first();
-
-        // Don't save anything if the most recent previous score is more
-        // recent than, or the same time as, the current score.
-        if ($previousLtiScore && $previousLtiScore->getSubmittedAt()->gte($scoreModel->getSubmittedAt())) {
-            throw new OutOfBoundsException(
-                sprintf(
-                    'User id "%s" has a more recent score for assessment #%d',
-                    $student->getId(),
-                    $this->ltiAssessment->getId(),
-                )
-            );
-        }
-
-        // Response/feedback status: determine from grading/activity progress,
-        // and previous score.
-        $scoreModel = $scoreModel
-            ->setIsResponse($scoreModel->determineResponseStatus())
-            ->setIsFeedback($scoreModel->determineFeedbackStatus());
-
-        $this->ltiScoreMapper->save($scoreModel);
-        return $score;
     }
 
     /**
@@ -167,5 +169,27 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             );
         }
         return $scoreModel->setStudent($student);
+    }
+
+    /**
+     * Set the LTI assessment into Schoolbox's score model.
+     *
+     * @param LtiScoreModel $scoreModel The Schoolbox score model.
+     * @return LtiScoreModel
+     * @return LtiScoreModel
+     */
+    private function setLtiAssessmentInScoreModel(LtiScoreModel $scoreModel): LtiScoreModel
+    {
+        // Assessment: load from mapper
+        try {
+            $ltiAssessmentDataModel = $this->ltiAssessmentMapper->findOneByColumn('assessment_id', $this->ltiAssessment->getId());
+        } catch (MapperException $e) {
+            throw new OutOfBoundsException(
+                sprintf('Assessment with ID #%d could not be found', $this->ltiAssessment->getId()),
+                0,
+                $e,
+            );
+        }
+        return $scoreModel->setLtiAssessment($ltiAssessmentDataModel);
     }
 }
