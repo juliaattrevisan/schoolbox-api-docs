@@ -1,11 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..700;1,300..700&display=swap");
 
+/* ==========================================================================
+   1. Foundation & Global Tokens
+   ========================================================================== */
+
 /* Tafsol Custom Styles - Updated to use Schoolbox Design System Variables */
 
 :root {
     --card-bg: #ffffff; // white card background
     --ff-primary: "Figtree", sans-serif;
 }
+
 body {
     // Override body background to use lighter shade of accent color
     background: var(--body-background);
@@ -33,6 +38,10 @@ body {
         font-family: var(--ff-primary) !important;
     }
 }
+
+/* ==========================================================================
+   2. Header & Global Navigation
+   ========================================================================== */
 
 #hybrid-bar {
     margin: 1rem;
@@ -96,21 +105,27 @@ body {
     }
 }
 
-#profile-drop {
-    background-color: var(--card-bg);
-    border-radius: var(--sbx-border-radius-normal);
-    height: 3rem;
-    margin-inline-end: 1rem;
-    overflow: hidden;
-    padding: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3rem;
+#side-menu,
+#side-menu-mygroups,
+#side-menu-mysubjects,
+#side-menu-mylinks {
+    & h3 {
+        border-bottom: 1px solid var(--sbx-color-foreground-secondary);
+        color: var(--sbx-color-accent) !important;
+        padding-inline: 0.5rem;
 
-    & img {
-        border-radius: var(--sbx-border-radius-normal);
+        & a {
+            color: var(--sbx-color-accent) !important;
+            border-radius: 0px !important;
+            background-color: transparent !important;
+            padding-inline: 0.5rem;
+        }
     }
 }
+
+/* ==========================================================================
+   3. Global Component Containers & Cards
+   ========================================================================== */
 
 // Component Container Styles
 #component-layout .component-container {
@@ -182,6 +197,31 @@ body {
     margin-inline-start: 0.5rem;
     width: 2rem;
 }
+
+.card {
+    & .card-feature-image img {
+        aspect-ratio: 16/12;
+        border-radius: var(--sbx-border-radius-normal);
+        object-fit: cover;
+    }
+
+    & img {
+        border-radius: calc(var(--sbx-border-radius-normal) / 2);
+    }
+}
+
+.card.compact.small-12 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.list-item:has(.card) + nav {
+    padding-top: 0.3rem;
+}
+
+/* ==========================================================================
+   4. Icons & Action Icons
+   ========================================================================== */
 
 [content-id="tab-control"] {
     transform: translateY(5px);
@@ -316,6 +356,10 @@ span:has(~ .gradient-0) {
     width: fit-content;
 }
 
+/* ==========================================================================
+   5. Tab Controls & Three-dot Menu
+   ========================================================================== */
+
 // The class home page Three dot Menu styles
 #tab-control {
     background-color: var(--card-bg);
@@ -350,6 +394,75 @@ span:has(~ .gradient-0) {
         }
     }
 }
+
+// Tabs styles
+.tabs {
+    background-color: var(--card-bg);
+    border-bottom: var(--border);
+    display: flex;
+    overflow-x: auto;
+    overflow-y: clip;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    & .active a {
+        border-bottom-width: 3px !important;
+        border-color: var(--sbx-color-accent);
+        font-weight: 600;
+    }
+
+    & a {
+        white-space: nowrap;
+
+        .active &:not([data-test^="homepage-component-palette-tab"]) {
+            border-bottom: 3px solid var(--sbx-color-accent) !important;
+        }
+    }
+}
+
+.tabs.vertical {
+    flex-direction: column;
+
+    & .tab-title:first-child {
+        & a {
+            border-top-left-radius: var(--sbx-border-radius-normal);
+        }
+    }
+}
+
+/* Tabs component styles */
+.component-tabs {
+    & .tabs {
+        border: var(--border);
+        border-bottom: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-radius: var(--sbx-border-radius-normal);
+    }
+
+    & .tabs-content {
+        border: var(--border);
+        border-radius: var(--sbx-border-radius-normal);
+        border-top: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+
+        & > .content li {
+            box-shadow: none !important;
+
+            & [data-component-palette] {
+                border-radius: var(--sbx-border-radius-normal);
+                padding: 1rem 2rem;
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   6. Empty States, Lists & Content Cards
+   ========================================================================== */
 
 .empty-state {
     background-color: #fff; // white background for empty state
@@ -450,26 +563,9 @@ span:has(~ .gradient-0) {
     }
 }
 
-.card {
-    & .card-feature-image img {
-        aspect-ratio: 16/12;
-        border-radius: var(--sbx-border-radius-normal);
-        object-fit: cover;
-    }
-
-    & img {
-        border-radius: calc(var(--sbx-border-radius-normal) / 2);
-    }
-}
-
-.card.compact.small-12 {
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.list-item:has(.card) + nav {
-    padding-top: 0.3rem;
-}
+/* ==========================================================================
+   7. Article / Discussion / Feed Styles
+   ========================================================================== */
 
 article:has(img) a > img, // Adjust image styles within articles
 article:has(img) p > img {
@@ -513,6 +609,35 @@ article:has(img) p > img {
         }
     }
 }
+
+.activity-feed {
+    & .grade {
+        border-radius: var(--sbx-border-radius-normal);
+        margin: 8px;
+    }
+}
+
+// Feed styles
+.feed .subheader,
+.feed h1.mini,
+.feed h2.mini,
+.feed h3.mini,
+.feed h4.mini,
+.feed h5.mini,
+.feed h6.mini,
+.feed label .mini.unit-heading,
+.feed .Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .fc-list-heading-main,
+.Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .feed .fc-list-heading-main,
+.feed table.rubric th[colspan],
+table.rubric .feed th[colspan],
+label .feed .mini.unit-heading {
+    border-top-left-radius: var(--sbx-border-radius-normal);
+    border-top-right-radius: var(--sbx-border-radius-normal);
+}
+
+/* ==========================================================================
+   8. Off-canvas Menus & Message List
+   ========================================================================== */
 
 // Left menu styles when left menu is not open
 .off-canvas-wrap.move-right :not(.left-open) {
@@ -566,24 +691,108 @@ article:has(img) p > img {
     color: var(--sbx-color-text-primary) !important;
 }
 
-// Side menu headings styles
-#side-menu,
-#side-menu-mygroups,
-#side-menu-mysubjects,
-#side-menu-mylinks {
-    & h3 {
-        border-bottom: 1px solid var(--sbx-color-foreground-secondary);
-        color: var(--sbx-color-accent) !important;
-        padding-inline: 0.5rem;
+// Message list styles
+#message-list {
+    & #notification-toggle-full {
+        background-color: transparent;
+        color: var(--sbx-color-accent);
+    }
 
-        & a {
-            color: var(--sbx-color-accent) !important;
-            border-radius: 0px !important;
-            background-color: transparent !important;
-            padding-inline: 0.5rem;
+    & li:has(:is(#msg-bar, section, .button)) {
+        padding-inline: 0.6rem;
+    }
+
+    & li:has(section) {
+        padding-block: 1rem 0.6rem;
+    }
+
+    & :where(#right-menu-dock, #notification-toggle-full, .icon-settings) {
+        color: var(--sbx-color-accent);
+    }
+}
+
+/* ==========================================================================
+   9. Side Navigation & Account Panel
+   ========================================================================== */
+
+.side-nav {
+    border: var(--border);
+    border-radius: var(--sbx-border-radius-normal);
+    overflow: hidden;
+
+    & li {
+        &.active > a {
+            border-left-width: 4px;
+        }
+
+        &.active
+            > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
+                button.submit
+            ):not(.show-ckeditor-button) {
+            color: var(--sbx-color-text-primary);
+            font-weight: 600;
+        }
+
+        &
+            > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
+                button.submit
+            ):not(.show-ckeditor-button) {
+            color: var(--sbx-color-text-primary);
+            font-family: var(--ff-primary);
+            padding-block: 1rem;
+        }
+    }
+
+    & li:not(:last-child) {
+        border-bottom: var(--border);
+    }
+}
+
+// Account content styles
+#account-content {
+    border-radius: var(--sbx-border-radius-normal);
+
+    & .separator {
+        background-color: #eee !important;
+        border-bottom: var(--border);
+        color: var(--sbx-color-accent);
+        font-weight: 600;
+    }
+
+    & [class^="icon"] {
+        color: var(--sbx-color-text-primary);
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.2;
+
+        li:has(&) {
+            border-bottom: var(--border) !important;
+            padding-block: 0.4rem;
+        }
+    }
+
+    & li.user {
+        border-bottom: var(--border);
+        padding-block: 0.8rem;
+        padding-inline: 0.8rem;
+
+        & img {
+            border-radius: var(--sbx-border-radius-normal);
+        }
+
+        & p {
+            color: var(--sbx-color-text-primary);
+
+            &:not(.meta) {
+                font-weight: 800;
+            }
         }
     }
 }
+
+/* ==========================================================================
+   10. Dashboard Components (Timetable, News, Slideshow, Recent Submissions, Child Subject, Paperly, Calendar)
+   ========================================================================== */
 
 // Timetable component styles
 .Component_Dashboard_TimetableController {
@@ -648,218 +857,6 @@ article:has(img) p > img {
     border-radius: var(--sbx-border-radius-normal);
     box-shadow: var(--sbx-shadow-m);
     overflow: hidden;
-}
-
-// Tabs styles
-.tabs {
-    background-color: var(--card-bg);
-    border-bottom: var(--border);
-    display: flex;
-    overflow-x: auto;
-    overflow-y: clip;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    & .active a {
-        border-bottom-width: 3px !important;
-        border-color: var(--sbx-color-accent);
-        font-weight: 600;
-    }
-
-    & a {
-        white-space: nowrap;
-
-        .active &:not([data-test^="homepage-component-palette-tab"]) {
-            border-bottom: 3px solid var(--sbx-color-accent) !important;
-        }
-    }
-}
-
-.tabs.vertical {
-    flex-direction: column;
-
-    & .tab-title:first-child {
-        & a {
-            border-top-left-radius: var(--sbx-border-radius-normal);
-        }
-    }
-}
-
-// Attachment browser styles
-.attachment-browser-panel-container {
-    & .ab-pane {
-        padding-bottom: 4.5rem !important;
-    }
-}
-
-// Island styles
-.island {
-    & .subheader {
-        color: var(--sbx-color-text-primary);
-        font-size: 1.5rem;
-        font-weight: 600;
-        text-transform: capitalize;
-    }
-
-    &:has(.profile-tabs.tabs-content) {
-        background-color: #fff;
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        margin-inline: 16px;
-        width: calc(100% - 32px);
-
-        & dl {
-            margin-inline: -16px;
-            width: calc(100% + 32px);
-        }
-
-        & .feed.filter-container:nth-of-type(1) {
-            & .activity-feed {
-                border-bottom: 0;
-                max-width: 100%;
-
-                & .profile-learning-actions {
-                    & > div {
-                        gap: 1rem;
-                        margin-top: 1rem;
-                        max-width: 100%;
-
-                        & a {
-                            background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 95%);
-                            border-radius: var(--sbx-border-radius-normal);
-                            padding-block: 2rem;
-
-                            &:hover {
-                                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 0%);
-                            }
-                        }
-                    }
-                }
-            }
-
-            & .feed-column.left,
-            & .feed-column.right {
-                display: none;
-            }
-        }
-    }
-}
-
-.island > .no-pad {
-    & > .profile {
-        background-color: #fff;
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        box-shadow: var(--sbx-shadow-m);
-    }
-
-    & .full-width {
-        padding-inline-end: 0;
-    }
-
-    & .profile {
-        & .columns:has(img) {
-            border-radius: var(--sbx-border-radius-normal);
-            overflow: hidden;
-        }
-
-        & dd,
-        & dt {
-            margin-bottom: 0.5rem;
-        }
-    }
-}
-
-.Schoolbox_Tile_Component_DashboardTileController {
-    & #component3371 .tileList {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    & #component4208 .tileList {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-
-    & .tileList {
-        display: flex;
-        flex-wrap: wrap;
-
-        & .tile {
-            border-radius: var(--sbx-border-radius-normal);
-            box-shadow: 5px -5px 5px rgba(0, 0, 0, 0.1);
-        }
-    }
-}
-
-// Component action styles
-.component-action {
-    border-radius: var(--sbx-border-radius-normal);
-    overflow: hidden;
-
-    & a {
-        &:not(:last-child) {
-            margin-inline-end: 8px;
-        }
-    }
-
-    & .button,
-    & button {
-        background-color: var(--sbx-color-accent);
-        border-radius: var(--sbx-border-radius-normal);
-        color: var(--sbx-color-accent-text);
-        padding-inline: 14px;
-    }
-
-    & section {
-        border-bottom: 0;
-        border-top: 0;
-        padding: 1rem;
-    }
-}
-
-// Meta styles
-.meta {
-    font-style: normal;
-
-    & span:last-child a {
-        color: var(--sbx-color-text-primary);
-    }
-}
-
-.Schoolbox_Paperly_Component_Dashboard_Controller {
-    & #paperly-dashboard-component-container {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-    }
-
-    & .flex-list {
-        gap: 0.5rem;
-        padding: 0.5rem;
-
-        & a {
-            background-color: var(--sbx-color-accent);
-            border-radius: var(--sbx-border-radius-normal);
-            color: var(--sbx-color-accent-text);
-        }
-    }
-}
-
-// Calendar component styles
-.Schoolbox_Calendar_Component_Dashboard_Controller {
-    & #calendar-12 {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        overflow: hidden;
-
-        & .fc-list-day-text {
-            color: var(--sbx-color-text-primary);
-        }
-
-        & tr:not(:last-child) td {
-            border-bottom: var(--border);
-        }
-    }
 }
 
 // Slideshow component styles
@@ -930,7 +927,78 @@ article:has(img) p > img {
     }
 }
 
-/* Old Css */
+.Component_Dashboard_ChildSubjectController {
+    & .flex-list {
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    & .row {
+        border: var(--border);
+        border-radius: var(--sbx-border-radius-normal);
+        margin-bottom: 1rem;
+        padding-block-start: 1rem;
+    }
+}
+
+.Schoolbox_Tile_Component_DashboardTileController {
+    & #component3371 .tileList {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    & #component4208 .tileList {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    & .tileList {
+        display: flex;
+        flex-wrap: wrap;
+
+        & .tile {
+            border-radius: var(--sbx-border-radius-normal);
+            box-shadow: 5px -5px 5px rgba(0, 0, 0, 0.1);
+        }
+    }
+}
+
+.Schoolbox_Paperly_Component_Dashboard_Controller {
+    & #paperly-dashboard-component-container {
+        border: var(--border);
+        border-radius: var(--sbx-border-radius-normal);
+    }
+
+    & .flex-list {
+        gap: 0.5rem;
+        padding: 0.5rem;
+
+        & a {
+            background-color: var(--sbx-color-accent);
+            border-radius: var(--sbx-border-radius-normal);
+            color: var(--sbx-color-accent-text);
+        }
+    }
+}
+
+// Calendar component styles
+.Schoolbox_Calendar_Component_Dashboard_Controller {
+    & #calendar-12 {
+        border: var(--border);
+        border-radius: var(--sbx-border-radius-normal);
+        overflow: hidden;
+
+        & .fc-list-day-text {
+            color: var(--sbx-color-text-primary);
+        }
+
+        & tr:not(:last-child) td {
+            border-bottom: var(--border);
+        }
+    }
+}
+
+/* ==========================================================================
+   11. Typography & Meta Styles
+   ========================================================================== */
 
 // Subheader styles
 .subheader {
@@ -939,6 +1007,19 @@ article:has(img) p > img {
     font-weight: 600;
     text-transform: capitalize;
 }
+
+// Meta styles
+.meta {
+    font-style: normal;
+
+    & span:last-child a {
+        color: var(--sbx-color-text-primary);
+    }
+}
+
+/* ==========================================================================
+   12. Buttons & CTAs
+   ========================================================================== */
 
 // Sub-navigation styles
 .sub-nav {
@@ -984,6 +1065,43 @@ button[data-action],
 .buttons button {
     border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
 }
+
+button.load-more,
+.button.load-more,
+.load-more.adtp-btn,
+.attachzone .load-more.dzone.adtp-btn,
+.dropzone-wrap .load-more.dzone.adtp-btn,
+.load-more.show-ckeditor-button,
+.attachzone .load-more.dzone.show-ckeditor-button,
+.dropzone-wrap .load-more.dzone.show-ckeditor-button,
+.flex-list.buttons a.load-more,
+.flex-list.buttons button.load-more,
+.load-more[type="submit"],
+a.load-more.submit,
+.attachzone .load-more.dzone[type="submit"],
+.attachzone a.load-more.dzone.submit,
+.dropzone-wrap .load-more.dzone[type="submit"],
+.dropzone-wrap a.load-more.dzone.submit,
+.attachzone button.load-more.dzone,
+.dropzone-wrap button.load-more.dzone,
+.context-switch nav a.load-more,
+.avatar-switch nav a.load-more,
+.attachzone .load-more.dzone.button,
+.attachzone .context-switch nav a.load-more.dzone,
+.attachzone .avatar-switch nav a.load-more.dzone,
+.context-switch nav .attachzone a.load-more.dzone,
+.avatar-switch nav .attachzone a.load-more.dzone,
+.dropzone-wrap .load-more.dzone.button,
+.dropzone-wrap .context-switch nav a.load-more.dzone,
+.dropzone-wrap .avatar-switch nav a.load-more.dzone,
+.context-switch nav .dropzone-wrap a.load-more.dzone,
+.avatar-switch nav .dropzone-wrap a.load-more.dzone {
+    border: none;
+}
+
+/* ==========================================================================
+   13. Pagination & Breadcrumbs
+   ========================================================================== */
 
 // Pagination styles
 .pagination {
@@ -1048,12 +1166,17 @@ button[data-action],
     }
 }
 
+/* ==========================================================================
+   14. Forms, Filters & Inputs
+   ========================================================================== */
+
 // Form element styles
 .filters {
     & label {
         border-radius: var(--sbx-border-radius-normal);
     }
 }
+
 input[type="checkbox"]:not(.plain) + label::after,
 input[type="checkbox"]:not(.plain) + label::before {
     border-radius: var(--sbx-border-radius-full) !important;
@@ -1065,6 +1188,12 @@ input[type="checkbox"]:not(.plain) + label::before {
 
     & label:last-of-type {
         border-bottom: 0 !important;
+    }
+}
+
+.checklist.events {
+    & li label {
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
 
@@ -1097,13 +1226,6 @@ input[type="checkbox"]:not(.plain) + label::before {
     }
 }
 
-// Component titlebar styles
-.component-titlebar {
-    border-bottom: var(--border);
-    border-top-left-radius: 0.6rem;
-    border-top-right-radius: 0.6rem;
-}
-
 .c-chips {
     & label {
         border-radius: var(--sbx-border-radius-normal) !important;
@@ -1128,6 +1250,117 @@ input[type="radio"] + .block {
 .dzone {
     border-radius: var(--sbx-border-radius-normal);
 }
+
+.selector {
+    & label::before,
+    & label::after {
+        border-radius: var(--sbx-border-radius-normal);
+    }
+}
+
+#createForm,
+#assessmentForm,
+#formPastoral {
+    border: 1px solid #dbe3ea;
+    border-radius: var(--sbx-border-radius-normal);
+    box-shadow: var(--sbx-shadow-m);
+
+    & section {
+        background-color: transparent;
+    }
+
+    & .content {
+        border-width: 1px;
+    }
+
+    & .selectize-control:has(+ button) {
+        & .selectize-input {
+            border-bottom-right-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        & + button {
+            border-bottom-left-radius: 0 !important;
+            border-top-left-radius: 0 !important;
+            margin-bottom: 0;
+        }
+    }
+
+    & #create-form-actions {
+        padding: 1rem;
+
+        & .buttons {
+            gap: 1rem;
+
+            & button {
+                &[id$="preview"] {
+                    background-color: transparent;
+                    border: 2px solid var(--sbx-color-accent);
+                    color: var(--sbx-color-accent) !important;
+                }
+
+                &[id$="submit"] {
+                    background-color: var(--sbx-color-accent);
+                    border: 2px solid var(--sbx-color-accent);
+                }
+            }
+        }
+    }
+
+    &#formPastoral {
+        padding-inline: 0;
+
+        & .buttons {
+            padding-inline: 1rem;
+        }
+
+        & .subheader {
+            padding-inline: 1rem;
+        }
+
+        & .tabs {
+            padding-inline: 1rem;
+        }
+
+        & #visibility-section {
+            padding-inline: 1rem;
+
+            & .icon-delete {
+                &::before {
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+}
+
+/* Reveal modal add-ons */
+.reveal-modal.no-pad {
+    .button-block {
+        border: 0;
+
+        & i {
+            color: var(--sbx-color-accent);
+        }
+
+        &:not(i) {
+            color: var(--sbx-color-text-primary);
+            font-weight: 600;
+        }
+    }
+
+    .tabs {
+        padding-inline: 1.5rem;
+    }
+
+    & .checklist-container {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ==========================================================================
+   15. Progress, Alerts, Tooltips & Misc Components
+   ========================================================================== */
 
 .reviewed.label,
 .submitted.label,
@@ -1200,72 +1433,18 @@ input[type="radio"] + .block {
     }
 }
 
-.selector {
-    & label::before,
-    & label::after {
-        border-radius: var(--sbx-border-radius-normal);
-    }
-}
-
-// Accordion styles
-.accordion {
-    & .accordion-navigation {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        overflow: hidden;
-
-        & > a {
-            background-color: color-mix(in srgb, var(--sbx-color-accent) 80%, transparent);
-            color: var(--sbx-color-accent-text);
-
-            &:hover {
-                background-color: var(--sbx-color-accent);
-            }
-        }
-
-        & > a[aria-expanded="true"] {
-            background-color: color-mix(in srgb, var(--sbx-color-accent) 100%, transparent);
-            color: var(--sbx-color-accent-text);
-        }
-    }
-
-    & .accordion-navigation:not(:last-child) {
-        margin-bottom: 1rem !important;
-    }
-}
-
-.side-nav {
-    border: var(--border);
+.f-dropdown {
+    background-color: #fff;
     border-radius: var(--sbx-border-radius-normal);
-    overflow: hidden;
-
-    & li {
-        &.active > a {
-            border-left-width: 4px;
-        }
-
-        &.active
-            > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
-                button.submit
-            ):not(.show-ckeditor-button) {
-            color: var(--sbx-color-text-primary);
-            font-weight: 600;
-        }
-
-        &
-            > a:first-child:not(.button):not(.adtp-btn):not(button):not([type="submit"]):not(a.submit):not(
-                button.submit
-            ):not(.show-ckeditor-button) {
-            color: var(--sbx-color-text-primary);
-            font-family: var(--ff-primary);
-            padding-block: 1rem;
-        }
-    }
-
-    & li:not(:last-child) {
-        border-bottom: var(--border);
-    }
 }
+
+.load-more.expand {
+    border-radius: var(--sbx-border-radius-normal);
+}
+
+/* ==========================================================================
+   16. Search Page & Results
+   ========================================================================== */
 
 // Search page styles
 .context-switch {
@@ -1404,39 +1583,86 @@ input[type="radio"] + .block {
     }
 }
 
-.f-dropdown {
-    background-color: #fff;
-    border-radius: var(--sbx-border-radius-normal);
-}
+.c-header-search__results {
+    border-bottom-left-radius: var(--sbx-border-radius-normal);
+    border-bottom-right-radius: var(--sbx-border-radius-normal);
+    border-top-left-radius: var(--sbx-border-radius-normal);
+    border-top-right-radius: var(--sbx-border-radius-normal);
 
-.load-more.expand {
-    border-radius: var(--sbx-border-radius-normal);
-}
+    .c-card--border-end {
+        a {
+            border-bottom: 0;
+        }
 
-.activity-feed {
-    & .grade {
-        border-radius: var(--sbx-border-radius-normal);
-        margin: 8px;
+        div {
+            border-color: #eceef1;
+        }
+
+        &:nth-child(even) {
+            background-color: color-mix(in srgb, var(--sbx-color-accent) 5%, #fff);
+        }
+
+        & em {
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        & h3 {
+            color: var(--sbx-color-text-primary);
+            font-weight: 600;
+        }
+
+        & .meta {
+            & a {
+                color: var(--sbx-color-text-primary);
+                font-size: 12px !important;
+            }
+        }
+    }
+
+    & .icon-search {
+        background-color: color-mix(in srgb, var(--sbx-color-accent), #fff 80%);
+        border-bottom-left-radius: var(--sbx-border-radius-normal);
+        border-bottom-right-radius: var(--sbx-border-radius-normal);
+        border-top-left-radius: var(--sbx-border-radius-normal);
+        border-top-right-radius: var(--sbx-border-radius-normal);
+        color: var(--sbx-color-accent);
+        font-size: 12px;
+        font-weight: 600;
+        padding-block: 1rem;
+    }
+
+    & .l-flex-col {
+        border-bottom-left-radius: var(--sbx-border-radius-normal);
+        border-bottom-right-radius: var(--sbx-border-radius-normal);
+        border-top-left-radius: var(--sbx-border-radius-normal);
+        border-top-right-radius: var(--sbx-border-radius-normal);
+
+        & .c-card:first-child {
+            border-top-left-radius: var(--sbx-border-radius-normal);
+            border-top-right-radius: var(--sbx-border-radius-normal);
+        }
+
+        & + .l-flex-col {
+            & .icon-search {
+                border-bottom-left-radius: var(--sbx-border-radius-normal);
+                border-bottom-right-radius: var(--sbx-border-radius-normal);
+                border-top-left-radius: 0 !important;
+                border-top-right-radius: 0 !important;
+            }
+        }
     }
 }
 
-// Feed styles
-.feed .subheader,
-.feed h1.mini,
-.feed h2.mini,
-.feed h3.mini,
-.feed h4.mini,
-.feed h5.mini,
-.feed h6.mini,
-.feed label .mini.unit-heading,
-.feed .Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .fc-list-heading-main,
-.Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .feed .fc-list-heading-main,
-.feed table.rubric th[colspan],
-table.rubric .feed th[colspan],
-label .feed .mini.unit-heading {
-    border-top-left-radius: var(--sbx-border-radius-normal);
-    border-top-right-radius: var(--sbx-border-radius-normal);
+.c-header-search__results {
+    margin-right: 72px;
 }
+
+/* ==========================================================================
+   17. Calendar (.fc) & Timetable Containers
+   ========================================================================== */
 
 .fc {
     border: var(--border);
@@ -1525,75 +1751,6 @@ label .feed .mini.unit-heading {
     }
 }
 
-.Component_Dashboard_ChildSubjectController {
-    & .flex-list {
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-
-    & .row {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        margin-bottom: 1rem;
-        padding-block-start: 1rem;
-    }
-}
-
-// Tabs component styles
-.component-tabs {
-    & .tabs {
-        border: var(--border);
-        border-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-radius: var(--sbx-border-radius-normal);
-    }
-
-    & .tabs-content {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        border-top: 0;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-
-        & > .content li {
-            box-shadow: none !important;
-
-            & [data-component-palette] {
-                border-radius: var(--sbx-border-radius-normal);
-                padding: 1rem 2rem;
-            }
-        }
-    }
-}
-
-// Message list styles
-#message-list {
-    & #notification-toggle-full {
-        background-color: transparent;
-        color: var(--sbx-color-accent);
-    }
-
-    & li:has(:is(#msg-bar, section, .button)) {
-        padding-inline: 0.6rem;
-    }
-
-    & li:has(section) {
-        padding-block: 1rem 0.6rem;
-    }
-
-    & :where(#right-menu-dock, #notification-toggle-full, .icon-settings) {
-        color: var(--sbx-color-accent);
-    }
-}
-
-// Checklist component styles
-.checklist.events {
-    & li label {
-        border-radius: var(--sbx-border-radius-normal);
-    }
-}
-
 .scrollable:has(> .timetable) {
     & .timetable {
         border: var(--border);
@@ -1613,77 +1770,95 @@ label .feed .mini.unit-heading {
     }
 }
 
-// Header search results styles
-.c-header-search__results {
-    border-bottom-left-radius: var(--sbx-border-radius-normal);
-    border-bottom-right-radius: var(--sbx-border-radius-normal);
-    border-top-left-radius: var(--sbx-border-radius-normal);
-    border-top-right-radius: var(--sbx-border-radius-normal);
+/* ==========================================================================
+   18. Islands & Profile Blocks
+   ========================================================================== */
 
-    .c-card--border-end {
-        a {
-            border-bottom: 0;
-        }
-
-        div {
-            border-color: #eceef1;
-        }
-
-        &:nth-child(even) {
-            background-color: color-mix(in srgb, var(--sbx-color-accent) 5%, #fff);
-        }
-
-        & em {
-            font-size: 12px;
-            font-style: normal;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        & h3 {
-            color: var(--sbx-color-text-primary);
-            font-weight: 600;
-        }
-
-        & .meta {
-            & a {
-                color: var(--sbx-color-text-primary);
-                font-size: 12px !important;
-            }
-        }
-    }
-
-    & .icon-search {
-        background-color: color-mix(in srgb, var(--sbx-color-accent), #fff 80%);
-        border-bottom-left-radius: var(--sbx-border-radius-normal);
-        border-bottom-right-radius: var(--sbx-border-radius-normal);
-        border-top-left-radius: var(--sbx-border-radius-normal);
-        border-top-right-radius: var(--sbx-border-radius-normal);
-        color: var(--sbx-color-accent);
-        font-size: 12px;
+// Island styles
+.island {
+    & .subheader {
+        color: var(--sbx-color-text-primary);
+        font-size: 1.5rem;
         font-weight: 600;
-        padding-block: 1rem;
+        text-transform: capitalize;
     }
 
-    & .l-flex-col {
-        border-bottom-left-radius: var(--sbx-border-radius-normal);
-        border-bottom-right-radius: var(--sbx-border-radius-normal);
-        border-top-left-radius: var(--sbx-border-radius-normal);
-        border-top-right-radius: var(--sbx-border-radius-normal);
+    &:has(.profile-tabs.tabs-content) {
+        background-color: #fff;
+        border: var(--border);
+        border-radius: var(--sbx-border-radius-normal);
+        margin-inline: 16px;
+        width: calc(100% - 32px);
 
-        & .c-card:first-child {
-            border-top-left-radius: var(--sbx-border-radius-normal);
-            border-top-right-radius: var(--sbx-border-radius-normal);
+        & dl {
+            margin-inline: -16px;
+            width: calc(100% + 32px);
         }
 
-        & + .l-flex-col {
-            & .icon-search {
-                border-bottom-left-radius: var(--sbx-border-radius-normal);
-                border-bottom-right-radius: var(--sbx-border-radius-normal);
-                border-top-left-radius: 0 !important;
-                border-top-right-radius: 0 !important;
+        & .feed.filter-container:nth-of-type(1) {
+            & .activity-feed {
+                border-bottom: 0;
+                max-width: 100%;
+
+                & .profile-learning-actions {
+                    & > div {
+                        gap: 1rem;
+                        margin-top: 1rem;
+                        max-width: 100%;
+
+                        & a {
+                            background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 95%);
+                            border-radius: var(--sbx-border-radius-normal);
+                            padding-block: 2rem;
+
+                            &:hover {
+                                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 0%);
+                            }
+                        }
+                    }
+                }
+            }
+
+            & .feed-column.left,
+            & .feed-column.right {
+                display: none;
             }
         }
+    }
+}
+
+.island > .no-pad {
+    & > .profile {
+        background-color: #fff;
+        border: var(--border);
+        border-radius: var(--sbx-border-radius-normal);
+        box-shadow: var(--sbx-shadow-m);
+    }
+
+    & .full-width {
+        padding-inline-end: 0;
+    }
+
+    & .profile {
+        & .columns:has(img) {
+            border-radius: var(--sbx-border-radius-normal);
+            overflow: hidden;
+        }
+
+        & dd,
+        & dt {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+
+/* ==========================================================================
+   19. Grids, Generic Layout & Misc Utility Styles
+   ========================================================================== */
+
+.attachment-browser-panel-container {
+    & .ab-pane {
+        padding-bottom: 4.5rem !important;
     }
 }
 
@@ -1702,146 +1877,94 @@ label .feed .mini.unit-heading {
     }
 }
 
-// Account content styles
-#account-content {
-    border-radius: var(--sbx-border-radius-normal);
-
-    & .separator {
-        background-color: #eee !important;
-        border-bottom: var(--border);
-        color: var(--sbx-color-accent);
-        font-weight: 600;
-    }
-
-    & [class^="icon"] {
-        color: var(--sbx-color-text-primary);
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 1.2;
-
-        li:has(&) {
-            border-bottom: var(--border) !important;
-            padding-block: 0.4rem;
-        }
-    }
-
-    & li.user {
-        border-bottom: var(--border);
-        padding-block: 0.8rem;
-        padding-inline: 0.8rem;
-
-        & img {
-            border-radius: var(--sbx-border-radius-normal);
-        }
-
-        & p {
-            color: var(--sbx-color-text-primary);
-
-            &:not(.meta) {
-                font-weight: 800;
-            }
-        }
-    }
+.Schoolbox_Learning_Assessment_Component_Homepage_Builder_Controller li > a {
+    display: inline-block;
 }
 
-#createForm,
-#assessmentForm,
-#formPastoral {
-    border: 1px solid #dbe3ea;
-    border-radius: var(--sbx-border-radius-normal);
-    box-shadow: var(--sbx-shadow-m);
-
-    & section {
-        background-color: transparent;
-    }
-
-    & .content {
-        border-width: 1px;
-    }
-
-    & .selectize-control:has(+ button) {
-        & .selectize-input {
-            border-bottom-right-radius: 0;
-            border-top-right-radius: 0;
-        }
-
-        & + button {
-            border-bottom-left-radius: 0 !important;
-            border-top-left-radius: 0 !important;
-            margin-bottom: 0;
-        }
-    }
-
-    & #create-form-actions {
-        padding: 1rem;
-
-        & .buttons {
-            gap: 1rem;
-
-            & button {
-                &[id$="preview"] {
-                    background-color: transparent;
-                    border: 2px solid var(--sbx-color-accent);
-                    color: var(--sbx-color-accent) !important;
-                }
-
-                &[id$="submit"] {
-                    background-color: var(--sbx-color-accent);
-                    border: 2px solid var(--sbx-color-accent);
-                }
-            }
-        }
-    }
-
-    &#formPastoral {
-        padding-inline: 0;
-
-        & .buttons {
-            padding-inline: 1rem;
-        }
-
-        & .subheader {
-            padding-inline: 1rem;
-        }
-
-        & .tabs {
-            padding-inline: 1rem;
-        }
-
-        & #visibility-section {
-            padding-inline: 1rem;
-
-            & .icon-delete {
-                &::before {
-                    padding-right: 0;
-                }
-            }
-        }
-    }
+.component-container.Component_Homepage_BreadcrumbController {
+    border: none !important;
+    box-shadow: none !important;
 }
 
-.reveal-modal.no-pad {
-    .button-block {
-        border: 0;
-
-        & i {
-            color: var(--sbx-color-accent);
-        }
-
-        &:not(i) {
-            color: var(--sbx-color-text-primary);
-            font-weight: 600;
-        }
-    }
-
-    .tabs {
-        padding-inline: 1.5rem;
-    }
-
-    & .checklist-container {
-        margin-bottom: 1rem;
-    }
+ul#tabs-sub-1 > li,
+ul#tabs-sub-2 > li,
+ul#tabs-sub-3 > li,
+ul#tabs-sub-4 > li,
+ul#tabs-sub-5 > li,
+ul#tabs-sub-6 > li {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
+
+#component-lock-switch label {
+    background-color: #4c5bb1;
+}
+
+#component-lock-switch label .icon-locked::before {
+    color: white;
+}
+
+#component-lock-switch label .icon-unlocked::before {
+    color: white;
+}
+
+.small-12.column.no-pad {
+    padding: 1rem !important;
+}
+
+.flex-list.buttons a,
+.flex-list.buttons button {
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.l-flex-row.l-flex--no-wrap.l-gap-m img {
+    border-radius: 0.6rem; /* You can adjust the pixel value for the desired roundness */
+}
+
+.pastoral-action-date-and-user img {
+    border-radius: 0.6rem; /* You can adjust the pixel value for the desired roundness */
+}
+
+button.show-ckeditor-button {
+    border-radius: 0.6rem;
+}
+
+a.source-select.icon-folder.placeholder {
+    border-radius: 0.2rem;
+}
+
+.modal__container.modal__container--m {
+    border-radius: 0.6rem;
+}
+
+section.banner.content img {
+    border-radius: 0.6rem;
+}
+
+select {
+    height: auto !important; /* The !important rule is added here */
+}
+
+.selectize-input.items.not-full.has-options.has-items > .item {
+    height: 24px;
+}
+
+button.button.disabled:empty {
+    display: none;
+}
+
+section {
+    position: relative;
+}
+
+#toaster {
+    border-radius: 0.6rem;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   20. Filter Panel & Report Content Layout
+   ========================================================================== */
 
 .row:has(> #filter_panel) {
     background-color: #fff;
@@ -1947,126 +2070,17 @@ label .feed .mini.unit-heading {
     }
 }
 
-button.load-more,
-.button.load-more,
-.load-more.adtp-btn,
-.attachzone .load-more.dzone.adtp-btn,
-.dropzone-wrap .load-more.dzone.adtp-btn,
-.load-more.show-ckeditor-button,
-.attachzone .load-more.dzone.show-ckeditor-button,
-.dropzone-wrap .load-more.dzone.show-ckeditor-button,
-.flex-list.buttons a.load-more,
-.flex-list.buttons button.load-more,
-.load-more[type="submit"],
-a.load-more.submit,
-.attachzone .load-more.dzone[type="submit"],
-.attachzone a.load-more.dzone.submit,
-.dropzone-wrap .load-more.dzone[type="submit"],
-.dropzone-wrap a.load-more.dzone.submit,
-.attachzone button.load-more.dzone,
-.dropzone-wrap button.load-more.dzone,
-.context-switch nav a.load-more,
-.avatar-switch nav a.load-more,
-.attachzone .load-more.dzone.button,
-.attachzone .context-switch nav a.load-more.dzone,
-.attachzone .avatar-switch nav a.load-more.dzone,
-.context-switch nav .attachzone a.load-more.dzone,
-.avatar-switch nav .attachzone a.load-more.dzone,
-.dropzone-wrap .load-more.dzone.button,
-.dropzone-wrap .context-switch nav a.load-more.dzone,
-.dropzone-wrap .avatar-switch nav a.load-more.dzone,
-.context-switch nav .dropzone-wrap a.load-more.dzone,
-.avatar-switch nav .dropzone-wrap a.load-more.dzone {
-    border: none;
-}
-.Schoolbox_Learning_Assessment_Component_Homepage_Builder_Controller li > a {
-    display: inline-block;
-}
-
-.component-container.Component_Homepage_BreadcrumbController {
-    border: none !important;
-    box-shadow: none !important;
-}
-
-ul#tabs-sub-1 > li,
-ul#tabs-sub-2 > li,
-ul#tabs-sub-3 > li,
-ul#tabs-sub-4 > li,
-ul#tabs-sub-5 > li,
-ul#tabs-sub-6 > li {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-#component-lock-switch label {
-    background-color: #4c5bb1;
-}
-
-#component-lock-switch label .icon-locked::before {
-    color: white;
-}
-
-#component-lock-switch label .icon-unlocked::before {
-    color: white;
-}
-
-.small-12.column.no-pad {
-    padding: 1rem !important;
-}
-
-.flex-list.buttons a,
-.flex-list.buttons button {
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1) !important;
-}
-
-.l-flex-row.l-flex--no-wrap.l-gap-m img {
-    border-radius: 0.6rem; /* You can adjust the pixel value for the desired roundness */
-}
-
-.pastoral-action-date-and-user img {
-    border-radius: 0.6rem; /* You can adjust the pixel value for the desired roundness */
-}
-
-button.show-ckeditor-button {
-    border-radius: 0.6rem;
-}
-
-a.source-select.icon-folder.placeholder {
-    border-radius: 0.2rem;
-}
-
-.modal__container.modal__container--m {
-    border-radius: 0.6rem;
-}
-
-section.banner.content img {
-    border-radius: 0.6rem;
-}
-
-select {
-    height: auto !important; /* The !important rule is added here */
-}
-
-.selectize-input.items.not-full.has-options.has-items > .item {
-    height: 24px;
-}
+/* ==========================================================================
+   21. Header Search Layout Tweaks
+   ========================================================================== */
 
 .c-header-search__results {
     margin-right: 72px;
 }
 
-button.button.disabled:empty {
-    display: none;
-}
-
-section {
-    position: relative;
-}
-
-#toaster {
-    border-radius: 0.6rem;
-    overflow: hidden;
-}
+/* ==========================================================================
+   22. Legacy / Removed Tafsol Styles (Commented Out)
+   ========================================================================== */
 
 /* Removed styles from original tafsol */
 /*
