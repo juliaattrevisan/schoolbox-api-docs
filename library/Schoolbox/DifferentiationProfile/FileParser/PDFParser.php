@@ -2,15 +2,23 @@
 
 namespace Schoolbox\DifferentiationProfile\FileParser;
 
-use Schoolbox\Resource\Storage\FilesystemProxy;
+use Smalot\PdfParser\Parser;
 
 class PDFParser implements IParser
 {
+    /**
+     * Constructor
+     *
+     * @param Parser $parser The PDF parser to use
+     */
     public function __construct(
-        private \Smalot\PdfParser\Parser $parser = new \Smalot\PdfParser\Parser(),
+        private readonly Parser $parser = new Parser(),
     ) {
     }
 
+    /**
+     * @inheritdoc
+     */
     public function flattenText(string $filePath): string
     {
         $pdf = $this->parser->parseFile($filePath);

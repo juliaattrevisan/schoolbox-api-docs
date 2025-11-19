@@ -6,10 +6,18 @@ use PhpOffice\PhpWord\IOFactory;
 
 class WordParser implements IParser
 {
+    /**
+     * Constructor
+     *
+     * @param string $readerType The reader type to use for loading the Word document
+     */
     public function __construct(
-        private string $readerType
+        private readonly string $readerType
     ) {
     }
+    /**
+     * @inheritdoc
+     */
     public function flattenText(string $filePath): string
     {
         $phpWord = IOFactory::load($filePath, $this->readerType);
