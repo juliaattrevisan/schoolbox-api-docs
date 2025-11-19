@@ -19,6 +19,7 @@ use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\DeleteLineItemServiceS
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\GetLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\ListLineItemsServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\UpdateLineItemServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
@@ -28,8 +29,13 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\LTI\Assessment as LtiAssessment;
+use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem;
 use Schoolbox\LTI\LineItem\GuidRepository;
+use Schoolbox\LTI\Platform\Server\ServiceServer;
+use Schoolbox\LTI\Score\LineItemGuidScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Url\Factory;
 
@@ -41,14 +47,23 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param LineItem\Mapper                 $lineItemMapper   Line item mapper, for persisting and fetching line items.
-     * @param RegistrationRepositoryInterface $registrations    Repository of tool+platform registrations.
-     * @param UserCodec                       $userCodec        User codec, used to decode a user ID in the score
-     *                                                          publish request into an actual user.
-     * @param CacheItemPoolInterface          $accessTokenCache Cache for access tokens.
+     * @param LineItem\Mapper                 $lineItemMapper            Line item mapper, for fetching line items.
+     * @param LtiAssessment\Mapper            $ltiAssessmentMapper       LTI assessment mapper, for retrieving the
+     *                                                                   assessment's details.
+     * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper LTI score mapper, for writing a mark for the
+     *                                                                   assessment.
+     * @param MapperProxy                     $assessmentDataSource      Assessment data source, for fetching the
+     *                                                                   assessment for a line item when posting scores.
+     * @param RegistrationRepositoryInterface $registrations             Repository of tool+platform registrations.
+     * @param UserCodec                       $userCodec                 User codec, used to decode a user ID in the
+     *                                                                   score publish request into an actual user.
+     * @param CacheItemPoolInterface          $accessTokenCache          Cache for access tokens.
      */
     public function __construct(
         private LineItem\Mapper $lineItemMapper,
+        private LtiAssessment\Mapper $ltiAssessmentMapper,
+        private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
+        private MapperProxy $assessmentDataSource,
         private RegistrationRepositoryInterface $registrations,
         private UserCodec $userCodec,
         private CacheItemPoolInterface $accessTokenCache
@@ -160,8 +175,33 @@ class Controller extends BaseController
      */
     public function postScorePublishForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
     {
+        // Need to load domain object for LTI assessment:
+        // must also assert that the line item matches.
+        // Do that here I guess?
+        $ltiAssessment = $this->assessmentDataSource->findOneByColumn('ltiAssessment.guid', $guid);
+        if (!$ltiAssessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
+            // Not an LTI assessment: this is a user error
+            throw new NotFound();
+        }
+
+        // Assert the line item's assessment is the same as the GUID's
+        if ($ltiAssessment->getId() !== $lineItem->getLtiAssessment()->getId()) {
+            throw new NotFound();
+        }
+
+        // If assertions pass, attempt the request:
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/score/platform.md
-        throw new NotFound();
+        $handler = new ScoreServiceServerRequestHandler(
+            $this->createRepository($guid),
+            new LineItemGuidScoreRepository(
+                $ltiAssessment,
+                $lineItem,
+                $this->ltiAssessmentMapper,
+                $this->ltiAssessmentScoreMapper,
+                $this->userCodec,
+            )
+        );
+        $this->response = $this->createResponse($handler);
     }
 
     /**

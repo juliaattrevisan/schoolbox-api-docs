@@ -11,6 +11,8 @@ namespace Schoolbox\LTI\Platform\LineItem\Guid;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
+use Schoolbox\LTI\Assessment\Score\Mapper as LtiAssessmentScoreMapper;
 use Schoolbox\LTI\LineItem;
 
 /**
@@ -97,6 +99,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(LineItem\Mapper::class),
+            $this->getMapperFactory()->get(LtiAssessmentMapper::class),
+            $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
+            $this->injector->get('assessmentDataSource'),
             $this->injector->get('lti.registrations'),
             $this->injector->get('lti.userCodec'),
             $this->injector->get('lti.accessTokenCache'),
