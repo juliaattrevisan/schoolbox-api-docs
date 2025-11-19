@@ -15,7 +15,10 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\CreateLineItemServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\DeleteLineItemServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\GetLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\ListLineItemsServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\UpdateLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -103,14 +106,16 @@ class Controller extends BaseController
      * @api   GET /lti-platform/line-item/guid/{guid}/{id}
      * @since 25.1
      *
-     * @param string         $guid
-     * @param LineItem\Model $lineItem
+     * @param string $guid
      * @return void
      */
-    public function getLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
+    public function getLineItemForGuidAndLineItem(string $guid): void
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
-        throw new NotFound();
+        // Note that the line item is identified by the URL itself
+        $repository     = $this->createRepository($guid);
+        $handler        = new GetLineItemServiceServerRequestHandler($repository);
+        $this->response = $this->createResponse($handler);
     }
 
     /**
@@ -120,14 +125,15 @@ class Controller extends BaseController
      * @api   PUT /lti-platform/line-item/guid/{guid}/{id}
      * @since 25.1
      *
-     * @param string         $guid
-     * @param LineItem\Model $lineItem
+     * @param string $guid
      * @return void
      */
-    public function putLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
+    public function putLineItemForGuidAndLineItem(string $guid): void
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
-        throw new NotFound();
+        $repository     = $this->createRepository($guid);
+        $handler        = new UpdateLineItemServiceServerRequestHandler($repository);
+        $this->response = $this->createResponse($handler);
     }
 
     /**
@@ -137,14 +143,15 @@ class Controller extends BaseController
      * @api   DELETE /lti-platform/line-item/guid/{guid}/{id}
      * @since 25.1
      *
-     * @param string         $guid
-     * @param LineItem\Model $lineItem
+     * @param string $guid
      * @return void
      */
-    public function deleteLineItemForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
+    public function deleteLineItemForGuidAndLineItem(string $guid): void
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#delete-line-item-service-endpoint
-        throw new NotFound();
+        $repository     = $this->createRepository($guid);
+        $handler        = new DeleteLineItemServiceServerRequestHandler($repository);
+        $this->response = $this->createResponse($handler);
     }
 
     /**
