@@ -126,7 +126,8 @@
         "psr/simple-cache": "^3.0",
         "clue/redis-react": "^2.8",
         "php-debugbar/php-debugbar": "^2.2",
-        "smalot/pdfparser": "^2.12"
+        "smalot/pdfparser": "^2.12",
+        "phpoffice/phpword": "^1.4"
     },
     "autoload-dev": {
       "psr-4": {

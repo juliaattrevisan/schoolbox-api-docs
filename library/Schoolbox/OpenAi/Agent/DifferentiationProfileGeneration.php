@@ -17,6 +17,7 @@ use Schoolbox\Pastoral\Model;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use Smalot\PdfParser\Parser;
+use PhpOffice\PhpWord\IOFactory;
 
 class DifferentiationProfileGeneration
 {
@@ -87,13 +88,59 @@ class DifferentiationProfileGeneration
                 ($record->getBodyPublic() ?? '') . "\n\n" .
                 $record->getAttachments()->reduce(
                     function (string $carry, \Schoolbox\Pastoral\Attachment\Model $attachment) {
-                        if (!$attachment->getMimetype()->isPDF() || $attachment->isDeleted()) {
+                        if ($attachment->isDeleted()) {
                             return $carry;
                         }
-
-                        $carry .= $this->pdfParser->parseContent(
+                        if ($attachment->getMimetype()->isPDF()) {
+                            $carry .= $this->pdfParser->parseContent(
                                 $this->filesystemProxy->read($attachment)
                             )->getText() . "\n\n";
+                        }
+
+                        if ($attachment->getMimetype()->matches('application/vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+                            $readerType = 'Word2007';
+                        } else if ($attachment->getMimetype()->matches('application/msword')) {
+                            $readerType = 'MsDoc';
+                        } else if ($attachment->getMimetype()->matches('application/vnd.oasis.opendocument.text')) {
+                            $readerType = 'ODText';
+                        }
+
+                        if (isset($readerType)) {
+                            $phpWord = IOFactory::load($this->filesystemProxy->localPath($attachment), $readerType);
+                            foreach ($phpWord->getSections() as $section) {
+                                foreach ($section->getElements() as $element) {
+                                    if (method_exists($element, 'getText')) {
+                                        $carry .= $element->getText() . "\n";
+                                    } elseif ($element instanceof \PhpOffice\PhpWord\Element\TextRun) {
+                                        foreach ($element->getElements() as $textRunElement) {
+                                            if (method_exists($textRunElement, 'getText')) {
+                                                $carry .= $textRunElement->getText();
+                                            }
+                                        }
+                                        $carry .= "\n";
+                                    } elseif ($element instanceof \PhpOffice\PhpWord\Element\Table) {
+                                        // Handle table elements
+                                        foreach ($element->getRows() as $row) {
+                                            foreach ($row->getCells() as $cell) {
+                                                foreach ($cell->getElements() as $cellElement) {
+                                                    if (method_exists($cellElement, 'getText')) {
+                                                        $carry .= $cellElement->getText() . "\t";
+                                                    } elseif ($cellElement instanceof \PhpOffice\PhpWord\Element\TextRun) {
+                                                        foreach ($cellElement->getElements() as $textRunElement) {
+                                                            if (method_exists($textRunElement, 'getText')) {
+                                                                $carry .= $textRunElement->getText();
+                                                            }
+                                                        }
+                                                        $carry .= "\t";
+                                                    }
+                                                }
+                                            }
+                                            $carry .= "\n";
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         return $carry;
                     },
                     ''
