@@ -40,9 +40,9 @@ export type AiSessionLog = {
     };
 }[AiFeature];
 
-export type AiSession = {
+export type AiSession<TFeature extends AiFeature = AiFeature> = {
     id: AiSessionId;
-    feature: string;
+    feature: TFeature;
     sessionId: AiSessionId;
     createdAt: string;
     createdBy: UserAuthor;
@@ -67,4 +67,4 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse = AiSessionLog[];
+export type AiSessionLogApiResponse<TFeature extends AiFeature = AiFeature> = (AiSessionLog & { feature: TFeature })[];

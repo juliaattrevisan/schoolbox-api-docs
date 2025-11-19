@@ -8,15 +8,9 @@ import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-import type {
-    AgentChatFeedMessage,
-    AgentChatRequest,
-    AgentChatResponse,
-} from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { AiFeature } from "./payload";
 import type { AiSession, AiUsageLogApiRequest, AiUsageLogApiResponse, AiSessionLogApiResponse } from "./payload";
+import AulAgentChat from "./aul-agent-chat.vue";
 
 interface Props {
     routeSearch: string;
@@ -28,7 +22,6 @@ const PAGE_SIZE = 30;
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
 const props = defineProps<Props>();
-const acStore = useAgentChatStore();
 
 const isLoading = window.Vue.ref(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -44,24 +37,30 @@ const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
 const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
-const selectedSessionFeed = window.Vue.ref<AgentChatFeedMessage[] | null>(null);
+const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
-const selectedSessionInfo = window.Vue.computed(() => {
+type AiSelectedSessionInfo = {
+    [K in AiFeature]: {
+        feature: K;
+        session: AiSession<K>;
+        log: AiSessionLogApiResponse<K>;
+    };
+}[AiFeature];
+
+const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | null>(() => {
     if (selectedSessionId.value === null) {
         return null;
     }
 
     const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
-    const feedInfo = selectedSessionFeed.value;
+    const logInfo = selectedSessionLog.value;
 
-    if (sessionInfo === undefined || feedInfo === null) {
+    if (sessionInfo === undefined || logInfo === null) {
         return null;
     }
 
-    return {
-        session: sessionInfo,
-        feed: feedInfo,
-    };
+    const info = { feature: sessionInfo.feature, session: sessionInfo, log: logInfo };
+    return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
 /**
@@ -70,7 +69,7 @@ const selectedSessionInfo = window.Vue.computed(() => {
 function closeSessionDetails(): void {
     sessionLoadError.value = null;
     selectedSessionId.value = null;
-    selectedSessionFeed.value = null;
+    selectedSessionLog.value = null;
 }
 
 /**
@@ -146,7 +145,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     sessionLoadError.value = null;
     selectedSessionId.value = session.id;
-    selectedSessionFeed.value = null;
+    selectedSessionLog.value = null;
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
@@ -158,36 +157,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         return;
     }
 
-    // TODO: this is going to have to handle whatever happens for lesson plans/non-chat stuff but for now just assume it's a chat
-
-    selectedSessionFeed.value = response.data.flatMap((entry) => {
-        if (entry.feature === AiFeature.IMAGE) {
-            const req: AgentChatRequest = {
-                type: "request",
-                entryKey: acStore.getNextEntryKey(),
-                user: entry.createdBy,
-                payload: {
-                    userPrompt: entry.data.request,
-                    aiSessionId: entry.sessionId,
-                    // the rest of these are never stored in the log
-                    attributes: {},
-                    imageUrl: null,
-                    previousResponseId: null,
-                },
-                file: null,
-            };
-
-            const res: AgentChatResponse = {
-                ...entry.data.response,
-                type: "response",
-                entryKey: acStore.getNextEntryKey(),
-            };
-
-            return [req, res];
-        }
-
-        return [];
-    });
+    selectedSessionLog.value = response.data;
 }
 </script>
 
@@ -355,7 +325,19 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                         </p>
                     </div>
                     <div class="clearfix"></div>
-                    <ac-feed class="l-mar-m" :feed="selectedSessionInfo.feed" :allow-selection="false" />
+                    <div class="l-mar-m">
+                        <aul-agent-chat
+                            v-if="selectedSessionInfo.feature === AiFeature.IMAGE"
+                            :session-log="selectedSessionInfo.log"
+                        />
+                        <div v-else class="empty-state">
+                            <i class="icon-view-hollow"></i>
+                            <p>
+                                The {{ props.features[selectedSessionInfo.feature].title }} feature does not support
+                                previews
+                            </p>
+                        </div>
+                    </div>
                 </template>
             </section>
         </div>
