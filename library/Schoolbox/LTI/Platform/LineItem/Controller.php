@@ -82,6 +82,7 @@ class Controller extends BaseController
 
     /**
      * LTI line item service endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
      * Currently, this does nothing: however it must exist so that the resource
      * link launch request can generate a score publish service endpoint.
@@ -101,6 +102,7 @@ class Controller extends BaseController
 
     /**
      * Score publish service endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#score-publish-service
      *
      * @api   POST /lti-platform/line-item/assessment/{assessmentId}/scores
      * @since 21.1.0
@@ -143,6 +145,7 @@ class Controller extends BaseController
 
     /**
      * LTI get line items endpoint: gets all line items with the given GUID.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#container-request-filters
      *
      * @param string $guid
      *
@@ -157,6 +160,7 @@ class Controller extends BaseController
     /**
      * LTI create line item endpoint: creates a new line item with the given
      * GUID.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#creating-a-new-line-item
      *
      * @param string $guid
      *
@@ -169,8 +173,48 @@ class Controller extends BaseController
     }
 
     /**
+     * LTI get line item endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     *
+     * @param string $guid
+     * @param string $id
+     * @return void
+     */
+    public function getLineItemForGuidAndId(string $guid, string $id): void
+    {
+        throw new NotFound();
+    }
+
+    /**
+     * LTI update line item endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     *
+     * @param string $guid
+     * @param string $id
+     * @return void
+     */
+    public function putLineItemForGuidAndId(string $guid, string $id): void
+    {
+        throw new NotFound();
+    }
+
+    /**
+     * LTI delete line item endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     *
+     * @param string $guid
+     * @param string $id
+     * @return void
+     */
+    public function deleteLineItemForGuidAndId(string $guid, string $id): void
+    {
+        throw new NotFound();
+    }
+
+    /**
      * LTI create score endpoint: creates a new score for this line item with
      * the given GUID.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#score-publish-service
      *
      * @param string $guid
      *
