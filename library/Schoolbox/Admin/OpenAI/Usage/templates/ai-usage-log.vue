@@ -15,6 +15,7 @@ import type {
     AgentChatRequest,
     AgentChatResponse,
 } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import { AiFeature } from "./payload";
 import type { AiSession, AiUsageLogApiRequest, AiUsageLogApiResponse, AiSessionLogApiResponse } from "./payload";
 
 interface Props {
@@ -160,31 +161,32 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     // TODO: this is going to have to handle whatever happens for lesson plans/non-chat stuff but for now just assume it's a chat
 
     selectedSessionFeed.value = response.data.flatMap((entry) => {
-        const req: AgentChatRequest = {
-            type: "request",
-            entryKey: acStore.getNextEntryKey(),
-            user: entry.createdBy,
-            payload: {
-                // TODO
-                userPrompt: "prompt message",
-                attributes: {},
-                imageUrl: null,
-                previousResponseId: null,
-                aiSessionId: session.id,
-            },
-            file: null,
-        };
+        if (entry.feature === AiFeature.IMAGE) {
+            const req: AgentChatRequest = {
+                type: "request",
+                entryKey: acStore.getNextEntryKey(),
+                user: entry.createdBy,
+                payload: {
+                    userPrompt: entry.data.request,
+                    aiSessionId: entry.sessionId,
+                    // the rest of these are never stored in the log
+                    attributes: {},
+                    imageUrl: null,
+                    previousResponseId: null,
+                },
+                file: null,
+            };
 
-        const res: AgentChatResponse = {
-            type: "response",
-            entryKey: acStore.getNextEntryKey(),
-            status: "success", // assume success for now...
-            responseId: null, // no openai response ID available I guess
-            image: null,
-            message: "response message", // TODO
-        };
+            const res: AgentChatResponse = {
+                ...entry.data.response,
+                type: "response",
+                entryKey: acStore.getNextEntryKey(),
+            };
 
-        return [req, res];
+            return [req, res];
+        }
+
+        return [];
     });
 }
 </script>

@@ -128,10 +128,50 @@ class ImageGeneration
                  * WARNING: If you were to change this structure, old conversations may not restore correctly unless migrated
                  * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
                  */
-                $event = [
-                    'eventType' => $message->eventType,
-                    'data' => $message->getDataAsArray(),
-                ];
+                try {
+                    $data = $message->getDataAsArray();
+                } catch (UnexpectedValueException $e) {
+                    $data = null;
+                }
+
+                if (null === $data) {
+                    /** couldn't decode the final message data, log an error instead - It should be impossible to end up here? */
+                    $event = [
+                        'status' => 'error',
+                        'responseId' => $responseId ?? null,
+                        'message' => 'Failed to decode',
+                    ];
+                } else if (AgentChatMessageEventType::COMPLETE->value === $message->eventType) {
+                    /** Successful completion */
+                    $event = [
+                        'status' => 'success',
+                        'responseId' => $data['responseId'],
+                        'image' => null,
+                        'message' => $data['message'],
+                    ];
+
+                    if (is_array($data['image'])) {
+                        $event['image'] = false; // false indicates that the image was generated but omitted from the log
+                    }
+                } else {
+                    /** Something went wrong, try to derive the error details assuming it's an ApiProblem */
+                    $problem = ApiProblem::fromArray($data);
+
+                    /** @see /www/static/js/util/sbx/apiUtils.ts */
+                    $failureMessage = 'An unexpected error occured';
+                    if ($problem->getTitle()) {
+                        $failureMessage = $problem->getTitle();
+                    }
+                    if ($problem->getDetail()) {
+                        $failureMessage .= ': ' . $problem->getDetail();
+                    }
+
+                    $event = [
+                        'status' => 'error',
+                        'responseId' => $responseId ?? null,
+                        'message' => $failureMessage,
+                    ];
+                }
 
                 $log->setOutputText(json_encode($event, JSON_THROW_ON_ERROR));
                 $this->client->saveLog($log);
@@ -369,6 +409,41 @@ class ImageGeneration
             'b64' => $base64Image,
             'name' => 'image.png',
             'mime' => 'image/png',
+        ];
+    }
+
+
+    /**
+     * Translate a saved log's inputText and outputText back into structured data for this particular feature
+     * @param Log\Model $log
+     * @return array{request:string,response:array}
+     */
+    public static function translateLogData(Log\Model $log): array
+    {
+        $inputText = $log->getInputText();
+        $outputText = $log->getOutputText();
+
+        $response = null;
+        if (!empty($outputText)) {
+            try {
+                $response = json_decode($outputText, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                // noop; leave null for below
+            }
+        }
+
+        if (null === $response) {
+            /** either failed to parse, or no output at all. Fall back to an unknown output */
+            $response = [
+                'status' => 'error',
+                'responseId' => null,
+                'message' => 'Unable to retrieve response',
+            ];
+        }
+
+        return [
+            'request' => $inputText,
+            'response' => $response,
         ];
     }
 }

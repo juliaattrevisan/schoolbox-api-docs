@@ -34,7 +34,7 @@ async function uploadImage(): Promise<void> {
         throw new Error("Unable to find selected feed item");
     }
 
-    if (!("image" in selectedFeedItem) || selectedFeedItem.image === null) {
+    if (!("image" in selectedFeedItem) || !selectedFeedItem.image) {
         throw new Error("Selected feed item does not have a valid image");
     }
 

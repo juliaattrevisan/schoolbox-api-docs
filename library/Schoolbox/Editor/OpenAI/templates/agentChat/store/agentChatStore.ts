@@ -202,7 +202,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         const slides = feed.value
             .map((item) => {
                 // only show final images
-                if (item.type !== "response" || item.status !== "success" || item.image === null) {
+                if (item.type !== "response" || item.status !== "success" || !item.image) {
                     return null;
                 }
 
