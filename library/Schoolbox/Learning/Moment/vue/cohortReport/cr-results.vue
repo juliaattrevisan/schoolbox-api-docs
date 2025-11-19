@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import dayjs from "dayjs";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 import CrResultsGroup from "./cr-results-group.vue";
@@ -15,8 +14,8 @@ const crfStore = useCohortReportFiltersStore();
 const resultGroups = window.Vue.computed(() => {
     const moments = crStore.results.map((moment) => ({
         moment,
-        createdAt: dayjs(moment.createdAt),
-        updatedAt: dayjs(moment.updatedAt),
+        createdAt: window.dayjs(moment.createdAt),
+        updatedAt: window.dayjs(moment.updatedAt),
     }));
 
     const groups: Record<string, (typeof moments)[number][]> = {};
