@@ -64,24 +64,6 @@ class Module extends BaseModule
             null,
             $preloadAssessment,
         );
-
-        $this->register(
-            self::METHOD_GET,
-            '/guid/{guid}',
-            'getLineItemsForGuid',
-        );
-
-        $this->register(
-            self::METHOD_POST,
-            '/guid/{guid}',
-            'postLineItemForGuid',
-        );
-
-        $this->register(
-            self::METHOD_POST,
-            '/guid/{guid}/scores',
-            'postScorePublishForGuid',
-        );
     }
 
     /**
