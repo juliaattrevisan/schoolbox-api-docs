@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -64,6 +65,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
             $this->getMapperFactory()->get(PastoralMapper::class),
             $this->injector->get('filesystem.storageProxy'),
+            new ParserFactory(),
             $this->injector->get('ai.clientFactory'),
         );
     }

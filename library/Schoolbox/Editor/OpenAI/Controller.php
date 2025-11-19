@@ -17,6 +17,7 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
@@ -47,6 +48,7 @@ class Controller extends Base
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
         private PastoralMapper $pastoralMapper,
         private FilesystemProxy $filesystemProxy,
+        private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
     ) {
     }
@@ -332,7 +334,7 @@ class Controller extends Base
             $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
             $diffConfig,
             $this->filesystemProxy,
-            new Parser(),
+            $this->parserFactory,
         );
 
         try {
