@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Psr7\HttpFactory;
+use OAT\Library\Lti1p3Ags\Service\LineItem\LineItemServiceInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
@@ -112,6 +113,8 @@ class Controller extends Base
             new AccessTokenRepository($this->accessTokenCache),
             new ScopeRepository([
                 new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
+                new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM),
+                new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM_READ_ONLY),
                 new Scope(MembershipServiceInterface::AUTHORIZATION_SCOPE_MEMBERSHIP),
             ]),
             // Currently, the auth token gets verified in:
