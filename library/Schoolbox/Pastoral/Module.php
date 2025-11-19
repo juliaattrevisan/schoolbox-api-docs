@@ -362,6 +362,12 @@ class Module extends BaseModule
                     }
 
                     $student = $userMapper->findWithSubjects($params['linkedStudentId']);
+
+                    // Only students can have pastoral records
+                    if (!$student->getRole()->isStudent()) {
+                        throw $this->generateError(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                    }
+
                     $this->getRelationshipHydrator()->loadTeachers([$student]);
                     $this->getRelationshipHydrator()->loadParents([$student]);
 
