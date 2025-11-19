@@ -104,7 +104,19 @@ class ImageGeneration
             yield $message->__toString();
 
             // TODO: probably log from here depending on the message type?
-            // TODO: should this fully stop the stream after receiving a COMPLETE/ERROR event? There shouldn't be anything meaningful to continue with... only case is if we want extra raw logs for errors
+
+            /**
+             * on a COMPLETE or ERROR event, there's nothing more to meaningfully continue with.
+             * We should stop processing now to avoid further random messages being sent to the frontend
+             */
+            if (
+                \in_array($message->eventType, [
+                    AgentChatMessageEventType::COMPLETE->value,
+                    AgentChatMessageEventType::ERROR->value
+                ], true)
+            ) {
+                break;
+            }
         }
     }
 
