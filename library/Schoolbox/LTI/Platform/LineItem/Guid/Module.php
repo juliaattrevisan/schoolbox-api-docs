@@ -96,8 +96,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(LtiAssessmentMapper::class),
-            $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
+            $this->getMapperFactory()->get(LineItem\Mapper::class),
             $this->injector->get('lti.registrations'),
             $this->injector->get('lti.userCodec'),
             $this->injector->get('lti.accessTokenCache'),

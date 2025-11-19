@@ -13,10 +13,12 @@ namespace Schoolbox\LTI\Platform\LineItem\Guid;
 use Alaress\Web\Controller\Base as BaseController;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\CreateLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
@@ -35,52 +37,20 @@ use Schoolbox\LTI\User\Codec as UserCodec;
 class Controller extends BaseController
 {
     /**
-     * LTI assessment mapper, for retrieving the assessment's details.
-     */
-    private LtiAssessment\Mapper $ltiAssessmentMapper;
-
-    /**
-     * LTI score mapper, for writing a mark for the assessment.
-     */
-    private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper;
-
-    /**
-     * Repository of tool+platform registrations.
-     */
-    private RegistrationRepositoryInterface $registrations;
-
-    /**
-     * User codec, used to decode a user ID in the score publish request into
-     * an actual user.
-     */
-    private UserCodec $userCodec;
-
-    /**
-     * Cache for access tokens.
-     */
-    private CacheItemPoolInterface $accessTokenCache;
-
-    /**
      * Constructor
      *
-     * @param LtiAssessment\Mapper            $ltiAssessmentMapper
-     * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper
-     * @param RegistrationRepositoryInterface $registrations
-     * @param UserCodec                       $userCodec
-     * @param CacheItemPoolInterface          $accessTokenCache
+     * @param LineItem\Mapper                 $lineItemMapper   Line item mapper, for persisting and fetching line items.
+     * @param RegistrationRepositoryInterface $registrations    Repository of tool+platform registrations.
+     * @param UserCodec                       $userCodec        User codec, used to decode a user ID in the score
+     *                                                          publish request into an actual user.
+     * @param CacheItemPoolInterface          $accessTokenCache Cache for access tokens.
      */
     public function __construct(
-        LtiAssessment\Mapper $ltiAssessmentMapper,
-        LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
-        RegistrationRepositoryInterface $registrations,
-        UserCodec $userCodec,
-        CacheItemPoolInterface $accessTokenCache
+        private LineItem\Mapper $lineItemMapper,
+        private RegistrationRepositoryInterface $registrations,
+        private UserCodec $userCodec,
+        private CacheItemPoolInterface $accessTokenCache
     ) {
-        $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
-        $this->ltiAssessmentScoreMapper = $ltiAssessmentScoreMapper;
-        $this->registrations            = $registrations;
-        $this->userCodec                = $userCodec;
-        $this->accessTokenCache         = $accessTokenCache;
     }
 
     /**
@@ -113,7 +83,29 @@ class Controller extends BaseController
     public function postLineItemForGuid(string $guid): void
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#create-line-item-service-endpoint
-        throw new NotFound();
+        $repository = new Repository(
+            $guid,
+            $this->lineItemMapper,
+            $this->routeGenerator,
+            $this->getRouter()->getMatcher()
+        );
+
+        $validator = new RequestAccessTokenValidator($this->registrations);
+
+        // Access token validity checker
+        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
+        $resourceServerValidator = new ResourceServer(
+            new AccessTokenRepository($this->accessTokenCache),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
+
+        $handler = new CreateLineItemServiceServerRequestHandler($repository);
+
+        $server = new LtiServiceServer($validator, $handler);
+
+        // Generates an authenticated response containing the line item creation response
+        $this->response = $server->handle($request);
     }
 
     /**
