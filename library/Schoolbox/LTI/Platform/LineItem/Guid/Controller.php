@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\CreateLineItemServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\ListLineItemsServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -66,7 +67,29 @@ class Controller extends BaseController
     public function getLineItemsForGuid(string $guid): void
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#list-line-items-service-endpoint
-        throw new NotFound();
+        $repository = new Repository(
+            $guid,
+            $this->lineItemMapper,
+            $this->routeGenerator,
+            $this->getRouter()->getMatcher()
+        );
+
+        $validator = new RequestAccessTokenValidator($this->registrations);
+
+        // Access token validity checker
+        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
+        $resourceServerValidator = new ResourceServer(
+            new AccessTokenRepository($this->accessTokenCache),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+        );
+        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
+
+        $handler = new ListLineItemsServiceServerRequestHandler($repository);
+
+        $server = new LtiServiceServer($validator, $handler);
+
+        // Generates an authenticated response containing the line item creation response
+        $this->response = $server->handle($request);
     }
 
     /**
