@@ -3,7 +3,7 @@
  * To display a grid-like display
  */
 
-import type { Header } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Header, Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     header: Header[];
@@ -20,43 +20,42 @@ const gridTemplateColumns = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div ref="mdpGridEl" class="scrollable">
-        <div class="mdp-grid">
-            <div ref="headerRowEl" class="mdp-grid__row mdp-grid__row--header">
+    <div class="mdp-grid">
+        <div ref="headerRowEl" class="mdp-grid__row mdp-grid__row--header">
+            <div
+                v-for="item in props.header"
+                :key="item.id"
+                class="fixed-top"
+                :class="{
+                    'fixed-left': item.isFixed,
+                }"
+            >
+                {{ item.title }}
+            </div>
+        </div>
+        <template v-if="!props.isLoading">
+            <div
+                v-for="(row, index) in props.rows"
+                :key="index"
+                class="mdp-grid__row"
+                :data-test="`mdp-grid-row-${index}`"
+            >
                 <div
                     v-for="item in props.header"
                     :key="item.id"
-                    class="fixed-top"
                     :class="{
                         'fixed-left': item.isFixed,
                     }"
+                    :data-test="`mdp-grid-row-cell-${(row as Profile).student.id}-${item.key}`"
                 >
-                    {{ item.title }}
+                    <!-- Use dynamic slot based on header type, fallback to default content -->
+                    <slot :name="item.type" :row="row" :header="item" :row-index="index">
+                        <!-- Default content if no slot is provided -->
+                        {{ row[item.key] }}
+                    </slot>
                 </div>
             </div>
-            <template v-if="!props.isLoading">
-                <div
-                    v-for="(row, index) in props.rows"
-                    :key="index"
-                    class="mdp-grid__row"
-                    :data-test="`mdp-grid-row-${index}`"
-                >
-                    <div
-                        v-for="item in props.header"
-                        :key="item.id"
-                        :class="{
-                            'fixed-left': item.isFixed,
-                        }"
-                    >
-                        <!-- Use dynamic slot based on header type, fallback to default content -->
-                        <slot :name="item.type" :row="row" :header="item" :row-index="index">
-                            <!-- Default content if no slot is provided -->
-                            {{ row[item.key] }}
-                        </slot>
-                    </div>
-                </div>
-            </template>
-        </div>
+        </template>
     </div>
 </template>
 
@@ -102,6 +101,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
     position: sticky;
     z-index: var(--sbx-depth-ui-sticky); // Behind the dropdowns and table header, but on top of the content
 }
+
 .fixed-top {
     position: sticky;
     top: 0;

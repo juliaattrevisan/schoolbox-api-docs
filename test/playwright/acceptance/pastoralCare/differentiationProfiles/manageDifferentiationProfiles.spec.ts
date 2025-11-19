@@ -79,8 +79,8 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.navigateToPage();
             tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
             const container = page.getByTestId("manage-differentiation-profiles-container");
-            const marioIzzo = container.getByText("Mario Izzo");
-            const msPenelopeLi = container.getByText("Ms Penelope Li");
+            const marioIzzo = container.getByText("Izzo, Mario");
+            const msPenelopeLi = container.getByText("Li, Penelope");
             await expect(marioIzzo).toBeVisible();
             await expect(msPenelopeLi).toBeVisible();
         } finally {
@@ -115,10 +115,10 @@ test.describe("Manage Differentiation Profiles", () => {
             await page.getByTestId("panel-apply-filters-button").click();
             await page.getByTestId("panel-apply-filters-button").click(); // click twice as first click closes the filter pop out
             await page.waitForLoadState("load"); // Waits for full page reload
-            tester.isGoingTo("Verify that Ms Jana Reed and Mr Leon Reed are visible");
+            tester.isGoingTo("Verify that Jana Reed and Leon Reed are visible");
             const container = page.getByTestId("manage-differentiation-profiles-container");
-            const msJanaReed = container.getByText("Ms Jana Reed");
-            const mrLeonReed = container.getByText("Mr Leon Reed");
+            const msJanaReed = container.getByText("Reed, Jana");
+            const mrLeonReed = container.getByText("Reed, Leon");
             await expect(msJanaReed).toBeVisible();
             await expect(mrLeonReed).toBeVisible();
         } finally {
@@ -135,6 +135,80 @@ test.describe("Manage Differentiation Profiles", () => {
                 { contribute_differentiation_profile: 0 },
                 { "name like": "Award/Achievement" },
             );
+        }
+    });
+
+    test("Verify text cell edit", async ({ tester, page, db }) => {
+        const studentId = 63; // Mario Izzo
+        const fieldKey = "overview";
+        try {
+            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+            await manageDifferentiationProfiles.enablePage(db);
+            await manageDifferentiationProfiles.addPastoralTypes();
+            await tester.loginAsAdmin();
+            await manageDifferentiationProfiles.navigateToPage();
+            tester.isGoingTo("Add some text to Mario Izzo's overview field");
+            await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
+            const textToType = "Mario has a fondness for anything relating to snakes! 🐍";
+            await page.keyboard.type(textToType);
+            await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
+            tester.isGoingTo("Verify that the text is still present after reload");
+            await page.reload();
+            const overviewCell = page.getByTestId(`mdp-grid-row-cell-${studentId}-${fieldKey}`);
+            await expect(overviewCell).toContainText(textToType);
+        } finally {
+            tester.isGoingTo("Clean up: Reset data state");
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
+            await db.updateInDatabase(
+                "lu_pastoral_type",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Bullying" },
+            );
+            await db.updateInDatabase(
+                "lu_pastoral_subtype",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Award/Achievement" },
+            );
+            await db.dontHaveInDatabase("differentiation_profiles", { student_id: studentId });
+        }
+    });
+
+    test("Verify adjustment cell edit", async ({ tester, page, db }) => {
+        const studentId = 63; // Mario Izzo
+        const fieldKey = "adjustment_category";
+        try {
+            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+            await manageDifferentiationProfiles.enablePage(db);
+            await manageDifferentiationProfiles.addPastoralTypes();
+            await tester.loginAsAdmin();
+            await manageDifferentiationProfiles.navigateToPage();
+            tester.isGoingTo("Add some adjustment to the category field");
+            await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
+            await page.click('label[for="checkbox-1-adjustment_category-63"]');
+            await page.click('label[for="checkbox-3-adjustment_category-63"]');
+            await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
+            tester.isGoingTo("Verify that the adjustment is still present after reload");
+            await page.reload();
+            const overviewCell = page.getByTestId(`mdp-grid-row-cell-${studentId}-${fieldKey}`);
+            tester.isGoingTo("Verify that can see a list of adjustments added");
+            await expect(overviewCell).toContainText("Cognitive");
+            await expect(overviewCell).toContainText("Social / Emotional");
+        } finally {
+            tester.isGoingTo("Clean up: Reset data state");
+            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
+            await db.updateInDatabase(
+                "lu_pastoral_type",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Bullying" },
+            );
+            await db.updateInDatabase(
+                "lu_pastoral_subtype",
+                { contribute_differentiation_profile: 0 },
+                { "name like": "Award/Achievement" },
+            );
+            await db.dontHaveInDatabase("differentiation_profiles", { student_id: studentId });
         }
     });
 });

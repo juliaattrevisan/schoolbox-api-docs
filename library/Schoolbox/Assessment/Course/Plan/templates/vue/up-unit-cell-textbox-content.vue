@@ -160,6 +160,7 @@ defineExpose({ focusEditor, isEmpty });
 
 <style>
 .editor-wrapper {
+    padding-bottom: 2px;
     z-index: var(--sbx-depth-default);
 }
 .editor-content {
@@ -172,9 +173,5 @@ defineExpose({ focusEditor, isEmpty });
 .editor-content.ck.ck-content.ck-editor__editable.ck-focused,
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
     border: 0 !important;
-}
-
-.editor-wrapper {
-    padding-bottom: 2px;
 }
 </style>

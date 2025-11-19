@@ -1,4 +1,4 @@
-import type { User } from "@schoolboxLibrary/types/User";
+import type { UserCC } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { Nested } from "@js/util/queryUtils";
 
@@ -8,7 +8,7 @@ import type { Nested } from "@js/util/queryUtils";
 export type MDPHeader = {
     id: number;
     key: string;
-    type: string;
+    type: HeaderType;
     name: string;
     module: string;
     title: string;
@@ -60,21 +60,40 @@ export type AdjustmentText = string | null;
  */
 export type Profile = {
     id: number | null;
-    student: User;
-    adjustment_category: AdjustmentType[] | null;
-    adjustment_level: AdjustmentType[] | null;
-    overview: AdjustmentText;
-    interests_strengths: AdjustmentText;
-    needs_challenges: AdjustmentText;
-    strategies_adjustments: AdjustmentText;
-    goals: AdjustmentText;
+    student: UserCC;
+    adjustment_category: number[] | null;
+    adjustment_level: number[] | null;
+    overview: string | null;
+    interests_strengths: string | null;
+    needs_challenges: string | null;
+    strategies_adjustments: string | null;
+    goals: string | null;
     created_at: string | null;
     updated_at: string | null;
     deleted_at: string | null;
     _routes: {
         linkedRecords?: string;
+        edit?: string;
     };
 };
+
+/**
+ * Type for keys that correspond to editable adjustment fields
+ */
+export type ProfileAdjustmentKeys = keyof Pick<Profile, "adjustment_category" | "adjustment_level">;
+
+/**
+ * Type for keys that correspond to editable text fields
+ */
+export type ProfileTextKeys = keyof Pick<
+    Profile,
+    "overview" | "interests_strengths" | "needs_challenges" | "strategies_adjustments" | "goals"
+>;
+
+/**
+ * Can be either ProfileAdjustmentKeys or ProfileTextKeys
+ */
+export type ProfileKeys = ProfileAdjustmentKeys | ProfileTextKeys;
 
 /**
  * The expected query parameters

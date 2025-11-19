@@ -158,8 +158,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 1,
                     'student'                => $userResponse,
-                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_1,
-                    'adjustment_level'       => self::ADJUSTMENT_LEVEL_ID_1,
+                    'adjustment_category'    => [1],
+                    'adjustment_level'       => [1],
                     'overview'               => 'This is an overview.',
                     'interests_strengths'    => 'Interests and strengths details.',
                     'needs_challenges'       => 'Needs and challenges details.',
@@ -219,8 +219,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 3,
                     'student'                => $userResponse,
-                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_2,
-                    'adjustment_level'       => self::ADJUSTMENT_LEVEL_ID_2,
+                    'adjustment_category'    => [1, 2],
+                    'adjustment_level'       => [2, 4],
                     'created_at'             => '01/02/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -276,8 +276,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 5,
                     'student'                => $userResponse,
-                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_4,
-                    'adjustment_level'       => self::ADJUSTMENT_LEVEL_ID_4,
+                    'adjustment_category'    => [4, 1],
+                    'adjustment_level'       => [4, 5],
                     'created_at'             => '01/04/2024',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -387,7 +387,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 9,
                     'student'                => $userResponse,
-                    'adjustment_category'    => self::ADJUSTMENT_CATEGORY_ID_4,
+                    'adjustment_category'    => [4, 1],
                     'overview'               => 'Visible overview.',
                     'needs_challenges'       => 'Visible needs.',
                     'goals'                  => 'Visible goals.',

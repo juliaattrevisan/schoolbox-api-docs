@@ -2,7 +2,7 @@
  * Utility class for manage differentiation profiles page
  */
 
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
 import ManageRecordSettings from "@schoolboxTest/playwright/support/page/pastoralCare/ManageRecordSettings";
@@ -16,6 +16,10 @@ export default class ManageDifferentiationProfiles {
     static readonly DATA_TEST_TOGGLE = "differentiation-profiles-toggle";
 
     static readonly DATA_TEST_TERMINOLOGY_HEADER = "differentiation-profiles-header-Terminology";
+
+    static readonly DATA_TEST_MODIFY_BUTTON = "mdp-grid-cell-action-modify-{studentId}-{fieldKey}";
+
+    static readonly DATA_TEST_SAVE_BUTTON = "mdp-grid-cell-action-save-{studentId}-{fieldKey}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -57,5 +61,41 @@ export default class ManageDifferentiationProfiles {
         await manageRecordSettings.gotoAwardAchievement();
         await manageRecordSettings.clickApplyToDifferentiationProfiles();
         await manageRecordSettings.clickSave();
+    }
+
+    /**
+     * Click a modify button
+     * @param studentId - The ID of the student
+     * @param fieldKey - The key of the field
+     */
+    async clickModifyButton(studentId: number, fieldKey: string): Promise<void> {
+        await this.page
+            .getByTestId(
+                ManageDifferentiationProfiles.DATA_TEST_MODIFY_BUTTON.replace(
+                    "{studentId}",
+                    studentId.toString(),
+                ).replace("{fieldKey}", fieldKey),
+            )
+            .click();
+        await this.page.waitForTimeout(500); // Wait for the textbox to be focused
+    }
+
+    /**
+     * Click a save button
+     * @param studentId - The ID of the student
+     * @param fieldKey - The key of the field
+     */
+    async clickSaveButton(studentId: number, fieldKey: string): Promise<void> {
+        await this.page
+            .getByTestId(
+                ManageDifferentiationProfiles.DATA_TEST_SAVE_BUTTON.replace(
+                    "{studentId}",
+                    studentId.toString(),
+                ).replace("{fieldKey}", fieldKey),
+            )
+            .click();
+        this.tester.isGoingTo("Verify that the text is saved correctly");
+        const successToast = this.page.getByText("Differentiation Profile successfully updated");
+        await expect(successToast).toBeVisible();
     }
 }
