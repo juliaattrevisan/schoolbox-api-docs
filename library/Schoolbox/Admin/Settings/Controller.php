@@ -111,7 +111,7 @@ class Controller extends ConfigController
                 ];
             }
 
-            foreach ($parentData['children'] as $childUrl => $childData) {
+            foreach (($parentData['children'] ?? []) as $childUrl => $childData) {
                 if (!$childData['visible']) {
                     $hiddenUrls[] = $childUrl;
                     continue;
@@ -119,10 +119,43 @@ class Controller extends ConfigController
                 if ($childData['searchable'] ?? $childData['visible']) {
                     $jsonPayload[] = [
                         'name'        => $childUrl,
-                        'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
+                        'title'       => sprintf(
+                            '%s › %s',
+                            $parentData['name'] ?? '',
+                            $childData['name'] ?? '',
+                        ),
                         'description' => $childData['description'] ?? '',
                         'url'         => $childUrl,
                     ];
+                }
+
+                /* Search for grandchildren nodes. This is not what we would normally do: academically, this problem is
+                 * better solved using recursion, but that would put the algorithm beyond reach of most developers.
+                 * Linguistically we're limited to parent/child/grandchild with this cheap implementation that does
+                 * -enough- for now, but if we get any deeper than three levels, we'll need to start really rethinking
+                 * how we construct this payload.
+                 *
+                 * Note that the children[] node should be optional to cater for accidentally omitting the node
+                 */
+                foreach (($childData['children'] ?? []) as $grandchildUrl => $grandchildData) {
+                    if (!$grandchildData['visible']) {
+                        $hiddenUrls[] = $grandchildUrl;
+                        continue;
+                    }
+
+                    if ($grandchildData['searchable'] ?? $grandchildData['visible']) {
+                        $jsonPayload[] = [
+                            'name'        => $grandchildUrl,
+                            'title'       => sprintf(
+                                '%s › %s › %s',
+                                $parentData['name'] ?? '',
+                                $childData['name'] ?? '',
+                                $grandchildData['name'] ?? ''
+                            ),
+                            'description' => $grandchildData['description'] ?? '',
+                            'url'         => $grandchildUrl,
+                        ];
+                    }
                 }
             }
         }
