@@ -26,43 +26,20 @@ use Schoolbox\Mapper\Exception as MapperException;
 class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
 {
     /**
-     * The LTI assessment to save scores for.
-     */
-    private LtiAssessment $ltiAssessment;
-
-    /**
-     * The mapper used to retrieve LTI assessments.
-     */
-    private LtiAssessmentMapper $ltiAssessmentMapper;
-
-    /**
-     * The mapper used to save and retrieve LTI scores.
-     */
-    private LtiScoreMapper $ltiScoreMapper;
-
-    /**
-     * User codec, used to decode the user ID in the score into a user to score.
-     */
-    private UserCodec $userCodec;
-
-    /**
      * Constructor
      *
-     * @param LtiAssessment       $model
-     * @param LtiAssessmentMapper $ltiAssessmentMapper
-     * @param LtiScoreMapper      $scoreMapper
-     * @param UserCodec           $userCodec
+     * @param LtiAssessment       $ltiAssessment       The LTI assessment to save scores for.
+     * @param LtiAssessmentMapper $ltiAssessmentMapper The mapper used to retrieve LTI assessments.
+     * @param LtiScoreMapper      $ltiScoreMapper      The mapper used to save and retrieve LTI scores.
+     * @param UserCodec           $userCodec           User codec, used to decode the user ID in the score into a user
+     *                                                 to score.
      */
     public function __construct(
-        LtiAssessment $model,
-        LtiAssessmentMapper $ltiAssessmentMapper,
-        LtiScoreMapper $scoreMapper,
-        UserCodec $userCodec
+        private LtiAssessment $ltiAssessment,
+        private LtiAssessmentMapper $ltiAssessmentMapper,
+        private LtiScoreMapper $ltiScoreMapper,
+        private UserCodec $userCodec
     ) {
-        $this->ltiAssessment       = $model;
-        $this->ltiAssessmentMapper = $ltiAssessmentMapper;
-        $this->ltiScoreMapper      = $scoreMapper;
-        $this->userCodec           = $userCodec;
     }
 
     /**
