@@ -89,10 +89,10 @@ class Repository implements LineItemRepositoryInterface
                     : null
             );
 
-        // Unsure what to do with:
-        // identifier
-        // custom properties
-        // submission review
+        // Not yet sure what to do with:
+        // * identifier
+        // * custom properties
+        // * submission review
         $this->lineItemMapper->save($lineItemModel);
 
         // Now the line item has an ID, its identifier can be set?

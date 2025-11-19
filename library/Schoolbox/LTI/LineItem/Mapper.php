@@ -50,7 +50,6 @@ class Mapper extends BaseMapper
         $this->uses('tag', self::TYPE_STRING);
         $this->uses('start_date', self::TYPE_DATETIME);
         $this->uses('end_date', self::TYPE_DATETIME);
-        $this->uses('lti_assessment_id', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
