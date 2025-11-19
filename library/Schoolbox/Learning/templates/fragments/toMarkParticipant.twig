@@ -12,29 +12,29 @@
 {% import 'sub/assessmentResponse.twig' as assessmentResponse %}
 
 {# Enable insertion of non IAssessable instance data transfer objects #}
-{% set isTask     = isTask    ?? assessment is task %}
-{% set isQuiz     = isQuiz    ?? assessment is quiz %}
-{% set isDueWork  = isDueWork ?? assessment is dueWork %}
+{% set isTask = isTask ?? assessment is task %}
+{% set isQuiz = isQuiz ?? assessment is quiz %}
+{% set isDueWork = isDueWork ?? assessment is dueWork %}
 
 <li data-participant="{{ participant.user.id }}">
     {% set response = participant.findMostRecentSubmittedResponse %}
     {% if isTask %}
-    <div class="compact card small-11">
-        <div>
-            {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
-            <p>
-                {{ participant.user.fullName }}
-                <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
-            </p>
+        <div class="compact card small-11">
+            <div>
+                {% include 'include/portrait.twig' with {user: participant.user, description: 'View submission'} only %}
+                <p>
+                    {{ participant.user.fullName }}
+                    <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
+                </p>
+            </div>
         </div>
-    </div>
-    <div class="small-1 columns no-pad">
-        {# An icon that shows if the student has attempted the task or not #}
-        {% include '@learningAssessment/fragments/progressTick.twig' with {
-            assessment:  assessment,
-            student: participant.user
-        } only %}
-    </div>
+        <div class="small-1 columns no-pad">
+            {# An icon that shows if the student has attempted the task or not #}
+            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                assessment:  assessment,
+                student: participant.user
+            } only %}
+        </div>
     {% elseif isQuiz %}
         {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
          # Legacy Quiz attempts are not going to be in learnosity
@@ -53,7 +53,7 @@
             <a class="link-row" href="{{ quizAttemptRoute }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
                 <div class="compact card small-12">
                     <div>
-                        {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
+                        {% include 'include/portrait.twig' with {user: participant.user, description: 'View attempt'} only %}
                         <p>
                             {{ participant.user.fullName }}
                             <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
@@ -65,7 +65,7 @@
             {# Legacy Attempt; this goes nowhere, for now #}
             <div class="compact card small-12">
                 <div>
-                    {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
+                    {% include 'include/portrait.twig' with {user: participant.user, description: 'View attempt'} only %}
                     <p>
                         {{ participant.user.fullName }}
                         <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
@@ -74,16 +74,16 @@
             </div>
         {% endif %}
     {% else %}
-    <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
-        <div class="compact card small-12">
-            <div>
-                {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
-                <p>
-                    {{ participant.user.fullName }}
-                    <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
-                </p>
+        <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+            <div class="compact card small-12">
+                <div>
+                    {% include 'include/portrait.twig' with {user: participant.user, description: 'View submission'} only %}
+                    <p>
+                        {{ participant.user.fullName }}
+                        <span class="pipe meta" title="{{ response.submittedAt.local }}">Submitted {{ response.submittedAt.relativeTime }}</span>
+                    </p>
+                </div>
             </div>
-        </div>
-    </a>
+        </a>
     {% endif %}
 </li>

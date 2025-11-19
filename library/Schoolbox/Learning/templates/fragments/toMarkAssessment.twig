@@ -13,9 +13,10 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {# Enable insertion of non IAssessable instance data transfer objects #}
-{% set isTask    = isTask    ?? assessment is task %}
-{% set isQuiz    = isQuiz    ?? assessment is quiz %}
+{% set isTask = isTask ?? assessment is task %}
+{% set isQuiz = isQuiz ?? assessment is quiz %}
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
+{% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
 
 {%- set icon  = isTask ? 'task' : (isQuiz ? 'quiz' : 'due-work') -%}
 
@@ -48,6 +49,11 @@
                 {% set submitTitleSuffix = 'completed this task' -%}
                 {% set markedTitleSuffix = 'teacher assessment' -%}
                 {% set markedPastTense = 'assessed' %}
+            {%- elseif isDialogAgent -%}
+                {# TODO I had to make up the langauge for this on the spot... #}
+                {% set submitTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
+                {% set markedTitleSuffix = 'AI-based feedback generation' -%}
+                {% set markedPastTense = 'evaluated' %}
             {%- else -%}
                 {% set submitTitleSuffix = '' -%}
                 {% set markedTitleSuffix = '' -%}

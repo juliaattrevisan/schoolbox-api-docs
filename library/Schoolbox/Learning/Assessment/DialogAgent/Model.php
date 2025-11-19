@@ -262,8 +262,26 @@ class Model extends AbstractAssessment
      */
     public function isFeedbackRequired(Participant $participant): bool
     {
-        // TODO: Implement isFeedbackRequired() method.
-        return false;
+        /* TODO Decide how a response "requires feedback or not" since it's performed by an automated third party
+         *  Potentially check that a dialog_agent_feedback row exists (and is populated) for a particular response id
+         *  and, if any column is missing (or the feedback row itself is missing) then feedback "is required".........
+         *  ......but teachers can't fulfil it even if they wanted to: something went wrong with the ai service or our
+         *  interpretation of what it did.
+         *
+         * TODO for now this will -assume- feedback is required for un-confusing people atm
+         */
+        $this->assertSameAssessment($participant);
+
+        $response = $this->getAuthoritativeResponse($participant, true);
+
+        /* TODO How to figure this out?
+            $feedback = $this->getAuthoritativeFeedback($participant, true);
+            if (!$feedback) {
+                return true;
+            }
+        */
+
+        return (bool)$response;
     }
 
 
