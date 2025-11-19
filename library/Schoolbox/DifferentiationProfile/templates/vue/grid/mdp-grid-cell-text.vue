@@ -87,7 +87,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
         }
     });
     editor.model.document.on("change", () => {
-        // Ensure cell is marked as focused when content changes
+        // Ensure cell is marked as focused when content changes - don't think we want this as we are injecting AI content programmatically
         // rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         // keep the currentText in sync with the editor content
         window.Vue.nextTick()
