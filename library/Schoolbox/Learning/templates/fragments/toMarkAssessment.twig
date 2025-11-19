@@ -18,7 +18,21 @@
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
 {% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
 
-{%- set icon  = isTask ? 'task' : (isQuiz ? 'quiz' : 'due-work') -%}
+{# A default icon catch-all #}
+{% set icon = 'due-work' %}
+
+{# Specific icon representations for each learning activity
+ # TODO SURELY there must be a less annoying way to do this...like asking the assessment itself for its prescribed icon?!
+ #}
+{% if isTask %}
+    {% set icon = 'task' %}
+{% elseif isQuiz %}
+    {% set icon = 'quiz' %}
+{% elseif isDueWork %}
+    {% set icon = 'due-work' %}
+{% elseif isDialogAgent %}
+    {% set icon = 'dialog-agent' %}
+{% endif %}
 
 <section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt ? assessment.dueAt.unixTimeStamp : '' }}">
     <div class="content collapsible">
