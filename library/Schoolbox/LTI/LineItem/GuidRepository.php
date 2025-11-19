@@ -7,13 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Platform\LineItem\Guid;
+namespace Schoolbox\LTI\LineItem;
 
 use Alaress_Date_Format;
 use Aura\Router\Generator;
-use Aura\Router\Matcher;
-use Aura\Router\RouterContainer;
-use GuzzleHttp\Psr7\ServerRequest;
 use OAT\Library\Lti1p3Ags\Model\LineItem as LtiLineItem;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollection;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
@@ -22,12 +19,11 @@ use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\LTI\LineItem as SchoolboxLineItem;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Url\Uri;
 
 /**
  * Repository for GUID-based line items.
  */
-class Repository implements LineItemRepositoryInterface
+class GuidRepository implements LineItemRepositoryInterface
 {
     /**
      * Constructor

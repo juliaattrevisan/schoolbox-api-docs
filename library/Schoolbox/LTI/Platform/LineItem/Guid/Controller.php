@@ -19,7 +19,6 @@ use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\DeleteLineItemServiceS
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\GetLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\ListLineItemsServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\UpdateLineItemServiceServerRequestHandler;
-use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
@@ -27,16 +26,10 @@ use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandler
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Assessment\Lti\Model;
-use Schoolbox\LTI\Assessment as LtiAssessment;
-use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem;
-use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
-use Schoolbox\LTI\Platform\Server\ServiceServer;
-use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
+use Schoolbox\LTI\LineItem\GuidRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Url\Factory;
 
@@ -179,7 +172,7 @@ class Controller extends BaseController
      */
     private function createRepository(string $guid): LineItemRepositoryInterface
     {
-        return new Repository(
+        return new GuidRepository(
             $guid,
             $this->lineItemMapper,
             $this->routeGenerator,
