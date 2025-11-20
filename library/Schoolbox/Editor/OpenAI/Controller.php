@@ -244,20 +244,6 @@ class Controller extends Base
         $aiConfig = new Config();
         $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
 
-        // if not enabled, 404
-        if ($aiConfig->isEnabled($chatConfig) === false) {
-            $returnCode = 404;
-
-            $problem = (new ApiProblem("AI Assistant is not enabled."))
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
-
         /** gen a sessionID guid for keeping track of what is happening
          * for ckeditor chat each ai request is a new session
          */
