@@ -30,7 +30,12 @@ class Mapper extends BaseMapper
         $this->hasTable('lti_assessment');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('guid', self::TYPE_STRING, self::COLUMN_UUID);
+
+        // GUID: an identifier associating this assessment with any line items
+        // created before it.
+        // Note this doesn't have self::COLUMN_UUID, as it should be managed
+        // outside of the mapper's save method.
+        $this->uses('guid', self::TYPE_STRING);
         $this->joins(
             'assessment_id',
             AssessmentMapper::class,

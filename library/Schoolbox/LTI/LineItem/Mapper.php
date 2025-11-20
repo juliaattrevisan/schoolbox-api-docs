@@ -40,8 +40,10 @@ class Mapper extends BaseMapper
             'ltiAssessment',
         );
 
-        // LTI assessment GUID: an identifier for the future LTI assessment
-        $this->uses('lti_assessment_guid', self::TYPE_STRING, self::COLUMN_UUID);
+        // LTI assessment GUID: an identifier for the future LTI assessment.
+        // Note this doesn't have self::COLUMN_UUID, as it should be managed
+        // outside of the mapper's save method.
+        $this->uses('lti_assessment_guid', self::TYPE_STRING);
 
         // Identifier URL: used on the tool's end to identify the line item
         $this->uses('identifier_url', self::TYPE_STRING);
