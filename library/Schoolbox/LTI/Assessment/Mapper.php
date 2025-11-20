@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Assessment;
 
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\LTI\LineItem;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper as BaseMapper;
 
@@ -62,6 +63,15 @@ class Mapper extends BaseMapper
                 'other_key' => 'lti_assessment_id',
             ],
         );
+        $this->hasJoin(
+            'lineItems',
+            [
+                'mapper'    => LineItem\Mapper::class,
+                'multiple'  => true,
+                'this_key'  => 'id',
+                'other_key' => 'lti_assessment_id',
+            ],
+        );
         $this->uses('lti_assessment_url', self::TYPE_STRING);
         $this->uses('lti_assessment_title', self::TYPE_STRING);
         $this->uses('lti_assessment_text', self::TYPE_STRING);
@@ -70,6 +80,7 @@ class Mapper extends BaseMapper
         $this->uses('line_item_score_maximum', self::TYPE_DECIMAL);
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'truncateFields']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->associateLineItems(...));
     }
 
     /**
@@ -106,5 +117,30 @@ class Mapper extends BaseMapper
             $model->setLtiAssessmentText(mb_substr($model->getLtiAssessmentText(), 0, 2048, $charset));
         }
         return true;
+    }
+
+    /**
+     * Post-save callback: find any line items whose `lti_assessment_guid` field
+     * matches this assessment's GUID, and associate them.
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function associateLineItems(Model $model): void
+    {
+        if ($model->getGuid() !== null) {
+            /** @var LineItem\Mapper $lineItemMapper */
+            $lineItemMapper = $this->getJoinMapper('lineItems');
+            $lineItems      = $lineItemMapper->findByPredicates(
+                $lineItemMapper->getPredicateBuilder()
+                    ->equals('lti_assessment_guid', $model->getGuid())
+                    ->isNull('lti_assessment_id')
+            );
+            foreach ($lineItems as $lineItem) {
+                /** @var LineItem\Model $lineItem */
+                $lineItem->setLtiAssessment($model);
+            }
+            $lineItemMapper->save($lineItems);
+        }
     }
 }
