@@ -132,26 +132,32 @@
             {type: 'due',     label: 'Due',     date: assessmentImpl.dueAt},
             {type: 'late',    label: 'Late',    date: assessmentImpl.closeAt},
         ] %}
-        {% set fullSetOfDates = true %}
     {% elseif assessmentSpec is lessonPlan %}
         {# Use a different label for the assessmentImpl.dueAt field for Lesson Plans only. #}
         {% set dates = [
             {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},
             {type: 'due',  label: locale.translate('lessonPlan', false, true),  date: assessmentImpl.dueAt},
         ] %}
-        {% set fullSetOfDates = false %}
+    {% elseif assessmentSpec is dialogAgent %}
+        {# Use a different label for the assessmentImpl.dueAt field for Lesson Plans only. #}
+        {% set dates = [
+            {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},
+            {type: 'open',  label: 'Open',  date: assessmentImpl.openAt},
+            {type: 'due',  label: 'Close',  date: assessmentImpl.dueAt},
+        ] %}
     {% else %}
         {% set dates = [
             {type: 'publish', label: 'Publish', date: assessmentImpl.publishAt},
             {type: 'due',     label: 'Due',     date: assessmentImpl.dueAt},
         ] %}
-        {% set fullSetOfDates = false %}
     {% endif %}
 
     <div class="list-item" id="unit-{{ unitImpl.id }}-dates" hidden>
         {% for date in dates %}
             {% include '@learningAssessmentExporter/export_assessment_row_date.twig' with {
-                fullSetOfDates:     fullSetOfDates,
+                next: dates[loop.index0 + 1] ?? null,
+                prev: dates[loop.index0 - 1] ?? null,
+                num: dates|length,
                 date:               date.date,
                 dateType:           date.type,
                 label:              date.label,
