@@ -10,7 +10,7 @@ import { useSaveStore } from "./mdpSaveStore";
 
 export const useGenAiStore = defineStore(`genAiStore`, () => {
     const saveStore = useSaveStore();
-    const isGenerating = window.Vue.ref(false);
+    const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
     const profileToGenerate = window.Vue.ref<Profile | null>(null);
@@ -37,7 +37,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
      * @param profile - the profile to save
      */
     async function generate(profile: Profile): Promise<void> {
-        // if (isGenerating.value) {
+        // if (isProcessing.value) {
         //     return;
         // }
         // if (profile._routes.edit === undefined) {
@@ -46,7 +46,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         // }
         // const toast = window.sbProps.toastActivate("Generating...");
         // try {
-        //     isGenerating.value = true;
+        //     isProcessing.value = true;
         //     loadError.value = null;
         //     const response = await apiRequest({
         //         url: profile._routes.edit,
@@ -64,7 +64,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         //     loadError.value = errorMessage;
         //     toast.timeout({ text: errorMessage, isSuccess: false });
         // } finally {
-        //     isGenerating.value = false;
+        //     isProcessing.value = false;
         // }
         // throw in a quick data test for now
 
@@ -82,7 +82,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     }
 
     return {
-        isGenerating,
+        isProcessing,
         isOpen,
         loadError,
         profileToGenerate,
