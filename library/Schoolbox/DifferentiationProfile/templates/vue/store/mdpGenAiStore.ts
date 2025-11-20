@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { isAbortError } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useSaveStore } from "./mdpSaveStore";
@@ -14,6 +15,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
     const profile = window.Vue.ref<Profile | null>(null); // the profile to generate AI content for
+    let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
      * Generate AI content for the selected profile
@@ -30,9 +32,11 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         try {
             isProcessing.value = true;
             loadError.value = null;
+            controller = new AbortController();
             const response = await apiRequest({
                 url: "/openai/differentiation-profile",
                 method: "POST",
+                signal: controller.signal,
                 body: { studentId: profile.value.student.id },
             });
             if (!response.success) {
@@ -41,6 +45,11 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             // toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
             // the date in the format of for example 24/05/2024
         } catch (error) {
+            // ignore abort errors, as the previous request was cancelled
+            if (isAbortError(error)) {
+                toast.timeout({ text: "Generation cancelled", isSuccess: false });
+                return;
+            }
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
             loadError.value = errorMessage;
             toast.timeout({ text: errorMessage, isSuccess: false });
@@ -73,11 +82,24 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     }
 
     /**
+     * The modal can also be closed by the close button,
+     * so make sure we also handle that case
+     */
+    window.Vue.watch(isOpen, (newValue) => {
+        if (!newValue) {
+            cancel();
+        }
+    });
+
+    /**
      * to hide the generate AI prompt
      */
     function cancel(): void {
         profile.value = null;
         isOpen.value = false;
+        if (isProcessing.value) {
+            controller.abort();
+        }
     }
 
     return {

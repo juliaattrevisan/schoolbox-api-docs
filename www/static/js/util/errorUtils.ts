@@ -8,7 +8,18 @@
  * @returns - true if abort error
  */
 export function isAbortError(error: unknown): boolean {
-    return !!error && typeof error === "object" && "name" in error && (error as { name: string }).name === "AbortError";
+    if (!error || typeof error !== "object") {
+        return false;
+    }
+    // Check for AbortError name
+    if ("name" in error && (error as { name: string }).name === "AbortError") {
+        return true;
+    }
+    // Check for specific abort message
+    if ("message" in error && (error as { message: string }).message === "signal is aborted without reason") {
+        return true;
+    }
+    return false;
 }
 
 /**
