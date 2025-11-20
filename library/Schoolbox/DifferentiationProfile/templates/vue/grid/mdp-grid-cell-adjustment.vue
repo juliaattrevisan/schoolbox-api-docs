@@ -39,10 +39,17 @@ const { contentHeight, componentActionHeight } = useContentHeight(
 
 // #region modifying the selected adjustments
 
-const selectedAdjustments = window.Vue.ref<number[]>(props.adjustments ?? []);
-const hasChanged = window.Vue.computed(
-    () => selectedAdjustments.value.join(",") !== (props.adjustments ?? []).join(","),
+const selectedAdjustments = window.Vue.ref<number[]>(
+    // filter to only the latest available options
+    (props.adjustments ?? []).filter((id) => props.options.some((option) => option.id === id)),
 );
+const hasChanged = window.Vue.computed(() => {
+    // Compare against the filtered original adjustments (excluding removed options)
+    const filteredOriginalAdjustments = (props.adjustments ?? []).filter((id) =>
+        props.options.some((option) => option.id === id),
+    );
+    return selectedAdjustments.value.join(",") !== filteredOriginalAdjustments.join(",");
+});
 const isSaving = window.Vue.ref(false);
 
 /**
@@ -142,7 +149,7 @@ async function onSave(): Promise<void> {
             </div>
             <div v-else class="l-pad-s">
                 <ul>
-                    <li v-for="adjustment in adjustments" :key="adjustment">
+                    <li v-for="adjustment in selectedAdjustments" :key="adjustment">
                         {{ options.find((option) => option.id === adjustment)?.name }}
                     </li>
                 </ul>
