@@ -58,5 +58,24 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->associateWithLtiAssessment(...));
+    }
+
+    /**
+     * Pre-save function: associate this line item with the LTI assessment whose
+     * GUID matches the model's `lti_assessment_guid` field.
+     *
+     * If there's no such assessment: this method will raise an error.
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function associateWithLtiAssessment(Model $model): void
+    {
+        if ($model->getLtiAssessmentGuid()) {
+            $ltiAssessment = $this->getJoinMapper('ltiAssessment')
+                ->findOneByColumn('guid', $model->getLtiAssessmentGuid());
+            $model->setLtiAssessment($ltiAssessment);
+        }
     }
 }

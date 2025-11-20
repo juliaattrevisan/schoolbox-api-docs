@@ -128,7 +128,6 @@ class GuidRepository implements LineItemRepositoryInterface
             );
 
         // Not yet sure what to do with:
-        // * identifier
         // * custom properties
         // * submission review
         $this->lineItemMapper->save($lineItemModel);
