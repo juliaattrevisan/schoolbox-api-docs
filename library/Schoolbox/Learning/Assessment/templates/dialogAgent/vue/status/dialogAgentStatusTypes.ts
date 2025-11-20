@@ -2,6 +2,10 @@ import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserCC } from "@schoolboxLibrary/types/User";
 import { DialogAgentResponseStatus, type DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 
+export type ApiDialogAgentActionResponse = {
+    response: DialogAgentResponse;
+};
+
 export type DialogAgentScenarioCriteria = {
     id: string;
     title: string;

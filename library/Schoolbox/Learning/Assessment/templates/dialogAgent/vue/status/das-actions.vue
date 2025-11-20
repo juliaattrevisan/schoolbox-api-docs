@@ -1,13 +1,43 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { DialogAgentParticipant } from "./dialogAgentStatusTypes";
+import type { ApiDialogAgentActionResponse, DialogAgentParticipant } from "./dialogAgentStatusTypes";
 
 interface Props {
     participant: DialogAgentParticipant;
 }
 
 const props = defineProps<Props>();
+
+/**
+ * Trigger an action for the participant and update their data accordingly
+ * @param actionUrl - The URL to send the action request to
+ * @param toast - A toast that is already active to update when done
+ * @param successMessage - Toast message to show on success
+ * @param failureMessage - Toast message to show on failure
+ */
+async function triggerAction(
+    actionUrl: string,
+    toast: ReturnType<typeof window.sbProps.toastActivate>,
+    successMessage: string,
+    failureMessage: string,
+): Promise<void> {
+    const response = await apiRequest<ApiDialogAgentActionResponse>({
+        method: "POST",
+        url: actionUrl,
+    });
+
+    if (!response.success) {
+        toast.timeout({ text: failureMessage, isSuccess: false });
+        return;
+    }
+
+    toast.timeout({ text: successMessage, isSuccess: true });
+
+    // Update the stored participant data
+    // TODO: don't update props
+    props.participant.response = response.data.response;
+}
 
 /**
  * When the user clicks on "Submit on behalf of"
@@ -17,15 +47,13 @@ async function onSobo(): Promise<void> {
 
     const toastContext = `on behalf of ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Submitting ${toastContext}`);
-    const response = await apiRequest({
-        method: "POST",
-        url: props.participant.response._routes.sobo,
-    });
 
-    toast.timeout({
-        text: response.success ? `Submitted ${toastContext}` : `Failed to submit ${toastContext}`,
-        isSuccess: response.success,
-    });
+    await triggerAction(
+        props.participant.response._routes.sobo,
+        toast,
+        `Submitted ${toastContext}`,
+        `Failed to submit ${toastContext}`,
+    );
 }
 
 /**
@@ -36,15 +64,12 @@ async function onReset(): Promise<void> {
 
     const toastContext = `${locale.dialogAgent.proper()} for ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Resetting ${toastContext}...`);
-    const response = await apiRequest({
-        method: "POST",
-        url: props.participant._routes.reset,
-    });
-
-    toast.timeout({
-        text: response.success ? `Reset ${toastContext}` : `Failed to reset ${toastContext}`,
-        isSuccess: response.success,
-    });
+    await triggerAction(
+        props.participant._routes.reset,
+        toast,
+        `Reset ${toastContext}`,
+        `Failed to reset ${toastContext}`,
+    );
 }
 
 /**
@@ -55,15 +80,12 @@ async function onReopen(): Promise<void> {
 
     const toastContext = `${locale.dialogAgent.proper()} for ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Reopening ${toastContext}...`);
-    const response = await apiRequest({
-        method: "POST",
-        url: props.participant.response._routes.reopen,
-    });
-
-    toast.timeout({
-        text: response.success ? `Reopened ${toastContext}` : `Failed to reopen ${toastContext}`,
-        isSuccess: response.success,
-    });
+    await triggerAction(
+        props.participant.response._routes.reopen,
+        toast,
+        `Reopened ${toastContext}`,
+        `Failed to reopen ${toastContext}`,
+    );
 }
 
 /**
@@ -74,15 +96,12 @@ async function onResolve(): Promise<void> {
 
     const toastContext = `assistance request from ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Resolving ${toastContext}...`);
-    const response = await apiRequest({
-        method: "POST",
-        url: props.participant.response._routes.resolve,
-    });
-
-    toast.timeout({
-        text: response.success ? `Resolved ${toastContext}` : `Failed to resolve ${toastContext}`,
-        isSuccess: response.success,
-    });
+    await triggerAction(
+        props.participant.response._routes.resolve,
+        toast,
+        `Resolved ${toastContext}`,
+        `Failed to resolve ${toastContext}`,
+    );
 }
 </script>
 
