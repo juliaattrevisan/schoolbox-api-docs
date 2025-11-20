@@ -77,8 +77,15 @@ function onModify(): void {
  */
 async function onSave(): Promise<void> {
     isSaving.value = true;
+    const newValue = selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null;
+    // If both original and new values are null/empty, don't trigger save
+    if (props.adjustments === null && newValue === null) {
+        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
+        isSaving.value = false;
+        return;
+    }
     const toSave = {
-        [props.headerKey]: selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null,
+        [props.headerKey]: newValue,
     };
     await saveStore.save(props.profile, toSave);
     rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
