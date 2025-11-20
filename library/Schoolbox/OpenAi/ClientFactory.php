@@ -84,6 +84,11 @@ class ClientFactory
 
         $providerEnum = Provider::tryFrom($provider) ?? Provider::Off;
 
+        // Off: exit with a notice
+        if ($providerEnum === Provider::Off) {
+            throw new UnexpectedValueException('AI queries are not enabled for this feature.');
+        }
+
         // OpenAI: build standard client
         if ($providerEnum === Provider::OpenAi) {
             return $this->buildOpenAi($apiKey);
