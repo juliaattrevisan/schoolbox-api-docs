@@ -38,7 +38,7 @@ class DifferentiationProfile
         1. Prioritize actionable details. For each field, focus on information that is most useful for a teacher making decisions and adjustments during a lesson or when creating learning activities.
         2. Synthesize and summarize. Condense information into concise, direct responses.
         3. Use a concise, action-oriented, imperative syntax for all actionable details. For example, use \"Provide rest breaks\" instead of \"The student may benefit from rest breaks\" or \"The teacher provides rest breaks.\"
-        4. Format all lists as single-string bulleted or dot-pointed lists, using a consistent symbol (e.g., a hyphen or a bullet character) to separate items.
+        4. Format all output within the JSON values using standard HTML tags (e.g., <ul>, <li>, <b>, <p>)
         5. Do not include any introductory phrases before the content of each field (e.g., \"The document lists...\" or \"These include...\"). Begin the content directly.
         6. Do not invent or infer information that is not explicitly present in the document.
         7. Maintain a third-person, objective perspective. Crucially, avoid introducing explicit subjects like \"The teacher\" or \"The student\" in action items; use the imperative, action-oriented syntax specified in Rule 3
@@ -94,11 +94,26 @@ class DifferentiationProfile
         'schema' => [
             'type' => 'object',
             'properties' => [
-                'overview' => ['type' => 'string'],
-                'interests_strengths' => ['type' => 'string'],
-                'needs_challenges' => ['type' => 'string'],
-                'strategies_adjustments' => ['type' => 'string'],
-                'goals' => ['type' => 'string']
+                'overview' => [
+                    'type' => 'string',
+                    'description' => 'USE HTML. concise Overview of key learner attributes, including diagnosis'
+                ],
+                'interests_strengths' => [
+                    'type' => 'string',
+                    'description' => 'USE HTML. List of students strengths and interests'
+                ],
+                'needs_challenges' => [
+                    'type' => 'string',
+                    'description' => 'USE HTML. List of Needs/Challenges that the student faces.'
+                ],
+                'strategies_adjustments' => [
+                    'type' => 'string',
+                    'description' => 'USE HTML. Specific Strategies to consider when differentiating for the student'
+                ],
+                'goals' => [
+                    'type' => 'string',
+                    'description' => 'USE HTML. Students individual learning goals.'
+                ]
             ],
             'required' => [
                 'overview',
