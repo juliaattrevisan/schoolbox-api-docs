@@ -30,6 +30,7 @@ use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessmentDomainObject;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\LineItem as LtiAssessmentLineItem;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
@@ -178,7 +179,7 @@ class Controller extends BaseController
         // must also assert that the line item matches.
         // Do that here I guess?
         $ltiAssessment = $this->assessmentDataSource->findOneByColumn('ltiAssessment.guid', $guid);
-        if (!$ltiAssessment instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
+        if (!$ltiAssessment instanceof LtiAssessmentDomainObject) {
             // Not an LTI assessment: this is a user error
             throw new NotFound();
         }
