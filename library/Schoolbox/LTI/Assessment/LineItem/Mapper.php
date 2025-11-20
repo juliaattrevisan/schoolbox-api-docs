@@ -74,7 +74,8 @@ class Mapper extends BaseMapper
     {
         if ($model->getLtiAssessmentGuid()) {
             $ltiAssessment = $this->getJoinMapper('ltiAssessment')
-                ->findOneByColumn('guid', $model->getLtiAssessmentGuid());
+                ->findByColumn('guid', $model->getLtiAssessmentGuid())
+                ->first();
             $model->setLtiAssessment($ltiAssessment);
         }
     }
