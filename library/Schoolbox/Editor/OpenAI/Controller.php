@@ -25,6 +25,7 @@ use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Smalot\PdfParser\Parser;
@@ -125,7 +126,7 @@ class Controller extends Base
                 return;
             }
             return;
-        } catch (\DomainException $e) {
+        } catch (AiException\Runtime $e) {
             /* Not configured? Not found
              */
             $returnCode = 404;
@@ -210,7 +211,7 @@ class Controller extends Base
                     ->withStatus($e->getCode());
                 return;
             }
-        } catch (\DomainException $e) {
+        } catch (AiException\Runtime $e) {
             // This will always be a stream
             /* Not configured? Not found
              */
@@ -276,7 +277,7 @@ class Controller extends Base
             );
             $this->response = $this->responseAsEventStream($response);
             return;
-        } catch (\DomainException $e) {
+        } catch (AiException\Runtime $e) {
             /* Not configured? Not found
              */
             $returnCode = 404;
