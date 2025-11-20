@@ -50,13 +50,15 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         // throw in a quick data test for now
 
         profile.overview =
-            "This student is a highly motivated learner with a keen interest in science and technology. They excel in collaborative projects and demonstrate strong problem-solving skills.";
-        profile.interests_strengths = "Enjoys reading science fiction and has a strong aptitude for mathematics.";
-        profile.needs_challenges = "Requires additional support in developing writing skills and time management.";
+            "<p>This student is a highly motivated learner with a keen interest in science and technology. They excel in collaborative projects and demonstrate strong problem-solving skills.</p>";
+        profile.interests_strengths =
+            "<p>Enjoys reading science fiction and has a strong aptitude for mathematics.</p>";
+        profile.needs_challenges =
+            "<p>Requires additional support in developing writing skills and time management.</p>";
         profile.strategies_adjustments =
-            "Incorporate visual aids and hands-on activities to enhance understanding. Provide clear instructions and checklists for assignments.";
+            "<p>Incorporate visual aids and hands-on activities to enhance understanding. Provide clear instructions and checklists for assignments.</p>";
         profile.goals =
-            "Improve writing skills by attending weekly workshops. Enhance time management through the use of planners and regular check-ins.";
+            "<p>Improve writing skills by attending weekly workshops. Enhance time management through the use of planners and regular check-ins.</p>";
         await saveStore.save(profile);
     }
 
