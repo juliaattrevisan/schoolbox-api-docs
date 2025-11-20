@@ -4,7 +4,11 @@ import UserLink from "@schoolboxVue/components/user/user-link.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
 import { getResponseStatus } from "./dialogAgentStatusTypes";
-import type { DialogAgentParticipant, DialogAgentScenarioCriteria } from "./dialogAgentStatusTypes";
+import type {
+    ApiDialogAgentActionResponse,
+    DialogAgentParticipant,
+    DialogAgentScenarioCriteria,
+} from "./dialogAgentStatusTypes";
 import DasActions from "./das-actions.vue";
 
 interface Props {
@@ -13,6 +17,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{
+    (e: "updateParticipant", data: ApiDialogAgentActionResponse): void;
+}>();
 
 /**
  * Retrieve the title to show for a progress tick for a participant
@@ -75,7 +82,10 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
                 :data-tooltip="getProgressTickTitle(participant) || undefined"
             />
             <ul :id="`response-options-${participant.user.id}`" class="f-dropdown" data-dropdown-content>
-                <das-actions :participant="participant" />
+                <das-actions
+                    :participant="participant"
+                    @update-participant="(data) => emit('updateParticipant', data)"
+                />
             </ul>
         </td>
         <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">

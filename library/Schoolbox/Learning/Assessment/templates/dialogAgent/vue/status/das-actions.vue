@@ -8,6 +8,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits<{
+    (e: "updateParticipant", data: ApiDialogAgentActionResponse): void;
+}>();
 
 /**
  * Trigger an action for the participant and update their data accordingly
@@ -35,8 +38,7 @@ async function triggerAction(
     toast.timeout({ text: successMessage, isSuccess: true });
 
     // Update the stored participant data
-    // TODO: don't update props
-    props.participant.response = response.data.response;
+    emit("updateParticipant", response.data);
 }
 
 /**
