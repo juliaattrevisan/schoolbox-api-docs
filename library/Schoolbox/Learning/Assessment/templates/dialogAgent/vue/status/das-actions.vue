@@ -62,12 +62,12 @@ async function onSobo(): Promise<void> {
  * When the user clicks on "Reset"
  */
 async function onReset(): Promise<void> {
-    if (!props.participant._routes.reset) return;
+    if (!props.participant.response?._routes.reset) return;
 
     const toastContext = `${locale.dialogAgent.proper()} for ${props.participant.user.fullName}`;
     const toast = window.sbProps.toastActivate(`Resetting ${toastContext}...`);
     await triggerAction(
-        props.participant._routes.reset,
+        props.participant.response._routes.reset,
         toast,
         `Reset ${toastContext}`,
         `Failed to reset ${toastContext}`,
@@ -123,7 +123,7 @@ async function onResolve(): Promise<void> {
             {{ `Submit on behalf of ${props.participant.user.fullName}` }}
         </button>
     </li>
-    <li v-if="props.participant._routes.reset">
+    <li v-if="props.participant.response?._routes.reset">
         <button class="icon-refresh" @click="onReset">
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>

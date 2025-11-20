@@ -9,7 +9,7 @@ export enum DialogAgentResponseAction {
     ACTION_SOBO = "sobo",
     ACTION_REOPEN = "reopen",
     ACTION_RESOLVE = "resolve",
-    ACTION_RESET = "reset", // reset is done per participant, not per response
+    ACTION_RESET = "reset",
 }
 
 /**

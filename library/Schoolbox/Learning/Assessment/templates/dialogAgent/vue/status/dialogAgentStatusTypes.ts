@@ -20,6 +20,7 @@ export type DialogAgentResponse = {
         [DialogAgentResponseAction.ACTION_SOBO]?: string | null;
         [DialogAgentResponseAction.ACTION_REOPEN]?: string | null;
         [DialogAgentResponseAction.ACTION_RESOLVE]?: string | null;
+        [DialogAgentResponseAction.ACTION_RESET]?: string | null;
     };
 };
 
@@ -30,7 +31,6 @@ export type DialogAgentParticipant = {
     feedback: Record<DialogAgentScenarioCriteria["id"], string>;
     _routes: {
         summary?: string | null;
-        [DialogAgentResponseAction.ACTION_RESET]?: string | null;
     };
 };
 
