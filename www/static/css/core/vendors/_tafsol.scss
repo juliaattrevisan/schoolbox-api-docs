@@ -1852,6 +1852,21 @@ input[type="radio"] + .block {
     }
 }
 
+#profile-drop {
+    margin-inline-end: 1rem;
+    height: 3rem;
+    width: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: var(--sbx-border-radius-normal);
+    overflow: hidden;
+    padding: 0.5rem;
+    background-color: #fff;
+
+    & img {
+        border-radius: var(--sbx-border-radius-normal);
+    }
+}
 /* ==========================================================================
    19. Grids, Generic Layout & Misc Utility Styles
    ========================================================================== */
