@@ -22,6 +22,7 @@ const mbStore = useMarkbookStore();
                 href="#"
                 :class="mbStore.showAverages ? 'icon-up-arrow' : 'icon-down-arrow'"
                 title="Show additional metrics"
+                data-test="markbook-class-average-expander"
                 @click="mbStore.showAverages = !mbStore.showAverages"
             ></a>
             Class Average
@@ -29,6 +30,7 @@ const mbStore = useMarkbookStore();
 
         <th
             v-if="mbStore.showDrafts"
+            data-test="class-average-mark-book-page-draft"
             class="fixed-left student-grade-cell"
             :class="getGradient(props.classImpl.stats.draftNormalisedMean, 100, true)"
         >
@@ -36,6 +38,7 @@ const mbStore = useMarkbookStore();
         </th>
         <th
             v-else
+            data-test="class-average-mark-book-page"
             class="fixed-left student-grade-cell"
             :class="getGradient(props.classImpl.stats.normalisedMean, 100, true)"
         >
