@@ -61,13 +61,7 @@ class Controller extends ConfigController
             } catch (Exception $e) {
                 throw new Exception("Failed to encode config for feature '$feature': " . $e->getMessage(), 0, $e);
             }
-            try {
-                $this->getConfigMapper()->save($conf);
-            } catch (\Exception $e) {
-                echo $e->getMessage();
-                die();
-            }
-
+            $this->getConfigMapper()->save($conf);
         }
 
         /* Go back to the place from whence you came
