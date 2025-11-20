@@ -178,14 +178,14 @@ class Controller extends BaseController
         // Need to load domain object for LTI assessment:
         // must also assert that the line item matches.
         // Do that here I guess?
-        $ltiAssessment = $this->assessmentDataSource->findOneByColumn('ltiAssessment.guid', $guid);
+        $ltiAssessment = $this->assessmentDataSource->findOneByColumn('l.guid', $guid, true);
         if (!$ltiAssessment instanceof LtiAssessmentDomainObject) {
             // Not an LTI assessment: this is a user error
             throw new NotFound();
         }
 
         // Assert the line item's assessment is the same as the GUID's
-        if ($ltiAssessment->getId() !== $lineItem->getLtiAssessment()->getId()) {
+        if ($ltiAssessment->getGuid() !== $lineItem->getLtiAssessmentGuid()) {
             throw new NotFound();
         }
 
