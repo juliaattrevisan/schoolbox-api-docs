@@ -11,7 +11,26 @@ import { useSaveStore } from "./mdpSaveStore";
 export const useGenAiStore = defineStore(`genAiStore`, () => {
     const saveStore = useSaveStore();
     const isGenerating = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
+    const profileToGenerate = window.Vue.ref<Profile | null>(null);
+
+    /**
+     * to display a prompt to generate AI content for a profile
+     * @param profile - the profile to generate content for
+     */
+    function prompt(profile: Profile): void {
+        profileToGenerate.value = profile;
+        isOpen.value = true;
+    }
+
+    /**
+     * to hide the generate AI prompt
+     */
+    function cancel(): void {
+        profileToGenerate.value = null;
+        isOpen.value = false;
+    }
 
     /**
      * Save the given student row
@@ -63,6 +82,12 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     }
 
     return {
+        isGenerating,
+        isOpen,
+        loadError,
+        profileToGenerate,
+        prompt,
+        cancel,
         generate,
     };
 });
