@@ -394,12 +394,10 @@ class Controller extends Base
      */
     private function translatePayload(Response $response): void
     {
-        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
         $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
 
         $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
             'response' => $responseTranslator->__invoke($response),
         ])->withStatus(200);
     }
