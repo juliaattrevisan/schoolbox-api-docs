@@ -2091,6 +2091,12 @@ section {
     margin-right: 72px;
 }
 
+//added to fix some styling issue
+.f-dropdown li :is(a, button),
+.f-dropdown li :is(a, button)::before {
+    color: var(--sbx-color-accent);
+}
+
 /* ==========================================================================
    22. Legacy / Removed Tafsol Styles (Commented Out)
    ========================================================================== */
