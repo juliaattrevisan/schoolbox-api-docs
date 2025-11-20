@@ -12,10 +12,16 @@ import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useGenAiStore } from "./store/mdpGenAiStore";
 import { useSaveStore } from "./store/mdpSaveStore";
 
+type AiResponseItem = {
+    response: string | null;
+    title: string;
+    key: ProfileTextKeys;
+};
+
 const headerStore = useHeaderStore();
 const genAiStore = useGenAiStore();
 const saveStore = useSaveStore();
-const selectedOptions = window.Vue.ref<string[]>([]);
+const selectedOptions = window.Vue.ref<Partial<Record<ProfileTextKeys, AiResponseItem | null>>>({});
 
 /**
  * Watch for changes to aiResponse and auto-select all options when it's regenerated
@@ -24,7 +30,11 @@ window.Vue.watch(
     () => genAiStore.aiResponse,
     (newResponse) => {
         if (newResponse && Array.isArray(newResponse)) {
-            selectedOptions.value = newResponse.map((item) => item.key as string);
+            const newSelectedOptions: Partial<Record<ProfileTextKeys, AiResponseItem | null>> = {};
+            newResponse.forEach((item: AiResponseItem) => {
+                newSelectedOptions[item.key] = item;
+            });
+            selectedOptions.value = newSelectedOptions;
         }
     },
 );
@@ -36,22 +46,14 @@ function onConfirmSelected(): void {
     if (genAiStore.isProcessing || !genAiStore.profile || !genAiStore.aiResponse) {
         return;
     }
-
-    // Update the profile with selected AI content
-    const { profile } = genAiStore;
-    const profileToUpdate = profile as Profile;
-
-    selectedOptions.value.forEach((selectedKey) => {
-        const aiResponseItem = genAiStore.aiResponse?.find((item: any) => item.key === selectedKey) as any;
-        if (aiResponseItem && aiResponseItem.response) {
-            profileToUpdate[selectedKey as ProfileTextKeys] = aiResponseItem.response;
+    // Build the toSave object with selected AI content
+    const toSave: Partial<Pick<Profile, ProfileTextKeys>> = {};
+    Object.values(selectedOptions.value).forEach((item: AiResponseItem | null) => {
+        if (item && item.response) {
+            toSave[item.key] = item.response;
         }
     });
-
-    // Save the updated profile
-    void saveStore.save(profileToUpdate);
-
-    // Close the modal
+    void saveStore.save(genAiStore.profile as Profile, toSave);
     genAiStore.cancel();
 }
 </script>
@@ -83,8 +85,9 @@ function onConfirmSelected(): void {
                         <div>
                             <input
                                 :id="`ai-response-${item.key}`"
-                                v-model="selectedOptions"
-                                :value="item.key"
+                                v-model="selectedOptions[item.key]"
+                                :true-value="item"
+                                :false-value="null"
                                 type="checkbox"
                                 :data-test="`mdp-ai-modal-i-response-${item.key}`"
                             />

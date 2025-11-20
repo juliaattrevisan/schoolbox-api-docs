@@ -77,9 +77,10 @@ function onModify(): void {
  */
 async function onSave(): Promise<void> {
     isSaving.value = true;
-    const { profile } = props;
-    profile[props.headerKey] = selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null;
-    await saveStore.save(profile);
+    const toSave = {
+        [props.headerKey]: selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null,
+    };
+    await saveStore.save(props.profile, toSave);
     rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
     isSaving.value = false;
 }

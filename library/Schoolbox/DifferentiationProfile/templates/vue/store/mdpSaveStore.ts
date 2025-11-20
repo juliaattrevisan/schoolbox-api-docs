@@ -17,15 +17,13 @@ export const useSaveStore = defineStore(`saveStore`, () => {
      * @param toSave - object containing specific keys to update in the profile
      * @returns the updated profile object
      */
-    function updateProfile(profile: Profile, toSave: Partial<Pick<Profile, ProfileKeys>>): Profile {
-        const updatedProfile = { ...profile };
+    function updateProfile(profile: Profile, toSave: Partial<Pick<Profile, ProfileKeys>>): void {
         Object.keys(toSave).forEach((key) => {
             const profileKey = key as ProfileKeys;
             if (toSave[profileKey] !== undefined) {
-                (updatedProfile as any)[profileKey] = toSave[profileKey];
+                (profile as any)[profileKey] = toSave[profileKey];
             }
         });
-        return updatedProfile;
     }
 
     /**
@@ -45,11 +43,11 @@ export const useSaveStore = defineStore(`saveStore`, () => {
         try {
             isSaving.value = true;
             loadError.value = null;
-            const updatedProfile = updateProfile(profile, toSave);
+            updateProfile(profile, toSave);
             const response = await apiRequest({
                 url: profile._routes.edit,
                 method: "POST",
-                body: updatedProfile,
+                body: profile,
             });
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");

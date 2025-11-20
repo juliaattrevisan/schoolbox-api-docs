@@ -209,9 +209,10 @@ window.Vue.watch(
  */
 function onSave(): void {
     if (!isEditorCreated.value) return;
-    const { profile } = props;
-    profile[props.headerKey] = currentText.value;
-    void saveStore.save(profile);
+    const toSave = {
+        [props.headerKey]: currentText.value,
+    };
+    void saveStore.save(props.profile, toSave);
 }
 </script>
 
