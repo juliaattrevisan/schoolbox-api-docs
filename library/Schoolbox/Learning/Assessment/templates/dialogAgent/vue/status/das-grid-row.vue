@@ -27,19 +27,17 @@ const emit = defineEmits<{
  * @returns The title string
  */
 function getProgressTickTitle(participant: DialogAgentParticipant): string {
-    if (participant.response === null) {
-        return getResponseStatus(null);
+    if (participant.response !== null) {
+        if (participant.response.assistanceRequestedAt !== null) {
+            return `Assistance requested ${getRelativeTime(participant.response.assistanceRequestedAt, true)}`;
+        }
+
+        if (participant.response.submittedAt !== null) {
+            return `Submitted ${getRelativeTime(participant.response.submittedAt, true)}`;
+        }
     }
 
-    if (participant.response.assistanceRequestedAt !== null) {
-        return `Assistance requested ${getRelativeTime(participant.response.assistanceRequestedAt, true)}`;
-    }
-
-    if (participant.response.submittedAt !== null) {
-        return `Submitted ${getRelativeTime(participant.response.submittedAt, true)}`;
-    }
-
-    return STATUS_LABELS[participant.response.status];
+    return STATUS_LABELS[getResponseStatus(participant.response)];
 }
 </script>
 
