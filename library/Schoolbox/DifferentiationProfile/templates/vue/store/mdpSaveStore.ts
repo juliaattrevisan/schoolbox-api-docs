@@ -5,17 +5,35 @@
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import locale from "@js/terminology/rosettaStone";
-import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 
 export const useSaveStore = defineStore(`saveStore`, () => {
     const isSaving = window.Vue.ref(false);
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
     /**
+     * Update a profile with the provided keys
+     * @param profile - the profile to update
+     * @param toSave - object containing specific keys to update in the profile
+     * @returns the updated profile object
+     */
+    function updateProfile(profile: Profile, toSave: Partial<Pick<Profile, ProfileKeys>>): Profile {
+        const updatedProfile = { ...profile };
+        Object.keys(toSave).forEach((key) => {
+            const profileKey = key as ProfileKeys;
+            if (toSave[profileKey] !== undefined) {
+                (updatedProfile as any)[profileKey] = toSave[profileKey];
+            }
+        });
+        return updatedProfile;
+    }
+
+    /**
      * Save the given student row
      * @param profile - the profile to save
+     * @param toSave - object containing specific keys to update in the profile
      */
-    async function save(profile: Profile): Promise<void> {
+    async function save(profile: Profile, toSave: Partial<Pick<Profile, ProfileKeys>>): Promise<void> {
         if (isSaving.value) {
             return;
         }
@@ -27,10 +45,11 @@ export const useSaveStore = defineStore(`saveStore`, () => {
         try {
             isSaving.value = true;
             loadError.value = null;
+            const updatedProfile = updateProfile(profile, toSave);
             const response = await apiRequest({
                 url: profile._routes.edit,
                 method: "POST",
-                body: profile,
+                body: updatedProfile,
             });
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
@@ -49,5 +68,6 @@ export const useSaveStore = defineStore(`saveStore`, () => {
 
     return {
         save,
+        updateProfile,
     };
 });

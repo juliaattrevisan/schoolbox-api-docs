@@ -7,23 +7,53 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import locale from "@js/terminology/rosettaStone";
+import type { Profile, ProfileTextKeys } from "../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useGenAiStore } from "./store/mdpGenAiStore";
+import { useSaveStore } from "./store/mdpSaveStore";
 
 const headerStore = useHeaderStore();
 const genAiStore = useGenAiStore();
+const saveStore = useSaveStore();
+const selectedOptions = window.Vue.ref<string[]>([]);
+
+/**
+ * Watch for changes to aiResponse and auto-select all options when it's regenerated
+ */
+window.Vue.watch(
+    () => genAiStore.aiResponse,
+    (newResponse) => {
+        if (newResponse && Array.isArray(newResponse)) {
+            selectedOptions.value = newResponse.map((item) => item.key as string);
+        }
+    },
+);
 
 /**
  * To confirm adding AI content to the differentiation profile
  */
 function onConfirmSelected(): void {
-    if (genAiStore.isProcessing) {
+    if (genAiStore.isProcessing || !genAiStore.profile || !genAiStore.aiResponse) {
         return;
     }
-    // void genAiStore.generate(genAiStore.profileToGenerate);
-}
 
-const selectedOptions = window.Vue.ref([]);
+    // Update the profile with selected AI content
+    const { profile } = genAiStore;
+    const profileToUpdate = profile as Profile;
+
+    selectedOptions.value.forEach((selectedKey) => {
+        const aiResponseItem = genAiStore.aiResponse?.find((item: any) => item.key === selectedKey) as any;
+        if (aiResponseItem && aiResponseItem.response) {
+            profileToUpdate[selectedKey as ProfileTextKeys] = aiResponseItem.response;
+        }
+    });
+
+    // Save the updated profile
+    void saveStore.save(profileToUpdate);
+
+    // Close the modal
+    genAiStore.cancel();
+}
 </script>
 
 <template>
@@ -54,6 +84,7 @@ const selectedOptions = window.Vue.ref([]);
                             <input
                                 :id="`ai-response-${item.key}`"
                                 v-model="selectedOptions"
+                                :value="item.key"
                                 type="checkbox"
                                 :data-test="`mdp-ai-modal-i-response-${item.key}`"
                             />
@@ -61,7 +92,7 @@ const selectedOptions = window.Vue.ref([]);
                                 :for="`ai-response-${item.key}`"
                                 class="checkbox-label"
                                 :data-test="`mdp-ai-modal-i-response-${item.key}-label`"
-                                >{{ item.title }}</label
+                                ><strong>{{ item.title }}</strong></label
                             >
                         </div>
                         <!-- eslint-disable-next-line vue/no-v-html - This is sanitized by the backend already -->
