@@ -160,9 +160,18 @@ class Controller extends ConfigController
             }
         }
 
+        /* Nobody's really explained what this last foreach() was supposed to fulfil, but afaict, this finds all the
+         * additional configs that might exist outside of Subnav's purview. Excluding configs already defined in Subnav
+         * means we can avoid them doubling up in the search results payload.
+         */
         $pb = $this->getConfigMapper()->getPredicateBuilder();
         $pb->equals('hidden', 'false')
-           ->notEquals('module', 'custom');
+            ->notEquals('module', ConfigMapper::MODULE_CUSTOM)
+            /* All AI configs live in their own module but what about all the other modules?
+             * This exclusion prevents them from appearing twice
+             */
+            ->notEquals('module', ConfigMapper::MODULE_AI_SERVICES);
+
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
         /** @var Config $config */
