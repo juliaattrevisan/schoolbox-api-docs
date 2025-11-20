@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\LineItem;
+namespace Schoolbox\LTI\Assessment\LineItem;
 
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;

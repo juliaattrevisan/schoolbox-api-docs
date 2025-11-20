@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\LineItem;
+namespace Schoolbox\LTI\Assessment\LineItem;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Assessment;
 
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\LTI\LineItem;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\Mapper as BaseMapper;
 

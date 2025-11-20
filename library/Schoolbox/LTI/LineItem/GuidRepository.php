@@ -17,7 +17,7 @@ use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use Psr\Http\Message\UriInterface;
-use Schoolbox\LTI\LineItem as SchoolboxLineItem;
+use Schoolbox\LTI\Assessment\LineItem as SchoolboxLineItem;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**

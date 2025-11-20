@@ -10,14 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Assessment\Score;
 
 use PDOStatement;
+use Schoolbox\Assessment\Participant;
 use Schoolbox\GenericCollection;
+use Schoolbox\LTI\Assessment\LineItem\Mapper as LTILineItemMapper;
 use Schoolbox\LTI\Assessment\Mapper as LTIAssessmentMapper;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
-use Schoolbox\LTI\LineItem\Mapper as LTILineItemMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Participant;
 
 /**
  * LTI assessment score mapper.

@@ -13,7 +13,6 @@ use OAT\Library\Lti1p3Ags\Model\Score\ScoreInterface;
 use OAT\Library\Lti1p3Ags\Repository\ScoreRepositoryInterface;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment;
-use Schoolbox\LTI\LineItem;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -30,17 +29,17 @@ class LineItemGuidScoreRepository implements ScoreRepositoryInterface
     /**
      * Constructor
      *
-     * @param LtiAssessment           $ltiAssessment       The LTI assessment to save scores for.
-     *                                                     Note this is the domain object, not the data model.
-     * @param LineItem\Model          $ltiLineItem         The line item to save the score for.
-     * @param Assessment\Mapper       $ltiAssessmentMapper The mapper used to retrieve LTI assessments.
-     * @param Assessment\Score\Mapper $ltiScoreMapper      The mapper used to save and retrieve LTI scores.
-     * @param UserCodec               $userCodec           User codec, used to decode the user ID in the score into a
-     *                                                     user to score.
+     * @param LtiAssessment             $ltiAssessment       The LTI assessment to save scores for.
+     *                                                       Note this is the domain object, not the data model.
+     * @param Assessment\LineItem\Model $ltiLineItem         The line item to save the score for.
+     * @param Assessment\Mapper         $ltiAssessmentMapper The mapper used to retrieve LTI assessments.
+     * @param Assessment\Score\Mapper   $ltiScoreMapper      The mapper used to save and retrieve LTI scores.
+     * @param UserCodec                 $userCodec           User codec, used to decode the user ID in the score into a
+     *                                                       user to score.
      */
     public function __construct(
         private LtiAssessment $ltiAssessment,
-        private LineItem\Model $ltiLineItem,
+        private Assessment\LineItem\Model $ltiLineItem,
         private Assessment\Mapper $ltiAssessmentMapper,
         private Assessment\Score\Mapper $ltiScoreMapper,
         private UserCodec $userCodec

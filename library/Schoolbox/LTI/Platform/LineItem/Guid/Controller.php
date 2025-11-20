@@ -31,10 +31,9 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\LTI\Assessment as LtiAssessment;
+use Schoolbox\LTI\Assessment\LineItem as LtiAssessmentLineItem;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
-use Schoolbox\LTI\LineItem;
 use Schoolbox\LTI\LineItem\GuidRepository;
-use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\LineItemGuidScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Url\Factory;
@@ -47,20 +46,20 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param LineItem\Mapper                 $lineItemMapper            Line item mapper, for fetching line items.
-     * @param LtiAssessment\Mapper            $ltiAssessmentMapper       LTI assessment mapper, for retrieving the
-     *                                                                   assessment's details.
+     * @param LtiAssessmentLineItem\Mapper    $lineItemMapper           Line item mapper, for fetching line items.
+     * @param LtiAssessment\Mapper            $ltiAssessmentMapper      LTI assessment mapper, for retrieving the
+     *                                                                  assessment's details.
      * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper LTI score mapper, for writing a mark for the
-     *                                                                   assessment.
-     * @param MapperProxy                     $assessmentDataSource      Assessment data source, for fetching the
-     *                                                                   assessment for a line item when posting scores.
-     * @param RegistrationRepositoryInterface $registrations             Repository of tool+platform registrations.
-     * @param UserCodec                       $userCodec                 User codec, used to decode a user ID in the
-     *                                                                   score publish request into an actual user.
-     * @param CacheItemPoolInterface          $accessTokenCache          Cache for access tokens.
+     *                                                                  assessment.
+     * @param MapperProxy                     $assessmentDataSource     Assessment data source, for fetching the
+     *                                                                  assessment for a line item when posting scores.
+     * @param RegistrationRepositoryInterface $registrations            Repository of tool+platform registrations.
+     * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
+     *                                                                  score publish request into an actual user.
+     * @param CacheItemPoolInterface          $accessTokenCache         Cache for access tokens.
      */
     public function __construct(
-        private LineItem\Mapper $lineItemMapper,
+        private LtiAssessment\LineItem\Mapper $lineItemMapper,
         private LtiAssessment\Mapper $ltiAssessmentMapper,
         private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
         private MapperProxy $assessmentDataSource,
@@ -170,10 +169,10 @@ class Controller extends BaseController
      * @api   POST /lti-platform/line-item/guid/{guid}/{id}/scores
      * @since 25.1
      *
-     * @param string         $guid
-     * @param LineItem\Model $lineItem
+     * @param string                       $guid
+     * @param LtiAssessment\LineItem\Model $lineItem
      */
-    public function postScorePublishForGuidAndLineItem(string $guid, LineItem\Model $lineItem): void
+    public function postScorePublishForGuidAndLineItem(string $guid, LtiAssessment\LineItem\Model $lineItem): void
     {
         // Need to load domain object for LTI assessment:
         // must also assert that the line item matches.

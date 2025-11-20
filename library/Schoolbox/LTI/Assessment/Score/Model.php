@@ -11,8 +11,8 @@ namespace Schoolbox\LTI\Assessment\Score;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\LTI\Assessment\LineItem\Model as LTILineItemModel;
 use Schoolbox\LTI\Assessment\Model as LTIAssessmentModel;
-use Schoolbox\LTI\LineItem\Model as LTILineItemModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
