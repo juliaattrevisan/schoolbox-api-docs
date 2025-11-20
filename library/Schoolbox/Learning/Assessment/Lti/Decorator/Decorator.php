@@ -35,7 +35,8 @@ class Decorator implements DecoratorInterface
         ?int $toolId,
         ?array $customFields,
         ?string $lineItemResourceId,
-        ?float $lineItemScoreMaximum
+        ?float $lineItemScoreMaximum,
+        ?string $guid,
     ) {
         $this->setLtiAssessmentUrl($url);
         $this->setLtiAssessmentTitle($ltiAssessmentTitle);
@@ -44,6 +45,7 @@ class Decorator implements DecoratorInterface
         $this->setCustomFields($customFields);
         $this->setLineItemResourceId($lineItemResourceId);
         $this->setLineItemScoreMaximum($lineItemScoreMaximum);
+        $this->setGuid($guid);
     }
 
     /**
@@ -58,6 +60,8 @@ class Decorator implements DecoratorInterface
             ->setLtiTool((new LtiTool())->setId($this->ltiToolId))
             ->setCustomFields($this->customFields)
             ->setLineItemResourceId($this->lineItemResourceId)
-            ->setLineItemScoreMaximum($this->lineItemScoreMaximum);
+            ->setLineItemScoreMaximum($this->lineItemScoreMaximum)
+            ->setGuid($this->guid)
+        ;
     }
 }
