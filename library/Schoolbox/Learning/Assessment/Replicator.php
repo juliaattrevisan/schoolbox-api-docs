@@ -91,6 +91,11 @@ class Replicator
         }
 
         $this->preprocessQuiz($source, $newAssessment);
+        /* TODO FOR SOME REASON THIS IS NECESSARY HERE and nowhere else such as MapperProxy's special DialogAgent clauses
+         */
+        if ($newAssessment instanceof DialogAgent\Model) {
+            $newAssessment->setCloseAt($newAssessment->getDueAt());
+        }
 
         $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destinationContext->getAssessables()->add($newAssessment);
