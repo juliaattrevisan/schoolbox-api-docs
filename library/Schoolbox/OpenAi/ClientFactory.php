@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi;
 
+use DomainException;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
 use Schoolbox\Admin\OpenAI;
@@ -86,7 +87,7 @@ class ClientFactory
 
         // Off: exit with a notice
         if ($providerEnum === Provider::Off) {
-            throw new UnexpectedValueException('AI queries are not enabled for this feature.');
+            throw new DomainException('AI queries are not enabled for this feature.');
         }
 
         // OpenAI: build standard client
