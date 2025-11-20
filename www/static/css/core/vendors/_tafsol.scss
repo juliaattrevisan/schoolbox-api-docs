@@ -68,14 +68,12 @@ body {
 
     & #notification-toggle {
         align-items: center;
-        background-color: var(--card-bg);
-        border-radius: var(--sbx-border-radius-normal);
         display: flex;
         height: 2rem;
         width: 2rem;
 
         &::before {
-            color: #000000;
+            color: var(--sbx-color-accent-text);
             height: 100%;
             line-height: 1.9;
             width: 100%;
