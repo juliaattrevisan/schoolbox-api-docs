@@ -25,10 +25,9 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             return;
         }
         // if (profile._routes.edit === undefined) {
-        //     loadError.value = "Edit route is undefined";
+        //     loadError.value = "AI route is undefined";
         //     return;
         // }
-        const toast = window.sbProps.toastActivate("Generating...");
         try {
             isProcessing.value = true;
             loadError.value = null;
@@ -42,17 +41,14 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to generate");
             }
-            // toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
             // the date in the format of for example 24/05/2024
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
             if (isAbortError(error)) {
-                toast.timeout({ text: "Generation cancelled", isSuccess: false });
                 return;
             }
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
             loadError.value = errorMessage;
-            toast.timeout({ text: errorMessage, isSuccess: false });
         } finally {
             isProcessing.value = false;
         }
