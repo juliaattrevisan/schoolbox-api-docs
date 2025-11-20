@@ -8,6 +8,7 @@ import { isAbortError } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useSaveStore } from "./mdpSaveStore";
+import { useHeaderStore } from "./mdpHeaderStore";
 
 /**
  * Type for AI response containing at least one ProfileTextKeys field
@@ -16,12 +17,29 @@ type AiResponse = Partial<Pick<Profile, ProfileTextKeys>>;
 
 export const useGenAiStore = defineStore(`genAiStore`, () => {
     const saveStore = useSaveStore();
+    const headerStore = useHeaderStore();
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
     const profile = window.Vue.ref<Profile | null>(null); // the profile to generate AI content for
     const aiResponse = window.Vue.ref<AiResponse | null>(null); // to store the AI generated content
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+
+    /**
+     * Filter response data to only include fields that are enabled in the header store
+     * @param responseData - The AI response data to filter
+     * @returns Filtered data containing only enabled fields
+     */
+    function filterEnabledFields(responseData: AiResponse): AiResponse {
+        const enabledFieldKeys = headerStore.enabledFields.map((field) => field.key as ProfileTextKeys);
+        const filteredData: AiResponse = {};
+        enabledFieldKeys.forEach((key: ProfileTextKeys) => {
+            if (key in responseData && responseData[key] !== undefined) {
+                (filteredData as any)[key] = responseData[key];
+            }
+        });
+        return filteredData;
+    }
 
     /**
      * Generate AI content for the selected profile
@@ -48,8 +66,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to generate");
             }
-            aiResponse.value = response.data;
-            // the date in the format of for example 24/05/2024
+            aiResponse.value = filterEnabledFields(response.data);
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
             if (isAbortError(error)) {
