@@ -335,25 +335,6 @@ nav:has(
     top: 0rem !important;
 }
 
-h3:has(+ .gradient-0) {
-    margin-bottom: 0.5rem;
-}
-
-span ~ .gradient-0 {
-    margin-inline-start: 0.5rem;
-}
-
-span:has(~ .gradient-0) {
-    margin-inline-start: 0.5rem;
-}
-
-.gradient-0 {
-    background-color: color-mix(in srgb, currentColor, transparent 90%);
-    border-radius: var(--sbx-border-radius-normal);
-    padding: 4px 10px;
-    width: fit-content;
-}
-
 /* ==========================================================================
    5. Tab Controls & Three-dot Menu
    ========================================================================== */
@@ -2238,6 +2219,24 @@ section.main {
             border-bottom: var(--border);
         }
     }
+}
+    h3:has(+ .gradient-0) {
+    margin-bottom: 0.5rem;
+}
+
+span ~ .gradient-0 {
+    margin-inline-start: 0.5rem;
+}
+
+span:has(~ .gradient-0) {
+    margin-inline-start: 0.5rem;
+}
+
+.gradient-0 {
+    background-color: color-mix(in srgb, currentColor, transparent 90%);
+    border-radius: var(--sbx-border-radius-normal);
+    padding: 4px 10px;
+    width: fit-content;
 }
 
 **
