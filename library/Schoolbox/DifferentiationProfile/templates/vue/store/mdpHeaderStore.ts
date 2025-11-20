@@ -3,11 +3,25 @@
  */
 
 import { defineStore } from "pinia";
-import type { MDPHeader, Header } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { MDPHeader, Header, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 
 export const useHeaderStore = defineStore(`headerStore`, () => {
     const header = window.Vue.ref<Header[]>([]);
+
+    // List of ProfileTextKeys to filter by
+    const profileTextKeys: ProfileTextKeys[] = [
+        "overview",
+        "interests_strengths",
+        "needs_challenges",
+        "strategies_adjustments",
+        "goals",
+    ];
+
+    // Computed ref for enabled fields that match ProfileTextKeys
+    const enabledFields = window.Vue.computed(() => {
+        return header.value.filter((h) => profileTextKeys.includes(h.key as ProfileTextKeys));
+    });
 
     /**
      * store any passed through properties
@@ -60,6 +74,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
 
     return {
         header,
+        enabledFields,
         init,
         getTitleByKey,
     };
