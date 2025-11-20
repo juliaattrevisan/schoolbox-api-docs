@@ -11,9 +11,18 @@ import { useSaveStore } from "./mdpSaveStore";
 import { useHeaderStore } from "./mdpHeaderStore";
 
 /**
- * Type for AI response containing at least one ProfileTextKeys field
+ * Type for individual AI response item
  */
-type AiResponse = Partial<Pick<Profile, ProfileTextKeys>>;
+type AiResponseItem = {
+    response: string | null;
+    title: string;
+    key: ProfileTextKeys;
+};
+
+/**
+ * Type for AI response array containing response items with titles
+ */
+type AiResponse = AiResponseItem[];
 
 export const useGenAiStore = defineStore(`genAiStore`, () => {
     const saveStore = useSaveStore();
@@ -22,20 +31,25 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
     const profile = window.Vue.ref<Profile | null>(null); // the profile to generate AI content for
-    const aiResponse = window.Vue.ref<AiResponse | null>(null); // to store the AI generated content
+    const aiResponse = window.Vue.ref<AiResponse | null>(null); // to store the AI generated content array
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
      * Filter response data to only include fields that are enabled in the header store
      * @param responseData - The AI response data to filter
-     * @returns Filtered data containing only enabled fields
+     * @returns Array of filtered data containing only enabled fields with their titles
      */
-    function filterEnabledFields(responseData: AiResponse): AiResponse {
-        const enabledFieldKeys = headerStore.enabledFields.map((field) => field.key as ProfileTextKeys);
-        const filteredData: AiResponse = {};
-        enabledFieldKeys.forEach((key: ProfileTextKeys) => {
+    function filterEnabledFields(responseData: Partial<Pick<Profile, ProfileTextKeys>>): AiResponse {
+        const enabledFields = headerStore.enabledFields;
+        const filteredData: AiResponse = [];
+        enabledFields.forEach((field) => {
+            const key = field.key as ProfileTextKeys;
             if (key in responseData && responseData[key] !== undefined) {
-                (filteredData as any)[key] = responseData[key];
+                filteredData.push({
+                    response: responseData[key] || null,
+                    title: field.title,
+                    key: field.key as ProfileTextKeys,
+                });
             }
         });
         return filteredData;
@@ -57,7 +71,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             loadError.value = null;
             aiResponse.value = null;
             controller = new AbortController();
-            const response = await apiRequest<AiResponse, { studentId: number }>({
+            const response = await apiRequest<Partial<Pick<Profile, ProfileTextKeys>>, { studentId: number }>({
                 url: "/openai/differentiation-profile",
                 method: "POST",
                 signal: controller.signal,
@@ -77,19 +91,6 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         } finally {
             isProcessing.value = false;
         }
-        // throw in a quick data test for now
-
-        // profile.overview =
-        //     "<p>This student is a highly motivated learner with a keen interest in science and technology. They excel in collaborative projects and demonstrate strong problem-solving skills.</p>";
-        // profile.interests_strengths =
-        //     "<p>Enjoys reading science fiction and has a strong aptitude for mathematics.</p>";
-        // profile.needs_challenges =
-        //     "<p>Requires additional support in developing writing skills and time management.</p>";
-        // profile.strategies_adjustments =
-        //     "<p>Incorporate visual aids and hands-on activities to enhance understanding. Provide clear instructions and checklists for assignments.</p>";
-        // profile.goals =
-        //     "<p>Improve writing skills by attending weekly workshops. Enhance time management through the use of planners and regular check-ins.</p>";
-        // await saveStore.save(profile);
     }
 
     /**

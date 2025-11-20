@@ -5,9 +5,12 @@
 
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
+import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import locale from "@js/terminology/rosettaStone";
+import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useGenAiStore } from "./store/mdpGenAiStore";
 
+const headerStore = useHeaderStore();
 const genAiStore = useGenAiStore();
 
 /**
@@ -19,17 +22,53 @@ function onConfirmSelected(): void {
     }
     // void genAiStore.generate(genAiStore.profileToGenerate);
 }
+
+const selectedOptions = window.Vue.ref([]);
 </script>
 
 <template>
     <basic-modal v-model:is-open="genAiStore.isOpen">
-        <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onConfirmSelected">
+        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirmSelected">
             <h2 data-test="up-delete-units-title">
                 Suggested {{ locale.differentiationProfile.translate(false, true) }} for
                 {{ genAiStore.profile?.student.givenName }}
                 {{ genAiStore.profile?.student.lastName }}
             </h2>
             <request-error v-if="genAiStore.loadError" :further-info="genAiStore.loadError" />
+            <div v-else-if="genAiStore.isProcessing">
+                <template v-for="(field, i) in headerStore.enabledFields" :key="field.id">
+                    <hr v-if="i > 0" />
+                    <loading-cards :rows="1" :show-image="false">
+                        <h3>&nbsp;</h3>
+                        <p></p>
+                        <p></p>
+                        <p></p>
+                    </loading-cards>
+                </template>
+            </div>
+            <div v-else-if="genAiStore.aiResponse">
+                <template v-for="(item, i) in genAiStore.aiResponse" :key="item.key">
+                    <hr v-if="i > 0" />
+                    <div class="l-flex-col l-gap-s">
+                        <div>
+                            <input
+                                :id="`ai-response-${item.key}`"
+                                v-model="selectedOptions"
+                                type="checkbox"
+                                :data-test="`mdp-ai-modal-i-response-${item.key}`"
+                            />
+                            <label
+                                :for="`ai-response-${item.key}`"
+                                class="checkbox-label"
+                                :data-test="`mdp-ai-modal-i-response-${item.key}-label`"
+                                >{{ item.title }}</label
+                            >
+                        </div>
+                        <!-- eslint-disable-next-line vue/no-v-html - This is sanitized by the backend already -->
+                        <div v-html="item.response"></div>
+                    </div>
+                </template>
+            </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button
                     class="button l-flex__item--1"
@@ -39,6 +78,7 @@ function onConfirmSelected(): void {
                     Cancel
                 </button>
                 <button
+                    v-if="!genAiStore.isProcessing"
                     class="button submit l-flex__item--1"
                     type="button"
                     data-test="up-delete-unit-delete"
