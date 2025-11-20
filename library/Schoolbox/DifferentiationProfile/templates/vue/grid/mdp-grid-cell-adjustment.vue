@@ -73,17 +73,33 @@ function onModify(): void {
 // #endregion modifying the selected adjustments
 
 /**
+ * Sort adjustments by the order they appear in props.options
+ * @param adjustments - the adjustments to sort
+ * @returns the sorted adjustments array
+ */
+function getSortedAdjustments(adjustments: number[]): number[] {
+    return adjustments.length > 0
+        ? adjustments.sort((a, b) => {
+              const indexA = props.options.findIndex((option) => option.id === a);
+              const indexB = props.options.findIndex((option) => option.id === b);
+              return indexA - indexB;
+          })
+        : [];
+}
+
+/**
  * When the save button is clicked.
  */
 async function onSave(): Promise<void> {
     isSaving.value = true;
-    const newValue = selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null;
     // If both original and new values are null/empty, don't trigger save
-    if (props.adjustments === null && newValue === null) {
+    if (props.adjustments === null && selectedAdjustments.value.length === 0) {
         rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
         isSaving.value = false;
         return;
     }
+    const sortedAdjustments = getSortedAdjustments(selectedAdjustments.value);
+    const newValue = sortedAdjustments.length > 0 ? sortedAdjustments : null;
     const toSave = {
         [props.headerKey]: newValue,
     };
