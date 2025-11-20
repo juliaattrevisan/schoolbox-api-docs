@@ -25,10 +25,10 @@ function onLinkedRecordsSelected(): void {
 }
 
 /**
- * When the linked records button is clicked
+ * When the generate with AI button is clicked
  */
 function onGenerateSelected(): void {
-    void genAiStore.generate(props.profile);
+    void genAiStore.prompt(props.profile);
 }
 </script>
 

@@ -25,6 +25,7 @@ import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
+import MdpAiModal from "./mdp-ai-modal.vue";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useRowsStore } from "./store/mdpRowsStore";
 import { useLinkedRecordsStore } from "./store/mdpLinkedRecordsStore";
@@ -124,6 +125,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
         :title="linkedRecordsStore.title"
         :meta="linkedRecordsStore.meta"
     />
+    <mdp-ai-modal />
     <dummy-inline-editor />
 </template>
 
