@@ -52,6 +52,7 @@ RUN apt-get update && apt-get upgrade -y && \
         zlib \
         fileinfo \
         libxml \
+        gd \
         opcache && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

@@ -127,7 +127,8 @@
         "clue/redis-react": "^2.8",
         "php-debugbar/php-debugbar": "^2.2",
         "smalot/pdfparser": "^2.12",
-        "phpoffice/phpword": "^1.4"
+        "phpoffice/phpword": "^1.4",
+        "ext-gd": "*"
     },
     "autoload-dev": {
       "psr-4": {
