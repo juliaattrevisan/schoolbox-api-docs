@@ -5,7 +5,6 @@
  * @link      https://schoolbox.education/
  */
 
-
 declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform\LineItem\Guid;
