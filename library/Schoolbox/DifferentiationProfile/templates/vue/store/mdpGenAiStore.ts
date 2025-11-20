@@ -6,8 +6,13 @@ import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { isAbortError } from "@js/util/errorUtils";
 import locale from "@js/terminology/rosettaStone";
-import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useSaveStore } from "./mdpSaveStore";
+
+/**
+ * Type for AI response containing at least one ProfileTextKeys field
+ */
+type AiResponse = Partial<Pick<Profile, ProfileTextKeys>>;
 
 export const useGenAiStore = defineStore(`genAiStore`, () => {
     const saveStore = useSaveStore();
@@ -15,6 +20,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
     const profile = window.Vue.ref<Profile | null>(null); // the profile to generate AI content for
+    const aiResponse = window.Vue.ref<AiResponse | null>(null); // to store the AI generated content
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
@@ -31,8 +37,9 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         try {
             isProcessing.value = true;
             loadError.value = null;
+            aiResponse.value = null;
             controller = new AbortController();
-            const response = await apiRequest({
+            const response = await apiRequest<AiResponse, { studentId: number }>({
                 url: "/openai/differentiation-profile",
                 method: "POST",
                 signal: controller.signal,
@@ -41,6 +48,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to generate");
             }
+            aiResponse.value = response.data;
             // the date in the format of for example 24/05/2024
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
@@ -92,6 +100,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
      */
     function cancel(): void {
         profile.value = null;
+        aiResponse.value = null;
         isOpen.value = false;
         if (isProcessing.value) {
             controller.abort();
@@ -103,6 +112,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         isOpen,
         loadError,
         profile,
+        aiResponse,
         prompt,
         cancel,
         generate,
