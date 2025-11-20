@@ -1285,6 +1285,13 @@ class MapperProxy
      */
     public function save(IAssessable $assessable, User $currentUser)
     {
+        /* Artificially enforce close = due for dialog agents *specifically before* translation because something
+         * else will persist $assessable specially, not just the $dataModel itself.
+         */
+        if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
+            $assessable->setCloseAt($assessable->getDueAt());
+        }
+
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable);
         // Folder context translation:
