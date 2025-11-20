@@ -31,8 +31,6 @@ body {
 
     font-family: var(--ff-primary) !important;
 
-    --left-head-font: var(--sbx-color-accent);
-
     // to prevent barcode font override
     & *:not(.barcode-39) {
         font-family: var(--ff-primary) !important;
@@ -2118,6 +2116,8 @@ body {
     //--accent-foreground: var(--sbx-color-accent); // Replaced with direct usage of --sbx-color-accent
     //--form-border-color: var(--sbx-color-accent); // Don't need this variable anymore
     //background-color: #ffffff; // This is overridden in this file
+    --left-head-font: var(--sbx-color-accent); // Don't need this variable anymore
+
 
 }
 
