@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi;
 use DomainException;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
+use JsonException;
 use Schoolbox\Admin\OpenAI;
 use UnexpectedValueException;
 use Schoolbox\Editor\OpenAI\Helper;
@@ -69,17 +70,23 @@ class ClientFactory
      *
      * @param string&Helper::FEATURE_* $feature The feature to build for.
      * @return IClient
-     * @throws UnexpectedValueException if the provider is not implemented, or
-     *                                  it is but doesn't implement the feature.
+     * @throws Exception\Runtime if something went wrong with building the
+     *                           provider, e.g.:
+     *                           * it is not implemented
+     *                           * it is but doesn't implement the feature
      */
     public function buildForFeature(string $feature): IClient
     {
         // Each feature maps to a config which holds the API key and provider
         $configKey = OpenAI\Config::ALL_MODULES[$feature] ?? null;
         if ($configKey === null) {
-            throw new UnexpectedValueException(sprintf('AI feature "%s" is not implemented', $feature));
+            throw new Exception\FeatureNotImplemented(sprintf('AI feature "%s" is not implemented', $feature));
         }
-        $aiConfig = new OpenAI\Config()->decode((string)$this->config->get($configKey));
+        try {
+            $aiConfig = new OpenAI\Config()->decode((string)$this->config->get($configKey));
+        } catch (JsonException $e) {
+            throw new Exception\FeatureNotImplemented(sprintf('AI feature "%s" configuration cannot be parsed', $feature), 0, $e);
+        }
         $apiKey   = $aiConfig[OpenAi\Config::SECTION_GENERAL][OpenAI\Config::FIELD_AIKEY]['value'] ?? '';
         $provider = $aiConfig[OpenAI\Config::FIELD_PROVIDER]['value'] ?? '';
 
@@ -87,7 +94,7 @@ class ClientFactory
 
         // Off: exit with a notice
         if ($providerEnum === Provider::Off) {
-            throw new DomainException('AI queries are not enabled for this feature.');
+            throw new Exception\AgentNotEnabled('AI queries are not enabled for this feature.');
         }
 
         // OpenAI: build standard client
@@ -107,7 +114,7 @@ class ClientFactory
                         '2023-12-01-preview',
                     );
                 case Helper::FEATURE_IMAGE:
-                    throw new UnexpectedValueException('Image feature for Azure is not implemented');
+                    throw new Exception\FeatureNotSupportedByProvider('Image feature for Azure is not implemented');
                 default:
                     // Default does not use deployment ID
                     return $this->buildAzure(
@@ -119,7 +126,7 @@ class ClientFactory
             }
         }
 
-        throw new UnexpectedValueException(sprintf('AI provider "%s" is not implemented', $provider));
+        throw new Exception\ProviderNotImplemented(sprintf('AI provider "%s" is not implemented', $provider));
     }
 
 
