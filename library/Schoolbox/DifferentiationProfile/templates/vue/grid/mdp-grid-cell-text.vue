@@ -56,8 +56,7 @@ const isSaving = window.Vue.ref(false);
  * Whether the content of the cell is focused
  */
 const isContentFocused = window.Vue.computed(() => {
-    const store = rowsStore as unknown as { focusedCells?: Record<number, string[]> };
-    return (store.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+    return (rowsStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
 });
 
 /**
