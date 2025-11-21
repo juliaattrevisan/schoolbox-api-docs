@@ -210,7 +210,7 @@ window.Vue.watch(
 function onSave(): void {
     if (!isEditorCreated.value) return;
     const toSave = {
-        [props.headerKey]: currentText.value,
+        [props.headerKey]: currentText.value === "" ? null : currentText.value,
     };
     void saveStore.save(props.profile, toSave);
 }
