@@ -53,6 +53,32 @@ const loadError = window.Vue.ref<string | null>(null); // to store any error tha
 const saveText = window.Vue.computed(() => (isProcessing.value ? "Saving..." : "Save"));
 
 /**
+ * Prepare the request body with cleaned up modules data
+ * @returns The request body object with enabled flag and cleaned modules
+ */
+function getBody(): { enabled: number; modules: Data["modules"] } {
+    const cleanedModules = { ...data.value.modules };
+    Object.keys(cleanedModules).forEach((moduleKey) => {
+        const module = cleanedModules[moduleKey];
+        if (module.fields) {
+            Object.keys(module.fields).forEach((fieldKey) => {
+                const field = module.fields[fieldKey];
+                if (field.terminology === "") {
+                    field.terminology = null;
+                }
+                if (field.description === "") {
+                    field.description = null;
+                }
+            });
+        }
+    });
+    return {
+        enabled: data.value.featureToggle.enabled ? 1 : 0,
+        modules: cleanedModules,
+    };
+}
+
+/**
  * pass the new latest details to the backend
  */
 async function onSaveSelected(): Promise<void> {
@@ -63,13 +89,11 @@ async function onSaveSelected(): Promise<void> {
     try {
         isProcessing.value = true;
         loadError.value = null;
+
         const response = await apiRequest({
             url: props.postRoute,
             method: "POST",
-            body: {
-                enabled: data.value.featureToggle.enabled ? 1 : 0,
-                modules: data.value.modules,
-            },
+            body: getBody(),
         });
         if (!response.success) {
             throw new Error(response.message || "Failed to save");

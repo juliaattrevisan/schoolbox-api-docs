@@ -15,8 +15,8 @@ export type Field = {
     id: string | number;
     name: string;
     title: string;
-    terminology: string;
-    description: string;
+    terminology: string | null;
+    description: string | null;
     is_enabled: boolean;
     sequence: number; // The position/order of the field within its module
 };
