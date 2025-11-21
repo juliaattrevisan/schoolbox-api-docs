@@ -91,9 +91,9 @@ export type ProfileTextKeys = keyof Pick<
 >;
 
 /**
- * Can be either ProfileAdjustmentKeys or ProfileTextKeys
+ * Any of the profile data that can be updated
  */
-export type ProfileKeys = ProfileAdjustmentKeys | ProfileTextKeys;
+export type ProfileKeys = keyof Pick<Profile, "id" | "updated_at"> | ProfileAdjustmentKeys | ProfileTextKeys;
 
 /**
  * The expected query parameters

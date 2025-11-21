@@ -7,6 +7,13 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 
+/**
+ * Type for save response
+ */
+type SaveResponse = {
+    id: number;
+};
+
 export const useSaveStore = defineStore(`saveStore`, () => {
     const isSaving = window.Vue.ref(false);
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
@@ -44,7 +51,7 @@ export const useSaveStore = defineStore(`saveStore`, () => {
             isSaving.value = true;
             loadError.value = null;
             updateProfile(profile, toSave);
-            const response = await apiRequest({
+            const response = await apiRequest<SaveResponse, Profile>({
                 url: profile._routes.edit,
                 method: "POST",
                 body: profile,
@@ -52,9 +59,8 @@ export const useSaveStore = defineStore(`saveStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
             }
+            updateProfile(profile, { ...response.data, updated_at: window.dayjs(new Date()).format("DD/MM/YYYY") });
             toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
-            // the date in the format of for example 24/05/2024
-            profile.updated_at = window.dayjs(new Date()).format("DD/MM/YYYY");
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
             loadError.value = errorMessage;
