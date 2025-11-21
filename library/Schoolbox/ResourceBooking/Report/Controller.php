@@ -170,7 +170,7 @@ class Controller extends Base
                     }
                 }
             }
-            // collisions should overwrite the event list
+            // event list will now only contain clashes (seeing as we requested them)
             $eventList = new GenericCollection(EventInterface::class, $clashesOnlyList);
         }
 
