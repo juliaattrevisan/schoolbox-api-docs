@@ -140,6 +140,7 @@ class Controller extends Base
             /** @var array<int|string, Event[]> $eventsByResource */
             $eventsByResource = [];
             foreach ($eventList as $event) {
+                 // Due to hydration differences between resource bookings and timetable events, we need to extract the resource ID
                 $resourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event)
                     ? $event->getBooking()->getResource()->getId()
                     : $event->getResourceId();
