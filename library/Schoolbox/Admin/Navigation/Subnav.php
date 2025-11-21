@@ -782,7 +782,33 @@ class Subnav
                         'visible' => true,
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
                         'searchable' => true,
-                        'children' => []
+                        'children' => [
+                            '/adminv2/ai-services#ai_text_chat' => [
+                                'name' => 'AI Text Chat',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for interactive text editors.',
+                            ],
+                            '/adminv2/ai-services#ai_lessonplan' => [
+                                'name' => 'AI Lesson Plan',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for generating lesson plan content.',
+                            ],
+                            '/adminv2/ai-services#ai_dialogagent' => [
+                                'name' => 'AI Discussion Activity',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for discussion learning activities.',
+                            ],
+                            '/adminv2/ai-services#ai_differentiation' => [
+                                'name' => 'AI Differentiation Profiles',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for differentiation profile support in discussion learning activities.',
+                            ],
+                            '/adminv2/ai-services#ai_image_generation' => [
+                                'name' => 'AI Image Generation',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for image generation.',
+                            ],
+                        ]
                     ],
                     '/adminv2/aiLog' => [
                         'name' => 'AI Usage Log',

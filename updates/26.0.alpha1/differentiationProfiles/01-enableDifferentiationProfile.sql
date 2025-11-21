@@ -1,5 +1,5 @@
 ALTER TABLE config
-MODIFY module enum ('settings', 'comms', 'custom', 'oauth', 'schoolData', 'lti', 'report-export', 'feature-tours', 'openai-text', 'openai-image', 'differentiation-profiles')
+MODIFY module enum ('settings', 'comms', 'custom', 'oauth', 'schoolData', 'lti', 'report-export', 'feature-tours', 'ai-services', 'differentiation-profiles')
 DEFAULT 'settings';
 
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)

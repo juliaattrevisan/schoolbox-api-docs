@@ -111,7 +111,7 @@ class Controller extends ConfigController
                 ];
             }
 
-            foreach ($parentData['children'] as $childUrl => $childData) {
+            foreach (($parentData['children'] ?? []) as $childUrl => $childData) {
                 if (!$childData['visible']) {
                     $hiddenUrls[] = $childUrl;
                     continue;
@@ -119,29 +119,64 @@ class Controller extends ConfigController
                 if ($childData['searchable'] ?? $childData['visible']) {
                     $jsonPayload[] = [
                         'name'        => $childUrl,
-                        'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
+                        'title'       => sprintf(
+                            '%s › %s',
+                            $parentData['name'] ?? '',
+                            $childData['name'] ?? '',
+                        ),
                         'description' => $childData['description'] ?? '',
                         'url'         => $childUrl,
                     ];
                 }
+
+                /* Search for grandchildren nodes. This is not what we would normally do: academically, this problem is
+                 * better solved using recursion, but that would put the algorithm beyond reach of most developers.
+                 * Linguistically we're limited to parent/child/grandchild with this cheap implementation that does
+                 * -enough- for now, but if we get any deeper than three levels, we'll need to start really rethinking
+                 * how we construct this payload.
+                 *
+                 * Note that the children[] node should be optional to cater for accidentally omitting the node
+                 */
+                foreach (($childData['children'] ?? []) as $grandchildUrl => $grandchildData) {
+                    if (!$grandchildData['visible']) {
+                        $hiddenUrls[] = $grandchildUrl;
+                        continue;
+                    }
+
+                    if ($grandchildData['searchable'] ?? $grandchildData['visible']) {
+                        $jsonPayload[] = [
+                            'name'        => $grandchildUrl,
+                            'title'       => sprintf(
+                                '%s › %s › %s',
+                                $parentData['name'] ?? '',
+                                $childData['name'] ?? '',
+                                $grandchildData['name'] ?? ''
+                            ),
+                            'description' => $grandchildData['description'] ?? '',
+                            'url'         => $grandchildUrl,
+                        ];
+                    }
+                }
             }
         }
 
+        /* Nobody's really explained what this last foreach() was supposed to fulfil, but afaict, this finds all the
+         * additional configs that might exist outside of Subnav's purview. Excluding configs already defined in Subnav
+         * means we can avoid them doubling up in the search results payload.
+         */
         $pb = $this->getConfigMapper()->getPredicateBuilder();
         $pb->equals('hidden', 'false')
-           ->notEquals('module', 'custom');
+            ->notEquals('module', ConfigMapper::MODULE_CUSTOM)
+            /* All AI configs live in their own module but what about all the other modules?
+             * This exclusion prevents them from appearing twice
+             */
+            ->notEquals('module', ConfigMapper::MODULE_AI_SERVICES);
+
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
         /** @var Config $config */
         foreach ($foundConfig as $config) {
             $module = $config->getModule();
-
-            /* Special case for OpenAI settings since they have their own module
-             * based on them being for Text AI and Image AI
-             */
-            if (in_array($module, [ConfigMapper::MODULE_OPENAI_TEXT, ConfigMapper::MODULE_OPENAI_IMAGE])) {
-                $module = ConfigMapper::MODULE_OPENAI_AI_SERVICES;
-            }
 
             $type = $config->getType() ? $config->getType()->getType() : '';
             $url = $this->getSettingsPageUrl($module, $type);

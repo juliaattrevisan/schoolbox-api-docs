@@ -46,17 +46,8 @@ class ConfigMapper extends Mapper
     public const MODULE_LTI        = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
     public const MODULE_FEATURE_TOURS = 'feature-tours';
+    public const MODULE_AI_SERVICES = 'ai-services';
     public const MODULE_DIFFERENTIATION_PROFILES = 'differentiation-profiles';
-
-    /* Logically group each set of ai credentials based purely on the purpose they serve
-     * since the settings controllers group by module
-     */
-    public const MODULE_OPENAI_TEXT = 'openai-text';
-    public const MODULE_OPENAI_IMAGE = 'openai-image';
-
-    /* A special case for search
-     */
-    public const MODULE_OPENAI_AI_SERVICES = 'ai-services';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -582,8 +573,7 @@ class ConfigMapper extends Mapper
                 self::MODULE_LTI,
                 self::MODULE_REPORT_EXPORT,
                 self::MODULE_FEATURE_TOURS,
-                self::MODULE_OPENAI_TEXT,
-                self::MODULE_OPENAI_IMAGE,
+                self::MODULE_AI_SERVICES,
                 self::MODULE_DIFFERENTIATION_PROFILES,
             ]
         );
