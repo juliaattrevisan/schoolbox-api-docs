@@ -5,7 +5,7 @@ import type { AgentChatImage } from "../agentChatTypes";
 
 /**
  * The possible event types that agentChat expects to receive during an event stream
- * @see /library/Schoolbox/OpenAi/EventStream/AgentChatMessageEventType.php
+ * @see /library/Schoolbox/OpenAi/AgentChat/MessageEventType.php
  */
 export enum AgentChatMessageEventType {
     /**

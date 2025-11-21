@@ -7,13 +7,13 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\EventStream;
+namespace Schoolbox\OpenAi\AgentChat;
 
 /**
  * The possible event types that agentChat expects to receive during an event stream
  * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
  */
-enum AgentChatMessageEventType: string
+enum MessageEventType: string
 {
     /**
      * Intermediate event - The response was created and we recieved some sign of life back from the AI
