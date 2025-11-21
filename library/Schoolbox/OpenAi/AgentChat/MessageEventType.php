@@ -11,6 +11,7 @@ namespace Schoolbox\OpenAi\AgentChat;
 
 /**
  * The possible event types that agentChat expects to receive during an event stream
+ * This differs from the event types recieved from an AI tool, they are internal types to Agent Chat logic
  * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
  */
 enum MessageEventType: string

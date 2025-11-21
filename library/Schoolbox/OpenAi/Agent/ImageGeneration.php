@@ -9,33 +9,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent;
 
-use Crell\ApiProblem\ApiProblem;
 use Psr\Http\Client\ClientExceptionInterface;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
-use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\AgentChat;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Agent for generating images via OpenAI.
  */
 class ImageGeneration
 {
-    /**
-     * The following AgentChatMessageEventType events indicate the end of a response
-     * and when we should finalise the log and stop sending more messages to the frontend.
-     */
-    private const array AGENT_CHAT_EVENT_TYPES_FINISHED = [
-        AgentChat\MessageEventType::COMPLETE->value,
-        AgentChat\MessageEventType::ERROR->value,
-    ];
-
-
     /**
      * Constructor
      *
@@ -77,111 +63,8 @@ class ImageGeneration
         // TODO: Should $prompt (what ends up being logged as inputText) contain the other parameters such as the style you selected too? or are we okay with loosing that info
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
 
-        // TODO: what happens to random errors thrown from within here? do they end up as ApiProblem's correctly?
-        // TODO: Hmm.. I swear I had issues always using large chunks with it being slow for deltas
-        $stream = $this->client->createResponseStream($payload, $log, 8192);
-
-        /**
-         * The response ID associated to the OpenAI request once we receive it.
-         * Used by the frontend to track the response and continue the conversation
-         *
-         * Passed by reference to handleStreamMessage so it can be set and maintained once we receive it
-         */
-        $responseId = null;
-
-        // TODO: perhaps use something similar to ILogHandler instead of doing this here
-        foreach ($stream as $rawMessage) {
-            $message = null;
-
-            try {
-                $message = AgentChat\MessageHandler::handleStreamMessage($rawMessage, $responseId);
-            } catch (SchoolboxException $e) {
-                /** Some error occured during processing, send it onwards to the frontend as an ApiProblem */
-                $problem = (new ApiProblem($e->getMessage()))->setStatus($e->getCode());
-
-                $message = new Message(
-                    json_encode($problem->asArray(), JSON_THROW_ON_ERROR),
-                    AgentChat\MessageEventType::ERROR->value
-                );
-            }
-
-            if (null === $message) {
-                /** Nothing relevant to send, skip this message */
-                continue;
-            }
-
-            yield $message->__toString();
-
-            // TODO: probably log from here depending on the message type?
-
-            /**
-             * on a COMPLETE or ERROR event, there's nothing more to meaningfully continue with.
-             * We should stop processing now to avoid further random messages being sent to the frontend
-             *
-             * This is also where the final output text can be extracted for restoring the conversation later
-             */
-            if (\in_array($message->eventType, self::AGENT_CHAT_EVENT_TYPES_FINISHED, true)) {
-                /**
-                 * This indicates the final output for the response, it can be restored later in this exact format
-                 * WARNING: If you were to change this structure, old conversations may not restore correctly unless migrated
-                 * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
-                 */
-                try {
-                    $data = $message->getDataAsArray();
-                } catch (UnexpectedValueException $e) {
-                    $data = null;
-                }
-
-                if (null === $data) {
-                    /** couldn't decode the final message data, log an error instead - It should be impossible to end up here? */
-                    $event = [
-                        'status' => 'error',
-                        'responseId' => $responseId ?? null,
-                        'message' => 'Failed to decode',
-                    ];
-                } else if (AgentChat\MessageEventType::COMPLETE->value === $message->eventType) {
-                    /** Successful completion */
-                    $event = [
-                        'status' => 'success',
-                        'responseId' => $data['responseId'],
-                        'image' => null,
-                        'message' => $data['message'],
-                    ];
-
-                    if (is_array($data['image'])) {
-                        $event['image'] = false; // false indicates that the image was generated but omitted from the log
-                    }
-                } else {
-                    /** Something went wrong, try to derive the error details assuming it's an ApiProblem */
-                    $problem = ApiProblem::fromArray($data);
-
-                    /** @see /www/static/js/util/sbx/apiUtils.ts */
-                    $failureMessage = 'An unexpected error occured';
-                    if ($problem->getTitle()) {
-                        $failureMessage = $problem->getTitle();
-                    }
-                    if ($problem->getDetail()) {
-                        $failureMessage .= ': ' . $problem->getDetail();
-                    }
-
-                    $event = [
-                        'status' => 'error',
-                        'responseId' => $responseId ?? null,
-                        'message' => $failureMessage,
-                    ];
-                }
-
-                $log->setOutputText(json_encode($event, JSON_THROW_ON_ERROR));
-                $this->client->saveLog($log);
-
-                // TODO: This basically overrides whatever ResponseMessage::logCompletion thought the final status was, we are a lot more informed here than over there...
-                // perhaps this needs to be revised to set those states properly?
-                return;
-            }
-        }
-
-        /** Reached the end of the stream without receiving a final event, something went wrong... */
-        // TODO: What to do in this scenario? either just leave it and the frontend will detect an early end already, or send a specific error message?
+        $handler = new AgentChat\MessageHandler($this->client);
+        return $handler->requestStream($payload, $log);
     }
 
 
@@ -222,58 +105,5 @@ class ImageGeneration
             $imageUrl,
             $previousResponseId,
         );
-    }
-
-
-    /**
-     * Translate a base64 image into an array expected by the frontend for agent chat messages
-     * @param string $base64Image
-     * @return array
-     * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/agentChatTypes.ts AgentChatImage
-     */
-    private static function translateImageData(string $base64Image): array
-    {
-        /* currently we always expect a PNG back from the AI, so assume it is */
-        // TODO: this should actually be linked to ImageGeneration::IMAGE_OUTPUT_FORMAT in some way I guess
-        return [
-            'b64' => $base64Image,
-            'name' => 'image.png',
-            'mime' => 'image/png',
-        ];
-    }
-
-
-    /**
-     * Translate a saved log's inputText and outputText back into structured data for this particular feature
-     * @param Log\Model $log
-     * @return array{request:string,response:array}
-     */
-    public static function translateLogData(Log\Model $log): array
-    {
-        $inputText = $log->getInputText();
-        $outputText = $log->getOutputText();
-
-        $response = null;
-        if (!empty($outputText)) {
-            try {
-                $response = json_decode($outputText, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
-                // noop; leave null for below
-            }
-        }
-
-        if (null === $response) {
-            /** either failed to parse, or no output at all. Fall back to an unknown output */
-            $response = [
-                'status' => 'error',
-                'responseId' => null,
-                'message' => 'Unable to retrieve response',
-            ];
-        }
-
-        return [
-            'request' => $inputText,
-            'response' => $response,
-        ];
     }
 }

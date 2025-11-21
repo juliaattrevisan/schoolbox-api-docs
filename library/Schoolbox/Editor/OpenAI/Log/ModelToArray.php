@@ -37,7 +37,7 @@ class ModelToArray
         if ($log->getFeature() === Helper::FEATURE_CHAT) {
             $logData = null; // nothing for now, but should be added later
         } elseif ($log->getFeature() === Helper::FEATURE_IMAGE) {
-            $logData = \Schoolbox\OpenAi\Agent\ImageGeneration::translateLogData($log);
+            $logData = \Schoolbox\OpenAi\AgentChat\MessageHandler::translateLogData($log);
         }
 
         $translation = [
