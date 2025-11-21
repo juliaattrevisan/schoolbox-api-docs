@@ -169,7 +169,10 @@
                 }
             ] %}
         {% elseif assessment is dialogAgent %}
-            {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui) #}
+            {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui)
+             # ...and the due date is put in the same place as Close Date, for cosmetic reasons only: it still retains
+             # the same programmatic meaning as Due Date despite this positioning
+             #}
             {% set dates = [
                 {
                     'type': 'publish',
@@ -180,6 +183,7 @@
                     'label': 'Open'
                 },
                 null,
+
                 {
                     'type': 'due',
                     'label': 'Close'
