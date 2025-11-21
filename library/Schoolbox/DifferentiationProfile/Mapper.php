@@ -8,6 +8,7 @@
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Filter\Filters\DifferentiationProfile;
 use Schoolbox\Filter\Filters\DifferentiationProfile\Name\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -119,11 +120,17 @@ class Mapper extends BaseMapper
         }
 
         if (!empty($adjustmentCategories)) {
-            $pb = $pb->in('ac.id', $adjustmentCategories);
+            $categories = implode(',', $adjustmentCategories);
+            $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN ( $categories )", [
+                'adjustment_categories_none_key' => DifferentiationProfile\AdjustmentCategory\KeyConverter::NONE_KEY_VALUE,
+            ]);
         }
 
         if (!empty($adjustmentLevels)) {
-            $pb = $pb->in('al.id', $adjustmentLevels);
+            $levels = implode(',', $adjustmentLevels);
+            $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN ( $levels )", [
+                'adjustment_levels_none_key' => DifferentiationProfile\AdjustmentLevel\KeyConverter::NONE_KEY_VALUE,
+            ]);
         }
 
         $pb->isNull('differentiation_profiles.deleted_at');
@@ -169,8 +176,8 @@ class Mapper extends BaseMapper
                 {$this->getFromString()}
                 INNER JOIN userCampus sc ON s.id = sc.uid
                 INNER JOIN userAccess ua ON sc.campus = ua.sid AND ua.service = :service AND ua.type >= :accessLevel AND ua.uid = :viewerId
-                LEFT JOIN differentiation_profiles_adjustment_category ac ON differentiation_profiles.adjustment_category = ac.id
-                LEFT JOIN differentiation_profiles_adjustment_level al ON differentiation_profiles.adjustment_level = al.id
+                LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
+                LEFT JOIN differentiation_profiles_adjustment_level al ON FIND_IN_SET(al.id, differentiation_profiles.adjustment_level)
                 WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
                 AND {$where}
                 GROUP BY p.student_id, s.lastname, s.chosen_name
