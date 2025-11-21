@@ -337,7 +337,7 @@ class Controller extends Base
             $this->response = $this->responseAsJson(
                 [
                     "id" => $model->getId(),
-                    "lastUpdated" => $model->getUpdatedAt()->getShort(),
+                    "lastUpdatedAt" => $model->getUpdatedAt()->getShort(),
                 ]
             )->withStatus(200);
         } catch (\Exception $e) {
