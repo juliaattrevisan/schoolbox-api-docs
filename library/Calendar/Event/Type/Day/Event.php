@@ -487,7 +487,7 @@ class Event extends EventBase
             $eventA instanceof \Calendar\Event\Type\Timetable\Event &&
             $eventB instanceof \Calendar\Event\Type\Timetable\Event
         ) {
-            // if not booking, then assume its a timetable event
+            // This must be a timetable event
             // check if for the same homepage (class)
             if (
                 ($eventA->getCategoryId() === $eventB->getCategoryId())
