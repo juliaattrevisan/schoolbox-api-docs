@@ -475,8 +475,12 @@ class Event extends EventBase
             if ($eventA->getBooking()->getId() === $eventB->getBooking()->getId()) {
                 return false;
             }
-            // only care if the booking is pending, so we can see conflicts (that we need to action)
-            if ($eventB->getBooking()->getStatus()->getId() !== StatusModel::STATUS_PENDING) {
+            // only care if a booking is NOT pending, so we can see conflicts (that we need to action)
+            // bookings that are both pending are not a clash
+            if (
+                $eventB->getBooking()->getStatus()->getId() === StatusModel::STATUS_PENDING &&
+                $eventA->getBooking()->getStatus()->getId() === StatusModel::STATUS_PENDING
+            ) {
                 return false;
             }
         } elseif (

@@ -346,7 +346,7 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 102,
                 BookingStatusModel::STATUS_APPROVED,
-                false,
+                true,
             ],
             'b-pending-and-overlap-clash' => [
                 '2025-11-13 09:00:00',
@@ -368,7 +368,7 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 402,
                 BookingStatusModel::STATUS_PENDING,
-                true,
+                false,
             ],
             'both-approved-overlap-no-clash' => [
                 '2025-11-13 08:00:00',
@@ -379,7 +379,7 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 502,
                 BookingStatusModel::STATUS_APPROVED,
-                false,
+                true,
             ],
             'b-pending-but-non-overlap-no-clash' => [
                 '2025-11-13 09:00:00',
