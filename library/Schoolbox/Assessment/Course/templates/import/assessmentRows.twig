@@ -241,8 +241,17 @@
 
                     {# Process each assessment's date scheme algorithmically #}
                     {% for struct in dates %}
-                        {% set next = dates[loop.index0 + 1] ?? null %}
-                        {% set prev = dates[loop.index0 - 1] ?? null %}
+                        {# YES I know this is a bit ugly-looking but twig just isn't that great
+                         # The idea here is that there are only four canonical dates, a fixed domain-limited quantity,
+                         # which won't expand trivially: we'd have to inves A LOT to make a fifth date or remove one
+                         # of them (this is consequential on a galactic level)
+                         #
+                         # So to save a bunch of kerfuffle around twig for loops we can count on this somewhat assumed
+                         # rule of the universe and just look ahead (or look behind) to find the nearest non-null
+                         # neighbouring date to sync against. This is super cheap, not super artistic.
+                         #}
+                        {% set next = dates[loop.index0 + 1] ?? dates[loop.index0 + 2] ?? dates[loop.index0 + 3] ?? null %}
+                        {% set prev = dates[loop.index0 - 1] ?? dates[loop.index0 - 2] ?? dates[loop.index0 - 3] ?? null %}
 
                         {% if struct is null %}
                             {# an empty placeholder cell for grid niceness #}
