@@ -1,26 +1,54 @@
-{#
-    'fullSetOfDates'     bool
-    'date'               Alaress_Date_Format
-    'dateType'           string
-    'label'              string
-    'unitImplementation' UnitImplementation\Model
-#}
+{##
+ # Date renderer for exporting individual activities to homepages that didn't have them
+ #
+ # This operates on the natural sequencing of publish, due, open, close dates.
+ # These four dates have been canonical since...pretty much the start of time.
+ #
+ # The publish date must be before due, due must be before open, etc. However, some activities only use a subset
+ # of these canonical four dates. Nevertheless, the sequencing rule is still obeyed so that dates synchronise
+ # in the intended manner (publish before due, due before open, etc).
+ #
+ # We can figure out the synchoronisation algorithmically, provided we follow this pattern.
+ #
+ # @param array|null $next            A struct representing the next date in a sequence
+ # @param array|null $prev            A struct representing the previous date in a sequence
+ # @param int $num                    The total number of dates we'll be rendering (for column width purposes only)
+ # @param \Alaress_Date_Format $date  A string representing the current date being rendered
+ # @param string $type                A string representing one of the four canonical dates
+ # @param string $label               A user-facing version of the $type
+ # @param Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImplementation  A unit implementation instance
+ #}
 
-{% set large = (fullSetOfDates) ? 3 : 6 %}
+{% set startSync = null %}
+{% set endSync = null %}
 
-{% if dateType == 'publish' %}
-    {% set endSync = (fullSetOfDates) ? 'open' : 'due' %}
-{% elseif dateType == 'open' %}
-    {% set startSync = 'publish' %}
-    {% set endSync = 'due' %}
-{% elseif dateType == 'due' %}
-    {% set startSync = (fullSetOfDates) ? 'open' : 'publish' %}
-    {% set endSync = (fullSetOfDates) ? 'late' : '' %}
-{% else %}
-    {% set startSync = 'due' %}
+{% if prev is not null %}
+    {% set startSync = prev.type %}
 {% endif %}
 
-<div class="small-12 medium-6 large-{{ large }} columns">
+{% if next is not null %}
+    {% set endSync = next.type %}
+{% endif %}
+
+{# Figure out a column width based on the number of elements we're going to render
+ # Dates come in groups of 2, 3, or 4 elements. Medium viewports always display in two columns and large viewports used
+ # to display all four dates in one column. Dialog Agents adds an odd number in here so you can't get a nice grid of
+ # input elements anymore. You'll just have to live with that.
+ #}
+{% set colWidthLarge = 2 %}
+
+{% if num == 4 %}
+    {# All four dates exist (e.g. due work) - each date takes up 3 cols #}
+    {% set colWidthLarge = 3 %}
+{% elseif num == 3 %}
+    {# Only three dates (e.g. dialog agents) - each date takes up 4 cols #}
+    {% set colWidthLarge = 4 %}
+{% elseif num == 2 %}
+    {# Only two dates (e.g. lesson plans) - each date takes up 6 cols#}
+    {% set colWidthLarge = 6 %}
+{% endif %}
+
+<div class="small-12 medium-6 large-{{ colWidthLarge }} columns">
     <label for="{{ dateType }}Date-{{ unitImplementation.id }}">{{ label }} Date</label>
     <input id="{{ dateType }}Date-{{ unitImplementation.id }}"
            name="unit[{{ unitImplementation.id }}][{{ dateType }}]"
@@ -30,8 +58,8 @@
            data-datepicker-time
            data-datepicker-format="datetime"
            data-datepicker-buttontext=""
-           {% if startSync is defined %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
-           {% if endSync is defined %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           {% if startSync is not null %}data-datesync-startdate="#{{ startSync }}Date-{{ unitImplementation.id }}"{% endif %}
+           {% if endSync is not null %}data-datesync-enddate="#{{ endSync }}Date-{{ unitImplementation.id }}"{% endif %}
            required
     />
 </div>

@@ -98,12 +98,113 @@
          # workflow so don't change that expecting it to affect behaviours here.
          # $acceptingResponses is passed quietly and implicitly into fragments/dates.twig
          # (not mentioned in this twig file) where it's used to decide which natpickers to show
+         #
+         # TODO verify this statement made in 2023
          #}
-        {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) or assessment is lti %}
-        {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
-        {% set dueSyncStart         = (acceptingResponses) ? 'open' : 'publish' %}
-        {% set dueSyncEnd           = (acceptingResponses) ? 'close' : '' %}
 
+
+        {# Default dates
+         # lti, lesson plan, task, project etc. all default to needing just two dates.
+         # null elements here cause an empty table cell to be rendered so it's somehat indicative of the ui
+         # This accommodates the growing variety of activites' esoteric requirements
+         #
+         # These come as (type, label) tuples so you can
+         #     - conditionally decide which dates are relevant without copypasting A LOT of functional code
+         #     - arbitrarily rename a label for those special activities
+         #     - change the order and thus the implicit sequencing
+         #     - insert empty columns whenever you need one
+         #}
+        {% set dates = [
+            {
+                'type': 'publish',
+                'label': 'Publish'
+            },
+            null,
+            {
+                'type': 'due',
+                'label': 'Due'
+            },
+            null
+        ] %}
+
+        {# Ideally these fragments would be somewhere in each assessment's folder, but that's part of a bigger
+         # swamp problem where we need to reorganise how features interrogate activities' particular behaviours
+         #}
+        {% if assessment is dueWork %}
+            {% if not assessment.acceptNone %}
+                {# Due Work uniquely offers offline submissions; online submissions require all four dates #}
+                {% set dates = [
+                    {
+                        'type': 'publish',
+                        'label': 'Publish'
+                    },
+                    {
+                        'type': 'open',
+                        'label': 'Open'
+                    },
+                    {
+                        'type': 'due',
+                        'label': 'Due'
+                    },
+                    {
+                        'type': 'close',
+                        'label': 'Late'
+                    }
+                ] %}
+            {% endif %}
+        {% elseif assessment is quiz %}
+            {% set dates = [
+                {
+                    'type': 'publish',
+                    'label': 'Publish'
+                },
+                {
+                    'type': 'open',
+                    'label': 'Open'
+                },
+                {
+                    'type': 'due',
+                    'label': 'Due'
+                },
+                {
+                    'type': 'close',
+                    'label': 'Late'
+                }
+            ] %}
+        {% elseif assessment is dialogAgent %}
+            {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui)
+             # ...and the due date is put in the same place as Close Date, for cosmetic reasons only: it still retains
+             # the same programmatic meaning as Due Date despite this positioning
+             #}
+            {% set dates = [
+                {
+                    'type': 'publish',
+                    'label': 'Publish'
+                },
+                {
+                    'type': 'open',
+                    'label': 'Open'
+                },
+                null,
+                {
+                    'type': 'due',
+                    'label': 'Close'
+                }
+            ] %}
+        {% elseif assessment is lessonPlan %}
+            {% set dates = [
+                {
+                    'type': 'publish',
+                    'label': 'Publish'
+                },
+                null,
+                {
+                    'type': 'due',
+                    'label': locale.translate('lessonPlan', false, true)
+                },
+                null
+            ] %}
+        {% endif %}
 
         {# Render the assessment only if:
          # * I can read the unit spec, or:
@@ -144,59 +245,69 @@
                 </div>
                 <div data-assessment-dates="{{ assessment.id }}"{% if not isChecked %} style="display: none;"{% endif %}>
 
-                    {#publish date is always relevant #}
-                    {% include '@course/import/date.twig' with {
-                        assessmentDate: assessment.publishAt,
-                        unitDate: unitImpl.openDate,
-                        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                        dateProperty: 'publish',
-                        dateSyncEnd: publishDateSync,
-                        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
-                    } only %}
+                    {# Process each assessment's date scheme algorithmically #}
+                    {% for struct in dates %}
+                        {# YES I know this is a bit ugly-looking but twig just isn't that great
+                         # The idea here is that there are only four canonical dates, a fixed domain-limited quantity,
+                         # which won't expand trivially: we'd have to invest A LOT to make a fifth date or remove one
+                         # of them (this is consequential on a galactic level)
+                         #
+                         # So to save a bunch of kerfuffle around twig for loops we can count on this somewhat assumed
+                         # rule of the universe and just look ahead (or look behind) to find the nearest non-null
+                         # neighbouring date to sync against. This is super cheap, not super artistic.
+                         #}
+                        {% set next = dates[loop.index0 + 1]['type'] ?? dates[loop.index0 + 2]['type'] ?? dates[loop.index0 + 3]['type'] ?? null %}
+                        {% set prev = dates[loop.index0 - 1]['type'] ?? dates[loop.index0 - 2]['type'] ?? dates[loop.index0 - 3]['type'] ?? null %}
 
-                    {#open date is relevant when accepting responses#}
-                    {% if acceptingResponses %}
-                        {% include '@course/import/date.twig' with {
-                            assessmentDate: assessment.openAt,
-                            unitDate: unitImpl.openDate,
-                            inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                            dateProperty: 'open',
-                            dateSyncStart: 'publish',
-                            dateSyncEnd: 'due',
-                            assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
-                        } only %}
-                    {% else %}
-                        <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
-                    {% endif %}
-
-                    {#due date is always relevant#}
-                    {% include '@course/import/date.twig' with {
-                        assessmentDate: assessment.dueAt,
-                        unitDate: defaultDueDate,
-                        endOfDay: true,
-                        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                        dateLabel: (assessment is lessonPlan ? locale.translate('lessonPlan', false, true): 'Due'),
-                        dateProperty: 'due',
-                        dateSyncStart: dueSyncStart,
-                        dateSyncEnd: dueSyncEnd,
-                        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
-                    } only %}
-
-                    {#close (late) date is relevant when accepting responses#}
-                    {% if acceptingResponses %}
-                        {% include '@course/import/date.twig' with {
-                            assessmentDate: assessment.closeAt,
-                            unitDate: unitImpl.dueDate.endOfDay,
-                            endOfDay: true,
-                            inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                            dateProperty: 'close',
-                            dateSyncStart: 'due',
-                            dateLabel: 'Late',
-                            assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
-                        } only %}
-                    {% else %}
-                        <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
-                    {% endif %}
+                        {% if struct is null %}
+                            {# an empty placeholder cell for grid niceness #}
+                            <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+                        {% elseif 'publish' == struct.type %}
+                            {% include '@course/import/date.twig' with {
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+                                assessmentDate: assessment.publishAt,
+                                unitDate: unitImpl.openDate,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: struct.type,
+                                dateLabel: struct.label,
+                                dateSyncEnd: next
+                            } only %}
+                        {% elseif 'open' == struct.type %}
+                            {% include '@course/import/date.twig' with {
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+                                assessmentDate: assessment.openAt,
+                                unitDate: unitImpl.openDate,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: struct.type,
+                                dateLabel: struct.label,
+                                dateSyncStart: prev,
+                                dateSyncEnd: next
+                            } only %}
+                        {% elseif 'due' == struct.type %}
+                            {% include '@course/import/date.twig' with {
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+                                assessmentDate: assessment.dueAt,
+                                unitDate: defaultDueDate,
+                                endOfDay: true,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: struct.type,
+                                dateLabel: struct.label,
+                                dateSyncStart: prev,
+                                dateSyncEnd: next
+                            } only %}
+                        {% elseif 'close' == struct.type %}
+                            {% include '@course/import/date.twig' with {
+                                assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+                                assessmentDate: assessment.closeAt,
+                                unitDate: unitImpl.dueDate.endOfDay,
+                                endOfDay: true,
+                                inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+                                dateProperty: struct.type,
+                                dateLabel: struct.label,
+                                dateSyncStart: prev
+                            } only %}
+                        {% endif %}
+                    {% endfor %}
                 </div>
 
                 {#Recurse #}
@@ -219,6 +330,5 @@
                 {% endif %}
             </li>
         {% endif %}
-
     {% endfor %}
 </ul>

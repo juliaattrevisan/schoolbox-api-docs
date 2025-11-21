@@ -20,6 +20,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
@@ -137,26 +138,27 @@ class ImportFactory
 
         $query = "
             SELECT
-                us.id                        AS 'us.id',
-                usf.name                     AS 'usf.name',
-                sa.id                        AS 'sa.id',
-                sa.title                     AS 'sa.title',
-                sa.default_open_span         AS 'sa.default_open_span',
-                sa.sequence                  AS 'sa.sequence',
-                sa.work_type_id              AS 'sa.work_type_id',
-                sa.deleted_at                AS 'sa.deleted_at',
-                lwt.name                     AS 'lwt.name',
-                sdw.assessment_id            AS 'sdw.id',
-                sdw.accept_submission        AS 'sdw.accept_submission',
-                sdw.multi_submission         AS 'sdw.multi_submission',
-                sqz.assessment_id            AS 'sqz.id',
-                sqz.learnosity_reference     AS 'sqz.learnosity_reference',
-                sqz.learnosity_job_reference AS 'sqz.learnosity_job_reference',
-                sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
-                stk.assessment_id            AS 'stk.id',
-                spr.assessment_id            AS 'spr.id',
-                slt.assessment_id            AS 'slt.id',
-                specLessonPlan.assessment_id AS 'specLessonPlan.id'
+                us.id                         AS 'us.id',
+                usf.name                      AS 'usf.name',
+                sa.id                         AS 'sa.id',
+                sa.title                      AS 'sa.title',
+                sa.default_open_span          AS 'sa.default_open_span',
+                sa.sequence                   AS 'sa.sequence',
+                sa.work_type_id               AS 'sa.work_type_id',
+                sa.deleted_at                 AS 'sa.deleted_at',
+                lwt.name                      AS 'lwt.name',
+                sdw.assessment_id             AS 'sdw.id',
+                sdw.accept_submission         AS 'sdw.accept_submission',
+                sdw.multi_submission          AS 'sdw.multi_submission',
+                sqz.assessment_id             AS 'sqz.id',
+                sqz.learnosity_reference      AS 'sqz.learnosity_reference',
+                sqz.learnosity_job_reference  AS 'sqz.learnosity_job_reference',
+                sqz.learnosity_job_status     AS 'sqz.learnosity_job_status',
+                stk.assessment_id             AS 'stk.id',
+                spr.assessment_id             AS 'spr.id',
+                slt.assessment_id             AS 'slt.id',
+                specLessonPlan.assessment_id  AS 'specLessonPlan.id',
+                specDialogAgent.assessment_id AS 'specDialogAgent.id'
             FROM course_unit_specification us
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
@@ -168,6 +170,7 @@ class ImportFactory
             LEFT JOIN project spr ON spr.assessment_id = sa.id
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
+            LEFT JOIN dialog_agent specDialogAgent ON specDialogAgent.assessment_id = sa.id
         ";
 
         $pb = new Builder($this->database->getQuoter(), '');
@@ -296,54 +299,57 @@ class ImportFactory
         // AssessmentSpecs in UnitSpecs, optionally with corresponding AssessmentImpl if it exists
         $query1   = "
             SELECT
-                us.id                 AS 'us.id',
-                usf.name              AS 'usf.name',
-                sa.id                 AS 'sa.id',
-                sa.title              AS 'sa.title',
-                sa.deleted_at         AS 'sa.deleted_at',
-                sa.sequence           AS 'sa.sequence',
-                sa.work_type_id       AS 'sa.work_type_id',
-                lwt.name			  AS 'lwt.name',
-                sa.default_open_span  AS 'sa.default_open_span',
-                sdw.assessment_id     AS 'sdw.id',
-                sdw.accept_submission AS 'sdw.accept_submission',
-                sdw.multi_submission  AS 'sdw.multi_submission',
-                sqz.assessment_id     AS 'sqz.id',
-                sqz.learnosity_reference     AS 'sqz.learnosity_reference',
-                sqz.learnosity_job_reference AS 'sqz.learnosity_job_reference',
-                sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
-                stk.assessment_id     AS 'stk.id',
-                spr.assessment_id     AS 'spr.id',
-                slt.assessment_id     AS 'slt.id',
-                specLessonPlan.assessment_id AS 'specLessonPlan.id',
-                ia.id                 AS 'ia.id',
-                ia.title              AS 'ia.title',
-                ia.publish_date       AS 'ia.publish_date',
-                ia.open_date          AS 'ia.open_date',
-                ia.due_date           AS 'ia.due_date',
-                ia.close_date         AS 'ia.close_date',
-                ia.sequence           AS 'ia.sequence',
-                ia.work_type_id       AS 'ia.work_type_id',
-                ia.deleted_at         AS 'ia.deleted_at',
-                idw.assessment_id     AS 'idw.id',
-                idw.accept_submission AS 'idw.accept_submission',
-                idw.multi_submission  AS 'idw.multi_submission',
-                iqz.assessment_id     AS 'iqz.id',
-                itk.assessment_id     AS 'itk.id',
-                ipr.assessment_id     AS 'ipr.id',
-                ilt.assessment_id     AS 'ilt.id',
-                implLessonPlan.assessment_id AS 'implLessonPlan.id'
+                us.id                         AS 'us.id',
+                usf.name                      AS 'usf.name',
+                sa.id                         AS 'sa.id',
+                sa.title                      AS 'sa.title',
+                sa.deleted_at                 AS 'sa.deleted_at',
+                sa.sequence                   AS 'sa.sequence',
+                sa.work_type_id               AS 'sa.work_type_id',
+                lwt.name                      AS 'lwt.name',
+                sa.default_open_span          AS 'sa.default_open_span',
+                sdw.assessment_id             AS 'sdw.id',
+                sdw.accept_submission         AS 'sdw.accept_submission',
+                sdw.multi_submission          AS 'sdw.multi_submission',
+                sqz.assessment_id             AS 'sqz.id',
+                sqz.learnosity_reference      AS 'sqz.learnosity_reference',
+                sqz.learnosity_job_reference  AS 'sqz.learnosity_job_reference',
+                sqz.learnosity_job_status     AS 'sqz.learnosity_job_status',
+                stk.assessment_id             AS 'stk.id',
+                spr.assessment_id             AS 'spr.id',
+                slt.assessment_id             AS 'slt.id',
+                specLessonPlan.assessment_id  AS 'specLessonPlan.id',
+                specDialogAgent.assessment_id AS 'specDialogAgent.id',
+                ia.id                         AS 'ia.id',
+                ia.title                      AS 'ia.title',
+                ia.publish_date               AS 'ia.publish_date',
+                ia.open_date                  AS 'ia.open_date',
+                ia.due_date                   AS 'ia.due_date',
+                ia.close_date                 AS 'ia.close_date',
+                ia.sequence                   AS 'ia.sequence',
+                ia.work_type_id               AS 'ia.work_type_id',
+                ia.deleted_at                 AS 'ia.deleted_at',
+                idw.assessment_id             AS 'idw.id',
+                idw.accept_submission         AS 'idw.accept_submission',
+                idw.multi_submission          AS 'idw.multi_submission',
+                iqz.assessment_id             AS 'iqz.id',
+                itk.assessment_id             AS 'itk.id',
+                ipr.assessment_id             AS 'ipr.id',
+                ilt.assessment_id             AS 'ilt.id',
+                implLessonPlan.assessment_id  AS 'implLessonPlan.id',
+                implDialogAgent.assessment_id AS 'implDialogAgent.id'
             FROM course_unit_specification us
             JOIN folder usf                               ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
             JOIN assessment sa                            ON sa.id = aus.assessment_id
-            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
+            LEFT JOIN lu_work_type lwt                    ON lwt.id = sa.work_type_id
             LEFT JOIN submission_box sdw                  ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz                          ON sqz.assessment_id = sa.id
             LEFT JOIN task stk                            ON stk.assessment_id = sa.id
             LEFT JOIN project spr                         ON spr.assessment_id = sa.id
             LEFT JOIN lti_assessment slt                  ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan          ON specLessonPlan.assessment_id = sa.id
+            LEFT JOIN dialog_agent specDialogAgent        ON specDialogAgent.assessment_id = sa.id
             LEFT JOIN ($innerQuery1) `t1`                 ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia                       ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw                  ON idw.assessment_id = ia.id
@@ -352,6 +358,7 @@ class ImportFactory
             LEFT JOIN project ipr                         ON ipr.assessment_id = ia.id
             LEFT JOIN lti_assessment ilt                  ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan          ON implLessonPlan.assessment_id = ia.id
+            LEFT JOIN dialog_agent implDialogAgent        ON implDialogAgent.assessment_id = ia.id
         ";
         $pbOuter1 = new Builder($this->database->getQuoter(), '');
         $pbOuter1->in('us.id', array_keys($unitSpecCache));
@@ -361,43 +368,45 @@ class ImportFactory
         // 5. AssessmentImpls created directly in UnitImpl, no corresponding AssessmentSpec
         $query2   = "
             SELECT
-                us.id             AS 'us.id',
-                usf.name          AS 'usf.name',
-                null              AS 'sa.id',
-                null              AS 'sa.title',
-                null              AS 'sa.deleted_at',
-                null              AS 'sa.sequence',
-                null              AS 'sa.work_type_id',
-                null			  AS 'lwt.name',
-                null              AS 'sa.default_open_span',
-                null              AS 'sdw.id',
-                null              AS 'sdw.accept_submission',
-                null              AS 'sdw.multi_submission',
-                null              AS 'sqz.id',
-                null              AS 'sqz.learnosity_reference',
-                null              AS 'sqz.learnosity_job_reference',
-                null              AS 'sqz.learnosity_job_status',
-                null              AS 'stk.id',
-                null              AS 'spr.id',
-                null              AS 'slt.id',
-                null              AS 'specLessonPlan.id',
-                ia.id             AS 'ia.id',
-                ia.title          AS 'ia.title',
-                ia.publish_date   AS 'ia.publish_date',
-                ia.open_date      AS 'ia.open_date',
-                ia.due_date       AS 'ia.due_date',
-                ia.close_date     AS 'ia.close_date',
-                ia.sequence       AS 'ia.sequence',
-                ia.work_type_id   AS 'ia.work_type_id',
-                ia.deleted_at     AS 'ia.deleted_at',
-                idw.assessment_id AS 'idw.id',
-                idw.accept_submission AS 'idw.accept_submission',
-                idw.multi_submission  AS 'idw.multi_submission',
-                iqz.assessment_id AS 'iqz.id',
-                itk.assessment_id AS 'itk.id',
-                ipr.assessment_id AS 'ipr.id',
-                ilt.assessment_id AS 'ilt.id',
-                implLessonPlan.assessment_id AS 'implLessonPlan.id'
+                us.id                         AS 'us.id',
+                usf.name                      AS 'usf.name',
+                null                          AS 'sa.id',
+                null                          AS 'sa.title',
+                null                          AS 'sa.deleted_at',
+                null                          AS 'sa.sequence',
+                null                          AS 'sa.work_type_id',
+                null			                       AS 'lwt.name',
+                null                          AS 'sa.default_open_span',
+                null                          AS 'sdw.id',
+                null                          AS 'sdw.accept_submission',
+                null                          AS 'sdw.multi_submission',
+                null                          AS 'sqz.id',
+                null                          AS 'sqz.learnosity_reference',
+                null                          AS 'sqz.learnosity_job_reference',
+                null                          AS 'sqz.learnosity_job_status',
+                null                          AS 'stk.id',
+                null                          AS 'spr.id',
+                null                          AS 'slt.id',
+                null                          AS 'specLessonPlan.id',
+                null                          AS 'specDialogAgent.id',
+                ia.id                         AS 'ia.id',
+                ia.title                      AS 'ia.title',
+                ia.publish_date               AS 'ia.publish_date',
+                ia.open_date                  AS 'ia.open_date',
+                ia.due_date                   AS 'ia.due_date',
+                ia.close_date                 AS 'ia.close_date',
+                ia.sequence                   AS 'ia.sequence',
+                ia.work_type_id               AS 'ia.work_type_id',
+                ia.deleted_at                 AS 'ia.deleted_at',
+                idw.assessment_id             AS 'idw.id',
+                idw.accept_submission         AS 'idw.accept_submission',
+                idw.multi_submission          AS 'idw.multi_submission',
+                iqz.assessment_id             AS 'iqz.id',
+                itk.assessment_id             AS 'itk.id',
+                ipr.assessment_id             AS 'ipr.id',
+                ilt.assessment_id             AS 'ilt.id',
+                implLessonPlan.assessment_id  AS 'implLessonPlan.id',
+                implDialogAgent.assessment_id AS 'implDialogAgent.id'
             FROM course_unit_implementation ui
             JOIN course_unit_specification us ON us.id = ui.course_unit_specification_id
             JOIN folder usf ON usf.id = us.folder_id
@@ -410,6 +419,7 @@ class ImportFactory
             LEFT JOIN project ipr ON ipr.assessment_id = ia.id
             LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan ON implLessonPlan.assessment_id = ia.id
+            LEFT JOIN dialog_agent implDialogAgent ON implDialogAgent.assessment_id = ia.id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
         ";
         $pbOuter2 = new Builder($this->database->getQuoter(), '');
@@ -521,7 +531,8 @@ class ImportFactory
                 sqz.learnosity_job_status    AS 'sqz.learnosity_job_status',
                 stk.assessment_id     AS 'stk.id',
                 slt.assessment_id     AS 'slt.id',
-                specLessonPlan.assessment_id AS 'specLessonPlan.id'
+                specLessonPlan.assessment_id AS 'specLessonPlan.id',
+                specDialogAgent.assessment_id AS 'specDialogAgent.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment sa           ON sa.id = pa.assessment_id
@@ -532,6 +543,7 @@ class ImportFactory
             LEFT JOIN task stk           ON stk.assessment_id = sa.id
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
             LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
+            LEFT JOIN dialog_agent specDialogAgent ON specDialogAgent.assessment_id = sa.id
         ";
 
         $pb    = new Builder($this->database->getQuoter(), '');
@@ -610,7 +622,8 @@ class ImportFactory
                 iqz.assessment_id     AS 'iqz.id',
                 itk.assessment_id     AS 'itk.id',
                 ilt.assessment_id     AS 'ilt.id',
-                implLessonPlan.assessment_id AS 'implLessonPlan.id'
+                implLessonPlan.assessment_id AS 'implLessonPlan.id',
+                implDialogAgent.assessment_id AS 'implDialogAgent.id'
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment ia           ON ia.id = pa.assessment_id
@@ -621,6 +634,7 @@ class ImportFactory
             LEFT JOIN task itk           ON itk.assessment_id = ia.id
             LEFT JOIN lti_assessment ilt ON ilt.assessment_id = ia.id
             LEFT JOIN lesson_plan implLessonPlan ON implLessonPlan.assessment_id = ia.id
+            LEFT JOIN dialog_agent implDialogAgent ON implDialogAgent.assessment_id = ia.id
         ";
 
         $pb    = new Builder($this->database->getQuoter(), '');
@@ -841,6 +855,8 @@ class ImportFactory
              * as a Project). Not sure if this was by design or by accident.
              */
             $assessmentSpec = new LessonPlan();
+        } elseif ($row['specDialogAgent.id']) {
+            $assessmentSpec = new DialogAgent();
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
         } else {
@@ -903,6 +919,8 @@ class ImportFactory
             $assessmentImpl = new LtiAssessment();
         } elseif ($row['implLessonPlan.id']) {
             $assessmentImpl = new LessonPlan();
+        } elseif ($row['implDialogAgent.id']) {
+            $assessmentImpl = new DialogAgent();
         } elseif ($row['ipr.id']) { // Project needs to be checked at last, as this is not set for an assessment in a project
             $assessmentImpl = new Project();
         } else {

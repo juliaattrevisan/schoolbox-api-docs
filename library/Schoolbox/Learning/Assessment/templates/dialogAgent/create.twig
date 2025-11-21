@@ -69,6 +69,9 @@
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
 
+    {# Default Activity Duration #}
+    {% include '@learningAssessment/fragments/default_open_span.twig' with {assessment: assessment} only %}
+
     {# Allowed Time #}
     <div class="row">
         <div class="small-5 medium-2 columns">

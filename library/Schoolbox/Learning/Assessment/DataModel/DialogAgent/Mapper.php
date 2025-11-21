@@ -65,6 +65,7 @@ class Mapper extends \Schoolbox\Mapper
         ));
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
     }
 
 
@@ -133,5 +134,24 @@ class Mapper extends \Schoolbox\Mapper
         if (null === $dialogAgent->getUpdatedBy()) {
             $dialogAgent->setUpdatedBy($this->getSessionUser()->getId());
         }
+    }
+
+
+    /**
+     * Prefill deleter fields (the Swamp shouldn't need to know about this)
+     *
+     * @param Model $dialogAgent
+     * @return void
+     * @throws Exception
+     */
+    protected function deleterFields(Model $dialogAgent): void
+    {
+        /* Remember who deleted this thing, in a dirty doubletap
+         */
+        $dialogAgent->setDeletedBy($this->getSessionUser()->getId());
+        $this->save($dialogAgent);
+
+        /* TODO remove scenario context stuff specifically related to this instance
+         */
     }
 }

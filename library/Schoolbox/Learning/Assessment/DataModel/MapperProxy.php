@@ -1285,6 +1285,13 @@ class MapperProxy
      */
     public function save(IAssessable $assessable, User $currentUser)
     {
+        /* Artificially enforce close = due for dialog agents *specifically before* translation because something
+         * else will persist $assessable specially, not just the $dataModel itself.
+         */
+        if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
+            $assessable->setCloseAt($assessable->getDueAt());
+        }
+
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable);
         // Folder context translation:
@@ -1544,7 +1551,11 @@ class MapperProxy
 
             $lessonPlanMapper->delete($subModel);
         } elseif ($subModel instanceof DialogAgent\Model) {
-            /* TODO I think this is how it was envisaged to work?
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\Model instance
+             */
+            $this->baseMapper->delete($dataModel);
+
+            /* Deletes the \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model instance
              */
             DialogAgent\Mapper::getInstance()->delete($subModel);
         } else {
