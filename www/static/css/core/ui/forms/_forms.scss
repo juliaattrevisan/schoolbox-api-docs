@@ -1241,11 +1241,6 @@ body.sbx-body {
             display: none;
         }
 
-        + label.checkbox-label,
-        body.login & + label {
-            display: none;
-        }
-
         &:checked {
             + label.checkbox-label::before,
             + label.checkbox-label::after,

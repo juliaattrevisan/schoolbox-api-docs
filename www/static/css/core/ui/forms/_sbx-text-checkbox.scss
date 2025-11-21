@@ -58,12 +58,24 @@
     &:disabled {
         @include sbx-form.form-input-disabled;
     }
-    & + label {
-        vertical-align: text-bottom;
-    }
 }
 /* indeterminate state */
 .sbx-body .indeterminate[type="checkbox"]::before {
     clip-path: polygon(100% 35%, 100% 60%, 0% 60%, 0% 35%);
     transform: scale(1);
+}
+
+.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
+.sbx-body .login input[type="checkbox"]:not(.plain) + label:before,
+.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
+.sbx-body body.login input[type="checkbox"]:not(.plain) + label:after {
+    display: none;
+}
+input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
+body.login input[type="checkbox"]:not(.plain) + label:after {
+    display: none;
+}
+input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
+body.login input[type="checkbox"]:not(.plain) + label:before {
+    display: none;
 }

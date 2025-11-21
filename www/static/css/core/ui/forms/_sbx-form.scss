@@ -32,3 +32,14 @@
         --sbx-animation-form-input-change: 0ms;
     }
 }
+
+.sbx-body label,
+.sbx-body label.checkbox-label,
+.sbx-body.body.login input[type="checkbox"]:not(.plain) + label {
+    font-weight: normal !important;
+    vertical-align: text-bottom !important;
+}
+.sbx-body label.checkbox-label {
+    margin: 0 1rem 0 0.5rem !important;
+    padding: 0 !important;
+}
