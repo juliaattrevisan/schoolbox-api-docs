@@ -127,6 +127,9 @@
             null
         ] %}
 
+        {# Ideally these fragments would be somewhere in each assessment's folder, but that's part of a bigger
+         # swamp problem where we need to reorganise how features interrogate activities' particular behaviours
+         #}
         {% if assessment is dueWork %}
             {% if not assessment.acceptNone %}
                 {# Due Work uniquely offers offline submissions; online submissions require all four dates #}
@@ -183,7 +186,6 @@
                     'label': 'Open'
                 },
                 null,
-
                 {
                     'type': 'due',
                     'label': 'Close'
