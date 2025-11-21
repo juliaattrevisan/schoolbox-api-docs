@@ -12,9 +12,13 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
+use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Agent for generating images via OpenAI.
@@ -58,19 +62,9 @@ class ImageGeneration
         ?string $imageUrl = null,
         ?string $previousResponseId = null,
     ): iterable {
-        return $this->client->createResponseStream(
-            $this->buildPayload(
-                $prompt,
-                $size,
-                $style,
-                $imageUrl,
-                $previousResponseId,
-            ),
-            $user,
-            Helper::FEATURE_IMAGE,
-            $sessionId,
-            8192,
-        );
+        $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
+        $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
+        return $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
     }
 
     /**
@@ -110,5 +104,39 @@ class ImageGeneration
             $imageUrl,
             $previousResponseId,
         );
+    }
+
+    /**
+     * Callback method for message stream.
+     *
+     * If this message is a finished response, then extract the output text out
+     * of it and add it to the log.
+     *
+     * @param Message   $message
+     * @param Log\Model $log
+     * @return void
+     */
+    private function listenForOutputText(Message $message, Log\Model $log): void
+    {
+        if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
+            $outputTextParts = [];
+            try {
+                $decodedMessage = $message->getDataAsArray();
+            } catch (UnexpectedValueException) {
+                // Not valid data: nothing can be done.
+                // Could always inspect the full stream data to figure it out?
+            }
+            foreach (($decodedMessage['response']['output']) ?? [] as $output) {
+                foreach (($output['content'] ?? []) as $content) {
+                    if ($content['type'] === 'output_text' && isset($content['text'])) {
+                        $outputTextParts[] = $content['text'];
+                    }
+                }
+            }
+            $outputText = !empty($outputTextParts)
+                ? implode("\n\n", $outputTextParts)
+                : null;
+            $log->setOutputText($outputText);
+        }
     }
 }

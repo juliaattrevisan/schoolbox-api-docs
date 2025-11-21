@@ -22,6 +22,8 @@ class Model
     private string $prompt;
     private ?int $inputTokens = null;
     private ?int $outputTokens = null;
+    private ?string $inputText = null;
+    private ?string $outputText = null;
     private ?string $model = null;
     private ?string $endpoint = null;
     private ?string $feature = null;
@@ -32,6 +34,9 @@ class Model
 
     // TEXT max length, to trim the prompt, rather than die.
     private const PROMPT_MAX_LENGTH = 65535;
+
+    // TEXT max length for input_text and output_text columns
+    private const TEXT_MAX_LENGTH = 65535;
 
     // MEDIUM TEXT max length, to trim the response, rather than die.
     private const RESPONSE_MAX_LENGTH = 16777215;
@@ -155,6 +160,50 @@ class Model
     public function setOutputTokens(?int $outputTokens): self
     {
         $this->outputTokens = $outputTokens;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInputText(): ?string
+    {
+        return $this->inputText;
+    }
+
+    /**
+     * @param string|null $inputText
+     * @return $this
+     */
+    public function setInputText(?string $inputText): self
+    {
+        // Limit the input text length to prevent database errors
+        if ($inputText && mb_strlen($inputText) > self::TEXT_MAX_LENGTH) {
+            $inputText = mb_substr($inputText, 0, self::TEXT_MAX_LENGTH);
+        }
+        $this->inputText = $inputText;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOutputText(): ?string
+    {
+        return $this->outputText;
+    }
+
+    /**
+     * @param string|null $outputText
+     * @return $this
+     */
+    public function setOutputText(?string $outputText): self
+    {
+        // Limit the output text length to prevent database errors
+        if ($outputText && mb_strlen($outputText) > self::TEXT_MAX_LENGTH) {
+            $outputText = mb_substr($outputText, 0, self::TEXT_MAX_LENGTH);
+        }
+        $this->outputText = $outputText;
         return $this;
     }
 

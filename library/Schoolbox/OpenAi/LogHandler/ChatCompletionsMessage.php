@@ -22,7 +22,7 @@ class ChatCompletionsMessage implements ILogHandler
     /**
      * Handle the message by writing it directly to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log): Log\Model
+    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
     {
         // Chat completions messages don't have an event type:
         // just write the message data directly to the log.
@@ -43,6 +43,9 @@ class ChatCompletionsMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+        if (is_callable($streamListener)) {
+            $streamListener($message, $log);
+        }
 
         // Otherwise, handle the data from the message as if it were a response
         $this->handleResponse($rawData, $log);

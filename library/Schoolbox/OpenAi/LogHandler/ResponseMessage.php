@@ -26,7 +26,7 @@ class ResponseMessage implements ILogHandler
      * There are 3 possible events that indicate the end of a response: see
      * https://platform.openai.com/docs/api-reference/responses-streaming/response.
      */
-    private const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete', 'error'];
+    public const array EVENT_TYPES_FINISHED = ['response.completed', 'response.failed', 'response.incomplete', 'error'];
 
     /**
      * When an image is omitted from the request/response: replace the image
@@ -37,7 +37,7 @@ class ResponseMessage implements ILogHandler
     /**
      * Handle the message by stripping image data when writing to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log): Log\Model
+    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
     {
         // Prepare the message for logging
         $eventType = $message->eventType;
@@ -57,13 +57,19 @@ class ResponseMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
-        $log = $this->logUsage($rawData, $log);
+        if (is_callable($streamListener)) {
+            $streamListener($message, $log);
+        }
+        if (isset($rawData['response'])) {
+            // Handle information about the response
+            $log = $this->logUsage($rawData['response'], $log);
 
-        // Is this the final event? If so, log its completion status.
-        // There are 3 possible events that indicate the end of a response
-        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if (in_array($eventType, self::EVENT_TYPES_FINISHED)) {
-            $log = $this->logCompletion($rawData['response'] ?? [], $log);
+            // Is this the final event? If so, log its completion status.
+            // There are 3 possible events that indicate the end of a response
+            // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+            if (in_array($eventType, self::EVENT_TYPES_FINISHED)) {
+                $log = $this->logCompletion($rawData['response'] ?? [], $log);
+            }
         }
         return $log;
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Editor\OpenAI;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use Html2Text\Html2Text;
 use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
@@ -256,6 +257,7 @@ class Controller extends Base
         $agent = new CkEditorTextChat(
             $this->clientFactory->buildForFeature(Helper::FEATURE_CHAT),
             $chatConfig,
+            new Html2Text(),
         );
 
         try {

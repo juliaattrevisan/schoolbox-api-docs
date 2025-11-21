@@ -26,13 +26,13 @@ interface ILogHandler
      * * extracting the value from `$message` before it's added to the log's
      *   response
      *
-     * @param Message   $message The message from OpenAI.
-     *                           This may contain a data structure similar to
-     *                           the one handled by `handleResponse`.
-     * @param Log\Model $log     The log object to update.
+     * @param Message       $message        The message from OpenAI.
+     *                                      This may contain a structure similar to the one handled by `handleResponse`.
+     * @param Log\Model     $log            The log object to update.
+     * @param callable|null $streamListener A function to call for each event in the stream, as it is received.
      * @return Log\Model The updated log object.
      */
-    public function handleMessage(Message $message, Log\Model $log): Log\Model;
+    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model;
 
     /**
      * Handle a full response from OpenAI, by writing it to a log.
