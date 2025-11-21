@@ -17,8 +17,6 @@ use Schoolbox\OpenAi\IClient;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
-use Smalot\PdfParser\Parser;
-use PhpOffice\PhpWord\IOFactory;
 
 class DifferentiationProfileGeneration
 {
@@ -54,12 +52,8 @@ class DifferentiationProfileGeneration
 
         $payload = $payloadGenerator->generate();
 
-        $response = $this->client->createResponse(
-            $payload,
-            $user,
-            Helper::FEATURE_DIFFERENTIATION,
-            $aiSessionId
-        );
+        $log = $this->client->createLog($payload, null, $user, Helper::FEATURE_DIFFERENTIATION, $aiSessionId);
+        $response = $this->client->createResponse($payload, $log);
 
         $data = json_decode($response->getBody()->getContents(), true);
 
