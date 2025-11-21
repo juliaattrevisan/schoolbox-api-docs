@@ -54,7 +54,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                     h.name === "adjustment_category" || h.name === "adjustment_level"
                         ? HeaderType.ADJUSTMENT
                         : HeaderType.TEXT,
-                title: h.terminology,
+                title: h.terminology === null || h.terminology.trim() === "" ? h.title : h.terminology,
                 width: h.name === "adjustment_category" || h.name === "adjustment_level" ? 300 : 500,
                 isFixed: false,
                 isSortable: false,
