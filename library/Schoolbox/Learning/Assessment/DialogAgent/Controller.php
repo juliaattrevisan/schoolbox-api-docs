@@ -754,7 +754,6 @@ class Controller extends Assessment\Controller
                     'feedback' => $feedback,
                     '_routes' => [
                         'summary' => $this->getRouteIfAuthorized('learningAssessment.getSummary', $routeParams),
-                        'reset' => $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParams),
                     ],
                 ];
             }

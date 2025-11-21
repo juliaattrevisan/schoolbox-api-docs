@@ -348,8 +348,11 @@ class Controller extends Base
 
 
     /**
-     * Resetting a dialog agent for a particular student sets the entirety of that students responses to
-     * non-authoritative and creates a new authoritative response for them to fill in, letting them Begin Again
+     * Resetting a dialog agent for a particular student creates a new authoritative response (draft)
+     * for the student to fill in, letting them begin again from scratch. This can only be done on
+     * a currently in-progress authoritative response, you can't reset from the submitted or incomplete state.
+     *
+     * The responseId provided must be the student's authoritative response for it to be reset.
      *
      * @param IAssessable $assessment
      * @param User $student
@@ -357,20 +360,14 @@ class Controller extends Base
      * @throws Deleted
      * @throws Exception
      */
-    public function postReset(IAssessable $assessment, User $student): void
+    public function postReset(IAssessable $assessment, User $student, Response $response): void
     {
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        /* Reset existing responses to non-authoritative
+        /* Reset the existing response to be non-authoritative
          */
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
-        foreach ($participant->getAllResponses() as $response) {
-            $response->setAuthoritative(false);
+        $response->setAuthoritative(false);
+        $this->dialogAgentResponseMapper->save($response);
 
-            $this->dialogAgentResponseMapper->save($response);
-        }
-
-        /* Spawn a new one
+        /* Spawn a new one, using the latest dialog agent configuration which may differ to what $response had
          */
         $newResponse = $this->dialogAgentResponseMapper->createModel()
             ->setAssessable($assessment)
@@ -394,12 +391,10 @@ class Controller extends Base
      */
     private function translatePayload(Response $response): void
     {
-        $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
         $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
 
         $this->response = $this->responseAsJson([
-            'user' => $userTranslator->convertLinkedUser($response->getSubmittedOnBehalfOf()),
             'response' => $responseTranslator->__invoke($response),
         ])->withStatus(200);
     }

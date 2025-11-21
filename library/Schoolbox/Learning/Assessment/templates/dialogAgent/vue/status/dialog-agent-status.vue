@@ -53,6 +53,8 @@ function toggleCollapse(assessmentId: number): void {
 </script>
 
 <template>
+    <!-- TODO: bulk actions -->
+
     <div class="row">
         <!-- Metadata about the activity -->
         <div class="small-12 large-4 columns">

@@ -91,6 +91,8 @@ class Module extends BaseModule
                 throw new NotFound();
             }
 
+            // TODO: $participant->getAuthoritativeResponse() could possibly be used to simplify these
+
             /* Explore $participant's responses to find an identifier that exists for them.
              * If one doesn't exist, they're requesting someone else's response id
              */
@@ -137,6 +139,7 @@ class Module extends BaseModule
          */
         $assRoute  = '/{assessmentId:\d+}';
         $studentParam  = '{studentId:\d+}';
+        $responseParam = '{responseId:\d+}';
 
         /* Create a dialog agent's configuration
          */
@@ -149,18 +152,18 @@ class Module extends BaseModule
 
         /* View a response (readonly mode)
          */
-        $this->register('GET', "{$assRoute}/{$studentParam}/view/{responseId:\d+}", 'getViewResponse', new Rule\All(
+        $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
             $canViewSummary,
             $this->buildRuleCanAction(Status::ACTION_VIEW)
         ), $preloadParticipantAndResponse);
 
         /* Student requests assistance for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{responseId:\d+}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
+        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{responseId:\d+}", 'postAssistanceResolve', new Rule\All(
+        $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{$responseParam}", 'postAssistanceResolve', new Rule\All(
             $canWrite,
             $this->buildRuleCanAction(Status::ACTION_RESOLVE)
         ), $preloadParticipantAndResponse);
@@ -168,14 +171,14 @@ class Module extends BaseModule
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
          * with details about who did the sobo
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/sobo/{responseId:\d+}", 'postSobo', new Rule\All(
+        $this->register('POST', "{$assRoute}/{$studentParam}/sobo/{$responseParam}", 'postSobo', new Rule\All(
             $canWrite,
             $this->buildRuleCanAction(Status::ACTION_SOBO)
         ), $preloadParticipantAndResponse);
 
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{responseId:\d+}", 'postReopen', new Rule\All(
+        $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{$responseParam}", 'postReopen', new Rule\All(
             $canWrite,
             $this->buildRuleCanAction(Status::ACTION_REOPEN)
         ), $preloadParticipantAndResponse);
@@ -183,10 +186,10 @@ class Module extends BaseModule
         /* Resets a dialog agent for a particular person. This creates a new authoritative response instance,
          * setting all other responses to non-authoritative, basically letting students start afresh.
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/reset", 'postReset', new Rule\All(
+        $this->register('POST', "{$assRoute}/{$studentParam}/reset/{$responseParam}", 'postReset', new Rule\All(
             $canWrite,
             $this->buildRuleCanAction(Status::ACTION_RESET)
-        ), $preloadParticipant);
+        ), $preloadParticipantAndResponse);
     }
 
 
@@ -362,19 +365,10 @@ class Module extends BaseModule
     {
         return new Rule\LazyCallback(
             fn() => new Rule\Callback(function (array $params) use ($action): void {
-                /* Accommodate a special case for resetting the dialog agent for a particular person
-                 *
-                 * This is always available to conduct upon a person since it operates on their entire response
-                 * history rather than an individula response instance
-                 */
-                if (Status::ACTION_RESET === $action) {
-                    return;
-                }
-
                 $status = (new DialogAgent\Response\Lookup\Status())->calculate($params['response'] ?? null);
 
                 if (!$status['actions'][$action]) {
-                    throw new Forbidden(sprintf(
+                    throw new Forbidden(\sprintf(
                         'Action "%s" is not allowed',
                         $action,
                     ));

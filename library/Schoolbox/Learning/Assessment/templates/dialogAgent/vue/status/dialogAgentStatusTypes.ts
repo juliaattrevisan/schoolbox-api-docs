@@ -2,6 +2,10 @@ import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { UserCC } from "@schoolboxLibrary/types/User";
 import { DialogAgentResponseStatus, type DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 
+export type ApiDialogAgentActionResponse = {
+    response: DialogAgentResponse;
+};
+
 export type DialogAgentScenarioCriteria = {
     id: string;
     title: string;
@@ -16,6 +20,7 @@ export type DialogAgentResponse = {
         [DialogAgentResponseAction.ACTION_SOBO]?: string | null;
         [DialogAgentResponseAction.ACTION_REOPEN]?: string | null;
         [DialogAgentResponseAction.ACTION_RESOLVE]?: string | null;
+        [DialogAgentResponseAction.ACTION_RESET]?: string | null;
     };
 };
 
@@ -26,7 +31,6 @@ export type DialogAgentParticipant = {
     feedback: Record<DialogAgentScenarioCriteria["id"], string>;
     _routes: {
         summary?: string | null;
-        [DialogAgentResponseAction.ACTION_RESET]?: string | null;
     };
 };
 

@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { cloneDeep } from "lodash";
 import locale from "@js/terminology/rosettaStone";
 import type { DialogAgentResponseStatus } from "@schoolboxAssessment/Types/dialogAgent";
 import { getResponseStatus } from "./dialogAgentStatusTypes";
-import type { DialogAgentParticipant, DialogAgentScenarioCriteria } from "./dialogAgentStatusTypes";
+import type {
+    ApiDialogAgentActionResponse,
+    DialogAgentParticipant,
+    DialogAgentScenarioCriteria,
+} from "./dialogAgentStatusTypes";
 import DasGridRow from "./das-grid-row.vue";
 
 interface Props {
@@ -15,8 +20,36 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits(["resetFilters"]);
 
+const participantsData = window.Vue.ref<DialogAgentParticipant[]>([]);
+
+/**
+ * Clone the participants list, we'll then be able to modify it based on actions from das-actions.vue
+ * When the props change, this will re-run and reset the participants list again
+ */
+window.Vue.watch(
+    () => props.participants,
+    (newParticipants) => {
+        participantsData.value = cloneDeep(newParticipants);
+    },
+    { immediate: true },
+);
+
+/**
+ * Update the stored participant data after an action
+ * @param participant The participant to update
+ * @param data The updated data from the API to apply
+ */
+function applyParticipantUpdates(participant: DialogAgentParticipant, data: ApiDialogAgentActionResponse): void {
+    const index = participantsData.value.findIndex((p) => p.id === participant.id);
+    if (index === -1) {
+        throw new Error("Unable to find participant to update"); // shouldn't get here
+    }
+
+    participantsData.value[index].response = data.response;
+}
+
 const filteredParticipants = window.Vue.computed(() => {
-    return props.participants.filter((participant) => {
+    return participantsData.value.filter((participant) => {
         if (!props.filters[getResponseStatus(participant.response)]) {
             return false;
         }
@@ -41,7 +74,7 @@ const filteredParticipants = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="props.participants.length === 0" class="empty-state">
+    <div v-if="participantsData.length === 0" class="empty-state">
         <i class="icon-dialog-agent"></i>
         <p>This {{ locale.activity.singular() }} has no students participating.</p>
     </div>
@@ -68,6 +101,7 @@ const filteredParticipants = window.Vue.computed(() => {
                         :key="participant.id"
                         :participant="participant"
                         :criteria="props.criteria"
+                        @update-participant="(data) => applyParticipantUpdates(participant, data)"
                     />
                 </tbody>
             </table>
