@@ -487,7 +487,15 @@ class Calendar extends DeprecatedModel
                 $event->setMaxAttendees($currentEvent['max_attendees']);
 
                 $event->setCompleted((bool)$currentEvent['completed']);
-                $event->setPath('/calendar/event/' . $currentEvent['id']);
+
+                /* only set path if user has read access, historically this doesn't accept null
+                 * and the frontend uses a falsey check so empty string is probably okay for now...
+                 */
+                $event->setPath(
+                    $this->getPerm($currentEvent) >= UserAccess::ACCESS_READ
+                        ? '/calendar/event/' . $currentEvent['id']
+                        : ''
+                );
 
                 $isPublished     = $event->isPublishedAtDate(Alaress_Date_Format::now());
                 $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner($viewer->getId()) || $event->isEditable();
