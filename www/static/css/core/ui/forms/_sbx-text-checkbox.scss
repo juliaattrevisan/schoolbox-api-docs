@@ -82,3 +82,6 @@ input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
 body.login input[type="checkbox"]:not(.plain) + label:before {
     display: none;
 }
+.information-list.card-selectable > li .selector {
+    padding: 1.5rem 0rem 0rem 0rem;
+}
