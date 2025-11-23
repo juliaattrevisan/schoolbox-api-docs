@@ -46,7 +46,7 @@ class ImageGeneration
      * @param string|null $style              If provided: a style for the image.
      *                                        Should match a value of `ImageStyle`.
      * @param string|null $imageUrl           If provided: a URL to use as an example for the image.
-     * @param string|null $previousResponseId If provided: the ID of a previous request made to OpenAI.
+     * @param string|null $previousResponseId If provided: th`e ID of a previous request made to OpenAI.
      * @return iterable<string>
      * @throws ClientExceptionInterface
      */
@@ -63,7 +63,7 @@ class ImageGeneration
         // TODO: Should $prompt (what ends up being logged as inputText) contain the other parameters such as the style you selected too? or are we okay with loosing that info
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
 
-        $handler = new AgentChat\MessageHandler($this->client);
+        $handler = new AgentChat\MessageHandler($this->client, requireFinalImage: true);
         return $handler->requestStream($payload, $log);
     }
 

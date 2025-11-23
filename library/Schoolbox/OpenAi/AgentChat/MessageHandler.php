@@ -43,8 +43,9 @@ class MessageHandler
      *
      * @param IClient $client An AI provider client: needs to point to the Responses endpoint of the client
      *                        (e.g. https://platform.openai.com/docs/api-reference/responses/create).
+     * @param bool   $requireFinalImage Whether to require an image to be present in the final response, images are optional otherwise
      */
-    public function __construct(private IClient $client)
+    public function __construct(private IClient $client, private bool $requireFinalImage)
     {
     }
 
@@ -79,7 +80,7 @@ class MessageHandler
             $message = null;
 
             try {
-                $message = self::handleStreamMessage($rawMessage, $responseId);
+                $message = $this->handleStreamMessage($rawMessage, $responseId);
             } catch (SchoolboxException $e) {
                 /** Some error occured during processing, send it onwards to the frontend as an ApiProblem */
                 $problem = (new ApiProblem($e->getMessage()))->setStatus($e->getCode());
@@ -181,7 +182,7 @@ class MessageHandler
      * @throws UnexpectedValueException if the message data is not valid JSON or cannot be decoded
      * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
      */
-    private static function handleStreamMessage(Message $rawMessage, ?string &$responseId = null): ?Message
+    private function handleStreamMessage(Message $rawMessage, ?string &$responseId = null): ?Message
     {
         // TODO: NOTE: This is just a basic clone of our current logic moved all to the backend, needs to be properly refined
 
@@ -260,8 +261,7 @@ class MessageHandler
                 throw new SchoolboxException($outputContent['refusal'], 400);
             }
 
-            // TODO: This only applies for image generation, if this logic is split out further then it needs to be tweaked to optional for that area.
-            if (null === $imageBase64) {
+            if (null === $imageBase64 && $this->requireFinalImage) {
                 /**
                  * No output image? probably a refusal in the form of text
                  * This could occur on the Image Generator if the system prompt specifically disallows
@@ -279,7 +279,7 @@ class MessageHandler
             return new Message(
                 json_encode([
                     'responseId' => $responseId ?? $data['response']['id'] ?? null,
-                    'image' => self::translateImageData($imageBase64),
+                    'image' => $imageBase64 ? self::translateImageData($imageBase64) : null,
                     'message' => $outputContent['text'] ?? '',
                 ], JSON_THROW_ON_ERROR),
                 MessageEventType::COMPLETE->value
