@@ -172,7 +172,7 @@ async function onSave(): Promise<void> {
             </div>
             <div ref="componentActionEl">
                 <mdp-grid-cell-action
-                    :profile="props.profile"
+                    :id="props.profile.student.id"
                     :header-key="props.headerKey"
                     :has-changed="hasChanged"
                     :is-saving="isSaving"
