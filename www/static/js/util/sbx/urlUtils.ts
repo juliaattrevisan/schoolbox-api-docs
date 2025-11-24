@@ -4,6 +4,7 @@
  *
  * Use the base64encoded version of the url's pathname, so it can work in
  * conjunction with Class Redirect in the back end
+ * @param url - the url to go to, or leave blank to retrieve just the returnUrl param
  * @returns - The returnUrl parameter with the current path encoded in base64
  */
 export function getReturnUrl(url?: string | undefined): string {
