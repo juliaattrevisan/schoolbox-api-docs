@@ -23,12 +23,12 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $textFeatures = new Config()->fetchFeatures($this->getConfigMapper());
+        $features = new Config()->fetchFeatures($this->getConfigMapper());
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
-            'features' => $textFeatures,
+            'features' => $features,
             'fields' => Config::FIELDS,
             'providers' => Config::PROVIDERS,
             'models' => Config::AI_MODELS,
