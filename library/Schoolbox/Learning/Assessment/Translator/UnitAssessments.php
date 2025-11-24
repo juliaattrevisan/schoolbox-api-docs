@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 use Schoolbox\User;
 
 /**
