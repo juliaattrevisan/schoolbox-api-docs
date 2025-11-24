@@ -12,6 +12,7 @@ import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationP
  */
 type SaveResponse = {
     id: number;
+    updated_at: string;
 };
 
 export const useSaveStore = defineStore(`saveStore`, () => {
@@ -59,7 +60,7 @@ export const useSaveStore = defineStore(`saveStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
             }
-            updateProfile(profile, { ...response.data, updated_at: window.dayjs(new Date()).format("DD/MM/YYYY") });
+            updateProfile(profile, { ...response.data });
             toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
