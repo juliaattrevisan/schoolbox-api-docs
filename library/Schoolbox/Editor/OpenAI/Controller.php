@@ -17,12 +17,17 @@ use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
+use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Smalot\PdfParser\Parser;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -41,6 +46,9 @@ class Controller extends Base
      */
     public function __construct(
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private PastoralMapper $pastoralMapper,
+        private FilesystemProxy $filesystemProxy,
+        private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
     ) {
     }
@@ -271,6 +279,74 @@ class Controller extends Base
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+    public function postDifferentiation(): void
+    {
+        $this->setAllowBackToTheFuture(false);
+
+        $aiConfig = new Config();
+        $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIFFERENTIATION));
+
+        if ($aiConfig->isEnabled($diffConfig) === false) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem("AI Differentiation is not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
+        $aiSessionId = (string)Uuid::uuid4();
+
+        $studentId = $this->requestPost->get('studentId');
+        if (!$studentId) {
+            $returnCode = 400;
+
+            $problem = (new ApiProblem("Student Id is required."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
+        $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
+
+        $agent = new DifferentiationProfileGeneration(
+            $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
+            $diffConfig,
+            $this->filesystemProxy,
+            $this->parserFactory,
+        );
+
+        try {
+            [$response, $status] = $agent->request(
+                $this->getUser(),
+                $records,
+                $aiSessionId,
+            );
+
+            $this->response = $this->responseAsJson($response)->withStatus($status);
+            return;
+        } catch (\DomainException $e) {
             $returnCode = 404;
 
             $problem = (new ApiProblem($e->getMessage()))

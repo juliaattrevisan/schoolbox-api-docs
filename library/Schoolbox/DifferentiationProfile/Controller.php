@@ -34,15 +34,17 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param RosettaStone                 $rosettaStone
-     * @param AdjustmentCategoriesMapper   $adjustmentCategoriesMapper
-     * @param AdjustmentLevelsMapper       $adjustmentLevelsMapper
-     * @param AdminConfigMapper            $differentiationProfileConfigMapper
-     * @param AdminConfigModelToArray      $adminConfigModelToArray
-     * @param IFactoryFactory              $filterFactoryFactory
-     * @param Mapper                       $filterMapper
-     * @param Filter\Selection\Mapper      $filterSelectionMapper
-     * @param DifferentiationProfileMapper $mapper
+     * @param RosettaStone                                              $rosettaStone
+     * @param AdjustmentCategoriesMapper                                $adjustmentCategoriesMapper
+     * @param AdjustmentLevelsMapper                                    $adjustmentLevelsMapper
+     * @param AdminConfigMapper                                         $differentiationProfileConfigMapper
+     * @param AdminConfigModelToArray                                   $adminConfigModelToArray
+     * @param IFactoryFactory                                           $filterFactoryFactory
+     * @param Mapper                                                    $filterMapper
+     * @param Filter\Selection\Mapper                                   $filterSelectionMapper
+     * @param DifferentiationProfileMapper                              $mapper
+     * @param PastoralMapper                                            $pastoralMapper
+     * @param \Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray $pastoralTranslator
      */
     public function __construct(
         private RosettaStone $rosettaStone,
@@ -69,7 +71,7 @@ class Controller extends Base
         $adjustmentCategories = $this->adjustmentCategoriesMapper->findAll();
         $adjustmentLevels     = $this->adjustmentLevelsMapper->findAll();
         $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
-        $translation = $this->rosettaStone->translate('differentiationProfile', true, true);
+        $translation          = $this->rosettaStone->translate('differentiationProfile', true, true);
 
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
@@ -183,6 +185,7 @@ class Controller extends Base
     /**
      * Get linked pastoral records for a student that contribute to differentiation profile
      *
+     * @param int|null $studentId
      * @return void
      */
     public function getLinkedPastoralRecords(?int $studentId): void
@@ -334,6 +337,7 @@ class Controller extends Base
             $this->response = $this->responseAsJson(
                 [
                     "id" => $model->getId(),
+                    "lastUpdatedAt" => $model->getUpdatedAt()->getShort(),
                 ]
             )->withStatus(200);
         } catch (\Exception $e) {

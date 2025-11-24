@@ -134,8 +134,8 @@ class Controller extends ConfigController
                             ->setId($fields['id'])
                             ->setName($name)
                             ->setTitle($fields['title'])
-                            ->setTerminology(trim($fields['terminology'] ?? ''))
-                            ->setDescription(trim($fields['description'] ?? ''))
+                            ->setTerminology(!empty($fields['terminology']) ? trim($fields['terminology']) : null)
+                            ->setDescription(!empty($fields['description']) ? trim($fields['description']) : null)
                             ->setIsEnabled((bool)($fields['is_enabled'] ?? false))
                             ->setModule($moduleName)
                             ->setSequence($fields['sequence']);

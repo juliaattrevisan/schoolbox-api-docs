@@ -11,6 +11,11 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -26,6 +31,15 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF),
         );
 
+        $hasDifferentiationProfileService = new Rule\All(
+            $isStaff,
+            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+            new Rule\HasServicePermission(
+                UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+                UserAccess::ACCESS_WRITE
+            ),
+        );
+
         /* This /openai/ route is used by Little Robot Dude from the ckeditor
          * directly, to produce its output
          */
@@ -38,6 +52,10 @@ class Module extends BaseModule
         /* Image generation: for OpenAI only
          */
         $this->register('POST', '/image', 'postImage', $isStaff);
+
+        /* Differentiation Profile generation
+         */
+        $this->register('POST', '/differentiation-profile', 'postDifferentiation', $hasDifferentiationProfileService);
     }
 
 
@@ -45,6 +63,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+            $this->getMapperFactory()->get(PastoralMapper::class),
+            $this->injector->get('filesystem.storageProxy'),
+            new ParserFactory(),
             $this->injector->get('ai.clientFactory'),
         );
     }
