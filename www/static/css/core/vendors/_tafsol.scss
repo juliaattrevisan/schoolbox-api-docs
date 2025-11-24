@@ -206,11 +206,6 @@ body {
     }
 }
 
-.card.compact.small-12 {
-    padding-left: 0;
-    padding-right: 0;
-}
-
 .list-item:has(.card) + nav {
     padding-top: 0.3rem;
 }
@@ -1756,9 +1751,9 @@ section {
 .row:has(> #filter_panel) {
     background-color: #fff;
     border: var(--border);
-    border-top-left-radius: var(--sbx-border-radius-normal);
-    border-top-right-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-border-radius-normal);
     box-shadow: var(--sbx-shadow-m);
+    margin-bottom: 1rem;
 
     & #filter_panel {
         padding-inline: 0;
@@ -2237,6 +2232,9 @@ span:has(~ .gradient-0) {
     padding: 4px 10px;
     width: fit-content;
 }
-
+.card.compact.small-12 { //removed because it is effcting on reveal modals spacing
+    padding-left: 0;
+    padding-right: 0;
+}
 **
 */

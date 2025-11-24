@@ -85,3 +85,24 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 .sbx-body .information-list.card-selectable > li .selector {
     cursor: auto;
 }
+
+// Fix reveal modal checklist checkbox alignment issue
+.sbx-body {
+    .reveal-modal {
+        span.name {
+            white-space: normal;
+        }
+
+        .checklist {
+            overflow-y: visible;
+
+            input[type="checkbox"] {
+                margin-left: 1rem;
+
+                &:focus {
+                    margin-left: 1rem;
+                }
+            }
+        }
+    }
+}
