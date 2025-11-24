@@ -14,7 +14,7 @@
                     <h2 class="subheader">{{ feature.title }}</h2>
                     <section>
                         <fieldset>
-                            <div class="columns">
+                            <div id="ai_{{ feature.feature }}" class="columns">
                                 {# module specific config #}
                                 {% include '@adminOpenAi/config.twig' with {
                                     feature: feature,
@@ -175,3 +175,5 @@
         </style>
     </div>
 </div>
+
+{% include '@settings/fragments/moduleConfigHighlight.twig' %}
