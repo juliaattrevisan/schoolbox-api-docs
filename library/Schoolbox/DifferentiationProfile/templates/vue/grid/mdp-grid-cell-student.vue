@@ -3,6 +3,7 @@
  * Display a student and access to select linked records and generate with AI
  */
 
+import { sbProps } from "@js/util/sbx/pageUtils";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
@@ -54,7 +55,13 @@ function onGenerateSelected(): void {
         >
             View Linked Records
         </button>
-        <button class="button icon-ai f-no-margins" @click="onGenerateSelected">Generate with AI</button>
+        <button
+            v-if="sbProps.aiFeatures.differentiation?.enabled"
+            class="button icon-ai f-no-margins"
+            @click="onGenerateSelected"
+        >
+            Generate with AI
+        </button>
     </div>
 </template>
 

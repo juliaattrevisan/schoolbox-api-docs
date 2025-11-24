@@ -26,8 +26,8 @@ function onConfirmSelected(): void {
         <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onConfirmSelected">
             <h2 data-test="up-delete-units-title">
                 Suggested {{ locale.differentiationProfile.translate(false, true) }} for
-                {{ genAiStore.profileToGenerate?.student.givenName }}
-                {{ genAiStore.profileToGenerate?.student.lastName }}
+                {{ genAiStore.profile?.student.givenName }}
+                {{ genAiStore.profile?.student.lastName }}
             </h2>
             <request-error v-if="genAiStore.loadError" :further-info="genAiStore.loadError" />
             <div class="l-flex l-gap-xs f-no-margins">
