@@ -61,7 +61,8 @@
             {% set redirect = '?' ~ RETURN_URL.name ~ '=' ~ returnUrlEncoded|escape('url')%}
         {% endif %}
 
-        {% if assessment.isImplementation %}
+        {# Only students and staffs get to see this button; parents and guests don't #}
+        {% if assessment.isImplementation and (USER.role.isStudent or USER.role.isStaff) %}
             {% if button.url %}
                 <a class="submit button"
                    href="{{ button.url }}{{ redirect }}"
