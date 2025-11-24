@@ -46,7 +46,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
      * @returns Array of filtered data containing only enabled fields with their titles
      */
     function filterEnabledFields(responseData: Partial<Pick<Profile, ProfileTextKeys>>): AiResponse {
-        const enabledFields = headerStore.enabledFields;
+        const { enabledFields } = headerStore;
         const filteredData: AiResponse = [];
         enabledFields.forEach((field) => {
             const { key } = field as { key: ProfileTextKeys };
@@ -54,7 +54,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
                 filteredData.push({
                     response: responseData[key] || null,
                     title: field.title,
-                    key: key,
+                    key,
                 });
             }
         });
