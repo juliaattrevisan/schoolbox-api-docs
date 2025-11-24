@@ -64,6 +64,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
     display: grid;
     grid-template-columns: v-bind(gridTemplateColumns);
     position: relative;
+    width: max-content;
 }
 
 .mdp-grid__row {
