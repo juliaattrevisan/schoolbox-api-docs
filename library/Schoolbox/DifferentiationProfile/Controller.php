@@ -101,7 +101,10 @@ class Controller extends Base
                 'header'               => $adminConfigs->map(
                     fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
                 ),
-                'route' => $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData'),
+                'routes' => [
+                    'getData' => $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData'),
+                    'genAi' => $this->getRouteIfAuthorized('openai.postDifferentiation'),
+                ]
             ],
             "Manage $translation"
         );

@@ -3,6 +3,14 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { Nested } from "@js/util/queryUtils";
 
 /**
+ * Routes configuration
+ */
+export type Routes = {
+    getData: string;
+    genAi: string;
+};
+
+/**
  * Differentiation Profile header configuration
  */
 export type MDPHeader = {

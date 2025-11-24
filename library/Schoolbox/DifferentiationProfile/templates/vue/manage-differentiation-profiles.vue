@@ -12,8 +12,9 @@ import CursorPagination from "@schoolboxVue/components/pagination/cursor-paginat
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
 import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
-import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
+import type { Routes as PastoralRoutes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type {
+    Routes,
     MDPHeader,
     AdjustmentType,
     ProfileAdjustmentKeys,
@@ -29,14 +30,15 @@ import MdpAiModal from "./mdp-ai-modal.vue";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useRowsStore } from "./store/mdpRowsStore";
 import { useLinkedRecordsStore } from "./store/mdpLinkedRecordsStore";
+import { useGenAiStore } from "./store/mdpGenAiStore";
 
 const props = defineProps<{
     header: MDPHeader[];
     adjustmentCategories: AdjustmentType[];
     adjustmentLevels: AdjustmentType[];
-    route: string;
+    routes: Routes;
     pastoralConfig: Config;
-    pastoralRoutes: Routes;
+    pastoralRoutes: PastoralRoutes;
 }>();
 
 window.Vue.provide("pastoralConfig", props.pastoralConfig);
@@ -45,8 +47,10 @@ window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 const headerStore = useHeaderStore();
 headerStore.init(props.header);
 const rowsStore = useRowsStore();
-rowsStore.init(props.route);
+rowsStore.init(props.routes.getData);
 const linkedRecordsStore = useLinkedRecordsStore();
+const genAiStore = useGenAiStore();
+genAiStore.init(props.routes.genAi);
 
 /**
  * Keep the container below the height of the viewport

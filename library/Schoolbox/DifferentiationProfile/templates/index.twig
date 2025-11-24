@@ -38,7 +38,7 @@
                 :header="{{ header|json_encode }}"
                 :adjustment-categories="{{ adjustmentCategories|json_encode }}"
                 :adjustment-levels="{{ adjustmentLevels|json_encode }}"
-                route="{{ route }}"
+                :routes="{{ routes|json_encode }}"
                 :pastoral-config="{{ {
                     pastoralPointEnabled: config.pastoral_point_enabled,
                     pastoralActionEnable: config.pastoral_action_enable,

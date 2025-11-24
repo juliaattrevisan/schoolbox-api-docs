@@ -23,6 +23,7 @@ type AiResponseItem = {
 type AiResponse = AiResponseItem[];
 
 export const useGenAiStore = defineStore(`genAiStore`, () => {
+    const route = window.Vue.ref<string>("");
     const headerStore = useHeaderStore();
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
@@ -30,6 +31,14 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     const profile = window.Vue.ref<Profile | null>(null); // the profile to generate AI content for
     const aiResponse = window.Vue.ref<AiResponse | null>(null); // to store the AI generated content array
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+
+    /**
+     * store any passed through properties
+     * @param $route - the route to generate AI content from
+     */
+    function init($route: string): void {
+        route.value = $route;
+    }
 
     /**
      * Filter response data to only include fields that are enabled in the header store
@@ -128,6 +137,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         loadError,
         profile,
         aiResponse,
+        init,
         prompt,
         cancel,
         generate,
