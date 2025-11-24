@@ -68,7 +68,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             self::TYPE_STRING,
             self::COLUMN_ENUM,
             'variant',
-            [Event::VARIANT_EVENT, Event::VARIANT_TASK,]
+            [Event::VARIANT_EVENT, Event::VARIANT_TASK, Event::VARIANT_BOOKING,]
         );
 
         $this->hasJoin('owner', array(
@@ -595,7 +595,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         ';
 
         if ($excludeResourceBookings) {
-            $query .= ' AND resource_booking.id IS NULL ';
+            $query .= " AND event.variant != '" . Event::VARIANT_BOOKING . "'";
         }
 
         $statement = $this->database->prepare($query);

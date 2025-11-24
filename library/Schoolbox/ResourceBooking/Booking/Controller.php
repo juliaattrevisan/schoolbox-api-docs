@@ -646,6 +646,8 @@ class Controller extends Base
         // * My bookings (shows in my elements)
         // * Bookings for items I moderate?)
         $event->setType(Calendar\EventTypeMapper::getInstance()->createModel()->setId(1));
+        // this was created first as a booking, set it as such.
+        $event->setVariant(Calendar\Event::VARIANT_BOOKING);
         // Owner and author could be separate - as a moderator I could create
         // bookings for other people.
         $event->setOwner($this->getUser());
