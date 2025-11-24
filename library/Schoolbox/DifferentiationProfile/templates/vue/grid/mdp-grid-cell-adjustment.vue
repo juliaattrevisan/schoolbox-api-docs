@@ -4,11 +4,11 @@
  */
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
+import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
 import type { Profile, ProfileAdjustmentKeys, AdjustmentType } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../store/mdpHeaderStore";
 import { useRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
 import { useSaveStore } from "../store/mdpSaveStore";
-import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
 import { useContentHeight } from "./composable/useContentHeight";
 
@@ -171,7 +171,7 @@ async function onSave(): Promise<void> {
                 </empty-state>
             </div>
             <div ref="componentActionEl">
-                <mdp-grid-cell-action
+                <lg-cell-action-save
                     :id="props.profile.student.id"
                     :header-key="props.headerKey"
                     :has-changed="hasChanged"
