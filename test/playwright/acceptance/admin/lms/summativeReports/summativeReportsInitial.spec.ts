@@ -85,4 +85,43 @@ test.describe.serial("Admin LMS - Summative Reports Initial", () => {
             schoolLogo,
         });
     });
+
+    test("duplicate and delete the summative report", async ({ tester }) => {
+        tester.isGoingTo("duplicate the modified summative report and check it is presented in the list");
+        await summativeReportList.goto();
+        await summativeReportList.clickSummativeReportActionButton("copy", modifiedTitle);
+        const duplicatedTitle = `${modifiedTitle} (copy)`;
+        await summativeReportList.checkSummativeReportTitleIsPresented(duplicatedTitle);
+        tester.isGoingTo("click the preview icon and check the summative report details");
+        await summativeReportList.clickPreviewIcon(duplicatedTitle);
+        await summativeReportList.checkPreviewReportDetails({
+            title: duplicatedTitle,
+            schoolName: "Alaress Pty Ltd",
+            studentName: "Penelope Li",
+            year: "Year 9",
+            introduction: "This is an introductory message.",
+            schoolLogo,
+        });
+        tester.isGoingTo("delete the duplicated summative report and check it is no longer presented in the list");
+        await summativeReportList.deleteSummativeReportByTitle(duplicatedTitle);
+        await summativeReportList.checkSummativeReportIsDeleted(duplicatedTitle);
+        tester.isGoingTo("reload the page to ensure the summative report is deleted permanently");
+        await summativeReportList.goto();
+        await summativeReportList.checkSummativeReportIsDeleted(duplicatedTitle);
+    });
+
+    /**
+     * Soft deleting data to not impact the tests
+    //
+     */
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does impact next suite of tests",
+        );
+        await db.updateInDatabase(
+            "summative_report",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Summative Report Initial Test%", deleted_at: null },
+        );
+    });
 });

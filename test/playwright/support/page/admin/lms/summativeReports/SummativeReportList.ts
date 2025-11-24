@@ -1,6 +1,7 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class SummativeReportList {
     private tester: AcceptanceTester;
@@ -29,9 +30,12 @@ export default class SummativeReportList {
 
     static readonly DATA_TEST_PREVIEW_INTRODUCTION = "summative-preview-introduction";
 
+    private common: Common;
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
+        this.common = new Common(page);
     }
 
     /**
@@ -66,6 +70,25 @@ export default class SummativeReportList {
     async checkSummativeReportTitleIsPresented(title: string): Promise<void> {
         const dataTestId = SummativeReportList.DATA_TEST_SUMMATIVE_TITLE.replace("{title}", title);
         await expect(this.page.getByTestId(dataTestId)).toContainText(title);
+    }
+
+    /**
+     * delete a summative report by its title
+     * @param title - The title of the summative report
+     */
+    async deleteSummativeReportByTitle(title: string): Promise<void> {
+        await this.clickSummativeReportActionButton("delete", title);
+        await this.common.clickConfirmButton();
+        await expect(this.page.getByTestId("toast")).toBeHidden();
+    }
+
+    /**
+     * check the summative report is not presented in the list
+     * @param title - The title of the summative report
+     */
+    async checkSummativeReportIsDeleted(title: string): Promise<void> {
+        const dataTestId = SummativeReportList.DATA_TEST_SUMMATIVE_TITLE.replace("{title}", title);
+        await expect(this.page.getByTestId(dataTestId)).toHaveCount(0);
     }
 
     /**
@@ -141,5 +164,6 @@ export default class SummativeReportList {
         if (details.schoolLogo) {
             await expect(newPage.locator(`img[src*="/storage/image.php?hash"]`)).toBeVisible();
         }
+        await newPage.close();
     }
 }
