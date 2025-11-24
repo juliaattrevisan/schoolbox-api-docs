@@ -89,13 +89,6 @@ class Button
             return null;
         }
 
-        /* If you're a staff member viewing a student's summary, don't show a call to action. You can't do it on behalf
-         * of anyone else; you have to be the $viewer to have a call to action.
-         */
-        if ($viewer->getId() !== $participant->getUser()->getId()) {
-            return null;
-        }
-
         /* If the assessment has surpassed its publish date, but not yet reached its open date,
          * button says "Begin" in a disabled state.
          */
