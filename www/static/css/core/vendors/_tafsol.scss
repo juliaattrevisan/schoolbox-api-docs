@@ -476,6 +476,7 @@ nav:has(
     & li:not(:last-child) {
         /* Added :not(:last-child) so the final element doesn't get a bottom border */
         border-bottom: 1px solid var(--sbx-color-foreground-secondary); /* The separator is now visible */
+        margin-bottom: 0.5rem; /* adds spacing between items */
     }
 }
 
