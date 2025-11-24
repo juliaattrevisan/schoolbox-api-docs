@@ -5,9 +5,7 @@
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { isAbortError } from "@js/util/errorUtils";
-import locale from "@js/terminology/rosettaStone";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useSaveStore } from "./mdpSaveStore";
 import { useHeaderStore } from "./mdpHeaderStore";
 
 /**
@@ -25,7 +23,6 @@ type AiResponseItem = {
 type AiResponse = AiResponseItem[];
 
 export const useGenAiStore = defineStore(`genAiStore`, () => {
-    const saveStore = useSaveStore();
     const headerStore = useHeaderStore();
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
@@ -43,12 +40,12 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         const enabledFields = headerStore.enabledFields;
         const filteredData: AiResponse = [];
         enabledFields.forEach((field) => {
-            const key = field.key as ProfileTextKeys;
+            const { key } = field as { key: ProfileTextKeys };
             if (key in responseData && responseData[key] !== undefined) {
                 filteredData.push({
                     response: responseData[key] || null,
                     title: field.title,
-                    key: field.key as ProfileTextKeys,
+                    key: key,
                 });
             }
         });
@@ -100,18 +97,8 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
     function prompt($profile: Profile): void {
         profile.value = $profile;
         isOpen.value = true;
-        generate();
+        void generate();
     }
-
-    /**
-     * The modal can also be closed by the close button,
-     * so make sure we also handle that case
-     */
-    window.Vue.watch(isOpen, (newValue) => {
-        if (!newValue) {
-            cancel();
-        }
-    });
 
     /**
      * to hide the generate AI prompt
@@ -124,6 +111,16 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             controller.abort();
         }
     }
+
+    /**
+     * The modal can also be closed by the close button,
+     * so make sure we also handle that case
+     */
+    window.Vue.watch(isOpen, (newValue) => {
+        if (!newValue) {
+            cancel();
+        }
+    });
 
     return {
         isProcessing,

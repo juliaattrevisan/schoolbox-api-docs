@@ -23,13 +23,12 @@ export const useSaveStore = defineStore(`saveStore`, () => {
      * Update a profile with the provided keys
      * @param profile - the profile to update
      * @param toSave - object containing specific keys to update in the profile
-     * @returns the updated profile object
      */
-    function updateProfile(profile: Profile, toSave: Partial<Pick<Profile, ProfileKeys>>): void {
-        Object.keys(toSave).forEach((key) => {
-            const profileKey = key as ProfileKeys;
-            if (toSave[profileKey] !== undefined) {
-                (profile as any)[profileKey] = toSave[profileKey];
+    function updateProfile<K extends ProfileKeys>(profile: Profile, toSave: Partial<Record<K, Profile[K]>>): void {
+        (Object.keys(toSave) as K[]).forEach((key) => {
+            const value = toSave[key];
+            if (value !== undefined) {
+                profile[key] = value;
             }
         });
     }
