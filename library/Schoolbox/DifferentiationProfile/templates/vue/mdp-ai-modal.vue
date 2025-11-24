@@ -68,7 +68,7 @@ function onConfirmSelected(): void {
             </h2>
             <request-error v-if="genAiStore.loadError" :further-info="genAiStore.loadError" />
             <div v-else-if="genAiStore.isProcessing">
-                <template v-for="(field, i) in headerStore.enabledFields" :key="field.id">
+                <template v-for="field in headerStore.enabledFields" :key="field.id">
                     <loading-cards :rows="1" :show-image="false">
                         <h3>&nbsp;</h3>
                         <p></p>
