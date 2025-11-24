@@ -43,8 +43,9 @@ const { contentHeight, componentActionHeight } = useContentHeight(
 
 // #region modifying the text content with CKEditor
 
+const initialTextboxContent = props.text ?? "";
 const currentText = window.Vue.ref<string | null>(props.text);
-const editorContent = window.Vue.ref(currentText.value ?? "");
+const editorContent = window.Vue.ref(props.text ?? "");
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
 let editor: InlineEditor;
@@ -234,7 +235,7 @@ function onSave(): void {
                     ref="editorContentEl"
                     tag="div"
                     class="editor-content"
-                    :content="editorContent"
+                    :content="initialTextboxContent"
                 ></media-article>
                 <div class="clearfix"></div>
             </div>
