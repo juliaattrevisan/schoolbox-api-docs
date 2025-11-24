@@ -68,10 +68,10 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
         if (isProcessing.value || profile.value === null) {
             return;
         }
-        // if (profile._routes.edit === undefined) {
-        //     loadError.value = "AI route is undefined";
-        //     return;
-        // }
+        if (route.value === "") {
+            loadError.value = "AI route is undefined";
+            return;
+        }
         try {
             isProcessing.value = true;
             loadError.value = null;
