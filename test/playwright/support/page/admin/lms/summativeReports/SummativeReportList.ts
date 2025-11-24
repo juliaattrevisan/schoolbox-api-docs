@@ -117,8 +117,7 @@ export default class SummativeReportList {
     }
 
     /**
-     * check the preview report page shows the details of the summative report: title, school name
-     * if provided title and/or schoolname are provided check them otherwise skip to the next item
+     * check the preview report page shows the details of the summative report: title, school name, student name, year, introduction, school logo
      * @param details - The details to check
      * @param details.title - The title of the summative report
      * @param details.schoolName - The school name
