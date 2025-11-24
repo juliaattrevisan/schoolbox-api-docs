@@ -87,7 +87,7 @@ interface IClient
      *                                      otherwise, allow the client itself to decide.
      * @param callable|null $streamListener A function to call for each event in the stream, as it is received:
      *                                      this may be used to update `$log` with further information.
-     * @return iterable
+     * @return iterable<EventStream\Message>
      */
     public function createChatCompletionStream(
         array $payload,
