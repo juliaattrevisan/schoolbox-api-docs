@@ -12,6 +12,6 @@ composer install --no-progress -o $*
 checkexit=`echo $?`;
 if [ $checkexit -eq 0 ];
 then
-	sha1sum composer.lock > vendor/composer.lock.checksum;
+    sha1sum composer.lock > vendor/composer.lock.checksum;
 fi
 exit $checkexit;
