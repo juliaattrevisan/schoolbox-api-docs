@@ -435,6 +435,8 @@ services:
   presidio-analyzer:
     container_name: presidio-analyzer
     image: mcr.microsoft.com/presidio-analyzer
+    environment:
+      NLP_CONF_FILE: ./docker/presidio-analyzer/config/nlp.yaml
 
   presidio-anonymizer:
     container_name: presidio-anonymizer
