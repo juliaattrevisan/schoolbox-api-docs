@@ -371,15 +371,18 @@ class Client implements IClient
             foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
-                yield clone $message; // clone as the logHandler may modify it
 
                 // Update the log, and save it:
                 // even if that raises an exception, still save the log
                 try {
-                    $logHandler->handleMessage($message, $log, $streamListener);
+                    // logHandler may modify the message, so clone it so we can yield later
+                    $logHandler->handleMessage(clone $message, $log, $streamListener);
                 } finally {
                     $this->saveLog($log);
                 }
+
+                // Yield after logging as if the parent throws or returns early it would otherwise not be logged
+                yield $message;
             }
 
             // If nothing happened: set a default return code, and save log
