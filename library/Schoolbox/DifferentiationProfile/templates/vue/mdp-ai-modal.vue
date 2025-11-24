@@ -69,39 +69,34 @@ function onConfirmSelected(): void {
             <request-error v-if="genAiStore.loadError" :further-info="genAiStore.loadError" />
             <div v-else-if="genAiStore.isProcessing">
                 <template v-for="(field, i) in headerStore.enabledFields" :key="field.id">
-                    <hr v-if="i > 0" />
                     <loading-cards :rows="1" :show-image="false">
                         <h3>&nbsp;</h3>
-                        <p></p>
                         <p></p>
                         <p></p>
                     </loading-cards>
                 </template>
             </div>
-            <div v-else-if="genAiStore.aiResponse">
-                <template v-for="(item, i) in genAiStore.aiResponse" :key="item.key">
-                    <hr v-if="i > 0" />
-                    <div class="l-flex-col l-gap-s">
-                        <div>
-                            <input
-                                :id="`ai-response-${item.key}`"
-                                v-model="selectedOptions[item.key]"
-                                :true-value="item"
-                                :false-value="null"
-                                type="checkbox"
-                                :data-test="`mdp-ai-modal-i-response-${item.key}`"
-                            />
-                            <label
-                                :for="`ai-response-${item.key}`"
-                                class="checkbox-label"
-                                :data-test="`mdp-ai-modal-i-response-${item.key}-label`"
-                                ><strong>{{ item.title }}</strong></label
-                            >
-                        </div>
-                        <!-- eslint-disable-next-line vue/no-v-html - This is sanitized by the backend already -->
-                        <div v-html="item.response"></div>
+            <div v-else-if="genAiStore.aiResponse" class="c-vert-scroll-container l-flex-col l-gap-s l-pad-s">
+                <div v-for="item in genAiStore.aiResponse" :key="item.key" class="l-flex-col l-gap-s">
+                    <div>
+                        <input
+                            :id="`ai-response-${item.key}`"
+                            v-model="selectedOptions[item.key]"
+                            :true-value="item"
+                            :false-value="null"
+                            type="checkbox"
+                            :data-test="`mdp-ai-modal-i-response-${item.key}`"
+                        />
+                        <label
+                            :for="`ai-response-${item.key}`"
+                            class="checkbox-label"
+                            :data-test="`mdp-ai-modal-i-response-${item.key}-label`"
+                            ><strong>{{ item.title }}</strong></label
+                        >
                     </div>
-                </template>
+                    <!-- eslint-disable-next-line vue/no-v-html - This is sanitized by the backend already -->
+                    <div v-html="item.response"></div>
+                </div>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button
@@ -124,3 +119,9 @@ function onConfirmSelected(): void {
         </form>
     </basic-modal>
 </template>
+
+<style scoped>
+.c-vert-scroll-container {
+    max-height: 700px; /* overwrite default max-height */
+}
+</style>
