@@ -63,7 +63,6 @@ class Helper
      */
     public const string FEATURE_LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
 
-
     /**
      * When an image is omitted from the request/response, we replace the base64 data with this const
      */
