@@ -266,7 +266,7 @@ class Controller extends Base
             }
         } else {
             $model = $this->mapper->createModel()
-                ->setStudent($student);
+                                  ->setStudent($student);
         }
 
         $adjustment_level = $post->get('adjustment_level');
@@ -377,14 +377,14 @@ class Controller extends Base
 
         $this->response = $this->responseAsJson(
             array_reduce(array_keys($configKey), function ($carry, $key) use ($profile, $configs, $configKey) {
-                  if ($configs->offsetExists($key)) {
-                      $method = $configKey[$key];
-                      $carry[] = [
-                          'terminology' => $configs->offsetGet($key)->getTerminology() ?? $configs->offsetGet($key)->getName(),
-                          'value'       => call_user_func([$profile, $method]),
-                      ];
-                  }
-                  return $carry;
+                if ($configs->offsetExists($key)) {
+                    $method = $configKey[$key];
+                    $carry[] = [
+                        'terminology' => $configs->offsetGet($key)->getTerminology() ?? $configs->offsetGet($key)->getName(),
+                        'value'       => call_user_func([$profile, $method]),
+                    ];
+                }
+                return $carry;
             }, [])
         );
     }
