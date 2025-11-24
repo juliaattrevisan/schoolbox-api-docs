@@ -1,1 +1,16 @@
 **/*.js
+.git
+.vagrant
+conf
+debian
+docs
+debian
+node_modules
+packages
+patches
+sql
+tools
+updates
+vagrantcache
+vendor
+www/static/js/bundle
