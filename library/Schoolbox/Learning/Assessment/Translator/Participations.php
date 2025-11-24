@@ -95,7 +95,14 @@ class Participations
                     'assessmentId' => $assess->getId(),
                     'student' => $participant,
                     'studentId'    => $participant->getId(),
-                ])
+                ]),
+                'differentiationProfile' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.viewDifferentiationProfileData',
+                    [
+                        'student' => $participant,
+                        'studentId' => $participant->getId()
+                    ],
+                ),
             ]
         ];
     }

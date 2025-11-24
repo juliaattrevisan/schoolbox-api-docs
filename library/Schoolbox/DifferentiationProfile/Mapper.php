@@ -24,6 +24,19 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * Configuration mapping between config keys and corresponding model getter methods
+     */
+    public const CONFIG_METHOD_MAPPING = [
+        'adjustment_category' => 'getAdjustmentCategory',
+        'adjustment_level' => 'getAdjustmentLevel',
+        'overview' => 'getOverview',
+        'interests_strengths' => 'getInterestsStrengths',
+        'needs_challenges' => 'getNeedsChallenges',
+        'strategies_adjustments' => 'getStrategiesAdjustments',
+        'goals' => 'getGoals',
+    ];
+
     public const int DEFAULT_LIMIT = 20;
     /**
      * Setup mapper

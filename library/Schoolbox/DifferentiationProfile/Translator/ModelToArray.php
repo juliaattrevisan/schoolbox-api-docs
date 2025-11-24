@@ -6,6 +6,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Collection;
+use Schoolbox\DifferentiationProfile\Mapper;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\Admin\DifferentiationProfiles\Model as Config;
 use Schoolbox\User;
@@ -61,15 +62,7 @@ class ModelToArray
             'deleted_at'            => $model->getDeletedAt()?->getShort(),
         ];
 
-        $configKey = [
-            'adjustment_category' => 'getAdjustmentCategory',
-            'adjustment_level' => 'getAdjustmentLevel',
-            'overview' => 'getOverview',
-            'interests_strengths' => 'getInterestsStrengths',
-            'needs_challenges' => 'getNeedsChallenges',
-            'strategies_adjustments' => 'getStrategiesAdjustments',
-            'goals' => 'getGoals',
-        ];
+        $configKey = Mapper::CONFIG_METHOD_MAPPING;
 
         /* filtering out and only get the enabled config values
          */
