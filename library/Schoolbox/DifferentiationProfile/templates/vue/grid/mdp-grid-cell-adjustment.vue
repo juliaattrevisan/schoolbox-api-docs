@@ -128,7 +128,7 @@ async function onSave(): Promise<void> {
     >
         <div ref="contentEl">
             <div v-if="isContentFocused">
-                <div class="checklist l-pad-s">
+                <div v-if="props.options.length > 0" class="checklist l-pad-s">
                     <legend class="t-visually-hidden">
                         {{ headerStore.getTitleByKey(props.headerKey) }} for {{ props.profile.student.givenName }}
                         {{ props.profile.student.lastName }}
@@ -145,6 +145,9 @@ async function onSave(): Promise<void> {
                             }}</label>
                         </li>
                     </ul>
+                </div>
+                <div v-else class="l-pad-s">
+                    <p><em>No available options to select.</em></p>
                 </div>
             </div>
             <div v-else class="l-pad-s">
