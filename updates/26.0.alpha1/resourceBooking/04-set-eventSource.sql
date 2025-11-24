@@ -3,4 +3,4 @@
 -- resource booking events, should be 'booking'
 update event
 set variant = 'booking'
-where id in (select event_id from schoolbox.resource_booking);
+where id in (select event_id from resource_booking);
