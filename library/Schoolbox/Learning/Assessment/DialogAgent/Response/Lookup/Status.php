@@ -27,12 +27,13 @@ class Status
 
     /**
      * Consts correlating to the status enum used by frontend world
+     * Not to be confused with the progress tick classes, despite them currently being the same strings
      * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
      */
-    private const string STATUS_INCOMPLETE = 'incomplete';
-    private const string STATUS_IN_PROGRESS = 'in-progress';
-    private const string STATUS_REQUIRES_ASSISTANCE = 'requires-assistance';
-    private const string STATUS_SUBMITTED = 'submitted';
+    public const string STATUS_INCOMPLETE = 'incomplete';
+    public const string STATUS_IN_PROGRESS = 'in-progress';
+    public const string STATUS_REQUIRES_ASSISTANCE = 'requires-assistance';
+    public const string STATUS_SUBMITTED = 'submitted';
 
 
     /**

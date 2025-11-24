@@ -22,6 +22,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Project;
@@ -190,6 +191,7 @@ class Controller extends WebController\Base
             $filters[AssessmentTypeDefinition::class] = [
                 AssessmentTypeDefinition::KEY_PROJECT           => AssessmentTypeDefinition::KEY_PROJECT,
                 AssessmentTypeDefinition::KEY_QUIZ              => AssessmentTypeDefinition::KEY_QUIZ,
+                AssessmentTypeDefinition::KEY_DIALOG_AGENT      => AssessmentTypeDefinition::KEY_DIALOG_AGENT,
                 AssessmentTypeDefinition::KEY_DUE_WORK          => AssessmentTypeDefinition::KEY_DUE_WORK,
                 AssessmentTypeDefinition::KEY_TASK              => AssessmentTypeDefinition::KEY_TASK,
                 AssessmentTypeDefinition::KEY_LTI_ASSESSMENT    => AssessmentTypeDefinition::KEY_LTI_ASSESSMENT,
@@ -366,9 +368,9 @@ class Controller extends WebController\Base
                                                 return null;
                                             }
 
-                                            /* Find the progress tick status, only relevant for tasks */
+                                            /* Find the progress tick status, only relevant for tasks/dialogAgent */
                                             $progressTick = null;
-                                            if ($aImpl instanceof Task\Model) {
+                                            if ($aImpl instanceof Task\Model || $aImpl instanceof DialogAgent\Model) {
                                                 $unitAssessmentsTranslator = new UnitAssessments(
                                                     $this->routeGenerator,
                                                     $this->getAuthorizer(),
