@@ -14,6 +14,7 @@ export enum AiFeature {
     IMAGE = "image",
     DIALOG_AGENT = "dialogagent",
     DIFFERENTIATION = "differentiation",
+    LEARNING_ACTIVITY_CUSTOMISATION = "learningactivitycustomisation",
 }
 
 export type AiLogFeatureData<TInputText, TOutputText> = {
@@ -27,6 +28,7 @@ type AiLogFeatureDataMap = {
     [AiFeature.IMAGE]: AiLogAgentChatData;
     [AiFeature.DIALOG_AGENT]: null; // TODO define when implemented
     [AiFeature.DIFFERENTIATION]: null;
+    [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: null;
 };
 
 export type AiSessionLog = {
