@@ -112,7 +112,7 @@ function onConfirmSelected(): void {
                     Cancel
                 </button>
                 <button
-                    v-if="!genAiStore.isProcessing"
+                    v-if="!genAiStore.isProcessing && genAiStore.aiResponse"
                     class="button submit l-flex__item--1"
                     type="button"
                     data-test="up-delete-unit-delete"
