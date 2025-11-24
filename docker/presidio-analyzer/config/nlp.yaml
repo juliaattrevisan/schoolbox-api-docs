@@ -1,4 +1,4 @@
 # Should just be able to override the models, and use other defaults
 models:
   - lang_code: en
-    model_name: xlm-roberta-base
+    model_name: "FacebookAI/xlm-roberta-base"
