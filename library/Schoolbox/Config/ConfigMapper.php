@@ -404,6 +404,7 @@ class ConfigMapper extends Mapper
     public const NAME_AI_DIALOGAGENT = 'ai_dialogagent';
     public const NAME_AI_DIFFERENTIATION = 'ai_differentiation';
     public const NAME_AI_IMAGE_GENERATION = 'ai_image_generation';
+    public const NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION = 'ai_learning_activity_customisation';
 
     // image ai configs
     /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE */
