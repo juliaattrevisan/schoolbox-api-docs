@@ -611,8 +611,10 @@ export default {
     }
 }
 
-.VueTables__select-row {
-    width: 30px;
+body:not(.sbx-body) {
+    .VueTables__select-row {
+        width: 30px;
+    }
 }
 
 .name {
