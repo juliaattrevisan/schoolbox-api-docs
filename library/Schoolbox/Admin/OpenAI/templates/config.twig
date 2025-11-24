@@ -47,8 +47,8 @@
             {% set title %}Azure OpenAI Deployment ID{% endset %}
             {% set description %}The deployment name you chose when you deployed the model in Azure.{% endset %}
         {% elseif name == 'system_prompt' %}
-            {% set title %}{{ feature.title }} Generation System Prompt{% endset %}
-            {% set description %}Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.{% endset %}
+            {% set title %}Generation System Prompt{% endset %}
+            {% set description %}Provide some additional instructions to shape what the AI service generates for requests.{% endset %}
         {% elseif name == 'output_quality' %}
             {% set title %}Output Quality{% endset %}
             {% set description %}Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.{% endset %}
