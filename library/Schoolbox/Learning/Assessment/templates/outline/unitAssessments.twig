@@ -92,12 +92,12 @@
                             <a title="{{ title }}" href="{{ route }}" data-test="course-outline-assessment-title-{{ assessment.title }}">
                                 {# Render the icon for the assessment type #}
                                 <span class="{{ icon.renderClass(assessment) }}"></span>
-                                <p>{{ assessment.title }}</p>
+                                <p class="t-break-word">{{ assessment.title }}</p>
                             </a>
                         {% else %}
                             <div title="{{ title }}">
                                 <span class="{{ icon.renderClass(assessment) }}"></span>
-                                <p>{{ assessment.title }}</p>
+                                <p class="t-break-word">{{ assessment.title }}</p>
                             </div>
                         {% endif %}
 
@@ -214,12 +214,12 @@
                                 {% if customRoute %}
                                     <a title="{{ customTitle }}" href="{{ customRoute }}">
                                         <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
-                                        <p>{{ customisedAssessment.title }}</p>
+                                        <p class="t-break-word">{{ customisedAssessment.title }}</p>
                                     </a>
                                 {% else %}
                                     <div title="{{ customTitle }}">
                                         <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
-                                        <p>{{ customisedAssessment.title }}</p>
+                                        <p class="t-break-word">{{ customisedAssessment.title }}</p>
                                     </div>
                                 {% endif %}
                                 {% if canWrite %}
