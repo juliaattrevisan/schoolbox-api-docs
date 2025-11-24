@@ -67,6 +67,11 @@ class CanViewAssessable extends AbstractAssessableRule
                 }
             }
         }
-        throw new Unauthorized("User '{$user->getId()}' is not permitted to see assessment '{$assessable->getId()}'");
+        throw new Unauthorized(sprintf(
+            "User %s is not permitted to see assessment %s for learner id %s; check parameters and identifiers.",
+            $user->getId(),
+            $assessable->getId(),
+            $params['studentId']
+        ));
     }
 }
