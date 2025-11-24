@@ -3,10 +3,7 @@
  * To display a grid-like display
  */
 
-import type {
-    Header,
-    Profile,
-} from "../../../../library/Schoolbox/DifferentiationProfile/templates/js/types/manageDifferentiationProfilesTypes";
+import type { Header } from "./types/lazyGridTypes";
 
 const props = defineProps<{
     header: Header[];
@@ -30,7 +27,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
                 :key="item.id"
                 class="u-sticky-top"
                 :class="{
-                    'u-sticky-left': item.isFixed,
+                    'u-sticky-left': item.isSticky,
                 }"
             >
                 {{ item.title }}
@@ -44,12 +41,12 @@ const gridTemplateColumns = window.Vue.computed(() => {
                 :data-test="`lazy-grid-row-${index}`"
             >
                 <div
-                    v-for="item in props.header"
+                    v-for="(item, cellIndex) in props.header"
                     :key="item.id"
                     :class="{
-                        'u-sticky-left': item.isFixed,
+                        'u-sticky-left': item.isSticky,
                     }"
-                    :data-test="`lazy-grid-row-cell-${(row as Profile).student.id}-${item.key}`"
+                    :data-test="`lazy-grid-row-cell-${cellIndex}-${item.key}`"
                 >
                     <!-- Use dynamic slot based on header type, fallback to default content -->
                     <slot :name="item.type" :row="row" :header="item" :row-index="index">

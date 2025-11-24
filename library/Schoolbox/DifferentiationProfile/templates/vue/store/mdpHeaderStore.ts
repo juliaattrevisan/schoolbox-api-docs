@@ -33,7 +33,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 id: 0,
                 title: "Student",
                 width: 250,
-                isFixed: true,
+                isSticky: true,
                 isSortable: true,
                 key: "student",
                 type: HeaderType.USER,
@@ -44,7 +44,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 type: HeaderType.DATE,
                 title: "Last updated",
                 width: 150,
-                isFixed: false,
+                isSticky: false,
                 isSortable: true,
             },
             ...$header.map((h) => ({
@@ -56,7 +56,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                         : HeaderType.TEXT,
                 title: h.terminology === null || h.terminology.trim() === "" ? h.title : h.terminology,
                 width: h.name === "adjustment_category" || h.name === "adjustment_level" ? 300 : 500,
-                isFixed: false,
+                isSticky: false,
                 isSortable: false,
             })),
         ];

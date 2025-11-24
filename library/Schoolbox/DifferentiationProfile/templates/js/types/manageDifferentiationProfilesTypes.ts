@@ -1,4 +1,5 @@
 import type { UserCC } from "@schoolboxLibrary/types/User";
+import type { Header as LazyGridHeader } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { Nested } from "@js/util/queryUtils";
 
@@ -40,14 +41,8 @@ export enum HeaderType {
 /**
  * To define the structure of each column
  */
-export type Header = {
-    id: number;
-    key: string;
+export type Header = LazyGridHeader & {
     type: HeaderType;
-    title: string;
-    width: number;
-    isFixed: boolean;
-    isSortable: boolean;
 };
 
 /**
