@@ -1,6 +1,7 @@
-import { test, expect } from "@schoolboxTest/playwright/support/integrations";
+import { test } from "@schoolboxTest/playwright/support/integrations";
 import CreateSummativeReport from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/CreateSummativeReport";
 import SummativeList from "@schoolboxTest/playwright/support/page/admin/lms/summativeReports/SummativeReportList";
+import path from "path";
 
 /**
  * check the summative empty message is presented
@@ -18,6 +19,7 @@ test.describe.serial("Admin LMS - Summative Reports Initial", () => {
 
     const summativeReportTitle = "Summative Report Initial Test";
     const modifiedTitle = `${summativeReportTitle} - Modified`;
+    const schoolLogo = path.join(__dirname, "../../../../support/file/baboon.png");
 
     test.beforeEach(async ({ tester, page }) => {
         summativeReportList = new SummativeList(tester, page);
@@ -25,7 +27,7 @@ test.describe.serial("Admin LMS - Summative Reports Initial", () => {
         await tester.loginAsAdmin();
     });
 
-    test("check the summative empty message and mandatory fields validation; create a summative report", async ({
+    test("check the summative empty message and mandatory fields validation; create a summative report and preview it", async ({
         tester,
         page,
     }) => {
@@ -48,22 +50,39 @@ test.describe.serial("Admin LMS - Summative Reports Initial", () => {
         await page.reload();
         await createSummativeReport.fillTitleField(summativeReportTitle);
         await createSummativeReport.fillPeriodsField("2020");
-        await createSummativeReport.fillCampusField("Secondary");
+        await createSummativeReport.fillStudentSelectionField("year-levels", "9");
         await createSummativeReport.clickSaveButton();
         await summativeReportList.checkSummativeReportTitleIsPresented(summativeReportTitle);
+        tester.isGoingTo("click the preview icon and check the summative report details");
+        await summativeReportList.clickPreviewIcon(summativeReportTitle);
+        await summativeReportList.checkPreviewReportDetails({
+            title: summativeReportTitle,
+            schoolName: "Alaress Pty Ltd",
+            studentName: "Jana Reed",
+            year: "Year 9",
+        });
     });
 
-    test("modify the summative report", async ({ tester, page }) => {
+    test("modify the summative report and preview it", async ({ tester, db }) => {
         tester.isGoingTo("modify the created summative report");
         await summativeReportList.goto();
         await summativeReportList.clickSummativeReportActionButton("modify", summativeReportTitle);
         await createSummativeReport.fillTitleField(modifiedTitle);
+        await createSummativeReport.attachLogoImage(db, schoolLogo);
         await createSummativeReport.fillIntroductoryMessageField("This is an introductory message.");
-        await page.locator("input#report-campuses-selectized").click();
-        await page.keyboard.press("Backspace");
-        await createSummativeReport.fillStudentSelectionField("Penelope Li");
+        await createSummativeReport.deleteStudentSelectionFieldData("year-levels");
+        await createSummativeReport.fillStudentSelectionField("students", "Penelope Li");
         await createSummativeReport.clickSaveButton();
         await summativeReportList.checkSummativeReportTitleIsPresented(modifiedTitle);
-        // Ms Penelope Li - Year 9, Middle Student (511)
+        tester.isGoingTo("click the preview icon and check the summative report details");
+        await summativeReportList.clickPreviewIcon(modifiedTitle);
+        await summativeReportList.checkPreviewReportDetails({
+            title: modifiedTitle,
+            schoolName: "Alaress Pty Ltd",
+            studentName: "Penelope Li",
+            year: "Year 9",
+            introduction: "This is an introductory message.",
+            schoolLogo,
+        });
     });
 });

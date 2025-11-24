@@ -1,6 +1,7 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 export default class CreateSummativeReport {
     private tester: AcceptanceTester;
@@ -35,6 +36,8 @@ export default class CreateSummativeReport {
 
     static readonly CLASS_CURRICULUM_PROGRESSION_TITLE_ERROR = "#report-class-vic-progression-title-error";
 
+    private filePath?: string;
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -64,6 +67,16 @@ export default class CreateSummativeReport {
     }
 
     /**
+     * fill feature image
+     * @param db - The DatabaseHelper instance
+     * @param filePath - The filename to fill
+     */
+    async attachLogoImage(db: DatabaseHelper, filePath: string): Promise<void> {
+        const attachZone = this.page.locator("#LogoZone");
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
+    }
+
+    /**
      * fill the introductory message field
      * @param message - The message to fill in
      */
@@ -82,24 +95,23 @@ export default class CreateSummativeReport {
     }
 
     /**
-     * fill in the campus field
-     * @param campus - The campus to fill in
+     * fill in the year level, campus or student field
+     * @param studentSelection - The field to fill in: campuses, year-levels or students
+     * @param data - The data to fill in
      */
-    async fillCampusField(campus: string): Promise<void> {
-        await this.page.locator(`input[id="report-campuses-selectized"]`).click();
-        await this.page.keyboard.type(campus, { delay: 500 });
-        await this.page.locator("[data-selectable]").last().filter({ hasText: campus }).click();
+    async fillStudentSelectionField(studentSelection: string, data: string): Promise<void> {
+        await this.page.locator(`input[id="report-${studentSelection}-selectized"]`).click();
+        await this.page.keyboard.type(data, { delay: 500 });
+        await this.page.keyboard.press("Enter");
     }
 
     /**
-     * fill the student selection field
-     * @param studentSelection - The student selection to fill in
+     * delete data from the student selection field
+     * @param studentSelection - The field to delete data from: campuses, year-levels or students
      */
-    async fillStudentSelectionField(studentSelection: string): Promise<void> {
-        await this.page.locator(`input[id="report-students-selectized"]`).click();
-        await this.page.keyboard.type(studentSelection, { delay: 500 });
-        await this.page.keyboard.press("Enter");
-        // await this.page.locator("[data-selectable]").first().filter({ hasText: studentSelection }).click();
+    async deleteStudentSelectionFieldData(studentSelection: string): Promise<void> {
+        await this.page.locator(`input#report-${studentSelection}-selectized`).click();
+        await this.page.keyboard.press("Backspace");
     }
 
     /**
