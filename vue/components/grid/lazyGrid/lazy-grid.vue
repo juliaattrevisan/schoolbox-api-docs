@@ -23,14 +23,14 @@ const gridTemplateColumns = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="mdp-grid">
-        <div ref="headerRowEl" class="mdp-grid__row mdp-grid__row--header">
+    <div class="lazy-grid">
+        <div ref="headerRowEl" class="lazy-grid__row lazy-grid__row--header">
             <div
                 v-for="item in props.header"
                 :key="item.id"
-                class="fixed-top"
+                class="u-sticky-top"
                 :class="{
-                    'fixed-left': item.isFixed,
+                    'u-sticky-left': item.isFixed,
                 }"
             >
                 {{ item.title }}
@@ -40,16 +40,16 @@ const gridTemplateColumns = window.Vue.computed(() => {
             <div
                 v-for="(row, index) in props.rows"
                 :key="index"
-                class="mdp-grid__row"
-                :data-test="`mdp-grid-row-${index}`"
+                class="lazy-grid__row"
+                :data-test="`lazy-grid-row-${index}`"
             >
                 <div
                     v-for="item in props.header"
                     :key="item.id"
                     :class="{
-                        'fixed-left': item.isFixed,
+                        'u-sticky-left': item.isFixed,
                     }"
-                    :data-test="`mdp-grid-row-cell-${(row as Profile).student.id}-${item.key}`"
+                    :data-test="`lazy-grid-row-cell-${(row as Profile).student.id}-${item.key}`"
                 >
                     <!-- Use dynamic slot based on header type, fallback to default content -->
                     <slot :name="item.type" :row="row" :header="item" :row-index="index">
@@ -63,14 +63,14 @@ const gridTemplateColumns = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
-.mdp-grid {
+.lazy-grid {
     display: grid;
     grid-template-columns: v-bind(gridTemplateColumns);
     position: relative;
-    width: max-content;
+    width: max-content; /* so sticky left elements stick for the entire width */
 }
 
-.mdp-grid__row {
+.lazy-grid__row {
     display: contents; // Allow the children to be displayed as a grid
     > div {
         background-color: #fff;
@@ -96,19 +96,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
     }
 }
 
-.fixed-top.fixed-left {
+.u-sticky-top.u-sticky-left {
     z-index: calc(var(--sbx-depth-ui-sticky) + 3); // On top of both the left column, the header, and the dropdowns
-}
-
-.fixed-left {
-    left: 0;
-    position: sticky;
-    z-index: var(--sbx-depth-ui-sticky); // Behind the dropdowns and table header, but on top of the content
-}
-
-.fixed-top {
-    position: sticky;
-    top: 0;
-    z-index: calc(var(--sbx-depth-ui-sticky) + 2); // On top of both the left column and the dropdowns
 }
 </style>
