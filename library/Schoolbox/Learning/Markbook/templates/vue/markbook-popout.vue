@@ -13,6 +13,7 @@ import {
     ACTIVITY_TYPE_PROJECT,
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_QUIZ,
+    ACTIVITY_TYPE_DIALOG_AGENT,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
@@ -111,6 +112,7 @@ const cellInfo = window.Vue.computed(() => {
         activity,
         classImpl,
         aImpl,
+        student,
         participant,
     };
 });
@@ -205,6 +207,9 @@ const viewStatusText = window.Vue.computed(() => {
     }
     if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
         return "Submission History";
+    }
+    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT) {
+        return `${locale.dialogAgent.proper()} History`;
     }
     if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_TASK) {
         return "Student View";
@@ -372,7 +377,11 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             }
 
             // If including student reload the activity list
-            if ([ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(activity.assessmentType)) {
+            if (
+                [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_DIALOG_AGENT].includes(
+                    activity.assessmentType,
+                )
+            ) {
                 await getActivity();
             } else {
                 activityItems.value = [];
@@ -631,7 +640,8 @@ function onToggleSelected(): void {
                         'is-disabled':
                             !routes.historyRoute ||
                             cellInfo.participant.isExcluded ||
-                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK),
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) ||
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT),
                     }"
                     :link="routes.historyRoute ? getReturnUrl(routes.historyRoute) : undefined"
                 >
