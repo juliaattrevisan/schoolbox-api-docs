@@ -112,11 +112,10 @@ test.describe.serial("Admin LMS - Summative Reports Initial", () => {
 
     /**
      * Soft deleting data to not impact the tests
-    //
      */
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does impact next suite of tests",
+            "update delete_at for the data created in this test so it does not impact next suite of tests",
         );
         await db.updateInDatabase(
             "summative_report",

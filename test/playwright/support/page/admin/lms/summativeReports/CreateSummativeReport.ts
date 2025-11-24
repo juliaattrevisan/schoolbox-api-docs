@@ -42,10 +42,10 @@ export default class CreateSummativeReport {
         this.tester = tester;
         this.page = page;
     }
+
     /**
      * Navigates to the create summative report page
      */
-
     async goto(): Promise<void> {
         await this.page.goto(CreateSummativeReport.URL);
     }
@@ -59,9 +59,8 @@ export default class CreateSummativeReport {
 
     /**
      * fill in the title field
-     * @param { string } title - The title to fill in
+     * @param title - The title to fill in
      */
-
     async fillTitleField(title: string): Promise<void> {
         await this.page.fill(CreateSummativeReport.TITLE, title);
     }
@@ -129,14 +128,14 @@ export default class CreateSummativeReport {
     }
 
     /**
-     * check the summary curriculum progression
+     * toggle the summary curriculum progression checkbox
      */
     async toggleSummaryCurriculumProgression(): Promise<void> {
         await this.page.click(CreateSummativeReport.ENABLE_SUMMARY_CURRICULUM_PROGRESSION);
     }
 
     /**
-     * check the class curriculum progression
+     * toggle the class curriculum progression
      */
     async toggleClassCurriculumProgression(): Promise<void> {
         await this.page.click(CreateSummativeReport.ENABLE_CLASS_CURRICULUM_PROGRESSION);

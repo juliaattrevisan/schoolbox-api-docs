@@ -92,7 +92,7 @@ export default class SummativeReportList {
     }
 
     /**
-     * click a buttons to action in the summative report list
+     * click a button to perform action in the summative report list
      * @param action - The action to perform (preview, download, modify, copy, delete)
      * @param title - The title of the summative report
      */
