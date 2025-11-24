@@ -62,13 +62,17 @@
         {% endif %}
 
         {# Only students and staffs get to see this button; parents and guests don't #}
-        {% if assessment.isImplementation and (USER.role.isStudent or USER.role.isStaff) %}
+        {% if button %}
             {% if button.url %}
                 <a class="submit button"
                    href="{{ button.url }}{{ redirect }}"
                    data-test="assessment-summary-create-button"
                 >{{ button.label }} {{ locale.dialogAgent }}</a>
             {% else %}
+                {# button.url will be falsy if USER cannot access it; in the student or staff roletype workflows, at some
+                 # point they'll be able to use this button: we show it in a disabled state with the expectation that one
+                 # day it'll be enabled as a consequence of a student's action.
+                 #}
                 <a class="submit button disabled"
                    href="#"
                    aria-disabled="true"

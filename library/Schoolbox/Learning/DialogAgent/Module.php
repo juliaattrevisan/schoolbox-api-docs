@@ -251,6 +251,20 @@ class Module extends BaseModule
                 new Rule\HasRole(Role::STUDENT),
                 new Rule\HasRole(Role::STAFF),
             ),
+            /* Assessment must be an implementation, not a specification
+             */
+            new Rule\LazyCallback(
+                fn() => new Rule\Callback(function (array $params): void {
+                    if (!$params['assessment']->isImplementation()) {
+                        throw new Forbidden(\sprintf(
+                            'Assessment %s is not an implementation.',
+                            $params['assessment']->getId(),
+                        ));
+                    }
+                })
+            ),
+            /* The rules below were yoinked from Learning/Assessment/Module.
+             */
             new CanViewAssessable(new Visibility($this->getAccess())),
             new Rule\Any(
                 // Instructor/staff viewing their own summary page

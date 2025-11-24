@@ -61,25 +61,39 @@ class Button
      * @param Model $assessment
      * @param null|Participant $participant
      * @param User $viewer
-     * @return array
+     * @return array|null
      * @throws RouteNotFound
      */
-    public function generate(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): array
+    public function generate(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): ?array
     {
         $now = \Alaress_Date_Format::now();
         $url = null;
 
-        /* No participant? You might be a staff member creating this thing since that workflow also lands you at
-         * the assessment summary screen. Without a participant you can't do much here.
+        /* Parents don't have a button at all.
+         * Guests don't have a button at all.
          *
-         * I guess...this?
+         * At this point, even though the auth check fails and causes your generated route to be null, this class would
+         * have forcibly spawned an array representing a button that had a null url simply by getting to
+         * if ($assessment->getOpenAt()->lte($now)) since button generation here presumes a student/staff interaction.
+         */
+        if (!$viewer->getRole()->isStaff() && !$viewer->getRole()->isStudent()) {
+            return null;
+        }
+
+        /* No participant? You might be a staff member creating this thing since that workflow also lands you at
+         * the assessment summary screen. Without a participant you can't do much here. Staff shouldn't have a call to
+         * action at this point: experimenting is done in the Configure Agent screen. Staff can't do the activity on
+         * behalf of a student.
          */
         if (null === $participant) {
-            return [
-                'label' => self::LABEL_START,
-                'responseId' => null,
-                'url' => null,
-            ];
+            return null;
+        }
+
+        /* If you're a staff member viewing a student's summary, don't show a call to action. You can't do it on behalf
+         * of anyone else; you have to be the $viewer to have a call to action.
+         */
+        if ($viewer->getId() !== $participant->getUser()->getId()) {
+            return null;
         }
 
         /* If the assessment has surpassed its publish date, but not yet reached its open date,
