@@ -436,7 +436,10 @@ services:
     container_name: presidio-analyzer
     image: mcr.microsoft.com/presidio-analyzer
     environment:
-      NLP_CONF_FILE: ./docker/presidio-analyzer/config/nlp.yaml
+      NLP_CONF_FILE: /config/nlp.yaml
+    # also need to mount this file
+    volumes:
+      - presidio-analyzer-config:/config
 
   presidio-anonymizer:
     container_name: presidio-anonymizer
@@ -536,6 +539,13 @@ volumes:
       type: none
       o: bind
       device: ../.aws
+
+  presidio-analyzer-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./presidio-analyzer/config
 
   # Volume for ClamAV signatures
   clamav-data:
