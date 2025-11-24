@@ -35,10 +35,10 @@ const gridTemplateColumns = window.Vue.computed(() => {
         </div>
         <template v-if="!props.isLoading">
             <div
-                v-for="(row, index) in props.rows"
-                :key="index"
+                v-for="(row, rowIndex) in props.rows"
+                :key="rowIndex"
                 class="lazy-grid__row"
-                :data-test="`lazy-grid-row-${index}`"
+                :data-test="`lazy-grid-row-${rowIndex}`"
             >
                 <div
                     v-for="(item, cellIndex) in props.header"
@@ -46,10 +46,10 @@ const gridTemplateColumns = window.Vue.computed(() => {
                     :class="{
                         'u-sticky-left': item.isSticky,
                     }"
-                    :data-test="`lazy-grid-row-cell-${cellIndex}-${item.key}`"
+                    :data-test="`lazy-grid-row-cell-${rowIndex}-${cellIndex}-${item.key}`"
                 >
                     <!-- Use dynamic slot based on header type, fallback to default content -->
-                    <slot :name="item.type" :row="row" :header="item" :row-index="index">
+                    <slot :name="item.type" :row="row" :header="item" :row-index="rowIndex">
                         <!-- Default content if no slot is provided -->
                         {{ row[item.key] }}
                     </slot>

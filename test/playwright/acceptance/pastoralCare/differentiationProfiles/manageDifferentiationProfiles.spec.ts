@@ -154,7 +154,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
             tester.isGoingTo("Verify that the text is still present after reload");
             await page.reload();
-            const overviewCell = page.getByTestId(`mdp-grid-row-cell-${studentId}-${fieldKey}`);
+            const overviewCell = page.getByTestId(`lazy-grid-row-cell-0-4-${fieldKey}`);
             await expect(overviewCell).toContainText(textToType);
         } finally {
             tester.isGoingTo("Clean up: Reset data state");
@@ -190,7 +190,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
             tester.isGoingTo("Verify that the adjustment is still present after reload");
             await page.reload();
-            const overviewCell = page.getByTestId(`mdp-grid-row-cell-${studentId}-${fieldKey}`);
+            const overviewCell = page.getByTestId(`lazy-grid-row-cell-0-2-${fieldKey}`);
             tester.isGoingTo("Verify that can see a list of adjustments added");
             await expect(overviewCell).toContainText("Cognitive");
             await expect(overviewCell).toContainText("Social / Emotional");

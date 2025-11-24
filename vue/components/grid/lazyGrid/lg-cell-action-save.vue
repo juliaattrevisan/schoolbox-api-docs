@@ -38,7 +38,7 @@ function onSaveClicked(): void {
             <button
                 v-else-if="!props.hasChanged && !props.isFocused"
                 class="button"
-                :data-test="`mdp-grid-cell-action-modify-${props.id}-${props.headerKey}`"
+                :data-test="`lg-cell-action-save-modify-${props.id}-${props.headerKey}`"
                 @click="onModifyClicked"
             >
                 Modify
@@ -47,7 +47,7 @@ function onSaveClicked(): void {
             <button
                 v-else
                 class="button"
-                :data-test="`mdp-grid-cell-action-save-${props.id}-${props.headerKey}`"
+                :data-test="`lg-cell-action-save-save-${props.id}-${props.headerKey}`"
                 @mousedown="onSaveClicked"
             >
                 Save

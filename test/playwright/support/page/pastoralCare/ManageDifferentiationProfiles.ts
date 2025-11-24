@@ -17,9 +17,9 @@ export default class ManageDifferentiationProfiles {
 
     static readonly DATA_TEST_TERMINOLOGY_HEADER = "differentiation-profiles-header-Terminology";
 
-    static readonly DATA_TEST_MODIFY_BUTTON = "mdp-grid-cell-action-modify-{studentId}-{fieldKey}";
+    static readonly DATA_TEST_MODIFY_BUTTON = "lg-cell-action-save-modify-{studentId}-{fieldKey}";
 
-    static readonly DATA_TEST_SAVE_BUTTON = "mdp-grid-cell-action-save-{studentId}-{fieldKey}";
+    static readonly DATA_TEST_SAVE_BUTTON = "lg-cell-action-save-save-{studentId}-{fieldKey}";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
