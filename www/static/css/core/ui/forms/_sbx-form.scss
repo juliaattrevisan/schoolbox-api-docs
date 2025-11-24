@@ -60,3 +60,8 @@
 .sbx-body input:has(+ label p.meta) {
     vertical-align: top;
 }
+
+// Ensure articles wrap normally
+.sbx-body article {
+    white-space: normal !important;
+}
