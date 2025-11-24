@@ -190,13 +190,16 @@ function onModify(): void {
  */
 window.Vue.watch(
     () => props.text,
-    (newText) => {
+    async (newText) => {
         if (newText === currentText.value) {
             return;
         }
         currentText.value = newText;
         editorContent.value = newText ?? "";
         if (isEditorCreated.value) {
+            editor.setData(editorContent.value);
+        } else {
+            await focusEditor();
             editor.setData(editorContent.value);
         }
     },
