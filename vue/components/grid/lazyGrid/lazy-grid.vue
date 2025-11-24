@@ -3,7 +3,10 @@
  * To display a grid-like display
  */
 
-import type { Header, Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type {
+    Header,
+    Profile,
+} from "../../../../library/Schoolbox/DifferentiationProfile/templates/js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     header: Header[];

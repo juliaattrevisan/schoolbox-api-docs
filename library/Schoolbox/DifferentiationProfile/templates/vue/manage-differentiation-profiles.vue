@@ -9,6 +9,7 @@ import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CursorPagination from "@schoolboxVue/components/pagination/cursor-pagination.vue";
+import LazyGrid from "@schoolboxVue/components/grid/lazyGrid/lazy-grid.vue";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
 import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
@@ -22,7 +23,6 @@ import type {
     Payload,
     Profile,
 } from "../js/types/manageDifferentiationProfilesTypes";
-import MdpGrid from "./grid/mdp-grid.vue";
 import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
 import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
 import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
@@ -77,7 +77,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
     </empty-state>
     <template v-else-if="rowsStore.hasRows && rowsStore.payload">
         <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
-            <mdp-grid
+            <lazy-grid
                 :header="headerStore.header"
                 :rows="rowsStore.payload.data.profiles"
                 :is-loading="rowsStore.isMoreLoading"
@@ -112,7 +112,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                         {{ row[columnHeader.key] ? (row[columnHeader.key] as string) : "" }}
                     </div>
                 </template>
-            </mdp-grid>
+            </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
             <cursor-pagination
                 :url="rowsStore.url"
