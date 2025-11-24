@@ -74,15 +74,15 @@
 .sbx-body body.login input[type="checkbox"]:not(.plain) + label:after {
     display: none;
 }
-input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
+.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:after,
 body.login input[type="checkbox"]:not(.plain) + label:after {
     display: none;
 }
-input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
+.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label:before,
 body.login input[type="checkbox"]:not(.plain) + label:before {
     display: none;
 }
-.information-list.card-selectable > li .selector {
+.sbx-body .information-list.card-selectable > li .selector {
     padding: 1.5rem 0rem 0rem 0rem;
     cursor: auto;
 }

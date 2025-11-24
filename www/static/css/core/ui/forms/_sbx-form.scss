@@ -43,3 +43,20 @@
     margin: 0 1rem 0 0.5rem !important;
     padding: 0 !important;
 }
+
+// Ensure inputs and their labels stay on the same line in columns layout
+.sbx-body .columns:has(input + label),
+.sbx-body li:has(input + label) {
+    white-space: nowrap;
+}
+
+// Ensure meta text wraps normally
+.sbx-body .columns:has(input + label) p.meta,
+.sbx-body li:has(input + label) p.meta {
+    white-space: normal;
+}
+
+// Align inputs to the top when there is meta text
+.sbx-body input:has(+ label p.meta) {
+    vertical-align: top;
+}

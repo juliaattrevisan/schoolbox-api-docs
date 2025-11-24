@@ -61,8 +61,3 @@
         vertical-align: text-bottom;
     }
 }
-
-// Ensure radio buttons and their labels stay on the same line in columns layout
-.columns:has(input + label) {
-    white-space: nowrap;
-}
