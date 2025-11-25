@@ -73,7 +73,7 @@ class Event extends EventBase
     /**
      * Associated resource bookings
      *
-     * @var null|GenericCollection
+     * @var null|GenericCollection<ResourceBookingModel>
      */
     protected ?GenericCollection $bookingsCollection = null;
 
