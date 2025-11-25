@@ -460,6 +460,10 @@ class Mapper extends BaseMapper
      */
     public function getForAllEventIds(array $eventIds): array
     {
+        if (count($eventIds) === 0) {
+            return [];
+        }
+
         $query = "
             SELECT
                 {$this->getColumnString('b')},
