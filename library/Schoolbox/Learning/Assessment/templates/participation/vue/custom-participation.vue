@@ -4,6 +4,7 @@
  */
 
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
@@ -23,7 +24,11 @@ const props = defineProps<{
     customisations: (Plan | CustomisedPlan)[];
 }>();
 
+/**
+ * Handle selection of participants via checkboxes
+ */
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
+const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(allParticipants);
 
 /**
  * Get student pastoral counts
@@ -34,37 +39,15 @@ const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
     () => allParticipants.value,
 );
 
-// #region checkboxes and selection
-
-const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1); // show the checkboxes if there are more than one participant
-const selectedList = window.Vue.ref<Participant[]>([]); // currently selected participants (check boxes in the table)
-
 /**
- * Check if all participants are selected
+ * Exclude and include participants handlers
  */
-const allSelected = window.Vue.computed({
-    get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant)),
-    set: (value) => {
-        selectedList.value = value ? allParticipants.value : [];
-    },
-});
-
-/**
- * Function to check if the selection is indeterminate (some but not all selected)
- * to set the checkbox state appropriately
- */
-const isIndeterminate = window.Vue.computed(() => {
-    return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
-});
-
-// #endregion checkboxes and selection
-
-// #region participant modifications
-
 const { excludeParticipants } = useExcludeParticipant(loadError);
-
 const { includeParticipants } = useIncludeParticipant(loadError);
 
+/**
+ * To include participants in existing customisation plans
+ */
 const {
     isIncludeInExistingOpen,
     includeInExistingList,
@@ -74,10 +57,11 @@ const {
     openIncludeInExistingModal,
 } = useIncludeInExisting(loadError, props.customisations, props.routes.includeInExistingCustomisation, selectedList);
 
+/**
+ * To confirm action if any participants have submission/feedback
+ */
 const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onConfirmActionSelected } =
     usePerformAction(selectedList, excludeParticipants, includeParticipants, includeParticipantInExistingPlan);
-
-// #endregion participant modifications
 </script>
 
 <template>
