@@ -126,43 +126,48 @@ export default class SummativeReportList {
      * @param details.introduction - The introduction text
      * @param details.schoolLogo - The school logo
      */
-    async checkPreviewReportDetails(details: {
-        title?: string;
-        schoolName?: string;
-        studentName?: string;
-        year?: string;
-        introduction?: string;
-        schoolLogo?: string;
-    }): Promise<void> {
-        const [newPage] = await Promise.all([
-            this.page.context().waitForEvent("page"), // Wait for new page to open
-        ]);
+    async checkPreviewReportDetails(
+        previewPage: Page,
+        details: {
+            title?: string;
+            schoolName?: string;
+            studentName?: string;
+            year?: string;
+            introduction?: string;
+            schoolLogo?: string;
+        },
+    ): Promise<void> {
+        // const [newPage] = await Promise.all([
+        //     this.page.context().waitForEvent("page"), // Wait for new page to open
+        // ]);
         if (details.title) {
-            await expect(newPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_TITLE)).toContainText(details.title);
+            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_TITLE)).toContainText(
+                details.title,
+            );
         }
         if (details.schoolName) {
-            await expect(newPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_SCHOOL_NAME)).toContainText(
+            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_SCHOOL_NAME)).toContainText(
                 details.schoolName,
             );
         }
         if (details.studentName) {
-            await expect(newPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_NAME)).toContainText(
+            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_NAME)).toContainText(
                 details.studentName,
             );
         }
         if (details.year) {
-            await expect(newPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_YEAR)).toContainText(
+            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_YEAR)).toContainText(
                 details.year,
             );
         }
         if (details.introduction) {
-            await expect(newPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_INTRODUCTION)).toContainText(
+            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_INTRODUCTION)).toContainText(
                 details.introduction,
             );
         }
         if (details.schoolLogo) {
-            await expect(newPage.locator(`img[src*="/storage/image.php?hash"]`)).toBeVisible();
+            await expect(previewPage.locator(`img[src*="/storage/image.php?hash"]`)).toBeVisible();
         }
-        await newPage.close();
+        await previewPage.close();
     }
 }
