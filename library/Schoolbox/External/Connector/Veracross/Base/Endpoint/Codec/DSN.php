@@ -149,7 +149,7 @@ class DSN implements IDSN
          */
         $options = [];
 
-        foreach ($parts['options'] as $key => $value) {
+        foreach ($parts['options'] ?? [] as $key => $value) {
             $options[] = "{$key}={$value}";
         }
 
