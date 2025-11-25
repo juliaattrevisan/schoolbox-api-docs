@@ -10,6 +10,7 @@ import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vu
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
 import { AiLogType } from "./payload";
 import type {
+    AiSessionId,
     AiFeature,
     AiSession,
     AiUsageLogApiRequest,
@@ -42,7 +43,7 @@ const usageSessions = window.Vue.ref<AiSession[]>([]);
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
-const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
+const selectedSessionId = window.Vue.ref<AiSessionId | null>(null);
 const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
 type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {

@@ -6,7 +6,11 @@ import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
-type AiSessionId = string;
+/**
+ * A unique guid for an AI session, used to group related requests such as a chat conversation together
+ * Some endpoints have one session ID per request (such as lesson plans) as they don't connect with each other
+ */
+export type AiSessionId = string;
 
 export enum AiFeature {
     CHAT = "chat",

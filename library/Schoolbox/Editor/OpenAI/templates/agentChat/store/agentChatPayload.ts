@@ -1,6 +1,6 @@
 import { sseApiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse, SseMessageEvent, SseMessageCallback } from "@js/util/sbx/apiUtils";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import type { AiSessionId } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { AgentChatImage } from "../agentChatTypes";
 
 /**
@@ -51,7 +51,7 @@ export type AgentChatApiPayload = {
      * - when messaging against a response, this is unused as the session ID is stored against the response already
      * - when testing the chat agent, this will be generated on load from the backend
      */
-    aiSessionId: AiSession["id"] | null;
+    aiSessionId: AiSessionId | null;
 };
 
 type AgentChatApiResponseCompleted = {
