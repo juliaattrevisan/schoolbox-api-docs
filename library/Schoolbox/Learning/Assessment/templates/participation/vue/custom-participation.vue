@@ -9,6 +9,7 @@ import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import CpParticipant from "./cp-participant.vue";
 import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
@@ -294,17 +295,6 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
     return `(Modified ${locale.activity?.singular()})`;
 }
 
-/**
- * Gets the modification URL for a customised plan
- * @param customisedPlan - The customised plan to get the URL for
- * @returns The modification URL with return URL parameter
- */
-function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
-    const baseUrl =
-        customisedPlan.name !== null ? customisedPlan._links.modify : customisedPlan.assessable._links.modify;
-    return `${baseUrl}?${getReturnUrl()}`;
-}
-
 // #endregion
 
 // #region perform modification and check for interactions prior to action
@@ -405,170 +395,22 @@ async function onConfirmActionSelected(): Promise<void> {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
+                    <cp-participant
                         v-for="participant in allParticipants"
                         :key="participant.id"
-                        :data-test="`custom-participation-row-${participant.user.id}`"
-                    >
-                        <td v-if="showCheckboxes">
-                            <input
-                                :id="`id-${participant.user.id}`"
-                                v-model="selectedList"
-                                type="checkbox"
-                                :value="participant"
-                                :data-test="`custom-participation-checkbox-${participant.user.id}`"
-                            />
-                            <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
-                        </td>
-                        <td>
-                            <img
-                                :src="`/portrait.php?id=${participant.user.id}&size=square64`"
-                                :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
-                            />
-                        </td>
-                        <td>
-                            <div class="l-flex-col l-gap-s">
-                                <div v-if="participant.user.id">
-                                    <a :href="`/search/user/${participant.user.id}`">
-                                        {{ participant.user.lastname }},
-                                        {{ participant.user.preferredName || participant.user.firstname }}
-                                        {{ participant.user.pronoun || "" }}
-                                    </a>
-                                </div>
-                                <template v-else>
-                                    {{ participant.user.lastname }},
-                                    {{ participant.user.preferredName || participant.user.firstname }}
-                                    {{ participant.user.pronoun || "" }}
-                                </template>
-                                <div class="l-flex-row l-gap-xs">
-                                    <sbx-label
-                                        v-for="studentBadge in studentPastoralCounts[participant.user.id]"
-                                        :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                        :title="studentBadge.title"
-                                        :text="studentBadge.count.toString()"
-                                        :icon="studentBadge.icon"
-                                        :background-color="studentBadge.bgColor"
-                                        :text-color="studentBadge.fgColor"
-                                        :href="studentBadge.destinationUrl"
-                                    />
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <template v-if="participant.customisedPlan !== null">
-                                <a :href="getCustomisedPlanUrl(participant.customisedPlan)">
-                                    {{ participant.customisedPlan.name ?? participant.customisedPlan.assessable.title }}
-                                </a>
-                                <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
-                            </template>
-                            <template v-else-if="participant.plan.name !== null">
-                                <a :href="`${participant.plan._links.modify}?${getReturnUrl()}`">
-                                    {{ participant.plan.name }}
-                                </a>
-                                <span class="meta">{{ getCustomisationMeta(participant.plan) }}</span>
-                            </template>
-                            <template v-else-if="participant.excludedAt !== null">Excluded</template>
-                        </td>
-                        <td class="no-pad">
-                            <div v-if="participant.user.id" class="actions-small-1">
-                                <nav>
-                                    <sbx-pop-out
-                                        :content-id="`participant-${participant.user.id}`"
-                                        move-to="#pop-out-container"
-                                        is-close-on-content-click
-                                    ></sbx-pop-out>
-                                </nav>
-                                <ul
-                                    :id="`participant-${participant.user.id}`"
-                                    data-dropdown-content=""
-                                    class="f-dropdown"
-                                >
-                                    <template
-                                        v-if="
-                                            participant.excludedAt !== null ||
-                                            participant.plan.name !== null ||
-                                            participant.customisedPlan !== null
-                                        "
-                                    >
-                                        <li class="separator">Manage</li>
-                                        <li>
-                                            <button
-                                                class="icon-close"
-                                                @click.prevent="
-                                                    onActionSelected([participant], 'removeCustomisation', true)
-                                                "
-                                            >
-                                                Remove Customisation
-                                            </button>
-                                        </li>
-                                    </template>
-                                    <template v-else>
-                                        <li class="separator">Manage</li>
-                                        <li>
-                                            <button
-                                                class="icon-modify"
-                                                @click.prevent="
-                                                    onActionSelected(
-                                                        [participant],
-                                                        `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
-                                                        true,
-                                                    )
-                                                "
-                                            >
-                                                Modify
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button
-                                                class="icon-staff-students"
-                                                @click.prevent="onActionSelected([participant], 'exclude', true)"
-                                            >
-                                                Exclude
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button
-                                                v-if="props.customisations.length > 0"
-                                                class="icon-list"
-                                                @click.prevent="openIncludeInExistingModal(true, participant)"
-                                            >
-                                                Include in Existing Customisation
-                                            </button>
-                                        </li>
-                                        <li class="separator">Create</li>
-                                        <li v-if="getAssessmentParticipationCopyActivity">
-                                            <button
-                                                class="icon-copy"
-                                                @click.prevent="
-                                                    onActionSelected(
-                                                        [participant],
-                                                        `${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
-                                                        true,
-                                                    )
-                                                "
-                                            >
-                                                Copy Activity
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button
-                                                class="icon-submissions"
-                                                @click.prevent="
-                                                    onActionSelected(
-                                                        [participant],
-                                                        `${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
-                                                        true,
-                                                    )
-                                                "
-                                            >
-                                                New Activity
-                                            </button>
-                                        </li>
-                                    </template>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
+                        :participant="participant"
+                        :show-checkboxes="showCheckboxes"
+                        :selected-list="selectedList"
+                        :student-pastoral-counts="studentPastoralCounts"
+                        :get-learning-plan-new-url="props.getLearningPlanNewUrl"
+                        :get-assessment-participation-new-activity="props.getAssessmentParticipationNewActivity"
+                        :get-assessment-participation-copy-activity="props.getAssessmentParticipationCopyActivity"
+                        :assessment-id="props.assessmentId"
+                        :customisations="props.customisations"
+                        @update:selected-list="selectedList = $event"
+                        @action-selected="onActionSelected"
+                        @open-include-in-existing-modal="openIncludeInExistingModal"
+                    />
                 </tbody>
             </table>
         </div>
@@ -596,7 +438,7 @@ async function onConfirmActionSelected(): Promise<void> {
                             @click.prevent="
                                 onActionSelected(
                                     selectedList,
-                                    `${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
+                                    `${props.getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
                                     false,
                                 )
                             "
@@ -617,14 +459,14 @@ async function onConfirmActionSelected(): Promise<void> {
                             Include in Existing Customisation
                         </button>
                     </div>
-                    <div v-if="getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
+                    <div v-if="props.getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
                         <button
                             class="icon-copy submit"
                             data-test="custom-participation-copy-activity"
                             @click.prevent="
                                 onActionSelected(
                                     selectedList,
-                                    `${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                    `${props.getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     false,
                                 )
                             "
@@ -638,7 +480,7 @@ async function onConfirmActionSelected(): Promise<void> {
                             @click.prevent="
                                 onActionSelected(
                                     selectedList,
-                                    `${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                    `${props.getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     false,
                                 )
                             "
