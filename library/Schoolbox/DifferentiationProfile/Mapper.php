@@ -112,7 +112,10 @@ class Mapper extends BaseMapper
         }
 
         if (!empty($yearLevelIds)) {
-            $pb = $pb->in('s.year_id', $yearLevelIds);
+            $yearLevels = implode(',', $yearLevelIds);
+            $pb = $pb->rawWhere("COALESCE(s.year_id, :year_levels_none_key) IN ( $yearLevels )", [
+                'year_levels_none_key' => DifferentiationProfile\YearLevel\KeyConverter::NONE_KEY_VALUE,
+            ]);
         }
 
         if (!empty($campusIds)) {

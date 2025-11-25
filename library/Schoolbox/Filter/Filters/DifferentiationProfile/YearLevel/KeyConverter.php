@@ -20,6 +20,8 @@ use Schoolbox\User;
  */
 class KeyConverter extends AbstractKeyConverter
 {
+    public const int NONE_KEY_VALUE = -1;
+
     /**
      * @var Collection|int[]
      */
@@ -43,7 +45,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function getItem(string $key, User $user, string $page): ?int
     {
-        return Definition::KEY_NONE === $key ? null : (int)$key;
+        return Definition::KEY_NONE === $key ? self::NONE_KEY_VALUE : (int)$key;
     }
 
 
