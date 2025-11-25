@@ -6,6 +6,9 @@ import type { AgentChatFeedMessage } from "./agentChatTypes";
 
 interface Props {
     feed: AgentChatFeedMessage[];
+    /** A message to display before the actual error message when generation fails */
+    errorPrefix?: string;
+    /** Whether the user can select this response */
     allowSelection?: boolean;
 }
 const props = defineProps<Props>();
@@ -27,7 +30,12 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 
                 <ac-feed-alert v-if="message.type === 'alert'" :message="message" />
                 <ac-feed-request v-else-if="message.type === 'request'" :message="message" />
-                <ac-feed-response v-else :message="message" :allow-selection="props.allowSelection" />
+                <ac-feed-response
+                    v-else
+                    :message="message"
+                    :error-prefix="props.errorPrefix"
+                    :allow-selection="props.allowSelection"
+                />
             </template>
         </div>
     </div>

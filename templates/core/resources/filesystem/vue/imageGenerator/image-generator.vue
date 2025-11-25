@@ -56,6 +56,7 @@ window.Vue.onMounted(() => {
             class="l-mar-m--bottom"
             style="max-height: 35vh"
             allow-selection
+            error-prefix="There was a problem generating the image."
         />
         <!-- file context is only available for the first message for now -->
         <ac-prompt

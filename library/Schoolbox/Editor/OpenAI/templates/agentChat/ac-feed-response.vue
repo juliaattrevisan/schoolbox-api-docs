@@ -7,6 +7,8 @@ interface Props {
      * The message to display
      */
     message: AgentChatResponse;
+    /** A message to display before the actual error message when generation fails */
+    errorPrefix?: string;
     /** Whether the user can select this response */
     allowSelection: boolean;
 }
@@ -60,7 +62,7 @@ const imageSrc = window.Vue.computed(() => {
         </template>
 
         <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0 l-pad-s">
-            <b>There was a problem generating the image.</b>
+            <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
             {{ props.message.message }}
         </p>
 

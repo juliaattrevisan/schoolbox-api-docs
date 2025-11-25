@@ -191,7 +191,12 @@ function submitResponse(): void {
         </nav>
     </div>
 
-    <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 50vh; height: 100%">
+    <ac-feed
+        class="l-mar-m--bottom"
+        style="max-height: 50vh; height: 100%"
+        :feed="acStore.fullFeed"
+        error-prefix="There was a problem retrieving the response."
+    >
         <template #header>
             <div
                 v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
