@@ -97,10 +97,10 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
             overflow-y: visible;
 
             input[type="checkbox"] {
-                margin-left: 1rem;
+                margin: 0 1rem 0 1rem;
 
                 &:focus {
-                    margin-left: 1rem;
+                    margin: 0 1rem 0 1rem;
                 }
             }
         }

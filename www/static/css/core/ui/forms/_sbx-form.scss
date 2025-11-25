@@ -44,12 +44,6 @@
     padding: 0 !important;
 }
 
-// Ensure inputs and their labels stay on the same line in columns layout
-.sbx-body .columns:has(input + label),
-.sbx-body li:has(input + label) {
-    white-space: nowrap;
-}
-
 // Ensure meta text wraps normally
 .sbx-body .columns:has(input + label) p.meta,
 .sbx-body li:has(input + label) p.meta {
