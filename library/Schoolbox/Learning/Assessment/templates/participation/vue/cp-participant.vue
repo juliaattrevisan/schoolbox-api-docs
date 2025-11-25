@@ -21,6 +21,7 @@ const props = defineProps<{
 const selectedList = defineModel<Participant[]>("selectedList", { default: [] });
 
 const emit = defineEmits<{
+    (event: "viewDifferentiationProfile", participant: Participant): void;
     (event: "actionSelected", participants: Participant[], action: string, isSingle: boolean): void;
     (event: "openIncludeInExistingModal", isSingle: boolean, participant: Participant | null): void;
 }>();
@@ -49,17 +50,24 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 }
 
 /**
- * Handle action selection events
+ * To open the differentiation profile view
+ */
+function onDPSelected(): void {
+    emit("viewDifferentiationProfile", props.participant);
+}
+
+/**
+ * To open the action event
  * @param action - The action to perform
  */
-function handleActionSelected(action: string): void {
+function onActionSelected(action: string): void {
     emit("actionSelected", [props.participant], action, true);
 }
 
 /**
- * Handle include in existing modal
+ * To open the include in existing modal
  */
-function handleOpenIncludeInExistingModal(): void {
+function onOpenIncludeInExistingModal(): void {
     emit("openIncludeInExistingModal", true, props.participant);
 }
 </script>
@@ -111,7 +119,12 @@ function handleOpenIncludeInExistingModal(): void {
             </div>
         </td>
         <td v-if="props.hasDifferentiationProfiles">
-            <button v-if="props.participant._links.differentiationProfile">
+            <button
+                v-if="props.participant._links.differentiationProfile"
+                class="sbx-link-button"
+                type="button"
+                @click.prevent="onDPSelected"
+            >
                 View {{ locale.differentiationProfile.translate(false, true) }}
             </button>
         </td>
@@ -149,7 +162,7 @@ function handleOpenIncludeInExistingModal(): void {
                     >
                         <li class="separator">Manage</li>
                         <li>
-                            <button class="icon-close" @click.prevent="handleActionSelected('removeCustomisation')">
+                            <button class="icon-close" @click.prevent="onActionSelected('removeCustomisation')">
                                 Remove Customisation
                             </button>
                         </li>
@@ -160,7 +173,7 @@ function handleOpenIncludeInExistingModal(): void {
                             <button
                                 class="icon-modify"
                                 @click.prevent="
-                                    handleActionSelected(
+                                    onActionSelected(
                                         `${props.routes.getLearningPlanNewUrl}?student=${props.participant.user.id}&${getReturnUrl()}`,
                                     )
                                 "
@@ -169,7 +182,7 @@ function handleOpenIncludeInExistingModal(): void {
                             </button>
                         </li>
                         <li>
-                            <button class="icon-staff-students" @click.prevent="handleActionSelected('exclude')">
+                            <button class="icon-staff-students" @click.prevent="onActionSelected('exclude')">
                                 Exclude
                             </button>
                         </li>
@@ -177,7 +190,7 @@ function handleOpenIncludeInExistingModal(): void {
                             <button
                                 v-if="customisations.length > 0"
                                 class="icon-list"
-                                @click.prevent="handleOpenIncludeInExistingModal"
+                                @click.prevent="onOpenIncludeInExistingModal"
                             >
                                 Include in Existing Customisation
                             </button>
@@ -187,7 +200,7 @@ function handleOpenIncludeInExistingModal(): void {
                             <button
                                 class="icon-copy"
                                 @click.prevent="
-                                    handleActionSelected(
+                                    onActionSelected(
                                         `${props.routes.getAssessmentParticipationCopyActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
@@ -199,7 +212,7 @@ function handleOpenIncludeInExistingModal(): void {
                             <button
                                 class="icon-submissions"
                                 @click.prevent="
-                                    handleActionSelected(
+                                    onActionSelected(
                                         `${props.routes.getAssessmentParticipationNewActivity}?student=${props.participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "

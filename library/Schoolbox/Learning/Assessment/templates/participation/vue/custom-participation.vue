@@ -64,7 +64,18 @@ const {
 const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onConfirmActionSelected } =
     usePerformAction(selectedList, excludeParticipants, includeParticipants, includeParticipantInExistingPlan);
 
+// #region Differentiation Profiles
+
 const hasDifferentiationProfiles = window.Vue.ref(true); // Placeholder for actual logic to determine if differentiation profiles exist
+
+/**
+ *
+ * @param participant
+ */
+function onDPSelected(participant: Participant): void {
+    // Placeholder for logic to handle viewing differentiation profile
+    console.warn("View differentiation profile for:", participant);
+}
 </script>
 
 <template>
@@ -106,6 +117,7 @@ const hasDifferentiationProfiles = window.Vue.ref(true); // Placeholder for actu
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
                         :has-differentiation-profiles="hasDifferentiationProfiles"
+                        @view-differentiation-profile="onDPSelected"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
                     />
