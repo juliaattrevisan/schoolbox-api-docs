@@ -463,6 +463,11 @@ if [ -f "$SITE_ROOT"/post-provision.sh ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
     "$SITE_ROOT"/post-provision.sh;
+    POST_PROVISION_EXIT_CODE=$?
+    echo $POST_PROVISION_EXIT_CODE > "${cachedir}/post_provision_exit_code"
+else
+    echo "[SB][`date +%Y-%m-%d\ %X`] No post-provision.sh found, skipping custom provisioning";
+    echo "-1" > "${cachedir}/post_provision_exit_code"
 fi
 
 # update all dates to current time
