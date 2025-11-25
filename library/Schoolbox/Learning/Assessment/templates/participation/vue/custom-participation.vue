@@ -3,13 +3,12 @@
  * Custom Participation Vue Component
  */
 import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
-import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import locale from "@js/terminology/rosettaStone";
-import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpParticipant from "./cp-participant.vue";
+import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
@@ -44,17 +43,6 @@ const allSelected = window.Vue.computed({
  */
 const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
-});
-
-/**
- * Check if any selected participants has a customisation,
- * whether can show the "Remove Customisation" action or not
- */
-const hasCustomisedInSelection = window.Vue.computed(() => {
-    return selectedList.value.some(
-        (participant) =>
-            participant.excludedAt !== null || participant.plan.name !== null || participant.customisedPlan !== null,
-    );
 });
 
 // #endregion
@@ -408,81 +396,14 @@ async function onConfirmActionSelected(): Promise<void> {
         </div>
         <!-- container for the sbx-pop-out to be displayed in -->
         <div id="pop-out-container"></div>
-        <bottom-drawer data-test="custom-participation-bottom-drawer" :show-drawer="selectedList.length > 0">
-            <h3 class="selected-count">
-                <em>{{ selectedList.length }} selected</em>
-            </h3>
-            <button class="button-clear" @click.prevent="selectedList = []">Clear selection</button>
-            <div class="l-flex-row l-flex--justify l-gap-xs">
-                <template v-if="hasCustomisedInSelection">
-                    <button
-                        class="icon-close submit"
-                        data-test="custom-participation-remove-customisation"
-                        @click.prevent="onActionSelected(selectedList, 'removeCustomisation', false)"
-                    >
-                        Remove Customisation
-                    </button>
-                </template>
-                <template v-else>
-                    <div class="l-flex__item--1-auto">
-                        <button
-                            class="icon-modify submit"
-                            @click.prevent="
-                                onActionSelected(
-                                    selectedList,
-                                    `${props.routes.getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
-                                    false,
-                                )
-                            "
-                        >
-                            Modify
-                        </button>
-                    </div>
-                    <div class="l-flex__item--1-auto">
-                        <button
-                            class="icon-staff-students submit"
-                            @click.prevent="onActionSelected(selectedList, 'exclude', false)"
-                        >
-                            Exclude
-                        </button>
-                    </div>
-                    <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
-                        <button class="icon-list submit" @click.prevent="openIncludeInExistingModal(false, null)">
-                            Include in Existing Customisation
-                        </button>
-                    </div>
-                    <div v-if="props.routes.getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
-                        <button
-                            class="icon-copy submit"
-                            data-test="custom-participation-copy-activity"
-                            @click.prevent="
-                                onActionSelected(
-                                    selectedList,
-                                    `${props.routes.getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
-                                    false,
-                                )
-                            "
-                        >
-                            Copy Activity
-                        </button>
-                    </div>
-                    <div class="l-flex__item--1-auto">
-                        <button
-                            class="icon-submissions submit"
-                            @click.prevent="
-                                onActionSelected(
-                                    selectedList,
-                                    `${props.routes.getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
-                                    false,
-                                )
-                            "
-                        >
-                            New Activity
-                        </button>
-                    </div>
-                </template>
-            </div>
-        </bottom-drawer>
+        <cp-bottom-drawer
+            v-model:selected-list="selectedList"
+            :routes="routes"
+            :assessment-id="props.assessmentId"
+            :customisations="props.customisations"
+            @action-selected="onActionSelected"
+            @open-include-in-existing-modal="openIncludeInExistingModal"
+        />
     </div>
     <basic-modal v-model:is-open="isIncludeInExistingOpen">
         <div class="l-flex-col l-gap-m f-no-margins">
@@ -567,28 +488,3 @@ async function onConfirmActionSelected(): Promise<void> {
         </div>
     </basic-modal>
 </template>
-
-<style scoped>
-.selected-count {
-    display: inline-block;
-    margin-right: 0.5rem;
-}
-
-.button-clear {
-    background: none;
-    display: inline-block;
-    font-size: 0.8rem;
-    padding: 0px;
-    vertical-align: baseline;
-}
-
-@media (max-width: 768px) {
-    .flex-container {
-        flex-direction: column;
-    }
-
-    .l-flex__item--1-auto {
-        flex: 1 1 100%;
-    }
-}
-</style>
