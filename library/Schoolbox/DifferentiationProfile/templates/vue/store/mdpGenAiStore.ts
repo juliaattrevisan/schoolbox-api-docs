@@ -5,17 +5,8 @@
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { isAbortError } from "@js/util/errorUtils";
-import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileTextKeys, AiResponseItem } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "./mdpHeaderStore";
-
-/**
- * Type for individual AI response item
- */
-type AiResponseItem = {
-    response: string | null;
-    title: string;
-    key: ProfileTextKeys;
-};
 
 /**
  * Type for AI response array containing response items with titles
@@ -46,9 +37,9 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
      * @returns Array of filtered data containing only enabled fields with their titles
      */
     function filterEnabledFields(responseData: Partial<Pick<Profile, ProfileTextKeys>>): AiResponse {
-        const { enabledFields } = headerStore;
+        const { enabledTextFields } = headerStore;
         const filteredData: AiResponse = [];
-        enabledFields.forEach((field) => {
+        enabledTextFields.forEach((field) => {
             const { key } = field as { key: ProfileTextKeys };
             if (key in responseData && responseData[key] !== undefined) {
                 filteredData.push({
@@ -78,7 +69,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             aiResponse.value = null;
             controller = new AbortController();
             const response = await apiRequest<Partial<Pick<Profile, ProfileTextKeys>>, { studentId: number }>({
-                url: "/openai/differentiation-profile",
+                url: route.value,
                 method: "POST",
                 signal: controller.signal,
                 body: { studentId: profile.value.student.id },

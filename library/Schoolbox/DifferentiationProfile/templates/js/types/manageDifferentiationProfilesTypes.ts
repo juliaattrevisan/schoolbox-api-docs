@@ -116,3 +116,12 @@ export type Payload = {
     };
     metadata: Metadata;
 };
+
+/**
+ * Type for individual AI response item
+ */
+export type AiResponseItem = {
+    response: string | null;
+    title: string;
+    key: ProfileTextKeys;
+};

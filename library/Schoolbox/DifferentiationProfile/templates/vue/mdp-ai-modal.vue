@@ -7,16 +7,10 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import locale from "@js/terminology/rosettaStone";
-import type { Profile, ProfileTextKeys } from "../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileTextKeys, AiResponseItem } from "../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useGenAiStore } from "./store/mdpGenAiStore";
 import { useSaveStore } from "./store/mdpSaveStore";
-
-type AiResponseItem = {
-    response: string | null;
-    title: string;
-    key: ProfileTextKeys;
-};
 
 const headerStore = useHeaderStore();
 const genAiStore = useGenAiStore();
@@ -35,6 +29,8 @@ window.Vue.watch(
                 newSelectedOptions[item.key] = item;
             });
             selectedOptions.value = newSelectedOptions;
+        } else if (newResponse === null) {
+            selectedOptions.value = {};
         }
     },
 );
@@ -68,7 +64,7 @@ function onConfirmSelected(): void {
             </h2>
             <request-error v-if="genAiStore.loadError" :further-info="genAiStore.loadError" />
             <div v-else-if="genAiStore.isProcessing">
-                <template v-for="field in headerStore.enabledFields" :key="field.id">
+                <template v-for="field in headerStore.enabledTextFields" :key="field.id">
                     <loading-cards :rows="1" :show-image="false">
                         <h3>&nbsp;</h3>
                         <p></p>

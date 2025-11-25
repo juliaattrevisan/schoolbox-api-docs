@@ -9,18 +9,9 @@ import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 export const useHeaderStore = defineStore(`headerStore`, () => {
     const header = window.Vue.ref<Header[]>([]);
 
-    // List of ProfileTextKeys to filter by
-    const profileTextKeys: ProfileTextKeys[] = [
-        "overview",
-        "interests_strengths",
-        "needs_challenges",
-        "strategies_adjustments",
-        "goals",
-    ];
-
-    // Computed ref for enabled fields that match ProfileTextKeys
-    const enabledFields = window.Vue.computed(() => {
-        return header.value.filter((h) => profileTextKeys.includes(h.key as ProfileTextKeys));
+    // Computed ref for enabled fields that match Text type
+    const enabledTextFields = window.Vue.computed(() => {
+        return header.value.filter((h) => h.type === HeaderType.TEXT);
     });
 
     /**
@@ -74,7 +65,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
 
     return {
         header,
-        enabledFields,
+        enabledTextFields,
         init,
         getTitleByKey,
     };
