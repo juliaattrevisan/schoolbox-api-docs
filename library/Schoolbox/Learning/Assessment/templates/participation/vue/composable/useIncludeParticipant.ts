@@ -1,10 +1,11 @@
+import type { Ref } from "vue";
 import { postIncludeParticipant } from "../../js/types/customParticipationPayload";
 import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for including participants in activities
  */
-export function useIncludeParticipant(loadError: ReturnType<typeof window.Vue.ref<string | null>>) {
+export function useIncludeParticipant(loadError: Ref<string | null>) {
     /**
      * Includes a participant.
      * @param participant - The participant to include.

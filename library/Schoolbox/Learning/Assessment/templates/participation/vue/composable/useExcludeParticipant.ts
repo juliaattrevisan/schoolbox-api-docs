@@ -1,3 +1,4 @@
+import type { Ref } from "vue";
 import { hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Participant } from "../../js/types/customParticipationTypes";
@@ -5,7 +6,7 @@ import type { Participant } from "../../js/types/customParticipationTypes";
 /**
  * Composable for excluding participants from activities
  */
-export function useExcludeParticipant(loadError: ReturnType<typeof window.Vue.ref<string | null>>) {
+export function useExcludeParticipant(loadError: Ref<string | null>) {
     /**
      * Excludes a participant.
      * @param participant - The participant to exclude.
