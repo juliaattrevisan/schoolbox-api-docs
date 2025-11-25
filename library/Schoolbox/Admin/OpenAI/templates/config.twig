@@ -44,6 +44,25 @@
     }
 } %}
 
+{# Each panel consists of various sections; each supported AI service (openAI, azure, et al) has its own section
+ # but there is a "general" section for universal ideas (such as provider). When you add a new AI service, you can chuck
+ # it at the bottom of this list along with its corresponding attributes
+ #}
+{% set sections = {
+    'general': {
+        'dataAttrs': 'data-feature-openai data-feature-azure',
+        'style': 'display:none'
+    },
+    'OpenAI': {
+        'dataAttrs': 'data-feature-openai',
+        'style': 'display:none'
+    },
+    'Azure': {
+        'dataAttrs': 'data-feature-azure',
+        'style': 'display:none'
+    }
+} %}
+
 <div data-feature="{{ feature.feature }}">
     {% for name, formInput in feature.formInputs %}
         {% set section = formInput.section ?? null %}
@@ -61,19 +80,8 @@
         {% set type = formInput.type %}
 
         {# As does style and attributes #}
-        {% set dataAttrs = '' %}
-        {% set style = '' %}
-
-        {% if section == 'general' %}
-            {% set dataAttrs = "data-feature-openai data-feature-azure" %}
-            {% set style = 'display:none' %}
-        {% elseif section == 'OpenAI' %}
-            {% set dataAttrs = "data-feature-openai" %}
-            {% set style = 'display:none' %}
-        {% elseif section == 'Azure' %}
-            {% set dataAttrs = "data-feature-azure" %}
-            {% set style = 'display:none' %}
-        {% endif %}
+        {% set dataAttrs = sections[section].dataAttrs ?? '' %}
+        {% set style = sections[section].style ?? '' %}
 
         {# Generate label and description from a lookup here, instead of in PHP code #}
         {% set title = manifest[name].title ?? 'No title - please add one' %}
