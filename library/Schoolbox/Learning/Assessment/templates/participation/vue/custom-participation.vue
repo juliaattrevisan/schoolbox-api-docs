@@ -2,9 +2,8 @@
 /**
  * Custom Participation Vue Component
  */
-import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
+import { hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
@@ -12,6 +11,7 @@ import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
+import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
 
 const props = defineProps<{
     allParticipants: Participant[];
@@ -50,54 +50,11 @@ const isIndeterminate = window.Vue.computed(() => {
 
 // #region pastoral counts
 
-const loadError = window.Vue.ref<string | null>(null);
-const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
-
-/**
- * Fetch the pastoral counts for the students
- */
-async function getStudentPastoralCounts(): Promise<void> {
-    if (!props.pastoralEnabled || props.routes.getStudentsPastoralCountsUrl === "") {
-        return;
-    }
-    const url = props.routes.getStudentsPastoralCountsUrl.replace(
-        "{studentIds}",
-        allParticipants.value.map((participant) => participant.user.id).join(","),
-    );
-    try {
-        const response = await fetch(url, { headers: { Accept: "application/json" } });
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-        const responseJson = (await response.json()) as Record<string, StudentPastoralCountBadge[]>;
-        if (typeof responseJson !== "object" || responseJson === null) {
-            throw new Error("Unexpected response format");
-        }
-        if (typeof responseJson === "object" && responseJson !== null) {
-            // get data
-            studentPastoralCounts.value = responseJson;
-        } else {
-            throw new Error("Unexpected response format");
-        }
-    } catch (error) {
-        // ignore abort errors, as the previous report was cancelled
-        if (isAbortError(error)) {
-            return;
-        }
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
-        console.error(error);
-    }
-}
-
-/**
- * Load the student pastoral counts when the component is mounted.
- */
-window.Vue.onMounted(() => {
-    void getStudentPastoralCounts();
-});
+const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
+    props.pastoralEnabled,
+    props.routes.getStudentsPastoralCountsUrl,
+    () => allParticipants.value,
+);
 
 // #endregion
 
