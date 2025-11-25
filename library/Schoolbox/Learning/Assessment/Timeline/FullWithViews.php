@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\Views\Mapper;
 use Schoolbox\User;
 
@@ -90,6 +91,13 @@ class FullWithViews
                         'relative' => $interaction->getSubmittedAt()->getRelativeTime(),
                     ];
                 }
+
+                /* I am not a fan of this being here at all, but this concept is entirely unique to Dialog Agents... */
+                $assistanceRequested = null;
+                if ($interaction instanceof DialogAgent\Response\Model) {
+                    $assistanceRequested = $interaction->getAssistanceRequestedAt() !== null;
+                }
+
                 $stack[] = [
                     'type' => self::INTERACTION_RESPONSE,
                     'effector' => [
@@ -98,6 +106,7 @@ class FullWithViews
                     ],
                     'submitted' => $interaction->isSubmitted(),
                     'submittedOnTime' => $interaction->isSubmittedOnTime(),
+                    'assistanceRequested' => $assistanceRequested,
                     'date' => $date
                 ];
             }

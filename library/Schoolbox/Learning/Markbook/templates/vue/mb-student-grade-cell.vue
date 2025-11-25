@@ -5,6 +5,7 @@ import { keysOf } from "@js/util/arrayUtils";
 import { getGradient } from "@js/util/cssUtils";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
 import {
+    ACTIVITY_TYPE_DIALOG_AGENT,
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_LTI_ASSESSMENT,
     ACTIVITY_TYPE_QUIZ,
@@ -69,9 +70,12 @@ const hasPopOutMenu = window.Vue.computed(() => {
     }
 
     // ...and the assessment must be of a type that supports it
-    return [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_LTI_ASSESSMENT].includes(
-        assessment.value.assessmentType,
-    );
+    return [
+        ACTIVITY_TYPE_DUE_WORK,
+        ACTIVITY_TYPE_QUIZ,
+        ACTIVITY_TYPE_DIALOG_AGENT,
+        ACTIVITY_TYPE_LTI_ASSESSMENT,
+    ].includes(assessment.value.assessmentType);
 });
 
 /**

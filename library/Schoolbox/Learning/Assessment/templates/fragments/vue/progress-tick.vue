@@ -6,6 +6,7 @@
  */
 
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import { DialogAgentResponseStatus, STATUS_LABELS } from "@schoolboxAssessment/Types/dialogAgent";
 import { ProgressTickClass } from "@schoolboxAssessment/Types/progressTick";
 
 /**
@@ -115,6 +116,13 @@ const mouseoverTitle = window.Vue.computed(() => {
             return postRouteUrl.value ? undefined : "Resubmission Required";
         case ProgressTickClass.REVIEWED:
             return "Completed";
+        // derive these from the dialog agent statuses for now
+        case ProgressTickClass.REQUIRES_ASSISTANCE:
+            return STATUS_LABELS[DialogAgentResponseStatus.ASSISTANCE];
+        case ProgressTickClass.IN_PROGRESS:
+            return STATUS_LABELS[DialogAgentResponseStatus.IN_PROGRESS];
+        case ProgressTickClass.SUBMITTED:
+            return STATUS_LABELS[DialogAgentResponseStatus.SUBMITTED];
         default:
             return undefined;
     }

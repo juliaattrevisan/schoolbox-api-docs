@@ -13,6 +13,7 @@ import {
     ACTIVITY_TYPE_PROJECT,
     ACTIVITY_TYPE_DUE_WORK,
     ACTIVITY_TYPE_QUIZ,
+    ACTIVITY_TYPE_DIALOG_AGENT,
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
@@ -29,7 +30,6 @@ const mbStore = useMarkbookStore();
  * an activity linked to the selected mark book item
  */
 type ActivityItem = {
-    type: string;
     date: {
         datetime: string;
         short: string;
@@ -39,10 +39,11 @@ type ActivityItem = {
         id: number;
         name: string;
     };
-    submitted?: boolean;
-    submittedOnTime?: boolean;
-    published?: boolean;
-};
+} & (
+    | { type: "response"; assistanceRequested: boolean; submitted: boolean; submittedOnTime: boolean }
+    | { type: "feedback"; published: boolean }
+    | { type: "view" }
+);
 
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
@@ -111,6 +112,7 @@ const cellInfo = window.Vue.computed(() => {
         activity,
         classImpl,
         aImpl,
+        student,
         participant,
     };
 });
@@ -205,6 +207,9 @@ const viewStatusText = window.Vue.computed(() => {
     }
     if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) {
         return "Submission History";
+    }
+    if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT) {
+        return `${locale.dialogAgent.proper()} History`;
     }
     if (cellInfo.value.activity.assessmentType === ACTIVITY_TYPE_TASK) {
         return "Student View";
@@ -372,7 +377,11 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             }
 
             // If including student reload the activity list
-            if ([ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ].includes(activity.assessmentType)) {
+            if (
+                [ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ, ACTIVITY_TYPE_DIALOG_AGENT].includes(
+                    activity.assessmentType,
+                )
+            ) {
                 await getActivity();
             } else {
                 activityItems.value = [];
@@ -499,18 +508,26 @@ window.Vue.watch(
  */
 function getAction(item: ActivityItem): string {
     // If we have a response, we have to consider additional scenarios.
-    if (item.type === "response" && item.submitted && item.submittedOnTime) {
-        return "submitted on time";
-    }
-    if (item.type === "response" && item.submitted && !item.submittedOnTime) {
-        return "submitted late";
-    }
     if (item.type === "response") {
+        if (item.submitted && !item.submittedOnTime) {
+            return "submitted late";
+        }
+
+        if (item.submitted) {
+            return "submitted on time";
+        }
+
+        if (item.assistanceRequested) {
+            return "requested assistance";
+        }
+
         return "drafted a response";
     }
+
     if (item.type === "view") {
         return "viewed the assessment";
     }
+
     if (item.type === "feedback") {
         return `${item.published ? "published" : "drafted"} feedback`;
     }
@@ -631,7 +648,8 @@ function onToggleSelected(): void {
                         'is-disabled':
                             !routes.historyRoute ||
                             cellInfo.participant.isExcluded ||
-                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK),
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK) ||
+                            (isActivityEmpty && cellInfo.activity.assessmentType === ACTIVITY_TYPE_DIALOG_AGENT),
                     }"
                     :link="routes.historyRoute ? getReturnUrl(routes.historyRoute) : undefined"
                 >
