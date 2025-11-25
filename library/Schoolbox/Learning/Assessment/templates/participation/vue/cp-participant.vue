@@ -110,6 +110,9 @@ function handleOpenIncludeInExistingModal(): void {
             </div>
         </td>
         <td>
+            <p>Blah</p>
+        </td>
+        <td>
             <template v-if="participant.customisedPlan !== null">
                 <a :href="getCustomisedPlanUrl(participant.customisedPlan)">
                     {{ participant.customisedPlan.name ?? participant.customisedPlan.assessable.title }}

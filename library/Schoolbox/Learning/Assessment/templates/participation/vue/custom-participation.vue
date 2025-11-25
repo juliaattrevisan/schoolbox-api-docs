@@ -3,6 +3,7 @@
  * Display a list of students linked to an assessment and provide details and actions for student participation
  */
 
+import locale from "@js/terminology/rosettaStone";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import CpParticipant from "./cp-participant.vue";
@@ -84,6 +85,7 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
                         </th>
                         <td width="84"></td>
                         <th>Name</th>
+                        <th>{{ locale.differentiationProfile.translate(false, true) }}</th>
                         <th>Customisation</th>
                         <td></td>
                     </tr>
