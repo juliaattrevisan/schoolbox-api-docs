@@ -426,6 +426,7 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Access::class),
             ),
             $assessmentMapperProxy,
+            $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
             $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
