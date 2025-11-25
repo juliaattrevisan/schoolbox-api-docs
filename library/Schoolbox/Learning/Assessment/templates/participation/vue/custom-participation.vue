@@ -8,10 +8,10 @@ import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
-import { postIncludeExistingParticipant } from "../js/types/customParticipationPayload";
 import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
+import { useIncludeInExisting } from "./composable/useIncludeInExisting";
 
 const props = defineProps<{
     allParticipants: Participant[];
@@ -67,63 +67,14 @@ const { includeParticipants } = useIncludeParticipant(loadError);
 
 // #region include in existing customisation
 
-const isIncludeInExistingOpen = window.Vue.ref(false);
-const includeInExistingList = window.Vue.ref<Participant[]>([]); // array of participants to include in existing customisation
-const includeInExistingActivityId = window.Vue.ref<number | null>(null);
-const isSingleIncludeInExisting = window.Vue.ref(false); // whether the include is for a single participant (three-dot) or multiple (bottom drawer)
-
-/**
- * Add all the selected participants to an existing customisation plan.
- */
-async function includeParticipantInExistingPlan(): Promise<void> {
-    if (includeInExistingActivityId.value === null) return;
-    const activity = props.customisations.find((plan) => plan.id === includeInExistingActivityId.value);
-    if (!activity) return;
-    const toast = window.sbProps.toastActivate("Adding to customisation...");
-    const response = await postIncludeExistingParticipant(props.routes.includeInExistingCustomisation, {
-        students: includeInExistingList.value.map((p) => p.user.id),
-        ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
-        ...(activity.name !== null ? { planId: activity.id } : {}),
-        includeResponse: true,
-    });
-    if (!response.success) {
-        const error = response.message ?? "";
-        loadError.value = error;
-        console.error("Error adding Customisation:", error);
-        toast.timeout({ text: error, isSuccess: false });
-        return;
-    }
-    const { data } = response;
-    // add the activity to each participant
-    includeInExistingList.value.forEach((participant) => {
-        if ("assessable" in activity) {
-            participant.customisedPlan = { ...activity };
-            participant.hasInteraction = data?.hasInteraction?.[participant.user.id] ?? false;
-        } else {
-            participant.plan = { ...activity };
-            participant.hasInteraction = data?.hasInteraction?.[participant.user.id] ?? false;
-        }
-    });
-    toast.timeout({ text: "Customisation added successfully", isSuccess: true });
-    isIncludeInExistingOpen.value = false;
-    includeInExistingList.value = [];
-}
-
-/**
- * Opens the modal to include a participant in an existing customisation.
- * @param isSingle - Whether this is a single participant inclusion (from pop-out) or multiple (from bottom drawer).
- * @param participant - The participant to be included.
- */
-function openIncludeInExistingModal(isSingle: boolean, participant: Participant | null): void {
-    isSingleIncludeInExisting.value = isSingle;
-    if (isSingleIncludeInExisting && participant !== null) {
-        includeInExistingList.value = [participant];
-    } else {
-        includeInExistingList.value = selectedList.value;
-    }
-    includeInExistingActivityId.value = null;
-    isIncludeInExistingOpen.value = true;
-}
+const {
+    isIncludeInExistingOpen,
+    includeInExistingList,
+    includeInExistingActivityId,
+    isSingleIncludeInExisting,
+    includeParticipantInExistingPlan,
+    openIncludeInExistingModal,
+} = useIncludeInExisting(loadError, props.customisations, props.routes.includeInExistingCustomisation, selectedList);
 
 // #endregion
 
