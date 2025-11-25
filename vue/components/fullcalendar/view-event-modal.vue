@@ -657,7 +657,7 @@ export default {
          * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
          * @return {Promise}
          */
-        eventDelete(efficacy) {
+        async eventDelete(efficacy) {
             this.$refs.eventDeleteModal.close();
             // Ensure we are sending standard POST data, NOT a JSON encoded string
             let data = new URLSearchParams({
@@ -666,7 +666,7 @@ export default {
                 efficacy: efficacy,
             });
 
-            fetch(this.eventExtendedProps.links.delete, {
+            return fetch(this.eventExtendedProps.links.delete, {
                 method: "POST",
                 body: data.toString(),
                 headers: {
@@ -695,7 +695,7 @@ export default {
          * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
          * @return {Promise}
          */
-        bookingDelete(efficacy) {
+        async bookingDelete(efficacy) {
             this.$refs.bookingDeleteModal.close();
             let data = new URLSearchParams({
                     efficacy: efficacy,
@@ -703,7 +703,7 @@ export default {
                 cancelActionUrl = this.eventExtendedProps.booking.actions.find(
                     (action) => action.action === "cancel",
                 ).href;
-            fetch(cancelActionUrl, {
+            return fetch(cancelActionUrl, {
                 method: "POST",
                 body: data.toString(),
                 headers: {
@@ -732,7 +732,7 @@ export default {
          * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
          * @return {Promise}
          */
-        bookingApprove(efficacy) {
+        async bookingApprove(efficacy) {
             this.$refs.bookingApproveSeriesModal.close();
             let data = new URLSearchParams({
                     efficacy: efficacy,
@@ -740,7 +740,7 @@ export default {
                 approveActionUrl = this.eventExtendedProps.booking.actions.find(
                     (action) => action.action === "approve",
                 ).href;
-            fetch(approveActionUrl, {
+            return fetch(approveActionUrl, {
                 method: "POST",
                 body: data.toString(),
                 headers: {
