@@ -439,7 +439,7 @@ class Calendar extends DeprecatedModel
             // Get them all in one query outside the loop below to minimise the number of database queries.
             $allEventIds = array_map(static fn ($currentEvent) => $currentEvent['id'], $allEvents);
             $resourceBookingMapper = ResourceBookingMapper::getInstance();
-            /** @var array<int, GenericCollection<ResourceBookingModel>> $resourceBookingModels */
+            /** @var array<int, GenericCollection<ResourceBookingModel>> $resourceBookingModelsByEventId */
             $resourceBookingModelsByEventId = $resourceBookingMapper->getForAllEventIds($allEventIds);
 
             foreach ($allEvents as $currentEvent) {
