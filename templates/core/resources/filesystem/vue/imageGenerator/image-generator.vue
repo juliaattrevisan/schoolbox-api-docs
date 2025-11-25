@@ -32,10 +32,6 @@ const acStore = useAgentChatStore();
 // State to keep track of the final upload process
 const uploadLoading = window.Vue.ref<boolean>(false);
 const uploadError = window.Vue.ref<string | null>(null);
-
-window.Vue.onMounted(() => {
-    acStore.init(props.generateRoute);
-});
 </script>
 
 <template>
@@ -60,10 +56,14 @@ window.Vue.onMounted(() => {
         />
         <!-- file context is only available for the first message for now -->
         <ac-prompt
+            :request-config="{
+                messageRoute: props.generateRoute,
+                aiSessionId: props.aiSessionId,
+                requireImage: true,
+            }"
             prompt-placeholder="Describe or refine the image you want to generate"
             :allow-file-drop="acStore.feed.length === 0"
             :prompt-attributes="props.promptAttributes"
-            :ai-session-id="props.aiSessionId"
         />
         <div v-if="uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>

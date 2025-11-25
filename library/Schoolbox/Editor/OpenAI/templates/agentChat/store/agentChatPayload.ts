@@ -41,12 +41,17 @@ export type AgentChatApiPayload = {
     imageUrl: string | null;
     previousResponseId: string | null;
     /**
-     * to keep track of the current ai conversation thread
-     * on each load of the tab (in the dropzone modal) this will regen from the backend
-     *
+     * To keep track of the current ai conversation thread
      * This should be unique for a new unique conversation
+     *
+     * image generation (required)
+     * - on each load of the tab (in the dropzone modal) this will regen from the backend
+     *
+     * dialog agent chat (optional)
+     * - when messaging against a response, this is unused as the session ID is stored against the response already
+     * - when testing the chat agent, this will be generated on load from the backend
      */
-    aiSessionId: AiSession["id"];
+    aiSessionId: AiSession["id"] | null;
 };
 
 type AgentChatApiResponseCompleted = {

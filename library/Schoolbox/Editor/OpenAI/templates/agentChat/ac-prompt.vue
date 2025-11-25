@@ -2,30 +2,18 @@
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "./store/agentChatStore";
+import type { AgentChatRequestConfig } from "./store/agentChatStore";
 import type { AgentChatPromptAttribute } from "./agentChatTypes";
 
 interface Props {
-    /**
-     * Whether or not to allow a file to be uploaded for image context
-     */
+    requestConfig: AgentChatRequestConfig;
+    /** Whether or not to allow a file to be uploaded for image context */
     allowFileDrop?: boolean;
-    /**
-     * The placeholder text for the prompt textarea
-     */
+    /** The placeholder text for the prompt textarea */
     promptPlaceholder?: string;
-    /**
-     * The extra attributes to show in the prompt (dropdowns)
-     */
+    /** The extra attributes to show in the prompt (dropdowns) */
     promptAttributes: AgentChatPromptAttribute[];
-    /**
-     * to keep track of the current ai conversation thread
-     * on each load of the tab (in the dropzone modal) this will regen from the backend
-     *
-     * This should be unique for a new unique conversation
-     */
-    aiSessionId: AiSession["id"];
 }
 
 const props = defineProps<Props>();
@@ -77,12 +65,13 @@ async function sendRequest(): Promise<void> {
     }
 
     const isSuccess = await acStore.sendRequest(
+        props.requestConfig,
         {
             userPrompt: prompt.value.trim(),
             attributes: attributes.value,
             imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
             previousResponseId: acStore.getPreviousResponseId(),
-            aiSessionId: props.aiSessionId,
+            aiSessionId: props.requestConfig.aiSessionId,
         },
         currentFile.value,
     );

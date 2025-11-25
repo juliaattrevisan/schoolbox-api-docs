@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
@@ -39,8 +38,6 @@ const isInstructor = window.Vue.computed(() => {
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
 
-    acStore.init(props.generateRoute);
-
     if (props.activity.openingMessage !== null) {
         // TODO: I wonder if the backend should add this when it provides us the full chat?
         acStore.feed.push({
@@ -72,7 +69,7 @@ window.Vue.onMounted(() => {
             attributes: {},
             imageUrl: null,
             previousResponseId: null,
-            aiSessionId: currentResponse.value.aiSessionId,
+            aiSessionId: null,
         },
         file: null,
     });
@@ -95,7 +92,7 @@ window.Vue.onMounted(() => {
             attributes: {},
             imageUrl: null,
             previousResponseId: null,
-            aiSessionId: currentResponse.value.aiSessionId,
+            aiSessionId: null,
         },
         file: null,
     });
@@ -216,9 +213,14 @@ function submitResponse(): void {
         </template>
     </ac-feed>
     <ac-prompt
+        v-if="props.generateRoute"
+        :request-config="{
+            messageRoute: props.generateRoute,
+            aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
+            requireImage: false,
+        }"
         prompt-placeholder="Type a response here..."
         :prompt-attributes="[]"
-        :ai-session-id="currentResponse.aiSessionId"
     />
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 </template>

@@ -2,26 +2,30 @@ import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { AgentChatFeedMessage, AgentChatResponseInProgress } from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
 
+/**
+ * Configuration for the request that is dependent on the place implementing Agent Chat
+ */
+export type AgentChatRequestConfig = {
+    /** The route to send messages to */
+    messageRoute: string;
+    /** The AI session ID to include in the request, if required */
+    aiSessionId: AiSession["id"] | null;
+    /** Whether an image is required in responses */
+    requireImage: boolean;
+};
+
 export const useAgentChatStore = defineStore("agentChat", () => {
     const feed = window.Vue.ref<AgentChatFeedMessage[]>([]);
-    const generateRoute = window.Vue.ref<string | null>(null);
 
     const activeGeneration = window.Vue.ref<AgentChatResponseInProgress | null>(null);
 
     /** When allowing selection of a particular entry (such as in the image generator), the selected entry */
     const selectedFeedEntry = window.Vue.ref<AgentChatFeedMessage["entryKey"] | null>(null);
-
-    /**
-     * Initialise the store
-     * @param $generateRoute - The route to use for generating images
-     */
-    function init($generateRoute: string): void {
-        generateRoute.value = $generateRoute;
-    }
 
     /**
      * @returns The full feed of messages (includes the partial entry at the end if currently generating)
@@ -59,17 +63,18 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
     /**
      * Request a new image from the AI
+     * @param config - The configuration for the request
      * @param payload - The payload to send to the AI
      * @param file - The file that was sent with the request (if any)
      * @returns whether the request was sent successfully or not
      */
-    async function sendRequest(payload: AgentChatApiPayload, file: FileDropFile | null): Promise<boolean> {
+    async function sendRequest(
+        config: AgentChatRequestConfig,
+        payload: AgentChatApiPayload,
+        file: FileDropFile | null,
+    ): Promise<boolean> {
         if (activeGeneration.value !== null) {
             return false;
-        }
-
-        if (generateRoute.value === null) {
-            throw new Error("generateRoute is not set");
         }
 
         feed.value.push({
@@ -98,7 +103,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
         let hasErrored = false;
         const abortController = new AbortController();
-        const response = await generateImage(generateRoute.value, payload, abortController.signal, (event) => {
+        const response = await generateImage(config.messageRoute, payload, abortController.signal, (event) => {
             if (event.data.success === false) {
                 /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
                 hasErrored = true;
@@ -161,8 +166,12 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             return false;
         }
 
-        if (response.data.image === null) {
-            /** TODO: only the image generator requires this, other types won't - make it flexible whilst still having this check for there */
+        /**
+         * The image generator requires an image and uses the scenario where no image is returned
+         * as a moderation error. That *should* be handled already by the backend and returned as a type: error
+         * so we should never actually get here but just in case, check for it to avoid confusion and bad state
+         */
+        if (config.requireImage && response.data.image === null) {
             feed.value.push({
                 type: "response",
                 status: "error",
@@ -217,7 +226,6 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     return {
-        init,
         feed,
         fullFeed,
         activeGeneration,
