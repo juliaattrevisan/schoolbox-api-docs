@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import type { MDPHeader, Header, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { MDPHeader, Header } from "../../js/types/manageDifferentiationProfilesTypes";
 import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 
 export const useHeaderStore = defineStore(`headerStore`, () => {
