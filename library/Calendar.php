@@ -9,10 +9,11 @@
 use Calendar\Event\Type\Day\Event;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\Event as EventModel;
-use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\User;
 
 class Calendar extends DeprecatedModel
@@ -465,6 +466,12 @@ class Calendar extends DeprecatedModel
                 );
                 $event->setAllDay(!empty($currentEvent['allday']));
                 $event->setSeriesId($currentEvent['series_id']);
+
+                $resourceBookingMapper = ResourceBookingMapper::getInstance();
+
+                /** @var GenericCollection<ResourceBookingModel> $resourceBookingModels */
+                $resourceBookingModels = $resourceBookingMapper->findByEventId($currentEvent['id']);
+                $event->setBookingsCollection($resourceBookingModels);
 
                 /* If you have write access to the event
                  */
