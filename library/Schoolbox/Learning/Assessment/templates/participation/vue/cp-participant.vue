@@ -15,7 +15,7 @@ const props = defineProps<{
     routes: Routes;
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
-    hasDifferentiationProfiles: boolean;
+    differentiationEnabled: boolean;
 }>();
 
 const selectedList = defineModel<Participant[]>("selectedList", { default: [] });
@@ -118,7 +118,7 @@ function onOpenIncludeInExistingModal(): void {
                 </div>
             </div>
         </td>
-        <td v-if="props.hasDifferentiationProfiles">
+        <td v-if="props.differentiationEnabled">
             <button
                 v-if="props.participant._links.differentiationProfile"
                 class="sbx-link-button"

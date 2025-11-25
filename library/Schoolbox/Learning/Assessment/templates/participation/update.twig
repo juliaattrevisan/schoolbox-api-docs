@@ -2,12 +2,6 @@
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{#{% set hasCustomisation = false %}#}
-{#{% for participant in assessment.allParticipants  %}#}
-{#    {% if participant.excludedAt or participant.plan.name %}#}
-{#        {% set hasCustomisation = true %}#}
-{#    {% endif %}#}
-{#{% endfor %}#}
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
@@ -19,6 +13,7 @@
     <custom-participation
     :all-participants="{{ (allParticipants ?? []) | json_encode }}"
     :pastoral-enabled="Boolean({{ pastoralEnabled }})"
+    :differentiation-enabled="Boolean({{ differentiationEnabled }})"
     :routes="{{ {
         getStudentsPastoralCountsUrl: routeLookup('pastoral.getStudentsCount'),
         getLearningPlanNewUrl: learningPlanNew,

@@ -26,9 +26,9 @@ window.Vue.watch(isOpen, (newIsOpen) => {
 });
 
 /**
- * Handle cancel action
+ * Handle close action
  */
-function handleClose(): void {
+function onClose(): void {
     participant.value = null;
 }
 </script>
@@ -43,7 +43,7 @@ function handleClose(): void {
                 </h2>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="handleClose">Close</button>
+                <button class="button l-flex__item--1" @click.prevent="onClose">Close</button>
             </div>
         </div>
     </basic-modal>

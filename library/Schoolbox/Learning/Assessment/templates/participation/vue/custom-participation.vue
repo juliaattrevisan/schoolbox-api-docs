@@ -21,6 +21,7 @@ import { usePerformAction } from "./composable/usePerformAction";
 const props = defineProps<{
     allParticipants: Participant[];
     pastoralEnabled: boolean;
+    differentiationEnabled: boolean;
     routes: Routes;
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
@@ -67,7 +68,6 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
 
 // #region Differentiation Profiles
 
-const hasDifferentiationProfiles = window.Vue.ref(true); // Placeholder for actual logic to determine if differentiation profiles exist
 const participantWithDP = window.Vue.ref<Participant | null>(null);
 
 /**
@@ -77,6 +77,8 @@ const participantWithDP = window.Vue.ref<Participant | null>(null);
 function onDPSelected(participant: Participant): void {
     participantWithDP.value = participant;
 }
+
+// #endregion Differentiation Profiles
 </script>
 
 <template>
@@ -99,7 +101,7 @@ function onDPSelected(participant: Participant): void {
                         </th>
                         <td width="84"></td>
                         <th>Name</th>
-                        <th v-if="hasDifferentiationProfiles">
+                        <th v-if="props.differentiationEnabled">
                             {{ locale.differentiationProfile.translate(false, true) }}
                         </th>
                         <th>Customisation</th>
@@ -117,7 +119,7 @@ function onDPSelected(participant: Participant): void {
                         :routes="props.routes"
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
-                        :has-differentiation-profiles="hasDifferentiationProfiles"
+                        :differentiation-enabled="props.differentiationEnabled"
                         @view-differentiation-profile="onDPSelected"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
