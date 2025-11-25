@@ -499,7 +499,7 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            $collectionsByEventId[$bookingModel->getEvent()->getId()]->add($bookingModel);
+            $collectionsByEventId[$row['b.event_id']]->add($bookingModel);
         }
 
         return $collectionsByEventId;
