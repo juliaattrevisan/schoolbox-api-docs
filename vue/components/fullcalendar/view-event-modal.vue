@@ -950,26 +950,51 @@ export default {
                 <div class="medium-4 small-12">
                     <template v-if="eventExtendedProps.booking.related.length">
                         <h3>Related Bookings</h3>
-                        <ul>
-                            <li v-for="(relatedBooking, index) in eventExtendedProps.booking.related" :key="index">
-                                ({{ relatedBooking.status.name }})
-                                <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
-                            </li>
-                        </ul>
+                        <meta-list>
+                            <meta-item
+                                v-for="booking in eventExtendedProps.booking.related"
+                                :key="booking.item.id"
+                                :class="{
+                                    'icon-approve': booking.status.isApproved,
+                                    'icon-time-value': booking.status.isPending,
+                                    'icon-close': booking.status.isRejected,
+                                }"
+                            >
+                                <template v-if="booking.href">
+                                    <a :href="booking.href">{{ booking.item.name }}</a>
+                                </template>
+                                <template v-else>
+                                    {{ booking.item.name }}
+                                </template>
+                            </meta-item>
+                        </meta-list>
                     </template>
                     <template v-if="eventExtendedProps.bookings.length">
                         <h3>Resources</h3>
-                        <ul>
-                            <li v-for="(booking, index) in eventExtendedProps.bookings" :key="index">
-                                ({{ booking.status.name }}) <a :href="booking.href">{{ booking.item.name }}</a>
-                            </li>
-                        </ul>
+                        <meta-list>
+                            <meta-item
+                                v-for="booking in eventExtendedProps.bookings"
+                                :key="booking.item.id"
+                                :class="{
+                                    'icon-approve': booking.status.isApproved,
+                                    'icon-time-value': booking.status.isPending,
+                                    'icon-close': booking.status.isRejected,
+                                }"
+                            >
+                                <template v-if="booking.href">
+                                    <a :href="booking.href">{{ booking.item.name }}</a>
+                                </template>
+                                <template v-else>
+                                    {{ booking.item.name }}
+                                </template>
+                            </meta-item>
+                        </meta-list>
                     </template>
                     <!--
                         Temporary solution to prevent a mysterious error:
                         main.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
-                        when there's a related booking. According to my research, it's not a sizzle error and  we'll
-                        need to update jQuery to 3.x. However, doing so may potentially open un new issues.
+                        when there's a related booking. According to my research, it's not a sizzle error and we'll
+                        need to update jQuery to 3.x. However, doing so may potentially open up new issues.
                      -->
                     <template v-else></template>
                 </div>
