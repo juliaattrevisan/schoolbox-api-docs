@@ -967,7 +967,7 @@ export default {
                             </meta-item>
                         </meta-list>
                     </template>
-                    <template v-if="eventExtendedProps.bookings.length">
+                    <template v-else-if="eventExtendedProps.bookings.length">
                         <h3>Resources</h3>
                         <meta-list>
                             <meta-item
