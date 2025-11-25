@@ -14,7 +14,6 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IProgressTick;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
@@ -90,7 +89,7 @@ class UnitAssessments
 
         // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
         $progressTick = null;
-        if ($assessment instanceof IProgressTick && $this->student->getId() === $this->loggedInUser->getId()) {
+        if ($this->student->getId() === $this->loggedInUser->getId()) {
             $participant = $assessment->getParticipantIfExtant($this->student);
             $progressTick = $assessment->getProgressTick(
                 $this->routeGenerator,
