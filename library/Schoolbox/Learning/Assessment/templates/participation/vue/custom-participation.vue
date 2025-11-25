@@ -7,9 +7,9 @@ import locale from "@js/terminology/rosettaStone";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import type { User } from "@schoolboxLibrary/types/User";
+import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
-import CpViewDpModal from "./cp-view-dp-modal.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
@@ -141,7 +141,7 @@ function onDPSelected(participant: Participant): void {
             @open-include-in-existing-modal="openIncludeInExistingModal"
         />
     </div>
-    <cp-view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
+    <view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
     <cp-include-in-existing-modal
         v-model:is-open="isIncludeInExistingOpen"
         v-model:selected-activity-id="includeInExistingActivityId"
