@@ -17,15 +17,11 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Format;
-use Aura\Router\Exception\RouteNotFound;
-use Aura\Router\Generator;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IProgressTick;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\User;
@@ -40,7 +36,7 @@ use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
  * When a teacher assesses a student, it will generate both an IResponse and an IFeedback, with a mark of 'incomplete' or 'teacher-assessed'.
  *
  */
-class Model extends AbstractAssessment implements IProgressTick
+class Model extends AbstractAssessment
 {
     /**
      * Is this task self-markable?
@@ -491,92 +487,5 @@ class Model extends AbstractAssessment implements IProgressTick
     public function getFeedbackClass()
     {
         return TaskFeedback::class;
-    }
-
-
-    /**
-     * The logic used in this function is intended to match the logic used in progressTick.twig.
-     *
-     * @param Generator $routeGenerator
-     * @param Authorizer $authorizer
-     * @param Participant|null $participant
-     * @param User $viewer
-     * @param array $overload
-     * @return null|array
-     * @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
-     */
-    public function getProgressTick(
-        Generator $routeGenerator,
-        Authorizer $authorizer,
-        ?Participant $participant,
-        \Schoolbox\User $viewer,
-        array $overload = []
-    ): ?array {
-        if (null === $participant || $participant->isExcluded()) {
-            // The student ought to be a participant.  The only way this situation could arise is if the student was
-            // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
-            // at the start of this page-load (in Assessment/Module.php).
-            return null;
-        }
-
-        $progress = '';
-
-        // Only set this var if the assessment is a task so participants can create a
-        // response asynchronously without reloading the page.  This only applies to Tasks.
-        // Due Work and Quiz require more in-depth workflows to submit a response.
-        $postRouteUrl = null;
-
-        if ($this->isImplementation()) {
-            $postRouteName = 'learningAssessment.postCreateResponse';
-            $postRouteParams = [
-                'assessment' => $this,
-                'assessmentId' => $this->getId(),
-                'student' => $participant->getUser(),
-                'studentId' => $participant->getUser()->getId()
-            ];
-
-            if ($authorizer->isPathAuthorizedForUser($postRouteName, $postRouteParams, $viewer)) {
-                $postRouteUrl = $routeGenerator->generate($postRouteName, $postRouteParams);
-            }
-        }
-
-        if ($postRouteUrl === null) {
-            $postRouteUrl = '';
-        }
-
-        $loggedInUserShouldSeeIncompleteStatus = (
-            $participant->isResponseRequired() && (
-                $viewer->getRole()->isStaff() || (
-                    $this->isImplementation() &&
-                    $this->isOpen($participant->getUser()) &&
-                    $this->isSelfAssessable()
-                )
-            )
-        );
-
-        if ($postRouteUrl !== '') {
-            if ($loggedInUserShouldSeeIncompleteStatus) {
-                $progress = 'incomplete';
-            } elseif ($participant->isFeedbackRequired()) {
-                $progress = 'pending';
-            } elseif ($participant->isReviewComplete()) {
-                $progress = 'reviewed';
-            }
-        } else {
-            if ($loggedInUserShouldSeeIncompleteStatus) {
-                $progress = 'incomplete';
-            } elseif ($participant->isFeedbackRequired()) {
-                $progress = 'pending';
-            } elseif ($participant->isResubmissionRequired()) {
-                $progress = 'failed';
-            } elseif ($participant->isReviewComplete()) {
-                $progress = 'reviewed';
-            }
-        }
-
-        return [
-            'postRouteUrl'  => $postRouteUrl,
-            'progressClass' => $progress,
-        ];
     }
 }
