@@ -254,7 +254,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     </thead>
 
                     <tbody>
-                        <tr v-for="session in usageSessions" :key="session.id">
+                        <tr v-for="session in usageSessions" :key="session.id ?? undefined">
                             <td>
                                 {{ formatSessionDate(session) }}
                             </td>
@@ -272,7 +272,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             </td>
                             <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.sessionId && session._routes.getLog">
+                                <nav v-if="session.id !== null && session._routes.getLog">
                                     <a
                                         class="icon-eye"
                                         :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"

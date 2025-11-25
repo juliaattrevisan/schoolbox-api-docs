@@ -7,10 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Editor\OpenAI\Log;
+namespace Schoolbox\Editor\OpenAI\Log\Translator;
 
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\User;
+use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log\Model;
 
 class ModelToArray
 {
@@ -25,10 +26,11 @@ class ModelToArray
     }
 
     /**
-     * Convert an AILog model to an array for API responses.
+     * Convert an AILog model to an array for API responses representing an individual log entry.
      *
      * @param Model $log
      * @return array
+     * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/payload.ts AiSessionLog
      */
     public function __invoke(Model $log): array
     {

@@ -26,6 +26,7 @@ type AiLogFeatureDataMap = {
     [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: null;
 };
 
+/** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/Session/ModelToArray.php */
 export type AiSessionLog = {
     [K in AiFeature]: {
         id: number;
@@ -37,10 +38,10 @@ export type AiSessionLog = {
     };
 }[AiFeature];
 
+/** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/ModelToArray.php */
 export type AiSession<TFeature extends AiFeature = AiFeature> = {
     id: AiSessionId;
     feature: TFeature;
-    sessionId: AiSessionId;
     createdAt: string;
     createdBy: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API

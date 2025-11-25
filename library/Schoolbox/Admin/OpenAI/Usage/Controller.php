@@ -16,10 +16,8 @@ use Aura\Router\Exception\RouteNotFound;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
-use Schoolbox\Editor\OpenAI\Log\Model as AILog;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
-use Schoolbox\Editor\OpenAI\Log\ModelToArray;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
@@ -33,28 +31,17 @@ class Controller extends Base
 
 
     /**
-     * This converts $log instances to their array representation
-     *
-     * @var ModelToArray
-     */
-    private ModelToArray $sessionTranslator;
-
-
-    /**
      * Controller constructor.
      *
-     * @param AILogMapper $aiLogMapper
+     * @param Log\Mapper $aiLogMapper
      * @param ConfigMapper $configMapper
      * @param UserMapper $userMapper
      */
     public function __construct(
-        private AILogMapper $aiLogMapper,
+        private Log\Mapper $aiLogMapper,
         private ConfigMapper $configMapper,
         private UserMapper $userMapper,
     ) {
-        $this->sessionTranslator = new ModelToArray(
-            new User\Translator\Author\ModelToArray()
-        );
     }
 
 
@@ -94,6 +81,7 @@ class Controller extends Base
      * @return void
      * @throws RouteNotFound
      * @throws Exception
+     * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/payload.ts AiUsageLogApiResponse
      */
     public function postSearch(): void
     {
@@ -202,7 +190,11 @@ class Controller extends Base
             }
         }
 
-        // new db query space...
+        /**
+         * Each entry of $logGroups has the same semantics as an individual $log,
+         * it's just that it's one row that represents multiple grouped logs for a given session ID.
+         * Not all fields will make sense in this context (e.g. prompt, response, errorMessage, etc)
+         */
         $logGroups = $this->aiLogMapper->getGroupedLogs(
             $keyword,
             $feature,
@@ -226,30 +218,22 @@ class Controller extends Base
             ->setTotal($count)
             ->setPageSize($limit);
 
-        /* Compile a stack of unique session ids rather than each individual log instance because you'll
-         * have a lot of records -per session id- for those who are resuming chats etc. where you probably
-         * only want to see one $log instance to represent that entire conversation. Probably.
+        /**
+         * Compile a stack of unique sessions rather than each individual log instance because you'll
+         * have a lot of records -per session id- for those who are resuming chats etc.
+         *
+         * The frontend treats an AI Session as a distinct representation compared to an AI Session Log entry
+         * for future flexibility if we were to change the way sessions are represented, this distinction is
+         * handled by the two translators.
          */
-        $sessions = [];
+        $userTranslator = new User\Translator\Author\ModelToArray();
+        $sessionLinksTranslator = new Log\Translator\Session\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $sessionTranslator = new Log\Translator\Session\ModelToArray(
+            $userTranslator,
+            $sessionLinksTranslator
+        );
 
-        foreach ($logGroups as $logGroup) {
-            /* Make an array representation of each $logGroup instance
-             *
-             * Note that a $logGroup is actually the same semantics as an individual $log, it's just that
-             * it's one row that represents multiple
-             */
-            $translated = $this->sessionTranslator->__invoke($logGroup);
-
-            /* Bolt on this random _routes node
-             */
-            $translated['_routes'] = [
-                'getLog' => $this->getRouteIfAuthorized('openAIUsage.getLog', [
-                    'sessionId' => $logGroup->getSessionId()
-                ]),
-            ];
-
-            $sessions[] = $translated;
-        }
+        $sessions = $logGroups->map($sessionTranslator);
 
         $this->response = $this->responseAsJson([
             'data' => $sessions,
@@ -266,10 +250,11 @@ class Controller extends Base
 
 
     /**
-     * @param AILog $log // first in the tree
+     * @param Log\Model $log - first log in the tree
      * @return void
+     * @see /library/Schoolbox/Admin/OpenAI/Usage/templates/payload.ts AiSessionLogApiResponse
      */
-    public function getLog(AILog $log): void
+    public function getLog(Log\Model $log): void
     {
         $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), [
             'order' => [
@@ -277,7 +262,10 @@ class Controller extends Base
             ]
         ]);
 
-        $logEntriesArray = $logEntries->map($this->sessionTranslator);
+        $userTranslator = new User\Translator\Author\ModelToArray();
+        $logTranslator = new Log\Translator\ModelToArray($userTranslator);
+
+        $logEntriesArray = $logEntries->map($logTranslator);
 
         $this->response = $this->responseAsJson($logEntriesArray);
     }
