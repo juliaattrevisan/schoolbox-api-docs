@@ -453,12 +453,12 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Hydrates all bookings found along with their resources.
+     * Return an array of collections of ResourceBookingModels, indexed by eventId.
      *
-     * @param  int $eventId
-     * @return GenericCollection<Model>
+     * @param  array<int> $eventIds
+     * @return array<int, GenericCollection<Model>>
      */
-    public function findByEventId(int $eventId): GenericCollection
+    public function getForAllEventIds(array $eventIds): array
     {
         $query = "
             SELECT
@@ -466,14 +466,13 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('resource', 'r')}
             FROM {$this->getTable()} b
             INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
-            WHERE b.event_id=:eventId
+            WHERE b.event_id IN (" . implode(',', array_map('intval', $eventIds)) . ")
             AND r.deleted_at IS NULL
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('eventId', $eventId);
         $statement->execute();
 
-        $collection = new GenericCollection(Model::class);
+        $collectionsByEventId = [];
         foreach ($statement as $row) {
             try {
                 $bookingModel = $this->hydrate($row, 'b', function ($mapper, $model, $row) {
@@ -484,16 +483,25 @@ class Mapper extends BaseMapper
                     $model->setResource($resource);
                     return $model;
                 });
-            } catch (BaseMapper\Exception $e) {
+            } catch (BaseMapper\Exception) {
                 continue; // Skip the problem booking and move on to the next one.
             }
 
-            if ($bookingModel !== null) {
-                $collection->add($bookingModel);
+            if ($bookingModel === null) {
+                //  Skip the problem booking and move on to the next one.
+                continue;
             }
+
+            $eventId = $bookingModel->getEvent()->getId();
+
+            if (!array_key_exists($eventId, $collectionsByEventId)) {
+                $collectionsByEventId[$eventId] = new GenericCollection(Model::class);
+            }
+
+            $collectionsByEventId[$eventId]->add($bookingModel);
         }
 
-        return $collection;
+        return $collectionsByEventId;
     }
 
 

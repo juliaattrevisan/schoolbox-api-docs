@@ -435,6 +435,13 @@ class Calendar extends DeprecatedModel
         $stack = new GenericCollection(EventInterface::class);
 
         if (is_array($allEvents) && count($allEvents)) {
+            // Get linked ResourceBookingModels for all events.
+            // Get them all in one query outside the loop below to minimise the number of database queries.
+            $allEventIds = array_map(static fn ($currentEvent) => $currentEvent['id'], $allEvents);
+            $resourceBookingMapper = ResourceBookingMapper::getInstance();
+            /** @var array<int, GenericCollection<ResourceBookingModel>> $resourceBookingModels */
+            $resourceBookingModelsByEventId = $resourceBookingMapper->getForAllEventIds($allEventIds);
+
             foreach ($allEvents as $currentEvent) {
                 $event = new Event();
 
@@ -466,12 +473,7 @@ class Calendar extends DeprecatedModel
                 );
                 $event->setAllDay(!empty($currentEvent['allday']));
                 $event->setSeriesId($currentEvent['series_id']);
-
-                $resourceBookingMapper = ResourceBookingMapper::getInstance();
-
-                /** @var GenericCollection<ResourceBookingModel> $resourceBookingModels */
-                $resourceBookingModels = $resourceBookingMapper->findByEventId($currentEvent['id']);
-                $event->setBookingsCollection($resourceBookingModels);
+                $event->setBookingsCollection($resourceBookingModelsByEventId[$currentEvent['id']]);
 
                 /* If you have write access to the event
                  */
