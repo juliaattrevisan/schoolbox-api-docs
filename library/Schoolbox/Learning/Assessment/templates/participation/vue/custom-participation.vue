@@ -110,6 +110,7 @@ async function performAction(): Promise<void> {
         selectedList.value = [];
     }
     modifyList.value = [];
+    isConfirmModifyOpen.value = false; // close the confirmation modal
 }
 
 /**
