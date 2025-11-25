@@ -16,6 +16,7 @@ namespace Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 
 class Event extends EventBase
 {
