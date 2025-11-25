@@ -106,3 +106,11 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
         }
     }
 }
+
+.sbx-body ul#filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    list-style: none;
+    justify-content: end;
+}
