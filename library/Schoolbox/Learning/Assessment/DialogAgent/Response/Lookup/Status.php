@@ -84,6 +84,8 @@ class Status
             ];
         }
 
+        // TODO: deal with duration eventually. still allow SOBO from staff
+
         /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
          * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
          *
@@ -109,7 +111,7 @@ class Status
             return [
                 'status' => self::STATUS_INCOMPLETE,
                 'actions' => [
-                    self::ACTION_VIEW => false,
+                    self::ACTION_VIEW => true,
                     self::ACTION_MESSAGE => true,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
