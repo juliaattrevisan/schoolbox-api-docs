@@ -8,6 +8,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
+import CpViewDpModal from "./cp-view-dp-modal.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
@@ -67,14 +68,14 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
 // #region Differentiation Profiles
 
 const hasDifferentiationProfiles = window.Vue.ref(true); // Placeholder for actual logic to determine if differentiation profiles exist
+const participantWithDP = window.Vue.ref<Participant | null>(null);
 
 /**
- *
- * @param participant
+ * Display the differentiation profile for a participant
+ * @param participant - The participant whose differentiation profile is to be viewed
  */
 function onDPSelected(participant: Participant): void {
-    // Placeholder for logic to handle viewing differentiation profile
-    console.warn("View differentiation profile for:", participant);
+    participantWithDP.value = participant;
 }
 </script>
 
@@ -135,6 +136,7 @@ function onDPSelected(participant: Participant): void {
             @open-include-in-existing-modal="openIncludeInExistingModal"
         />
     </div>
+    <cp-view-dp-modal v-model:participant="participantWithDP" />
     <cp-include-in-existing-modal
         v-model:is-open="isIncludeInExistingOpen"
         v-model:selected-activity-id="includeInExistingActivityId"
