@@ -20,16 +20,6 @@ export default class SummativeReportList {
 
     static readonly DATA_TEST_PREVIEW_ICON = "summative-report-preview-{title}";
 
-    static readonly DATA_TEST_PREVIEW_TITLE = "summative-preview-title";
-
-    static readonly DATA_TEST_PREVIEW_SCHOOL_NAME = "summative-preview-school-name";
-
-    static readonly DATA_TEST_PREVIEW_STUDENT_NAME = "summative-preview-student-name";
-
-    static readonly DATA_TEST_PREVIEW_STUDENT_YEAR = "summative-preview-student-year";
-
-    static readonly DATA_TEST_PREVIEW_INTRODUCTION = "summative-preview-introduction";
-
     private common: Common;
 
     constructor(tester: AcceptanceTester, page: Page) {
@@ -110,64 +100,13 @@ export default class SummativeReportList {
     /**
      * click the preview icon of a summative report
      * @param title - The title of the summative report
+     * @returns The preview page
      */
-    async clickPreviewIcon(title: string): Promise<void> {
+    async clickPreviewIcon(title: string): Promise<Page> {
+        const popupPromise = this.page.waitForEvent("popup");
         const dataTestId = SummativeReportList.DATA_TEST_PREVIEW_ICON.replace("{title}", title);
         await this.page.getByTestId(dataTestId).click();
-    }
-
-    /**
-     * check the preview report page shows the details of the summative report: title, school name, student name, year, introduction, school logo
-     * @param details - The details to check
-     * @param details.title - The title of the summative report
-     * @param details.schoolName - The school name
-     * @param details.studentName - The student name
-     * @param details.year - The student year
-     * @param details.introduction - The introduction text
-     * @param details.schoolLogo - The school logo
-     */
-    async checkPreviewReportDetails(
-        previewPage: Page,
-        details: {
-            title?: string;
-            schoolName?: string;
-            studentName?: string;
-            year?: string;
-            introduction?: string;
-            schoolLogo?: string;
-        },
-    ): Promise<void> {
-        // const [newPage] = await Promise.all([
-        //     this.page.context().waitForEvent("page"), // Wait for new page to open
-        // ]);
-        if (details.title) {
-            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_TITLE)).toContainText(
-                details.title,
-            );
-        }
-        if (details.schoolName) {
-            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_SCHOOL_NAME)).toContainText(
-                details.schoolName,
-            );
-        }
-        if (details.studentName) {
-            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_NAME)).toContainText(
-                details.studentName,
-            );
-        }
-        if (details.year) {
-            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_STUDENT_YEAR)).toContainText(
-                details.year,
-            );
-        }
-        if (details.introduction) {
-            await expect(previewPage.getByTestId(SummativeReportList.DATA_TEST_PREVIEW_INTRODUCTION)).toContainText(
-                details.introduction,
-            );
-        }
-        if (details.schoolLogo) {
-            await expect(previewPage.locator(`img[src*="/storage/image.php?hash"]`)).toBeVisible();
-        }
-        await previewPage.close();
+        const previewPage = await popupPromise;
+        return previewPage;
     }
 }
