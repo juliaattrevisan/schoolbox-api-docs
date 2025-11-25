@@ -418,7 +418,6 @@ class Module extends BaseModule
                 $this->getAuthorizer(),
                 $this->getMapperFactory()->get(Access::class),
             ),
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
             $assessmentMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
             $responseMapperProxy,

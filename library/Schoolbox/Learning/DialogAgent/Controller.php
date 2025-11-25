@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
@@ -26,8 +25,6 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgen
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LockedChecker;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -46,7 +43,6 @@ class Controller extends Base
      * Constructor.
      *
      * @param BreadcrumbFactory $bakery
-     * @param Mapper $termMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
@@ -55,7 +51,6 @@ class Controller extends Base
      */
     public function __construct(
         private BreadcrumbFactory $bakery,
-        private \Schoolbox\Assessment\Term\Mapper $termMapper,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
