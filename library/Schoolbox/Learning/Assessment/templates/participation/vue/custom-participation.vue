@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * Custom Participation Vue Component
+ * Display a list of students linked to an assessment and provide details and actions for student participation
  */
+
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
@@ -23,6 +24,15 @@ const props = defineProps<{
 }>();
 
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
+
+/**
+ * Get student pastoral counts
+ */
+const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
+    props.pastoralEnabled,
+    props.routes.getStudentsPastoralCountsUrl,
+    () => allParticipants.value,
+);
 
 // #region checkboxes and selection
 
@@ -47,26 +57,13 @@ const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
 });
 
-// #endregion
+// #endregion checkboxes and selection
 
-// #region pastoral counts
-
-const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
-    props.pastoralEnabled,
-    props.routes.getStudentsPastoralCountsUrl,
-    () => allParticipants.value,
-);
-
-// #endregion
-
-// #region exclude/include participants
+// #region participant modifications
 
 const { excludeParticipants } = useExcludeParticipant(loadError);
+
 const { includeParticipants } = useIncludeParticipant(loadError);
-
-// #endregion
-
-// #region include in existing customisation
 
 const {
     isIncludeInExistingOpen,
@@ -77,14 +74,10 @@ const {
     openIncludeInExistingModal,
 } = useIncludeInExisting(loadError, props.customisations, props.routes.includeInExistingCustomisation, selectedList);
 
-// #endregion
-
-// #region perform modification and check for interactions prior to action
-
 const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onConfirmActionSelected } =
     usePerformAction(selectedList, excludeParticipants, includeParticipants, includeParticipantInExistingPlan);
 
-// #endregion
+// #endregion participant modifications
 </script>
 
 <template>
