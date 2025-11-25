@@ -9,6 +9,7 @@ import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
+import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
@@ -194,18 +195,12 @@ const includeInExistingActivityId = window.Vue.ref<number | null>(null);
 const isSingleIncludeInExisting = window.Vue.ref(false); // whether the include is for a single participant (three-dot) or multiple (bottom drawer)
 
 /**
- * The current selected activity for inclusion.
- */
-const includeInExistingActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
-    return props.customisations.find((plan) => plan.id === includeInExistingActivityId.value) ?? null;
-});
-
-/**
  * Add all the selected participants to an existing customisation plan.
  */
 async function includeParticipantInExistingPlan(): Promise<void> {
-    if (includeInExistingActivity.value === null) return;
-    const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
+    if (includeInExistingActivityId.value === null) return;
+    const activity = props.customisations.find((plan) => plan.id === includeInExistingActivityId.value);
+    if (!activity) return;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     const response = await postIncludeExistingParticipant(props.routes.includeInExistingCustomisation, {
         students: includeInExistingList.value.map((p) => p.user.id),
@@ -213,7 +208,6 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         ...(activity.name !== null ? { planId: activity.id } : {}),
         includeResponse: true,
     });
-
     if (!response.success) {
         const error = response.message ?? "";
         loadError.value = error;
@@ -221,7 +215,6 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         toast.timeout({ text: error, isSuccess: false });
         return;
     }
-
     const { data } = response;
     // add the activity to each participant
     includeInExistingList.value.forEach((participant) => {
@@ -252,30 +245,6 @@ function openIncludeInExistingModal(isSingle: boolean, participant: Participant 
     }
     includeInExistingActivityId.value = null;
     isIncludeInExistingOpen.value = true;
-}
-
-/**
- * Generates a label for a given customisation plan.
- * @param plan - The customisation plan to generate the label for.
- * @returns The label for the customisation plan.
- */
-function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
-    if ("assessable" in plan && plan.assessable !== null) {
-        return plan.assessable.title || "";
-    }
-    return plan.name || "";
-}
-
-/**
- * Generates the meta for a given customisation plan.
- * @param plan - The customisation plan to generate the meta for.
- * @returns The meta for the customisation plan.
- */
-function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
-    if ("assessable" in plan && plan.assessable !== null) {
-        return `(New ${locale.activity?.singular()})`;
-    }
-    return `(Modified ${locale.activity?.singular()})`;
 }
 
 // #endregion
@@ -405,49 +374,14 @@ async function onConfirmActionSelected(): Promise<void> {
             @open-include-in-existing-modal="openIncludeInExistingModal"
         />
     </div>
-    <basic-modal v-model:is-open="isIncludeInExistingOpen">
-        <div class="l-flex-col l-gap-m f-no-margins">
-            <div class="l-flex-col l-gap-s f-no-margins">
-                <h2>Include in existing customisation</h2>
-                <p class="meta">
-                    Modifying participation for:
-                    <template v-for="(participant, index) in includeInExistingList" :key="participant.user.id">
-                        {{
-                            participant.user.preferredName ? participant.user.preferredName : participant.user.firstname
-                        }}
-                        {{ participant.user.lastname
-                        }}<template v-if="index < includeInExistingList.length - 2">, </template
-                        ><template v-if="index === includeInExistingList.length - 2"> and </template>
-                    </template>
-                </p>
-            </div>
-            <div class="l-flex-col l-gap-s f-no-margins">
-                <label for="activitySelect">Customisation</label>
-                <select id="activitySelect" v-model="includeInExistingActivityId" class="f-no-margins">
-                    <option value="null" disabled>Select customisation</option>
-                    <option
-                        v-for="customisation in props.customisations"
-                        :key="customisation.id"
-                        :value="customisation.id"
-                    >
-                        {{ getCustomisationLabel(customisation) }} {{ getCustomisationMeta(customisation) }}
-                    </option>
-                </select>
-            </div>
-            <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="isIncludeInExistingOpen = false">Cancel</button>
-                <button
-                    class="button submit l-flex__item--1"
-                    :disabled="!includeInExistingActivity"
-                    @click.prevent="
-                        onActionSelected(includeInExistingList, 'includeInExisting', isSingleIncludeInExisting)
-                    "
-                >
-                    Confirm
-                </button>
-            </div>
-        </div>
-    </basic-modal>
+    <cp-include-in-existing-modal
+        v-model:is-open="isIncludeInExistingOpen"
+        v-model:selected-activity-id="includeInExistingActivityId"
+        :customisations="props.customisations"
+        :participant-list="includeInExistingList"
+        :is-single="isSingleIncludeInExisting"
+        @confirm="onActionSelected"
+    />
     <basic-modal v-model:is-open="isConfirmModifyOpen">
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
