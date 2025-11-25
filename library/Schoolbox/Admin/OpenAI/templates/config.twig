@@ -1,7 +1,73 @@
-<div data-feature="{{ feature.feature }}">
+{##
+ # Configuration panels for AI Services
+ #
+ # Each panel presents a user interface that represents (ultimately) a serialized payload that we persist to the db.
+ # Each payload consists of all the possible settings but only a subset is shown, such as all the azure-related ones
+ # if you enabled an Azure-based service.
+ #
+ # System Prompts are customisable per-feature.
+ #
+ # @param array $feature  A set of configurations per-feature with their own values and representations
+ #}
 
+{# A set of (name, (title/description)) tuples for easy-to-read indexing here
+ # Also, when you add a new thing, it's easier to see where
+ #}
+{% set manifest = {
+    'provider': {
+        'title': 'Provider',
+        'description': 'Select which provider you will use for this AI service; choose "Off" to disable this feature.'
+    },
+    'ai_key': {
+        'title': 'OpenAI API Key',
+        'description': 'This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.'
+    },
+    'model': {
+        'title': 'OpenAI Model',
+        'description': 'Select which model you wish to use for your OpenAI service.'
+    },
+    'resource_name': {
+        'title': 'Azure OpenAI Resource Name',
+        'description': 'The name of your Azure OpenAI Resource.'
+    },
+    'deployment_id': {
+        'title': 'Azure OpenAI Deployment ID',
+        'description': 'The deployment name you chose when you deployed the model in Azure.'
+    },
+    'system_prompt': {
+        'title': 'Generation System Prompt',
+        'description': 'Provide some additional instructions to shape what the AI service generates for requests.'
+    },
+    'output_quality': {
+        'title': 'Output Quality',
+        'description': 'Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.'
+    }
+} %}
+
+{# Each panel consists of various sections; each supported AI service (openAI, azure, et al) has its own section
+ # but there is a "general" section for universal ideas (such as provider). When you add a new AI service, you can chuck
+ # it at the bottom of this list along with its corresponding attributes
+ #}
+{% set sections = {
+    'general': {
+        'dataAttrs': 'data-feature-openai data-feature-azure',
+        'style': 'display:none'
+    },
+    'OpenAI': {
+        'dataAttrs': 'data-feature-openai',
+        'style': 'display:none'
+    },
+    'Azure': {
+        'dataAttrs': 'data-feature-azure',
+        'style': 'display:none'
+    }
+} %}
+
+<div data-feature="{{ feature.feature }}">
     {% for name, formInput in feature.formInputs %}
         {% set section = formInput.section ?? null %}
+
+        {# "provider" doesn't belong in a section and has its own treatment... #}
         {% if section is null %}
             {% set inputName %}[{{ feature.feature }}][{{ name }}][value]{% endset %}
             {% set inputValue %}{{ feature.config[name].value ?? '' }}{% endset %}
@@ -14,45 +80,12 @@
         {% set type = formInput.type %}
 
         {# As does style and attributes #}
-        {% if section == 'general' %}
-            {% set dataAttrs = "data-feature-openai data-feature-azure" %}
-            {% set style = 'display:none' %}
-        {% elseif section == 'OpenAI' %}
-            {% set dataAttrs = "data-feature-openai" %}
-            {% set style = 'display:none' %}
-        {% elseif section == 'Azure' %}
-            {% set dataAttrs = "data-feature-azure" %}
-            {% set style = 'display:none' %}
-        {% else %}
-            {% set dataAttrs = '' %}
-            {% set style = '' %}
-        {% endif %}
+        {% set dataAttrs = sections[section].dataAttrs ?? '' %}
+        {% set style = sections[section].style ?? '' %}
 
         {# Generate label and description from a lookup here, instead of in PHP code #}
-        {% set title %}No title - please add one{% endset %}
-        {% set description %}No description - please add one{% endset %}
-        {% if name == 'provider' %}
-            {% set title %}Provider{% endset %}
-            {% set description %}Select which provider you will use for this AI service; choose "Off" to disable this feature.{% endset %}
-        {% elseif name == 'ai_key' %}
-            {% set title %}OpenAI API Key{% endset %}
-            {% set description %}This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.{% endset %}
-        {% elseif name == 'model' %}
-            {% set title %}OpenAI Model{% endset %}
-            {% set description %}Select which model you wish to use for your OpenAI service.{% endset %}
-        {% elseif name == 'resource_name' %}
-            {% set title %}Azure OpenAI Resource Name{% endset %}
-            {% set description %}The name of your Azure OpenAI Resource.{% endset %}
-        {% elseif name == 'deployment_id' %}
-            {% set title %}Azure OpenAI Deployment ID{% endset %}
-            {% set description %}The deployment name you chose when you deployed the model in Azure.{% endset %}
-        {% elseif name == 'system_prompt' %}
-            {% set title %}{{ feature.title }} Generation System Prompt{% endset %}
-            {% set description %}Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.{% endset %}
-        {% elseif name == 'output_quality' %}
-            {% set title %}Output Quality{% endset %}
-            {% set description %}Select which output quality you wish to use for image generation. A higher quality will improve the result of more complex images but will take longer to generate and use more credit.{% endset %}
-        {% endif %}
+        {% set title = manifest[name].title ?? 'No title - please add one' %}
+        {% set description = manifest[name].description ?? 'No description - please add one' %}
 
         <label id="{{ feature.feature }}-{{ name }}-label"
                for="{{ feature.feature }}-{{ name }}-value"
