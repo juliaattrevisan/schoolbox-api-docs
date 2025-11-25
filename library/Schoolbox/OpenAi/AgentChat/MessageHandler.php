@@ -64,8 +64,7 @@ class MessageHandler
         Log\Model $log,
     ): iterable {
         // TODO: what happens to random errors thrown from within here? do they end up as ApiProblem's correctly?
-        // TODO: Hmm.. I swear I had issues always using large chunks with it being slow for deltas
-        $stream = $this->client->createResponseStream($payload, $log, 8192);
+        $stream = $this->client->createResponseStream($payload, $log);
 
         /**
          * The response ID associated to the OpenAI request once we receive it.
