@@ -478,7 +478,9 @@ class Mapper extends BaseMapper
 
         // Pre-fill the array with empty collections, indexed by eventId.
         // The calling code can then rely on the existence of a key for each supplied eventId.
-        $collectionsByEventId = array_fill_keys($eventIds, new GenericCollection(Model::class));
+        foreach ($eventIds as $eventId) {
+            $collectionsByEventId[$eventId] = new GenericCollection(Model::class);
+        }
 
         foreach ($statement as $row) {
             try {
