@@ -857,121 +857,123 @@ export default {
             <template v-else>
                 <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
             </template>
-            <div class="medium-8 small-12">
-                <meta-list>
-                    <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
-                        <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
-                    </template>
-                    <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{
-                        eventExtendedProps.booking.status.name
-                    }}</meta-item>
-                    <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{
-                        eventExtendedProps.dateSpan
-                    }}</meta-item>
-                    <meta-item class="icon-location" v-if="eventExtendedProps.location">{{
-                        eventExtendedProps.location
-                    }}</meta-item>
-                    <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id"
-                        >Posted by
-                        <a :href="'/search/user/' + String(eventExtendedProps.author.id)">{{
-                            eventExtendedProps.author.name
-                        }}</a></meta-item
-                    >
-                    <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id"
-                        >Reviewed by
-                        <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">{{
-                            eventExtendedProps.reviewer.name
-                        }}</a></meta-item
-                    >
-                    <template
-                        v-if="
-                            eventExtendedProps.timetable.staff && Object.keys(eventExtendedProps.timetable.staff).length
-                        "
-                    >
-                        <meta-item class="icon-staff">
-                            <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
-                                <template v-if="id">
-                                    <a :href="'/search/user/' + String(id)">{{ name }}</a>
-                                </template>
-                                <template v-else>{{ name }}</template
-                                ><span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1"
-                                    >,
-                                </span>
-                            </template>
-                        </meta-item>
-                    </template>
-                    <meta-item
-                        class="icon-class-list"
-                        v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)"
-                    >
-                        Attendance:
-                        <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)"
-                            >Invite only</template
+            <div class="l-grid l-grid--12">
+                <div class="medium-8 small-12">
+                    <meta-list>
+                        <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
+                            <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
+                        </template>
+                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{
+                            eventExtendedProps.booking.status.name
+                        }}</meta-item>
+                        <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{
+                            eventExtendedProps.dateSpan
+                        }}</meta-item>
+                        <meta-item class="icon-location" v-if="eventExtendedProps.location">{{
+                            eventExtendedProps.location
+                        }}</meta-item>
+                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id"
+                            >Posted by
+                            <a :href="'/search/user/' + String(eventExtendedProps.author.id)">{{
+                                eventExtendedProps.author.name
+                            }}</a></meta-item
                         >
-                        <template v-else-if="isOpen(eventExtendedProps.attendance.payload.level)">Open</template>
-
+                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id"
+                            >Reviewed by
+                            <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">{{
+                                eventExtendedProps.reviewer.name
+                            }}</a></meta-item
+                        >
                         <template
                             v-if="
-                                this.canRsvp(
-                                    eventExtendedProps.attendance.payload.level,
-                                    eventExtendedProps.attendance.payload.attendees.guests,
-                                    eventExtendedProps.attendance.payload.currentUser.user.id,
-                                    eventExtendedProps.attendance.payload.currentUser.status,
-                                    eventExtendedProps.attendance.payload.attendees.max,
-                                    eventExtendedProps.attendance.payload.attendees.available,
-                                ) && this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
+                                eventExtendedProps.timetable.staff &&
+                                Object.keys(eventExtendedProps.timetable.staff).length
                             "
                         >
-                            (<template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{
-                                eventExtendedProps.attendance.payload.attendees.available
-                            }}</template>
-                            <template v-else>No</template>
-                            available
-                            <template v-if="eventExtendedProps.attendance.payload.attendees.available === 1"
-                                >place</template
-                            >
-                            <template v-else>places</template>
-                            remaining)
+                            <meta-item class="icon-staff">
+                                <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
+                                    <template v-if="id">
+                                        <a :href="'/search/user/' + String(id)">{{ name }}</a>
+                                    </template>
+                                    <template v-else>{{ name }}</template
+                                    ><span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1"
+                                        >,
+                                    </span>
+                                </template>
+                            </meta-item>
                         </template>
-                    </meta-item>
+                        <meta-item
+                            class="icon-class-list"
+                            v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)"
+                        >
+                            Attendance:
+                            <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)"
+                                >Invite only</template
+                            >
+                            <template v-else-if="isOpen(eventExtendedProps.attendance.payload.level)">Open</template>
 
-                    <!-- EOTC metadata -->
-                    <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC"
-                        >Assigned Staff: {{ eventExtendedProps.eotc.numStaff }}</meta-item
-                    >
-                    <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC"
-                        >Students: {{ eventExtendedProps.eotc.numStudents }}</meta-item
-                    >
-                </meta-list>
-                <media-article :content="eventExtendedProps.detail"></media-article>
-            </div>
+                            <template
+                                v-if="
+                                    this.canRsvp(
+                                        eventExtendedProps.attendance.payload.level,
+                                        eventExtendedProps.attendance.payload.attendees.guests,
+                                        eventExtendedProps.attendance.payload.currentUser.user.id,
+                                        eventExtendedProps.attendance.payload.currentUser.status,
+                                        eventExtendedProps.attendance.payload.attendees.max,
+                                        eventExtendedProps.attendance.payload.attendees.available,
+                                    ) && this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
+                                "
+                            >
+                                (<template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{
+                                    eventExtendedProps.attendance.payload.attendees.available
+                                }}</template>
+                                <template v-else>No</template>
+                                available
+                                <template v-if="eventExtendedProps.attendance.payload.attendees.available === 1"
+                                    >place</template
+                                >
+                                <template v-else>places</template>
+                                remaining)
+                            </template>
+                        </meta-item>
 
-            <template v-if="eventExtendedProps.booking.related.length">
-                <h3>Related Bookings</h3>
-                <ul>
-                    <li v-for="(relatedBooking, index) in eventExtendedProps.booking.related" :key="index">
-                        ({{ relatedBooking.status.name }}) <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
-                    </li>
-                </ul>
-            </template>
-            <template v-if="eventExtendedProps.bookings.length">
-                <div class="medium-4 small-12">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li v-for="(booking, index) in eventExtendedProps.bookings" :key="index">
-                            ({{ booking.status.name }}) <a :href="booking.href">{{ booking.item.name }}</a>
-                        </li>
-                    </ul>
+                        <!-- EOTC metadata -->
+                        <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC"
+                            >Assigned Staff: {{ eventExtendedProps.eotc.numStaff }}</meta-item
+                        >
+                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC"
+                            >Students: {{ eventExtendedProps.eotc.numStudents }}</meta-item
+                        >
+                    </meta-list>
+                    <media-article :content="eventExtendedProps.detail"></media-article>
                 </div>
-            </template>
-
-            <!--
-                Temporary solution to prevent a mysterious error:
-                main.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
-                when there's a related booking. According to my research, it's not a sizzle error and  we'll
-                need to update jQuery to 3.x. However, doing so may potentially open un new issues.
-             -->
-            <template v-else></template>
+                <div class="medium-4 small-12">
+                    <template v-if="eventExtendedProps.booking.related.length">
+                        <h3>Related Bookings</h3>
+                        <ul>
+                            <li v-for="(relatedBooking, index) in eventExtendedProps.booking.related" :key="index">
+                                ({{ relatedBooking.status.name }})
+                                <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
+                            </li>
+                        </ul>
+                    </template>
+                    <template v-if="eventExtendedProps.bookings.length">
+                        <h3>Resources</h3>
+                        <ul>
+                            <li v-for="(booking, index) in eventExtendedProps.bookings" :key="index">
+                                ({{ booking.status.name }}) <a :href="booking.href">{{ booking.item.name }}</a>
+                            </li>
+                        </ul>
+                    </template>
+                    <!--
+                        Temporary solution to prevent a mysterious error:
+                        main.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
+                        when there's a related booking. According to my research, it's not a sizzle error and  we'll
+                        need to update jQuery to 3.x. However, doing so may potentially open un new issues.
+                     -->
+                    <template v-else></template>
+                </div>
+            </div>
 
             <template v-if="hasComponentActions()">
                 <div class="component-action">
