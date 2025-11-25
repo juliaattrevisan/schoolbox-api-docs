@@ -194,6 +194,7 @@
                 targetCheckbox.attr('readonly', 'readonly');
                 targetCheckbox.attr('data-always-read-only', 1);
                 if (permission === '0') {
+                    targetCheckbox.hide();
                     targetCheckboxLabel.hide();
                 }
             } else {
@@ -203,6 +204,7 @@
                 targetCheckbox.attr('data-always-read-only', 0);
                 if (permission === '0') {
                     targetCheckbox.prop('checked', false);
+                    targetCheckbox.hide();
                     targetCheckboxLabel.hide();
                 }
             }

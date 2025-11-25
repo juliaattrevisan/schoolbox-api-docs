@@ -6,7 +6,7 @@
 @mixin form-input-focus {
     background: var(--sbx-color-foreground-primary);
     border-color: var(--sbx-color-accent);
-    outline: calc(var(--sbx-border-width-normal) + 2px) solid var(--sbx-color-accent);
+    outline: calc(var(--sbx-border-width-normal) + 1px) solid var(--sbx-color-accent);
     outline-offset: calc(var(--sbx-border-width-normal) + 1px);
 }
 
@@ -31,4 +31,34 @@
     :root {
         --sbx-animation-form-input-change: 0ms;
     }
+}
+
+.sbx-body label,
+.sbx-body label.checkbox-label,
+.sbx-body.body.login input[type="checkbox"]:not(.plain) + label {
+    font-weight: normal !important;
+    vertical-align: text-bottom !important;
+}
+.sbx-body label.checkbox-label {
+    margin: 0 1rem 0 0.5rem !important;
+    padding: 0 !important;
+}
+
+.sbx-body .option-list .columns:has(input + label),
+.sbx-body .option-list li:has(input + label) {
+    white-space: nowrap;
+}
+// Ensure meta text wraps normally
+.sbx-body .columns:has(input + label) p.meta,
+.sbx-body li:has(input + label) p.meta {
+    white-space: normal;
+}
+
+// Align inputs to the top when there is meta text
+.sbx-body input:has(+ label p.meta) {
+    vertical-align: top;
+}
+
+.sbx-body .reveal-modal .component-action {
+    margin: 1rem 0 0 0;
 }
