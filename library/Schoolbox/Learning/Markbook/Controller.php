@@ -25,7 +25,6 @@ use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\Assessment\IProgressTick;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task;
@@ -238,13 +237,14 @@ class Controller extends Base
 
                                     /* Find the progress tick status, only relevant for tasks/dialogAgent */
                                     $progressTick = null;
-                                    if ($aImpl instanceof IProgressTick) {
-                                        $progressTick = $aImpl->getProgressTick(
+                                    if ($aImpl instanceof Task\Model || $aImpl instanceof DialogAgent\Model) {
+                                        $unitAssessmentsTranslator = new UnitAssessments(
                                             $this->routeGenerator,
                                             $this->getAuthorizer(),
-                                            $participant,
+                                            $participant->getUser(),
                                             $this->getUser(),
                                         );
+                                        $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
                                     }
 
                                     $draftMark = isset($markbook->getHasDraft()[$aImpl->getId()][$student->getId()]);

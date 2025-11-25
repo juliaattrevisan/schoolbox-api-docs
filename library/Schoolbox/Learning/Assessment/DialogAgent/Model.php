@@ -8,23 +8,19 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
-use Alaress\Authorizer\Authorizer;
-use Aura\Router\Generator;
 use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\IProgressTick;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\User;
 
-class Model extends AbstractAssessment implements IProgressTick
+class Model extends AbstractAssessment
 {
     /**
      * This appears on Create Activity screens but you probably need to rename
@@ -588,36 +584,5 @@ class Model extends AbstractAssessment implements IProgressTick
     {
         $this->prompt = $prompt;
         return $this;
-    }
-
-
-    /**
-     * Represent the current state of affairs as a progress tick
-     *
-     * @param Generator $routeGenerator
-     * @param Authorizer $authorizer
-     * @param Participant|null $participant
-     * @param User $viewer
-     * @param array $overload
-     * @return array|null
-     */
-    public function getProgressTick(
-        Generator $routeGenerator,
-        Authorizer $authorizer,
-        ?Participant $participant,
-        \Schoolbox\User $viewer,
-        array $overload = []
-    ): ?array {
-        $response = $participant->getAuthoritativeResponse(true);
-        $status = (new Status())->calculate($response);
-
-        /* Defaults to "In Progress" if a status couldn't be determined
-         */
-        $progress = Status::ICONS[$status['status']] ?? Status::ICONS[Status::STATUS_IN_PROGRESS];
-
-        return [
-            'postRouteUrl'  => null, // dialog agent ticks aren't ever actionable
-            'progressClass' => $progress,
-        ];
     }
 }

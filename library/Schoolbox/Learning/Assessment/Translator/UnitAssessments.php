@@ -14,10 +14,10 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IProgressTick;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 use Schoolbox\User;
 
 /**
@@ -90,14 +90,9 @@ class UnitAssessments
 
         // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
         $progressTick = null;
-        if ($assessment instanceof IProgressTick && $this->student->getId() === $this->loggedInUser->getId()) {
+        if ($this->student->getId() === $this->loggedInUser->getId()) {
             $participant = $assessment->getParticipantIfExtant($this->student);
-            $progressTick = $assessment->getProgressTick(
-                $this->routeGenerator,
-                $this->authorizer,
-                $participant,
-                $this->loggedInUser
-            );
+            $progressTick = $this->getProgressTick($assessment, $participant);
         }
 
         $dueAt = $this->getDueAt($assessment);
@@ -262,6 +257,106 @@ class UnitAssessments
         return null;
     }
 
+    /**
+     * The logic used in this function is intended to match the logic used in progressTick.twig.
+     *
+     * @param IAssessable $assessable
+     * @param Participant|null $participant
+     * @return ?array
+     * @throws RouteNotFound
+     * @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
+     */
+    public function getProgressTick(IAssessable $assessable, ?Participant $participant): ?array
+    {
+        if (null === $participant || $participant->isExcluded()) {
+            // The student ought to be a participant.  The only way this situation could arise is if the student was
+            // excluded from the assessment, or marked as deleted, by another process, since permissions were checked
+            // at the start of this page-load (in Assessment/Module.php).
+            return null;
+        }
+
+        $progress = '';
+
+        /** If this is a DialogAgent, it has totally unique logic for its progress tick compared to everything else */
+        if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
+            $response = $participant->getAuthoritativeResponse(true);
+            $status = (new Lookup\Status())->calculate($response);
+
+            // TODO: Ideally these strings for progress tick states (including the normal ones) would in an enum somewhere
+            if ($status['status'] === Lookup\Status::STATUS_INCOMPLETE) {
+                $progress = 'incomplete';
+            } elseif ($status['status'] === Lookup\Status::STATUS_REQUIRES_ASSISTANCE) {
+                $progress = 'requires-assistance';
+            } elseif ($status['status'] === Lookup\Status::STATUS_SUBMITTED) {
+                $progress = 'submitted';
+            } else {
+                $progress = 'in-progress';
+            }
+
+            return [
+                'postRouteUrl'  => null, // dialog agent ticks aren't ever actionable
+                'progressClass' => $progress,
+            ];
+        }
+
+        // Only set this var if the assessment is a task so participants can create a
+        // response asynchronously without reloading the page.  This only applies to Tasks.
+        // Due Work and Quiz require more in-depth workflows to submit a response.
+        $postRouteUrl = null;
+        if ($assessable instanceof \Schoolbox\Learning\Assessment\Task\Model && $assessable->isImplementation()) {
+            $postRouteName = 'learningAssessment.postCreateResponse';
+            $postRouteParams = [
+                'assessment' => $assessable,
+                'assessmentId' => $assessable->getId(),
+                'student' => $this->student,
+                'studentId' => $this->student->getId()
+            ];
+
+            if ($this->authorizer->isPathAuthorizedForUser($postRouteName, $postRouteParams, $this->loggedInUser)) {
+                $postRouteUrl = $this->routeGenerator->generate($postRouteName, $postRouteParams);
+            }
+        }
+
+        if ($postRouteUrl === null) {
+            $postRouteUrl = '';
+        }
+
+        $loggedInUserShouldSeeIncompleteStatus = (
+            $participant->isResponseRequired() && (
+                $this->loggedInUser->getRole()->isStaff() || (
+                    $assessable instanceof \Schoolbox\Learning\Assessment\Task\Model &&
+                    $assessable->isImplementation() &&
+                    $assessable->isOpen($this->student) &&
+                    $assessable->isSelfAssessable()
+                )
+            )
+        );
+
+        if ($postRouteUrl !== '') {
+            if ($loggedInUserShouldSeeIncompleteStatus) {
+                $progress = 'incomplete';
+            } elseif ($participant->isFeedbackRequired()) {
+                $progress = 'pending';
+            } elseif ($participant->isReviewComplete()) {
+                $progress = 'reviewed';
+            }
+        } else {
+            if ($loggedInUserShouldSeeIncompleteStatus) {
+                $progress = 'incomplete';
+            } elseif ($participant->isFeedbackRequired()) {
+                $progress = 'pending';
+            } elseif ($participant->isResubmissionRequired()) {
+                $progress = 'failed';
+            } elseif ($participant->isReviewComplete()) {
+                $progress = 'reviewed';
+            }
+        }
+
+        return [
+            'postRouteUrl'  => $postRouteUrl,
+            'progressClass' => $progress,
+        ];
+    }
 
     /**
      * We should be showing the students personalised plan duedate (if it exists), or the assessment due date.
