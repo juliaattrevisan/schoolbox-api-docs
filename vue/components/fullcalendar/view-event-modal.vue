@@ -138,6 +138,11 @@ export default {
                 }
             }
 
+            // Sanity check.
+            if (data?.booking && data?.bookings) {
+                console.error("Only one of {'data.booking', 'data.bookings'} should be filled.");
+            }
+
             return {
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
@@ -157,12 +162,17 @@ export default {
                     id: Math.max(0, data?.links?.category?.id || 0),
                 },
                 dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
+                // If the modal is for a booking item (representing a row of the resource_booking table),
+                // there will be one booking, so 'booking' will be filled, and 'bookings' will not be filled.
                 booking: {
                     isBooking: (data?.booking?.status || "").length,
                     status: data?.booking?.status,
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
                 },
+                // If the modal is for an event item (representing a row of the event table),
+                // there may be zero or multiple bookings, so 'booking' will not be filled, but 'bookings' may be filled.
+                bookings: data?.bookings || [],
                 timetable: {
                     code: data?.timetable?.code,
                     staff: data?.timetable?.staff,
