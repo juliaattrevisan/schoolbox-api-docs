@@ -4,12 +4,11 @@
  */
 import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import locale from "@js/terminology/rosettaStone";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
+import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
@@ -311,7 +310,6 @@ function onActionSelected(participants: Participant[], action: string, $isSingle
  */
 async function onConfirmActionSelected(): Promise<void> {
     await performAction();
-    isConfirmModifyOpen.value = false;
 }
 
 // #endregion
@@ -382,43 +380,9 @@ async function onConfirmActionSelected(): Promise<void> {
         :is-single="isSingleIncludeInExisting"
         @confirm="onActionSelected"
     />
-    <basic-modal v-model:is-open="isConfirmModifyOpen">
-        <div class="l-flex-col l-gap-m f-no-margins">
-            <div class="l-flex-col l-gap-s f-no-margins">
-                <h2>Please confirm</h2>
-                <p class="f-no-margins">
-                    The following student(s) have submissions and/or feedback for this
-                    {{ locale.assessment.singular() }}.
-                </p>
-                <div class="l-flex-col l-gap-xs">
-                    <div
-                        v-for="participant in participantsWithInteractions"
-                        :key="participant.user.id"
-                        class="l-flex l-gap-s l-align-center"
-                    >
-                        <img
-                            :src="`/portrait.php?id=${participant.user.id}&size=square32`"
-                            :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
-                        />
-                        <p>
-                            {{
-                                participant.user.preferredName
-                                    ? participant.user.preferredName
-                                    : participant.user.firstname
-                            }}
-                            {{ participant.user.lastname }}
-                        </p>
-                    </div>
-                </div>
-                <p>
-                    Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions
-                    and/or feedback. Proceed?
-                </p>
-            </div>
-            <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button submit l-flex__item--1" @click.prevent="onConfirmActionSelected">Yes</button>
-                <button class="button l-flex__item--1" @click.prevent="isConfirmModifyOpen = false">Cancel</button>
-            </div>
-        </div>
-    </basic-modal>
+    <cp-confirm-modify-modal
+        v-model:is-open="isConfirmModifyOpen"
+        :participants-with-interactions="participantsWithInteractions"
+        @confirm="onConfirmActionSelected"
+    />
 </template>
