@@ -10,7 +10,6 @@ namespace Schoolbox\ResourceBooking\Booking;
 
 use Schoolbox\Calendar\Event;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Timeline\Generic;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
