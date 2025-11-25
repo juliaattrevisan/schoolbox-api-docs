@@ -471,6 +471,7 @@ class Mapper extends BaseMapper
             FROM {$this->getTable()} b
             INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
             WHERE b.event_id IN (" . implode(',', array_map('intval', $eventIds)) . ")
+            AND b.deleted_at IS NULL
             AND r.deleted_at IS NULL
         ";
         $statement = $this->getDatabase()->prepare($query);
