@@ -6,7 +6,7 @@
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 
-FROM dunglas/frankenphp:1.9-php${PHP_MAJOR_VERSION}-trixie
+FROM dunglas/frankenphp:1.10-php${PHP_MAJOR_VERSION}-trixie
 
 ARG PHP_MAJOR_VERSION
 
@@ -17,7 +17,7 @@ ARG ENV
 # Install pdo_sqlsrv requirements
 # (workaround from https://github.com/mlocati/docker-php-extension-installer/pull/1149#discussion_r2307219876)
 RUN apt-get update && \
-    apt-get install -qy --no-install-recommends gnupg && \
+    apt-get install -qy --no-install-recommends gnupg jq && \
     curl -sSLf https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor --yes --output /usr/share/keyrings/microsoft-prod.gpg && \
     curl -sSLf https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
     apt-get update && \
