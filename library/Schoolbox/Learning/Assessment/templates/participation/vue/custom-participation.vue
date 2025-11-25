@@ -8,9 +8,10 @@ import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
-import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
+import { postIncludeExistingParticipant } from "../js/types/customParticipationPayload";
 import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
+import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 
 const props = defineProps<{
     allParticipants: Participant[];
@@ -60,42 +61,7 @@ const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
 // #region exclude/include participants
 
 const { excludeParticipants } = useExcludeParticipant(loadError);
-
-/**
- * Includes a participant.
- * @param participant - The participant to include.
- * @returns A promise that resolves when the operation is complete.
- */
-async function includeParticipant(participant: Participant): Promise<void> {
-    const toast = window.sbProps.toastActivate("Removing customisation...");
-    const response = await postIncludeParticipant(participant._links.include, {
-        includeResponse: true,
-    });
-
-    if (!response.success) {
-        const error = response.message ?? "";
-        loadError.value = error;
-        console.error("Error including participant:", error);
-        toast.timeout({ text: error, isSuccess: false });
-        return;
-    }
-
-    participant.excludedAt = null; // Resetting the exclusion timestamp
-    participant.plan.name = null; // Resetting the plan
-    participant.customisedPlan = null; // Resetting the customised plan
-    participant.hasInteraction = response.data?.hasInteraction ?? false;
-    toast.timeout({ text: "Customisation removed successfully" });
-}
-
-/**
- * Includes the selected participants.
- * Clears the selection after the operation is complete.
- * @param participants - The participants to include.
- * @returns A promise that resolves when all inclusions are complete.
- */
-async function includeParticipants(participants: Participant[]): Promise<void> {
-    await Promise.all(participants.map((participant) => includeParticipant(participant)));
-}
+const { includeParticipants } = useIncludeParticipant(loadError);
 
 // #endregion
 
