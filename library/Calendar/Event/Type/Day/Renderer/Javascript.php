@@ -153,6 +153,7 @@ class Javascript extends Base
                 $href .= '?date=' . urlencode($event->getStartTime()->getURLDate());
             }
             $bookingsArray[] = [
+                'id' => $booking->getId(),
                 'item' => [
                     'id' => $booking->getResource()->getId(),
                     'name' => $booking->getResource()->getName(),

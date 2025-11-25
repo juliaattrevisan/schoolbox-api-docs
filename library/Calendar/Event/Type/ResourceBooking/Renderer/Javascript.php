@@ -192,6 +192,7 @@ class Javascript extends Base
                 // So by definition there is only one booking.  Other types of events represent rows of the
                 // `event` table and so may be linked to multiple bookings via resource_booking.event_id.
                 'booking'    => [
+                    'id'       => $this->getEvent()->getBooking()->getId(),
                     'item'     => [
                         'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
                         'name' => $this->getEvent()->getBooking()->getResource()->getName(),

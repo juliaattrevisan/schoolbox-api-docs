@@ -951,7 +951,7 @@ export default {
                         <meta-list>
                             <meta-item
                                 v-for="booking in eventExtendedProps.booking.related"
-                                :key="booking.item.id"
+                                :key="booking.id"
                                 :class="{
                                     'icon-approve': booking.status.isApproved,
                                     'icon-time-value': booking.status.isPending,
@@ -972,7 +972,7 @@ export default {
                         <meta-list>
                             <meta-item
                                 v-for="booking in eventExtendedProps.bookings"
-                                :key="booking.item.id"
+                                :key="booking.id"
                                 :class="{
                                     'icon-approve': booking.status.isApproved,
                                     'icon-time-value': booking.status.isPending,
