@@ -7,6 +7,10 @@ import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { User } from "@schoolboxLibrary/types/User";
 
+const props = defineProps<{
+    route: string;
+}>();
+
 const student = defineModel<User | null>("student", { default: null });
 const isOpen = window.Vue.ref(false);
 

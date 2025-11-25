@@ -70,12 +70,14 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
 // #region Differentiation Profiles
 
 const studentWithDP = window.Vue.ref<User | null>(null);
+const studentWithDPRoute = window.Vue.ref<string>("");
 
 /**
  * Display the differentiation profile for a participant
  * @param participant - The participant whose differentiation profile is to be viewed
  */
 function onDPSelected(participant: Participant): void {
+    studentWithDPRoute.value = participant._links.differentiationProfile ?? "";
     studentWithDP.value = participant.user;
 }
 
@@ -139,7 +141,7 @@ function onDPSelected(participant: Participant): void {
             @open-include-in-existing-modal="openIncludeInExistingModal"
         />
     </div>
-    <cp-view-dp-modal v-model:student="studentWithDP" />
+    <cp-view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
     <cp-include-in-existing-modal
         v-model:is-open="isIncludeInExistingOpen"
         v-model:selected-activity-id="includeInExistingActivityId"
