@@ -135,9 +135,13 @@ class Javascript extends Base
      */
     private function renderBookings(Event $event): array
     {
-        $bookingsArray = [];
+        $bookingsCollection = $event->getBookingsCollection();
+        if ($bookingsCollection === null) {
+            return [];
+        }
 
-        foreach ($event->getBookingsCollection() as $booking) {
+        $bookingsArray = [];
+        foreach ($bookingsCollection as $booking) {
             $href = $this->getRouteIfAuthorized(
                 'resourceItem.read',
                 [
