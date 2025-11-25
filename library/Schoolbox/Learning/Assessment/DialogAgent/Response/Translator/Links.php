@@ -41,6 +41,7 @@ class Links extends AbstractLinks
         ];
 
         $translation[Status::ACTION_VIEW] = $this->getRouteIfAuthorized('learningDialogAgent.getViewResponse', $routeParamsResponse);
+        $translation[Status::ACTION_MESSAGE] = $this->getRouteIfAuthorized('learningDialogAgent.postMessage', $routeParamsResponse);
         $translation[Status::ACTION_SOBO] = $this->getRouteIfAuthorized('learningDialogAgent.postSobo', $routeParamsResponse);
         $translation[Status::ACTION_REOPEN] = $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse);
         $translation[Status::ACTION_RESOLVE] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse);

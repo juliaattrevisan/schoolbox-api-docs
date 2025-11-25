@@ -153,6 +153,13 @@ class Module extends BaseModule
             $this->buildRuleCanAction(Status::ACTION_VIEW)
         ), $preloadParticipantAndResponse);
 
+        /* Student sends a message to the chat agent for a particular response
+         */
+        $this->register('POST', "{$assRoute}/{$studentParam}/message/{responseId:\d+}", 'postMessage', new Rule\All(
+            $canSubmit,
+            $this->buildRuleCanAction(Status::ACTION_MESSAGE)
+        ), $preloadParticipantAndResponse);
+
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);

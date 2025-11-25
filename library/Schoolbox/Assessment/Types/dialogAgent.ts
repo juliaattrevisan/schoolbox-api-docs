@@ -6,6 +6,7 @@ import { ProgressTickClass } from "./progressTick";
  */
 export enum DialogAgentResponseAction {
     ACTION_VIEW = "view",
+    ACTION_MESSAGE = "message",
     ACTION_SOBO = "sobo",
     ACTION_REOPEN = "reopen",
     ACTION_RESOLVE = "resolve",

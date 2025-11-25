@@ -192,6 +192,20 @@ class Controller extends Base
 
 
     /**
+     * Send a message to the chat agent for a particular response and stream the reply
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Response $response
+     * @return void
+     */
+    public function postMessage(IAssessable $assessment, User $student, Response $response): void
+    {
+        // TODO: AI stuffs
+    }
+
+
+    /**
      * The current user requested assistance on a particular response. This applies only to authoritative responses:
      * you can't resolve assistance on non-authoritative responses.
      *
