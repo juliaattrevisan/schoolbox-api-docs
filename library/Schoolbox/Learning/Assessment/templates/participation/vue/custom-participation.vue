@@ -398,16 +398,15 @@ async function onConfirmActionSelected(): Promise<void> {
                     <cp-participant
                         v-for="participant in allParticipants"
                         :key="participant.id"
+                        v-model:selected-list="selectedList"
                         :participant="participant"
                         :show-checkboxes="showCheckboxes"
-                        :selected-list="selectedList"
                         :student-pastoral-counts="studentPastoralCounts"
                         :get-learning-plan-new-url="props.getLearningPlanNewUrl"
                         :get-assessment-participation-new-activity="props.getAssessmentParticipationNewActivity"
                         :get-assessment-participation-copy-activity="props.getAssessmentParticipationCopyActivity"
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
-                        @update:selected-list="selectedList = $event"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
                     />

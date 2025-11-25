@@ -11,7 +11,6 @@ import type { CustomisedPlan, Participant, Plan } from "../js/types/customPartic
 const props = defineProps<{
     participant: Participant;
     showCheckboxes: boolean;
-    selectedList: Participant[];
     studentPastoralCounts: Record<string, StudentPastoralCountBadge[]>;
     getLearningPlanNewUrl: string;
     getAssessmentParticipationNewActivity: string;
@@ -20,40 +19,12 @@ const props = defineProps<{
     customisations: (Plan | CustomisedPlan)[];
 }>();
 
+const selectedList = defineModel<Participant[]>("selectedList", { default: [] });
+
 const emit = defineEmits<{
-    (event: "update:selectedList", value: Participant[]): void;
     (event: "actionSelected", participants: Participant[], action: string, isSingle: boolean): void;
     (event: "openIncludeInExistingModal", isSingle: boolean, participant: Participant | null): void;
 }>();
-
-/**
- * Handle checkbox change for participant selection
- * @param event - The checkbox change event
- */
-function handleSelectionChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const newSelectedList = [...props.selectedList];
-
-    if (target.checked) {
-        if (!newSelectedList.includes(props.participant)) {
-            newSelectedList.push(props.participant);
-        }
-    } else {
-        const index = newSelectedList.indexOf(props.participant);
-        if (index > -1) {
-            newSelectedList.splice(index, 1);
-        }
-    }
-
-    emit("update:selectedList", newSelectedList);
-}
-
-/**
- * Check if the participant is selected
- */
-const isSelected = window.Vue.computed(() => {
-    return props.selectedList.includes(props.participant);
-});
 
 /**
  * Generates the meta for a given customisation plan.
@@ -99,10 +70,10 @@ function handleOpenIncludeInExistingModal(): void {
         <td v-if="showCheckboxes">
             <input
                 :id="`id-${participant.user.id}`"
+                v-model="selectedList"
                 type="checkbox"
-                :checked="isSelected"
+                :value="participant"
                 :data-test="`custom-participation-checkbox-${participant.user.id}`"
-                @change="handleSelectionChange"
             />
             <label :for="`id-${participant.user.id}`" class="checkbox-label"></label>
         </td>
