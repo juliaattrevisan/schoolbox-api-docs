@@ -6,15 +6,13 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
-import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
+import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     participant: Participant;
     showCheckboxes: boolean;
     studentPastoralCounts: Record<string, StudentPastoralCountBadge[]>;
-    getLearningPlanNewUrl: string;
-    getAssessmentParticipationNewActivity: string;
-    getAssessmentParticipationCopyActivity: string;
+    routes: Routes;
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
 }>();
@@ -157,7 +155,7 @@ function handleOpenIncludeInExistingModal(): void {
                                 class="icon-modify"
                                 @click.prevent="
                                     handleActionSelected(
-                                        `${getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
+                                        `${props.routes.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
                                     )
                                 "
                             >
@@ -179,12 +177,12 @@ function handleOpenIncludeInExistingModal(): void {
                             </button>
                         </li>
                         <li class="separator">Create</li>
-                        <li v-if="getAssessmentParticipationCopyActivity">
+                        <li v-if="props.routes.getAssessmentParticipationCopyActivity">
                             <button
                                 class="icon-copy"
                                 @click.prevent="
                                     handleActionSelected(
-                                        `${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                        `${props.routes.getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
                             >
@@ -196,7 +194,7 @@ function handleOpenIncludeInExistingModal(): void {
                                 class="icon-submissions"
                                 @click.prevent="
                                     handleActionSelected(
-                                        `${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                        `${props.routes.getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     )
                                 "
                             >

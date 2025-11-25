@@ -10,21 +10,16 @@ import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vu
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpParticipant from "./cp-participant.vue";
-import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
+import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
-interface Props {
+const props = defineProps<{
     allParticipants: Participant[];
     pastoralEnabled: boolean;
-    getStudentsPastoralCountsUrl: string;
-    getLearningPlanNewUrl: string;
-    getAssessmentParticipationNewActivity: string;
-    getAssessmentParticipationCopyActivity: string;
+    routes: Routes;
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
-    includeInExistingCustomisation: string;
-}
-const props = defineProps<Props>();
+}>();
 
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 
@@ -73,10 +68,10 @@ const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCount
  * Fetch the pastoral counts for the students
  */
 async function getStudentPastoralCounts(): Promise<void> {
-    if (!props.pastoralEnabled || props.getStudentsPastoralCountsUrl === "") {
+    if (!props.pastoralEnabled || props.routes.getStudentsPastoralCountsUrl === "") {
         return;
     }
-    const url = props.getStudentsPastoralCountsUrl.replace(
+    const url = props.routes.getStudentsPastoralCountsUrl.replace(
         "{studentIds}",
         allParticipants.value.map((participant) => participant.user.id).join(","),
     );
@@ -224,7 +219,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     if (includeInExistingActivity.value === null) return;
     const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
-    const response = await postIncludeExistingParticipant(props.includeInExistingCustomisation, {
+    const response = await postIncludeExistingParticipant(props.routes.includeInExistingCustomisation, {
         students: includeInExistingList.value.map((p) => p.user.id),
         ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
         ...(activity.name !== null ? { planId: activity.id } : {}),
@@ -402,9 +397,7 @@ async function onConfirmActionSelected(): Promise<void> {
                         :participant="participant"
                         :show-checkboxes="showCheckboxes"
                         :student-pastoral-counts="studentPastoralCounts"
-                        :get-learning-plan-new-url="props.getLearningPlanNewUrl"
-                        :get-assessment-participation-new-activity="props.getAssessmentParticipationNewActivity"
-                        :get-assessment-participation-copy-activity="props.getAssessmentParticipationCopyActivity"
+                        :routes="props.routes"
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
                         @action-selected="onActionSelected"
@@ -437,7 +430,7 @@ async function onConfirmActionSelected(): Promise<void> {
                             @click.prevent="
                                 onActionSelected(
                                     selectedList,
-                                    `${props.getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
+                                    `${props.routes.getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
                                     false,
                                 )
                             "
@@ -458,14 +451,14 @@ async function onConfirmActionSelected(): Promise<void> {
                             Include in Existing Customisation
                         </button>
                     </div>
-                    <div v-if="props.getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
+                    <div v-if="props.routes.getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
                         <button
                             class="icon-copy submit"
                             data-test="custom-participation-copy-activity"
                             @click.prevent="
                                 onActionSelected(
                                     selectedList,
-                                    `${props.getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
+                                    `${props.routes.getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     false,
                                 )
                             "
@@ -479,7 +472,7 @@ async function onConfirmActionSelected(): Promise<void> {
                             @click.prevent="
                                 onActionSelected(
                                     selectedList,
-                                    `${props.getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
+                                    `${props.routes.getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
                                     false,
                                 )
                             "

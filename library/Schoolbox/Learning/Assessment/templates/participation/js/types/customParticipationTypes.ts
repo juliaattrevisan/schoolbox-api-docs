@@ -1,6 +1,17 @@
 import type { User } from "@schoolboxLibrary/types/User";
 
 /**
+ * Routes used in the custom participation component
+ */
+export type Routes = {
+    getStudentsPastoralCountsUrl: string;
+    getLearningPlanNewUrl: string;
+    getAssessmentParticipationNewActivity: string;
+    getAssessmentParticipationCopyActivity: string;
+    includeInExistingCustomisation: string;
+};
+
+/**
  * The expected payload for a plan associated with a participant
  * this will be related to the original activity, and whether it's been modified
  */
