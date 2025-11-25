@@ -64,6 +64,6 @@ export type Participant = {
     _links: {
         exclude: string;
         include: string;
-        differentiationProfile?: string;
+        differentiationProfile: string | null;
     };
 };
