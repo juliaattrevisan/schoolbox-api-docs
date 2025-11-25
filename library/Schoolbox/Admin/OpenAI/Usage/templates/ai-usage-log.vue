@@ -8,8 +8,14 @@ import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import { AiFeature } from "./payload";
-import type { AiSession, AiUsageLogApiRequest, AiUsageLogApiResponse, AiSessionLogApiResponse } from "./payload";
+import { AiLogType } from "./payload";
+import type {
+    AiFeature,
+    AiSession,
+    AiUsageLogApiRequest,
+    AiUsageLogApiResponse,
+    AiSessionLogApiResponse,
+} from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
 
 interface Props {
@@ -39,13 +45,13 @@ const sessionLoadError = window.Vue.ref<string | null>(null);
 const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
 const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
-type AiSelectedSessionInfo = {
-    [K in AiFeature]: {
-        feature: K;
-        session: AiSession<K>;
-        log: AiSessionLogApiResponse<K>;
+type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
+    [KLogType in AiLogType]: {
+        logType: KLogType;
+        session: AiSession<KLogType, TFeature>;
+        log: AiSessionLogApiResponse<KLogType, TFeature>;
     };
-}[AiFeature];
+}[AiLogType];
 
 const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | null>(() => {
     if (selectedSessionId.value === null) {
@@ -59,7 +65,7 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | null>(()
         return null;
     }
 
-    const info = { feature: sessionInfo.feature, session: sessionInfo, log: logInfo };
+    const info = { logType: sessionInfo.logType, session: sessionInfo, log: logInfo };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
@@ -272,7 +278,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             </td>
                             <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.id !== null && session._routes.getLog">
+                                <nav v-if="session.id !== null && session.logType !== null && session._routes.getLog">
                                     <a
                                         class="icon-eye"
                                         :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"
@@ -319,14 +325,14 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     <div class="clearfix"></div>
                     <div class="l-mar-m">
                         <aul-agent-chat
-                            v-if="selectedSessionInfo.feature === AiFeature.IMAGE"
+                            v-if="selectedSessionInfo.logType === AiLogType.AGENT_CHAT"
                             :session-log="selectedSessionInfo.log"
                         />
                         <div v-else class="empty-state">
                             <i class="icon-view-hollow"></i>
                             <p>
-                                The {{ props.features[selectedSessionInfo.feature].title }} feature does not support
-                                previews
+                                The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not
+                                support previews for this log.
                             </p>
                         </div>
                     </div>

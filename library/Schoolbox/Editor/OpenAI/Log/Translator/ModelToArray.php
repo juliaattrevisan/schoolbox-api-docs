@@ -11,6 +11,7 @@ namespace Schoolbox\Editor\OpenAI\Log\Translator;
 
 use Schoolbox\User;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log\LogType;
 use Schoolbox\Editor\OpenAI\Log\Model;
 
 class ModelToArray
@@ -34,11 +35,11 @@ class ModelToArray
      */
     public function __invoke(Model $log): array
     {
-        /** This will differ between different features, or not exist at all if a feature doesn't support it (null) */
+        // TODO: log types will need to be stored in the DB due to dialog agent having multiple ways to render, currently not implemented yet
+        $logType = null;
         $logData = null;
-        if ($log->getFeature() === Helper::FEATURE_CHAT) {
-            $logData = null; // nothing for now, but should be added later
-        } elseif ($log->getFeature() === Helper::FEATURE_IMAGE) {
+        if (Helper::FEATURE_IMAGE === $log->getFeature() || Helper::FEATURE_DIALOGAGENT === $log->getFeature()) {
+            $logType = LogType::AGENT_CHAT;
             $logData = self::translateLogData($log);
         }
 
@@ -48,6 +49,7 @@ class ModelToArray
             'feature' => $log->getFeature(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $this->userTranslator->__invoke($log->getUser()),
+            'logType' => $logType?->value,
             'data' => $logData,
         ];
 

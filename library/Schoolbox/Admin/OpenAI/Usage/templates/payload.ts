@@ -17,31 +17,38 @@ export enum AiFeature {
     LEARNING_ACTIVITY_CUSTOMISATION = "learningactivitycustomisation",
 }
 
-type AiLogFeatureDataMap = {
-    [AiFeature.CHAT]: null;
-    [AiFeature.LESSON_PLAN]: null;
-    [AiFeature.IMAGE]: AiLogAgentChatData;
-    [AiFeature.DIALOG_AGENT]: null; // TODO define when implemented
-    [AiFeature.DIFFERENTIATION]: null;
-    [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: null;
+/**
+ * Each log type represents a different way that log data should be represented
+ * @see /library/Schoolbox/Editor/OpenAI/Log/LogType.php
+ */
+export enum AiLogType {
+    AGENT_CHAT = "agent_chat",
+}
+
+type AiLogTypeDataMap = {
+    [AiLogType.AGENT_CHAT]: AiLogAgentChatData;
+};
+
+export type AiLogFeatureData<TInputText, TOutputText> = {
+    request: TInputText;
+    response: TOutputText;
 };
 
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/Session/ModelToArray.php */
 export type AiSessionLog = {
-    [K in AiFeature]: {
-        id: number;
-        sessionId: AiSessionId;
-        createdAt: string;
-        createdBy: UserAuthor;
-        feature: K;
-        data: AiLogFeatureDataMap[K];
-    };
-}[AiFeature];
+    id: number;
+    sessionId: AiSessionId;
+    createdAt: string;
+    createdBy: UserAuthor;
+    feature: AiFeature;
+} & ({ [K in AiLogType]: { logType: K; data: AiLogTypeDataMap[K] } }[AiLogType] | { logType: null; data: null });
 
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/ModelToArray.php */
-export type AiSession<TFeature extends AiFeature = AiFeature> = {
-    id: AiSessionId;
+export type AiSession<TLogType extends AiLogType = AiLogType, TFeature extends AiFeature = AiFeature> = {
+    /** The session ID can be null for legacy records which never had a session ID before we added those */
+    id: AiSessionId | null;
     feature: TFeature;
+    logType: TLogType | null;
     createdAt: string;
     createdBy: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
@@ -65,4 +72,7 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse<TFeature extends AiFeature = AiFeature> = (AiSessionLog & { feature: TFeature })[];
+export type AiSessionLogApiResponse<
+    TLogType extends AiLogType = AiLogType,
+    TFeature extends AiFeature = AiFeature,
+> = (AiSessionLog & { logType: TLogType; feature: TFeature })[];
