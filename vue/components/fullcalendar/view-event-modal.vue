@@ -955,12 +955,14 @@ export default {
                 </ul>
             </template>
             <template v-if="eventExtendedProps.bookings.length">
-                <h3>Resources</h3>
-                <ul>
-                    <li v-for="(booking, index) in eventExtendedProps.bookings" :key="index">
-                        ({{ booking.status.name }}) <a :href="booking.href">{{ booking.item.name }}</a>
-                    </li>
-                </ul>
+                <div class="medium-4 small-12">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li v-for="(booking, index) in eventExtendedProps.bookings" :key="index">
+                            ({{ booking.status.name }}) <a :href="booking.href">{{ booking.item.name }}</a>
+                        </li>
+                    </ul>
+                </div>
             </template>
 
             <!--
