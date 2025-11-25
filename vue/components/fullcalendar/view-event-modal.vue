@@ -142,6 +142,8 @@ export default {
             if (data?.booking && data?.bookings) {
                 console.error("Only one of {'data.booking', 'data.bookings'} should be filled.");
             }
+            console.info("view-event-modal.vue eventExtendedProps() data.booking: ", data?.booking);
+            console.info("view-event-modal.vue eventExtendedProps() data.bookings: ", data?.bookings);
 
             return {
                 eventId: metadata?.eventId,

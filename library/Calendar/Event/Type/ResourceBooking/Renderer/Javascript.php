@@ -188,6 +188,9 @@ class Javascript extends Base
                     'requestButton' => false,
                     'listButton'    => false,
                 ],
+                // A ResourceBooking/Event represents a row of the `resource_booking` table.
+                // So by definition there is only one booking.  Other types of events represent rows of the
+                // `event` table and so may be linked to multiple bookings via resource_booking.event_id.
                 'booking'    => [
                     'item'     => [
                         'id'   => $this->getEvent()->getBooking()->getResource()->getId(),
