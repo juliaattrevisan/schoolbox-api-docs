@@ -27,7 +27,6 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -405,14 +404,29 @@ class Controller extends Assessment\Controller
 
         /**
          * If there is an existing unsubmitted response and resume it if there is one,
-         * otherwise create a new response
-         * @var ResponseModel|null $existingResponse
+         * otherwise create a new response for the student to create messages against
+         * @var Response\Model|null $response
          */
-        $existingResponse = $participant?->findMostRecentDraftResponse();
+        $response = $participant?->findMostRecentDraftResponse();
+        // TODO: is this endpoint supposed to be able to load the existing auth response, and then deny you from messaging if its submitted?
+        if (null === $response) {
+            $response = $this->dialogAgentResponseMapper->createModel()
+                ->setAssessable($assessment)
+                ->setSubmittedOnBehalfOf($student)
+                ->setCreatedBy($this->getUser()->getId())
+                ->setCreatedAt(\Alaress_Date_Format::now())
+                ->setUpdatedBy($this->getUser()->getId())
+                ->setUpdatedAt(\Alaress_Date_Format::now());
 
-        // TODO: i'll likely need this to create a blank response here if one doesn't exist already but TBC in the chat ticket
+            // TODO: deal with existing auth responses that were submitted... and consider the workflows to end up here
+            $response->setAuthoritative(true);
+
+            $this->dialogAgentResponseMapper->save($response);
+        }
 
         $userTranslator = new User\Translator\Author\ModelToArray();
+        $responseLinksTranslator = new Response\Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
 
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
@@ -424,11 +438,7 @@ class Controller extends Assessment\Controller
             'openingMessage' => $assessment->getOpeningMessage(),
             'student' => $userTranslator->__invoke($student),
             'participant' => $participant,
-            // TODO: This should probably be a ModelToArray
-            'response' => [
-                'aiSessionId' => $existingResponse?->getSessionId() ?? (string)Uuid::uuid4(),
-                'assistanceRequestedAt' => $existingResponse?->getAssistanceRequestedAt() ?? null,
-            ],
+            'response' => $responseTranslator->__invoke($response),
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
         ];
@@ -453,6 +463,9 @@ class Controller extends Assessment\Controller
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
+        // TODO: this endpoint needs thought, it shouldn't be *creating* a response because you would already have one to be submitting against
+        // perhaps this is actually where postMessage should be?
+
         $requestPost = $this->requestPost;
 
         /* If an existing responseId was provided, update that instance
@@ -641,7 +654,7 @@ class Controller extends Assessment\Controller
 
                 $authoritativeResponse = null;
                 if ($participant->getAllResponses()->count()) {
-                    /** @var ResponseModel|null $authoritativeResponse */
+                    /** @var Response\Model|null $authoritativeResponse */
                     $authoritativeResponse = $implementation->getAuthoritativeResponse($participant, true);
                 }
 

@@ -1,17 +1,12 @@
 <script lang="ts" setup>
+import { getRfc3339String } from "@js/util/dateUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-
-type DialogAgentResponse = {
-    aiSessionId: AiSession["id"];
-    assistanceRequestedAt: string | null;
-};
+import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
-    generateRoute: string;
     openingMessage: string | null;
     response: DialogAgentResponse;
     student: UserAuthor;
@@ -125,7 +120,7 @@ window.Vue.onMounted(() => {
 function changeHelpRequest(helpRequested: boolean): void {
     const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
     if (helpRequested) {
-        currentResponse.value.assistanceRequestedAt = window.dayjs().format(window.dateDisplayFormats.dayjsDateLong);
+        currentResponse.value.assistanceRequestedAt = getRfc3339String(window.dayjs());
 
         if (isInstructor.value) {
             acStore.feed.push({
@@ -251,9 +246,9 @@ window.Vue.onMounted(() => {
         </ac-feed>
     </div>
     <ac-prompt
-        v-if="props.generateRoute"
+        v-if="props.response._routes.message"
         :request-config="{
-            messageRoute: props.generateRoute,
+            messageRoute: props.response._routes.message,
             aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
             requireImage: false,
         }"
