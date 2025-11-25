@@ -125,7 +125,13 @@ class DSN implements IDSN
                 $matches = [];
                 preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
 
-                $struct['options'][$matches[1]] = $matches[2];
+                /* Not sure if this can actually happen, but as a precautionary measure, only try to inspect
+                 * $matches if it contains something. It's not likely we'd have a count of options that fails to
+                 * match the OPTION_FORMAT due to the strictness of dsn construction outside of here...but anyway
+                 */
+                if (!empty($matches)) {
+                    $struct['options'][$matches[1]] = $matches[2];
+                }
             }
         }
 
