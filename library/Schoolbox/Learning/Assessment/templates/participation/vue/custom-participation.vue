@@ -5,6 +5,7 @@
 import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
@@ -317,12 +318,7 @@ async function onConfirmActionSelected(): Promise<void> {
 
 <template>
     <div v-if="loadError" class="c-island l-pad-m" data-test="custom-participation-load-error">
-        <div class="alert-box alert f-no-margins">
-            Sorry, there was an error during report retrieval. Please
-            <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists.
-            <em>Further support info: {{ loadError }}</em>
-        </div>
+        <data-load-error data-title="Student Participation" :further-info="loadError" />
     </div>
     <div>
         <div class="scrollable">
