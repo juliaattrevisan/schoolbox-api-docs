@@ -2,8 +2,6 @@
 /**
  * Custom Participation Vue Component
  */
-import { hasErrorMessage } from "@js/util/errorUtils";
-import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
@@ -12,6 +10,7 @@ import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
+import { useExcludeParticipant } from "./composable/useExcludeParticipant";
 
 const props = defineProps<{
     allParticipants: Participant[];
@@ -60,51 +59,7 @@ const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
 
 // #region exclude/include participants
 
-/**
- * Excludes a participant.
- * @param participant - The participant to exclude.
- * @returns A promise that resolves when the operation is complete.
- */
-async function excludeParticipant(participant: Participant): Promise<void> {
-    const toast = window.sbProps.toastActivate("Excluding...");
-    try {
-        const response = await fetch(participant._links.exclude, {
-            method: "POST",
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-        });
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-        participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
-        participant.hasInteraction = false;
-        toast.timeout({ text: "Student excluded successfully" });
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
-        console.error("Error excluding participant:", error);
-        toast.timeout({ text: "Error excluding student", isSuccess: false });
-    }
-}
-
-/**
- * Excludes the selected participants.
- * Clears the selection after the operation is complete.
- * @param participants - The participants to exclude.
- * @returns A promise that resolves when all exclusions are complete.
- */
-async function excludeParticipants(participants: Participant[]): Promise<void> {
-    try {
-        await Promise.all(participants.map((participant) => excludeParticipant(participant)));
-        selectedList.value = [];
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
-        console.error("Error excluding selected participants:", error);
-    }
-}
+const { excludeParticipants } = useExcludeParticipant(loadError);
 
 /**
  * Includes a participant.
@@ -224,7 +179,7 @@ async function performAction(): Promise<void> {
             await includeParticipants(modifyList.value);
             break;
         case "exclude":
-            await excludeParticipants(modifyList.value);
+            await excludeParticipants(modifyList.value, selectedList);
             break;
         case "includeInExisting":
             await includeParticipantInExistingPlan();
