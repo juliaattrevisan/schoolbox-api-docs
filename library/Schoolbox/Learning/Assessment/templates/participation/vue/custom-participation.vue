@@ -6,6 +6,7 @@
 import locale from "@js/terminology/rosettaStone";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
+import type { User } from "@schoolboxLibrary/types/User";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpViewDpModal from "./cp-view-dp-modal.vue";
@@ -68,14 +69,14 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
 
 // #region Differentiation Profiles
 
-const participantWithDP = window.Vue.ref<Participant | null>(null);
+const studentWithDP = window.Vue.ref<User | null>(null);
 
 /**
  * Display the differentiation profile for a participant
  * @param participant - The participant whose differentiation profile is to be viewed
  */
 function onDPSelected(participant: Participant): void {
-    participantWithDP.value = participant;
+    studentWithDP.value = participant.user;
 }
 
 // #endregion Differentiation Profiles
@@ -138,7 +139,7 @@ function onDPSelected(participant: Participant): void {
             @open-include-in-existing-modal="openIncludeInExistingModal"
         />
     </div>
-    <cp-view-dp-modal v-model:participant="participantWithDP" />
+    <cp-view-dp-modal v-model:student="studentWithDP" />
     <cp-include-in-existing-modal
         v-model:is-open="isIncludeInExistingOpen"
         v-model:selected-activity-id="includeInExistingActivityId"
