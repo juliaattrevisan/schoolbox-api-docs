@@ -472,7 +472,10 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
 
-        $collectionsByEventId = [];
+        // Pre-fill the array with empty collections, indexed by eventId.
+        // The calling code can then rely on the existence of a key for each supplied eventId.
+        $collectionsByEventId = array_fill_keys($eventIds, new GenericCollection(Model::class));
+
         foreach ($statement as $row) {
             try {
                 $bookingModel = $this->hydrate($row, 'b', function ($mapper, $model, $row) {
@@ -492,13 +495,7 @@ class Mapper extends BaseMapper
                 continue;
             }
 
-            $eventId = $bookingModel->getEvent()->getId();
-
-            if (!array_key_exists($eventId, $collectionsByEventId)) {
-                $collectionsByEventId[$eventId] = new GenericCollection(Model::class);
-            }
-
-            $collectionsByEventId[$eventId]->add($bookingModel);
+            $collectionsByEventId[$bookingModel->getEvent()->getId()]->add($bookingModel);
         }
 
         return $collectionsByEventId;
