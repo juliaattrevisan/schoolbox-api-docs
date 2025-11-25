@@ -63,6 +63,8 @@ const {
  */
 const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onConfirmActionSelected } =
     usePerformAction(selectedList, excludeParticipants, includeParticipants, includeParticipantInExistingPlan);
+
+const hasDifferentiationProfiles = window.Vue.ref(true); // Placeholder for actual logic to determine if differentiation profiles exist
 </script>
 
 <template>
@@ -85,7 +87,9 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
                         </th>
                         <td width="84"></td>
                         <th>Name</th>
-                        <th>{{ locale.differentiationProfile.translate(false, true) }}</th>
+                        <th v-if="hasDifferentiationProfiles">
+                            {{ locale.differentiationProfile.translate(false, true) }}
+                        </th>
                         <th>Customisation</th>
                         <td></td>
                     </tr>
@@ -101,6 +105,7 @@ const { isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onC
                         :routes="props.routes"
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
+                        :has-differentiation-profiles="hasDifferentiationProfiles"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
                     />

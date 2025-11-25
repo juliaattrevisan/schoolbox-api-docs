@@ -15,6 +15,7 @@ const props = defineProps<{
     routes: Routes;
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
+    hasDifferentiationProfiles: boolean;
 }>();
 
 const selectedList = defineModel<Participant[]>("selectedList", { default: [] });
@@ -109,8 +110,8 @@ function handleOpenIncludeInExistingModal(): void {
                 </div>
             </div>
         </td>
-        <td>
-            <p>Blah</p>
+        <td v-if="props.hasDifferentiationProfiles">
+            <p>DP</p>
         </td>
         <td>
             <template v-if="participant.customisedPlan !== null">
