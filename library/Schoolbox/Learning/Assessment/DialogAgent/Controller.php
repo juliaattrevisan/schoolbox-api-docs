@@ -421,11 +421,7 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment' => $assessment,
-            // TODO: This should probably be a ModelToArray
-            'activity' => [
-                'id' => $assessment->getId(),
-                'openingMessage' => $assessment->getOpeningMessage(),
-            ],
+            'openingMessage' => $assessment->getOpeningMessage(),
             'student' => $userTranslator->__invoke($student),
             'participant' => $participant,
             // TODO: This should probably be a ModelToArray

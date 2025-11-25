@@ -1,17 +1,9 @@
 <script lang="ts" setup>
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-
-// TODO: define this properly somewhere based on a translator in the backend
-type DialogAgentActivity = {
-    id: number;
-    openingMessage: string | null;
-    // _routes: {
-    //     postMessage: string;
-    // };
-};
 
 type DialogAgentResponse = {
     aiSessionId: AiSession["id"];
@@ -20,7 +12,7 @@ type DialogAgentResponse = {
 
 interface Props {
     generateRoute: string;
-    activity: DialogAgentActivity;
+    openingMessage: string | null;
     response: DialogAgentResponse;
     student: UserAuthor;
 }
@@ -38,7 +30,7 @@ const isInstructor = window.Vue.computed(() => {
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
 
-    if (props.activity.openingMessage !== null) {
+    if (props.openingMessage !== null) {
         // TODO: I wonder if the backend should add this when it provides us the full chat?
         acStore.feed.push({
             type: "response",
@@ -46,7 +38,7 @@ window.Vue.onMounted(() => {
             entryKey: acStore.getNextEntryKey(),
             responseId: null,
             image: null,
-            message: props.activity.openingMessage,
+            message: props.openingMessage,
         });
     }
 
