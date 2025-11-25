@@ -69,6 +69,12 @@ class Event extends EventBase
      */
     protected $categoryCollection = null;
 
+    /**
+     * Associated resource bookings
+     *
+     * @var null|GenericCollection
+     */
+    protected ?GenericCollection $bookingsCollection;
 
     /**
      * Whether or not this Task has been completed
@@ -97,18 +103,15 @@ class Event extends EventBase
      */
     protected $path;
 
-
     /**
      * @var int|null
      */
     protected $maxAttendees;
 
-
     /**
      * @var int|null
      */
     protected $numAttendees;
-
 
     /**
      * Whether the current user is invited to attend an event
@@ -116,7 +119,6 @@ class Event extends EventBase
      * @var int|null
      */
     protected $attendanceStatus;
-
 
     /**
      * Can someone attend this event
@@ -127,7 +129,6 @@ class Event extends EventBase
     {
         return $this->getAttendance();
     }
-
 
     /**
      * Event visibility; generates a CSS string
@@ -354,6 +355,26 @@ class Event extends EventBase
     public function getCategoryCollection()
     {
         return $this->categoryCollection;
+    }
+
+    /**
+     * Set bookings collection
+     *
+     * @param GenericCollection<ResourceBookingModel> $bookingsCollection
+     */
+    public function setBookingsCollection(GenericCollection $bookingsCollection): void
+    {
+        $this->bookingsCollection = $bookingsCollection;
+    }
+
+    /**
+     * Get bookings collection
+     *
+     * @return GenericCollection<ResourceBookingModel>
+     */
+    public function getBookingsCollection(): GenericCollection
+    {
+        return $this->bookingsCollection;
     }
 
     /**
