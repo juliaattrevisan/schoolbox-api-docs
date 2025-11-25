@@ -319,4 +319,25 @@ class Controller extends Base
             return;
         }
     }
+
+    public function postCustomisation(): void
+    {
+        $this->setAllowBackToTheFuture(false);
+
+        $aiConfig = new Config();
+        $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIFFERENTIATION));
+
+        if ($aiConfig->isEnabled($diffConfig) === false) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem("AI Differentiation is not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+    }
 }

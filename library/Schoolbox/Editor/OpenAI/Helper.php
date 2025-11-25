@@ -48,20 +48,20 @@ class Helper
     /**
      * Feature types (both for logging and identifying in schoolbox code)
      */
-    public const FEATURE_CHAT = 'chat';
-    public const FEATURE_LESSONPLAN = 'lessonplan';
-    public const FEATURE_IMAGE = 'image';
+    public const string FEATURE_CHAT = 'chat';
+    public const string FEATURE_LESSONPLAN = 'lessonplan';
+    public const string FEATURE_IMAGE = 'image';
     // Discussion Learning Activity
-    public const FEATURE_DIALOGAGENT = 'dialogagent';
+    public const string FEATURE_DIALOGAGENT = 'dialogagent';
     // Differentiation Profiles
-    public const FEATURE_DIFFERENTIATION = 'differentiation';
+    public const string FEATURE_DIFFERENTIATION = 'differentiation';
     /**
      * Learning Activity Customisation
      * Independent from FEATURE_DIFFERENTIATION, but usually follows it in a workflow
      * Since differentiation can be populated without AI involvement, this is separate so it can still be used
      * This also allows schools to disable customisation while keeping differentiation enabled (or vice-versa) if they want to
      */
-    public const FEATURE_LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
+    public const string FEATURE_LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
 
 
     /**
