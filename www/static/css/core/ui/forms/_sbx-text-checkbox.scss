@@ -82,6 +82,8 @@ body.login input[type="checkbox"]:not(.plain) + label:after {
 body.login input[type="checkbox"]:not(.plain) + label:before {
     display: none;
 }
+
+// Reset cursor for checkboxes used as selectors for fixing cursor issues in packages page
 .sbx-body .information-list.card-selectable > li .selector {
     cursor: auto;
 }
@@ -113,4 +115,14 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
     gap: var(--spacing-xs);
     list-style: none;
     justify-content: end;
+}
+
+// Hide labels for checkboxes used as selectors
+.sbx-body .card-selectable .selector input[type="checkbox"] + label {
+    display: none;
+}
+
+// Hide labels for checkboxes in buttons container
+.sbx-body .buttons-container .checklist input[type="checkbox"] + label {
+    display: none;
 }
