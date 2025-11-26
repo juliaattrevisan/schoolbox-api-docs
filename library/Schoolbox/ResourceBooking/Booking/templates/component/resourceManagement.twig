@@ -79,8 +79,14 @@
 
                                                 {# cardception #}
                                                 <div class="small-12">
+                                                    {% if event.booking.status.ispending %} {# pending entries here are clashes, so we need to change the styling #}
+                                                    <div class="warning">
+                                                    {% endif %}
                                                     {# time, and only time (start - end) #}
-                                                    <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
+                                                    <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }} {% if event.booking.status.ispending %}<div class="icon-alert warning">&nbsp;</div> {% endif %}</time>{% endif %}
+                                                    {% if event.booking.status.ispending %} {# pending entries here are clashes, so we need to change the styling #}
+                                                    </div>
+                                                    {% endif %}
                                                     <div class="small-12 tiny card">
                                                         {# small portrait of booker #}
                                                         <a href="/search/user/{{ event.booking.event.owner.id }}">

@@ -137,6 +137,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                     // only record clashes
                     if ($eventB->isClash($eventA)) {
                         $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][] = $eventB;
+                    } else {
+                        $var = false;
                     }
                 }
 
