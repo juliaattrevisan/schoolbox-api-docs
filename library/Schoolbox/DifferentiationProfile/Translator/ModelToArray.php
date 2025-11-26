@@ -56,9 +56,9 @@ class ModelToArray
                     ],
                 ),
             ],
-            'created_at'            => $model->getCreatedAt()?->getLocalShort(),
-            'updated_at'            => $model->getUpdatedAt()?->getLocalShort(),
-            'deleted_at'            => $model->getDeletedAt()?->getLocalShort(),
+            'created_at'            => $model->getCreatedAt()?->getShort(),
+            'updated_at'            => $model->getUpdatedAt()?->getShort(),
+            'deleted_at'            => $model->getDeletedAt()?->getShort(),
         ];
 
         $configKey = [

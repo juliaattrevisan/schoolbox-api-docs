@@ -486,7 +486,14 @@ table.attempts-table {
     border-right: 1px solid var(--body-background);
 }
 
-/* make a table <th> sticky on the left */
+/* make an element sticky on the top */
+.u-sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: calc(var(--sbx-depth-ui-sticky) + 2); // On top of both the left column and the dropdowns
+}
+
+/* make an element sticky on the left */
 .u-sticky-left {
     background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
     left: 0;

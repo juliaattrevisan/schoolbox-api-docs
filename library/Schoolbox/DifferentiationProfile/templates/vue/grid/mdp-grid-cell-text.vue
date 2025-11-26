@@ -9,11 +9,11 @@ import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
+import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
 import type { Profile, ProfileTextKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../store/mdpHeaderStore";
 import { useRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
 import { useSaveStore } from "../store/mdpSaveStore";
-import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
 import { useContentHeight } from "./composable/useContentHeight";
 
@@ -43,8 +43,9 @@ const { contentHeight, componentActionHeight } = useContentHeight(
 
 // #region modifying the text content with CKEditor
 
+const initialTextboxContent = props.text ?? "";
 const currentText = window.Vue.ref<string | null>(props.text);
-const editorContent = window.Vue.ref(currentText.value ?? "");
+const editorContent = window.Vue.ref(props.text ?? "");
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
 const editorId = `mdp-textbox-${props.profile.student.id}-${props.headerKey}`;
 let editor: InlineEditor;
@@ -56,8 +57,7 @@ const isSaving = window.Vue.ref(false);
  * Whether the content of the cell is focused
  */
 const isContentFocused = window.Vue.computed(() => {
-    const store = rowsStore as unknown as { focusedCells?: Record<number, string[]> };
-    return (store.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+    return (rowsStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
 });
 
 /**
@@ -87,8 +87,6 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
         }
     });
     editor.model.document.on("change", () => {
-        // Ensure cell is marked as focused when content changes
-        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
         // keep the currentText in sync with the editor content
         window.Vue.nextTick()
             .then(() => {
@@ -185,6 +183,26 @@ function onModify(): void {
     void focusEditor();
 }
 
+/**
+ * Watch for external changes to the text prop and update the editor content accordingly
+ */
+window.Vue.watch(
+    () => props.text,
+    async (newText) => {
+        if (newText === currentText.value) {
+            return;
+        }
+        currentText.value = newText;
+        editorContent.value = newText ?? "";
+        if (isEditorCreated.value) {
+            editor.setData(editorContent.value);
+        } else {
+            await focusEditor();
+            editor.setData(editorContent.value);
+        }
+    },
+);
+
 // #endregion modifying the text content with CKEditor
 
 /**
@@ -192,9 +210,10 @@ function onModify(): void {
  */
 function onSave(): void {
     if (!isEditorCreated.value) return;
-    const { profile } = props;
-    profile[props.headerKey] = currentText.value;
-    void saveStore.save(profile);
+    const toSave = {
+        [props.headerKey]: currentText.value === "" ? null : currentText.value,
+    };
+    void saveStore.save(props.profile, toSave);
 }
 </script>
 
@@ -217,7 +236,7 @@ function onSave(): void {
                     ref="editorContentEl"
                     tag="div"
                     class="editor-content"
-                    :content="editorContent"
+                    :content="initialTextboxContent"
                 ></media-article>
                 <div class="clearfix"></div>
             </div>
@@ -238,8 +257,8 @@ function onSave(): void {
                 </empty-state>
             </div>
             <div ref="componentActionEl">
-                <mdp-grid-cell-action
-                    :profile="props.profile"
+                <lg-cell-action-save
+                    :id="props.profile.student.id"
                     :header-key="props.headerKey"
                     :has-changed="hasContentChanged"
                     :is-saving="isSaving"

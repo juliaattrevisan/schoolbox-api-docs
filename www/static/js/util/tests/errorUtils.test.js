@@ -21,4 +21,8 @@ describe("isAbortError()", () => {
         const error = { name: "AbortError" };
         expect(isAbortError(error)).toBe(true);
     });
+    test("error with 'signal is aborted without reason' message to be true", () => {
+        const error = { message: "signal is aborted without reason" };
+        expect(isAbortError(error)).toBe(true);
+    });
 });

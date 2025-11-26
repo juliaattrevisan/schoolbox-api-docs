@@ -3,10 +3,12 @@
  * Display a student and access to select linked records and generate with AI
  */
 
+import { sbProps } from "@js/util/sbx/pageUtils";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useLinkedRecordsStore } from "../store/mdpLinkedRecordsStore";
+import { useGenAiStore } from "../store/mdpGenAiStore";
 
 const props = defineProps<{
     user: User;
@@ -14,12 +16,20 @@ const props = defineProps<{
 }>();
 
 const linkedRecordsStore = useLinkedRecordsStore();
+const genAiStore = useGenAiStore();
 
 /**
  * When the linked records button is clicked
  */
 function onLinkedRecordsSelected(): void {
     linkedRecordsStore.select(props.profile);
+}
+
+/**
+ * When the generate with AI button is clicked
+ */
+function onGenerateSelected(): void {
+    void genAiStore.prompt(props.profile);
 }
 </script>
 
@@ -38,8 +48,19 @@ function onLinkedRecordsSelected(): void {
                 </template>
             </div>
         </div>
-        <button v-if="props.profile._routes?.linkedRecords" class="button" @click="onLinkedRecordsSelected">
+        <button
+            v-if="props.profile._routes?.linkedRecords"
+            class="button f-no-margins"
+            @click="onLinkedRecordsSelected"
+        >
             View Linked Records
+        </button>
+        <button
+            v-if="sbProps.aiFeatures.differentiation?.enabled"
+            class="button icon-ai f-no-margins"
+            @click="onGenerateSelected"
+        >
+            Generate with AI
         </button>
     </div>
 </template>

@@ -1,6 +1,15 @@
 import type { UserCC } from "@schoolboxLibrary/types/User";
+import type { Header as LazyGridHeader } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { Nested } from "@js/util/queryUtils";
+
+/**
+ * Routes configuration
+ */
+export type Routes = {
+    getData: string;
+    genAi: string;
+};
 
 /**
  * Differentiation Profile header configuration
@@ -32,14 +41,8 @@ export enum HeaderType {
 /**
  * To define the structure of each column
  */
-export type Header = {
-    id: number;
-    key: string;
+export type Header = LazyGridHeader & {
     type: HeaderType;
-    title: string;
-    width: number;
-    isFixed: boolean;
-    isSortable: boolean;
 };
 
 /**
@@ -91,9 +94,9 @@ export type ProfileTextKeys = keyof Pick<
 >;
 
 /**
- * Can be either ProfileAdjustmentKeys or ProfileTextKeys
+ * Any of the profile data that can be updated
  */
-export type ProfileKeys = ProfileAdjustmentKeys | ProfileTextKeys;
+export type ProfileKeys = keyof Pick<Profile, "id" | "updated_at"> | ProfileAdjustmentKeys | ProfileTextKeys;
 
 /**
  * The expected query parameters
@@ -112,4 +115,13 @@ export type Payload = {
         profiles: Profile[];
     };
     metadata: Metadata;
+};
+
+/**
+ * Type for individual AI response item
+ */
+export type AiResponseItem = {
+    response: string | null;
+    title: string;
+    key: ProfileTextKeys;
 };

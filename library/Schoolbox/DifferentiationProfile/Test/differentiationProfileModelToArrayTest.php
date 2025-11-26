@@ -74,7 +74,8 @@ class differentiationProfileModelToArrayTest extends TestCase
             [
                 ConfigMapper::NAME_MAIL_ADDRESS => 'test.schoolbox.com.au',
                 ConfigMapper::NAME_NAME_FORMAT  => '{title} {firstname} {lastname}',
-                'date_local' => 'd/m/Y',
+                'date_short' => 'M j, Y',
+                'date_time' => 'g:ia',
             ]
         );
 
@@ -165,8 +166,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => 'Needs and challenges details.',
                     'strategies_adjustments' => 'Strategies and adjustments details.',
                     'goals'                  => 'Goals details.',
-                    'created_at'             => '01/01/2024',
-                    'updated_at'             => '02/01/2024',
+                    'created_at'             => 'Jan 1, 2024 12:00am',
+                    'updated_at'             => 'Jan 2, 2024 1:00am',
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -198,7 +199,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => null,
                     'created_at'             => null,
                     'updated_at'             => null,
-                    'deleted_at'             => '01/03/2024',
+                    'deleted_at'             => 'Mar 1, 2024 12:00am',
                     '_routes'                => $routes,
                 ],
             ],
@@ -221,7 +222,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'adjustment_category'    => [1, 2],
                     'adjustment_level'       => [2, 4],
-                    'created_at'             => '01/02/2024',
+                    'created_at'             => 'Feb 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
@@ -250,8 +251,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'overview'               => 'Visible overview.',
                     'goals'                  => 'Visible goals.',
-                    'created_at'             => '15/03/2024',
-                    'updated_at'             => '20/03/2024',
+                    'created_at'             => 'Mar 15, 2024 12:00am',
+                    'updated_at'             => 'Mar 20, 2024 12:00am',
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -278,7 +279,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'adjustment_category'    => [4, 1],
                     'adjustment_level'       => [4, 5],
-                    'created_at'             => '01/04/2024',
+                    'created_at'             => 'Apr 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
@@ -301,7 +302,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 6,
                     'student'                => $userResponse,
-                    'created_at'             => '01/05/2024',
+                    'created_at'             => 'May 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
@@ -313,7 +314,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(7)
                     ->setStudent($student)
                     ->setAdjustmentCategory(self::ADJUSTMENT_CATEGORY_ID_3)
-                    ->setAdjustmentLevel(self::ADJUSTMENT_CATEGORY_ID_2)
+                    ->setAdjustmentLevel(self::ADJUSTMENT_LEVEL_ID_2)
                     ->setOverview('Hidden overview.')
                     ->setInterestsStrengths('Visible interests and strengths.')
                     ->setNeedsChallenges('Visible needs and challenges.')
@@ -332,8 +333,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'interests_strengths'    => 'Visible interests and strengths.',
                     'needs_challenges'       => 'Visible needs and challenges.',
                     'strategies_adjustments' => 'Visible strategies and adjustments.',
-                    'created_at'             => '01/06/2024',
-                    'updated_at'             => '15/06/2024',
+                    'created_at'             => 'Jun 1, 2024 12:00am',
+                    'updated_at'             => 'Jun 15, 2024 12:00am',
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -358,7 +359,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'id'                     => 8,
                     'student'                => $userResponse,
                     'overview'               => 'Only this overview is visible.',
-                    'created_at'             => '01/07/2024',
+                    'created_at'             => 'Jul 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
@@ -391,8 +392,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'overview'               => 'Visible overview.',
                     'needs_challenges'       => 'Visible needs.',
                     'goals'                  => 'Visible goals.',
-                    'created_at'             => '01/08/2024',
-                    'updated_at'             => '10/08/2024',
+                    'created_at'             => 'Aug 1, 2024 12:00am',
+                    'updated_at'             => 'Aug 10, 2024 12:00am',
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],

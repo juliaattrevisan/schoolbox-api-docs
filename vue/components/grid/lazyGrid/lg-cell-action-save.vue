@@ -2,11 +2,10 @@
 /**
  * Actions for when a grid cell can be modified and saved.
  */
-import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
-    profile: Profile;
-    headerKey: ProfileKeys;
+    id: number;
+    headerKey: string;
     hasChanged: boolean;
     isSaving: boolean;
     isFocused: boolean;
@@ -39,7 +38,7 @@ function onSaveClicked(): void {
             <button
                 v-else-if="!props.hasChanged && !props.isFocused"
                 class="button"
-                :data-test="`mdp-grid-cell-action-modify-${props.profile.student.id}-${props.headerKey}`"
+                :data-test="`lg-cell-action-save-modify-${props.id}-${props.headerKey}`"
                 @click="onModifyClicked"
             >
                 Modify
@@ -48,7 +47,7 @@ function onSaveClicked(): void {
             <button
                 v-else
                 class="button"
-                :data-test="`mdp-grid-cell-action-save-${props.profile.student.id}-${props.headerKey}`"
+                :data-test="`lg-cell-action-save-save-${props.id}-${props.headerKey}`"
                 @mousedown="onSaveClicked"
             >
                 Save

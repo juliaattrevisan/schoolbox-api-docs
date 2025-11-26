@@ -5,17 +5,40 @@
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import locale from "@js/terminology/rosettaStone";
-import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+
+/**
+ * Type for save response
+ */
+type SaveResponse = {
+    id: number;
+    updated_at: string;
+};
 
 export const useSaveStore = defineStore(`saveStore`, () => {
     const isSaving = window.Vue.ref(false);
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
     /**
+     * Update a profile with the provided keys
+     * @param profile - the profile to update
+     * @param toSave - object containing specific keys to update in the profile
+     */
+    function updateProfile<K extends ProfileKeys>(profile: Profile, toSave: Partial<Record<K, Profile[K]>>): void {
+        (Object.keys(toSave) as K[]).forEach((key) => {
+            const value = toSave[key];
+            if (value !== undefined) {
+                profile[key] = value;
+            }
+        });
+    }
+
+    /**
      * Save the given student row
      * @param profile - the profile to save
+     * @param toSave - object containing specific keys to update in the profile
      */
-    async function save(profile: Profile): Promise<void> {
+    async function save(profile: Profile, toSave: Partial<Pick<Profile, ProfileKeys>>): Promise<void> {
         if (isSaving.value) {
             return;
         }
@@ -27,7 +50,8 @@ export const useSaveStore = defineStore(`saveStore`, () => {
         try {
             isSaving.value = true;
             loadError.value = null;
-            const response = await apiRequest({
+            updateProfile(profile, toSave);
+            const response = await apiRequest<SaveResponse, Profile>({
                 url: profile._routes.edit,
                 method: "POST",
                 body: profile,
@@ -35,9 +59,8 @@ export const useSaveStore = defineStore(`saveStore`, () => {
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
             }
+            updateProfile(profile, { ...response.data });
             toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
-            // the date in the format of for example 24/05/2024
-            profile.updated_at = window.dayjs(new Date()).format("DD/MM/YYYY");
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
             loadError.value = errorMessage;
@@ -49,5 +72,6 @@ export const useSaveStore = defineStore(`saveStore`, () => {
 
     return {
         save,
+        updateProfile,
     };
 });

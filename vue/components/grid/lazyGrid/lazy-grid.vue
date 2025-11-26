@@ -3,7 +3,7 @@
  * To display a grid-like display
  */
 
-import type { Header, Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import type { Header } from "./types/lazyGridTypes";
 
 const props = defineProps<{
     header: Header[];
@@ -20,14 +20,14 @@ const gridTemplateColumns = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="mdp-grid">
-        <div ref="headerRowEl" class="mdp-grid__row mdp-grid__row--header">
+    <div class="lazy-grid">
+        <div ref="headerRowEl" class="lazy-grid__row lazy-grid__row--header">
             <div
                 v-for="item in props.header"
                 :key="item.id"
-                class="fixed-top"
+                class="u-sticky-top"
                 :class="{
-                    'fixed-left': item.isFixed,
+                    'u-sticky-left': item.isSticky,
                 }"
             >
                 {{ item.title }}
@@ -35,21 +35,21 @@ const gridTemplateColumns = window.Vue.computed(() => {
         </div>
         <template v-if="!props.isLoading">
             <div
-                v-for="(row, index) in props.rows"
-                :key="index"
-                class="mdp-grid__row"
-                :data-test="`mdp-grid-row-${index}`"
+                v-for="(row, rowIndex) in props.rows"
+                :key="rowIndex"
+                class="lazy-grid__row"
+                :data-test="`lazy-grid-row-${rowIndex}`"
             >
                 <div
-                    v-for="item in props.header"
+                    v-for="(item, cellIndex) in props.header"
                     :key="item.id"
                     :class="{
-                        'fixed-left': item.isFixed,
+                        'u-sticky-left': item.isSticky,
                     }"
-                    :data-test="`mdp-grid-row-cell-${(row as Profile).student.id}-${item.key}`"
+                    :data-test="`lazy-grid-row-cell-${rowIndex}-${cellIndex}-${item.key}`"
                 >
                     <!-- Use dynamic slot based on header type, fallback to default content -->
-                    <slot :name="item.type" :row="row" :header="item" :row-index="index">
+                    <slot :name="item.type" :row="row" :header="item" :row-index="rowIndex">
                         <!-- Default content if no slot is provided -->
                         {{ row[item.key] }}
                     </slot>
@@ -60,13 +60,14 @@ const gridTemplateColumns = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
-.mdp-grid {
+.lazy-grid {
     display: grid;
     grid-template-columns: v-bind(gridTemplateColumns);
     position: relative;
+    width: max-content; /* so sticky left elements stick for the entire width */
 }
 
-.mdp-grid__row {
+.lazy-grid__row {
     display: contents; // Allow the children to be displayed as a grid
     > div {
         background-color: #fff;
@@ -92,19 +93,7 @@ const gridTemplateColumns = window.Vue.computed(() => {
     }
 }
 
-.fixed-top.fixed-left {
+.u-sticky-top.u-sticky-left {
     z-index: calc(var(--sbx-depth-ui-sticky) + 3); // On top of both the left column, the header, and the dropdowns
-}
-
-.fixed-left {
-    left: 0;
-    position: sticky;
-    z-index: var(--sbx-depth-ui-sticky); // Behind the dropdowns and table header, but on top of the content
-}
-
-.fixed-top {
-    position: sticky;
-    top: 0;
-    z-index: calc(var(--sbx-depth-ui-sticky) + 2); // On top of both the left column and the dropdowns
 }
 </style>

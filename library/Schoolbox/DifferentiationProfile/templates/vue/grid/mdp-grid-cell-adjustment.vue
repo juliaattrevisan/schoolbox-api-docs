@@ -4,11 +4,11 @@
  */
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
+import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
 import type { Profile, ProfileAdjustmentKeys, AdjustmentType } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../store/mdpHeaderStore";
 import { useRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
 import { useSaveStore } from "../store/mdpSaveStore";
-import MdpGridCellAction from "./mdp-grid-cell-action.vue";
 import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
 import { useContentHeight } from "./composable/useContentHeight";
 
@@ -39,10 +39,17 @@ const { contentHeight, componentActionHeight } = useContentHeight(
 
 // #region modifying the selected adjustments
 
-const selectedAdjustments = window.Vue.ref<number[]>(props.adjustments ?? []);
-const hasChanged = window.Vue.computed(
-    () => selectedAdjustments.value.join(",") !== (props.adjustments ?? []).join(","),
+const selectedAdjustments = window.Vue.ref<number[]>(
+    // filter to only the latest available options
+    (props.adjustments ?? []).filter((id) => props.options.some((option) => option.id === id)),
 );
+const hasChanged = window.Vue.computed(() => {
+    // Compare against the filtered original adjustments (excluding removed options)
+    const filteredOriginalAdjustments = (props.adjustments ?? []).filter((id) =>
+        props.options.some((option) => option.id === id),
+    );
+    return selectedAdjustments.value.join(",") !== filteredOriginalAdjustments.join(",");
+});
 const isSaving = window.Vue.ref(false);
 
 /**
@@ -73,13 +80,37 @@ function onModify(): void {
 // #endregion modifying the selected adjustments
 
 /**
+ * Sort adjustments by the order they appear in props.options
+ * @param adjustments - the adjustments to sort
+ * @returns the sorted adjustments array
+ */
+function getSortedAdjustments(adjustments: number[]): number[] {
+    return adjustments.length > 0
+        ? adjustments.sort((a, b) => {
+              const indexA = props.options.findIndex((option) => option.id === a);
+              const indexB = props.options.findIndex((option) => option.id === b);
+              return indexA - indexB;
+          })
+        : [];
+}
+
+/**
  * When the save button is clicked.
  */
 async function onSave(): Promise<void> {
     isSaving.value = true;
-    const { profile } = props;
-    profile[props.headerKey] = selectedAdjustments.value.length > 0 ? selectedAdjustments.value : null;
-    await saveStore.save(profile);
+    // If both original and new values are null/empty, don't trigger save
+    if (props.adjustments === null && selectedAdjustments.value.length === 0) {
+        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
+        isSaving.value = false;
+        return;
+    }
+    const sortedAdjustments = getSortedAdjustments(selectedAdjustments.value);
+    const newValue = sortedAdjustments.length > 0 ? sortedAdjustments : null;
+    const toSave = {
+        [props.headerKey]: newValue,
+    };
+    await saveStore.save(props.profile, toSave);
     rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
     isSaving.value = false;
 }
@@ -97,7 +128,7 @@ async function onSave(): Promise<void> {
     >
         <div ref="contentEl">
             <div v-if="isContentFocused">
-                <div class="checklist l-pad-s">
+                <div v-if="props.options.length > 0" class="checklist l-pad-s">
                     <legend class="t-visually-hidden">
                         {{ headerStore.getTitleByKey(props.headerKey) }} for {{ props.profile.student.givenName }}
                         {{ props.profile.student.lastName }}
@@ -115,10 +146,13 @@ async function onSave(): Promise<void> {
                         </li>
                     </ul>
                 </div>
+                <div v-else class="l-pad-s">
+                    <p><em>No available options to select.</em></p>
+                </div>
             </div>
             <div v-else class="l-pad-s">
                 <ul>
-                    <li v-for="adjustment in adjustments" :key="adjustment">
+                    <li v-for="adjustment in selectedAdjustments" :key="adjustment">
                         {{ options.find((option) => option.id === adjustment)?.name }}
                     </li>
                 </ul>
@@ -140,8 +174,8 @@ async function onSave(): Promise<void> {
                 </empty-state>
             </div>
             <div ref="componentActionEl">
-                <mdp-grid-cell-action
-                    :profile="props.profile"
+                <lg-cell-action-save
+                    :id="props.profile.student.id"
                     :header-key="props.headerKey"
                     :has-changed="hasChanged"
                     :is-saving="isSaving"

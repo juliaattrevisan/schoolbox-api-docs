@@ -9,6 +9,11 @@ import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 export const useHeaderStore = defineStore(`headerStore`, () => {
     const header = window.Vue.ref<Header[]>([]);
 
+    // Computed ref for enabled fields that match Text type
+    const enabledTextFields = window.Vue.computed(() => {
+        return header.value.filter((h) => h.type === HeaderType.TEXT);
+    });
+
     /**
      * store any passed through properties
      * @param $header - the headers for the grid
@@ -19,7 +24,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 id: 0,
                 title: "Student",
                 width: 250,
-                isFixed: true,
+                isSticky: true,
                 isSortable: true,
                 key: "student",
                 type: HeaderType.USER,
@@ -30,7 +35,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                 type: HeaderType.DATE,
                 title: "Last updated",
                 width: 150,
-                isFixed: false,
+                isSticky: false,
                 isSortable: true,
             },
             ...$header.map((h) => ({
@@ -40,9 +45,9 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
                     h.name === "adjustment_category" || h.name === "adjustment_level"
                         ? HeaderType.ADJUSTMENT
                         : HeaderType.TEXT,
-                title: h.terminology,
+                title: h.terminology === null || h.terminology.trim() === "" ? h.title : h.terminology,
                 width: h.name === "adjustment_category" || h.name === "adjustment_level" ? 300 : 500,
-                isFixed: false,
+                isSticky: false,
                 isSortable: false,
             })),
         ];
@@ -60,6 +65,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
 
     return {
         header,
+        enabledTextFields,
         init,
         getTitleByKey,
     };
