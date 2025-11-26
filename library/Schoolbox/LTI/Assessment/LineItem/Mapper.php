@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Assessment\LineItem;
 
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * LTI line item mapper.
@@ -68,15 +69,16 @@ class Mapper extends BaseMapper
      * If there's no such assessment: this method will raise an error.
      *
      * @param Model $model
-     * @return void
+     * @return true Always succeeds unless the LTI assessment wasn't found
+     * @throws MapperException if LTI assessment wasn't found
      */
-    public function associateWithLtiAssessment(Model $model): void
+    public function associateWithLtiAssessment(Model $model): true
     {
         if ($model->getLtiAssessmentGuid()) {
             $ltiAssessment = $this->getJoinMapper('ltiAssessment')
-                ->findByColumn('guid', $model->getLtiAssessmentGuid())
-                ->first();
+                ->findOneByColumn('guid', $model->getLtiAssessmentGuid());
             $model->setLtiAssessment($ltiAssessment);
         }
+        return true;
     }
 }
