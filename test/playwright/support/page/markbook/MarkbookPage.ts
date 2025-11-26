@@ -390,4 +390,31 @@ export default class MarkbookPage {
         // Reload the mark book to reflect changes
         await this.page.reload();
     }
+
+    /**
+     * selects a mark visibility option for a given assessment
+     * @param assessmentId - The ID of the assessment
+     * @param visibilityOption - The visibility option to select: '0 for Staff Only', '1 for Staff and Students', '2 for Staff, Students and their Parents'
+     */
+    async updateActivityMarkVisibility(
+        assessmentId: string | number,
+        visibilityOption: "0" | "1" | "2",
+    ): Promise<void> {
+        // locate the assessment dropdown, click it and select an option
+        const assessment = this.page.locator(`td[data-assessment="${assessmentId}"]`);
+        await assessment.click();
+        await assessment.locator('select[name="markVisibility"]').selectOption({ value: visibilityOption });
+        await this.page.locator(`div[data-test-is-success="true"]`).isVisible();
+    }
+
+    /**
+     * Checks the visibility option selected
+     * @param assessmentId - The ID of the assessment
+     * @param visibility - The visibility to check
+     */
+    async checkVisibilityOptionSelected(assessmentId: string | number, visibility: string | number): Promise<void> {
+        const assessment = this.page.locator(`td[data-assessment="${assessmentId}"]`);
+        const selectedValue = assessment.locator('select[name="markVisibility"]');
+        await expect(selectedValue).toHaveValue(visibility.toString());
+    }
 }

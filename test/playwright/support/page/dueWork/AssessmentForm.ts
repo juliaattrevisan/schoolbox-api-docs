@@ -11,6 +11,8 @@ export default class AssessmentForm {
 
     static readonly URL = "/learning/folders/{class_id}/assessments/new?type=dueWork";
 
+    static readonly URL_MODIFY = "/learning/assessments/{assessment_id}/modify";
+
     // Constants for data-test selectors
     static readonly SELECTOR_FORM = "assessment-form";
 
@@ -144,6 +146,14 @@ export default class AssessmentForm {
     }
 
     /**
+     * Navigates to the activity modify form for an assessment ID
+     * @param assessmentId - The assessment ID to navigate to
+     */
+    async gotoAssessmentModifyPage(assessmentId: number): Promise<void> {
+        await this.page.goto(AssessmentForm.URL_MODIFY.replace("{assessment_id}", assessmentId.toString()));
+    }
+
+    /**
      * Submits this form to create a duework - by default it skips the participation prompt by clicking Later
      * if you want to navifate to the participation plan page, set toParticipation to true eg: create(true, true);
      * Verifies that the homepage is visible after submission
@@ -258,6 +268,16 @@ export default class AssessmentForm {
     async setVisibility(visibility: number): Promise<void> {
         const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
         await visibilitySelectEl.selectOption({ value: visibility.toString() });
+    }
+
+    /**
+     * Checks the visibility option selected
+     * @param visibility - The visibility to check
+     */
+    async checkVisibilityOptionSelected(visibility: string): Promise<void> {
+        const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
+        const selectedValue = await visibilitySelectEl.locator('option[selected="selected"]').innerText();
+        expect(selectedValue).toBe(visibility);
     }
 
     /**
