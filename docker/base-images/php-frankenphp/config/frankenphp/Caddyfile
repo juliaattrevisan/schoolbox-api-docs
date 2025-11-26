@@ -167,14 +167,14 @@
         file_server
     }
 
-    log_skip /static*
-    log_skip /favicon.ico
-    log_skip /css*
-    log_skip /websocket
-    log_skip /pad*
-    log_skip /service-worker.js
-    log_skip /manifest
-    encode  zstd  gzip
+#    log_skip /static*
+#    log_skip /favicon.ico
+#    log_skip /css*
+#    log_skip /websocket
+#    log_skip /pad*
+#    log_skip /service-worker.js
+#    log_skip /manifest
+#    encode  zstd  gzip
     php_server {
         file_server off
         try_files index.php
