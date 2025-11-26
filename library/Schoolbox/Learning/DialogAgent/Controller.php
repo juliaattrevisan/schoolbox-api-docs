@@ -16,6 +16,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Ramsey\Uuid\Uuid;
 use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
@@ -537,16 +538,47 @@ class Controller extends Base
     {
         $statusChecker = new Status();
 
+        /* Compile scenario field names as header elements
+         */
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
+        $fields = [];
+
+        foreach ($scenario->getFields() as $field) {
+            $fields[] = $field->getTitle();
+        }
+
+        $headers = array_merge([
+            'User ID',
+            'External ID',
+            'Firstname',
+            'Lastname',
+            'Status'
+        ], $fields);
+
+        /* Compile everyone's authoritative response status and authoritative feedback content
+         */
         foreach ($assessment->getAllParticipants() as $participant) {
-            $stack[] = [
+            /* Make the same number of elements as $fields for now; these will eventually have feedback criteria in them
+             * but they should correspond 1:1 with $fields that we defined above
+             */
+            $feedbackFields = array_values(array_fill_keys($fields, null));
+
+            /* Slam them all together
+             */
+            $stack[] = array_merge([
                 $participant->getUser()->getId(),
                 $participant->getUser()->getExternalId(),
                 $participant->getUser()->getFirstName(),
                 $participant->getUser()->getLastName(),
                 $statusChecker->getHumanReadableStatus($participant->getAuthoritativeResponse(false)),
-            ];
+            ], $feedbackFields);
         }
 
-        new \Alaress_Probe($stack);
+        new \Alaress_Probe($headers);
+
+        foreach ($stack as $person) {
+            new \Alaress_Probe($person);
+        }
     }
 }
