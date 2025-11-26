@@ -162,6 +162,12 @@ class Controller extends Base
                     $eventAHash = spl_object_hash($eventA);
                     for ($j = $i + 1; $j < $count; $j++) {
                         $eventB = $resourceEvents[$j];
+                        // break early if there's no chance of a clash
+                        // we have sorted above by start time, so if eventB starts after eventA ends, no need to check further
+                        if ($eventB->getStartTime()->gt($eventA->getEndTime())) {
+                            break;
+                        }
+
                         if ($eventA->isClash($eventB)) {
                             $eventBHash = spl_object_hash($eventB);
                             // Add both events to the clash list
