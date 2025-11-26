@@ -388,9 +388,9 @@ class EventTest extends TestCase
         int $aStatus,
         int $bBookingId,
         int $bStatus,
+        bool $expected,
         ?int $aResourceId = 1,
-        ?int $bResourceId = 1,
-        bool $expected
+        ?int $bResourceId = 1
     ): void {
         $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus, $aResourceId);
         $b = $this->makeResourceBookingEvent($bStart, $bEnd, $bBookingId, $bStatus, $bResourceId);
@@ -410,9 +410,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING, // aStatus
                 100, // bBookingId
                 BookingStatusModel::STATUS_PENDING, // bStatus
+                false, // clash expected
                 1, // aResourceId
                 1, // bResourceId
-                false, // clash expected
             ],
             'b-not-pending-no-clash' => [
                 '2025-11-13 09:00:00',
@@ -423,9 +423,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 102,
                 BookingStatusModel::STATUS_APPROVED,
-                1,
-                1,
                 true,
+                1,
+                1,
             ],
             'b-pending-and-overlap-clash' => [
                 '2025-11-13 09:00:00',
@@ -436,9 +436,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 202,
                 BookingStatusModel::STATUS_PENDING,
-                1,
-                1,
                 true,
+                1,
+                1,
             ],
             'both-pending-overlap-clash' => [
                 '2025-11-13 08:00:00',
@@ -449,9 +449,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 402,
                 BookingStatusModel::STATUS_PENDING,
-                1,
-                1,
                 false,
+                1,
+                1,
             ],
             'both-approved-overlap-no-clash' => [
                 '2025-11-13 08:00:00',
@@ -462,9 +462,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 502,
                 BookingStatusModel::STATUS_APPROVED,
-                1,
-                1,
                 true,
+                1,
+                1,
             ],
             'b-pending-but-non-overlap-no-clash' => [
                 '2025-11-13 09:00:00',
@@ -475,9 +475,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 302,
                 BookingStatusModel::STATUS_PENDING,
-                1,
-                1,
                 false,
+                1,
+                1,
             ],
             'overlap-different-resource-no-clash' => [
                 '2025-11-13 09:00:00',
@@ -488,9 +488,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 702,
                 BookingStatusModel::STATUS_APPROVED,
+                false,
                 1, // aResourceId
                 2, // bResourceId (different resource)
-                false,
             ],
             'b-rejected-no-clash' => [ // rejected bookings do not clash
                 '2025-11-13 09:00:00',
@@ -501,9 +501,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 802,
                 BookingStatusModel::STATUS_REJECTED,
-                1,
-                1,
                 false,
+                1,
+                1,
             ],
             'a-rejected-no-clash' => [ // again rejected bookings don't clash
                 '2025-11-13 09:00:00',
@@ -514,9 +514,9 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_REJECTED,
                 902,
                 BookingStatusModel::STATUS_APPROVED,
-                1,
-                1,
                 false,
+                1,
+                1,
             ],
         ];
     }
@@ -542,9 +542,9 @@ class EventTest extends TestCase
         string $bEnd,
         int $aBookingId,
         int $aStatus,
-        ?int $aResourceId = 1,
         string $timetableClass,
-        bool $expected
+        bool $expected,
+        ?int $aResourceId = 1
     ): void {
         $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus, $aResourceId);
         $b = $this->makeEvent($bStart, $bEnd, $timetableClass);
@@ -562,9 +562,9 @@ class EventTest extends TestCase
                 '2025-11-13 10:30:00', // bEnd
                 601, // aBookingId
                 BookingStatusModel::STATUS_PENDING, // aStatus
-                1, // aResourceId
                 TimetableEvent::class, // timetableClass
                 true, // clash expected
+                1, // aResourceId
             ],
             'resourcebooking-approved-vs-timetable-overlap' => [
                 '2025-11-13 09:00:00',
@@ -573,9 +573,9 @@ class EventTest extends TestCase
                 '2025-11-13 10:30:00',
                 602,
                 BookingStatusModel::STATUS_APPROVED,
-                1,
                 TimetableEvent::class,
                 true,
+                1,
             ],
             'resourcebooking-pending-vs-suds-overlap' => [
                 '2025-11-13 09:00:00',
@@ -584,9 +584,9 @@ class EventTest extends TestCase
                 '2025-11-13 10:30:00',
                 603,
                 BookingStatusModel::STATUS_PENDING,
-                1,
                 SudsTimetableEvent::class,
                 true,
+                1,
             ],
             'resourcebooking-approved-vs-timetable-non-overlap' => [
                 '2025-11-13 09:00:00',
@@ -595,9 +595,9 @@ class EventTest extends TestCase
                 '2025-11-13 11:00:00',
                 604,
                 BookingStatusModel::STATUS_APPROVED,
-                1,
                 TimetableEvent::class,
                 false,
+                1,
             ],
         ];
     }
