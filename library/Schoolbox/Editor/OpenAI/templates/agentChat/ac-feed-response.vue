@@ -39,10 +39,7 @@ const imageSrc = window.Vue.computed(() => {
         <div>
             <img v-if="imageSrc" :src="imageSrc" />
 
-            <p
-                class="l-mar--0-bottom"
-                :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }"
-            >
+            <p class="l-mar--0-bottom" :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }">
                 {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
             </p>
         </div>
@@ -78,7 +75,7 @@ const imageSrc = window.Vue.computed(() => {
             </div>
             <p class="l-mar--0-bottom" :class="{ 'l-mar-s--top': imageSrc !== null }">
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
-                <article v-html="props.message.message"></article>
+                <span v-html="props.message.message"></span>
             </p>
         </div>
     </div>
