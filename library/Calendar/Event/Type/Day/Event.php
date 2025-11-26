@@ -447,7 +447,8 @@ class Event extends EventBase
     /**
      * Determine if this event clashes with another event
      * if it's the same event, return false
-     * if both are resource bookings, only care if $eventB is pending
+     * if one is a timetable event, check if same category (class) and then times overlap
+     * if both are resource bookings, only care if $eventB is pending (rejected bookings don't matter)
      *
      * @param self $eventB
      * @return bool
@@ -464,6 +465,19 @@ class Event extends EventBase
         // skip the same object...
         if ($eventAHash === $eventBHash) {
             return false;
+        }
+
+        // if either event is a rejected booking, skip
+        if ($eventA instanceof \Calendar\Event\Type\ResourceBooking\Event) {
+            if ($eventA->getBooking()->getStatus()->isRejected())
+            {
+                return false;
+            }
+        }
+        if ($eventB instanceof \Calendar\Event\Type\ResourceBooking\Event) {
+            if ($eventB->getBooking()->getStatus()->isRejected()) {
+                return false;
+            }
         }
 
         // Only check for status of pending bookings if both are resource bookings

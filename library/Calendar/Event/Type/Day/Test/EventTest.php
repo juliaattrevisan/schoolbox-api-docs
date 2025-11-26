@@ -40,6 +40,10 @@ class EventTest extends TestCase
         $event = new $class();
         $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
         $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
+
+        if ($class === ResourceBookingEvent::class) {
+            $event->setBooking(new BookingModel()->setStatus(new BookingStatusModel()->setId(BookingStatusModel::STATUS_APPROVED)));
+        }
         return $event;
     }
 
