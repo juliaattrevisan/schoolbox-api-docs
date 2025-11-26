@@ -12,12 +12,6 @@ interface Props {
     allowSelection?: boolean;
 }
 const props = defineProps<Props>();
-
-/**
- * To get scrolling to happen automatically,
- * we must use flex-direction: column-reverse and reverse the list here
- */
-const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 </script>
 
 <template>
@@ -25,7 +19,7 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
         <slot name="header"></slot>
 
         <div class="l-pad-s ac-feed-list">
-            <template v-for="(message, index) in reversedFeed" :key="message.entryKey">
+            <template v-for="(message, index) in props.feed" :key="message.entryKey">
                 <br v-if="index > 0" />
 
                 <ac-feed-alert v-if="message.type === 'alert'" :message="message" />
@@ -37,6 +31,8 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
                     :allow-selection="props.allowSelection"
                 />
             </template>
+
+            <div class="ac-feed-anchor"></div>
         </div>
     </div>
 </template>
@@ -49,10 +45,24 @@ const reversedFeed = window.Vue.computed(() => props.feed.slice().reverse());
 
 .ac-feed-list {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     justify-content: flex-end;
 
     /* To prevent the list from scrolling if you click an input */
     position: relative;
+}
+
+/**
+ * browsers try to avoid the page from shifting when new content is added,
+ * This makes it so that as long as the anchor is visible on the page the browser
+ * is forced to keep it in view, effectively making it so that the container is pinned to the bottom
+ */
+.ac-feed-list * {
+    overflow-anchor: none;
+}
+
+.ac-feed-anchor {
+    overflow-anchor: auto;
+    height: 1px;
 }
 </style>
