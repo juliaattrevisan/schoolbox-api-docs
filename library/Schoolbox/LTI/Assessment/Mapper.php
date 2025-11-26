@@ -140,11 +140,7 @@ class Mapper extends BaseMapper
                     ->equals('lti_assessment_guid', $model->getGuid())
                     ->isNull('lti_assessment_id')
             );
-            foreach ($lineItems as $lineItem) {
-                /** @var LineItem\Model $lineItem */
-                $lineItem->setLtiAssessment($model);
-            }
-            $lineItemMapper->save($lineItems);
+            $lineItemMapper->updateAll($lineItems, 'lti_assessment_id', $model->getId());
         }
     }
 }
