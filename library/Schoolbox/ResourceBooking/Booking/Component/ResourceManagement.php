@@ -81,9 +81,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
 
         // Group bookings by their item, and order within that list by date
         // (They should be date-ordered already)
-        $groupedBookings = [];
-        $groupedBookings2 = [];
-        $eventsByResource = [];
+        $eventsByResource = []; // init grouping array sorted
+        $groupedBookings = []; // final array grouped by day with only the events we care about
         foreach ($bookingEvents as $event) {
             if ($event instanceof Event) {
             // Due to hydration differences between resource bookings and timetable events, we need to extract the resource ID
@@ -159,31 +158,6 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             }
         }
 
-        foreach ($bookingEvents as $event) {
-            if ($event instanceof Event) {
-                // only care about pending events if they have a clash
-                $itemId = $event->getBooking()->getResource()->getId();
-                if (empty($groupedBookings2[$itemId])) {
-                    $groupedBookings2[$itemId] = [
-                        'resource'      => $event->getBooking()->getResource(),
-                        'bookingEvents' => [],
-                    ];
-                }
-                if (empty($groupedBookings2[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()])) {
-                    $groupedBookings2[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()] = [
-                        'dateFormat'  => [
-                            'day'  => $event->getStartTime()->getDay(),
-                            'monthName' => $event->getStartTime()->getUsingFormat('M'),
-                            'dayName' => $event->getStartTime()->getUsingFormat('D'),
-                        ],
-                        'events' => [],
-                    ];
-                }
-                $groupedBookings2[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()]['events'][] = $event;
-            }
-        }
-//        new \Alaress_Probe($groupedBookings, $groupedBookings2);
-//        die();
         usort($groupedBookings, function ($a, $b) {
             return strcmp($a['resource']->getName(), $b['resource']->getName());
         });
