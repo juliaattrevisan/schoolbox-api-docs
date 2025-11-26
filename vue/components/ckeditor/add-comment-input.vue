@@ -28,7 +28,10 @@ export default {
         },
     },
 
-    inject: ["editorTemplates", "editorHasTokens"],
+    inject: {
+        editorTemplates: { default: [] },
+        editorHasTokens: { default: false },
+    },
 
     data() {
         return {
