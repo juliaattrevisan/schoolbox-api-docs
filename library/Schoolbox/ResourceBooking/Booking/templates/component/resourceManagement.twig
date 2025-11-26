@@ -75,7 +75,7 @@
                                     <ul>
                                     {% for booking in date.events %}
                                         {% set event = booking.event %}
-                                        <li class="actions-small-1">
+                                        <li class="actions-small-1 card">
                                             <div class="list-item">
 
                                                 {# cardception #}
@@ -182,3 +182,11 @@
     </ul>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
+
+
+<style>
+    .card:nth-child(odd) {
+        background-color: #abab;
+    }
+
+</style>
