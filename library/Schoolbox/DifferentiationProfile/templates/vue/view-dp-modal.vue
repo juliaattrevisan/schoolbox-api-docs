@@ -7,7 +7,16 @@ import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { User } from "@schoolboxLibrary/types/User";
+
+/**
+ * The returned DP item type
+ */
+type Item = {
+    terminology: string;
+    value: string | null;
+};
 
 const props = defineProps<{
     route: string;
@@ -17,6 +26,7 @@ const student = defineModel<User | null>("student", { default: null });
 const isOpen = window.Vue.ref(false);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
+const data = window.Vue.ref<Item[]>([]);
 
 /**
  * Load the DP
@@ -30,7 +40,7 @@ async function load(): Promise<void> {
     try {
         isProcessing.value = true;
         loadError.value = null;
-        const response = await apiRequest<{ id: number }>({
+        const response = await apiRequest<Item[]>({
             url: props.route,
             method: "GET",
         });
@@ -39,7 +49,9 @@ async function load(): Promise<void> {
                 response.message || `Failed to retrieve ${locale.differentiationProfile.translate(false, true)}`,
             );
         }
-        debugger;
+        data.value = response.data || [];
+        // filter out that have a null or empty value
+        data.value = data.value.filter((item) => item.value !== null && item.value.trim() !== "");
         toast.timeout({ text: `${locale.differentiationProfile.translate(false, true)} successfully retrieved` });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
@@ -85,12 +97,18 @@ function onClose(): void {
             :data-title="locale.differentiationProfile.translate(false, true)"
             :further-info="loadError"
         />
-        <div v-else-if="student" class="l-flex-col l-gap-m f-no-margins">
+        <div v-else-if="student && data.length > 0" class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>
                     {{ locale.differentiationProfile.translate(false, true) }} for {{ student.givenName }}
                     {{ student.lastname }}
                 </h2>
+            </div>
+            <div class="l-flex-col l-gap-s f-no-margins">
+                <div v-for="item in data" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
+                    <h5>{{ item.terminology }}</h5>
+                    <media-article :content="item.value ?? ''" />
+                </div>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="onClose">Close</button>
