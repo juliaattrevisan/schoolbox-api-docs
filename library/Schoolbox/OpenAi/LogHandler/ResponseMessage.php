@@ -46,23 +46,23 @@ class ResponseMessage implements ILogHandler
         ?IListener $logListener,
     ): Log\Model {
         // Prepare the message for logging
-        $eventType = $outputMessage->eventType;
+        $eventType = $rawMessage->eventType;
         $rawData   = [];
         try {
-            $rawData      = json_decode($outputMessage->data, true, 512, JSON_THROW_ON_ERROR);
+            $rawData      = json_decode($rawMessage->data, true, 512, JSON_THROW_ON_ERROR);
             $filteredData = $this->filterResponseForLogging($eventType, $rawData);
             if (isset($filteredData['response'])) {
                 $filteredData['response'] = $this->filterImageGenerationOutput($filteredData['response']);
             }
 
             // Override message data before writing it
-            $outputMessage->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
+            $rawMessage->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
         }
 
         // This chunk gets added to the log
-        $log->setResponse(($log->getResponse() ?? '') . $outputMessage->__toString());
+        $log->setResponse(($log->getResponse() ?? '') . $rawMessage->__toString());
         if (is_callable($streamListener)) {
             $streamListener($outputMessage, $log);
         }
