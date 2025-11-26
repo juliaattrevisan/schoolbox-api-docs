@@ -1,0 +1,34 @@
+{##
+ # Configure a Dialog Agent's settings
+ #
+ # @param Assessment\DialogAgent\Model  An assessment instance
+ # @param array $scenario               Relevant info about the scenario
+ # @param array $assessmentConfigInfo   Current configuration info for the assessment
+ # @param array $helpfulnessOptions     A list of key-value pairs for Helpfulness options
+ # @param array $languageOptions        A list of language options
+ #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Configure {{ assessment.title }}</h1>
+    </div>
+</div>
+
+{% set updateRoute = routeLookupIfAuthorized(
+    'learningDialogAgent.postUpdate',
+    { assessmentId: assessment.id, assessment: assessment }
+) %}
+
+<div id="dialog-agent-configure-container">
+    <dialog-agent-configure
+        :scenario="{{ scenario |json_encode }}"
+        :assessment-config="{{ assessmentConfig |json_encode }}"
+        :helpfulness-options="{{ helpfulnessOptions |json_encode }}"
+        :language-options="{{ languageOptions |json_encode }}"
+        post-update="{{ updateRoute }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentConfigure.js?v={{ config.site_version }}"></script>

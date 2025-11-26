@@ -99,23 +99,43 @@ class Controller extends Base
             return $instance->getField()->getId();
         });
 
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'scenario' => $this->scenarioMapper->findById($assessment->getScenarioId()),
-            'fieldContexts' => $fieldContexts,
-            'helpfulness' => [
+            'scenario' => [
+                'title' => $scenario->getTitle(),
+                'description' => $scenario->getDescription(),
+            ],
+            'assessmentConfig' => [
+                'helpfulness' => $dialogAgent->getHelpfulness(),
+                'language' => $dialogAgent->getLanguage(),
+                'openingMessage' => $dialogAgent->getOpeningMessage(),
+                'rules' => $dialogAgent->getRules(),
+                'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
+                'fieldContexts' => $fieldContexts->map(fn ($fieldContext) => [
+                    'id' => $fieldContext->getField()->getId(),
+                    'body' => $fieldContext->getBody(),
+                    'field' => [
+                        'id' => $fieldContext->getField()->getId(),
+                        'title' => $fieldContext->getField()->getTitle(),
+                    ],
+                ])->reindex(),
+            ],
+            'helpfulnessOptions' => [
                 DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
                 DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
                 DialogAgentDataModel::HELPFULNESS_EXTREME => 'Extreme',
             ],
-            'languages' => [
-                'available' => Language::AVAILABLE,
-                'selected' => $assessment->getLanguage() ?? Language::DEFAULT,
-            ]
+            'languageOptions' => Language::AVAILABLE,
         ];
 
-        $this->response = $this->responseFromTemplate('@learningDialogAgent/update.twig', $data, sprintf('Configure %s', $assessment->getTitle()));
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/configure.twig',
+            $data,
+            \sprintf('Configure %s', $assessment->getTitle())
+        );
     }
 
 
