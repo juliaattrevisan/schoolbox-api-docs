@@ -9,10 +9,11 @@
 use Calendar\Event\Type\Day\Event;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\Event as EventModel;
-use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\User;
 
 class Calendar extends DeprecatedModel
@@ -21,6 +22,11 @@ class Calendar extends DeprecatedModel
      * @var Group
      */
     private $groupHandler;
+
+    /**
+     * @var ResourceBookingMapper
+     */
+    private ResourceBookingMapper $resourceBookingMapper;
 
     /** @var string[] */
     private $colourSet;
@@ -34,6 +40,7 @@ class Calendar extends DeprecatedModel
         $this->_index = "id";
 
         $this->groupHandler = new Group(UserAccess::SERVICE_CALENDAR);
+        $this->resourceBookingMapper = ResourceBookingMapper::getInstance(); // Could not inject because this class is used in too many places.
 
         parent::__construct();
     }
@@ -434,6 +441,12 @@ class Calendar extends DeprecatedModel
         $stack = new GenericCollection(EventInterface::class);
 
         if (is_array($allEvents) && count($allEvents)) {
+            // Get linked ResourceBookingModels for all events.
+            // Get them all in one query outside the loop below to minimise the number of database queries.
+            $allEventIds = array_map(static fn ($currentEvent) => $currentEvent['id'], $allEvents);
+            /** @var array<int, GenericCollection<ResourceBookingModel>> $resourceBookingModelsByEventId */
+            $resourceBookingModelsByEventId = $this->resourceBookingMapper->getForAllEventIds($allEventIds);
+
             foreach ($allEvents as $currentEvent) {
                 $event = new Event();
 
@@ -465,6 +478,7 @@ class Calendar extends DeprecatedModel
                 );
                 $event->setAllDay(!empty($currentEvent['allday']));
                 $event->setSeriesId($currentEvent['series_id']);
+                $event->setBookingsCollection($resourceBookingModelsByEventId[$currentEvent['id']]);
 
                 /* If you have write access to the event
                  */

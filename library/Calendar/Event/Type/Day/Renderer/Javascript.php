@@ -11,6 +11,7 @@
 namespace Calendar\Event\Type\Day\Renderer;
 
 use Alaress_Date_Format;
+use Calendar\Event\Type\Day\Event;
 
 class Javascript extends Base
 {
@@ -98,6 +99,7 @@ class Javascript extends Base
                     'visible' => $this->getEvent()->getActive() ? $cssClass : 'strike',
                 ],
                 'attendance' => $this->renderEventAttendance(),
+                'bookings' => $this->renderBookings($this->getEvent()),
             ],
         ];
 
@@ -123,5 +125,44 @@ class Javascript extends Base
                 'current' => $currentStatus,
             ],
         ];
+    }
+
+    /**
+     * Render all the bookings linked to the given event, in the array representation expected by view-event-modal.vue.
+     *
+     * @param Event $event
+     * @return array
+     */
+    private function renderBookings(Event $event): array
+    {
+        $bookingsCollection = $event->getBookingsCollection();
+        if ($bookingsCollection === null) {
+            return [];
+        }
+
+        $bookingsArray = [];
+        foreach ($bookingsCollection as $booking) {
+            $href = $this->getRouteIfAuthorized(
+                'resourceItem.read',
+                [
+                    'id' => $booking->getResource()->getId(),
+                    'format' => '',
+                ]
+            );
+            if ($href) {
+                $href .= '?date=' . urlencode($event->getStartTime()->getURLDate());
+            }
+            $bookingsArray[] = [
+                'id' => $booking->getId(),
+                'item' => [
+                    'id' => $booking->getResource()->getId(),
+                    'name' => $booking->getResource()->getName(),
+                ],
+                'status' => $booking->getStatus()->jsonSerialize(),
+                'href' => $href,
+            ];
+        }
+
+        return $bookingsArray;
     }
 }

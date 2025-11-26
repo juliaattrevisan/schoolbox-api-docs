@@ -9,6 +9,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Schoolbox\Calendar\Event;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
@@ -187,11 +188,11 @@ class Mapper extends BaseMapper
      *                             owner_id:    filters by this event owner
      *                             category_id: filters by a resource booking category
      *
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException
      */
-    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array(), ?array $allowedEventTypes = null)
+    public function findForTimespan($fromTimestamp, $toTimestamp, $statusIds = array(), $extra = array(), ?array $allowedEventTypes = null): GenericCollection
     {
         // Just search on date for now.
         // Events: any event whose start <= endWindow, or end >= startWindow
@@ -318,11 +319,11 @@ class Mapper extends BaseMapper
      *
      * @param array|null $allowedEventTypes  A set of lutEventType ids which filter the result set
      *
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException
      */
-    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array(), ?array $allowedEventTypes = null)
+    public function findForOwner($ownerId, $fromTimestamp, $toTimestamp, $statusIds = array(), ?array $allowedEventTypes = null): GenericCollection
     {
         return $this->findForTimespan(
             $fromTimestamp,
@@ -448,6 +449,64 @@ class Mapper extends BaseMapper
             return $model;
         }
         throw new BaseMapper\Exception\NotFound();
+    }
+
+
+    /**
+     * Return an array of collections of ResourceBookingModels, indexed by eventId.
+     *
+     * @param  array<int> $eventIds
+     * @return array<int, GenericCollection<Model>>
+     */
+    public function getForAllEventIds(array $eventIds): array
+    {
+        if (count($eventIds) === 0) {
+            return [];
+        }
+
+        $query = "
+            SELECT
+                {$this->getColumnString('b')},
+                {$this->getJoinColumnString('resource', 'r')}
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            WHERE b.event_id IN (" . implode(',', array_map('intval', $eventIds)) . ")
+            AND b.deleted_at IS NULL
+            AND r.deleted_at IS NULL
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        // Pre-fill the array to be returned, with empty collections indexed by eventId.
+        // The calling code can then rely on the existence of a key for each supplied eventId.
+        $collectionsByEventId = [];
+        foreach ($eventIds as $eventId) {
+            $collectionsByEventId[$eventId] = new GenericCollection(Model::class);
+        }
+
+        foreach ($statement as $row) {
+            try {
+                $bookingModel = $this->hydrate($row, 'b', function ($mapper, $model, $row) {
+                    /** @var self $mapper */
+                    /** @var Model $model */
+                    /** @var Item\Model $resource */
+                    $resource = $mapper->hydrateJoin($row, 'resource', 'r');
+                    $model->setResource($resource);
+                    return $model;
+                });
+            } catch (BaseMapper\Exception) {
+                continue; // Skip the problem booking and move on to the next one.
+            }
+
+            if ($bookingModel === null) {
+                //  Skip the problem booking and move on to the next one.
+                continue;
+            }
+
+            $collectionsByEventId[$row['b.event_id']]->add($bookingModel);
+        }
+
+        return $collectionsByEventId;
     }
 
 
