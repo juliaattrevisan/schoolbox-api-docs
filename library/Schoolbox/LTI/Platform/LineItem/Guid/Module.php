@@ -9,10 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform\LineItem\Guid;
 
+use Alaress\Authorizer\Rule\Callback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Ramsey\Uuid\Uuid;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
-use Schoolbox\LTI\Assessment\LineItem\Mapper as LtiAssessmentLineItemMapper;
+use Schoolbox\LTI\Assessment\LineItem as LtiAssessmentLineItem;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiAssessmentScoreMapper;
 
 /**
@@ -33,16 +36,22 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
+        $validGuidPermission     = new Callback($this->assertValidGuid(...));
+        $validLineItemPermission = new Callback($this->assertGuidMatchesLineItemId(...));
+        $lineItemPreload         = $this->preloadLineItem(...);
+
         // Line items container routes
         $this->register(
             self::METHOD_GET,
             '/{guid}',
             'getLineItemsForGuid',
+            $validGuidPermission,
         );
         $this->register(
             self::METHOD_POST,
             '/{guid}',
             'postLineItemForGuid',
+            $validGuidPermission,
         );
 
         // Line item routes
@@ -50,22 +59,22 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{guid}/{id}',
             'getLineItemForGuidAndLineItem',
-            null,
-            $this->preloadLineItem(...),
+            $validLineItemPermission,
+            $lineItemPreload,
         );
         $this->register(
             self::METHOD_PUT,
             '/{guid}/{id}',
             'putLineItemForGuidAndLineItem',
-            null,
-            $this->preloadLineItem(...),
+            $validLineItemPermission,
+            $lineItemPreload,
         );
         $this->register(
             self::METHOD_DELETE,
             '/{guid}/{id}',
             'deleteLineItemForGuidAndLineItem',
-            null,
-            $this->preloadLineItem(...),
+            $validLineItemPermission,
+            $lineItemPreload,
         );
 
         // Score publish route
@@ -73,8 +82,8 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{guid}/{id}/scores',
             'postScorePublishForGuidAndLineItem',
-            null,
-            $this->preloadLineItem(...),
+            $validLineItemPermission,
+            $lineItemPreload,
         );
     }
 
@@ -86,10 +95,43 @@ class Module extends BaseModule
      */
     private function preloadLineItem(array $params): array
     {
-        $lineItemMapper = $this->getMapperFactory()->get(LtiAssessmentLineItemMapper::class);
+        $lineItemMapper = $this->getMapperFactory()->get(LtiAssessmentLineItem\Mapper::class);
         return [
             'lineItem' => $lineItemMapper->findById($params['id']),
         ];
+    }
+
+    /**
+     * Ensure the given GUID is actually a valid GUID value.
+     *
+     * @param array $params
+     * @return void
+     */
+    private function assertValidGuid(array $params): void
+    {
+        if (!Uuid::isValid($params['guid'] ?? '')) {
+            throw new NotFound();
+        }
+    }
+
+    /**
+     * Ensure the GUID in the path matches the GUID of the line item in the
+     * path.
+     *
+     * Assumes that the GUID is valid, as it must have been in order to have
+     * been created.
+     *
+     * @param array $params
+     * @return void
+     */
+    private function assertGuidMatchesLineItemId(array $params): void
+    {
+        if (!$params['lineItem'] instanceof LtiAssessmentLineItem\Model) {
+            throw new NotFound();
+        }
+        if ($params['lineItem']->getLtiAssessmentGuid() !== $params['guid']) {
+            throw new NotFound();
+        }
     }
 
     /**
@@ -98,7 +140,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(LtiAssessmentLineItemMapper::class),
+            $this->getMapperFactory()->get(LtiAssessmentLineItem\Mapper::class),
             $this->getMapperFactory()->get(LtiAssessmentMapper::class),
             $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
             $this->injector->get('assessmentDataSource'),
