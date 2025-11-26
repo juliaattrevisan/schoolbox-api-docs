@@ -73,18 +73,19 @@
                                     </div>
 
                                     <ul>
-                                    {% for event in date.events %}
+                                    {% for booking in date.events %}
+                                        {% set event = booking.event %}
                                         <li class="actions-small-1">
                                             <div class="list-item">
 
                                                 {# cardception #}
                                                 <div class="small-12">
-                                                    {% if event.booking.status.ispending %} {# pending entries here are clashes, so we need to change the styling #}
+                                                    {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
                                                     <div class="warning">
                                                     {% endif %}
                                                     {# time, and only time (start - end) #}
-                                                    <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }} {% if event.booking.status.ispending %}<div class="icon-alert warning">&nbsp;</div> {% endif %}</time>{% endif %}
-                                                    {% if event.booking.status.ispending %} {# pending entries here are clashes, so we need to change the styling #}
+                                                    <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }} {% if booking.clash and event.booking.status.ispending %}<div class="icon-alert warning">&nbsp;</div> {% endif %}</time>{% endif %}
+                                                    {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
                                                     </div>
                                                     {% endif %}
                                                     <div class="small-12 tiny card">

@@ -121,7 +121,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
 
                 // add to the list only if its published
                 if ($eventA->getBooking()->getStatus()->isApproved()) {
-                    $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][] = $eventA;
+                    $eventAHash = spl_object_hash($eventA);
+                    $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash] = [
+                        'event' => $eventA,
+                        'clash' => false
+                    ];
                 }
 
                 // now check for clashes with pending bookings
@@ -136,7 +140,13 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
 
                     // only record clashes
                     if ($eventB->isClash($eventA)) {
-                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][] = $eventB;
+                        $eventBHash = spl_object_hash($eventB);
+                        $eventAHash = spl_object_hash($eventA);
+                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventBHash] = [
+                            'event' => $eventB,
+                            'clash' => true
+                        ];
+                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'] = true;
                     } else {
                         $var = false;
                     }
