@@ -447,8 +447,10 @@ class Event extends EventBase
     /**
      * Determine if this event clashes with another event
      * if it's the same event, return false
+     * if different resources, return false
      * if one is a timetable event, check if same category (class) and then times overlap
-     * if both are resource bookings, only care if $eventB is pending (rejected bookings don't matter)
+     * if either is a rejected booking, return false
+     * if both are resource bookings, only care if one is pending
      *
      * @param self $eventB
      * @return bool
