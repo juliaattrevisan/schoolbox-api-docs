@@ -6,7 +6,7 @@ import type { Ref } from "vue";
  * @returns Object containing checkbox list state and computed properties
  */
 export function useSelectedList<T>(items: Ref<T[]>) {
-    const selectedList = window.Vue.ref<T[]>([]); // currently selected items (checkboxes in the list)
+    const selectedList = window.Vue.ref<T[]>([]) as Ref<T[]>; // currently selected items (checkboxes in the list)
 
     /**
      * Show checkboxes if there are more than one item

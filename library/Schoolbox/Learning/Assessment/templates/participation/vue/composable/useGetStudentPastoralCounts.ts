@@ -1,3 +1,4 @@
+import type { Ref } from "vue";
 import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
@@ -5,12 +6,20 @@ import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for fetching and managing student pastoral counts
+ * @param pastoralEnabled - Whether the pastoral feature is enabled
+ * @param getStudentsPastoralCountsUrl - The URL template to fetch student pastoral counts
+ * @param allParticipants - Function that returns the list of all participants
+ * @returns loadError, studentPastoralCounts, getStudentPastoralCounts
  */
 export function useGetStudentPastoralCounts(
     pastoralEnabled: boolean,
     getStudentsPastoralCountsUrl: string,
     allParticipants: () => Participant[],
-) {
+): {
+    loadError: Ref<string | null>;
+    studentPastoralCounts: Ref<Record<string, StudentPastoralCountBadge[]>>;
+    getStudentPastoralCounts: () => Promise<void>;
+} {
     const loadError = window.Vue.ref<string | null>(null);
     const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
 

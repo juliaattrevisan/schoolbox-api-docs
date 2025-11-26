@@ -5,8 +5,16 @@ import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for excluding participants from activities
+ * @param loadError - Reactive ref to store any loading errors
+ * @returns - excludeParticipant, excludeParticipants
  */
-export function useExcludeParticipant(loadError: Ref<string | null>) {
+export function useExcludeParticipant(loadError: Ref<string | null>): {
+    excludeParticipant: (participant: Participant) => Promise<void>;
+    excludeParticipants: (
+        participants: Participant[],
+        selectedList?: ReturnType<typeof window.Vue.ref<Participant[]>>,
+    ) => Promise<void>;
+} {
     /**
      * Excludes a participant.
      * @param participant - The participant to exclude.

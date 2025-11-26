@@ -4,13 +4,25 @@ import type { CustomisedPlan, Participant, Plan } from "../../js/types/customPar
 
 /**
  * Composable for including participants in existing customisations
+ * @param loadError - Reactive ref to store any loading errors
+ * @param customisations - List of available customisations (plans and customised plans)
+ * @param includeInExistingCustomisationUrl - The URL to post the inclusion request to
+ * @param selectedList - Reactive ref to the currently selected participants
+ * @returns isIncludeInExistingOpen, includeInExistingList, includeInExistingActivityId, isSingleIncludeInExisting, includeParticipantInExistingPlan, openIncludeInExistingModal
  */
 export function useIncludeInExisting(
     loadError: Ref<string | null>,
     customisations: (Plan | CustomisedPlan)[],
     includeInExistingCustomisationUrl: string,
     selectedList: Ref<Participant[]>,
-) {
+): {
+    isIncludeInExistingOpen: Ref<boolean>;
+    includeInExistingList: Ref<Participant[]>;
+    includeInExistingActivityId: Ref<number | null>;
+    isSingleIncludeInExisting: Ref<boolean>;
+    includeParticipantInExistingPlan: () => Promise<void>;
+    openIncludeInExistingModal: (isSingle: boolean, participant: Participant | null) => void;
+} {
     const isIncludeInExistingOpen = window.Vue.ref(false);
     const includeInExistingList = window.Vue.ref<Participant[]>([]); // array of participants to include in existing customisation
     const includeInExistingActivityId = window.Vue.ref<number | null>(null);
