@@ -1,32 +1,31 @@
 import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
-import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
-import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
+import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { AgentChatFeedMessage, AgentChatResponseInProgress } from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
 
+/**
+ * Configuration for the request that is dependent on the place implementing Agent Chat
+ */
+export type AgentChatRequestConfig = {
+    /** The route to send messages to */
+    messageRoute: string;
+    /** The AI session ID to include in the request, if required */
+    aiSessionId: AiSession["id"] | null;
+    /** Whether an image is required in responses */
+    requireImage: boolean;
+};
+
 export const useAgentChatStore = defineStore("agentChat", () => {
     const feed = window.Vue.ref<AgentChatFeedMessage[]>([]);
-    const generateRoute = window.Vue.ref<string | null>(null);
 
     const activeGeneration = window.Vue.ref<AgentChatResponseInProgress | null>(null);
 
     /** When allowing selection of a particular entry (such as in the image generator), the selected entry */
     const selectedFeedEntry = window.Vue.ref<AgentChatFeedMessage["entryKey"] | null>(null);
-
-    // State to keep track of the final upload process
-    const uploadLoading = window.Vue.ref(false);
-    const uploadError = window.Vue.ref<string | null>(null);
-
-    /**
-     * Initialise the store
-     * @param $generateRoute - The route to use for generating images
-     */
-    function init($generateRoute: string): void {
-        generateRoute.value = $generateRoute;
-    }
 
     /**
      * @returns The full feed of messages (includes the partial entry at the end if currently generating)
@@ -64,17 +63,18 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
     /**
      * Request a new image from the AI
+     * @param config - The configuration for the request
      * @param payload - The payload to send to the AI
      * @param file - The file that was sent with the request (if any)
      * @returns whether the request was sent successfully or not
      */
-    async function sendRequest(payload: AgentChatApiPayload, file: FileDropFile | null): Promise<boolean> {
+    async function sendRequest(
+        config: AgentChatRequestConfig,
+        payload: AgentChatApiPayload,
+        file: FileDropFile | null,
+    ): Promise<boolean> {
         if (activeGeneration.value !== null) {
             return false;
-        }
-
-        if (generateRoute.value === null) {
-            throw new Error("generateRoute is not set");
         }
 
         feed.value.push({
@@ -103,7 +103,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
         let hasErrored = false;
         const abortController = new AbortController();
-        const response = await generateImage(generateRoute.value, payload, abortController.signal, (event) => {
+        const response = await generateImage(config.messageRoute, payload, abortController.signal, (event) => {
             if (event.data.success === false) {
                 /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
                 hasErrored = true;
@@ -166,8 +166,12 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             return false;
         }
 
-        if (response.data.image === null) {
-            /** TODO: only the image generator requires this, other types won't - make it flexible whilst still having this check for there */
+        /**
+         * The image generator requires an image and uses the scenario where no image is returned
+         * as a moderation error. That *should* be handled already by the backend and returned as a type: error
+         * so we should never actually get here but just in case, check for it to avoid confusion and bad state
+         */
+        if (config.requireImage && response.data.image === null) {
             feed.value.push({
                 type: "response",
                 status: "error",
@@ -198,38 +202,30 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      * Show a lightbox with all the images in the feed
      * @param entryKey - The entry key that should be selected initially
      */
-    function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): void {
-        const slides = feed.value
-            .map((item) => {
-                // only show final images
-                if (item.type !== "response" || item.status !== "success" || !item.image) {
-                    return null;
+    async function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): Promise<void> {
+        // only show successful responses that contain images
+        const finalFeedItems = feed.value.filter((item) => item.type === "response" && item.status === "success");
+
+        const slides: GalleryItem[] = [];
+        let selectedIndex = 0;
+
+        for (const item of finalFeedItems) {
+            if (item.image) {
+                slides.push({ src: `data:${item.image.mime};base64,${item.image.b64}` });
+
+                if (item.entryKey === entryKey) {
+                    selectedIndex = slides.length - 1;
                 }
+            }
+        }
 
-                return {
-                    key: item.entryKey,
-                    src: `data:${item.image.mime};base64,${item.image.b64}`,
-                };
-            })
-            .filter((item) => item !== null);
-
-        document.dispatchEvent(
-            new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
-                detail: {
-                    targetKey: `ac-feed-lightbox`,
-                    options: {
-                        dynamic: true,
-                        dynamicEl: slides.map((item): GalleryItem => ({ src: item.src })),
-                        index: slides.findIndex((slide) => slide.key === entryKey),
-                    },
-                    onCreated: (gallery) => gallery.openGallery(),
-                },
-            }),
-        );
+        const lightbox = await createLightbox("ac-feed-lightbox", slides, {
+            index: selectedIndex,
+        });
+        lightbox.openGallery();
     }
 
     return {
-        init,
         feed,
         fullFeed,
         activeGeneration,
@@ -237,8 +233,6 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,
-        uploadLoading,
-        uploadError,
         spawnLightbox,
     };
 });

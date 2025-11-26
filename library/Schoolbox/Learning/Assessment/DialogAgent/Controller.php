@@ -50,6 +50,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Ramsey\Uuid\Uuid;
 use Twig\Error\Error;
 
 /**
@@ -373,7 +374,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * This is where students will create their dialog agent discussion stuffs
+     * This is where students will create or resume their dialog agent discussion stuffs
      *
      * @param IAssessable $assessment
      * @param User $student
@@ -385,17 +386,14 @@ class Controller extends Assessment\Controller
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        /** @var null|Participant $participant */
+        /** @var Model $assessment */
+
         $participant = $assessment->getParticipantIfExtant($student);
 
         // Is the page being displayed in readonly mode?
         /* TODO Are students allowed to visit this after the activity is closed?
          */
         $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
-
-        // For some reason I can't use get/setFlash?
-        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
-        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
 
         /* Prepare a redirection url
          */
@@ -414,6 +412,8 @@ class Controller extends Assessment\Controller
 
         // TODO: i'll likely need this to create a blank response here if one doesn't exist already but TBC in the chat ticket
 
+        $userTranslator = new User\Translator\Author\ModelToArray();
+
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                 [
@@ -421,84 +421,14 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment' => $assessment,
-            'student' => $student,
+            'openingMessage' => $assessment->getOpeningMessage(),
+            'student' => $userTranslator->__invoke($student),
             'participant' => $participant,
-            'existingResponse' => $existingResponse,
-            'errorMessage' => $errorMessage,
-            'readonly' => $isInteractionLocked,
-            'returnUrl' => $returnUrl,
-        ];
-
-        $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response/create.twig',
-            $data
-        );
-    }
-
-
-    /**
-     * Resume an unsubmitted response
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     * @throws Deleted
-     * @throws Error
-     * @throws Exception
-     * @throws RouteNotFound
-     */
-    public function getResumeResponse(IAssessable $assessment, User $student): void
-    {
-        // TODO: i'm not too sure how actually necessary this is, getCreateResponseForm should be enough??
-        // when would you ever want two draft responses and to be able to resume either one...
-
-        /** @var null|Participant $participant */
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
-         * button which goes to that particular response so students can continue it.
-         *
-         * Otherwise create a new response.
-         */
-        $existingResponse = null;
-
-        if ($participant) {
-            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-                ->equals('learner_id', $participant->getUser()->getId())
-                ->isNull('submitted_by')
-                ->isNull('submitted_at');
-
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-        }
-
-        // Is the page being displayed in readonly mode?
-        /* TODO Are students allowed to visit this after the activity is closed?
-         */
-        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
-
-        // For some reason I can't use get/setFlash?
-        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
-        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-
-        /* Prepare a redirection url
-         */
-        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
-        } else {
-            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
-        }
-        $data = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    sprintf('Create Response for %s', $assessment->getTitle()),
-                ]
-            ),
-            'assessment' => $assessment,
-            'student' => $student,
-            'participant' => $participant,
-            'existingResponse' => $existingResponse,
-            'errorMessage' => $errorMessage,
+            // TODO: This should probably be a ModelToArray
+            'response' => [
+                'aiSessionId' => $existingResponse?->getSessionId() ?? (string)Uuid::uuid4(),
+                'assistanceRequestedAt' => $existingResponse?->getAssistanceRequestedAt() ?? null,
+            ],
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
         ];

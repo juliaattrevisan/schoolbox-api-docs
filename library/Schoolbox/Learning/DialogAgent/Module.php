@@ -146,10 +146,6 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
         $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
-        /* Resume a response
-         */
-        $this->register('GET', "{$assRoute}/{$studentParam}/resume", 'getResumeResponse', $canSubmit, $preloadParticipant);
-
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
@@ -422,7 +418,6 @@ class Module extends BaseModule
                 $this->getAuthorizer(),
                 $this->getMapperFactory()->get(Access::class),
             ),
-            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
             $assessmentMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
             $responseMapperProxy,

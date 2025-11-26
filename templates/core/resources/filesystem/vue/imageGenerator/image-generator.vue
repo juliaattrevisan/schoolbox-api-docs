@@ -29,13 +29,13 @@ interface Props {
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
-window.Vue.onMounted(() => {
-    acStore.init(props.generateRoute);
-});
+// State to keep track of the final upload process
+const uploadLoading = window.Vue.ref<boolean>(false);
+const uploadError = window.Vue.ref<string | null>(null);
 </script>
 
 <template>
-    <div v-if="acStore.uploadLoading" class="ab-pane">
+    <div v-if="uploadLoading" class="ab-pane">
         <h2>Uploading Image</h2>
         <div class="loader"></div>
     </div>
@@ -46,15 +46,32 @@ window.Vue.onMounted(() => {
             and framing. See more information on these on
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
-        <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 35vh" allow-selection />
-        <ac-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
-        <div v-if="acStore.uploadError !== null" class="alert-box alert l-mar--0">
+        <ac-feed
+            v-if="acStore.feed.length > 0"
+            :feed="acStore.fullFeed"
+            class="l-mar-m--bottom"
+            style="max-height: 35vh"
+            allow-selection
+            error-prefix="There was a problem generating the image."
+        />
+        <!-- file context is only available for the first message for now -->
+        <ac-prompt
+            :request-config="{
+                messageRoute: props.generateRoute,
+                aiSessionId: props.aiSessionId,
+                requireImage: true,
+            }"
+            prompt-placeholder="Describe or refine the image you want to generate"
+            :allow-file-drop="acStore.feed.length === 0"
+            :prompt-attributes="props.promptAttributes"
+        />
+        <div v-if="uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
-            {{ acStore.uploadError }}
+            {{ uploadError }}
         </div>
         <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
-    <ig-actions />
+    <ig-actions v-model:uploadLoading="uploadLoading" v-model:uploadError="uploadError" />
 </template>
 
 <style scoped lang="scss">

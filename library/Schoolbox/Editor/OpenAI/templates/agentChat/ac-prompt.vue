@@ -2,22 +2,18 @@
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "./store/agentChatStore";
+import type { AgentChatRequestConfig } from "./store/agentChatStore";
 import type { AgentChatPromptAttribute } from "./agentChatTypes";
 
 interface Props {
-    /**
-     * The extra attributes to show in the prompt (dropdowns)
-     */
+    requestConfig: AgentChatRequestConfig;
+    /** Whether or not to allow a file to be uploaded for image context */
+    allowFileDrop?: boolean;
+    /** The placeholder text for the prompt textarea */
+    promptPlaceholder?: string;
+    /** The extra attributes to show in the prompt (dropdowns) */
     promptAttributes: AgentChatPromptAttribute[];
-    /**
-     * to keep track of the current ai conversation thread
-     * on each load of the tab (in the dropzone modal) this will regen from the backend
-     *
-     * This should be unique for a new unique conversation
-     */
-    aiSessionId: AiSession["id"];
 }
 
 const props = defineProps<Props>();
@@ -69,12 +65,13 @@ async function sendRequest(): Promise<void> {
     }
 
     const isSuccess = await acStore.sendRequest(
+        props.requestConfig,
         {
             userPrompt: prompt.value.trim(),
             attributes: attributes.value,
             imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
             previousResponseId: acStore.getPreviousResponseId(),
-            aiSessionId: props.aiSessionId,
+            aiSessionId: props.requestConfig.aiSessionId,
         },
         currentFile.value,
     );
@@ -105,9 +102,8 @@ const isFormDisabled = window.Vue.computed(() => {
 </script>
 
 <template>
-    <!-- file context is only available for the first message -->
     <file-drop
-        v-if="acStore.feed.length === 0"
+        v-if="props.allowFileDrop"
         id="ac-prompt-file-drop"
         v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
@@ -120,14 +116,14 @@ const isFormDisabled = window.Vue.computed(() => {
             v-model.trim="prompt"
             name="prompt"
             rows="1"
-            placeholder="Describe or refine the image you want to generate"
+            :placeholder="props.promptPlaceholder"
             style="resize: vertical; margin-bottom: 0"
             :disabled="isFormDisabled || undefined"
             required
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
     </label>
-    <div class="ac-prompt-actions actions-small-1 l-mar-m--bottom">
+    <div class="ac-prompt-actions actions-small-1 l-mar-s--bottom">
         <div class="list-item">
             <select
                 v-for="(attr, index) in props.promptAttributes"

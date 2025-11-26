@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
@@ -26,8 +25,6 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgen
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LockedChecker;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -46,7 +43,6 @@ class Controller extends Base
      * Constructor.
      *
      * @param BreadcrumbFactory $bakery
-     * @param Mapper $termMapper
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
@@ -55,7 +51,6 @@ class Controller extends Base
      */
     public function __construct(
         private BreadcrumbFactory $bakery,
-        private \Schoolbox\Assessment\Term\Mapper $termMapper,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
@@ -179,77 +174,6 @@ class Controller extends Base
         }
 
         $this->response = $this->redirectAfterPost($returnUrl);
-    }
-
-
-    /**
-     * Resume an unsubmitted response
-     *
-     * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     * @throws Deleted
-     * @throws Error
-     * @throws Exception
-     * @throws RouteNotFound
-     */
-    public function getResumeResponse(IAssessable $assessment, User $student): void
-    {
-        /** @var null|Participant $participant */
-        $participant = $assessment->getParticipantIfExtant($student);
-
-        /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
-         * button which goes to that particular response so students can continue it.
-         *
-         * Otherwise create a new response.
-         */
-        $existingResponse = null;
-
-        if ($participant) {
-            $pb = $this->dialogAgentResponseMapper->getPredicateBuilder()
-                ->equals('dialog_agent_id', $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId())
-                ->equals('learner_id', $participant->getUser()->getId())
-                ->isNull('submitted_by')
-                ->isNull('submitted_at');
-
-            $existingResponse = $this->dialogAgentResponseMapper->findByPredicates($pb)->first();
-        }
-
-        // Is the page being displayed in readonly mode?
-        /* TODO Are students allowed to visit this after the activity is closed?
-         */
-        $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
-
-        // For some reason I can't use get/setFlash?
-        $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
-        $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-
-        /* Prepare a redirection url
-         */
-        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
-        } else {
-            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
-        }
-        $data = [
-            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    sprintf('Create Response for %s', $assessment->getTitle()),
-                ]
-            ),
-            'assessment' => $assessment,
-            'student' => $student,
-            'participant' => $participant,
-            'existingResponse' => $existingResponse,
-            'errorMessage' => $errorMessage,
-            'readonly' => $isInteractionLocked,
-            'returnUrl' => $returnUrl,
-        ];
-
-        $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response/create.twig',
-            $data
-        );
     }
 
 

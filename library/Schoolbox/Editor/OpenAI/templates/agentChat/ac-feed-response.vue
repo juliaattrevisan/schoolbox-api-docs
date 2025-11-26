@@ -7,6 +7,8 @@ interface Props {
      * The message to display
      */
     message: AgentChatResponse;
+    /** A message to display before the actual error message when generation fails */
+    errorPrefix?: string;
     /** Whether the user can select this response */
     allowSelection: boolean;
 }
@@ -46,7 +48,7 @@ const imageSrc = window.Vue.computed(() => {
         </div>
     </div>
 
-    <div v-else class="ac-feed-response ac-feed-response-success radiolist">
+    <div v-else class="ac-feed-response ac-feed-response-success" :class="{ radiolist: props.allowSelection }">
         <template v-if="props.allowSelection">
             <input
                 :id="radioId"
@@ -59,8 +61,8 @@ const imageSrc = window.Vue.computed(() => {
             <label :for="radioId"> </label>
         </template>
 
-        <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
-            <b>There was a problem generating the image.</b>
+        <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0 l-pad-s">
+            <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
             {{ props.message.message }}
         </p>
 

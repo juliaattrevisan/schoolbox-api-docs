@@ -44,7 +44,7 @@ const sessionFeed = window.Vue.computed<AgentChatFeedMessage[]>(() => {
 </script>
 
 <template>
-    <ac-feed :feed="sessionFeed" :allow-selection="false" />
+    <ac-feed :feed="sessionFeed" :allow-selection="false" error-prefix="There was a problem retrieving the response." />
 </template>
 
 <style scoped></style>
