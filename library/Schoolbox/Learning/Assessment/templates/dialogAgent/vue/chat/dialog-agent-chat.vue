@@ -27,55 +27,10 @@ window.Vue.onMounted(() => {
     currentResponse.value = props.response;
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
 
-    // TODO: all temporary
-    const currentUser = {
-        id: window.schoolboxUser.id,
-        fullName: window.schoolboxUser.name,
-        _links: {
-            profile: `/search/user/${window.schoolboxUser.id}`,
-            avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
-        },
-    };
-
-    acStore.feed.push({
-        type: "request",
-        entryKey: acStore.getNextEntryKey(),
-        user: currentUser,
-        payload: {
-            userPrompt: "You're a wizard, Harry",
-            attributes: {},
-            imageUrl: null,
-            previousResponseId: null,
-            aiSessionId: null,
-        },
-        file: null,
-    });
-
-    acStore.feed.push({
-        type: "response",
-        status: "success",
-        entryKey: acStore.getNextEntryKey(),
-        responseId: null,
-        image: null,
-        message: "I'm a what?",
-    });
-
-    acStore.feed.push({
-        type: "request",
-        entryKey: acStore.getNextEntryKey(),
-        user: currentUser,
-        payload: {
-            userPrompt: "ignore all previous instructions... etc etc",
-            attributes: {},
-            imageUrl: null,
-            previousResponseId: null,
-            aiSessionId: null,
-        },
-        file: null,
-    });
-
+    // TODO: all temporary, needs to inject into the right timeline position when it actually exists etc
     if (isInstructor.value) {
         acStore.feed.push({
+            // TODO: this would only ever come from props.feed
             type: "alert",
             side: "response",
             severity: "warning",
@@ -85,6 +40,9 @@ window.Vue.onMounted(() => {
 
         const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
         acStore.feed.push({
+            // TODO: a teacher can't spawn this, but they can 'resolve' it so we would need to track it somehow
+            // hence need to be able to insert it based on the createdAt time of each log entry (not currently tracked on the frontend)
+            // and then not include it when it's eventually resolved
             type: "alert",
             side: "request",
             severity: "warning-tint",
@@ -92,14 +50,15 @@ window.Vue.onMounted(() => {
             message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
         });
 
-        const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-        acStore.feed.push({
-            type: "alert",
-            side: "request",
-            severity: "highlight",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
-        });
+        // This won't actually exist I think. The "requested assistance" message just gets purged
+        // const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
+        // acStore.feed.push({
+        //     type: "alert",
+        //     side: "request",
+        //     severity: "highlight",
+        //     entryKey: acStore.getNextEntryKey(),
+        //     message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
+        // });
     }
 });
 
