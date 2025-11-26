@@ -9,9 +9,9 @@ class DialogAgentChat
     /**
      * These three params control wildness and output length
      */
-    private const TEMPERATURE = 0.7;
-    private const TOP_P = 0.9;
-    private const MAX_OUTPUT_TOKENS = 20000;
+    private const float TEMPERATURE = 0.7;
+    private const float TOP_P = 0.9;
+    private const int MAX_OUTPUT_TOKENS = 20000;
 
 
     /**
@@ -24,7 +24,7 @@ class DialogAgentChat
      * into DIALOG_AGENT_PROMPT, so that can just be dumped in here. The other placeholders are subject to
      * change more easily and hence have to be handled as additions here.
      */
-    private const PROMPT_SYSTEM_PERSONA = "
+    private const string PROMPT_SYSTEM_PERSONA = "
         [DIALOG_AGENT_PROMPT]
         Course/Unit Context: [COURSE_UNIT_CONTEXT]
         [DIFFERENTIATION_PROFILE]

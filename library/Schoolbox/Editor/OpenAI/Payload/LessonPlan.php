@@ -13,16 +13,16 @@ class LessonPlan
     /**
      * These three params control wildness and output length
      */
-    private const TEMPERATURE = 0.7;
-    private const TOP_P = 0.9;
-    private const MAX_OUTPUT_TOKENS = 20000;
+    private const float TEMPERATURE = 0.7;
+    private const float TOP_P = 0.9;
+    private const int MAX_OUTPUT_TOKENS = 20000;
 
 
     /**
      * This seems mostly the same across most usages, other than specifying that context
      * (some parts stolen directly from openai's docs)
      */
-    private const PROMPT_SYSTEM_PERSONA_MULTIPLE = "
+    private const string PROMPT_SYSTEM_PERSONA_MULTIPLE = "
         You are an expert teacher, proficient in creating engaging, well-developed, and effective learning and teaching
         plans for your students. You will receive a plan type that is part of a specific course and unit within a defined
         curriculum area. Your task is to develop a plan that addresses the provided curriculum content and incorporates
@@ -43,7 +43,7 @@ class LessonPlan
     /**
      * This is the same as above, but for regenerating a single field only
      */
-    private const PROMPT_SYSTEM_PERSONA_SINGLE = "
+    private const string PROMPT_SYSTEM_PERSONA_SINGLE = "
         You are an expert teacher, proficient in creating engaging, well-developed, and effective learning and teaching
         plans for your students. You will receive a plan type that is part of a specific course and unit within a defined
         curriculum area. Your task is to regenerate a single specified field in a teaching plan, based on the full context
@@ -73,7 +73,7 @@ class LessonPlan
      * Something that shapes what the ai would make;
      * provide additional instructions (if meaningful)
      */
-    private const PROMPT_USER_PERSONA_MULTIPLE = "
+    private const string PROMPT_USER_PERSONA_MULTIPLE = "
         Plan Type: [TEMPLATE TITLE]
         Title: [LESSON PLAN TITLE]
         Course/Unit Context: [CONTEXT]
@@ -87,7 +87,7 @@ class LessonPlan
     /**
      * This is the same as above, but for regenerating a single field only
      */
-    private const PROMPT_USER_PERSONA_SINGLE = "
+    private const string PROMPT_USER_PERSONA_SINGLE = "
         Field to Regenerate: [CURRENT FIELD TITLE]
 
         Plan Type: [TEMPLATE TITLE]
@@ -105,7 +105,7 @@ class LessonPlan
     /**
      * A structure that AI is supposed to obey, but...I don't think it cares
      */
-    private const RESPONSE_FORMAT = [
+    private const array RESPONSE_FORMAT = [
         'type' => 'json_schema',
         'name' => 'fields_format',
         'schema' => [

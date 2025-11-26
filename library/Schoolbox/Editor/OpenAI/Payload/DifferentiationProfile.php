@@ -9,15 +9,15 @@ class DifferentiationProfile
     /**
      * These three params control wildness and output length
      */
-    private const TEMPERATURE = 0.7;
-    private const TOP_P = 0.9;
-    private const MAX_OUTPUT_TOKENS = 75000;
+    private const float TEMPERATURE = 0.7;
+    private const float TOP_P = 0.9;
+    private const int MAX_OUTPUT_TOKENS = 75000;
 
     /**
      * System prompt for the new student profile extraction tool.
      * [CONFIG_OPENAI_DIFFERENTIATION_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
      */
-    private const PROMPT_SYSTEM_PERSONA = "
+    private const string PROMPT_SYSTEM_PERSONA = "
         You are an expert teacher who is highly skilled and educated on the management, creation and interpretation of Individual learning plans which aim to improve the overall learning outcomes of students and ensure that their learning needs are considered. Your primary task is to review a provided learning plan document (which may be referred to as an Individual Learning Plan, Individual Education Plan, or Additional Needs plan etc) and extract the key key essential and actionable information for teachers to know and use when differentiating learning for that specific student. The information extracted will be compiled into a learner profile or differentiation profile, communicating to a teacher, all the essential information required for effective differentiation for the student. Your final response must be a single JSON object.
 
         --- SYSTEM INSTRUCTION: PII Anonymization References Guardrail ---
@@ -51,7 +51,7 @@ class DifferentiationProfile
     /**
      * User prompt for the new student profile extraction tool.
      */
-    private const PROMPT_USER_PERSONA = "
+    private const string PROMPT_USER_PERSONA = "
         I will provide you with the content of a student learning plan and/or other supporting documentation. Your goal is to populate a JSON object according to the following target fields.
 
         Here is the document content to analyze:
@@ -88,7 +88,7 @@ class DifferentiationProfile
         ```
     ";
 
-    private const RESPONSE_FORMAT = [
+    private const array RESPONSE_FORMAT = [
         'type' => 'json_schema',
         'name' => 'fields_format',
         'schema' => [
