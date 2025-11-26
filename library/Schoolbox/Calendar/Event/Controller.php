@@ -121,7 +121,7 @@ class Controller extends Base
      */
     public function getEvent(Event $event): void
     {
-        $helper = new Helper($this->roleMapper, $this->folderMapper);
+        $helper = new Helper($this->roleMapper, $this->folderMapper, $this->resourceBookingMapper);
 
         try {
             $attendanceStatus = $this->attendanceMapper->findOneByColumnList([
@@ -140,7 +140,7 @@ class Controller extends Base
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
-            'resourceBookings' => $this->resourceBookingMapper->findByColumn('event_id', $event->getId()),
+            'resourceBookingsCollection' => $helper->getResourceBookingsCollection($event),
             'user' => $this->getUser(),
 
             /* Modify perms are calculated in the attendance list fragment

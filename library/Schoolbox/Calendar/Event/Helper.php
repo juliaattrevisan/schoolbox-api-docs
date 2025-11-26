@@ -11,6 +11,8 @@ namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Relation\Role;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\RoleMapper;
@@ -30,15 +32,22 @@ class Helper
     private $folderMapper;
 
     /**
+     * @var ResourceBookingMapper
+     */
+    private ResourceBookingMapper $resourceBookingMapper;
+
+    /**
      * Helper constructor.
      *
-     * @param RoleMapper   $roleMapper
+     * @param RoleMapper $roleMapper
      * @param FolderMapper $folderMapper
+     * @param ResourceBookingMapper $resourceBookingMapper
      */
-    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper)
+    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper, ResourceBookingMapper $resourceBookingMapper)
     {
-        $this->roleMapper   = $roleMapper;
+        $this->roleMapper = $roleMapper;
         $this->folderMapper = $folderMapper;
+        $this->resourceBookingMapper = $resourceBookingMapper;
     }
 
     /**
@@ -115,6 +124,27 @@ class Helper
             $result[] = [
                 'name' => $folder->getNameWithCodes(),
                 'id'   => $folder->getId(),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Event $event
+     * @return array
+     */
+    public function getResourceBookingsCollection(Event $event): array
+    {
+        $result = [];
+
+        $resourceBookings = $this->resourceBookingMapper->findByColumn('event_id', $event->getId());
+
+        /** @var ResourceBookingModel $resourceBooking */
+        foreach ($resourceBookings as $resourceBooking) {
+            $result[] = [
+                'name' => $resourceBooking->getName(),
+                'id'   => $resourceBooking->getId(),
             ];
         }
 

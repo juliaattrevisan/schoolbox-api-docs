@@ -35,6 +35,8 @@ export default {
     props: ["event"],
 
     data() {
+        console.info("calendar-event-details.vue data()");
+        console.info("calendar-event-details.vue data() this.event.resourceBookings: ", this.event.resourceBookings);
         return {
             currentAttendanceStatus: this.event.attendance.status.current,
             numMax: this.event.attendance.payload.attendees.max,
@@ -119,6 +121,7 @@ export default {
     },
 
     created() {
+        console.info("calendar-event-details.vue created() e");
         this.ENDPOINTS = ENDPOINTS;
         this.canRsvp = checks.canRsvp;
         this.showRsvpButtons = checks.showRsvpButtons;
@@ -131,6 +134,7 @@ export default {
         this.FORMAT_LONG_DATE_WITH_TIME = FORMAT_LONG_DATE_WITH_TIME;
         this.FORMAT_DATE_ONLY = FORMAT_DATE_ONLY;
         this.FORMAT_TIME_ONLY = FORMAT_TIME_ONLY;
+        console.info("calendar-event-details.vue created() x");
     },
 
     methods: {
@@ -646,6 +650,21 @@ export default {
                     </template>
                 </section>
             </template>
+        </div>
+
+        <div class="small-12 medium-8 island">
+            <section class="detail content">
+                <div class="title-section">
+                    <h1>Resource Bookings</h1>
+                </div>
+                <div class="meta">
+                    <ul class="action-list resource-bookings-list" v-if="this.event.resourceBookings">
+                        <li class="actions-small-1" v-for="booking in this.event.resourceBookings" :key="booking.id">
+                            {{ booking.name }}
+                        </li>
+                    </ul>
+                </div>
+            </section>
         </div>
 
         <div data-toast class="toast"></div>
