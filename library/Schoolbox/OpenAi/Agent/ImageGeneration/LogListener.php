@@ -60,7 +60,7 @@ class LogListener implements IListener
                 /** couldn't decode the final message data, log an error instead - It should be impossible to end up here? */
                 $event = [
                     'status' => 'error',
-                    'responseId' => $responseId ?? null,
+                    'responseId' => null,
                     'message' => 'Failed to decode',
                 ];
             } else if (MessageEventType::COMPLETE->value === $outputMessage->eventType) {
@@ -90,7 +90,7 @@ class LogListener implements IListener
 
                 $event = [
                     'status' => 'error',
-                    'responseId' => $responseId ?? null,
+                    'responseId' => $data['responseId'] ?? null,
                     'message' => $failureMessage,
                 ];
             }
