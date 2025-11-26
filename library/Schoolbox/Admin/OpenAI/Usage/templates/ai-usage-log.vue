@@ -54,16 +54,23 @@ type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
     };
 }[AiLogType];
 
-const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | null>(() => {
+type AiSelectedSessionInfoLoading = Pick<AiSelectedSessionInfo, "session">;
+
+const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelectedSessionInfoLoading | null>(() => {
     if (selectedSessionId.value === null) {
         return null;
     }
 
     const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
-    const logInfo = selectedSessionLog.value;
-
-    if (sessionInfo === undefined || logInfo === null) {
+    if (sessionInfo === undefined) {
+        console.warn(`Session ID ${selectedSessionId.value} not found`); // shouldn't get here
         return null;
+    }
+
+    const logInfo = selectedSessionLog.value;
+    if (logInfo === null) {
+        // still loading
+        return { session: sessionInfo };
     }
 
     const info = { logType: sessionInfo.logType, session: sessionInfo, log: logInfo };
@@ -302,42 +309,41 @@ async function openSessionDetails(session: AiSession): Promise<void> {
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else-if="selectedSessionId !== null || sessionLoadError !== null">
-                <div v-if="selectedSessionInfo === null" class="loader"></div>
-                <template v-else>
-                    <div class="card small-12">
-                        <span>
-                            <user-photo :user-id="selectedSessionInfo.session.createdBy.id || 0" render="small" />
-                            <h3>
-                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                            </h3>
-                        </span>
-                        <p class="meta">
-                            Created by
-                            <component
-                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
-                            >
-                                {{ selectedSessionInfo.session.createdBy.fullName }}
-                            </component>
-                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+            <section v-else-if="selectedSessionInfo !== null">
+                <div class="card small-12">
+                    <span>
+                        <user-photo :user-id="selectedSessionInfo.session.createdBy.id || 0" render="small" />
+                        <h3>
+                            {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
+                        </h3>
+                    </span>
+                    <p class="meta">
+                        Created by
+                        <component
+                            :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                            :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                        >
+                            {{ selectedSessionInfo.session.createdBy.fullName }}
+                        </component>
+                        <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
+
+                <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
+                <div v-else class="l-mar-m">
+                    <aul-agent-chat
+                        v-if="selectedSessionInfo.logType === AiLogType.AGENT_CHAT"
+                        :session-log="selectedSessionInfo.log"
+                    />
+                    <div v-else class="empty-state">
+                        <i class="icon-view-hollow"></i>
+                        <p>
+                            The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
+                            previews for this session.
                         </p>
                     </div>
-                    <div class="clearfix"></div>
-                    <div class="l-mar-m">
-                        <aul-agent-chat
-                            v-if="selectedSessionInfo.logType === AiLogType.AGENT_CHAT"
-                            :session-log="selectedSessionInfo.log"
-                        />
-                        <div v-else class="empty-state">
-                            <i class="icon-view-hollow"></i>
-                            <p>
-                                The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not
-                                support previews for this log.
-                            </p>
-                        </div>
-                    </div>
-                </template>
+                </div>
             </section>
         </div>
     </div>
