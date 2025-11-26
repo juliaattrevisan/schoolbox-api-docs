@@ -32,17 +32,31 @@ class EventTest extends TestCase
      *
      * @param string $start
      * @param string $end
-     * @param $class
+     * @param string $class
+     * @param int|null $resourceId
      * @return DayEvent|mixed
      */
-    private function makeEvent(string $start, string $end, $class = DayEvent::class)
+    private function makeEvent(string $start, string $end, $class = DayEvent::class, ?int $resourceId = 1)
     {
         $event = new $class();
         $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
         $event->setEndTime(Alaress_Date_Format::newDatabaseDate($end));
 
         if ($class === ResourceBookingEvent::class) {
-            $event->setBooking(new BookingModel()->setStatus(new BookingStatusModel()->setId(BookingStatusModel::STATUS_APPROVED)));
+            // provide a minimal booking with approved status and a resource id so isClash can check resource equality
+            $booking = new BookingModel();
+            $booking->setStatus((new BookingStatusModel())->setId(BookingStatusModel::STATUS_APPROVED));
+            if (!is_null($resourceId)) {
+                $resource = new \Schoolbox\ResourceBooking\Item\Model();
+                $resource->setId($resourceId);
+                $booking->setResource($resource);
+            }
+            $event->setBooking($booking);
+        } else {
+            // non-resourcebooking events should carry a resource id for comparison
+            if (!is_null($resourceId) && method_exists($event, 'setResourceId')) {
+                $event->setResourceId($resourceId);
+            }
         }
         return $event;
     }
@@ -54,9 +68,10 @@ class EventTest extends TestCase
      * @param string $end
      * @param int $bookingId
      * @param int $statusId
+     * @param int|null $resourceId
      * @return ResourceBookingEvent
      */
-    private function makeResourceBookingEvent(string $start, string $end, int $bookingId, int $statusId): ResourceBookingEvent
+    private function makeResourceBookingEvent(string $start, string $end, int $bookingId, int $statusId, ?int $resourceId = 1): ResourceBookingEvent
     {
         $event = new ResourceBookingEvent();
         $event->setStartTime(Alaress_Date_Format::newDatabaseDate($start));
@@ -67,6 +82,11 @@ class EventTest extends TestCase
         $status = new BookingStatusModel();
         $status->setId($statusId);
         $booking->setStatus($status);
+
+        // attach the provided resource id so resource comparisons succeed
+        $resource = new \Schoolbox\ResourceBooking\Item\Model();
+        $resource->setId($resourceId);
+        $booking->setResource($resource);
 
         $event->setBooking($booking);
         return $event;
@@ -95,11 +115,13 @@ class EventTest extends TestCase
         string $classA,
         string $classB,
         bool $expected,
+        ?int $aResourceId = null,
+        ?int $bResourceId = null,
         ?int $aCategory = null,
         ?int $bCategory = null
     ): void {
-        $a = $this->makeEvent($aStart, $aEnd, $classA);
-        $b = $this->makeEvent($bStart, $bEnd, $classB);
+        $a = $this->makeEvent($aStart, $aEnd, $classA, $aResourceId);
+        $b = $this->makeEvent($bStart, $bEnd, $classB, $bResourceId);
 
         if (!is_null($aCategory)) {
             $a->setCategoryId($aCategory);
@@ -122,6 +144,8 @@ class EventTest extends TestCase
                 DayEvent::class, // classA
                 DayEvent::class, // classB
                 true, // clash expected
+                1, // aResourceId
+                1, // bResourceId
                 null, // aCategory
                 null, // bCategory
             ],
@@ -133,6 +157,8 @@ class EventTest extends TestCase
                 DayEvent::class,
                 DayEvent::class,
                 false,
+                1,
+                1,
                 null,
                 null,
             ],
@@ -144,6 +170,8 @@ class EventTest extends TestCase
                 TimetableEvent::class,
                 TimetableEvent::class,
                 false,
+                1,
+                1,
                 42,
                 42,
             ],
@@ -155,6 +183,8 @@ class EventTest extends TestCase
                 SudsTimetableEvent::class,
                 SudsTimetableEvent::class,
                 true,
+                1,
+                1,
                 42,
                 42,
             ],
@@ -166,6 +196,8 @@ class EventTest extends TestCase
                 SudsTimetableEvent::class,
                 SudsTimetableEvent::class,
                 true,
+                1,
+                1,
                 -1, // category -1 is the unset category id
                 -1, // category -1 is the unset category id
             ],
@@ -177,6 +209,8 @@ class EventTest extends TestCase
                 SudsTimetableEvent::class,
                 SudsTimetableEvent::class,
                 true,
+                1,
+                1,
                 10,
                 11,
             ],
@@ -188,6 +222,8 @@ class EventTest extends TestCase
                 SudsTimetableEvent::class,
                 SudsTimetableEvent::class,
                 false,
+                1,
+                1,
                 10,
                 10,
             ],
@@ -200,6 +236,8 @@ class EventTest extends TestCase
                 DayEvent::class,
                 TimetableEvent::class,
                 true,
+                1,
+                1,
                 null,
                 null,
             ],
@@ -211,6 +249,8 @@ class EventTest extends TestCase
                 DayEvent::class,
                 TimetableEvent::class,
                 false,
+                1,
+                1,
                 null,
                 null,
             ],
@@ -222,6 +262,8 @@ class EventTest extends TestCase
                 DayEvent::class,
                 SudsTimetableEvent::class,
                 true,
+                1,
+                1,
                 null,
                 null,
             ],
@@ -233,6 +275,8 @@ class EventTest extends TestCase
                 TimetableEvent::class,
                 SudsTimetableEvent::class,
                 true,
+                1,
+                1,
                 null,
                 null,
             ],
@@ -244,6 +288,8 @@ class EventTest extends TestCase
                 TimetableEvent::class,
                 SudsTimetableEvent::class,
                 false,
+                1,
+                1,
                 null,
                 null,
             ],
@@ -256,8 +302,8 @@ class EventTest extends TestCase
                 ResourceBookingEvent::class,
                 TimetableEvent::class,
                 true,
-                null,
-                null,
+                1,
+                1,
             ],
             'resourcebooking-vs-timetable-non-overlap' => [
                 '2025-11-13 09:00:00',
@@ -267,8 +313,8 @@ class EventTest extends TestCase
                 ResourceBookingEvent::class,
                 TimetableEvent::class,
                 false,
-                null,
-                null,
+                1,
+                1,
             ],
             'resourcebooking-vs-suds-overlap' => [
                 '2025-11-13 09:00:00',
@@ -278,8 +324,8 @@ class EventTest extends TestCase
                 ResourceBookingEvent::class,
                 SudsTimetableEvent::class,
                 true,
-                null,
-                null,
+                1,
+                1,
             ],
             'resourcebooking-vs-suds-non-overlap' => [
                 '2025-11-13 09:00:00',
@@ -289,8 +335,8 @@ class EventTest extends TestCase
                 ResourceBookingEvent::class,
                 SudsTimetableEvent::class,
                 false,
-                null,
-                null,
+                1,
+                1,
             ],
         ];
     }
@@ -319,10 +365,12 @@ class EventTest extends TestCase
         int $aStatus,
         int $bBookingId,
         int $bStatus,
+        ?int $aResourceId = 1,
+        ?int $bResourceId = 1,
         bool $expected
     ): void {
-        $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
-        $b = $this->makeResourceBookingEvent($bStart, $bEnd, $bBookingId, $bStatus);
+        $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus, $aResourceId);
+        $b = $this->makeResourceBookingEvent($bStart, $bEnd, $bBookingId, $bStatus, $bResourceId);
 
         $this->assertSame($expected, $a->isClash($b));
     }
@@ -339,6 +387,8 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING, // aStatus
                 100, // bBookingId
                 BookingStatusModel::STATUS_PENDING, // bStatus
+                1, // aResourceId
+                1, // bResourceId
                 false, // clash expected
             ],
             'b-not-pending-no-clash' => [
@@ -350,6 +400,8 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 102,
                 BookingStatusModel::STATUS_APPROVED,
+                1,
+                1,
                 true,
             ],
             'b-pending-and-overlap-clash' => [
@@ -361,6 +413,8 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 202,
                 BookingStatusModel::STATUS_PENDING,
+                1,
+                1,
                 true,
             ],
             'both-pending-overlap-clash' => [
@@ -372,6 +426,8 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_PENDING,
                 402,
                 BookingStatusModel::STATUS_PENDING,
+                1,
+                1,
                 false,
             ],
             'both-approved-overlap-no-clash' => [
@@ -383,6 +439,8 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 502,
                 BookingStatusModel::STATUS_APPROVED,
+                1,
+                1,
                 true,
             ],
             'b-pending-but-non-overlap-no-clash' => [
@@ -394,6 +452,8 @@ class EventTest extends TestCase
                 BookingStatusModel::STATUS_APPROVED,
                 302,
                 BookingStatusModel::STATUS_PENDING,
+                1,
+                1,
                 false,
             ],
             // RB vs Timetable cases will be tested separately
@@ -421,10 +481,11 @@ class EventTest extends TestCase
         string $bEnd,
         int $aBookingId,
         int $aStatus,
+        ?int $aResourceId = 1,
         string $timetableClass,
         bool $expected
     ): void {
-        $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus);
+        $a = $this->makeResourceBookingEvent($aStart, $aEnd, $aBookingId, $aStatus, $aResourceId);
         $b = $this->makeEvent($bStart, $bEnd, $timetableClass);
 
         $this->assertSame($expected, $a->isClash($b));
@@ -440,6 +501,7 @@ class EventTest extends TestCase
                 '2025-11-13 10:30:00', // bEnd
                 601, // aBookingId
                 BookingStatusModel::STATUS_PENDING, // aStatus
+                1, // aResourceId
                 TimetableEvent::class, // timetableClass
                 true, // clash expected
             ],
@@ -450,6 +512,7 @@ class EventTest extends TestCase
                 '2025-11-13 10:30:00',
                 602,
                 BookingStatusModel::STATUS_APPROVED,
+                1,
                 TimetableEvent::class,
                 true,
             ],
@@ -460,6 +523,7 @@ class EventTest extends TestCase
                 '2025-11-13 10:30:00',
                 603,
                 BookingStatusModel::STATUS_PENDING,
+                1,
                 SudsTimetableEvent::class,
                 true,
             ],
@@ -470,6 +534,7 @@ class EventTest extends TestCase
                 '2025-11-13 11:00:00',
                 604,
                 BookingStatusModel::STATUS_APPROVED,
+                1,
                 TimetableEvent::class,
                 false,
             ],

@@ -467,6 +467,17 @@ class Event extends EventBase
             return false;
         }
 
+        // check this is for the same resource (assume nothing)
+        $resourceIdA = ($eventA instanceof \Calendar\Event\Type\ResourceBooking\Event)
+            ? $eventA->getBooking()->getResource()->getId()
+            : $eventA->getResourceId();
+        $resourceIdB = ($eventB instanceof \Calendar\Event\Type\ResourceBooking\Event)
+            ? $eventB->getBooking()->getResource()->getId()
+            : $eventB->getResourceId();
+        if ($resourceIdA !== $resourceIdB) {
+            return false;
+        }
+
         // if either event is a rejected booking, skip
         if ($eventA instanceof \Calendar\Event\Type\ResourceBooking\Event) {
             if ($eventA->getBooking()->getStatus()->isRejected()) {
