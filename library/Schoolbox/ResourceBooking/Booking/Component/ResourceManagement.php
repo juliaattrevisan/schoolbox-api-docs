@@ -118,8 +118,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                     ];
                 }
 
-                // add to the list only if its published
-                if ($eventA->getBooking()->getStatus()->isApproved()) {
+                // we default to showing all pending bookings, so we can see what we need to approve
+                if ($eventA->getBooking()->getStatus()->isPending()) {
                     $eventAHash = spl_object_hash($eventA);
                     $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash] = [
                         'event' => $eventA,
@@ -132,8 +132,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                     /** @var Event $eventB */
                     $eventB = $resourceEvents[$j];
 
-                    // approved bookings have been recorded, lets only care about pending ones (clashes)
-                    if (!$eventB->getBooking()->getStatus()->isPending()) {
+                    // pending bookings have been recorded, lets only care about approved ones (clashes)
+                    if ($eventB->getBooking()->getStatus()->isPending()) {
                         continue;
                     }
 
