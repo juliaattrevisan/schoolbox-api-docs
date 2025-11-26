@@ -367,7 +367,7 @@ class Client implements IClient
      *                                                             before sending to the stream.
      * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
      *                                                             OpenAI, and modify the log accordingly.
-     * @return iterable<EventStream\Message> Each message in the stream as it's received.
+     * @return iterable<string> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(

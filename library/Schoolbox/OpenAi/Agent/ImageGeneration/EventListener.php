@@ -46,7 +46,6 @@ class EventListener implements IListener
      * into a structured format for the frontend that is independent of the AI provider
      *
      * @param Message $rawMessage The raw message from the stream to be parsed
-     * @param string|null &$responseId A reference to the response ID to set when we receive it so it can be reused between calls
      * @return ?Message A new Message object corresponding to one of the AgentChatMessageEventType cases
      * @throws SchoolboxException if an error occurs during processing, such as a refusal or incomplete response
      * @throws UnexpectedValueException if the message data is not valid JSON or cannot be decoded
@@ -148,7 +147,7 @@ class EventListener implements IListener
             return new Message(
                 json_encode(
                     [
-                        'responseId' => $responseId ?? $data['response']['id'] ?? null,
+                        'responseId' => $this->responseId ?? $data['response']['id'] ?? null,
                         'image'      => $imageBase64 ? self::translateImageData($imageBase64) : null,
                         'message'    => $outputContent['text'] ?? '',
                     ],
@@ -227,5 +226,4 @@ class EventListener implements IListener
             'mime' => 'image/png',
         ];
     }
-
 }

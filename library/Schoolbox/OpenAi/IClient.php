@@ -59,7 +59,7 @@ interface IClient
      *                                                             before sending to the stream.
      * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
      *                                                             OpenAI, and modify the log accordingly.
-     * @return iterable<EventStream\Message> Each message in the stream as it's received.
+     * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
     public function createResponseStream(
@@ -97,7 +97,7 @@ interface IClient
      *                                                              before sending to the stream.
      * @param ?LogHandler\Listener\IListener  $logListener          If set: call this for each message received from
      *                                                              OpenAI, and modify the log accordingly.
-     * @return iterable<EventStream\Message>
+     * @return iterable<string>
      */
     public function createChatCompletionStream(
         array $payload,
