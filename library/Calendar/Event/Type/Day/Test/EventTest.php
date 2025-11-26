@@ -338,6 +338,29 @@ class EventTest extends TestCase
                 1,
                 1,
             ],
+            // resource mismatch should not clash even if times overlap
+            'resourcebooking-vs-timetable-different-resource-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                ResourceBookingEvent::class,
+                TimetableEvent::class,
+                false,
+                1,
+                2,
+            ],
+            'resourcebooking-vs-suds-different-resource-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                ResourceBookingEvent::class,
+                SudsTimetableEvent::class,
+                false,
+                1,
+                2,
+            ],
         ];
     }
 
@@ -456,7 +479,45 @@ class EventTest extends TestCase
                 1,
                 false,
             ],
-            // RB vs Timetable cases will be tested separately
+            'overlap-different-resource-no-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                701,
+                BookingStatusModel::STATUS_APPROVED,
+                702,
+                BookingStatusModel::STATUS_APPROVED,
+                1, // aResourceId
+                2, // bResourceId (different resource)
+                false,
+            ],
+            'b-rejected-no-clash' => [ // rejected bookings do not clash
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                801,
+                BookingStatusModel::STATUS_APPROVED,
+                802,
+                BookingStatusModel::STATUS_REJECTED,
+                1,
+                1,
+                false,
+            ],
+            'a-rejected-no-clash' => [ // again rejected bookings don't clash
+                '2025-11-13 09:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 09:30:00',
+                '2025-11-13 10:30:00',
+                901,
+                BookingStatusModel::STATUS_REJECTED,
+                902,
+                BookingStatusModel::STATUS_APPROVED,
+                1,
+                1,
+                false,
+            ],
         ];
     }
 
