@@ -23,6 +23,11 @@ class Calendar extends DeprecatedModel
      */
     private $groupHandler;
 
+    /**
+     * @var ResourceBookingMapper
+     */
+    private ResourceBookingMapper $resourceBookingMapper;
+
     /** @var string[] */
     private $colourSet;
 
@@ -35,6 +40,7 @@ class Calendar extends DeprecatedModel
         $this->_index = "id";
 
         $this->groupHandler = new Group(UserAccess::SERVICE_CALENDAR);
+        $this->resourceBookingMapper = ResourceBookingMapper::getInstance();
 
         parent::__construct();
     }
@@ -438,9 +444,8 @@ class Calendar extends DeprecatedModel
             // Get linked ResourceBookingModels for all events.
             // Get them all in one query outside the loop below to minimise the number of database queries.
             $allEventIds = array_map(static fn ($currentEvent) => $currentEvent['id'], $allEvents);
-            $resourceBookingMapper = ResourceBookingMapper::getInstance();
             /** @var array<int, GenericCollection<ResourceBookingModel>> $resourceBookingModelsByEventId */
-            $resourceBookingModelsByEventId = $resourceBookingMapper->getForAllEventIds($allEventIds);
+            $resourceBookingModelsByEventId = $this->resourceBookingMapper->getForAllEventIds($allEventIds);
 
             foreach ($allEvents as $currentEvent) {
                 $event = new Event();
