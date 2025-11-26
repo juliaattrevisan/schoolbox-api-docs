@@ -161,6 +161,49 @@ function submitResponse(): void {
 
     console.warn("TODO"); // TODO
 }
+
+/**
+ * The max height of the feed area, responsive to screen size
+ */
+const maxHeight = window.Vue.ref("50vh");
+
+const feedContainerEl = window.Vue.useTemplateRef<HTMLDivElement>("feedContainerRef");
+
+/**
+ * Update the max height on mount and on resize
+ */
+function updateMaxHeight(): void {
+    const footer = document.querySelector("#footer");
+    const content = document.querySelector("#content");
+    const container = document.querySelector("#container");
+    if (!feedContainerEl.value || !footer || !content || !container) return;
+
+    const feedRect = feedContainerEl.value.getBoundingClientRect();
+    const footerRect = footer.getBoundingClientRect();
+    const contentRect = content.getBoundingClientRect();
+    const bodyRect = document.body.getBoundingClientRect();
+
+    const totalUsedHeight =
+        footerRect.height + // subtract the footer height
+        (feedRect.y - bodyRect.y) + // the height between the top of the body (to account for scroll) and the top of the feed
+        (contentRect.bottom - feedRect.bottom) + // the extra space below the feed until the bottom of the used content area
+        parseInt(getComputedStyle(container).paddingBottom, 10);
+
+    maxHeight.value = `${window.innerHeight - totalUsedHeight}px`;
+}
+
+const observer = window.Vue.ref<ResizeObserver | null>(null);
+
+window.Vue.onMounted(() => {
+    updateMaxHeight();
+    observer.value = new ResizeObserver(updateMaxHeight);
+    if (!feedContainerEl.value) {
+        console.warn("<dialog-agent-chat>: unable to find feed container");
+        return;
+    }
+
+    observer.value.observe(feedContainerEl.value);
+});
 </script>
 
 <template>
@@ -180,30 +223,33 @@ function submitResponse(): void {
         </nav>
     </div>
 
-    <ac-feed
-        class="l-mar-m--bottom"
-        style="max-height: 50vh; height: 100%"
-        :feed="acStore.fullFeed"
-        error-prefix="There was a problem retrieving the response."
-    >
-        <template #header>
-            <div
-                v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
-            >
-                <div class="l-flex l-flex--justify-space l-flex--align-center">
-                    <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
-                    <button
-                        class="button warning l-mar--0 dac-feed-help-dismiss"
-                        type="button"
-                        @click="changeHelpRequest(false)"
-                    >
-                        Help No Longer Needed
-                    </button>
+    <div ref="feedContainerRef">
+        <ac-feed
+            class="l-mar-m--bottom"
+            style="height: 100%; min-height: 20rem"
+            :style="{ maxHeight }"
+            :feed="acStore.fullFeed"
+            error-prefix="There was a problem retrieving the response."
+        >
+            <template #header>
+                <div
+                    v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
+                    class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
+                >
+                    <div class="l-flex l-flex--justify-space l-flex--align-center">
+                        <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
+                        <button
+                            class="button warning l-mar--0 dac-feed-help-dismiss"
+                            type="button"
+                            @click="changeHelpRequest(false)"
+                        >
+                            Help No Longer Needed
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </template>
-    </ac-feed>
+            </template>
+        </ac-feed>
+    </div>
     <ac-prompt
         v-if="props.generateRoute"
         :request-config="{
