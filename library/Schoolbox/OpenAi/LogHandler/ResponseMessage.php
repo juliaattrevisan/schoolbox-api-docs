@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\LogHandler;
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 
 /**
  * Handle messages from OpenAI's Response API:
@@ -37,28 +38,36 @@ class ResponseMessage implements ILogHandler
     /**
      * Handle the message by stripping image data when writing to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
-    {
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+        ?callable $streamListener,
+        ?IListener $logListener,
+    ): Log\Model {
         // Prepare the message for logging
-        $eventType = $message->eventType;
+        $eventType = $outputMessage->eventType;
         $rawData   = [];
         try {
-            $rawData      = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $rawData      = json_decode($outputMessage->data, true, 512, JSON_THROW_ON_ERROR);
             $filteredData = $this->filterResponseForLogging($eventType, $rawData);
             if (isset($filteredData['response'])) {
                 $filteredData['response'] = $this->filterImageGenerationOutput($filteredData['response']);
             }
 
             // Override message data before writing it
-            $message->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
+            $outputMessage->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
         }
 
         // This chunk gets added to the log
-        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+        $log->setResponse(($log->getResponse() ?? '') . $outputMessage->__toString());
         if (is_callable($streamListener)) {
-            $streamListener($message, $log);
+            $streamListener($outputMessage, $log);
+        }
+        if ($logListener) {
+            $log = $logListener->updateLog($log, $outputMessage, $rawMessage);
         }
         if (isset($rawData['response'])) {
             // Handle information about the response

@@ -398,7 +398,13 @@ class Client implements IClient
                 // even if that raises an exception, still save the log
                 try {
                     // logHandler may modify the message, so clone it so we can yield later
-                    $log = $logHandler->handleMessage(clone $message, $log, $streamListener);
+                    $log = $logHandler->handleMessage(
+                        clone $outputMessage,
+                        clone $message,
+                        $log,
+                        $streamListener,
+                        $logListener,
+                    );
                 } finally {
                     $this->saveLog($log);
                 }

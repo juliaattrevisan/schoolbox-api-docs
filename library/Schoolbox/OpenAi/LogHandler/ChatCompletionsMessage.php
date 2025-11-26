@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\LogHandler;
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 
 /**
  * Handle messages from OpenAI's Chat Completions API:
@@ -22,8 +23,13 @@ class ChatCompletionsMessage implements ILogHandler
     /**
      * Handle the message by writing it directly to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
-    {
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+        ?callable $streamListener,
+        ?IListener $logListener,
+    ): Log\Model {
         // Chat completions messages don't have an event type:
         // just write the message data directly to the log.
 
@@ -36,15 +42,18 @@ class ChatCompletionsMessage implements ILogHandler
             //   handled uniquely
 
             // Omit partial and completed image data from the output
-            $rawData = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $rawData = json_decode($outputMessage->data, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
         }
 
         // This chunk gets added to the log
-        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
+        $log->setResponse(($log->getResponse() ?? '') . $outputMessage->__toString());
         if (is_callable($streamListener)) {
-            $streamListener($message, $log);
+            $streamListener($outputMessage, $log);
+        }
+        if ($logListener) {
+            $log = $logListener->updateLog($log, $outputMessage, $rawMessage);
         }
 
         // Otherwise, handle the data from the message as if it were a response
