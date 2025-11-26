@@ -14,6 +14,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -85,6 +87,8 @@ class Module extends BaseModule
             $this->injector->get('filesystem.storageProxy'),
             new ParserFactory(),
             $this->injector->get('ai.clientFactory'),
+            $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
+            $this->injector->get('assessmentDataSource')
         );
     }
 }

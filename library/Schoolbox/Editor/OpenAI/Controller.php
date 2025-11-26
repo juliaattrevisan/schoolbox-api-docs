@@ -18,11 +18,14 @@ use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
+use Schoolbox\OpenAi\Agent\LearningActivityCustomisationGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
@@ -51,6 +54,8 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
+        private DifferentiationProfileMapper $differentiationProfileMapper,
+        private MapperProxy $assessmentMapperProxy,
     ) {
     }
 
@@ -331,6 +336,74 @@ class Controller extends Base
             $returnCode = 404;
 
             $problem = (new ApiProblem("AI Learning Activity Customisation is not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+
+        $aiSessionId = (string)Uuid::uuid4();
+
+        $agent = new LearningActivityCustomisationGeneration(
+            $this->clientFactory->buildForFeature(Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION),
+            $diffConfig,
+        );
+
+        $studentId = $this->requestPost->get('studentId');
+        if (!$studentId) {
+            $returnCode = 400;
+
+            $problem = (new ApiProblem("Student Id is required."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+
+        $assessmentId = $this->requestPost->get('assessmentId');
+        if (!$assessmentId) {
+            $returnCode = 400;
+
+            $problem = (new ApiProblem("Assessment Id is required."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+
+        try {
+
+            $assessment = $this->assessmentMapperProxy->findById($assessmentId);
+            $differentiationProfile = $this->differentiationProfileMapper->findOneByColumn(
+                'student_id',
+                $studentId,
+                [
+                    'order' => 'created_at DESC',
+                ]
+            );
+
+            [$response, $status] = $agent->request(
+                $this->getUser(),
+                $assessment,
+                $differentiationProfile,
+                $aiSessionId,
+            );
+
+            $this->response = $this->responseAsJson($response)->withStatus($status);
+            return;
+        } catch (\DomainException $e) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($returnCode)
                 ->asArray();
 
