@@ -565,6 +565,8 @@ class Controller extends Base
              */
             $feedbackFields = array_values(array_fill_keys($fields, null));
 
+            new \Alaress_Probe($participant->getAuthoritativeFeedback(true));
+
             /* Slam them all together
              */
             $stack[] = array_merge([

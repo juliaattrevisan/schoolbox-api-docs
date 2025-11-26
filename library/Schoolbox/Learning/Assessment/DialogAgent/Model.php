@@ -222,12 +222,15 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly): ?IFeedback
     {
-        // TODO: Implement getAuthoritativeFeedback() method.
-        //  foreach ($participant responses) {
-        //      if $response->getAuthoritative() {
-        //          return true;
-        //      }
-        //  }
+        /* TODO oh no
+         */
+        new \Alaress_Probe($participant->getPublishedFeedbacks());
+
+//          foreach ($participant responses) {
+//              if $response->getAuthoritative() {
+//                  return true;
+//              }
+//          }
 
         return null;
     }
