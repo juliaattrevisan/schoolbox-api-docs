@@ -39,6 +39,20 @@ class Status
 
 
     /**
+     * Human-readable equivalents of each status
+     *
+     * You might find this convenient to access as a public prop, in which case you can elevate it
+     * from private to public upon first encounter.
+     */
+    private const array STATUS_HR = [
+        self::STATUS_INCOMPLETE => 'Incomplete',
+        self::STATUS_IN_PROGRESS => 'In Progress',
+        self::STATUS_REQUIRES_ASSISTANCE => 'Requires Assistance',
+        self::STATUS_SUBMITTED => 'Submitted'
+    ];
+
+
+    /**
      * Decide the current status of a particular response and returns the various metadata
      * relevant per state which you will probably just arbitrarily render if extant.
      *
@@ -142,5 +156,19 @@ class Status
                 self::ACTION_ASSISTANCE_RESOLVE => false,
             ],
         ];
+    }
+
+
+    /**
+     * Get a human-readable equivalent of a status derivation
+     *
+     * @param ResponseModel|null $authoritativeResponse
+     * @return string
+     */
+    public function getHumanReadableStatus(?ResponseModel $authoritativeResponse): string
+    {
+        $status = $this->calculate($authoritativeResponse);
+
+        return self::STATUS_HR[$status['status']] ?? '';
     }
 }

@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentData
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
@@ -534,6 +535,18 @@ class Controller extends Base
      */
     public function getExport(IAssessable $assessment): void
     {
+        $statusChecker = new Status();
 
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $stack[] = [
+                $participant->getUser()->getId(),
+                $participant->getUser()->getExternalId(),
+                $participant->getUser()->getFirstName(),
+                $participant->getUser()->getLastName(),
+                $statusChecker->getHumanReadableStatus($participant->getAuthoritativeResponse(false)),
+            ];
+        }
+
+        new \Alaress_Probe($stack);
     }
 }
