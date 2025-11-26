@@ -40,7 +40,7 @@ class Calendar extends DeprecatedModel
         $this->_index = "id";
 
         $this->groupHandler = new Group(UserAccess::SERVICE_CALENDAR);
-        $this->resourceBookingMapper = ResourceBookingMapper::getInstance();
+        $this->resourceBookingMapper = ResourceBookingMapper::getInstance(); // Could not inject because this class is used in too many places.
 
         parent::__construct();
     }
