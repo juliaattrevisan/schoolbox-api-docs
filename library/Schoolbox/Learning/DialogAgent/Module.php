@@ -450,7 +450,6 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
