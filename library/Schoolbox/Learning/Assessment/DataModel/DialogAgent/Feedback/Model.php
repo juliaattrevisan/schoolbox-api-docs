@@ -25,6 +25,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
+     */
+    private ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent = null;
+
+
+    /**
      * @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model|null
      */
     private ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model $response = null;
@@ -40,6 +46,26 @@ class Model implements ISoftDeletable
      * @var string|null
      */
     private ?string $body = null;
+
+
+    /**
+     * @return \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
+     */
+    public function getDialogAgent(): ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model
+    {
+        return $this->dialogAgent;
+    }
+
+
+    /**
+     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null $dialogAgent
+     * @return $this
+     */
+    public function setDialogAgent(?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent): self
+    {
+        $this->dialogAgent = $dialogAgent;
+        return $this;
+    }
 
 
     /**

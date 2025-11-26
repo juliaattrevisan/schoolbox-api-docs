@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 
 /**
  * @method Model createModel($idValue = null)
@@ -29,12 +30,23 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('dialog_agent_feedback');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('dialog_agent_id', self::TYPE_INTEGER, null, 'dialogAgent');
         $this->uses('response_id', self::TYPE_INTEGER, null, 'response');
         $this->uses('criteria_id', self::TYPE_INTEGER, null, 'criteria');
         $this->uses('body', self::TYPE_STRING, null, 'body');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joins(
+            'dialog_agent_id',
+            \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class,
+            'id',
+            null,
+            null,
+            'dialogAgent',
+            'dialogAgent',
+        );
 
         $this->joins(
             'response_id',
@@ -55,5 +67,54 @@ class Mapper extends \Schoolbox\Mapper
             'criteria',
             'criteria',
         );
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('dialogAgent', 'dialogAgent')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
+        ";
+    }
+
+
+    /**
+     * @param \PDOStatement $statement
+     * @return GenericCollection
+     * @throws Exception
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        $stack = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $feedback = $this->hydrate($row);
+
+            /* The dialog agent needs an assessmentModel's id to associate responses with an assessment.
+             * Eventually this gets hydrated into Participant, which gives you access to each student's
+             * IResponse collections in the business logic as a convenience.
+             */
+            /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessmentModel */
+            $assessmentModel = $this->createJoinModel('dialogAgent.assessmentModel', $row['dialogAgent.assessment_id']);
+
+            /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent */
+            $dialogAgent = $this->createJoinModel('dialogAgent', $row['dialogAgent.id']);
+            $dialogAgent->setAssessmentModel($assessmentModel);
+
+            $feedback->setDialogAgent($dialogAgent);
+
+            $stack->add($feedback);
+        }
+
+        return $stack;
     }
 }

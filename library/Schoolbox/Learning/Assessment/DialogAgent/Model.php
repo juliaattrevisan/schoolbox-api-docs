@@ -224,7 +224,7 @@ class Model extends AbstractAssessment
     {
         /* TODO oh no
          */
-        new \Alaress_Probe($participant->getPublishedFeedbacks());
+//        new \Alaress_Probe($participant->getPublishedFeedbacks());
 
 //          foreach ($participant responses) {
 //              if $response->getAuthoritative() {
