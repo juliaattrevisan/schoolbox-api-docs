@@ -359,6 +359,10 @@ class Client implements IClient
      * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
      * @param int                    $chunkSize      How many bytes to read from each stream iteration.
      * @param callable|null          $streamListener A function to call for each event in the stream, as it is received.
+     * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
+     *                                                             before sending to the stream.
+     * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
+     *                                                             OpenAI, and modify the log accordingly.
      * @return iterable<EventStream\Message> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
@@ -368,11 +372,25 @@ class Client implements IClient
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
         ?callable $streamListener = null,
+        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {
             foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
+                // Modify the message before sending.
+                if ($eventStreamListener) {
+                    $outputMessage = $eventStreamListener->modifyMessage(clone $message);
+                } else {
+                    $outputMessage = clone $message;
+                }
+
+                // Not a message? Output nothing for now
+                if (!$outputMessage) {
+                    continue;
+                }
+
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
 
@@ -380,13 +398,13 @@ class Client implements IClient
                 // even if that raises an exception, still save the log
                 try {
                     // logHandler may modify the message, so clone it so we can yield later
-                    $logHandler->handleMessage(clone $message, $log, $streamListener);
+                    $log = $logHandler->handleMessage(clone $message, $log, $streamListener);
                 } finally {
                     $this->saveLog($log);
                 }
 
                 // Yield after logging as if the parent throws or returns early it would otherwise not be logged
-                yield $message;
+                yield $outputMessage;
             }
 
             // If nothing happened: set a default return code, and save log
