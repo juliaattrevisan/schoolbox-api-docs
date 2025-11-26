@@ -379,8 +379,10 @@ class Controller extends Base
             array_reduce(array_keys($configKey), function ($carry, $key) use ($profile, $configs, $configKey) {
                 if ($configs->offsetExists($key)) {
                     $method = $configKey[$key];
+                    /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
+                    $config = $configs->offsetGet($key);
                     $carry[] = [
-                        'terminology' => $configs->offsetGet($key)->getTerminology() ?? $configs->offsetGet($key)->getName(),
+                        'terminology' => $config->getTerminology() ?? $config->getTitle(),
                         'value'       => call_user_func([$profile, $method]),
                     ];
                 }
