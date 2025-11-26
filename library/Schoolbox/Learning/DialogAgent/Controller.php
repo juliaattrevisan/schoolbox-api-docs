@@ -162,6 +162,23 @@ class Controller extends Base
          */
         $this->fieldContextMapper->save($existingFieldContexts);
 
+        /* Produce the prompt
+         * In the future this will actually go and generate another prompt as an "improvement" to compare against,
+         * but that isn't in scope for 26.0 apparently.
+         *
+         * TODO: split this out into something reusable I guess
+         */
+        $fieldReplacements = [];
+        foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
+            $fieldPlaceholder = \sprintf('<%s>', $fieldContext->getField()->getSlug());
+            $fieldReplacements[$fieldPlaceholder] = $fieldContext->getBody();
+        }
+
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+        $assessment->setPrompt(strtr($scenario->getPromptTemplate(), $fieldReplacements));
+
+        $this->assessmentMapperProxy->save($assessment, $this->getUser());
+
         /* TODO Reset the chat here
          */
 
