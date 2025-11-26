@@ -109,8 +109,16 @@ class GuidRepository implements LineItemRepositoryInterface
      */
     public function save(LineItemInterface $lineItem): LineItemInterface
     {
-        $lineItemModel = $this->lineItemMapper->createModel()
-            ->setLtiAssessmentGuid($this->guid)
+        // Does a line item with this identifier already exist?
+        // If so modify that one: otherwise create a new one
+        $identifier = $lineItem->getIdentifier();
+        if ($identifier) {
+            $lineItemModel = $this->lineItemMapper->findOneByColumn('identifier_url', $identifier);
+        } else {
+            $lineItemModel = $this->lineItemMapper->createModel()
+                ->setLtiAssessmentGuid($this->guid);
+        }
+        $lineItemModel = $lineItemModel
             ->setScoreMaximum($lineItem->getScoreMaximum())
             ->setLabel($lineItem->getLabel())
             ->setResourceId($lineItem->getResourceIdentifier())
@@ -132,11 +140,16 @@ class GuidRepository implements LineItemRepositoryInterface
         // * submission review
         $this->lineItemMapper->save($lineItemModel);
 
-        // Now the line item has an ID, its identifier can be set?
-        $lineItemModel = $lineItemModel->setIdentifierUrl($this->buildIdentifier($lineItemModel));
-        $this->lineItemMapper->save($lineItemModel);
+        // Now the line item has an ID, its identifier can be set
+        // (if it didn't already have one)
+        if (!$identifier) {
+            $identifier    = $this->buildIdentifier($lineItemModel);
+            $lineItem      = $lineItem->setIdentifier($identifier);
+            $lineItemModel = $lineItemModel->setIdentifierUrl($identifier);
+            $this->lineItemMapper->save($lineItemModel);
+        }
 
-        return $lineItem->setIdentifier($lineItemModel->getIdentifierUrl());
+        return $lineItem;
     }
 
     /**
