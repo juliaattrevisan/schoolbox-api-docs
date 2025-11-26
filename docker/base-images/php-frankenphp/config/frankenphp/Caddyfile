@@ -100,9 +100,9 @@
         on_demand
     }
 
-    log {
-        output stderr
-    }
+#    log {
+#        output stderr
+#    }
     root * /usr/share/schoolbox/www
 
     @allowed-methods method GET HEAD POST PUT DELETE PATCH OPTIONS
