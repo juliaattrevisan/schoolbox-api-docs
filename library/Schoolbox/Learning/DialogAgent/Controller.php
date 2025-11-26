@@ -479,6 +479,7 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User $student
+     * @param Response $response
      * @return void
      * @throws Deleted
      * @throws Exception
@@ -522,5 +523,17 @@ class Controller extends Base
         $this->response = $this->responseAsJson([
             'response' => $responseTranslator->__invoke($response),
         ])->withStatus(200);
+    }
+
+
+    /**
+     * Export the status of everyone's Response(s) and Feedback(s) for the given assessment.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     */
+    public function getExport(IAssessable $assessment): void
+    {
+
     }
 }

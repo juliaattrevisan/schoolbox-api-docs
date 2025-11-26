@@ -231,6 +231,10 @@ class Module extends BaseModule
             $canWrite,
             $this->buildRuleCanAction(Status::ACTION_RESET)
         ), $preloadParticipantAndResponse);
+
+        /* Exports everyone's Response Status and Feedback Contents (if any exist) into a csv format.
+         */
+        $this->register('GET', "{$assRoute}/export", 'getExport', $canWrite, $preloadAssessment);
     }
 
 
