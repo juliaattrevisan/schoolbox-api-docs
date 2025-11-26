@@ -68,7 +68,7 @@
                                     routeLookup(
                                         'ltiPlatformContext.getGenerateDeepLinkingRequestForFolder',
                                         {toolId: tool.id, folderId: context.baseContext.folder.id}
-                                    ) ~ '?lineItemGuid=' ~ assessment.guid
+                                    ) ~ '?lineItemGuid=' ~ (assessment.guid | url_encode)
                                 )
                                 : ''
                             }}"
