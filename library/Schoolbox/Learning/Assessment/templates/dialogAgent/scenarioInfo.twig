@@ -36,14 +36,14 @@
     </ul>
 
     <strong>Prompt Template</strong>
-    <p class="meta">{{ scenario.promptTemplate }}</p>
+    <p class="meta">{{ scenario.promptTemplate|nl2br }}</p>
 
     <strong>Assessment Criteria</strong>
     <ul>
         {% for criterion in scenario.criteria %}
             <li>
                 <strong>{{ criterion.title }}</strong>
-                <p class="meta">{{ criterion.prompt }}</p>
+                <p class="meta">{{ criterion.prompt|nl2br }}</p>
             </li>
         {% endfor %}
     </ul>
