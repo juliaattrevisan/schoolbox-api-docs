@@ -64,19 +64,20 @@ class Mapper extends BaseMapper
 
     /**
      * Pre-save function: associate this line item with the LTI assessment whose
-     * GUID matches the model's `lti_assessment_guid` field.
+     * GUID matches the model's `lti_assessment_guid` field, if there is one.
      *
-     * If there's no such assessment: this method will raise an error.
+     * If there's no such assessment: this line item will be saved without an
+     * associated LTI assessment.
      *
      * @param Model $model
-     * @return true Always succeeds unless the LTI assessment wasn't found
-     * @throws MapperException if LTI assessment wasn't found
+     * @return true Always succeeds
      */
     public function associateWithLtiAssessment(Model $model): true
     {
         if ($model->getLtiAssessmentGuid()) {
             $ltiAssessment = $this->getJoinMapper('ltiAssessment')
-                ->findOneByColumn('guid', $model->getLtiAssessmentGuid());
+                ->findByColumn('guid', $model->getLtiAssessmentGuid())
+                ->first();
             $model->setLtiAssessment($ltiAssessment);
         }
         return true;
