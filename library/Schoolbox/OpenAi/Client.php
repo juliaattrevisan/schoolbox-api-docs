@@ -106,6 +106,8 @@ class Client implements IClient
             new LogHandler\ResponseMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $streamListener,
+            $eventStreamListener,
+            $logListener,
         );
     }
 
@@ -146,6 +148,8 @@ class Client implements IClient
             new LogHandler\ChatCompletionsMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $streamListener,
+            $eventStreamListener,
+            $logListener,
         );
     }
 
