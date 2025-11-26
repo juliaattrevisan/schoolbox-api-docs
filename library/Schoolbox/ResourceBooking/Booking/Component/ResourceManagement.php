@@ -66,11 +66,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             $this->getUser(),
             $this->getUser()
         );
-        $bookingApi->setStatus(
-            [
-                Booking\Status\Model::STATUS_PENDING,
-            ]
-        );
+//        $bookingApi->setStatus(
+//            [
+//                Booking\Status\Model::STATUS_PENDING,
+//            ]
+//        );
 
         // Still need to check if user actually has any bookable items.
         // If they don't, then don't display this component.
@@ -82,17 +82,83 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         // Group bookings by their item, and order within that list by date
         // (They should be date-ordered already)
         $groupedBookings = [];
+        $groupedBookings2 = [];
+        $eventsByResource = [];
         foreach ($bookingEvents as $event) {
             if ($event instanceof Event) {
+            // Due to hydration differences between resource bookings and timetable events, we need to extract the resource ID
+            $itemId = $event->getBooking()->getResource()->getId();
+            if (empty($eventsByResource[$itemId])) {
+                $eventsByResource[$itemId] = [];
+                $groupedBookings[$itemId] = [
+                    'resource'      => $event->getBooking()->getResource(),
+                    'bookingEvents' => [],
+                ];
+            }
+            $eventsByResource[$itemId][] = $event;
+            }
+        }
+        // Step 2: For each resource, sort events by start time and check for overlaps
+        foreach ($eventsByResource as $resourceID => $resourceEvents) {
+            // Sort by start time
+            usort($resourceEvents, function ($a, $b) {
+                return $a->getStartTime()->compare($b->getStartTime());
+            });
+            $count = count($resourceEvents);
+            for ($i = 0; $i < $count; $i++) {
+                /** @var Event $eventA */
+                $eventA = $resourceEvents[$i];
+                if (empty($groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()])) {
+                    $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()] = [
+                        'dateFormat' => [
+                            'day' => $eventA->getStartTime()->getDay(),
+                            'monthName' => $eventA->getStartTime()->getUsingFormat('M'),
+                            'dayName' => $eventA->getStartTime()->getUsingFormat('D'),
+                        ],
+                        'events' => [],
+                    ];
+                }
+
+                // add to the list only if its published
+                if ($eventA->getBooking()->getStatus()->isApproved()) {
+                    $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][] = $eventA;
+                }
+
+                // now check for clashes with pending bookings
+                for ($j = $i + 1; $j < $count; $j++) {
+                    /** @var Event $eventB */
+                    $eventB = $resourceEvents[$j];
+
+                    // approved bookings have been recorded, lets only care about pending ones (clashes)
+                    if (!$eventB->getBooking()->getStatus()->isPending()) {
+                        continue;
+                    }
+
+                    // only record clashes
+                    if ($eventB->isClash($eventA)) {
+                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][] = $eventB;
+                    }
+                }
+
+                // if no events, ignore this
+                if (empty($groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'])) {
+                    unset($groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]);
+                }
+            }
+        }
+
+        foreach ($bookingEvents as $event) {
+            if ($event instanceof Event) {
+                // only care about pending events if they have a clash
                 $itemId = $event->getBooking()->getResource()->getId();
-                if (empty($groupedBookings[$itemId])) {
-                    $groupedBookings[$itemId] = [
+                if (empty($groupedBookings2[$itemId])) {
+                    $groupedBookings2[$itemId] = [
                         'resource'      => $event->getBooking()->getResource(),
                         'bookingEvents' => [],
                     ];
                 }
-                if (empty($groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()])) {
-                    $groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()] = [
+                if (empty($groupedBookings2[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()])) {
+                    $groupedBookings2[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()] = [
                         'dateFormat'  => [
                             'day'  => $event->getStartTime()->getDay(),
                             'monthName' => $event->getStartTime()->getUsingFormat('M'),
@@ -101,9 +167,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                         'events' => [],
                     ];
                 }
-                $groupedBookings[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()]['events'][] = $event;
+                $groupedBookings2[$itemId]['bookingEvents'][$event->getStartTime()->getDateOnly()]['events'][] = $event;
             }
         }
+//        new \Alaress_Probe($groupedBookings, $groupedBookings2);
+//        die();
         usort($groupedBookings, function ($a, $b) {
             return strcmp($a['resource']->getName(), $b['resource']->getName());
         });
