@@ -469,8 +469,7 @@ class Event extends EventBase
 
         // if either event is a rejected booking, skip
         if ($eventA instanceof \Calendar\Event\Type\ResourceBooking\Event) {
-            if ($eventA->getBooking()->getStatus()->isRejected())
-            {
+            if ($eventA->getBooking()->getStatus()->isRejected()) {
                 return false;
             }
         }
