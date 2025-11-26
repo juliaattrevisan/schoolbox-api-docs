@@ -55,6 +55,10 @@ interface IClient
      *                                      otherwise, allow the client itself to decide.
      * @param callable|null $streamListener A function to call for each event in the stream, as it is received:
      *                                      this may be used to update `$log` with further information.
+     * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
+     *                                                             before sending to the stream.
+     * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
+     *                                                             OpenAI, and modify the log accordingly.
      * @return iterable<EventStream\Message> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
@@ -63,6 +67,8 @@ interface IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?callable $streamListener = null,
+        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?LogHandler\Listener\IListener $logListener = null,
     ): iterable;
 
     /**
@@ -87,6 +93,10 @@ interface IClient
      *                                      otherwise, allow the client itself to decide.
      * @param callable|null $streamListener A function to call for each event in the stream, as it is received:
      *                                      this may be used to update `$log` with further information.
+     * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
+     *                                                              before sending to the stream.
+     * @param ?LogHandler\Listener\IListener  $logListener          If set: call this for each message received from
+     *                                                              OpenAI, and modify the log accordingly.
      * @return iterable<EventStream\Message>
      */
     public function createChatCompletionStream(
@@ -94,6 +104,8 @@ interface IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?callable $streamListener = null,
+        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?LogHandler\Listener\IListener $logListener = null,
     ): iterable;
 
     /**

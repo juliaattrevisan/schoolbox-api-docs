@@ -93,6 +93,8 @@ class Client implements IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?callable $streamListener = null,
+        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log      = $log->setEndpoint($url->__toString());
@@ -131,6 +133,8 @@ class Client implements IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?callable $streamListener = null,
+        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log      = $log->setEndpoint($url->__toString());
