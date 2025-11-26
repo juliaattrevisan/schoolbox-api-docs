@@ -174,6 +174,14 @@ class Client implements IClient
     }
 
     /**
+     * @inheritdoc
+     */
+    public function saveLog(Log\Model $log): void
+    {
+        $this->logMapper->save($log);
+    }
+
+    /**
      * Generate the URL to which a request to an OpenAI-compatible AI provider
      * should be sent.
      *
@@ -213,7 +221,7 @@ class Client implements IClient
         } catch (BadResponseException $e) {
             $log->setReturnCode($e->getResponse()->getStatusCode())
                 ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
+            $this->saveLog($log);
 
             // Extract body from response, and put it in output
             $responseBody = $e->getResponse()->getBody()->getContents();
@@ -227,7 +235,7 @@ class Client implements IClient
         } catch (ClientExceptionInterface $e) {
             $log->setReturnCode(null)
                 ->setErrorMessage($e->getMessage());
-            $this->logMapper->save($log);
+            $this->saveLog($log);
             throw new SchoolboxException(
                 $e->getMessage(),
                 $e->getCode(),
@@ -332,7 +340,7 @@ class Client implements IClient
         $responseBody = $response->getBody()->getContents();
         $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $log = $logHandler->handleResponse($responseJson, $log);
-        $this->logMapper->save($log);
+        $this->saveLog($log);
 
         // Restore the body in its streamable glory
         return $response->withBody(Utils::streamFor($responseBody));
@@ -347,7 +355,7 @@ class Client implements IClient
      * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
      * @param int                    $chunkSize      How many bytes to read from each stream iteration.
      * @param callable|null          $streamListener A function to call for each event in the stream, as it is received.
-     * @return iterable<string> Each message in the stream as it's received.
+     * @return iterable<EventStream\Message> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
@@ -363,31 +371,35 @@ class Client implements IClient
             foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
-                yield $message->__toString();
 
                 // Update the log, and save it:
                 // even if that raises an exception, still save the log
                 try {
-                    $logHandler->handleMessage($message, $log, $streamListener);
+                    // logHandler may modify the message, so clone it so we can yield later
+                    $logHandler->handleMessage(clone $message, $log, $streamListener);
                 } finally {
-                    $this->logMapper->save($log);
+                    $this->saveLog($log);
                 }
+
+                // Yield after logging as if the parent throws or returns early it would otherwise not be logged
+                yield $message;
             }
 
             // If nothing happened: set a default return code, and save log
             $log->setReturnCode($log->getReturnCode() ?? 200);
-            $this->logMapper->save($log);
+            $this->saveLog($log);
         } else {
             // This is probably an error, so just finalise the log with whatever
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
             $log = $logHandler->handleResponse($responseJson, $log);
-            $this->logMapper->save($log);
+            $this->saveLog($log);
 
+            // TODO: is this actually going to show an error state to the frontend??
             // Convert it to a single message I guess, if finalising the log
             // didn't raise an exception?
-            yield new EventStream\Message($responseBody)->__toString();
+            yield new EventStream\Message($responseBody);
         }
     }
 }

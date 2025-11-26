@@ -3,22 +3,48 @@
  * @see /library/Schoolbox/Admin/OpenAI/Usage/Controller.php
  */
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
+import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
 type AiSessionId = string;
 
-export type AiSessionLog = {
-    id: number;
-    sessionId: AiSessionId;
-    feature: string;
-    createdAt: string;
-    createdBy: UserAuthor;
-    // TODO: not a full type yet, need to establish what we need first
+export enum AiFeature {
+    CHAT = "chat",
+    LESSON_PLAN = "lessonplan",
+    IMAGE = "image",
+    DIALOG_AGENT = "dialogagent",
+    DIFFERENTIATION = "differentiation",
+    LEARNING_ACTIVITY_CUSTOMISATION = "learningactivitycustomisation",
+}
+
+export type AiLogFeatureData<TInputText, TOutputText> = {
+    request: TInputText;
+    response: TOutputText;
 };
 
-export type AiSession = {
+type AiLogFeatureDataMap = {
+    [AiFeature.CHAT]: null;
+    [AiFeature.LESSON_PLAN]: null;
+    [AiFeature.IMAGE]: AiLogAgentChatData;
+    [AiFeature.DIALOG_AGENT]: null; // TODO define when implemented
+    [AiFeature.DIFFERENTIATION]: null;
+    [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: null;
+};
+
+export type AiSessionLog = {
+    [K in AiFeature]: {
+        id: number;
+        sessionId: AiSessionId;
+        createdAt: string;
+        createdBy: UserAuthor;
+        feature: K;
+        data: AiLogFeatureDataMap[K];
+    };
+}[AiFeature];
+
+export type AiSession<TFeature extends AiFeature = AiFeature> = {
     id: AiSessionId;
-    feature: string;
+    feature: TFeature;
     sessionId: AiSessionId;
     createdAt: string;
     createdBy: UserAuthor;
@@ -43,4 +69,4 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse = AiSessionLog[];
+export type AiSessionLogApiResponse<TFeature extends AiFeature = AiFeature> = (AiSessionLog & { feature: TFeature })[];

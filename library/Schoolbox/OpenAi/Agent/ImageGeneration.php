@@ -12,13 +12,10 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
-use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\AgentChat;
 use Schoolbox\OpenAi\IClient;
-use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Agent for generating images via OpenAI.
@@ -49,8 +46,8 @@ class ImageGeneration
      * @param string|null $style              If provided: a style for the image.
      *                                        Should match a value of `ImageStyle`.
      * @param string|null $imageUrl           If provided: a URL to use as an example for the image.
-     * @param string|null $previousResponseId If provided: the ID of a previous request made to OpenAI.
-     * @return iterable
+     * @param string|null $previousResponseId If provided: th`e ID of a previous request made to OpenAI.
+     * @return iterable<string>
      * @throws ClientExceptionInterface
      */
     public function requestStream(
@@ -63,9 +60,13 @@ class ImageGeneration
         ?string $previousResponseId = null,
     ): iterable {
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
+        // TODO: Should $prompt (what ends up being logged as inputText) contain the other parameters such as the style you selected too? or are we okay with loosing that info
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
-        return $this->client->createResponseStream($payload, $log, 8192, $this->listenForOutputText(...));
+
+        $handler = new AgentChat\MessageHandler($this->client, requireFinalImage: true);
+        return $handler->requestStream($payload, $log);
     }
+
 
     /**
      * Build a payload for the AI provider.
@@ -104,39 +105,5 @@ class ImageGeneration
             $imageUrl,
             $previousResponseId,
         );
-    }
-
-    /**
-     * Callback method for message stream.
-     *
-     * If this message is a finished response, then extract the output text out
-     * of it and add it to the log.
-     *
-     * @param Message   $message
-     * @param Log\Model $log
-     * @return void
-     */
-    private function listenForOutputText(Message $message, Log\Model $log): void
-    {
-        if (in_array($message->eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
-            $outputTextParts = [];
-            try {
-                $decodedMessage = $message->getDataAsArray();
-            } catch (UnexpectedValueException) {
-                // Not valid data: nothing can be done.
-                // Could always inspect the full stream data to figure it out?
-            }
-            foreach (($decodedMessage['response']['output']) ?? [] as $output) {
-                foreach (($output['content'] ?? []) as $content) {
-                    if ($content['type'] === 'output_text' && isset($content['text'])) {
-                        $outputTextParts[] = $content['text'];
-                    }
-                }
-            }
-            $outputText = !empty($outputTextParts)
-                ? implode("\n\n", $outputTextParts)
-                : null;
-            $log->setOutputText($outputText);
-        }
     }
 }

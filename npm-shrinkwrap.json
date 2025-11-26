@@ -116,7 +116,6 @@
         "msw": "~2.3.5",
         "msw-storybook-addon": "~2.0.4",
         "mysql2": "~3.14.1",
-        "openai": "^5.10.1",
         "prettier": "~3.5.3",
         "raw-loader": "~4.0.2",
         "sass": "~1.77.6",
@@ -23435,27 +23434,6 @@
         "url": "https://github.com/sponsors/sindresorhus"
       }
     },
-    "node_modules/openai": {
-      "version": "5.10.1",
-      "resolved": "https://registry.npmjs.org/openai/-/openai-5.10.1.tgz",
-      "integrity": "sha512-fq6xVfv1/gpLbsj8fArEt3b6B9jBxdhAK+VJ+bDvbUvNd+KTLlA3bnDeYZaBsGH9LUhJ1M1yXfp9sEyBLMx6eA==",
-      "dev": true,
-      "bin": {
-        "openai": "bin/cli"
-      },
-      "peerDependencies": {
-        "ws": "^8.18.0",
-        "zod": "^3.23.8"
-      },
-      "peerDependenciesMeta": {
-        "ws": {
-          "optional": true
-        },
-        "zod": {
-          "optional": true
-        }
-      }
-    },
     "node_modules/os-homedir": {
       "version": "1.0.2",
       "resolved": "https://registry.npmjs.org/os-homedir/-/os-homedir-1.0.2.tgz",
@@ -46413,13 +46391,6 @@
         "is-docker": "^2.1.1",
         "is-wsl": "^2.2.0"
       }
-    },
-    "openai": {
-      "version": "5.10.1",
-      "resolved": "https://registry.npmjs.org/openai/-/openai-5.10.1.tgz",
-      "integrity": "sha512-fq6xVfv1/gpLbsj8fArEt3b6B9jBxdhAK+VJ+bDvbUvNd+KTLlA3bnDeYZaBsGH9LUhJ1M1yXfp9sEyBLMx6eA==",
-      "dev": true,
-      "requires": {}
     },
     "os-homedir": {
       "version": "1.0.2",

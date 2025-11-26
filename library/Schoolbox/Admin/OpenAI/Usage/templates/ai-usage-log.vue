@@ -8,14 +8,9 @@ import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-import type {
-    AgentChatFeedMessage,
-    AgentChatRequest,
-    AgentChatResponse,
-} from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import { AiFeature } from "./payload";
 import type { AiSession, AiUsageLogApiRequest, AiUsageLogApiResponse, AiSessionLogApiResponse } from "./payload";
+import AulAgentChat from "./aul-agent-chat.vue";
 
 interface Props {
     routeSearch: string;
@@ -27,7 +22,6 @@ const PAGE_SIZE = 30;
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
 const props = defineProps<Props>();
-const acStore = useAgentChatStore();
 
 const isLoading = window.Vue.ref(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -43,24 +37,30 @@ const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
 const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
-const selectedSessionFeed = window.Vue.ref<AgentChatFeedMessage[] | null>(null);
+const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
-const selectedSessionInfo = window.Vue.computed(() => {
+type AiSelectedSessionInfo = {
+    [K in AiFeature]: {
+        feature: K;
+        session: AiSession<K>;
+        log: AiSessionLogApiResponse<K>;
+    };
+}[AiFeature];
+
+const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | null>(() => {
     if (selectedSessionId.value === null) {
         return null;
     }
 
     const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
-    const feedInfo = selectedSessionFeed.value;
+    const logInfo = selectedSessionLog.value;
 
-    if (sessionInfo === undefined || feedInfo === null) {
+    if (sessionInfo === undefined || logInfo === null) {
         return null;
     }
 
-    return {
-        session: sessionInfo,
-        feed: feedInfo,
-    };
+    const info = { feature: sessionInfo.feature, session: sessionInfo, log: logInfo };
+    return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
 /**
@@ -69,7 +69,7 @@ const selectedSessionInfo = window.Vue.computed(() => {
 function closeSessionDetails(): void {
     sessionLoadError.value = null;
     selectedSessionId.value = null;
-    selectedSessionFeed.value = null;
+    selectedSessionLog.value = null;
 }
 
 /**
@@ -145,7 +145,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     sessionLoadError.value = null;
     selectedSessionId.value = session.id;
-    selectedSessionFeed.value = null;
+    selectedSessionLog.value = null;
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
@@ -157,35 +157,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         return;
     }
 
-    // TODO: this is going to have to handle whatever happens for lesson plans/non-chat stuff but for now just assume it's a chat
-
-    selectedSessionFeed.value = response.data.flatMap((entry) => {
-        const req: AgentChatRequest = {
-            type: "request",
-            entryKey: acStore.getNextEntryKey(),
-            user: entry.createdBy,
-            payload: {
-                // TODO
-                userPrompt: "prompt message",
-                attributes: {},
-                imageUrl: null,
-                previousResponseId: null,
-                aiSessionId: session.id,
-            },
-            file: null,
-        };
-
-        const res: AgentChatResponse = {
-            type: "response",
-            entryKey: acStore.getNextEntryKey(),
-            status: "success", // assume success for now...
-            responseId: null, // no openai response ID available I guess
-            image: null,
-            message: "response message", // TODO
-        };
-
-        return [req, res];
-    });
+    selectedSessionLog.value = response.data;
 }
 </script>
 
@@ -260,10 +232,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 
     <div class="row">
-        <div
-            class="small-12 columns l-mar-m--bottom"
-            :class="{ 'medium-6': selectedSessionId !== null || sessionLoadError !== null, island: isLoading }"
-        >
+        <div class="small-12 medium-6 columns l-mar-m--bottom" :class="{ island: isLoading }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -272,33 +241,20 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 <div class="loader"></div>
             </section>
 
-            <div v-else-if="usageSessions.length > 0" class="scrollable">
+            <div v-else-if="usageSessions.length > 0">
                 <table>
                     <thead>
                         <tr>
-                            <th></th>
                             <th>Date</th>
                             <th>Feature</th>
                             <th>User</th>
-                            <th>&nbsp;</th>
+                            <th></th>
+                            <th></th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <tr v-for="session in usageSessions" :key="session.id">
-                            <td>
-                                <div v-if="session.sessionId" class="selector">
-                                    <input
-                                        :id="`chk-${session.id}`"
-                                        type="radio"
-                                        name="ai-usage-session"
-                                        :checked="session.id.toString() === selectedSessionId?.toString() || undefined"
-                                        :disabled="!session._routes.getLog || undefined"
-                                        @change="() => openSessionDetails(session)"
-                                    />
-                                    <label :for="`chk-${session.id}`" class="radio-label no-margin"></label>
-                                </div>
-                            </td>
                             <td>
                                 {{ formatSessionDate(session) }}
                             </td>
@@ -314,8 +270,16 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td v-if="200 !== session.returnCode">Error</td>
-                            <td v-else>&nbsp;</td>
+                            <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
+                            <td class="actions-small-1">
+                                <nav v-if="session.sessionId && session._routes.getLog">
+                                    <a
+                                        class="icon-eye"
+                                        :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"
+                                        @click="() => openSessionDetails(session)"
+                                    ></a>
+                                </nav>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -327,11 +291,11 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 @page-change="changePage"
             />
         </div>
-        <div v-if="selectedSessionId !== null || sessionLoadError !== null" class="small-12 medium-6 island">
+        <div class="small-12 medium-6 island">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else>
+            <section v-else-if="selectedSessionId !== null || sessionLoadError !== null">
                 <div v-if="selectedSessionInfo === null" class="loader"></div>
                 <template v-else>
                     <div class="card small-12">
@@ -353,7 +317,19 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                         </p>
                     </div>
                     <div class="clearfix"></div>
-                    <ac-feed class="l-mar-m" :feed="selectedSessionInfo.feed" :allow-selection="false" />
+                    <div class="l-mar-m">
+                        <aul-agent-chat
+                            v-if="selectedSessionInfo.feature === AiFeature.IMAGE"
+                            :session-log="selectedSessionInfo.log"
+                        />
+                        <div v-else class="empty-state">
+                            <i class="icon-view-hollow"></i>
+                            <p>
+                                The {{ props.features[selectedSessionInfo.feature].title }} feature does not support
+                                previews
+                            </p>
+                        </div>
+                    </div>
                 </template>
             </section>
         </div>
