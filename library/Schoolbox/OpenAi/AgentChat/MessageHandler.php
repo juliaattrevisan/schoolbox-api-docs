@@ -280,7 +280,9 @@ class MessageHandler
                 json_encode([
                     'responseId' => $responseId ?? $data['response']['id'] ?? null,
                     'image' => $imageBase64 ? self::translateImageData($imageBase64) : null,
-                    'message' => $outputContent['text'] ?? '',
+                    /** Markdown is allowed, convert it with scrub on output */
+                    // TODO: should the DB actually store the raw markdown instead and we always convert on output? this may be unsafe for historical logs
+                    'message' => \Scrub::markdown($outputContent['text'] ?? ''),
                 ], JSON_THROW_ON_ERROR),
                 MessageEventType::COMPLETE->value
             );
