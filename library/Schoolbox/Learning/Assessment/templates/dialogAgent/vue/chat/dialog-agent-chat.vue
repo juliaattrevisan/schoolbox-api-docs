@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { getRfc3339String } from "@js/util/dateUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
+import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
-    openingMessage: string | null;
+    feed: AiLogAgentChatData[];
     response: DialogAgentResponse;
     student: UserAuthor;
 }
@@ -24,18 +25,7 @@ const isInstructor = window.Vue.computed(() => {
 
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
-
-    if (props.openingMessage !== null) {
-        // TODO: I wonder if the backend should add this when it provides us the full chat?
-        acStore.feed.push({
-            type: "response",
-            status: "success",
-            entryKey: acStore.getNextEntryKey(),
-            responseId: null,
-            image: null,
-            message: props.openingMessage,
-        });
-    }
+    acStore.importFeed(acStore.parseFeed(props.feed, props.student));
 
     // TODO: all temporary
     const currentUser = {

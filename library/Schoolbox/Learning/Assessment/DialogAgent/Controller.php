@@ -16,6 +16,7 @@ use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
@@ -49,7 +50,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Ramsey\Uuid\Uuid;
 use Twig\Error\Error;
 
 /**
@@ -89,6 +89,7 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
@@ -118,6 +119,7 @@ class Controller extends Assessment\Controller
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        private AILogMapper $aiLogMapper,
         protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
@@ -424,6 +426,39 @@ class Controller extends Assessment\Controller
             $this->dialogAgentResponseMapper->save($response);
         }
 
+        /**
+         * Build up the existing feed from the logs.
+         * Also add extra messages such as the opening message as if they were real messages if available
+         */
+        $feed = new \Schoolbox\Collection();
+
+        if (trim((string)$assessment->getOpeningMessage()) !== '') {
+            // TODO: opening message is actually a required field, handle that properly (maybe it should influence the ability to get here, like prompt also should?)
+            $feed->add([
+                'type' => 'response',
+                'data' => [
+                    'status' => 'success',
+                    'responseId' => null,
+                    'image' => null,
+                    'message' => (string)$assessment->getOpeningMessage()
+                ],
+            ]);
+        }
+
+        if ($response->getSessionId()) {
+            $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
+                'order' => [ 'created_at' => 'ASC' ]
+            ]);
+
+            /* Assume they have the right log type since sessionId came from the response */
+            foreach ($logEntries as $log) {
+                $feed->add(\Schoolbox\OpenAi\AgentChat\MessageHandler::translateLogData($log));
+            }
+
+            // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
+        }
+
         $userTranslator = new User\Translator\Author\ModelToArray();
         $responseLinksTranslator = new Response\Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
@@ -435,7 +470,7 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment' => $assessment,
-            'openingMessage' => $assessment->getOpeningMessage(),
+            'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
             'participant' => $participant,
             'response' => $responseTranslator->__invoke($response),
