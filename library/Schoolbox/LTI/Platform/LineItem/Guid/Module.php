@@ -36,22 +36,20 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $validGuidPermission     = new Callback($this->assertValidGuid(...));
-        $validLineItemPermission = new Callback($this->assertGuidMatchesLineItemId(...));
-        $lineItemPreload         = $this->preloadLineItem(...);
-
         // Line items container routes
         $this->register(
             self::METHOD_GET,
             '/{guid}',
             'getLineItemsForGuid',
-            $validGuidPermission,
+            null,
+            $this->assertValidGuid(...),
         );
         $this->register(
             self::METHOD_POST,
             '/{guid}',
             'postLineItemForGuid',
-            $validGuidPermission,
+            null,
+            $this->assertValidGuid(...),
         );
 
         // Line item routes
@@ -59,22 +57,22 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{guid}/{id}',
             'getLineItemForGuidAndLineItem',
-            $validLineItemPermission,
-            $lineItemPreload,
+            null,
+            $this->preloadLineItem(...),
         );
         $this->register(
             self::METHOD_PUT,
             '/{guid}/{id}',
             'putLineItemForGuidAndLineItem',
-            $validLineItemPermission,
-            $lineItemPreload,
+            null,
+            $this->preloadLineItem(...),
         );
         $this->register(
             self::METHOD_DELETE,
             '/{guid}/{id}',
             'deleteLineItemForGuidAndLineItem',
-            $validLineItemPermission,
-            $lineItemPreload,
+            null,
+            $this->preloadLineItem(...),
         );
 
         // Score publish route
@@ -82,13 +80,28 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{guid}/{id}/scores',
             'postScorePublishForGuidAndLineItem',
-            $validLineItemPermission,
-            $lineItemPreload,
+            null,
+            $this->preloadLineItem(...),
         );
     }
 
     /**
-     * Preload the line item for the given ID.
+     * Preload which asserts the given GUID is actually a valid GUID value.
+     *
+     * @param array $params
+     * @return array
+     */
+    private function assertValidGuid(array $params): array
+    {
+        if (!Uuid::isValid($params['guid'] ?? '')) {
+            throw new NotFound();
+        }
+        return [];
+    }
+
+    /**
+     * Preload the line item for the given ID, also validating that its GUID
+     * is the same as the one in the route.
      *
      * @param array $params
      * @return array
@@ -96,42 +109,13 @@ class Module extends BaseModule
     private function preloadLineItem(array $params): array
     {
         $lineItemMapper = $this->getMapperFactory()->get(LtiAssessmentLineItem\Mapper::class);
+        $lineItem       = $lineItemMapper->findById($params['id']);
+        if ($lineItem->getLtiAssessmentGuid() !== ($params['guid'] ?? '')) {
+            throw new NotFound();
+        }
         return [
-            'lineItem' => $lineItemMapper->findById($params['id']),
+            'lineItem' => $lineItem,
         ];
-    }
-
-    /**
-     * Ensure the given GUID is actually a valid GUID value.
-     *
-     * @param array $params
-     * @return void
-     */
-    private function assertValidGuid(array $params): void
-    {
-        if (!Uuid::isValid($params['guid'] ?? '')) {
-            throw new NotFound();
-        }
-    }
-
-    /**
-     * Ensure the GUID in the path matches the GUID of the line item in the
-     * path.
-     *
-     * Assumes that the GUID is valid, as it must have been in order to have
-     * been created.
-     *
-     * @param array $params
-     * @return void
-     */
-    private function assertGuidMatchesLineItemId(array $params): void
-    {
-        if (!$params['lineItem'] instanceof LtiAssessmentLineItem\Model) {
-            throw new NotFound();
-        }
-        if ($params['lineItem']->getLtiAssessmentGuid() !== $params['guid']) {
-            throw new NotFound();
-        }
     }
 
     /**
