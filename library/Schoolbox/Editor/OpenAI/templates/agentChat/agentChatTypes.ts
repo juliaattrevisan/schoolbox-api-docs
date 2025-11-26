@@ -1,14 +1,17 @@
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiLogFeatureData } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { AgentChatApiPayload } from "./store/agentChatPayload";
 
 /** The expected data type for this feature that the AI log will restore */
-export type AiLogAgentChatData = AiLogFeatureData<
-    string,
-    | Pick<AgentChatResponseSuccess, "status" | "responseId" | "image" | "message">
+type AgentChatLogDataRequest = string;
+type AgentChatLogDataResponse =
     | Pick<AgentChatResponseError, "status" | "responseId" | "message">
->;
+    | Pick<AgentChatResponseSuccess, "status" | "responseId" | "image" | "message">;
+
+export type AiLogAgentChatData = (
+    | { type: "request"; data: AgentChatLogDataRequest }
+    | { type: "response"; data: AgentChatLogDataResponse }
+)[];
 
 export type AgentChatImage = {
     b64: string;

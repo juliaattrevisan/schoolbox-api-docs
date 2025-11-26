@@ -360,7 +360,7 @@ class MessageHandler
     /**
      * Translate a saved log's inputText and outputText back into structured data for this particular feature
      * @param Log\Model $log
-     * @return array{request:string,response:array}
+     * @return (array{type:'request',data:string}|array{type:'response',data:array})[]
      */
     public static function translateLogData(Log\Model $log): array
     {
@@ -385,9 +385,10 @@ class MessageHandler
             ];
         }
 
+        /** this could be extended to allow logs of more than 1 request/response per log entry, or even other new types */
         return [
-            'request' => $inputText,
-            'response' => $response,
+            ['type' => 'request', 'data' => $inputText],
+            ['type' => 'response', 'data' => $response],
         ];
     }
 }

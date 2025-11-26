@@ -1,9 +1,16 @@
 import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
+import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import type { AgentChatFeedMessage, AgentChatResponseInProgress } from "../agentChatTypes";
+import type {
+    AgentChatFeedMessage,
+    AgentChatRequest,
+    AgentChatResponse,
+    AgentChatResponseInProgress,
+    AiLogAgentChatData,
+} from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
 
@@ -59,6 +66,55 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     function getNextEntryKey(): number {
         currentEntryKey.value += 1;
         return currentEntryKey.value;
+    }
+
+    /**
+     * Parse a previous feed from the log format
+     * The results from this can then be used to populate the feed in the store or directly to <ac-feed>
+     * @param logEntries - The log entries to import
+     * @param user - The user who made the requests
+     * @returns The parsed feed messages
+     */
+    function parseFeed(logEntries: AiLogAgentChatData[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
+        const parsedFeed: AgentChatFeedMessage[] = [];
+
+        const messages = logEntries.flatMap((logMessages) => logMessages);
+        for (const message of messages) {
+            if (message.type === "request") {
+                parsedFeed.push({
+                    type: "request",
+                    entryKey: getNextEntryKey(),
+                    user,
+                    payload: {
+                        userPrompt: message.data,
+                        attributes: {}, // not currently stored in logs
+                        imageUrl: null, // not currently stored in logs
+                        previousResponseId: null, // not currently stored in logs
+                        aiSessionId: null, // not currently stored in logs
+                    },
+                    file: null, // not currently stored in logs
+                } satisfies AgentChatRequest);
+            } else if (message.type === "response") {
+                parsedFeed.push({
+                    ...message.data,
+                    type: "response",
+                    entryKey: getNextEntryKey(),
+                } satisfies AgentChatResponse);
+            } else {
+                assertUnreachable(message);
+            }
+        }
+        return parsedFeed;
+    }
+
+    /**
+     * Import a previous feed into the store
+     * @param messages - Messages to add to the feed
+     */
+    function importFeed(messages: AgentChatFeedMessage[]): void {
+        for (const message of messages) {
+            feed.value.push(message);
+        }
     }
 
     /**
@@ -228,6 +284,8 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     return {
         feed,
         fullFeed,
+        parseFeed,
+        importFeed,
         activeGeneration,
         getNextEntryKey,
         getPreviousResponseId,
