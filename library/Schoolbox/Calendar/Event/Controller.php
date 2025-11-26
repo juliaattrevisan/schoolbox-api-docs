@@ -106,6 +106,7 @@ class Controller extends Base
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
         $this->attendanceMapper = $attendanceMapper;
+        $this->bookingMapper = $bookingMapper;
         $this->folderAccess = $folderAccess;
         $this->validator = $validator;
         $this->editorTemplateHelper = $editorTemplateHelper;
@@ -141,6 +142,7 @@ class Controller extends Base
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
+            'resourceBookings' => $this->bookingMapper->findByColumn('event_id', $event->getId()),
             'user' => $this->getUser(),
 
             /* Modify perms are calculated in the attendance list fragment
