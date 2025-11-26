@@ -16,5 +16,6 @@ CREATE TABLE lti_line_item
     deleted_at          DATETIME NULL,
     CONSTRAINT lti_line_item_lti_assessment_id_fk
         FOREIGN KEY (lti_assessment_id) REFERENCES lti_assessment (id),
-    INDEX lti_line_item_lti_assessment_guid_index (lti_assessment_guid)
+    INDEX lti_line_item_lti_assessment_guid_index (lti_assessment_guid),
+    INDEX lti_line_item_identifier_url_index (identifier_url)
 );
