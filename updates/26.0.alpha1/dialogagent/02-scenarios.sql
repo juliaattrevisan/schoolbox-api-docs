@@ -426,18 +426,321 @@ INSERT INTO dialog_agent_scenario_criteria
 VALUES
     (
         1,
-        'Evidence of Understanding',
-        'Find evidence that shows understanding identified in the context of the task.',
+        'Effort rating',
+        'Figure out how much effort they provided.',
         1,
         NOW(),
         NOW(),
         null
     ),
     (
-        1,
-        'Attitude and Engagement',
-        'Provide feedback on the students interaction - specifically reviewing the attitude the student used, response language and etiquette of conversation, use supporting evidence.',
         2,
+        'Participation & Engagement',
+        'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
+
+Note any indications of thoughtful engagement, such as the student making connections, asking meaningful or relevant questions, or showing persistence with the task.
+
+Summarise, describing:
+• the level of engagement demonstrated (e.g., exploratory, attentive, surface-level, purposeful)
+• how the student interacted with the activity or the AI (e.g., seeking clarification, testing ideas, building on previous comments).',
+        1,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        2,
+        'Quality of Student Questions',
+        'Identify the questions asked by the student.
+Note whether questions were factual, interpretive, empathetic, or analytical.
+Look for evidence of curiosity, relevance, or follow-up questioning that deepened the conversation.
+Summarise, describing: (The overall focus or style of the student’s questioning. Any examples of probing or thoughtful questions. How their questions contributed to understanding the character’s experiences or perspective.)',
+        2,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        2,
+        'Understanding of Character’s Perspective',
+        'Identify moments where the student acknowledged, interpreted, or responded to the character’s feelings, motivations, or beliefs.
+Identify evidence of empathy, such as attempts to see the world through the character’s eyes or recognise their struggles, values, or decisions.
+Note whether the student challenged or supported the character’s reasoning with sensitivity or understanding.
+Summarise, describing: (The degree to which the student grasped the character’s perspective. How they demonstrated empathy or understanding. Any key insights or misinterpretations evident in their responses.)',
+        3,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        2,
+        'Critical Thinking & Reasoning',
+        'Identify moments where the student linked the conversation to other knowledge sources — e.g., class readings, historical events, personal experiences, or current issues.
+Identify examples of reasoning or comparison, such as drawing parallels, recognising patterns, or evaluating causes and effects.
+Note how these connections supported or extended the student’s understanding of the character or topic.
+Summarise, describing: (The types of connections the student made. How they reasoned through or applied those ideas. The overall relevance or insight gained from those links.)',
+        4,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        2,
+        'Connections to Learning Outcomes',
+        'Read the Context Field to understand the curriculum focus, intended learning outcomes, or thematic framing set by the teacher.
+Analyse the transcript for moments where the student showed understanding of these target ideas, including: Key curriculum concepts (e.g., characterisation, author intent, historical context, ethical reasoning), Links to prior knowledge, other texts, or earlier lessons & Real-world parallels or personal connections
+Identify how the student interpreted the character, situation, or dialogue in relation to the specific context provided by the teacher.
+Summarise, describing: ( How the student connected their discussion to the learning outcomes in the Context Field, The concepts, themes, or curriculum ideas they demonstrated understanding of & Any broader connections they made (e.g., to other texts, past learning, or lived experiences)',
+        5,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        2,
+        'Learning Debrief',
+        'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
+
+Look for indicators of the student’s emerging strengths, developing skills, and areas where further support or guided practice may help them progress (e.g., concepts they are still exploring, strategies they are beginning to use, or reasoning that is forming but not yet secure).
+
+Summarise, describing:
+• insights the student shows about their current learning
+• areas where additional scaffolding or next-step teaching may be beneficial (without evaluative or deficit language).',
+        6,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        3,
+        'Participation & Engagement',
+        'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
+
+Note any indications of thoughtful engagement, such as the student making connections, asking meaningful or relevant questions, or showing persistence with the task.
+
+Summarise, describing:
+• the level of engagement demonstrated (e.g., exploratory, attentive, surface-level, purposeful)
+• how the student interacted with the activity or the AI (e.g., seeking clarification, testing ideas, building on previous comments).',
+        1,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        3,
+        'Purpose & Relevance',
+        'Review the transcript for explanations of why the student chose the topic or why the project is meaningful.
+Identify any problems, audiences, or needs the student discussed.
+Note references to personal interest, community impact, or real-world connections.
+Summarise, describing: (The reason or motivation behind the project. The audience or issue it aims to address. How the student described its relevance or importance.)',
+        2,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        3,
+        'Process & Planning',
+        'Review the transcript for any references to how the student intends to carry out their project — including tasks, sequence, or timeframes.
+Identify mentions of materials, resources, or methods the student proposed.
+Note if the student discussed timeline stages, such as research, creation, testing, or presentation.
+Summarise, describing: (The main steps or plan the student outlined. Any methods or strategies they intend to use. Whether their planning appears structured or still developing.)',
+        3,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        3,
+        'Creative Thinking & Refinement',
+        'Identify points in the transcript where the student brainstormed, generated alternatives, or reconsidered ideas.
+Note how the AI’s prompts or feedback influenced the student’s creative development or scope refinement.
+Look for evidence of the student evaluating different options, combining ideas, or clarifying focus.
+Summarise, describing: (The ways the student used the AI to extend or improve their ideas. Any examples of creative problem-solving, comparison, or adaptation. How their concept evolved through discussion.)',
+        4,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        3,
+        'Project Next Steps',
+        'Review statements about what the student intends to do next — actions, follow-up tasks, or project milestones.
+Identify any mentions of resources, approvals, or guidance the student says they need (e.g., materials, teacher input, time, or collaboration).
+Note if the AI helped the student define a short-term plan or next stage of work.
+Summarise, describing: (The student’s intended next steps.Whether their plan appears specific or general at this stage.)',
+        5,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        3,
+        'Learning Debrief',
+        'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
+
+Look for indicators of the student’s emerging strengths, developing skills, and areas where further support or guided practice may help them progress (e.g., concepts they are still exploring, strategies they are beginning to use, or reasoning that is forming but not yet secure).
+
+Summarise, describing:
+• insights the student shows about their current learning
+• areas where additional scaffolding or next-step teaching may be beneficial (without evaluative or deficit language).',
+        6,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        4,
+        'Participation & Engagement',
+        'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
+
+Note any indications of thoughtful engagement, such as the student making connections, asking meaningful or relevant questions, or showing persistence with the task.
+
+Summarise, describing:
+• the level of engagement demonstrated (e.g., exploratory, attentive, surface-level, purposeful, persistent,)
+• how the student interacted with the activity or the AI (e.g., seeking clarification, testing ideas, building on previous comments).
+
+Consider the tone (motivated, disengaged or uncertain)',
+        1,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        4,
+        'Self-Awareness',
+        'Identify any statements that describe the student’s actions (what they did).
+Identify any statements that describe the student’s feelings, emotions, or reflections about those actions.
+Summarise, describing:
+The main activity or experience the student referred to.
+The feelings or self-awareness they expressed.
+The degree of reflection (surface-level or deeper insight).',
+        2,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        4,
+        'Explanation of Thinking / Process',
+        'Identify any statements that describe the student’s approach, method, or sequence of actions.
+Note any reasoning or decision-making steps they mention (e.g. why they chose a strategy, what they changed, how they adapted).
+Summarise, describing: (The task or challenge the student was working on. The strategies or steps they used to complete it.The level of insight shown in explaining their process (e.g. simple recount vs. thoughtful explanation).)',
+        3,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        4,
+        'Use of Feedback / Goal Setting',
+        'Identify any references to feedback they received (from teachers, peers, or self-assessment).
+Note how they describe using that feedback — whether they acknowledge it, apply it, or plan to use it.
+Identify any goals or intentions for future improvement.
+Summarise, describing: (What type of feedback the student discussed. How they responded to or applied it. Any goals or improvement actions they articulated.)',
+        4,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        4,
+        'Depth of Reflection ',
+        'Identify evidence that the student is analysing causes, effects, or reasons behind their experiences or outcomes.
+Look for signs of learning transfer or future planning (e.g. what they would do differently next time, how they can apply what they learned).
+Summarise, describing: (The main insight or analysis the student provides. Any patterns, lessons, or reasoning they identify. How they connect reflection to future action or broader learning)',
+        5,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        4,
+        'Learning Debrief',
+        'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
+
+Look for indicators of the student’s emerging strengths, developing skills, and areas where further support or guided practice may help them progress (e.g., concepts they are still exploring, strategies they are beginning to use, or reasoning that is forming but not yet secure).
+
+Summarise, describing:
+• insights the student shows about their current learning
+• areas where additional scaffolding or next-step teaching may be beneficial (without evaluative or deficit language).',
+        6,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        5,
+        'Participation & Engagement',
+        'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
+
+Note any indications of thoughtful engagement, such as the student making connections, asking meaningful or relevant questions, or showing persistence with the task.
+
+Summarise, describing:
+• the level of engagement demonstrated (e.g., exploratory, attentive, surface-level, purposeful)
+• how the student interacted with the activity or the AI (e.g., seeking clarification, testing ideas, building on previous comments).',
+        1,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        5,
+        'Student’s Initial Understanding',
+        'Identify what the student believed, assumed, or stated about the topic before deeper questioning occurred.
+Look for keywords or reasoning that show their starting perspective, level of confidence, or misconceptions.
+Summarise this, describing: (The main idea or belief the student expressed at the outset. Any reasoning or examples they used to justify it.)',
+        2,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        5,
+        'AI Prompting & Questioning Path',
+        'Identify the types of questions the AI used to deepen the discussion — e.g. clarifying questions, hypothetical scenarios, comparisons, or challenges to assumptions.
+Note whether the AI introduced counterexamples, evidence requests, or reasoning prompts that encouraged the student to think more critically.
+Summarise this describing: (The questioning strategies or patterns used by the AI. How those prompts shaped or redirected the discussion. Any notable moments where the AI introduced alternative viewpoints or deeper inquiry.',
+        3,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        5,
+        'Student’s Reasoning Development',
+        'Review the dialogue, focusing on the progression of the student’s responses across the conversation.
+Identify evidence of the student reconsidering, refining, or expanding their initial ideas.
+Note any new explanations, self-corrections, or links they make to prior knowledge, real-world examples, or alternative viewpoints.
+Summarise the reasoning progression, describing: (How the student’s thinking shifted or deepened. The kinds of reasoning or connections that emerged. Whether their responses showed increased nuance, logic, or self-awareness.)',
+        4,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        5,
+        'Remaining Gaps',
+        'Pay attention to the student’s final responses and the areas where their reasoning remained incomplete or unclear.
+Identify any concepts the student struggled to explain, contradictions in reasoning, or questions left unresolved.
+Look for signs that the AI attempted to prompt deeper thinking, but the student’s response stayed surface-level or uncertain.
+Summarise the aspects of the concept that remain misunderstood or undeveloped. Any ongoing misconceptions, gaps, or areas for further inquiry. How the student might benefit from revisiting or extending the discussion.',
+        5,
+        NOW(),
+        NOW(),
+        null
+    ),
+    (
+        5,
+        'Learning Debrief',
+        'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
+
+Look for indicators of the student’s emerging strengths, developing skills, and areas where further support or guided practice may help them progress (e.g., concepts they are still exploring, strategies they are beginning to use, or reasoning that is forming but not yet secure).
+
+Summarise the the following:
+• insights the student shows about their current learning
+• areas where additional scaffolding or next-step teaching may be beneficial (without evaluative or deficit language).',
+        6,
         NOW(),
         NOW(),
         null
