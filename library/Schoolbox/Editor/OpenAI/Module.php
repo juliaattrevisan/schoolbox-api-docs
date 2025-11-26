@@ -68,6 +68,12 @@ class Module extends BaseModule
             $hasDifferentiationProfileService,
             new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIFFERENTIATION, $this->getConfig()),
         ));
+        /* Learning Activity Customisation generation
+         */
+        $this->register('POST', '/learning-activity-customisation', 'postLearningActivityCustomisation', new Rule\All(
+            $hasDifferentiationProfileService,
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION, $this->getConfig()),
+        ));
     }
 
 

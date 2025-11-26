@@ -320,17 +320,17 @@ class Controller extends Base
         }
     }
 
-    public function postCustomisation(): void
+    public function postLearningActivityCustomisation(): void
     {
         $this->setAllowBackToTheFuture(false);
 
         $aiConfig = new Config();
-        $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIFFERENTIATION));
+        $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION));
 
         if ($aiConfig->isEnabled($diffConfig) === false) {
             $returnCode = 404;
 
-            $problem = (new ApiProblem("AI Differentiation is not enabled."))
+            $problem = (new ApiProblem("AI Learning Activity Customisation is not enabled."))
                 ->setStatus($returnCode)
                 ->asArray();
 
