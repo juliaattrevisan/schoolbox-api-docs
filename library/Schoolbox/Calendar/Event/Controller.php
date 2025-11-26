@@ -97,6 +97,17 @@ class Controller extends Base
         private ExternalEventMapper $externalEventMapper,
         private External_Timetable $externalTimetable,
     ) {
+        $this->errorMapper = $errorMapper;
+        $this->roleMapper = $roleMapper;
+        $this->folderMapper = $folderMapper;
+        $this->eventMapper = $eventMapper;
+        $this->eventTypeMapper = $eventTypeMapper;
+        $this->campusMapper = $campusMapper;
+        $this->userMapper = $userMapper;
+        $this->attendanceMapper = $attendanceMapper;
+        $this->folderAccess = $folderAccess;
+        $this->validator = $validator;
+        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -106,7 +117,7 @@ class Controller extends Base
      * @param Event $event
      * @throws Exception
      * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|\Twig\Error\Error
      */
     public function getEvent(Event $event): void
     {
@@ -117,11 +128,11 @@ class Controller extends Base
                 'event_id' => $event->getId(),
                 'user_id'  => $this->getUser()->getId()
             ])->getStatus();
-        } catch (Exception $e) {
+        } catch (Exception) {
             $attendanceStatus = null;
         }
 
-        $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+        $payload = new Payload($this->di, $this->attendanceMapper)->generate($event, $this->getUser());
 
         $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', [
             'event' => $event,
@@ -129,6 +140,7 @@ class Controller extends Base
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
+            'resourceBookings' => $this->resourceBookingMapper->findByColumn('event_id', $event->getId()),
             'user' => $this->getUser(),
 
             /* Modify perms are calculated in the attendance list fragment
