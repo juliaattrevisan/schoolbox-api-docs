@@ -410,7 +410,7 @@ class Client implements IClient
                 }
 
                 // Yield after logging as if the parent throws or returns early it would otherwise not be logged
-                yield $outputMessage;
+                yield $outputMessage->__toString();
             }
 
             // If nothing happened: set a default return code, and save log

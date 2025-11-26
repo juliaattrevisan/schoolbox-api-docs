@@ -62,9 +62,17 @@ class ImageGeneration
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
         // TODO: Should $prompt (what ends up being logged as inputText) contain the other parameters such as the style you selected too? or are we okay with loosing that info
         $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
+        return $this->client->createResponseStream(
+            $payload,
+            $log,
+            null,
+            null,
+            new ImageGeneration\EventListener(),
+            new ImageGeneration\LogListener(),
+        );
 
-        $handler = new AgentChat\MessageHandler($this->client, requireFinalImage: true);
-        return $handler->requestStream($payload, $log);
+//        $handler = new AgentChat\MessageHandler($this->client, requireFinalImage: true);
+//        return $handler->requestStream($payload, $log);
     }
 
 
