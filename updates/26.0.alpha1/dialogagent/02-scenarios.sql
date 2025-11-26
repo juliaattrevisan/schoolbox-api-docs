@@ -222,7 +222,7 @@ VALUES
         'switch',
         'This is a switch which will impact with a YES/NO',
         '{"onText":"Yes","offText":"No","onPrompt":"Make sure you link sheep into every answer","offPrompt":"Make sure you link aliens into every answer"}',
-        2,
+        3,
         NOW(),
         NOW(),
         null
