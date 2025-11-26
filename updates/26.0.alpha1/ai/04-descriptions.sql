@@ -27,3 +27,8 @@ UPDATE config
 SET `description` = 'Configure AI settings for image generation.'
 WHERE name = 'ai_image_generation'
 LIMIT 1;
+
+UPDATE config
+SET `description` = 'Configure AI settings for learning activity customisation.'
+WHERE name = 'ai_learning_activity_customisation'
+LIMIT 1;

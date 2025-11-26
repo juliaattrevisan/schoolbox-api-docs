@@ -149,6 +149,33 @@ VALUES (
                WHERE
                    c.module = "openai-text"
            )
+       ),
+       (
+           'ai_learning_activity_customisation',
+           'Learning Activity Customisation',
+           '',
+           (
+               SELECT id
+               FROM lu_config_field
+               WHERE
+                   field = 'json'
+           ),
+           (
+               SELECT id
+               FROM lu_config_type
+               WHERE
+                   type = 'AI'
+           ),
+           'true',
+           'false',
+           'false',
+           'openai-text',
+           (
+               SELECT MAX(sequence) + 6
+               FROM config c
+               WHERE
+                   c.module = "openai-text"
+           )
        );
 
 # -- Push down the 'openai-image' config following the text generation config

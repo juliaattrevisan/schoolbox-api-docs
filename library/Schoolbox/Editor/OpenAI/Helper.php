@@ -55,6 +55,13 @@ class Helper
     public const FEATURE_DIALOGAGENT = 'dialogagent';
     // Differentiation Profiles
     public const FEATURE_DIFFERENTIATION = 'differentiation';
+    /**
+     * Learning Activity Customisation
+     * Independent from FEATURE_DIFFERENTIATION, but usually follows it in a workflow
+     * Since differentiation can be populated without AI involvement, this is separate so it can still be used
+     * This also allows schools to disable customisation while keeping differentiation enabled (or vice-versa) if they want to
+     */
+    public const FEATURE_LEARNING_ACTIVITY_CUSTOMISATION = 'learningactivitycustomisation';
 
 
     /**

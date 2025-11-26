@@ -19,6 +19,7 @@ use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
+use Schoolbox\Editor\OpenAI;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
@@ -783,30 +784,35 @@ class Subnav
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
                         'searchable' => true,
                         'children' => [
-                            '/adminv2/ai-services#ai_text_chat' => [
+                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_CHAT => [
                                 'name' => 'AI Text Chat',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for interactive text editors.',
                             ],
-                            '/adminv2/ai-services#ai_lessonplan' => [
+                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_LESSONPLAN => [
                                 'name' => 'AI Lesson Plan',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for generating lesson plan content.',
                             ],
-                            '/adminv2/ai-services#ai_dialogagent' => [
+                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_DIALOGAGENT => [
                                 'name' => 'AI Discussion Activity',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for discussion learning activities.',
                             ],
-                            '/adminv2/ai-services#ai_differentiation' => [
+                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_DIFFERENTIATION => [
                                 'name' => 'AI Differentiation Profiles',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for differentiation profile support in discussion learning activities.',
                             ],
-                            '/adminv2/ai-services#ai_image_generation' => [
+                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_IMAGE => [
                                 'name' => 'AI Image Generation',
                                 'visible' => true,
                                 'description' => 'Configure AI settings for image generation.',
+                            ],
+                            '/adminv2/ai-services#ai_' . OpenAi\Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION => [
+                                'name' => 'AI Learning Activity Customisation',
+                                'visible' => true,
+                                'description' => 'Configure AI settings for learning activity customisation.',
                             ],
                         ]
                     ],
