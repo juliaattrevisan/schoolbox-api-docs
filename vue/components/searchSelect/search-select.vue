@@ -120,8 +120,6 @@ const currentResults = window.Vue.computed(() => {
 
 // #region close search results on lost focus / click outside
 
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
-
 /**
  * To close the search results
  */
@@ -194,7 +192,7 @@ function onButtonSelected(): void {
 </script>
 
 <template>
-    <div ref="searchSelectEl" v-on-click-outside="onClickOutside" :data-test="`search-select-${props.labelId}`">
+    <div v-on-click-outside="onClickOutside" :data-test="`search-select-${props.labelId}`">
         <template v-if="props.showInput">
             <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
             <slot name="meta"></slot>
