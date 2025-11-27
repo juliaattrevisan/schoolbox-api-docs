@@ -66,18 +66,17 @@ class Button
      */
     public function generate(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): ?array
     {
-        /* First check the View Response and Create Response routes to see if there's at least one button that
-         * COULD potentially display here, then decide whether it's enabled or not.
+        /* First check if you can author something (either by creating a new response or resuming an existing response)
          */
-        $button = $this->findViewResponseButton($assessment, $participant, $viewer);
+        $button = $this->findCreateResponseButton($assessment, $participant, $viewer);
 
         if ($button) {
             return $button;
         }
 
-        /* You can't view a response; maybe you can create one
+        /* If you can't author anything, maybe you can view something you previously did
          */
-        $button = $this->findCreateResponseButton($assessment, $participant, $viewer);
+        $button = $this->findViewResponseButton($assessment, $participant, $viewer);
 
         if ($button) {
             return $button;
