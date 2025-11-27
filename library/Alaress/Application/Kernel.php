@@ -2212,6 +2212,20 @@ abstract class Kernel
                 );
             })
         );
+        $di->set(
+            'lti.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    STDOUT,
+                    null,
+                    $config->get(ConfigMapper::NAME_LTI_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'lti.' . INSTANCE_ID,
+                ],
+            ),
+        );
 
         // OIDC things which aren't related to LTI
         // This is the cache for the response from the OIDC discovery and JWKS

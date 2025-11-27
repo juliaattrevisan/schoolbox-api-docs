@@ -232,6 +232,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_SUBMISSION_VISIBILITY_MAX = 'submission_visibility_max';
     public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
+    public const NAME_LTI_DEBUG_MODE         = 'lti_debug_mode';
 
     public const NAME_CUSTOM_ASSESSMENT_PARTICIPATION = 'custom_assessment_participation';
     public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
