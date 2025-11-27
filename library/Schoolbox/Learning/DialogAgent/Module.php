@@ -482,6 +482,7 @@ class Module extends BaseModule
             $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper::class),
         );
     }
 

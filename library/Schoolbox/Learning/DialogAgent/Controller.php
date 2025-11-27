@@ -57,6 +57,7 @@ class Controller extends Base
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
      * @param FieldContextMapper $fieldContextMapper
+     * @param CriteriaMapper $criteriaMapper
      */
     public function __construct(
         private BreadcrumbFactory $bakery,
@@ -66,6 +67,7 @@ class Controller extends Base
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
         private FieldContextMapper $fieldContextMapper,
+        private CriteriaMapper $criteriaMapper,
     ) {
     }
 
@@ -548,8 +550,7 @@ class Controller extends Base
 
         /* Compile scenario field names as header elements
          */
-        $criteriaMapper = CriteriaMapper::getInstance();
-        $criteria = $criteriaMapper->findByColumn('scenario_id', $assessment->getScenarioId());
+        $criteria = $this->criteriaMapper->findByColumn('scenario_id', $assessment->getScenarioId());
 
         $fields = [];
 
