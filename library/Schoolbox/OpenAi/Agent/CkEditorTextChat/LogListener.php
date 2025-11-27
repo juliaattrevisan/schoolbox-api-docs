@@ -12,7 +12,6 @@ namespace Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Html2Text\Html2Text;
 use Schoolbox\Editor\OpenAI\Log\Model;
 use Schoolbox\OpenAi\EventStream\Message;
-use Schoolbox\OpenAi\IClient;
 use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 use UnexpectedValueException;
 

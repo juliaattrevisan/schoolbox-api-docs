@@ -18,28 +18,39 @@ use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use UnexpectedValueException;
 
 /**
- * Class EventListener
+ * Event listener for image generation requests.
+ *
+ * Mutate the received event into something which the frontend is able to
+ * consume.
  */
 class EventListener implements IListener
 {
+    /**
+     * The response ID which OpenAI sent for this request.
+     *
+     * Will be included in the data for any subsequent events after this is
+     * received.
+     */
     private ?string $responseId = null;
 
+    /**
+     * @inheritdoc
+     */
     public function modifyMessage(Message $message): ?Message
     {
         try {
             $outputMessage = $this->handleStreamMessage($message);
         } catch (SchoolboxException $e) {
-            /** Some error occured during processing, send it onwards to the frontend as an ApiProblem */
-            $problem = (new ApiProblem($e->getMessage()))->setStatus($e->getCode());
+            /** Some error occurred during processing, send it onwards to the frontend as an ApiProblem */
+            $problem = new ApiProblem($e->getMessage())->setStatus($e->getCode());
 
             $outputMessage = new Message(
                 json_encode($problem->asArray(), JSON_THROW_ON_ERROR),
-                MessageEventType::ERROR->value
+                MessageEventType::ERROR->value,
             );
         }
         return $outputMessage;
     }
-
 
     /**
      * Handle a new message (from the createResponseStream iterable) and fully parse it
@@ -179,10 +190,13 @@ class EventListener implements IListener
             }
 
             return new Message(
-                json_encode([
-                                'responseId' => $this->responseId,
-                                'image' => self::translateImageData($imageBase64),
-                            ], JSON_THROW_ON_ERROR),
+                json_encode(
+                    [
+                        'responseId' => $this->responseId,
+                        'image'      => self::translateImageData($imageBase64),
+                    ],
+                    JSON_THROW_ON_ERROR
+                ),
                 MessageEventType::PARTIAL_IMAGE->value
             );
         }
@@ -197,10 +211,13 @@ class EventListener implements IListener
             }
 
             return new Message(
-                json_encode([
-                                'responseId' => $this->responseId,
-                                'delta' => $textDelta,
-                            ], JSON_THROW_ON_ERROR),
+                json_encode(
+                    [
+                        'responseId' => $this->responseId,
+                        'delta'      => $textDelta,
+                    ],
+                    JSON_THROW_ON_ERROR
+                ),
                 MessageEventType::DELTA->value
             );
         }
