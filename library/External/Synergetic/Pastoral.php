@@ -1301,7 +1301,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             if (empty($documentReferencesSeq)) {
                 $this->connector->rollBack();
-                throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+                throw new ExternalException('Error inserting pastoral document to record in Synergetic database. No document reference ID found');
             }
 
             // Add a document reference to the student so it shows up on their normal community record
@@ -1318,7 +1318,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             if (!$query->execute()) {
                 $this->connector->rollBack();
-                throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+                throw new ExternalException('Error linking pastoral document to record in Synergetic database: Failed insert student reference');
             }
 
             // Specifically link it to their pastoral record as well
@@ -1356,7 +1356,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             if (!$query->execute()) {
                 $this->connector->rollBack();
-                throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+                throw new ExternalException('Error linking pastoral document to record in Synergetic database: Fail inserting pastoral reference query');
             }
             $this->connector->commit();
             $pastoralAttachment = $this->pastoralAttachmentMapper->findById($upload->getPastoralAttachmentId());
