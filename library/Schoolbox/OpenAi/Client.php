@@ -431,7 +431,7 @@ class Client implements IClient
             // TODO: is this actually going to show an error state to the frontend??
             // Convert it to a single message I guess, if finalising the log
             // didn't raise an exception?
-            yield new EventStream\Message($responseBody);
+            yield new EventStream\Message($responseBody)->__toString();
         }
     }
 }

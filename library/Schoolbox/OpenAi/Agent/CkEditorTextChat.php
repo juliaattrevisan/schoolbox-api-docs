@@ -71,10 +71,7 @@ class CkEditorTextChat
         );
 
         /* Immediately pass on all streamed messages without any changes as CKEditor expects the raw response format */
-        $stream = $this->client->createChatCompletionStream($payload, $log, streamListener: $this->listenForOutputText(...));
-        foreach ($stream as $message) {
-            yield $message->__toString();
-        }
+        return $this->client->createChatCompletionStream($payload, $log, streamListener: $this->listenForOutputText(...));
     }
 
     /**
