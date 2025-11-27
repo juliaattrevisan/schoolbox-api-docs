@@ -24,6 +24,8 @@ use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConf
 use Schoolbox\Admin\DifferentiationProfiles\Model as AdminConfigModel;
 use Schoolbox\Admin\DifferentiationProfiles\Mapper as AdminConfigMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Twig\Error\Error;
 use Schoolbox\Filter\IFactoryFactory;
@@ -358,6 +360,8 @@ class Controller extends Base
      */
     public function viewDifferentiationProfileData(User $student): void
     {
+
+
         try {
             $profile = $this->mapper->findOneByColumn(
                 'student_id',

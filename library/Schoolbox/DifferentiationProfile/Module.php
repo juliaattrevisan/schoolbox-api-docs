@@ -57,6 +57,19 @@ class Module extends BaseModule
             ),
         );
 
+        $hasCampusPerms =  new Rule\HasServicePermission(
+            UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+            UserAccess::ACCESS_WRITE,
+            fn (array $params) => $this->getMapperFactory()
+                                       ->get(UserMapper::class)
+                                       ->findById($params['studentId'])->getCampusCollection()
+        );
+
+        $updateProfilePerms = new Rule\All(
+            $getPerms,
+            $hasCampusPerms
+        );
+
         $getProfilePerms = new Rule\All(
             $getPerms,
             new Rule\Callback(function (array $params): void {
@@ -66,7 +79,8 @@ class Module extends BaseModule
                 } catch (\Exception $e) {
                     throw new Unauthorized('Differentiation profile does not exist.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
                 }
-            })
+            }),
+            $hasCampusPerms
         );
 
         /* Only superusers can receive data from the form
@@ -88,7 +102,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/edit/{studentId}',
             'postDifferentiationProfileData',
-            $getPerms,
+            $updateProfilePerms,
             \Closure::fromCallable([$this, 'preloadStudent'])
         );
 
