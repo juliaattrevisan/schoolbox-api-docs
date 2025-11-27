@@ -670,6 +670,7 @@ export default {
                         </tbody>
                     </table>
                     <div v-else class="empty-state">
+                        <i class="icon-resource-booking"></i>
                         <p>
                             No resources are booked for this event.<br />
                             <a href="">Book a resource for this event</a>
