@@ -170,7 +170,7 @@ class Model implements ISoftDeletable
     /**
      * The LTI line item to which this score is attached, if any.
      */
-    private ?LTILineItemModel $ltiLineItem;
+    private ?LTILineItemModel $ltiLineItem = null;
 
     /**
      * The student to whom this score is given.
