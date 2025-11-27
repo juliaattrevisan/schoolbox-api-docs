@@ -53,10 +53,10 @@ interface IClient
      *                                                        logs.
      * @param int|null                   $chunkSize           If provided, read this many bytes per stream fetch:
      *                                                        otherwise, allow the client itself to decide.
-     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI
-     *                                                        before sending to the stream.
-     * @param ?LogHandler\ILogHandler    $logListener         If set: call this for each message received from
-     *                                                        OpenAI, and modify the log accordingly.
+     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI before
+     *                                                        sending to the stream.
+     * @param ?LogHandler\IListener      $logListener         If set: call this for each message received from OpenAI,
+     *                                                        and modify the log accordingly.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
@@ -65,7 +65,7 @@ interface IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\IListener $eventStreamListener = null,
-        ?LogHandler\ILogHandler $logListener = null,
+        ?LogHandler\IListener $logListener = null,
     ): iterable;
 
     /**
@@ -89,10 +89,10 @@ interface IClient
      *                                                        logs.
      * @param int|null                   $chunkSize           If provided, read this many bytes per stream fetch:
      *                                                        otherwise, allow the client itself to decide.
-     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI
-     *                                                        before sending to the stream.
-     * @param ?LogHandler\ILogHandler    $logListener         If set: call this for each message received from
-     *                                                        OpenAI, and modify the log accordingly.
+     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI before
+     *                                                        sending to the stream.
+     * @param LogHandler\IListener|null  $logListener         If set: call this for each message received from OpenAI,
+     *                                                        and modify the log accordingly.
      * @return iterable<string>
      */
     public function createChatCompletionStream(
@@ -100,7 +100,7 @@ interface IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\IListener $eventStreamListener = null,
-        ?LogHandler\ILogHandler $logListener = null,
+        ?LogHandler\IListener $logListener = null,
     ): iterable;
 
     /**

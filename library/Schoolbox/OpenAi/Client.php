@@ -93,7 +93,7 @@ class Client implements IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\IListener $eventStreamListener = null,
-        ?LogHandler\ILogHandler $logListener = null,
+        ?LogHandler\IListener $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log      = $log->setEndpoint($url->__toString());
@@ -139,7 +139,7 @@ class Client implements IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\IListener $eventStreamListener = null,
-        ?LogHandler\ILogHandler $logListener = null,
+        ?LogHandler\IListener $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log      = $log->setEndpoint($url->__toString());
@@ -336,9 +336,9 @@ class Client implements IClient
      * Request a non-streamed response from the AI provider, and handle the
      * logging and exceptions appropriately.
      *
-     * @param ResponseInterface      $response   The response from the AI provider.
-     * @param Log\Model              $log        The log to write to.
-     * @param LogHandler\ILogHandler $logHandler The log handler to use for the response.
+     * @param ResponseInterface    $response   The response from the AI provider.
+     * @param Log\Model            $log        The log to write to.
+     * @param LogHandler\IListener $logHandler The log handler to use for the response.
      * @return ResponseInterface The response from the AI provider.
      * @throws JsonException   if somehow the response body couldn't be decoded
      * @throws MapperException if somehow the log couldn't be saved
@@ -346,7 +346,7 @@ class Client implements IClient
     private function handleNonStreamedResponse(
         ResponseInterface $response,
         Log\Model $log,
-        LogHandler\ILogHandler $logHandler,
+        LogHandler\IListener $logHandler,
     ): ResponseInterface {
         // Do something with the response:
         // extract the body, and also log it.
@@ -368,7 +368,7 @@ class Client implements IClient
      *
      * @param ResponseInterface          $response            The response from the AI provider.
      * @param Log\Model                  $log                 The log to write to.
-     * @param LogHandler\ILogHandler     $logHandler          The log handler to use for each message.
+     * @param LogHandler\IListener       $logHandler          The log handler to use for each message.
      * @param int                        $chunkSize           How many bytes to read from each stream iteration.
      * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI before
      *                                                        sending to the stream.
@@ -378,7 +378,7 @@ class Client implements IClient
     private function handleStreamedResponse(
         ResponseInterface $response,
         Log\Model $log,
-        LogHandler\ILogHandler $logHandler,
+        LogHandler\IListener $logHandler,
         int $chunkSize,
         ?EventStream\IListener $eventStreamListener = null,
     ): iterable {

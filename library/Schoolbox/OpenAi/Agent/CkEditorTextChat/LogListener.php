@@ -12,7 +12,7 @@ namespace Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Html2Text\Html2Text;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
-use Schoolbox\OpenAi\LogHandler\ILogHandler;
+use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;
 
 /**
@@ -21,7 +21,7 @@ use UnexpectedValueException;
  * If a received message is a finished response, then extract the output text
  * out of it and add it to the log.
  */
-class LogListener implements ILogHandler
+class LogListener implements IListener
 {
     /**
      * Constructor

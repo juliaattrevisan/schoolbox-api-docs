@@ -13,7 +13,7 @@ use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
 use Schoolbox\OpenAi\EventStream\Message;
-use Schoolbox\OpenAi\LogHandler\ILogHandler;
+use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;
 
 /**
@@ -22,7 +22,7 @@ use UnexpectedValueException;
  * If a message is a finished response, then extract the output text out of it
  * and add it to the log.
  */
-class LogListener implements ILogHandler
+class LogListener implements IListener
 {
     /**
      * The following AgentChat\MessageEventType events indicate the end of a response

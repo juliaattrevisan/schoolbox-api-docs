@@ -20,7 +20,7 @@ use Schoolbox\OpenAi\EventStream\Message;
  * This log handler should apply to all Response API requests, regardless of
  * the agent which makes them.
  */
-class ResponseMessage implements ILogHandler
+class ResponseMessage implements IListener
 {
     /**
      * The following event types indicate that the response API has finished

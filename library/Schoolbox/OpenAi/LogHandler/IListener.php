@@ -16,7 +16,7 @@ use Schoolbox\OpenAi\EventStream\Message;
  * Listener for updating an OpenAI log object, based on the content of the
  * message stream.
  */
-interface ILogHandler
+interface IListener
 {
     /**
      * Handle this message, by writing it to a log.

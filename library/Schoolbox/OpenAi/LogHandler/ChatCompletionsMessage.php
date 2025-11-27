@@ -20,7 +20,7 @@ use Schoolbox\OpenAi\EventStream\Message;
  * This log handler should apply to all Chat Completions API requests,
  * regardless of the agent which makes them.
  */
-class ChatCompletionsMessage implements ILogHandler
+class ChatCompletionsMessage implements IListener
 {
     /**
      * Handle the message by writing it directly to the log.

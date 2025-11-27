@@ -15,21 +15,21 @@ use Schoolbox\OpenAi\EventStream\Message;
 /**
  * Composite log handler: applies all of its handlers to the log sequentially.
  */
-class Composite implements ILogHandler
+class Composite implements IListener
 {
     /**
      * All handlers in this composite.
      *
-     * @var array<ILogHandler>
+     * @var array<IListener>
      */
     private array $handlers = [];
 
     /**
      * Constructor
      *
-     * @param ILogHandler ...$handlers The handlers to apply.
+     * @param IListener ...$handlers The handlers to apply.
      */
-    public function __construct(ILogHandler ...$handlers)
+    public function __construct(IListener ...$handlers)
     {
         $this->handlers = $handlers;
     }
@@ -37,10 +37,10 @@ class Composite implements ILogHandler
     /**
      * Add a new handler to the composite.
      *
-     * @param ILogHandler $handler
+     * @param IListener $handler
      * @return $this
      */
-    public function addHandler(ILogHandler $handler): self
+    public function addHandler(IListener $handler): self
     {
         $this->handlers[] = $handler;
         return $this;
