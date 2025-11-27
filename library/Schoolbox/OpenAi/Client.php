@@ -409,7 +409,6 @@ class Client implements IClient
                         clone $outputMessage,
                         clone $message,
                         $log,
-                        null,
                     );
                 } finally {
                     $this->saveLog($log);

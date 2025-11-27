@@ -45,7 +45,6 @@ class ResponseMessage implements ILogHandler
         Message $outputMessage,
         Message $rawMessage,
         Log\Model $log,
-        ?IListener $logListener,
     ): Log\Model {
         // Prepare the message for logging
         $eventType = $rawMessage->eventType;
@@ -65,9 +64,6 @@ class ResponseMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $rawMessage->__toString());
-        if ($logListener) {
-            $log = $logListener->updateLog($log, $outputMessage, $rawMessage);
-        }
         if (isset($rawData['response'])) {
             // Handle information about the response
             $log = $this->logUsage($rawData['response'], $log);

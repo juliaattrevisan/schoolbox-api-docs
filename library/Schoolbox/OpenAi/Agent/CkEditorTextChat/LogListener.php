@@ -98,7 +98,6 @@ class LogListener implements IListener, ILogHandler
         Message $outputMessage,
         Message $rawMessage,
         Log\Model $log,
-        ?IListener $logListener,
     ): Log\Model {
         return $this->updateLog($log, $outputMessage, $rawMessage);
     }

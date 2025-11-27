@@ -54,10 +54,9 @@ class Composite implements ILogHandler
         Message $outputMessage,
         Message $rawMessage,
         Log\Model $log,
-        ?IListener $logListener,
     ): Log\Model {
         foreach ($this->handlers as $handler) {
-            $log = $handler->handleMessage($outputMessage, $rawMessage, $log, $logListener);
+            $log = $handler->handleMessage($outputMessage, $rawMessage, $log);
         }
         return $log;
     }
