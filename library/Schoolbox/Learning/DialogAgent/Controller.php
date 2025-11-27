@@ -565,7 +565,7 @@ class Controller extends Base
              */
             $feedbackFields = array_values(array_fill_keys($fields, null));
 
-            new \Alaress_Probe($participant->getAuthoritativeFeedback(true));
+            $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
             /* Slam them all together
              */
@@ -574,7 +574,7 @@ class Controller extends Base
                 $participant->getUser()->getExternalId(),
                 $participant->getUser()->getFirstName(),
                 $participant->getUser()->getLastName(),
-                $statusChecker->getHumanReadableStatus($participant->getAuthoritativeResponse(false)),
+                $statusChecker->getHumanReadableStatus($authoritativeFeedback),
             ], $feedbackFields);
         }
 

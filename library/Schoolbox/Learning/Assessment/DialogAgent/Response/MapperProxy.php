@@ -104,25 +104,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $stack = new GenericCollection(DomainObject::class);
 
-        foreach ($mapperModels as $dataModel) {
-            $domainObject = new DomainObject()
-                ->setId($dataModel->getId())
-                ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()?->getAssessmentModel()->getId()))
-                ->setAuthoritative($dataModel->getAuthoritative())
-                ->setStartedAt($dataModel->getStartedAt())
-                ->setSubmittedAt($dataModel->getSubmittedAt())
-                ->setSubmittedBy($dataModel->getSubmittedBy())
-                ->setSubmittedOnBehalfOf($dataModel->getLearner())
-                ->setSessionId($dataModel->getSessionId())
-                ->setAssistanceRequestedAt($dataModel->getAssistanceRequestedAt())
-                ->setCreatedAt($dataModel->getCreatedAt())
-                ->setCreatedBy($dataModel->getCreatedBy())
-                ->setUpdatedAt($dataModel->getUpdatedAt())
-                ->setUpdatedBy($dataModel->getUpdatedBy())
-                ->setDeletedAt($dataModel->getDeletedAt())
-                ->setDeletedBy($dataModel->getDeletedBy());
+        $responseTransformer =  new Transformer();
 
-            $stack->add($domainObject);
+        foreach ($mapperModels as $dataModel) {
+            $stack->add($responseTransformer->transformDataModel($dataModel));
         }
 
         return $stack;
@@ -142,25 +127,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $stack = new GenericCollection(DataModel::class);
 
-        foreach ($domainObjects as $domainObject) {
-            $dataModel = new DataModel()
-                ->setId($domainObject->getId())
-                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
-                ->setLearner($domainObject->getSubmittedOnBehalfOf())
-                ->setAuthoritative($domainObject->getAuthoritative())
-                ->setStartedAt($domainObject->getStartedAt())
-                ->setSubmittedAt($domainObject->getSubmittedAt())
-                ->setSubmittedBy($domainObject->getSubmittedBy())
-                ->setSessionId($domainObject->getSessionId())
-                ->setAssistanceRequestedAt($domainObject->getAssistanceRequestedAt())
-                ->setCreatedAt($domainObject->getCreatedAt())
-                ->setCreatedBy($domainObject->getCreatedBy())
-                ->setUpdatedAt($domainObject->getUpdatedAt())
-                ->setUpdatedBy($domainObject->getUpdatedBy())
-                ->setDeletedAt($domainObject->getDeletedAt())
-                ->setDeletedBy($domainObject->getDeletedBy());
+        $responseTransformer =  new Transformer();
 
-            $stack->add($dataModel);
+        foreach ($domainObjects as $domainObject) {
+            $stack->add($responseTransformer->transformDomainObject($domainObject, $this->getInternalValue($domainObject->getAssessable()->getId())));
         }
 
         return $stack;

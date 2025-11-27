@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper as Feedb
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Model as DataModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentDomainObject;
 use Schoolbox\Learning\Assessment\DialogAgent\Feedback\Model as DomainObject;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Transformer;
 use Schoolbox\Mapper;
 
 /**
@@ -104,11 +105,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $stack = new GenericCollection(DomainObject::class);
 
+        $responseTransformer = new Transformer();
+
         foreach ($mapperModels as $dataModel) {
             $domainObject = new DomainObject()
                 ->setId($dataModel->getId())
                 ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()?->getAssessmentModel()->getId()))
-                ->setBody($dataModel->getBody())
+                ->setResponse($responseTransformer->transformDataModel($dataModel->getResponse()))
+                ->setComment($dataModel->getBody())
                 ->setCriteriaId($dataModel->getCriteria()->getId())
                 ->setReviewee($dataModel->getResponse()->getLearner())
                 /* TODO Who owns this?
@@ -136,11 +140,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $stack = new GenericCollection(DataModel::class);
 
+        $responseTransformer = new Transformer();
+
         foreach ($domainObjects as $domainObject) {
             $dataModel = new DataModel()
                 ->setId($domainObject->getId())
                 ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
-                ->setBody($domainObject->getBody())
+                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
+                ->setBody($domainObject->getComment())
                 ->setCriteria((new \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model())->setId($domainObject->getCriteriaId()))
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setUpdatedAt($domainObject->getUpdatedAt())
