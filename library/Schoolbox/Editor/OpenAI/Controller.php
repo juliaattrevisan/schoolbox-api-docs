@@ -25,6 +25,7 @@ use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
+use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Smalot\PdfParser\Parser;
@@ -125,7 +126,7 @@ class Controller extends Base
                 return;
             }
             return;
-        } catch (\DomainException $e) {
+        } catch (AiException\Runtime $e) {
             /* Not configured? Not found
              */
             $returnCode = 404;
@@ -210,7 +211,7 @@ class Controller extends Base
                     ->withStatus($e->getCode());
                 return;
             }
-        } catch (\DomainException $e) {
+        } catch (AiException\Runtime $e) {
             // This will always be a stream
             /* Not configured? Not found
              */
@@ -243,20 +244,6 @@ class Controller extends Base
         $aiConfig = new Config();
         $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
 
-        // if not enabled, 404
-        if ($aiConfig->isEnabled($chatConfig) === false) {
-            $returnCode = 404;
-
-            $problem = (new ApiProblem("AI Assistant is not enabled."))
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
-
         /** gen a sessionID guid for keeping track of what is happening
          * for ckeditor chat each ai request is a new session
          */
@@ -276,7 +263,7 @@ class Controller extends Base
             );
             $this->response = $this->responseAsEventStream($response);
             return;
-        } catch (\DomainException $e) {
+        } catch (AiException\Runtime $e) {
             /* Not configured? Not found
              */
             $returnCode = 404;
