@@ -177,7 +177,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             }
 
             if (activeGeneration.value === null) {
-                /** The generation was stopped before the stream fully stopped and we recieved something extra, ignore it  */
+                /** The generation was stopped before the stream fully stopped and we received something extra, ignore it  */
                 abortController.abort();
                 return;
             }
