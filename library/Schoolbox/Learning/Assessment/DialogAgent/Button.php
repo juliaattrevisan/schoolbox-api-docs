@@ -8,8 +8,11 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\User;
 
 /**
  * andrew.carlton 44 minutes ago
@@ -40,10 +43,14 @@ class Button
      * Constructor.
      *
      * Contains a route generator so you can pre-build the relevant routes here
-     * @param \Aura\Router\Generator $routeGenerator
+     *
+     * @param Generator $routeGenerator
+     * @param Authorizer $authorizer
      */
-    public function __construct(private \Aura\Router\Generator $routeGenerator)
-    {
+    public function __construct(
+        private \Aura\Router\Generator $routeGenerator,
+        private Authorizer $authorizer,
+    ) {
     }
 
 
@@ -53,12 +60,14 @@ class Button
      *
      * @param Model $assessment
      * @param null|Participant $participant
+     * @param User $viewer
      * @return array
      * @throws RouteNotFound
      */
-    public function generate(Model $assessment, ?Participant $participant): array
+    public function generate(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): array
     {
         $now = \Alaress_Date_Format::now();
+        $url = null;
 
         /* No participant? You might be a staff member creating this thing since that workflow also lands you at
          * the assessment summary screen. Without a participant you can't do much here.
@@ -117,17 +126,25 @@ class Button
                  * but this is an authoritative response,
                  * button says "View" but lets you continue so you can look at it.
                  */
+                $route = 'learningDialogAgent.getViewResponse';
+
+                $params = [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'student' => $participant->getUser(),
+                    'studentId' => $participant->getUser()->getId(),
+                    'response' => $authoritativeResponse,
+                    'responseId' => $authoritativeResponse->getId()
+                ];
+
+                if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                    $url = $this->routeGenerator->generate($route, $params);
+                }
+
                 return [
                     'label' => self::LABEL_VIEW,
                     'responseId' => $authoritativeResponse->getId(),
-                    'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
-                        'assessment' => $assessment,
-                        'assessmentId' => $assessment->getId(),
-                        'student' => $participant->getUser(),
-                        'studentId' => $participant->getUser()->getId(),
-                        'response' => $authoritativeResponse,
-                        'responseId' => $authoritativeResponse->getId()
-                    ]),
+                    'url' => $url,
                 ];
             }
         }
@@ -140,15 +157,23 @@ class Button
                 /* If there are no responses at all, button says "Begin"
                  * You're about to make the first one and the first one is always authoritative.
                  */
+                $route = 'learningDialogAgent.getCreateResponseForm';
+
+                $params = [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'student' => $participant->getUser(),
+                    'studentId' => $participant->getUser()->getId(),
+                ];
+
+                if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                    $url = $this->routeGenerator->generate($route, $params);
+                }
+
                 return [
                     'label' => self::LABEL_START,
                     'responseId' => null,
-                    'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
-                        'assessment' => $assessment,
-                        'assessmentId' => $assessment->getId(),
-                        'student' => $participant->getUser(),
-                        'studentId' => $participant->getUser()->getId(),
-                    ]),
+                    'url' => $url,
                 ];
             }
 
@@ -162,31 +187,48 @@ class Button
                 if (null !== $authoritativeResponse->getSubmittedAt()) {
                     /* View (enabled)
                      */
+                    $route = 'learningDialogAgent.getViewResponse';
+
+                    $params = [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId(),
+                        'student' => $participant->getUser(),
+                        'studentId' => $participant->getUser()->getId(),
+                        'response' => $authoritativeResponse,
+                        'responseId' => $authoritativeResponse->getId()
+                    ];
+
+                    if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                        $url = $this->routeGenerator->generate($route, $params);
+                    }
+
                     return [
                         'label' => self::LABEL_VIEW,
                         'responseId' => $authoritativeResponse->getId(),
-                        'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
-                            'assessment' => $assessment,
-                            'assessmentId' => $assessment->getId(),
-                            'student' => $participant->getUser(),
-                            'studentId' => $participant->getUser()->getId(),
-                            'response' => $authoritativeResponse,
-                            'responseId' => $authoritativeResponse->getId()
-                        ]),
+                        'url' => $url
                     ];
                 } else {
                     /* Resume (enabled)
                      */
+                    $route = 'learningDialogAgent.getResumeResponse';
+
+                    $params = [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId(),
+                        'student' => $participant->getUser(),
+                        'studentId' => $participant->getUser()->getId(),
+                        'response' => $authoritativeResponse,
+                        'responseId' => $authoritativeResponse->getId()
+                    ];
+
+                    if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+                        $url = $this->routeGenerator->generate($route, $params);
+                    }
+
                     return [
                         'label' => self::LABEL_RESUME,
                         'responseId' => $authoritativeResponse->getId(),
-                        'enabled' => true,
-                        'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
-                            'assessment' => $assessment,
-                            'assessmentId' => $assessment->getId(),
-                            'student' => $participant->getUser(),
-                            'studentId' => $participant->getUser()->getId(),
-                        ]),
+                        'url' => $url,
                     ];
                 }
             }

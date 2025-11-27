@@ -349,7 +349,7 @@ class Controller extends Assessment\Controller
             'canRespond'        => $canRespond,
             /* An array representing a call to action
              */
-            'button' => (new Button($this->routeGenerator))->generate($assessment, $participant),
+            'button' => (new Button($this->routeGenerator, $this->authorizer))->generate($assessment, $participant, $this->getUser()),
             /* An unsubmitted response that can be resumed
              */
             'existingResponse' => $existingResponse,
