@@ -110,14 +110,14 @@ function submitResponse(): void {
 /**
  * The max height of the feed area, responsive to screen size
  */
-const maxHeight = window.Vue.ref("50vh");
+const maxFeedHeight = window.Vue.ref("50vh");
 
 const feedContainerEl = window.Vue.useTemplateRef<HTMLDivElement>("feedContainerRef");
 
 /**
- * Update the max height on mount and on resize
+ * Update the max feed height on mount and on resize
  */
-function updateMaxHeight(): void {
+function updateFeedHeight(): void {
     const footer = document.querySelector("#footer");
     const content = document.querySelector("#content");
     const container = document.querySelector("#container");
@@ -134,20 +134,32 @@ function updateMaxHeight(): void {
         (contentRect.bottom - feedRect.bottom) + // the extra space below the feed until the bottom of the used content area
         parseInt(getComputedStyle(container).paddingBottom, 10);
 
-    maxHeight.value = `${window.innerHeight - totalUsedHeight}px`;
+    maxFeedHeight.value = `${window.innerHeight - totalUsedHeight}px`;
 }
 
-const observer = window.Vue.ref<ResizeObserver | null>(null);
+const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
 
 window.Vue.onMounted(() => {
-    updateMaxHeight();
-    observer.value = new ResizeObserver(updateMaxHeight);
     if (!feedContainerEl.value) {
         console.warn("<dialog-agent-chat>: unable to find feed container");
         return;
     }
 
-    observer.value.observe(feedContainerEl.value);
+    // Initialize the ResizeObserver
+    resizeObserver.value = new ResizeObserver(updateFeedHeight);
+    resizeObserver.value.observe(feedContainerEl.value);
+    resizeObserver.value.observe(document.querySelector("#container")!);
+
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    updateFeedHeight();
+    window.addEventListener("DOMContentLoaded", updateFeedHeight, { once: true });
+});
+
+window.Vue.onUnmounted(() => {
+    // Clean up event listeners
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+    }
 });
 </script>
 
@@ -172,7 +184,7 @@ window.Vue.onMounted(() => {
         <ac-feed
             class="l-mar-m--bottom"
             style="height: 100%; min-height: 20rem"
-            :style="{ maxHeight }"
+            :style="{ maxHeight: maxFeedHeight }"
             :feed="acStore.fullFeed"
             error-prefix="There was a problem retrieving the response."
         >
