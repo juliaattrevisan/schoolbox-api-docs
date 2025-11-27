@@ -662,7 +662,7 @@ export default {
                         <tbody>
                             <tr v-for="booking in this.event.resourceBookings" :key="booking.id">
                                 <td>{{ booking.name !== "" ? booking.name : booking.resource.name }}</td>
-                                <td>
+                                <td class="text-right">
                                     <span :class="booking.status.name.toLowerCase() + ' label'">{{
                                         booking.status.name
                                     }}</span>
