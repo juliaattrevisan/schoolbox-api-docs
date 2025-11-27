@@ -57,6 +57,7 @@ function onTabSelected(tab: Tab): void {
  * also checking the URL for a tab type.
  */
 window.Vue.onMounted((): void => {
+    console.info("pastoral-report.vue e");
     // Check if there's a tab in the URL
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get(tabParamName);
@@ -72,6 +73,7 @@ window.Vue.onMounted((): void => {
         const [firstTab] = props.tabs;
         selectedTab.value = firstTab;
     }
+    console.info("pastoral-report.vue x");
 });
 
 /**

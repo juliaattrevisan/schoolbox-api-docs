@@ -5,6 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
+import ResourceBookingModal from "./resource-booking-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -26,6 +27,7 @@ export default {
         AudiencesModal,
         MediaArticle,
         SearchSelect,
+        ResourceBookingModal,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -453,6 +455,10 @@ export default {
         showAudiencesModal() {
             this.$refs.audiencesModal.open();
         },
+
+        showResourceBookingModal() {
+            this.$refs.resourceBookingModal.open();
+        },
     },
 };
 </script>
@@ -660,6 +666,7 @@ export default {
                         <a
                             class="icon-add f-no-margins"
                             href="TODO: Add URL"
+                            @click.prevent="showResourceBookingModal()"
                             aria-label="Add a resource booking"
                             title="Add a resource booking"
                         >
@@ -700,5 +707,6 @@ export default {
             :group-audiences="this.event.audiences.folders"
             :is-group="this.isGroupEvent"
         />
+        <resource-booking-modal ref="resourceBookingModal" />
     </div>
 </template>
