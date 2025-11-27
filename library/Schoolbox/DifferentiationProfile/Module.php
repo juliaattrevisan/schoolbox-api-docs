@@ -60,9 +60,11 @@ class Module extends BaseModule
         $hasCampusPerms =  new Rule\HasServicePermission(
             UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
             UserAccess::ACCESS_WRITE,
-            fn (array $params) => $this->getMapperFactory()
-                                       ->get(UserMapper::class)
-                                       ->findById($params['studentId'])->getCampusCollection()
+            fn (array $params) => (isset($params['student']) && $params['student'] instanceof User) ?
+                $params['student']->getCampusCollection() :
+                $this->getMapperFactory()
+                     ->get(UserMapper::class)
+                     ->findById($params['studentId'])->getCampusCollection()
         );
 
         $updateProfilePerms = new Rule\All(
