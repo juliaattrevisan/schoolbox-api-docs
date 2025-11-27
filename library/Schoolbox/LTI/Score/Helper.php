@@ -15,16 +15,24 @@ use OutOfBoundsException;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\LineItem\Model;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
+use Schoolbox\LTI\Assessment\Model as LtiAssessmentModel;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\LTI\Assessment\Score\Model as LtiScoreModel;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * Class Helper
+ * Helper class for setting scores on LTI assessments.
  */
 class Helper
 {
+    /**
+     * The data model for `$this->ltiAssessment`.
+     *
+     * @var LtiAssessmentModel|null
+     */
+    private ?LtiAssessmentModel $ltiAssessmentModel = null;
+
     /**
      * Constructor
      *
@@ -139,17 +147,7 @@ class Helper
      */
     public function setLtiAssessmentInScoreModel(LtiScoreModel $scoreModel): LtiScoreModel
     {
-        // Assessment: load from mapper
-        try {
-            $ltiAssessmentDataModel = $this->ltiAssessmentMapper->findOneByColumn('assessment_id', $this->ltiAssessment->getId());
-        } catch (MapperException $e) {
-            throw new OutOfBoundsException(
-                sprintf('Assessment with ID #%d could not be found', $this->ltiAssessment->getId()),
-                0,
-                $e,
-            );
-        }
-        return $scoreModel->setLtiAssessment($ltiAssessmentDataModel);
+        return $scoreModel->setLtiAssessment($this->findLtiAssessmentDataModel());
     }
 
     /**
@@ -165,7 +163,7 @@ class Helper
         // Find the most recent score on this assessment for the score's student
         // and (if provided) line item.
         $pb = $this->ltiScoreMapper->getPredicateBuilder()
-            ->equals('lti_assessment_id', $this->ltiAssessment->getId())
+            ->equals('lti_assessment_id', $this->findLtiAssessmentDataModel()->getId())
             ->equals('student_id', $scoreModel->getStudent()->getId());
         if ($ltiLineItem) {
             $pb = $pb->equals('lti_line_item_id', $ltiLineItem->getId());
@@ -192,5 +190,30 @@ class Helper
                 )
             );
         }
+    }
+
+    /**
+     * Find the data model for this helper's LTI assessment.
+     *
+     * @return LtiAssessmentModel
+     * @throws OutOfBoundsException if no assessment was found
+     */
+    private function findLtiAssessmentDataModel(): object
+    {
+        if (!$this->ltiAssessmentModel) {
+            try {
+                $this->ltiAssessmentModel = $this->ltiAssessmentMapper->findOneByColumn(
+                    'assessment_id',
+                    $this->ltiAssessment->getId(),
+                );
+            } catch (MapperException $e) {
+                throw new OutOfBoundsException(
+                    sprintf('Assessment with ID #%d could not be found', $this->ltiAssessment->getId()),
+                    0,
+                    $e,
+                );
+            }
+        }
+        return $this->ltiAssessmentModel;
     }
 }
