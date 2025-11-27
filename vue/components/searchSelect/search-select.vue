@@ -3,7 +3,7 @@
  * To search for results with a query and select them
  */
 
-import { toRef, useTemplateRef } from "vue";
+import { toRef } from "vue";
 import { vOnClickOutside } from "@vueuse/components";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
