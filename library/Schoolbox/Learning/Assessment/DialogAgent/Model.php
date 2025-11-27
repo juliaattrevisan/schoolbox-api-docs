@@ -147,10 +147,17 @@ class Model extends AbstractAssessment
          * Durations don't factor into whether you can make responses or anything, it's a clerical duty.
          */
 
-        /* TODO Check authoritative response is submitted
-         *  If it is, you can't make any more responses: you need staff to unlock it again for you
+        /* Check authoritative response is submitted
+         * If it is, you can't make any more responses: you need staff to unlock it again for you
          */
+        $authoritativeResponse = $this->getAuthoritativeResponse($this->getParticipantIfExtant($learner), false);
 
+        if ($authoritativeResponse && $authoritativeResponse->isSubmitted()) {
+            return false;
+        }
+
+        /* Make a new thing or resume an unsubmitted thing
+         */
         return true;
     }
 
