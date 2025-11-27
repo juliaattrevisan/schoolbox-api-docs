@@ -2221,8 +2221,8 @@ abstract class Kernel
             $di->lazyNew(
                 Logger::class,
                 [
-                    STDOUT,
                     null,
+                    STDOUT,
                     $config->get(ConfigMapper::NAME_LTI_DEBUG_MODE) ? Level::Debug : Level::Info,
                     [],
                     true,
