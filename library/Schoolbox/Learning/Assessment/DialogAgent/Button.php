@@ -12,6 +12,8 @@ use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
 /**
@@ -46,10 +48,12 @@ class Button
      *
      * @param Generator $routeGenerator
      * @param Authorizer $authorizer
+     * @param Access $access
      */
     public function __construct(
         private \Aura\Router\Generator $routeGenerator,
         private Authorizer $authorizer,
+        private \Schoolbox\Permission\Access\Access $access
     ) {
     }
 
@@ -63,9 +67,16 @@ class Button
      * @param User $viewer
      * @return array|null
      * @throws RouteNotFound
+     * @throws Exception
      */
     public function generate(Model $assessment, ?Participant $participant, User $viewer): ?array
     {
+        /* Specs have no action
+         */
+        if ($assessment->isSpecification()) {
+            return null;
+        }
+
         /* First check if you can author something (either by creating a new response or resuming an existing response)
          */
         $button = $this->findCreateResponseButton($assessment, $participant, $viewer);
@@ -92,7 +103,7 @@ class Button
 
         /* Students would see a disabled Begin button under the premise they'd be able to make a response someday
          */
-        if ($viewer->getRole()->isStudent() && $assessment->isImplementation()) {
+        if ($this->access->isLearner($viewer, $assessment->getBaseContext()->getFolder())) {
             return [
                 'label' => self::LABEL_START,
                 'url' => null,
@@ -103,7 +114,7 @@ class Button
          * screen _for themselves_ which is maybe a bit weird...perhaps it should just hide the call to action.
          * Staff aren't ever meant to do it for themselves.
          */
-        if ($viewer->getRole()->isStaff() && $assessment->isImplementation()) {
+        if ($this->access->isInstructor($viewer, $assessment->getBaseContext()->getFolder())) {
             return [
                 'label' => self::LABEL_VIEW,
                 'url' => null,
