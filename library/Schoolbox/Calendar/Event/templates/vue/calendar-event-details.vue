@@ -658,7 +658,7 @@ export default {
                     <h2>Resource Bookings</h2>
                 </div>
                 <div class="content-section">
-                    <table v-if="this.event.resourceBookings">
+                    <table v-if="this.event.resourceBookings | count">
                         <tbody>
                             <tr v-for="booking in this.event.resourceBookings" :key="booking.id">
                                 <td>{{ booking.name !== "" ? booking.name : booking.resource.name }}</td>
@@ -670,6 +670,12 @@ export default {
                             </tr>
                         </tbody>
                     </table>
+                    <div v-else class="empty-state">
+                        <p>
+                            No resources are booked for this event.<br />
+                            <a href="">Book a resource for this event</a>
+                        </p>
+                    </div>
                 </div>
             </section>
         </div>
