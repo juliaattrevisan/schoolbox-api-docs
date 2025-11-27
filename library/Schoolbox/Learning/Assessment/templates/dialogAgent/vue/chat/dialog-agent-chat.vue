@@ -112,7 +112,8 @@ function submitResponse(): void {
  */
 const maxFeedHeight = window.Vue.ref("50vh");
 
-const feedContainerEl = window.Vue.useTemplateRef<HTMLDivElement>("feedContainerRef");
+const feedRef = window.Vue.ref<InstanceType<typeof AcFeed> | null>(null);
+const feedEl = window.Vue.computed(() => feedRef.value?.feedEl as HTMLElement | null);
 
 /**
  * Update the max feed height on mount and on resize
@@ -121,9 +122,9 @@ function updateFeedHeight(): void {
     const footer = document.querySelector("#footer");
     const content = document.querySelector("#content");
     const container = document.querySelector("#container");
-    if (!feedContainerEl.value || !footer || !content || !container) return;
+    if (!feedEl.value || !footer || !content || !container) return;
 
-    const feedRect = feedContainerEl.value.getBoundingClientRect();
+    const feedRect = feedEl.value.getBoundingClientRect();
     const footerRect = footer.getBoundingClientRect();
     const contentRect = content.getBoundingClientRect();
     const bodyRect = document.body.getBoundingClientRect();
@@ -140,14 +141,15 @@ function updateFeedHeight(): void {
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
 
 window.Vue.onMounted(() => {
-    if (!feedContainerEl.value) {
+    if (!feedEl.value) {
         console.warn("<dialog-agent-chat>: unable to find feed container");
         return;
     }
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateFeedHeight);
-    resizeObserver.value.observe(feedContainerEl.value);
+    resizeObserver.value.observe(feedEl.value);
+    resizeObserver.value.observe(feedEl.value.parentElement!);
     resizeObserver.value.observe(document.querySelector("#container")!);
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
@@ -180,34 +182,32 @@ window.Vue.onUnmounted(() => {
         </nav>
     </div>
 
-    <div ref="feedContainerRef">
-        <ac-feed
-            class="l-mar-m--bottom"
-            style="height: 100%; min-height: 20rem"
-            :style="{ maxHeight: maxFeedHeight }"
-            :feed="acStore.fullFeed"
-            error-prefix="There was a problem retrieving the response."
-            initially-scrolled
-        >
-            <template #header>
-                <div
-                    v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                    class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
-                >
-                    <div class="l-flex l-flex--justify-space l-flex--align-center">
-                        <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
-                        <button
-                            class="button warning l-mar--0 dac-feed-help-dismiss"
-                            type="button"
-                            @click="changeHelpRequest(false)"
-                        >
-                            Help No Longer Needed
-                        </button>
-                    </div>
+    <ac-feed
+        ref="feedRef"
+        class="l-mar-m--bottom"
+        :max-height="maxFeedHeight"
+        :feed="acStore.fullFeed"
+        error-prefix="There was a problem retrieving the response."
+        initially-scrolled
+    >
+        <template #header>
+            <div
+                v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
+                class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
+            >
+                <div class="l-flex l-flex--justify-space l-flex--align-center">
+                    <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
+                    <button
+                        class="button warning l-mar--0 dac-feed-help-dismiss"
+                        type="button"
+                        @click="changeHelpRequest(false)"
+                    >
+                        Help No Longer Needed
+                    </button>
                 </div>
-            </template>
-        </ac-feed>
-    </div>
+            </div>
+        </template>
+    </ac-feed>
     <ac-prompt
         v-if="props.response._routes.message"
         :request-config="{

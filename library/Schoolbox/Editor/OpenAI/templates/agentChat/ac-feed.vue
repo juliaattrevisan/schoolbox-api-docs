@@ -13,6 +13,8 @@ interface Props {
     errorPrefix?: string;
     /** Whether the user can select this response */
     allowSelection?: boolean;
+    /** The maximum height of the feed container */
+    maxHeight: string;
     /** Should the feed be initially scrolled to the bottom? */
     initiallyScrolled?: boolean;
 }
@@ -43,27 +45,31 @@ acPromptEventBus.on(({ scrollFeed }) => {
         scrollFeedToBottom("smooth");
     }
 });
+
+defineExpose({ feedEl });
 </script>
 
 <template>
-    <div ref="feedRef" class="ac-feed">
+    <div class="ac-feed">
         <slot name="header"></slot>
 
-        <div class="l-pad-s ac-feed-list">
-            <template v-for="(message, index) in props.feed" :key="message.entryKey">
-                <br v-if="index > 0" />
+        <div ref="feedRef" class="l-pad-s ac-feed-list-wrapper" :style="{ maxHeight: props.maxHeight }">
+            <div class="ac-feed-list">
+                <template v-for="(message, index) in props.feed" :key="message.entryKey">
+                    <br v-if="index > 0" />
 
-                <ac-feed-alert v-if="message.type === AgentChatMessageType.ALERT" :message="message" />
-                <ac-feed-request v-else-if="message.type === AgentChatMessageType.REQUEST" :message="message" />
-                <ac-feed-response
-                    v-else
-                    :message="message"
-                    :error-prefix="props.errorPrefix"
-                    :allow-selection="props.allowSelection"
-                />
-            </template>
+                    <ac-feed-alert v-if="message.type === AgentChatMessageType.ALERT" :message="message" />
+                    <ac-feed-request v-else-if="message.type === AgentChatMessageType.REQUEST" :message="message" />
+                    <ac-feed-response
+                        v-else
+                        :message="message"
+                        :error-prefix="props.errorPrefix"
+                        :allow-selection="props.allowSelection"
+                    />
+                </template>
 
-            <div class="ac-feed-anchor"></div>
+                <div class="ac-feed-anchor"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -71,7 +77,12 @@ acPromptEventBus.on(({ scrollFeed }) => {
 <style scoped lang="scss">
 .ac-feed {
     border: 1px solid #b3b3b3;
+}
+
+.ac-feed-list-wrapper {
     overflow-y: auto;
+    min-height: 20rem;
+    height: 100%;
 }
 
 .ac-feed-list {
