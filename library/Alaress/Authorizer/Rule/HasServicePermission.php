@@ -11,6 +11,7 @@
 
 namespace Alaress\Authorizer\Rule;
 
+use Schoolbox\Collection;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Forbidden;
 
@@ -91,8 +92,17 @@ class HasServicePermission extends All
                     } else {
                         $identifier = $this->serviceIdentifier;
                     }
-                    if ($identifier == $access->getServiceIdentifier()) {
-                        return true;
+
+                    if (is_array($identifier)) {
+                        if (in_array($access->getServiceIdentifier(), $identifier, true)) {
+                            return true;
+                        }
+                    } else if ($identifier instanceof Collection) { // This deals with service identifiers that are collections (ie CampusCollection)
+                        if (in_array($access->getServiceIdentifier(), $identifier->getPropertyValues('id'), true)) {
+                            return true;
+                        }
+                    } else if ($identifier == $access->getServiceIdentifier()) {
+                            return true;
                     }
                 }
             }
