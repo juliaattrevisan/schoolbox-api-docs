@@ -19,8 +19,8 @@ interface Props {
 const props = defineProps<Props>();
 
 // Each sub-menu component so we can see if they have any visible content
-const pwaMenuInstallEl = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuInstall>>("pwaMenuInstallRef");
-const pwaMenuNotifEl = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuNotifications>>("pwaMenuNotifRef");
+const pwaMenuInstallRef = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuInstall>>("pwaMenuInstallRef");
+const pwaMenuNotifRef = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuNotifications>>("pwaMenuNotifRef");
 
 /**
  * Whether at least one of the buttons is visible so we can hide the entire panel if not
@@ -28,8 +28,8 @@ const pwaMenuNotifEl = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuNoti
  */
 const hasVisibleContent = window.Vue.computed(() => {
     // Each component must expose a 'hasVisibleContent' computed property
-    const pwaMenuVisible = pwaMenuInstallEl.value?.hasVisibleContent || false;
-    const notifMenuVisible = pwaMenuNotifEl.value?.hasVisibleContent || false;
+    const pwaMenuVisible = pwaMenuInstallRef.value?.hasVisibleContent || false;
+    const notifMenuVisible = pwaMenuNotifRef.value?.hasVisibleContent || false;
 
     return pwaMenuVisible || notifMenuVisible;
 });

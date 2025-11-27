@@ -19,7 +19,7 @@ const coursesStore = useCoursesStore();
 const nodesStore = useNodesStore();
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
-const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyRef");
+const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
 
 /**
  * When a title is selected, show the details modal
@@ -63,7 +63,7 @@ window.Vue.onMounted(() => {
 
 // #endregion
 
-const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableRef");
+const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
 
 /**
  * To display more nodes when there's lots to display and the user has scrolled to the bottom
@@ -79,7 +79,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
 </script>
 
 <template>
-    <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="cc-report-table">
+    <div ref="scrollableEl" class="scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="cc-report-table">
         <table class="coverage-report">
             <thead>
                 <tr>
@@ -116,7 +116,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
                     </template>
                 </tr>
             </thead>
-            <tbody ref="tbodyRef">
+            <tbody ref="tbodyEl">
                 <cc-report-table-node
                     v-for="node in nodesStore.nodes"
                     :key="node.id"

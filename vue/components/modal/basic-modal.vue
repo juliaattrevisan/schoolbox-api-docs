@@ -24,7 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const modalSize = window.Vue.computed(() => props.size || "m"); // Default size is medium
-const modalEl = useTemplateRef<HTMLDivElement | null>("modalRef"); // to get the modal element
+const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 if (props.hasFocusTrap) {
@@ -80,7 +80,7 @@ function onBackgroundClick(): void {
 <template>
     <teleport to="body">
         <transition>
-            <div v-if="isOpen" ref="modalRef" class="modal">
+            <div v-if="isOpen" ref="modalEl" class="modal">
                 <div v-on-click-outside="onBackgroundClick" :class="`modal__container modal__container--${modalSize}`">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <div class="modal__container_main"><slot></slot></div>

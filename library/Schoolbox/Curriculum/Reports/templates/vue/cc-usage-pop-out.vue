@@ -12,7 +12,7 @@ import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
 import CcUsagePopOutItems from "./cc-usage-pop-out-items.vue";
 import CcUsagePopOutRubric from "./cc-usage-pop-out-rubric.vue";
 
-const popOutElement = useTemplateRef<HTMLDivElement>("popOutRef");
+const popOutElement = useTemplateRef<HTMLDivElement>("popOutElement");
 const popOutStore = usePopOutStore();
 const filtersStore = useFiltersStore();
 const button = window.Vue.ref<HTMLButtonElement | null>(null);
@@ -65,7 +65,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="popOutRef" class="usage" style="display: none" data-test="cc-usage-pop-out">
+    <div ref="popOutElement" class="usage" style="display: none" data-test="cc-usage-pop-out">
         <div v-if="popOutStore.hasLoadError" class="alert-box alert f-no-margins">
             There was an error during usage retrieval. Please
             <a href="" title="refresh the page">refresh the page</a>

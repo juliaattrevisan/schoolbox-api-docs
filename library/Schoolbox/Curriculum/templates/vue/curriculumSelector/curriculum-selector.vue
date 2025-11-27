@@ -52,7 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const curriculumSelectorEl = useTemplateRef<HTMLDivElement | null>("curriculumSelectorRef");
+const curriculumSelectorEl = useTemplateRef<HTMLDivElement | null>("curriculumSelectorEl");
 const testId = window.Vue.ref<number>(0); // to add a id to target in tests when there are multiple selectors on the page
 
 /**
@@ -92,7 +92,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div ref="curriculumSelectorRef" class="curriculum-selector" :data-test="`curriculum-selector-${testId}`">
+    <div ref="curriculumSelectorEl" class="curriculum-selector" :data-test="`curriculum-selector-${testId}`">
         <cs-selected-nodes />
         <cs-search-input
             :curriculum-selector-el="curriculumSelectorEl"
