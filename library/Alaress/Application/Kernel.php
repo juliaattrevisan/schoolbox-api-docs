@@ -2154,7 +2154,7 @@ abstract class Kernel
                 $config = $di->get('config');
                 /** @var ToolModel[] $ltiTools */
                 $ltiTools = $di->get('lti.tools');
-                return (new KeyChainRepositoryFactory($config))->build($ltiTools);
+                return new KeyChainRepositoryFactory($config)->build($ltiTools);
             })
         );
         $di->set(
@@ -2203,12 +2203,16 @@ abstract class Kernel
                 $redis = $di->get('redis.storage');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
+                /** @var LoggerInterface $logger */
+                $logger = $di->get('lti.logger');
 
                 return new RedisAdapter(
                     $redis,
                     'accessToken.' . INSTANCE_ID,
                     0,
-                    new MarshallerAdapter(new Codec(new ClientRepository($registrationRepository))),
+                    new MarshallerAdapter(
+                        new Codec(new ClientRepository($registrationRepository, null, $logger)),
+                    ),
                 );
             })
         );
