@@ -13,8 +13,8 @@ interface Props {
     errorPrefix?: string;
     /** Whether the user can select this response */
     allowSelection?: boolean;
-    /** The maximum height of the feed container */
-    maxHeight: string;
+    /** The maximum height of the feed container, if any */
+    maxHeight?: string;
     /** The minimum height of the feed container, if any */
     minHeight?: string;
     /** Should the feed be initially scrolled to the bottom? */
@@ -58,7 +58,11 @@ defineExpose({ feedEl });
         <div
             ref="feedRef"
             class="l-pad-s ac-feed-list-wrapper"
-            :style="{ maxHeight: props.maxHeight, minHeight: props.minHeight }"
+            :style="{
+                maxHeight: props.maxHeight,
+                minHeight: props.minHeight,
+                height: props.maxHeight ? '100%' : undefined,
+            }"
         >
             <div class="ac-feed-list">
                 <template v-for="(message, index) in props.feed" :key="message.entryKey">
@@ -87,7 +91,6 @@ defineExpose({ feedEl });
 
 .ac-feed-list-wrapper {
     overflow-y: auto;
-    height: 100%;
 }
 
 .ac-feed-list {
