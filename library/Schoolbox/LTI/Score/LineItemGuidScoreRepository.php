@@ -65,7 +65,7 @@ class LineItemGuidScoreRepository implements ScoreRepositoryInterface
         $scoreModel = $scoreHelper->setStudentInScoreModel($score, $scoreModel);
         $scoreModel = $scoreHelper->setLtiAssessmentInScoreModel($scoreModel);
         $scoreModel = $scoreModel->setLtiLineItem($this->ltiLineItem);
-        $scoreHelper->assertNoMoreRecentPreviousScore($scoreModel);
+        $scoreHelper->assertNoMoreRecentPreviousScore($scoreModel, $this->ltiLineItem);
         $this->ltiScoreMapper->save($scoreModel);
         return $score;
     }

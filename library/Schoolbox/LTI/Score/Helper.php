@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use OAT\Library\Lti1p3Ags\Model\Score\ScoreInterface;
 use OutOfBoundsException;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\LTI\Assessment\LineItem\Model;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
 use Schoolbox\LTI\Assessment\Score\Model as LtiScoreModel;
@@ -159,15 +160,21 @@ class Helper
      * @return void
      * @throws OutOfBoundsException if a more recent score exists for this student in this assessment
      */
-    public function assertNoMoreRecentPreviousScore(LtiScoreModel $scoreModel): void
+    public function assertNoMoreRecentPreviousScore(LtiScoreModel $scoreModel, ?Model $ltiLineItem): void
     {
-        // Find the most recent previous score, if any
+        // Find the most recent score on this assessment for the score's student
+        // and (if provided) line item.
+        $pb = $this->ltiScoreMapper->getPredicateBuilder()
+            ->equals('lti_assessment_id', $this->ltiAssessment->getId())
+            ->equals('student_id', $scoreModel->getStudent()->getId());
+        if ($ltiLineItem) {
+            $pb = $pb->equals('lti_line_item_id', $ltiLineItem->getId());
+        } else {
+            $pb = $pb->isNull('lti_line_item_id');
+        }
         /** @var LtiScoreModel|null $previousLtiScore */
-        $previousLtiScore = $this->ltiScoreMapper->findByColumnList(
-            [
-                'lti_assessment_id' => $this->ltiAssessment->getId(),
-                'student_id'        => $scoreModel->getStudent()->getId(),
-            ],
+        $previousLtiScore = $this->ltiScoreMapper->findByPredicates(
+            $pb,
             [
                 'order' => ['submitted_at' => 'desc'],
                 'limit' => 1,

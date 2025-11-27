@@ -61,7 +61,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         $scoreModel = $scoreHelper->createScoreModel($score);
         $scoreModel = $scoreHelper->setStudentInScoreModel($score, $scoreModel);
         $scoreModel = $scoreHelper->setLtiAssessmentInScoreModel($scoreModel);
-        $scoreHelper->assertNoMoreRecentPreviousScore($scoreModel);
+        $scoreHelper->assertNoMoreRecentPreviousScore($scoreModel, null);
         $this->ltiScoreMapper->save($scoreModel);
         return $score;
     }
