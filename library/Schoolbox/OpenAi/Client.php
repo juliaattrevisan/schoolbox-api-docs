@@ -358,7 +358,6 @@ class Client implements IClient
      * @param Log\Model              $log            The log to write to.
      * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
      * @param int                    $chunkSize      How many bytes to read from each stream iteration.
-     * @param callable|null          $streamListener A function to call for each event in the stream, as it is received.
      * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
      *                                                             before sending to the stream.
      * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
@@ -371,7 +370,6 @@ class Client implements IClient
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
-        ?callable $streamListener = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
         ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
@@ -402,7 +400,7 @@ class Client implements IClient
                         clone $outputMessage,
                         clone $message,
                         $log,
-                        $streamListener,
+                        null,
                         $logListener,
                     );
                 } finally {
