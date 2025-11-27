@@ -536,6 +536,10 @@ class Controller extends Base
      */
     public function getExport(IAssessable $assessment): void
     {
+        /* For phpstorm ;(
+         */
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Model $assessment $fp */
+
         /* Set up a file pointer
          */
         $fp = fopen('php://temp', 'w');
