@@ -85,16 +85,16 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         $groupedBookings = []; // final array grouped by day with only the events we care about
         foreach ($bookingEvents as $event) {
             if ($event instanceof Event) {
-            // Due to hydration differences between resource bookings and timetable events, we need to extract the resource ID
-            $itemId = $event->getBooking()->getResource()->getId();
-            if (empty($eventsByResource[$itemId])) {
-                $eventsByResource[$itemId] = [];
-                $groupedBookings[$itemId] = [
-                    'resource'      => $event->getBooking()->getResource(),
-                    'bookingEvents' => [],
-                ];
-            }
-            $eventsByResource[$itemId][] = $event;
+                // Due to hydration differences between resource bookings and timetable events, we need to extract the resource ID
+                $itemId = $event->getBooking()->getResource()->getId();
+                if (empty($eventsByResource[$itemId])) {
+                    $eventsByResource[$itemId] = [];
+                    $groupedBookings[$itemId] = [
+                        'resource'      => $event->getBooking()->getResource(),
+                        'bookingEvents' => [],
+                    ];
+                }
+                $eventsByResource[$itemId][] = $event;
             }
         }
         // Step 2: For each resource, sort events by start time and check for overlaps

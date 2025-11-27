@@ -1300,6 +1300,6 @@ class Controller extends Base
 
         // approve the new booking
         $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
-        $this->setUpdateStatusResponse($newBooking, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
     }
 }
