@@ -103,10 +103,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             usort($resourceEvents, function ($a, $b) {
                 return $a->getStartTime()->compare($b->getStartTime());
             });
-            $count = count($resourceEvents);
-            for ($i = 0; $i < $count; $i++) {
+            foreach ($resourceEvents as $eventA) {
                 /** @var Event $eventA */
-                $eventA = $resourceEvents[$i];
                 if (empty($groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()])) {
                     $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()] = [
                         'dateFormat' => [
@@ -128,24 +126,16 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                 }
 
                 // now check for clashes with pending bookings
-                for ($j = $i + 1; $j < $count; $j++) {
+                foreach ($resourceEvents as $eventB) {
                     /** @var Event $eventB */
-                    $eventB = $resourceEvents[$j];
 
-                    // pending bookings have been recorded, lets only care about approved ones (clashes)
-                    if ($eventB->getBooking()->getStatus()->isPending()) {
-                        continue;
-                    }
-
-                    // only record clashes
-                    if ($eventB->isClash($eventA)) {
+                    // only record clashes if eventB is approved, we don't care about pending vs pending clashes
+                    if ($eventB->isClash($eventA) && $eventB->getBooking()->getStatus()->isApproved()) {
                         $eventAHash = spl_object_hash($eventA);
                         $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash] = [
                             'event' => $eventA,
                             'clash' => $eventB
                         ];
-                    } else {
-                        $var = false;
                     }
                 }
 
