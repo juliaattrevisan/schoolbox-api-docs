@@ -11,7 +11,6 @@ namespace Schoolbox\OpenAi;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\UriInterface;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\User;
 
@@ -56,7 +55,7 @@ interface IClient
      *                                                             otherwise, allow the client itself to decide.
      * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
      *                                                             before sending to the stream.
-     * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
+     * @param ?LogHandler\ILogHandler         $logListener         If set: call this for each message received from
      *                                                             OpenAI, and modify the log accordingly.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
@@ -66,7 +65,7 @@ interface IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
-        ?LogHandler\Listener\IListener $logListener = null,
+        ?LogHandler\ILogHandler $logListener = null,
     ): iterable;
 
     /**
@@ -92,7 +91,7 @@ interface IClient
      *                                                             otherwise, allow the client itself to decide.
      * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
      *                                                             before sending to the stream.
-     * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
+     * @param ?LogHandler\ILogHandler         $logListener         If set: call this for each message received from
      *                                                             OpenAI, and modify the log accordingly.
      * @return iterable<string>
      */
@@ -101,7 +100,7 @@ interface IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
-        ?LogHandler\Listener\IListener $logListener = null,
+        ?LogHandler\ILogHandler $logListener = null,
     ): iterable;
 
     /**

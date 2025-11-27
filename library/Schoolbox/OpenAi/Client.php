@@ -93,19 +93,25 @@ class Client implements IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
-        ?LogHandler\Listener\IListener $logListener = null,
+        ?LogHandler\ILogHandler $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
+
+        // Use the standard response log handler,
+        // plus whatever one was passed in.
+        $logHandler = new LogHandler\Composite(new LogHandler\ResponseMessage());
+        if ($logListener) {
+            $logHandler = $logHandler->addHandler($logListener);
+        }
         return $this->handleStreamedResponse(
             $response,
             $log,
-            new LogHandler\ResponseMessage(),
+            $logHandler,
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
-            $logListener,
         );
     }
 
@@ -133,19 +139,25 @@ class Client implements IClient
         Log\Model $log,
         ?int $chunkSize = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
-        ?LogHandler\Listener\IListener $logListener = null,
+        ?LogHandler\ILogHandler $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
+
+        // Use the standard chat completion log handler,
+        // plus whatever one was passed in.
+        $logHandler = new LogHandler\Composite(new LogHandler\ChatCompletionsMessage());
+        if ($logListener) {
+            $logHandler = $logHandler->addHandler($logListener);
+        }
         return $this->handleStreamedResponse(
             $response,
             $log,
-            new LogHandler\ChatCompletionsMessage(),
+            $logHandler,
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
-            $logListener,
         );
     }
 
@@ -360,8 +372,6 @@ class Client implements IClient
      * @param int                    $chunkSize      How many bytes to read from each stream iteration.
      * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
      *                                                             before sending to the stream.
-     * @param ?LogHandler\Listener\IListener  $logListener         If set: call this for each message received from
-     *                                                             OpenAI, and modify the log accordingly.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
@@ -371,7 +381,6 @@ class Client implements IClient
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
         ?EventStream\Listener\IListener $eventStreamListener = null,
-        ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
@@ -400,7 +409,7 @@ class Client implements IClient
                         clone $outputMessage,
                         clone $message,
                         $log,
-                        $logListener,
+                        null,
                     );
                 } finally {
                     $this->saveLog($log);
