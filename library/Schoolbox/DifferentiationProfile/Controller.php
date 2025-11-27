@@ -376,14 +376,16 @@ class Controller extends Base
         $configKey = DifferentiationProfileMapper::CONFIG_METHOD_MAPPING;
 
         $this->response = $this->responseAsJson(
-            array_reduce(array_keys($configKey), function ($carry, $key) use ($profile, $configs, $configKey) {
-                if ($configs->offsetExists($key)) {
-                    $method = $configKey[$key];
-                    /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
-                    $config = $configs->offsetGet($key);
+            $configs->reduce(function($carry, $config) use ($profile, $configKey) {
+                /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
+                if (array_key_exists($config->getName(), $configKey)) {
+                    $method = $configKey[$config->getName()];
+                    $value = call_user_func([$profile, $method]);
                     $carry[] = [
                         'terminology' => $config->getTerminology() ?? $config->getTitle(),
-                        'value'       => call_user_func([$profile, $method]),
+                        'value'       => ($config->getModule() === 'adjustments' && !empty($value))
+                            ? explode(',', $value)
+                            : $value,
                     ];
                 }
                 return $carry;
