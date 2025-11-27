@@ -203,6 +203,39 @@ export default {
             <section>
                 <label class="required" for="addBookingPurpose">Purpose</label>
                 <input id="addBookingPurpose" name="name" maxlength="255" type="text" v-model.trim="booking.name" />
+                <div class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom">
+                    <div>
+                        <label class="required" for="startDate"> From </label>
+                        <input
+                            name="startDate"
+                            id="startDate"
+                            data-datepicker
+                            data-datepicker-time
+                            data-datepicker-call="event"
+                            data-datesync-enddate="#endDate"
+                            type="text"
+                            size="15"
+                            maxlength="30"
+                            value="booking.startDateTime.local"
+                        />
+                    </div>
+                    <div>
+                        <label class="required" for="endDate"> Until </label>
+                        <input
+                            name="endDate"
+                            id="endDate"
+                            data-datepicker
+                            data-datepicker-time
+                            data-datepicker-call="event"
+                            data-datepicker-endofperiod
+                            data-datesync-startdate="#startDate"
+                            type="text"
+                            size="15"
+                            maxlength="30"
+                            value="booking.endDateTime.local"
+                        />
+                    </div>
+                </div>
                 <search-select
                     class="l-pad-m--bottom"
                     v-model:selected="resources"
