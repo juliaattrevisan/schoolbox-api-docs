@@ -485,12 +485,13 @@ class Mapper extends BaseMapper
                     /** @var Item\Model $resource */
                     $resource = $mapper->hydrateJoin($row, 'resource', 'r');
                     $model->setResource($resource);
+                    /** @var Status\Model $status */
                     $status = $mapper->hydrateJoin($row, 'status', 's');
                     $model->setStatus($status);
                     return $model;
                 });
             } catch (BaseMapper\Exception $e) {
-                $a = 1;
+                continue; // Skip the problem booking and move on to the next one.
             }
 
             if ($bookingModel !== null) {
