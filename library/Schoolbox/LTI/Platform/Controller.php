@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Platform;
 
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Psr7\HttpFactory;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use OAT\Library\Lti1p3Ags\Service\LineItem\LineItemServiceInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Exception\LtiException;
@@ -74,11 +75,16 @@ class Controller extends Base
     {
         // Do something with the OIDC request when I receive it
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/platform-originating-messages/#3-platform-side-oidc-authentication
-        $message = (new OidcAuthenticationRequestFactory(
-            $this->registrations,
-            $this->userAuthenticator,
-            $this->toolMapper,
-        ))->build($this->request);
+        try {
+            $message = new OidcAuthenticationRequestFactory(
+                $this->registrations,
+                $this->userAuthenticator,
+                $this->toolMapper,
+            )->build($this->request);
+        } catch (LtiExceptionInterface $e) {
+            $this->logger->error('getOidcAuthenticationRequest error: ' . $e->getMessage());
+            throw $e;
+        }
 
         $this->setAllowBackToTheFuture(false);
 
@@ -106,6 +112,8 @@ class Controller extends Base
      *
      * @api   GET /lti-platform/auth/token
      * @since 21.1.0
+     *
+     * @throws OAuthServerException if the access token couldn't be built
      */
     public function getOauthAccessTokenRequest(): void
     {
@@ -126,12 +134,17 @@ class Controller extends Base
         );
 
         // Build the access token response
-        $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
-        $this->response = $generator->generate(
-            $this->request,
-            new HttpFactory()->createResponse(),
-            KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
-        );
+        $generator = new AccessTokenResponseGenerator($this->keyChains, $factory);
+        try {
+            $this->response = $generator->generate(
+                $this->request,
+                new HttpFactory()->createResponse(),
+                KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
+            );
+        } catch (OAuthServerException $e) {
+            $this->logger->error('getOauthAccessTokenRequest error: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
@@ -139,6 +152,8 @@ class Controller extends Base
      *
      * @api   POST /lti-platform/auth/token
      * @since 21.1.0
+     *
+     * @throws OAuthServerException if the access token couldn't be built
      */
     public function postOauthAccessTokenRequest(): void
     {
@@ -167,8 +182,7 @@ class Controller extends Base
      * @since 21.1.0
      *
      * @param ToolModel $tool
-     * @throws LtiExceptionInterface if the result contains an error
-     * @throws LtiExceptionInterface if somehow resource links can't be created
+     * @throws LtiExceptionInterface if the result contains an error, or somehow resource links can't be created
      */
     public function getReceiveDeepLinkingResponse(ToolModel $tool): void
     {
@@ -176,13 +190,19 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
         $result = new ToolOriginatingLaunchFactory($this->registrations)->build($this->request);
         if ($result->hasError()) {
+            $this->logger->error('getReceiveDeepLinkingResponse result error: ' . $result->getError());
             throw new LtiException($result->getError());
         }
 
         // Each content item should be a link, which may be launched as a
         // resource link launch request.
-        $contentItems  = $result->getPayload()->getDeepLinkingContentItems();
-        $resourceLinks = new ResourceCollectionFactory()->createFromClaim($contentItems)->normalize();
+        $contentItems = $result->getPayload()->getDeepLinkingContentItems();
+        try {
+            $resourceLinks = new ResourceCollectionFactory()->createFromClaim($contentItems)->normalize();
+        } catch (LtiExceptionInterface $e) {
+            $this->logger->error('getReceiveDeepLinkingResponse resource links error: ' . $e->getMessage());
+            throw $e;
+        }
 
         // The end recipient of the resource link will need to know about the
         // tool which created the link, so it can launch the link later.
@@ -205,7 +225,7 @@ class Controller extends Base
      * @since 21.1.0
      *
      * @param ToolModel $tool
-     * @throws LtiExceptionInterface if somehow resource links can't be created
+     * @throws LtiExceptionInterface if the result contains an error, or somehow resource links can't be created
      */
     public function postReceiveDeepLinkingResponse(ToolModel $tool): void
     {
