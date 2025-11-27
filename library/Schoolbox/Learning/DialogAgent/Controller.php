@@ -589,11 +589,36 @@ class Controller extends Base
             ], array_values($feedbackFields));
         }
 
+        /* Header row
+         */
+        $fp = fopen('php://temp', 'w');
 
-        new \Alaress_Probe($headers);
+        fputcsv($fp, $headers, escape: '');
 
+        /* Body rows
+         */
         foreach ($stack as $person) {
-            new \Alaress_Probe($person);
+            fputcsv($fp, $person, escape: '');
         }
+
+        rewind($fp);
+
+        $contents = stream_get_contents($fp);
+
+        fclose($fp);
+
+        $filename = sprintf(
+            'discussion_%s_status_%s',
+            $assessment->getId(),
+            \Alaress_Date_Format::now()->getDatabase()
+        );
+
+        $this->response = $this->responseFromContent($contents)
+            ->withHeader('Pragma', ' ')
+            ->withHeader('Cache-Control', ' ')
+            ->withHeader('Content-Type', 'text/csv')
+            ->withHeader('Content-Length', strlen($contents))
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"")
+        ;
     }
 }
