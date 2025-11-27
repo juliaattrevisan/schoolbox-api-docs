@@ -8,13 +8,19 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Calendar\Event\Type\EventInterface;
 use Calendar_Api_Composite;
+use Schoolbox\GenericCollection;
+use Calendar\Event\Type\Day\Event as Event;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Item\Mapper;
 
 class Controller extends Base
 {
@@ -24,45 +30,19 @@ class Controller extends Base
     protected const MAX_REPORTING_PERIOD_MONTHS = 3;
 
     /**
-     * @var Item\Mapper
-     */
-    protected $itemMapper;
-
-    /**
-     * @var Category\Mapper
-     */
-    protected $categoryMapper;
-
-    /**
-     * @var Calendar_Api_Composite
-     */
-    protected $api;
-
-    /**
-     * @var CalendarApiFactory
-     */
-    protected $apiFactory;
-
-    /**
      * Constructor
      *
-     * @param Item\Mapper            $itemMapper
-     * @param Category\Mapper        $categoryMapper
+     * @param Mapper $itemMapper
+     * @param Category\Mapper $categoryMapper
      * @param Calendar_Api_Composite $api
-     * @param CalendarApiFactory     $apiFactory
+     * @param CalendarApiFactory $apiFactory
      */
     public function __construct(
-        Item\Mapper $itemMapper,
-        Category\Mapper $categoryMapper,
-        Calendar_Api_Composite $api,
-        CalendarApiFactory $apiFactory
+        protected Item\Mapper $itemMapper,
+        protected Category\Mapper $categoryMapper,
+        protected Calendar_Api_Composite $api,
+        protected CalendarApiFactory $apiFactory,
     ) {
-        $this
-            ->setItemMapper($itemMapper)
-            ->setCategoryMapper($categoryMapper)
-            ->setApi($api)
-            ->setApiFactory($apiFactory)
-        ;
     }
 
     /**
@@ -104,7 +84,7 @@ class Controller extends Base
 
         // Set up category list
         $categoryList = [];
-        foreach ($this->getCategoryMapper()->findAll(['order' => ['name' => 'asc']]) as $category) {
+        foreach ($this->categoryMapper->findAll(['order' => ['name' => 'asc']]) as $category) {
             $categoryList[$category->getId()] = $category;
         }
         $allCategories = array_keys($categoryList);
@@ -121,111 +101,99 @@ class Controller extends Base
         if (!empty($selectedCategories)) {
 
             /** @var Item\Model[] $resources */
-            $resources = $this->getItemMapper()->findByColumn(
+            $resources = $this->itemMapper->findByColumn(
                 'resource_category_id',
                 $selectedCategories
             );
         } else {
 
             /** @var Item\Model[] $resources */
-            $resources = $this->getItemMapper()->findAll();
+            $resources = $this->itemMapper->findAll();
         }
 
         // Build the list of events (slowly)
         $showClasses = $this->requestQuery->getBool('classes', true);
-        $this->getApi()->add(
-            $this->getApiFactory()->buildFromResourceCollection(
+        $clashesOnly = $this->requestQuery->getBool('clashesOnly', false);
+
+        $this->api->add(
+            $this->apiFactory->buildFromResourceCollection(
                 $resources,
                 $showClasses
             )
         );
 
+        /*
+         * $eventList may be edited (if only looking for clashes), so cache that,
+         * and we only have specific types provided from buildFromResourceCollection explicitly set the types of events
+         * \Calendar\Event\Type\ResourceBooking\Event
+         * \Calendar\Event\Type\Timetable\Event
+         * \Calendar\Event\Type\SudsTimetable\Event
+         */
+        /** @var GenericCollection<\Calendar\Event\Type\ResourceBooking\Event | \Calendar\Event\Type\Timetable\Event | \Calendar\Event\Type\SudsTimetable\Event> $eventList */
+        $eventList = $this->api->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp());
+
+        // if we are only showing clashes, filter the event list now
+        /** @var array<string, Event> $clashesOnlyList */
+        $clashesOnlyList = [];
+        if ($clashesOnly) {
+            // Step 1: Group events by resource ID
+            /** @var array<int|string, Event[]> $eventsByResource */
+            $eventsByResource = [];
+            foreach ($eventList as $event) {
+                 // Due to hydration differences between resource bookings and timetable events, we need to extract the resource ID
+                $resourceId = ($event instanceof \Calendar\Event\Type\ResourceBooking\Event)
+                    ? $event->getBooking()->getResource()->getId()
+                    : $event->getResourceId();
+                if (!isset($eventsByResource[$resourceId])) {
+                    $eventsByResource[$resourceId] = [];
+                }
+                $eventsByResource[$resourceId][] = $event;
+            }
+            // Step 2: For each resource, sort events by start time and check for overlaps
+            foreach ($eventsByResource as $resourceEvents) {
+                // Sort by start time
+                usort($resourceEvents, function ($a, $b) {
+                    return $a->getStartTime()->compare($b->getStartTime());
+                });
+                $count = count($resourceEvents);
+                for ($i = 0; $i < $count; $i++) {
+                    $eventA = $resourceEvents[$i];
+
+                    $eventAHash = spl_object_hash($eventA);
+                    for ($j = $i + 1; $j < $count; $j++) {
+                        $eventB = $resourceEvents[$j];
+                        // break early if there's no chance of a clash
+                        // we have sorted above by start time, so if eventB starts after eventA ends, no need to check further
+                        if ($eventB->getStartTime()->gt($eventA->getEndTime())) {
+                            break;
+                        }
+
+                        if ($eventA->isClash($eventB)) {
+                            $eventBHash = spl_object_hash($eventB);
+                            // Add both events to the clash list
+                            $clashesOnlyList[$eventAHash] = $eventA;
+                            $clashesOnlyList[$eventBHash] = $eventB;
+                        }
+                    }
+                }
+            }
+            // event list will now only contain clashes (seeing as we requested them)
+            $eventList = new GenericCollection(EventInterface::class, $clashesOnlyList);
+        }
+
         $this->response = $this->responseFromTemplate(
             '@resourceBookingReport/index.twig',
             [
                 'categoryList' => $categoryList,
-                'eventList'    => $this->getApi()->getEvents($start->getUnixTimeStamp(), $end->getUnixTimeStamp()),
+                'eventList'    => $eventList,
                 'search'       => [
                     'start'    => $start,
                     'end'      => $end,
                     'category' => $selectedCategories,
                     'classes'  => $showClasses,
+                    'clashesOnly'  => $clashesOnly,
                 ],
             ],
         );
-    }
-
-    /**
-     * @return Item\Mapper
-     */
-    protected function getItemMapper()
-    {
-        return $this->itemMapper;
-    }
-
-    /**
-     * @param  Item\Mapper $itemMapper
-     *
-     * @return $this
-     */
-    protected function setItemMapper($itemMapper)
-    {
-        $this->itemMapper = $itemMapper;
-        return $this;
-    }
-
-    /**
-     * @return Category\Mapper
-     */
-    protected function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
-
-    /**
-     * @param  Category\Mapper $categoryMapper
-     *
-     * @return $this
-     */
-    protected function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-        return $this;
-    }
-
-    /**
-     * @return Calendar_Api_Composite
-     */
-    protected function getApi()
-    {
-        return $this->api;
-    }
-
-    /**
-     * @param  Calendar_Api_Composite $api
-     * @return $this
-     */
-    protected function setApi($api)
-    {
-        $this->api = $api;
-        return $this;
-    }
-
-    /**
-     * @return CalendarApiFactory
-     */
-    protected function getApiFactory()
-    {
-        return $this->apiFactory;
-    }
-
-    /**
-     * @param  CalendarApiFactory $apiFactory
-     * @return $this
-     */
-    protected function setApiFactory($apiFactory)
-    {
-        $this->apiFactory = $apiFactory;
-        return $this;
     }
 }

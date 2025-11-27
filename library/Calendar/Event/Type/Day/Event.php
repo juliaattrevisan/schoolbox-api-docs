@@ -16,6 +16,7 @@ namespace Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\ResourceBooking\Booking\Status\Model as StatusModel;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 
 class Event extends EventBase
@@ -441,5 +442,97 @@ class Event extends EventBase
             self::RENDER_FORMAT_VCAL => Renderer\VObject::class,
             self::RENDER_FORMAT_CSV  => Renderer\Csv::class,
         ];
+    }
+
+    /**
+     * Determine if this event clashes with another event
+     * if it's the same event, return false
+     * if different resources, return false
+     * if one is a timetable event, check if same category (class) and then times overlap
+     * if either is a rejected booking, return false
+     * if both are resource bookings, only care if one is pending
+     * if both are resource bookings, skip if both pending or same booking id
+     *
+     * @param self $eventB
+     * @return bool
+     */
+    public function isClash(self $eventB): bool
+    {
+        $eventA = $this;
+        // cache start/end times and event hashes
+        $aStart = $eventA->getStartTime();
+        $aEnd = $eventA->getEndTime();
+        $eventAHash = spl_object_hash($eventA);
+        $eventBHash = spl_object_hash($eventB);
+
+        // skip the same object...
+        if ($eventAHash === $eventBHash) {
+            return false;
+        }
+
+        // check this is for the same resource (assume nothing)
+        $resourceIdA = ($eventA instanceof \Calendar\Event\Type\ResourceBooking\Event)
+            ? $eventA->getBooking()->getResource()->getId()
+            : $eventA->getResourceId();
+        $resourceIdB = ($eventB instanceof \Calendar\Event\Type\ResourceBooking\Event)
+            ? $eventB->getBooking()->getResource()->getId()
+            : $eventB->getResourceId();
+        if ($resourceIdA !== $resourceIdB) {
+            return false;
+        }
+
+        // if either event is a rejected booking, skip
+        if ($eventA instanceof \Calendar\Event\Type\ResourceBooking\Event) {
+            if ($eventA->getBooking()->getStatus()->isRejected()) {
+                return false;
+            }
+        }
+        if ($eventB instanceof \Calendar\Event\Type\ResourceBooking\Event) {
+            if ($eventB->getBooking()->getStatus()->isRejected()) {
+                return false;
+            }
+        }
+
+        // Only check for status of pending bookings if both are resource bookings
+        if (
+            $eventA instanceof \Calendar\Event\Type\ResourceBooking\Event &&
+            $eventB instanceof \Calendar\Event\Type\ResourceBooking\Event
+        ) {
+            // skip if same booking
+            if ($eventA->getBooking()->getId() === $eventB->getBooking()->getId()) {
+                return false;
+            }
+            // only care if a booking is NOT pending, so we can see conflicts (that we need to action)
+            // bookings that are both pending are not a clash
+            if (
+                $eventB->getBooking()->getStatus()->getId() === StatusModel::STATUS_PENDING &&
+                $eventA->getBooking()->getStatus()->getId() === StatusModel::STATUS_PENDING
+            ) {
+                return false;
+            }
+        } elseif (
+            $eventA instanceof \Calendar\Event\Type\Timetable\Event &&
+            $eventB instanceof \Calendar\Event\Type\Timetable\Event
+        ) {
+            // This must be a timetable event
+            // check if for the same homepage (class)
+            if (
+                ($eventA->getCategoryId() === $eventB->getCategoryId())
+                && ($eventA->getCategoryId() !== -1 || $eventB->getCategoryId() !== -1)
+            ) {
+                return false;
+            }
+        }
+        // Check for time overlap
+        $bStart = $eventB->getStartTime();
+        $bEnd = $eventB->getEndTime();
+        if ($aStart->lt($bEnd) && $aEnd->gt($bStart)) {
+            // Add both events to the clash list
+            return true;
+        } elseif ($bStart->gt($aEnd)) {
+            // No overlap: event B starts after event A ends
+            return false;
+        }
+        return false;
     }
 }

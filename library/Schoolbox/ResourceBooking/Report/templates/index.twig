@@ -150,8 +150,16 @@
                     </div>
 
                     <div class="small-6 columns">
+                        <fieldset class="radiolist">
+                            <legend>Clashes</legend>
+                            <ul class="option-list">
+                                <li><input type="radio" name="clashesOnly" value="0" id="clashesAllOption" {% if not search.clashesOnly %}checked{% endif %}><label for="clashesAllOption">Show All Bookings</label></li>
+                                <li><input type="radio" name="clashesOnly" value="1" id="clashesOnlyOption" {% if search.clashesOnly %}checked{% endif %} ><label for="clashesOnlyOption">Only Show Clash Bookings</label></li>
+                            </ul>
+                        </fieldset>
+
                         <fieldset>
-                            <legend>Show Classes</legend>
+                            <legend>Classes</legend>
                             <input type="hidden" name="classes" value="0" />
                             <input id='show-classes-checkbox' type="checkbox" name="classes" value="1" {% if search.classes %}checked{% endif %} />
                             <label for="show-classes-checkbox" class="checkbox-label">Show Classes</label>
@@ -206,10 +214,16 @@
                         </td>
                         <td>
                             {% if booking is empty %}
-                                {{ event.getLocation() }}
+                                {% if event.resourceId is empty %}
+                                    {{ event.getLocation() }}
+                                {% else %}
+                                    <a href="{{ routeLookup('resourceItem.read', {id: event.resourceId}) }}">
+                                        {{ event.getLocation() }}
+                                    </a>
+                                {% endif %}
                             {% else %}
                                 <a href="{{ routeLookup('resourceItem.read', {id: booking.getResource().getId()}) }}">
-                                    {{ booking.getResource().getRoomCode() | default(booking.getResource.getName()) }}
+                                    {{ booking.getResource().getRoomCode() | default(booking.getResource().getName()) }}
                                 </a>
                             {% endif %}
                         </td>

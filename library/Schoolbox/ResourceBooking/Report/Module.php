@@ -8,13 +8,14 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Calendar_Api_Composite;
 use External_Timetable;
 use Schoolbox\Role;
@@ -34,7 +35,6 @@ class Module extends BaseModule
         // All of these URLs relate to the resource ID, not a booking ID.
         // Therefore, they should probably be moved to the item module.
         $this->addGetRoute('index', $basePath, '');
-        $this->addGetRoute('download', $basePath, '/download');
     }
 
     /**
