@@ -2,8 +2,6 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
 
-use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as DataModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentDomainObject;
@@ -17,7 +15,6 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as DomainObject;
  */
 class Transformer
 {
-
     /**
      * Transforms the db-friendly data model representations into their domain model representations.
      *
@@ -50,14 +47,16 @@ class Transformer
     /**
      * Transforms the domain model representations into their db-friendly data model representations.
      *
-     * Note: for dialog agent responses, data and domain representations are the same.
-     *
      * @param DomainObject $domainObject
      * @param int $dialogAgentId
      * @return DataModel
      */
     public function transformDomainObject(DomainObject $domainObject, int $dialogAgentId): DataModel
     {
+        /* TODO CURRENTLY INCOMPLETE
+         *  Transformation from domain objects to data models is yet to be experienced; not sure if we'd ever try
+         *  to do it this way, or if we'd just use the datamodel stuff directly. It'd be way cheaper to do that...
+         */
         $dataModel = new DataModel()
             ->setId($domainObject->getId())
             ->setDialogAgent((new DialogAgentDataModel())->setId($dialogAgentId))
