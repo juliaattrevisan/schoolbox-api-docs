@@ -29,6 +29,7 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
 use OAT\Library\Lti1p3Nrps\Service\MembershipServiceInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
 use Schoolbox\LTI\Provider\Mapper as ToolMapper;
@@ -49,7 +50,7 @@ class Controller extends Base
      * @param CacheItemPoolInterface          $accessTokenCache  Cache for access tokens.
      * @param ToolMapper                      $toolMapper        Tool mapper, for fetching configuration when
      *                                                           authenticating incoming OIDC requests.
-     *
+     * @param LoggerInterface                 $logger            Logger for various aspects of LTI requests.
      */
     public function __construct(
         private KeyChainRepositoryInterface $keyChains,
@@ -57,6 +58,7 @@ class Controller extends Base
         private UserAuthenticatorInterface $userAuthenticator,
         private CacheItemPoolInterface $accessTokenCache,
         private ToolMapper $toolMapper,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -107,10 +109,10 @@ class Controller extends Base
      */
     public function getOauthAccessTokenRequest(): void
     {
-        $clientRepository = new ClientRepository($this->registrations);
+        $clientRepository = new ClientRepository($this->registrations, null, $this->logger);
         $factory          = new AuthorizationServerFactory(
             $clientRepository,
-            new AccessTokenRepository($this->accessTokenCache),
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
             new ScopeRepository([
                 new Scope(ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE),
                 new Scope(LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM),
@@ -127,7 +129,7 @@ class Controller extends Base
         $generator          = new AccessTokenResponseGenerator($this->keyChains, $factory);
         $this->response = $generator->generate(
             $this->request,
-            (new HttpFactory())->createResponse(),
+            new HttpFactory()->createResponse(),
             KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
         );
     }
@@ -172,7 +174,7 @@ class Controller extends Base
     {
         // Validate launch
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
-        $result = (new ToolOriginatingLaunchFactory($this->registrations))->build($this->request);
+        $result = new ToolOriginatingLaunchFactory($this->registrations)->build($this->request);
         if ($result->hasError()) {
             throw new LtiException($result->getError());
         }
@@ -180,7 +182,7 @@ class Controller extends Base
         // Each content item should be a link, which may be launched as a
         // resource link launch request.
         $contentItems  = $result->getPayload()->getDeepLinkingContentItems();
-        $resourceLinks = (new ResourceCollectionFactory())->createFromClaim($contentItems)->normalize();
+        $resourceLinks = new ResourceCollectionFactory()->createFromClaim($contentItems)->normalize();
 
         // The end recipient of the resource link will need to know about the
         // tool which created the link, so it can launch the link later.
