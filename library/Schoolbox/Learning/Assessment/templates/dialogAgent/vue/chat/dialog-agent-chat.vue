@@ -4,6 +4,7 @@ import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
@@ -31,8 +32,8 @@ window.Vue.onMounted(() => {
     if (isInstructor.value) {
         acStore.feed.push({
             // TODO: this would only ever come from props.feed
-            type: "alert",
-            side: "response",
+            type: AgentChatMessageType.ALERT,
+            side: AgentChatMessageType.RESPONSE,
             severity: "warning",
             entryKey: acStore.getNextEntryKey(),
             message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
@@ -43,8 +44,8 @@ window.Vue.onMounted(() => {
             // TODO: a teacher can't spawn this, but they can 'resolve' it so we would need to track it somehow
             // hence need to be able to insert it based on the createdAt time of each log entry (not currently tracked on the frontend)
             // and then not include it when it's eventually resolved
-            type: "alert",
-            side: "request",
+            type: AgentChatMessageType.ALERT,
+            side: AgentChatMessageType.REQUEST,
             severity: "warning-tint",
             entryKey: acStore.getNextEntryKey(),
             message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
@@ -73,8 +74,8 @@ function changeHelpRequest(helpRequested: boolean): void {
 
         if (isInstructor.value) {
             acStore.feed.push({
-                type: "alert",
-                side: "request",
+                type: AgentChatMessageType.ALERT,
+                side: AgentChatMessageType.REQUEST,
                 severity: "warning-tint",
                 entryKey: acStore.getNextEntryKey(),
                 message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
@@ -85,8 +86,8 @@ function changeHelpRequest(helpRequested: boolean): void {
 
         if (isInstructor.value) {
             acStore.feed.push({
-                type: "alert",
-                side: "request",
+                type: AgentChatMessageType.ALERT,
+                side: AgentChatMessageType.REQUEST,
                 severity: "highlight",
                 entryKey: acStore.getNextEntryKey(),
                 message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,

@@ -2,6 +2,7 @@
 import AcFeedAlert from "./ac-feed-alert.vue";
 import AcFeedRequest from "./ac-feed-request.vue";
 import AcFeedResponse from "./ac-feed-response.vue";
+import { AgentChatMessageType } from "./agentChatTypes";
 import type { AgentChatFeedMessage } from "./agentChatTypes";
 
 interface Props {
@@ -22,8 +23,8 @@ const props = defineProps<Props>();
             <template v-for="(message, index) in props.feed" :key="message.entryKey">
                 <br v-if="index > 0" />
 
-                <ac-feed-alert v-if="message.type === 'alert'" :message="message" />
-                <ac-feed-request v-else-if="message.type === 'request'" :message="message" />
+                <ac-feed-alert v-if="message.type === AgentChatMessageType.ALERT" :message="message" />
+                <ac-feed-request v-else-if="message.type === AgentChatMessageType.REQUEST" :message="message" />
                 <ac-feed-response
                     v-else
                     :message="message"

@@ -4,6 +4,7 @@ import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { AgentChatMessageType } from "../agentChatTypes";
 import type {
     AgentChatFeedMessage,
     AgentChatRequest,
@@ -80,9 +81,9 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
         const messages = logEntries.flatMap((logMessages) => logMessages);
         for (const message of messages) {
-            if (message.type === "request") {
+            if (message.type === AgentChatMessageType.REQUEST) {
                 parsedFeed.push({
-                    type: "request",
+                    type: AgentChatMessageType.REQUEST,
                     entryKey: getNextEntryKey(),
                     user,
                     payload: {
@@ -94,10 +95,10 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                     },
                     file: null, // not currently stored in logs
                 } satisfies AgentChatRequest);
-            } else if (message.type === "response") {
+            } else if (message.type === AgentChatMessageType.RESPONSE) {
                 parsedFeed.push({
                     ...message.data,
-                    type: "response",
+                    type: AgentChatMessageType.RESPONSE,
                     entryKey: getNextEntryKey(),
                 } satisfies AgentChatResponse);
             } else {
@@ -134,7 +135,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         }
 
         feed.value.push({
-            type: "request",
+            type: AgentChatMessageType.REQUEST,
             entryKey: getNextEntryKey(),
             user: {
                 id: window.schoolboxUser.id,
@@ -149,7 +150,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         });
 
         activeGeneration.value = {
-            type: "response",
+            type: AgentChatMessageType.RESPONSE,
             status: "in_progress",
             entryKey: `loading-${getNextEntryKey()}`,
             responseId: null,
@@ -164,7 +165,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                 /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
                 hasErrored = true;
                 feed.value.push({
-                    type: "response",
+                    type: AgentChatMessageType.RESPONSE,
                     status: "error",
                     entryKey: getNextEntryKey(),
                     responseId: activeGeneration.value?.responseId ?? null,
@@ -213,7 +214,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
              * - Some other unknown error
              */
             feed.value.push({
-                type: "response",
+                type: AgentChatMessageType.RESPONSE,
                 status: "error",
                 entryKey: getNextEntryKey(),
                 responseId,
@@ -229,7 +230,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
          */
         if (config.requireImage && response.data.image === null) {
             feed.value.push({
-                type: "response",
+                type: AgentChatMessageType.RESPONSE,
                 status: "error",
                 entryKey: getNextEntryKey(),
                 responseId: response.data.responseId,
@@ -240,7 +241,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
         /** All good at this point, persist the final response in the feed */
         feed.value.push({
-            type: "response",
+            type: AgentChatMessageType.RESPONSE,
             status: "success",
             entryKey: getNextEntryKey(),
             responseId: response.data.responseId,
@@ -260,7 +261,9 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      */
     async function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): Promise<void> {
         // only show successful responses that contain images
-        const finalFeedItems = feed.value.filter((item) => item.type === "response" && item.status === "success");
+        const finalFeedItems = feed.value.filter(
+            (item) => item.type === AgentChatMessageType.RESPONSE && item.status === "success",
+        );
 
         const slides: GalleryItem[] = [];
         let selectedIndex = 0;
