@@ -62,7 +62,7 @@
         {% endif %}
 
         {% if assessment.isImplementation %}
-            {% if button.enabled %}
+            {% if button.url %}
                 <a class="submit button"
                    href="{{ button.url }}{{ redirect }}"
                    data-test="assessment-summary-create-button"

@@ -69,7 +69,6 @@ class Button
             return [
                 'label' => self::LABEL_START,
                 'responseId' => null,
-                'enabled' => false,
                 'url' => null,
             ];
         }
@@ -83,7 +82,6 @@ class Button
             return [
                 'label' => self::LABEL_START,
                 'responseId' => null,
-                'enabled' => false,
                 'url' => null,
             ];
         }
@@ -112,7 +110,6 @@ class Button
                 return [
                     'label' => self::LABEL_VIEW,
                     'responseId' => null,
-                    'enabled' => false,
                     'url' => null,
                 ];
             } else {
@@ -123,7 +120,6 @@ class Button
                 return [
                     'label' => self::LABEL_VIEW,
                     'responseId' => $authoritativeResponse->getId(),
-                    'enabled' => true,
                     'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
                         'assessment' => $assessment,
                         'assessmentId' => $assessment->getId(),
@@ -147,7 +143,6 @@ class Button
                 return [
                     'label' => self::LABEL_START,
                     'responseId' => null,
-                    'enabled' => true,
                     'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
                         'assessment' => $assessment,
                         'assessmentId' => $assessment->getId(),
@@ -170,7 +165,6 @@ class Button
                     return [
                         'label' => self::LABEL_VIEW,
                         'responseId' => $authoritativeResponse->getId(),
-                        'enabled' => true,
                         'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
                             'assessment' => $assessment,
                             'assessmentId' => $assessment->getId(),
@@ -216,7 +210,6 @@ class Button
         return [
             'label' => self::LABEL_START,
             'responseId' => null,
-            'enabled' => false,
             'url' => null,
         ];
     }
