@@ -222,14 +222,12 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly): ?IFeedback
     {
-//        new \Alaress_Probe($participant, $participant->getAllFeedbacks());
         foreach ($participant->getAllFeedbacks() as $feedback) {
-            new \Alaress_Probe($participant->getUser()->getId(), $feedback->getComment(), $feedback->getResponse());
             /* Returns the feedback directly attributed to an authoritative response
              */
-//            if ($feedback->getResponse()->getAuthoritative()) {
-//                return $feedback;
-//            }
+            if ($feedback->getResponse()->getAuthoritative()) {
+                return $feedback;
+            }
         }
 
         /* No authoritative feedback exists yet

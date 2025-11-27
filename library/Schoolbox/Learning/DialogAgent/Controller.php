@@ -567,6 +567,7 @@ class Controller extends Base
 
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
+            new \Alaress_Probe($authoritativeFeedback?->getComment());
             /* Slam them all together
              */
             $stack[] = array_merge([
@@ -574,7 +575,7 @@ class Controller extends Base
                 $participant->getUser()->getExternalId(),
                 $participant->getUser()->getFirstName(),
                 $participant->getUser()->getLastName(),
-                $statusChecker->getHumanReadableStatus($authoritativeFeedback),
+                $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse()),
             ], $feedbackFields);
         }
 
