@@ -131,6 +131,7 @@ class Module extends BaseModule
             $this->injector->get('lti.registrations'),
             $this->injector->get('lti.userCodec'),
             $this->injector->get('lti.accessTokenCache'),
+            $this->injector->get('lti.logger'),
         );
     }
 }

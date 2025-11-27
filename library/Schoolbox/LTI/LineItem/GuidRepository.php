@@ -17,6 +17,7 @@ use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use Psr\Http\Message\UriInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\LTI\Assessment\LineItem as SchoolboxLineItem;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -32,12 +33,14 @@ class GuidRepository implements LineItemRepositoryInterface
      * @param SchoolboxLineItem\Mapper $lineItemMapper Line item mapper, for persisting and fetching line items.
      * @param Generator                $routeGenerator Route generator: used to create line item identifiers.
      * @param UriInterface             $baseUrl        Base URL used when building the line item's identifier.
+     * @param LoggerInterface          $logger         Log what this repository does.
      */
     public function __construct(
         private string $guid,
         private SchoolboxLineItem\Mapper $lineItemMapper,
         private Generator $routeGenerator,
         private UriInterface $baseUrl,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -54,8 +57,21 @@ class GuidRepository implements LineItemRepositoryInterface
             'identifier_url'      => $lineItemIdentifier,
         ])->first();
         if ($lineItem) {
+            $this->logger->debug(
+                __METHOD__ . ': line item found',
+                [
+                    'identifier' => $lineItemIdentifier,
+                    'lineItemId' => $lineItem->getId(),
+                ],
+            );
             return $this->convertModelToLineItem($lineItem);
         }
+        $this->logger->debug(
+            __METHOD__ . ': line item not found',
+            [
+                'identifier' => $lineItemIdentifier,
+            ],
+        );
         return null;
     }
 
@@ -97,6 +113,18 @@ class GuidRepository implements LineItemRepositoryInterface
         }
 
         $lineItemModels = $this->lineItemMapper->findByPredicates($pb, $options);
+        if (count($lineItemModels) > 0) {
+            $this->logger->debug(
+                __METHOD__ . ': line items found',
+                [
+                    'count' => count($lineItemModels),
+                ],
+            );
+        } else {
+            $this->logger->debug(
+                __METHOD__ . ': line items not found',
+            );
+        }
         return new LineItemCollection($lineItemModels->map($this->convertModelToLineItem(...))->getAll());
     }
 
@@ -138,7 +166,23 @@ class GuidRepository implements LineItemRepositoryInterface
         // Not yet sure what to do with:
         // * custom properties
         // * submission review
-        $this->lineItemMapper->save($lineItemModel);
+        try {
+            $this->lineItemMapper->save($lineItemModel);
+        } catch (MapperException $e) {
+            $this->logger->error(
+                __METHOD__ . ' error: line item not saved',
+                [
+                    'message' => $e->getMessage(),
+                ],
+            );
+            throw $e;
+        }
+        $this->logger->debug(
+            __METHOD__ . ': line item saved',
+            [
+                'lineItemId' => $lineItemModel->getId(),
+            ],
+        );
 
         // Now the line item has an ID, its identifier can be set
         // (if it didn't already have one)
@@ -146,7 +190,25 @@ class GuidRepository implements LineItemRepositoryInterface
             $identifier    = $this->buildIdentifier($lineItemModel);
             $lineItem      = $lineItem->setIdentifier($identifier);
             $lineItemModel = $lineItemModel->setIdentifierUrl($identifier);
-            $this->lineItemMapper->save($lineItemModel);
+            try {
+                $this->lineItemMapper->save($lineItemModel);
+            } catch (MapperException $e) {
+                $this->logger->error(
+                    __METHOD__ . ' error: identifier not added',
+                    [
+                        'message'    => $e->getMessage(),
+                        'lineItemId' => $lineItemModel->getId(),
+                    ],
+                );
+                throw $e;
+            }
+            $this->logger->debug(
+                __METHOD__ . ': added identifier',
+                [
+                    'lineItemId' => $lineItemModel->getId(),
+                    'identifier' => $identifier,
+                ],
+            );
         }
 
         return $lineItem;
@@ -160,10 +222,28 @@ class GuidRepository implements LineItemRepositoryInterface
      */
     public function delete(string $lineItemIdentifier): void
     {
-        $this->lineItemMapper->deleteByColumnList([
-            'lti_assessment_guid' => $this->guid,
-            'identifier_url'      => $lineItemIdentifier,
-        ]);
+        try {
+            $deleted = $this->lineItemMapper->deleteByColumnList([
+                'lti_assessment_guid' => $this->guid,
+                'identifier_url'      => $lineItemIdentifier,
+            ]);
+        } catch (MapperException $e) {
+            $this->logger->error(
+                __METHOD__ . ' error: line item not deleted',
+                [
+                    'message'    => $e->getMessage(),
+                    'identifier' => $lineItemIdentifier,
+                ],
+            );
+            throw $e;
+        }
+        $this->logger->debug(
+            __METHOD__ . ': line item deleted',
+            [
+                'identifier' => $lineItemIdentifier,
+                'count'      => $deleted,
+            ],
+        );
     }
 
     /**

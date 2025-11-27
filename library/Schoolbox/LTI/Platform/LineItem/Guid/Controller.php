@@ -26,6 +26,7 @@ use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandler
 use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -57,6 +58,7 @@ class Controller extends BaseController
      * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
      *                                                                  score publish request into an actual user.
      * @param CacheItemPoolInterface          $accessTokenCache         Cache for access tokens.
+     * @param LoggerInterface                 $logger                   Logger for what this controller does.
      */
     public function __construct(
         private LtiAssessment\LineItem\Mapper $lineItemMapper,
@@ -65,7 +67,8 @@ class Controller extends BaseController
         private MapperProxy $assessmentDataSource,
         private RegistrationRepositoryInterface $registrations,
         private UserCodec $userCodec,
-        private CacheItemPoolInterface $accessTokenCache
+        private CacheItemPoolInterface $accessTokenCache,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -102,7 +105,7 @@ class Controller extends BaseController
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#create-line-item-service-endpoint
         $repository     = $this->createRepository($guid);
-        $handler        = new CreateLineItemServiceServerRequestHandler($repository);
+        $handler        = new CreateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
         $this->response = $this->createResponse($handler);
     }
 
@@ -121,7 +124,7 @@ class Controller extends BaseController
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
         // Note that the line item is identified by the URL itself
         $repository     = $this->createRepository($guid);
-        $handler        = new GetLineItemServiceServerRequestHandler($repository);
+        $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
         $this->response = $this->createResponse($handler);
     }
 
@@ -139,7 +142,7 @@ class Controller extends BaseController
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
         $repository     = $this->createRepository($guid);
-        $handler        = new UpdateLineItemServiceServerRequestHandler($repository);
+        $handler        = new UpdateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
         $this->response = $this->createResponse($handler);
     }
 
@@ -157,7 +160,7 @@ class Controller extends BaseController
     {
         // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#delete-line-item-service-endpoint
         $repository     = $this->createRepository($guid);
-        $handler        = new DeleteLineItemServiceServerRequestHandler($repository);
+        $handler        = new DeleteLineItemServiceServerRequestHandler($repository, logger: $this->logger);
         $this->response = $this->createResponse($handler);
     }
 
@@ -216,6 +219,7 @@ class Controller extends BaseController
             $this->lineItemMapper,
             $this->routeGenerator,
             new Factory($this->getConfigLoader())->buildFullyQualified(),
+            $this->logger,
         );
     }
 
