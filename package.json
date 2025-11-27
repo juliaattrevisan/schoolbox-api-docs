@@ -1,6 +1,6 @@
 {
   "name": "schoolbox",
-  "version": "25.1.0",
+  "version": "26.0.0",
   "author": "Schoolbox Pty Ltd",
   "description": "Refer to 'External dependency list' in Confluence for more info on the dependencies below",
   "dependencies": {
