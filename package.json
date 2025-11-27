@@ -134,8 +134,8 @@
   },
   "scripts": {
     "build": "NODE_ENV=development rspack --config rspack.dev.js",
-    "watch": "rspack --config rspack.dev.js --watch",
-    "watch-poll": "rspack --config rspack.dev.js --watch --watch-poll=1000",
+    "watch": "NODE_ENV=development rspack --config rspack.dev.js --watch",
+    "watch-poll": "NODE_ENV=development rspack --config rspack.dev.js --watch --watch-poll=1000",
     "publish": "rspack --config rspack.prod.js",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
