@@ -10,12 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent\ImageGeneration;
 
 use Crell\ApiProblem\ApiProblem;
+use JsonException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
-use Schoolbox\OpenAi\EventStream\Listener\IListener;
+use Schoolbox\OpenAi\EventStream\IListener;
 use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\LogHandler\ResponseMessage;
-use JsonException;
 use UnexpectedValueException;
 
 /**

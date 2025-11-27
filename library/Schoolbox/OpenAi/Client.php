@@ -92,7 +92,7 @@ class Client implements IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
         ?LogHandler\ILogHandler $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
@@ -138,7 +138,7 @@ class Client implements IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
         ?LogHandler\ILogHandler $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
@@ -366,12 +366,12 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param ResponseInterface      $response       The response from the AI provider.
-     * @param Log\Model              $log            The log to write to.
-     * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
-     * @param int                    $chunkSize      How many bytes to read from each stream iteration.
-     * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
-     *                                                             before sending to the stream.
+     * @param ResponseInterface          $response            The response from the AI provider.
+     * @param Log\Model                  $log                 The log to write to.
+     * @param LogHandler\ILogHandler     $logHandler          The log handler to use for each message.
+     * @param int                        $chunkSize           How many bytes to read from each stream iteration.
+     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI before
+     *                                                        sending to the stream.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
@@ -380,7 +380,7 @@ class Client implements IClient
         Log\Model $log,
         LogHandler\ILogHandler $logHandler,
         int $chunkSize,
-        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
     ): iterable {
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');

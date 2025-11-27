@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\EventStream\Listener;
-
-use Schoolbox\OpenAi\EventStream\Message;
+namespace Schoolbox\OpenAi\EventStream;
 
 /**
  * Listener for modifying an event stream message object from OpenAI, before it

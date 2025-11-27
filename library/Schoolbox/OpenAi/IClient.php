@@ -47,16 +47,16 @@ interface IClient
      * Call the create model response API, and receive a stream:
      * * https://platform.openai.com/docs/api-reference/responses-streaming
      *
-     * @param array                           $payload             The request body to send.
-     * @param Log\Model                       $log                 The log to write to: will be updated with the
-     *                                                             response data, so that this call may be identified in
-     *                                                             logs.
-     * @param int|null                        $chunkSize           If provided, read this many bytes per stream fetch:
-     *                                                             otherwise, allow the client itself to decide.
-     * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
-     *                                                             before sending to the stream.
-     * @param ?LogHandler\ILogHandler         $logListener         If set: call this for each message received from
-     *                                                             OpenAI, and modify the log accordingly.
+     * @param array                      $payload             The request body to send.
+     * @param Log\Model                  $log                 The log to write to: will be updated with the
+     *                                                        response data, so that this call may be identified in
+     *                                                        logs.
+     * @param int|null                   $chunkSize           If provided, read this many bytes per stream fetch:
+     *                                                        otherwise, allow the client itself to decide.
+     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI
+     *                                                        before sending to the stream.
+     * @param ?LogHandler\ILogHandler    $logListener         If set: call this for each message received from
+     *                                                        OpenAI, and modify the log accordingly.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
@@ -64,7 +64,7 @@ interface IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
         ?LogHandler\ILogHandler $logListener = null,
     ): iterable;
 
@@ -83,23 +83,23 @@ interface IClient
      * Call the create chat completion API, and receive a stream:
      * * https://platform.openai.com/docs/api-reference/chat-streaming/streaming
      *
-     * @param array                           $payload             The request body to send.
-     * @param Log\Model                       $log                 The log to write to: will be updated with the
-     *                                                             response data, so that this call may be identified in
-     *                                                             logs.
-     * @param int|null                        $chunkSize           If provided, read this many bytes per stream fetch:
-     *                                                             otherwise, allow the client itself to decide.
-     * @param ?EventStream\Listener\IListener $eventStreamListener If set: use this to modify the message from OpenAI
-     *                                                             before sending to the stream.
-     * @param ?LogHandler\ILogHandler         $logListener         If set: call this for each message received from
-     *                                                             OpenAI, and modify the log accordingly.
+     * @param array                      $payload             The request body to send.
+     * @param Log\Model                  $log                 The log to write to: will be updated with the
+     *                                                        response data, so that this call may be identified in
+     *                                                        logs.
+     * @param int|null                   $chunkSize           If provided, read this many bytes per stream fetch:
+     *                                                        otherwise, allow the client itself to decide.
+     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI
+     *                                                        before sending to the stream.
+     * @param ?LogHandler\ILogHandler    $logListener         If set: call this for each message received from
+     *                                                        OpenAI, and modify the log accordingly.
      * @return iterable<string>
      */
     public function createChatCompletionStream(
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?EventStream\Listener\IListener $eventStreamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
         ?LogHandler\ILogHandler $logListener = null,
     ): iterable;
 
