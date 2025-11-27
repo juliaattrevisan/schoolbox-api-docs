@@ -80,9 +80,13 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('dialogAgent', 'dialogAgent')}
+                {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
+                {$this->getJoinColumnString('response', 'response')},
+                {$this->getJoinColumnString('response.learner', 'response.learner')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
+            INNER JOIN {$this->getJoinSql('response', '', 'response', true)}
+            INNER JOIN {$this->getJoinSql('response.learner', 'response', 'response.learner', true)}
         ";
     }
 
@@ -95,6 +99,8 @@ class Mapper extends \Schoolbox\Mapper
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $stack = $this->createCollection();
+        $userMapper = $this->getJoinMapper('response.learner');
+        $responseMapper = $this->getJoinMapper('response');
 
         foreach ($statement as $row) {
             $feedback = $this->hydrate($row);
@@ -111,6 +117,22 @@ class Mapper extends \Schoolbox\Mapper
             $dialogAgent->setAssessmentModel($assessmentModel);
 
             $feedback->setDialogAgent($dialogAgent);
+
+            /* Hydrate a corresponding Response instance
+             */
+            $response = $responseMapper->hydrate($row, 'response');
+
+            if ($response) {
+                /* Assign learner instance (wild! I don't think we have ever done it this way before)
+                 */
+                $learner = $userMapper->hydrate($row, 'response.learner');
+
+                if ($learner) {
+                    $response->setLearner($learner);
+                }
+
+                $feedback->setResponse($response);
+            }
 
             $stack->add($feedback);
         }

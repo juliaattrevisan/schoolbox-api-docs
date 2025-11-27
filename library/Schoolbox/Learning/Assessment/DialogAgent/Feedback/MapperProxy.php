@@ -110,8 +110,10 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()?->getAssessmentModel()->getId()))
                 ->setBody($dataModel->getBody())
                 ->setCriteriaId($dataModel->getCriteria()->getId())
-                ->setReviewee(null)
-                ->setReviewer(null)
+                ->setReviewee($dataModel->getResponse()->getLearner())
+                /* TODO Who owns this?
+                 */
+                ->setReviewer($dataModel->getResponse()->getLearner())
                 ->setCreatedAt($dataModel->getCreatedAt())
                 ->setUpdatedAt($dataModel->getUpdatedAt())
                 ->setDeletedAt($dataModel->getDeletedAt());
