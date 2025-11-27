@@ -174,23 +174,28 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     protected function transformDomainObjects(Collection $domainObjects)
     {
+        /* TODO CURRENTLY INCOMPLETE
+         *  I'm not exactly sure when we'd ever try to save this back in this manner via the swamp.
+         *  Each cell is fulfilled by AI, not a human, so it's outside the normal workflow that you see.
+         *  You're better off using the DataModel Mappers directly, really, for system-generated content
+         */
         $stack = new GenericCollection(DataModel::class);
 
-        $responseTransformer = new Transformer();
-
-        foreach ($domainObjects as $domainObject) {
-            $dataModel = new DataModel()
-                ->setId($domainObject->getId())
-                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
-                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
-                ->setBody($domainObject->getComment())
-                ->setCriteria((new \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model())->setId($domainObject->getCriteriaId()))
-                ->setCreatedAt($domainObject->getCreatedAt())
-                ->setUpdatedAt($domainObject->getUpdatedAt())
-                ->setDeletedAt($domainObject->getDeletedAt());
-
-            $stack->add($dataModel);
-        }
+//        $responseTransformer = new Transformer();
+//
+//        foreach ($domainObjects as $domainObject) {
+//            $dataModel = new DataModel()
+//                ->setId($domainObject->getId())
+//                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
+//                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
+//                ->setBody($domainObject->getComment())
+//                ->setCriteria((new \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model())->setId($domainObject->getCriteriaId()))
+//                ->setCreatedAt($domainObject->getCreatedAt())
+//                ->setUpdatedAt($domainObject->getUpdatedAt())
+//                ->setDeletedAt($domainObject->getDeletedAt());
+//
+//            $stack->add($dataModel);
+//        }
 
         return $stack;
     }
