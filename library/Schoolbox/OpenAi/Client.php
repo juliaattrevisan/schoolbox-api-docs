@@ -100,16 +100,16 @@ class Client implements IClient
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
 
-        // Use the standard response log handler,
+        // Use the standard response log listener,
         // plus whatever one was passed in.
-        $logHandler = new LogHandler\Composite(new LogHandler\ResponseMessage());
+        $logListeners = [new LogHandler\ResponseMessage()];
         if ($logListener) {
-            $logHandler = $logHandler->addHandler($logListener);
+            $logListeners[] = $logListener;
         }
         return $this->handleStreamedResponse(
             $response,
             $log,
-            $logHandler,
+            new LogHandler\Composite(...$logListeners),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
         );
@@ -146,16 +146,16 @@ class Client implements IClient
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
 
-        // Use the standard chat completion log handler,
+        // Use the standard chat completion log listener,
         // plus whatever one was passed in.
-        $logHandler = new LogHandler\Composite(new LogHandler\ChatCompletionsMessage());
+        $logListeners = [new LogHandler\ChatCompletionsMessage()];
         if ($logListener) {
-            $logHandler = $logHandler->addHandler($logListener);
+            $logListeners[] = $logListener;
         }
         return $this->handleStreamedResponse(
             $response,
             $log,
-            $logHandler,
+            new LogHandler\Composite(...$logListeners),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
         );
