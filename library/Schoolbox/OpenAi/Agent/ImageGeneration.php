@@ -66,7 +66,6 @@ class ImageGeneration
             $payload,
             $log,
             null,
-            null,
             new ImageGeneration\EventListener(),
             new ImageGeneration\LogListener(),
         );

@@ -92,7 +92,6 @@ class Client implements IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?callable $streamListener = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
         ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
@@ -134,7 +133,6 @@ class Client implements IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?callable $streamListener = null,
         ?EventStream\Listener\IListener $eventStreamListener = null,
         ?LogHandler\Listener\IListener $logListener = null,
     ): iterable {
