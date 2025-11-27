@@ -109,9 +109,9 @@ class Client implements IClient
         return $this->handleStreamedResponse(
             $response,
             $log,
-            new LogHandler\Composite(...$logListeners),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
+            new LogHandler\Composite(...$logListeners),
         );
     }
 
@@ -155,9 +155,9 @@ class Client implements IClient
         return $this->handleStreamedResponse(
             $response,
             $log,
-            new LogHandler\Composite(...$logListeners),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
+            new LogHandler\Composite(...$logListeners),
         );
     }
 
@@ -368,19 +368,19 @@ class Client implements IClient
      *
      * @param ResponseInterface          $response            The response from the AI provider.
      * @param Log\Model                  $log                 The log to write to.
-     * @param LogHandler\IListener       $logHandler          The log handler to use for each message.
      * @param int                        $chunkSize           How many bytes to read from each stream iteration.
      * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI before
      *                                                        sending to the stream.
+     * @param LogHandler\IListener|null  $logListener         The log handler to use for each message.
      * @return iterable<string> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
         ResponseInterface $response,
         Log\Model $log,
-        LogHandler\IListener $logHandler,
         int $chunkSize,
-        ?EventStream\IListener $eventStreamListener = null,
+        ?EventStream\IListener $eventStreamListener,
+        ?LogHandler\IListener $logListener,
     ): iterable {
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
@@ -403,15 +403,17 @@ class Client implements IClient
 
                 // Update the log, and save it:
                 // even if that raises an exception, still save the log
-                try {
-                    // logHandler may modify the message, so clone it so we can yield later
-                    $log = $logHandler->handleMessage(
-                        clone $outputMessage,
-                        clone $message,
-                        $log,
-                    );
-                } finally {
-                    $this->saveLog($log);
+                if ($logListener) {
+                    try {
+                        // logHandler may modify the message, so clone it so we can yield later
+                        $log = $logListener->handleMessage(
+                            clone $outputMessage,
+                            clone $message,
+                            $log,
+                        );
+                    } finally {
+                        $this->saveLog($log);
+                    }
                 }
 
                 // Yield after logging as if the parent throws or returns early it would otherwise not be logged
@@ -426,7 +428,7 @@ class Client implements IClient
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-            $log = $logHandler->handleResponse($responseJson, $log);
+            $log = $logListener->handleResponse($responseJson, $log);
             $this->saveLog($log);
 
             // TODO: is this actually going to show an error state to the frontend??
