@@ -17,6 +17,9 @@ use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 /**
  * Handle messages from OpenAI's Chat Completions API:
  * https://platform.openai.com/docs/api-reference/chat-streaming
+ *
+ * This log handler should apply to all Chat Completions API requests,
+ * regardless of the agent which makes them.
  */
 class ChatCompletionsMessage implements ILogHandler
 {

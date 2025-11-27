@@ -17,6 +17,9 @@ use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 /**
  * Handle messages from OpenAI's Response API:
  * https://platform.openai.com/docs/api-reference/responses-streaming
+ *
+ * This log handler should apply to all Response API requests, regardless of
+ * the agent which makes them.
  */
 class ResponseMessage implements ILogHandler
 {
