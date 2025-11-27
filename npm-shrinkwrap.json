@@ -1,12 +1,12 @@
 {
   "name": "schoolbox",
-  "version": "25.1.0",
+  "version": "26.0.0",
   "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "schoolbox",
-      "version": "25.1.0",
+      "version": "26.0.0",
       "license": "UNLICENSED",
       "dependencies": {
         "@andxor/jquery-ui-touch-punch-fix": "~1.0.2",
@@ -67,8 +67,8 @@
         "@happy-dom/jest-environment": "~18.0.1",
         "@pinia/testing": "~1.0.2",
         "@playwright/test": "~1.53.1",
-        "@rspack/cli": "^1.6.5",
-        "@rspack/core": "^1.6.5",
+        "@rspack/cli": "~1.6.5",
+        "@rspack/core": "~1.6.5",
         "@storybook/addon-a11y": "~8.5.3",
         "@storybook/addon-actions": "~8.5.3",
         "@storybook/addon-designs": "~8.1.0",
