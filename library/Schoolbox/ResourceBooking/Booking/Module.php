@@ -49,6 +49,9 @@ class Module extends BaseModule
         $this->addRoute('reject', $basePath, '/{id}/reject');
         $this->addRoute('setPending', $basePath, '/{id}/setPending');
         $this->addRoute('cancel', $basePath, '/{id}/cancel');
+
+        // Clash booking, approve the new booking and reject the old one
+        $this->addRoute('clashApprove', $basePath, '/{old}/{new}/clashApprove');
     }
 
     /**
@@ -75,6 +78,22 @@ class Module extends BaseModule
             function ($params) {
                 try {
                     return ['item' => $this->getItemMapper()->findById($params['id'])];
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    throw new NotFound();
+                }
+            }
+        );
+
+        // add the booking items to params for clash approve
+        $this->addRoutePreload(
+            $matcher,
+            '(?:clashApprove)',
+            function ($params) {
+                try {
+                    return [
+                        'oldBooking' => $this->getMapper()->findById($params['old']),
+                        'newBooking' => $this->getMapper()->findById($params['new'])
+                    ];
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     throw new NotFound();
                 }

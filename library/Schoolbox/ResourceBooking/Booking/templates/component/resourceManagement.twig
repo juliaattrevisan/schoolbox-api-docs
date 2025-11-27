@@ -147,28 +147,25 @@
                                                  #}
                                             <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
                                                 <li>
+                                                    <a href="{{ routeLookup('resourceBooking.edit', {id: booking.clash.booking.id}) }}?returnUrl={{ returnUrl }}"
+                                                       class="icon-modify">Modify approved booking</a>
+                                                </li>
+                                                <li>
                                                     <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-                                                       class="icon-modify">Modify Booking</a>
+                                                       class="icon-modify">Modify clash booking</a>
                                                 </li>
                                                 <li class="separator">Set Status</li>
 
                                                 <li>
-                                                    <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                    <a href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash.booking.id, new: event.booking.id}) }}"
                                                        data-set-status="approved"
-                                                       class="icon-approve">Approved</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                                       data-series-id="{{ event.booking.event.seriesId }}"
-                                                       data-set-status="pending"
-                                                       class="icon-undo">Pending</a>
+                                                       class="icon-approve">Approve clash booking / Reject original booking</a>
                                                 </li>
                                                 <li>
                                                     <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
                                                        data-series-id="{{ event.booking.event.seriesId }}"
                                                        data-set-status="rejected"
-                                                       class="icon-close">Rejected</a>
+                                                       class="icon-close">Reject clash booking</a>
                                                 </li>
                                             </ul>
                                             {% else %} {# standard pending booking tot options #}

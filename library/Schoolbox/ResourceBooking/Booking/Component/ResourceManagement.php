@@ -140,7 +140,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                     // only record clashes
                     if ($eventB->isClash($eventA)) {
                         $eventAHash = spl_object_hash($eventA);
-                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'] = $eventA;
+                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'] = $eventB;
                     } else {
                         $var = false;
                     }

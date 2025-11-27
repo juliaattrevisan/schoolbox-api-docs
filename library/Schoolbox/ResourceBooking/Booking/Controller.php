@@ -1262,4 +1262,20 @@ class Controller extends Base
         $this->externalEventMapper = $externalEventMapper;
         return $this;
     }
+
+    /**
+     * Handle approval of a booking that clashes with an existing booking.
+     * cancel the old booking (approved) and approve the new booking. (pending)
+     * @param Model $oldBooking
+     * @param Model $newBooking
+     * @return void
+     */
+    public function clashApprove(Model $oldBooking, Model $newBooking)
+    {
+        // reject the old booking, so we can approve the new one.
+        $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
+
+        $errorsNew = $this->changeStatus($newBooking, Status\Model::STATUS_APPROVED);
+        $this->setUpdateStatusResponse($newBooking, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
+    }
 }
