@@ -121,18 +121,24 @@ function onClose(): void {
                     {{ student.lastname }}
                 </h2>
             </div>
-            <div class="l-flex-col l-gap-s f-no-margins">
-                <div v-for="item in adjustmentData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
-                    <h5>{{ item.terminology }}</h5>
-                    <article>
-                        <ul>
-                            <li v-for="(value, index) in item.value" :key="index">{{ value }}</li>
-                        </ul>
-                    </article>
-                </div>
-                <div v-for="item in textData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
-                    <h5>{{ item.terminology }}</h5>
-                    <media-article :content="item.value" />
+            <div class="c-vert-scroll-container l-flex-col l-gap-s l-pad-s">
+                <div class="l-flex-col l-gap-s f-no-margins">
+                    <div
+                        v-for="item in adjustmentData"
+                        :key="item.terminology"
+                        class="l-flex-col l-gap-xs f-no-margins"
+                    >
+                        <h5>{{ item.terminology }}</h5>
+                        <article>
+                            <ul>
+                                <li v-for="(value, index) in item.value" :key="index">{{ value }}</li>
+                            </ul>
+                        </article>
+                    </div>
+                    <div v-for="item in textData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
+                        <h5>{{ item.terminology }}</h5>
+                        <media-article :content="item.value" />
+                    </div>
                 </div>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">

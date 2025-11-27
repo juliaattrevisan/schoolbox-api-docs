@@ -120,10 +120,10 @@
     background-color: var(--color-foreground-primary);
 }
 
-// default styling for a vertically scrollable container
+// default styling for a vertically scrollable container, typically used within a modal
 .c-vert-scroll-container {
     border: 1px solid var(--form-border-color);
-    max-height: 500px;
+    max-height: 700px;
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;

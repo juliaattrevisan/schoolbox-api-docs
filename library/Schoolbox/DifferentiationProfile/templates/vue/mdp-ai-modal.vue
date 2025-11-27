@@ -115,9 +115,3 @@ function onConfirmSelected(): void {
         </form>
     </basic-modal>
 </template>
-
-<style scoped>
-.c-vert-scroll-container {
-    max-height: 700px; /* overwrite default max-height */
-}
-</style>
