@@ -73,7 +73,7 @@ const imageSrc = window.Vue.computed(() => {
             <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar--0">
                 <i class="icon-image"></i>
             </div>
-            <p class="l-mar--0-bottom" :class="{ 'l-mar-s--top': imageSrc !== null }">
+            <p class="l-mar--0-bottom ac-feed-message-content" :class="{ 'l-mar-s--top': imageSrc !== null }">
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
                 <span v-html="props.message.message"></span>
             </p>
@@ -89,6 +89,18 @@ const imageSrc = window.Vue.computed(() => {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    /**
+     * It's actually possible for the response to contain embedded images
+     * if the AI felt like supplying a link to an image in markdown.
+     *
+     * When that occurs, the image could be very large, so we limit the size here.
+     * Since this image won't be previewable, it can be a bit larger than the normal ones above
+     */
+    .ac-feed-message-content :deep(img) {
+        max-width: 25rem;
+        max-height: 25rem;
     }
 
     .ac-img-omitted {
