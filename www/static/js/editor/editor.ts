@@ -72,7 +72,8 @@ async function create(sourceElement: SbxEditorElement, config: SbxEditorConfig):
             EditorClass = InlineEditor;
             break;
         default:
-            throw new Error(`Unsupported editor type: ${config.type}`);
+            console.error(`Unsupported editor type`);
+            return;
     }
     const editor = await EditorClass.create(sourceElement, getConfig(config));
     onCreated(sourceElement, editor, config);
