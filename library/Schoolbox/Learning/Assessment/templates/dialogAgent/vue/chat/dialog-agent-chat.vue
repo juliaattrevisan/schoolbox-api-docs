@@ -206,6 +206,7 @@ window.Vue.onUnmounted(() => {
     <ac-feed
         ref="feedRef"
         class="l-mar-m--bottom"
+        min-height="20rem"
         :max-height="maxFeedHeight"
         :feed="acStore.fullFeed"
         error-prefix="There was a problem retrieving the response."

@@ -15,6 +15,8 @@ interface Props {
     allowSelection?: boolean;
     /** The maximum height of the feed container */
     maxHeight: string;
+    /** The minimum height of the feed container, if any */
+    minHeight?: string;
     /** Should the feed be initially scrolled to the bottom? */
     initiallyScrolled?: boolean;
 }
@@ -53,7 +55,11 @@ defineExpose({ feedEl });
     <div class="ac-feed">
         <slot name="header"></slot>
 
-        <div ref="feedRef" class="l-pad-s ac-feed-list-wrapper" :style="{ maxHeight: props.maxHeight }">
+        <div
+            ref="feedRef"
+            class="l-pad-s ac-feed-list-wrapper"
+            :style="{ maxHeight: props.maxHeight, minHeight: props.minHeight }"
+        >
             <div class="ac-feed-list">
                 <template v-for="(message, index) in props.feed" :key="message.entryKey">
                     <br v-if="index > 0" />
@@ -81,7 +87,6 @@ defineExpose({ feedEl });
 
 .ac-feed-list-wrapper {
     overflow-y: auto;
-    min-height: 20rem;
     height: 100%;
 }
 
