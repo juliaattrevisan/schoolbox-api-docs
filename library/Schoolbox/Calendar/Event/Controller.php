@@ -28,6 +28,7 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -134,13 +135,12 @@ class Controller extends Base
 
         $payload = new Payload($this->di, $this->attendanceMapper)->generate($event, $this->getUser());
 
-        $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', [
+        $data = [
             'event' => $event,
             'level' => $helper->getEventLevel($event),
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
-            'resourceBookingsCollection' => $helper->getResourceBookingsCollection($event),
             'user' => $this->getUser(),
 
             /* Modify perms are calculated in the attendance list fragment
@@ -160,7 +160,14 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
-        ], $event->getTitle());
+        ];
+
+        // Only include resource booking data if the resource booking module is enabled.
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
+            $data['resourceBookingsCollection'] = $helper->getResourceBookingsCollection($event);
+        }
+
+        $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', $data, $event->getTitle());
     }
 
 

@@ -652,15 +652,15 @@ export default {
             </template>
         </div>
 
-        <div class="small-12 medium-8 island">
+        <div v-if="event.resourceBookings" class="small-12 medium-8 island">
             <section class="detail content">
                 <div class="title-section">
                     <h2>Resource Bookings</h2>
                 </div>
                 <div class="content-section">
-                    <table v-if="this.event.resourceBookings | count">
+                    <table v-if="event.resourceBookings.length > 0">
                         <tbody>
-                            <tr v-for="booking in this.event.resourceBookings" :key="booking.id">
+                            <tr v-for="booking in event.resourceBookings" :key="booking.id">
                                 <td>{{ booking.name !== "" ? booking.name : booking.resource.name }}</td>
                                 <td class="text-right">
                                     <span :class="booking.status.name.toLowerCase() + ' label'">{{
