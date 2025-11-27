@@ -1,5 +1,9 @@
 /**
- * All webpack configuration thats shared between dev and prod
+ * All rspack configuration that's shared between dev and prod
+ * Note that rspack is a new bundler that is a drop-in replacement for Webpack.
+ * As we previously used Webpack, this file is very similar to a Webpack configuration file
+ * and still references relevant Webpack documentation.
+ * See https://rspack.rs/ for more information.
  */
 
 const path = require("path");
@@ -289,7 +293,7 @@ module.exports = {
         // https://webpack.js.org/configuration/module/
         rules: [
             {
-                test: require.resolve("dayjs"), // see https://webpack.js.org/loaders/expose-loader/ - expose these to the global scope, allowing access to the properties in twig / other JS files
+                test: require.resolve("dayjs"), // see https://webpack.js.org/loaders/expose-loader/ - expose these to the global window. scope, allowing access to the properties in twig / other JS files
                 loader: "expose-loader",
                 options: {
                     exposes: { globalName: "dayjs", override: true },
@@ -303,17 +307,17 @@ module.exports = {
                 },
             },
             {
-                test: /\.ts(x?)$/, // typescript uses the same babel setup as JS files, but also uses ts-loader to convert the ts to js
-                exclude: /node_modules/,
-                use: [
-                    {
-                        loader: "ts-loader",
-                        options: {
-                            appendTsSuffixTo: [/\.vue$/],
-                            transpileOnly: true,
+                test: /\.ts$/, // see https://rspack.rs/guide/features/builtin-swc-loader - to handle TypeScript files
+                exclude: [/node_modules/],
+                loader: "builtin:swc-loader",
+                options: {
+                    jsc: {
+                        parser: {
+                            syntax: "typescript",
                         },
                     },
-                ],
+                },
+                type: "javascript/auto",
             },
             {
                 test: /\.vue$/,
@@ -324,12 +328,13 @@ module.exports = {
                         isCustomElement: (tag) => tag.startsWith("sbx-"), // allow sbx- tags in vue templates, which is our custom element prefix
                         whitespace: "preserve",
                     },
+                    // Note, for the majority of features to be available, make sure this option is `true`
+                    experimentalInlineMatchResource: true,
                 },
             },
             {
                 test: /\.css$/,
                 use: [
-                    { loader: "vue-style-loader" },
                     {
                         loader: "style-loader",
                         options: {
@@ -385,9 +390,12 @@ module.exports = {
             {
                 // to process svg files in the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
                 test: /(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
-                use: ["raw-loader"],
+                type: "asset/source",
             },
         ],
+    },
+    experiments: {
+        css: false, // Leave off for now long term, as our CSS/SCSS is now pretty old, and rspack plans to make this default to true in the future https://rspack.rs/guide/tech/css
     },
     externals: {
         vue: "Vue", // as Vue is loaded separately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
