@@ -66,11 +66,6 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             $this->getUser(),
             $this->getUser()
         );
-//        $bookingApi->setStatus(
-//            [
-//                Booking\Status\Model::STATUS_PENDING,
-//            ]
-//        );
 
         // Still need to check if user actually has any bookable items.
         // If they don't, then don't display this component.
