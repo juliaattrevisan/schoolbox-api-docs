@@ -107,21 +107,57 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         $responseTransformer = new Transformer();
 
-        foreach ($mapperModels as $dataModel) {
-            $domainObject = new DomainObject()
-                ->setId($dataModel->getId())
-                ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()?->getAssessmentModel()->getId()))
-                ->setResponse($responseTransformer->transformDataModel($dataModel->getResponse()))
-                ->setComment($dataModel->getBody())
-                ->setCriteriaId($dataModel->getCriteria()->getId())
-                ->setReviewee($dataModel->getResponse()->getLearner())
-                /* TODO Who owns this?
-                 */
-                ->setReviewer(null)
-                ->setCreatedAt($dataModel->getCreatedAt())
-                ->setUpdatedAt($dataModel->getUpdatedAt())
-                ->setDeletedAt($dataModel->getDeletedAt());
+        /* $mapperModels contains EVERYONE's feedback rows so you have to group them by user, then by response id
+         * They might appear totally out of order so you maybe can't assume sequentially grouped rows nicely
+         */
+        $feedbackStacks = [];
 
+        foreach ($mapperModels as $dataModel) {
+            $userId = $dataModel->getResponse()->getLearner()->getId();
+            $responseId = $dataModel->getResponse()->getId();
+
+            $feedbackStacks[$userId][$responseId][] = $dataModel;
+        }
+
+        /* Foreach of those, compile each feedback $dataModel into the set of Criteria in a Domain representation
+         */
+        foreach ($feedbackStacks as $userId => $feedbackData) {
+            /* These can't really have a primary key: they are an aggregation of many..........
+             * Init a GenericCollection to start with
+             */
+            $domainObject = (new DomainObject())
+                ->setCriteria(new GenericCollection(\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criteria::class));
+
+            /* Collate all the feedback per criterion into one big set
+             */
+            foreach ($feedbackData as $responseId => $feedbacks) {
+                foreach ($feedbacks as $feedback) {
+                    /* Populating the feedback object for the first time; you only need to do this once, but you need
+                     * something from the $feedback instance to do it (.............wow)
+                     */
+                    if (!$domainObject->getCriteria()->count()) {
+                        $domainObject->setAssessable((new DialogAgentDomainObject())->setId($feedback->getDialogAgent()?->getAssessmentModel()->getId()))
+                            ->setResponse($responseTransformer->transformDataModel($feedback->getResponse()))
+                            ->setReviewee($feedback->getResponse()->getLearner())
+                            /* TODO Who owns this?
+                             */
+                            ->setReviewer(null)
+                            ->setCreatedAt($feedback->getCreatedAt())
+                            ->setUpdatedAt($feedback->getUpdatedAt())
+                            ->setDeletedAt($feedback->getDeletedAt());
+                    }
+
+                    $feedbackObject = (new Criteria())
+                        ->setCriteriaId($feedback->getCriteria()->getId())
+                        ->setBody($feedback->getBody());
+
+
+                    $domainObject->getCriteria()->setOffset($feedback->getCriteria()->getId(), $feedbackObject);
+                }
+            }
+
+            /* Add this user's collated criteria feedback as one big unit
+             */
             $stack->add($domainObject);
         }
 

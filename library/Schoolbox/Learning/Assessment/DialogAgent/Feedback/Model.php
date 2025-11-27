@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DialogAgent\Feedback;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -27,11 +28,14 @@ class Model extends AbstractFeedback
 
 
     /**
-     * The criteria field for which this model exists; you should only need its id for now
+     * A set of criteria fields that each have feedback content, all collated here to be treated as one big unit
+     * \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criteria[]
      *
-     * @var int|null
+     * phpstorm complains about putting that into the actual typedef.
+     *
+     * @var GenericCollection
      */
-    private ?int $criteriaId = null;
+    private GenericCollection $criteria;
 
 
     /* Getters/Setters
@@ -58,21 +62,21 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return int|null
+     * @return GenericCollection
      */
-    public function getCriteriaId(): ?int
+    public function getCriteria(): GenericCollection
     {
-        return $this->criteriaId;
+        return $this->criteria;
     }
 
 
     /**
-     * @param int|null $criteriaId
+     * @param GenericCollection $criteria
      * @return $this
      */
-    public function setCriteriaId(?int $criteriaId): self
+    public function setCriteria(GenericCollection $criteria): self
     {
-        $this->criteriaId = $criteriaId;
+        $this->criteria = $criteria;
         return $this;
     }
 }
