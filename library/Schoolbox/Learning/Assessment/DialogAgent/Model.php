@@ -137,7 +137,14 @@ class Model extends AbstractAssessment
         }
 
         /* TODO Maybe something about activity duration should be in here...?
-         * I think so... also whether you can create a new response depending on existing responses
+         *  I think so... also whether you can create a new response depending on existing responses
+         */
+
+        /* TODO incorporate Assessment Duration
+         *
+         * Note that durations are -per response- and mostly enforced in frontend.
+         * Backend implements a crontab that forcibly shuts whatever the frontend couldn't.
+         * Durations don't factor into whether you can make responses or anything, it's a clerical duty.
          */
 
         return true;

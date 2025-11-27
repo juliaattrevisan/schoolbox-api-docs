@@ -152,13 +152,6 @@ class Button
              */
             $authoritativeResponse = $participant->getAuthoritativeResponse(false);
 
-            /* TODO incorporate Assessment Duration
-             *
-             * Note that durations are -per response- and mostly enforced in frontend.
-             * Backend implements a crontab that forcibly shuts whatever the frontend couldn't.
-             * Durations don't factor into whether you can make responses or anything, it's a clerical duty.
-             */
-
             /* Authoritative response exists and it's not yet submitted; resume it
              */
             if ($authoritativeResponse && !$authoritativeResponse->isSubmitted()) {
