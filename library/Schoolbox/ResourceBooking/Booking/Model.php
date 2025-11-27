@@ -257,10 +257,10 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
     * Set name
     *
-    * @param mixed $name
+    * @param string $name
     * @return $this
     */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
         return $this;
@@ -269,9 +269,9 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
     * Get name
     *
-    * @return mixed
+    * @return string
     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

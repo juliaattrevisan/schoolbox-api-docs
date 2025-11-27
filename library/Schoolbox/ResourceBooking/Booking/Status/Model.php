@@ -61,7 +61,7 @@ class Model implements JsonSerializable
      * @param  string $name
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
         return $this;
@@ -70,7 +70,7 @@ class Model implements JsonSerializable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

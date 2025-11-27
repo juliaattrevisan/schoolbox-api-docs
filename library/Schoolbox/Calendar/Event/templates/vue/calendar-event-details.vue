@@ -660,7 +660,7 @@ export default {
                 <div class="meta">
                     <ul class="action-list resource-bookings-list" v-if="this.event.resourceBookings">
                         <li class="actions-small-1" v-for="booking in this.event.resourceBookings" :key="booking.id">
-                            {{ booking.name }}
+                            {{ booking.name !== "" ? booking.name : booking.resource.name }}
                         </li>
                     </ul>
                 </div>
