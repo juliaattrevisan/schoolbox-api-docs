@@ -15,6 +15,7 @@ use Schoolbox\OpenAi\AgentChat\MessageEventType;
 use Schoolbox\OpenAi\EventStream\Listener\IListener;
 use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\LogHandler\ResponseMessage;
+use JsonException;
 use UnexpectedValueException;
 
 /**
@@ -39,28 +40,36 @@ class EventListener implements IListener
     public function modifyMessage(Message $message): ?Message
     {
         try {
-            $outputMessage = $this->handleStreamMessage($message);
+            return $this->handleStreamMessage($message);
         } catch (SchoolboxException $e) {
             /** Some error occurred during processing, send it onwards to the frontend as an ApiProblem */
             $problem = new ApiProblem($e->getMessage())->setStatus($e->getCode());
-
-            $outputMessage = new Message(
-                json_encode($problem->asArray(), JSON_THROW_ON_ERROR),
-                MessageEventType::ERROR->value,
-            );
+        } catch (JsonException $e) {
+            // JSON output exception
+            $problem = new ApiProblem($e->getMessage());
         }
-        return $outputMessage;
+
+        // This should always encode,
+        // but in case it fails just show the message
+        try {
+            $messageData = json_encode($problem->asArray(), JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            $messageData = $e->getMessage();
+        }
+        return new Message($messageData, MessageEventType::ERROR->value);
     }
 
     /**
      * Handle a new message (from the createResponseStream iterable) and fully parse it
      * into a structured format for the frontend that is independent of the AI provider
      *
+     * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
+     *
      * @param Message $rawMessage The raw message from the stream to be parsed
      * @return ?Message A new Message object corresponding to one of the AgentChatMessageEventType cases
-     * @throws SchoolboxException if an error occurs during processing, such as a refusal or incomplete response
+     * @throws SchoolboxException       if an error occurs during processing, such as a refusal or incomplete response
      * @throws UnexpectedValueException if the message data is not valid JSON or cannot be decoded
-     * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
+     * @throws JsonException            if for some reason message data failed to encode
      */
     private function handleStreamMessage(Message $rawMessage): ?Message
     {
