@@ -36,8 +36,11 @@ class LogListener implements ILogHandler
     /**
      * @inheritdoc
      */
-    public function updateLog(Log\Model $log, Message $outputMessage, Message $rawMessage): Log\Model
-    {
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+    ): Log\Model {
         // Chat completions only returns chunked output, and never returns a
         // summary.
         // Need to reconstitute output text from the chunks.
@@ -88,17 +91,6 @@ class LogListener implements ILogHandler
             $log->setOutputText($outputText);
         }
         return $log;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function handleMessage(
-        Message $outputMessage,
-        Message $rawMessage,
-        Log\Model $log,
-    ): Log\Model {
-        return $this->updateLog($log, $outputMessage, $rawMessage);
     }
 
     /**

@@ -36,8 +36,11 @@ class LogListener implements ILogHandler
     /**
      * @inheritdoc
      */
-    public function updateLog(Log\Model $log, Message $outputMessage, Message $rawMessage): Log\Model
-    {
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+    ): Log\Model {
         /**
          * on a COMPLETE or ERROR event, there's nothing more to meaningfully continue with.
          * We should stop processing now to avoid further random messages being sent to the frontend
@@ -101,17 +104,6 @@ class LogListener implements ILogHandler
             // perhaps this needs to be revised to set those states properly?
         }
         return $log;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function handleMessage(
-        Message $outputMessage,
-        Message $rawMessage,
-        Log\Model $log,
-    ): Log\Model {
-        return $this->updateLog($log, $outputMessage, $rawMessage);
     }
 
     /**
