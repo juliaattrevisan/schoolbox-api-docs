@@ -360,8 +360,6 @@ class Controller extends Base
      */
     public function viewDifferentiationProfileData(User $student): void
     {
-
-
         try {
             $profile = $this->mapper->findOneByColumn(
                 'student_id',
@@ -380,7 +378,7 @@ class Controller extends Base
         $configKey = DifferentiationProfileMapper::CONFIG_METHOD_MAPPING;
 
         $this->response = $this->responseAsJson(
-            $configs->reduce(function($carry, $config) use ($profile, $configKey) {
+            $configs->reduce(function ($carry, $config) use ($profile, $configKey) {
                 /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
                 if (array_key_exists($config->getName(), $configKey)) {
                     $method = $configKey[$config->getName()];
