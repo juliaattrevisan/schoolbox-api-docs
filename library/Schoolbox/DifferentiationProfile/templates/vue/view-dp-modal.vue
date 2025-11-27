@@ -15,7 +15,21 @@ import type { User } from "@schoolboxLibrary/types/User";
  */
 type Item = {
     terminology: string;
-    value: string | null;
+    value: string | string[] | null;
+};
+
+/**
+ * Adjustment item with array value
+ */
+type AdjustmentItem = Item & {
+    value: string[];
+};
+
+/**
+ * Text item with string value
+ */
+type TextItem = Item & {
+    value: string;
 };
 
 const props = defineProps<{
@@ -27,6 +41,8 @@ const isOpen = window.Vue.ref(false);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 const data = window.Vue.ref<Item[]>([]);
+const adjustmentData = window.Vue.ref<AdjustmentItem[]>([]);
+const textData = window.Vue.ref<TextItem[]>([]);
 
 /**
  * Load the DP
@@ -50,8 +66,9 @@ async function load(): Promise<void> {
             );
         }
         data.value = response.data || [];
-        // filter out that have a null or empty value
-        data.value = data.value.filter((item) => item.value !== null && item.value.trim() !== "");
+        data.value = data.value.filter((item) => item.value !== null); // filter out that have a null or empty value
+        adjustmentData.value = data.value.filter((item) => Array.isArray(item.value)) as AdjustmentItem[]; // adjustments are arrays
+        textData.value = data.value.filter((item) => !Array.isArray(item.value)) as TextItem[]; // leaving just text items
         toast.timeout({ text: `${locale.differentiationProfile.translate(false, true)} successfully retrieved` });
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
@@ -105,9 +122,17 @@ function onClose(): void {
                 </h2>
             </div>
             <div class="l-flex-col l-gap-s f-no-margins">
-                <div v-for="item in data" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
+                <div v-for="item in adjustmentData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
                     <h5>{{ item.terminology }}</h5>
-                    <media-article :content="item.value ?? ''" />
+                    <article>
+                        <ul>
+                            <li v-for="(value, index) in item.value" :key="index">{{ value }}</li>
+                        </ul>
+                    </article>
+                </div>
+                <div v-for="item in textData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
+                    <h5>{{ item.terminology }}</h5>
+                    <media-article :content="item.value" />
                 </div>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
