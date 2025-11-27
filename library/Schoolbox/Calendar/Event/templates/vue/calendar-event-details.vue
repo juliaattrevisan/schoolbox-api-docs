@@ -654,7 +654,18 @@ export default {
 
         <div v-if="event.resourceBookings" class="small-12 medium-8 island">
             <section class="detail content">
-                <h2>Resource Bookings</h2>
+                <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
+                    <h2>Resource Bookings</h2>
+                    <nav class="l-flex-row l-flex--align-center f-no-margins">
+                        <a
+                            class="icon-add f-no-margins"
+                            href="TODO: Add URL"
+                            aria-label="Add a resource booking"
+                            title="Add a resource booking"
+                        >
+                        </a>
+                    </nav>
+                </div>
                 <div class="meta"></div>
                 <div class="content-section">
                     <table v-if="event.resourceBookings.length > 0">
@@ -673,7 +684,7 @@ export default {
                         <i class="icon-resource-booking"></i>
                         <p>
                             No resources are booked for this event.<br />
-                            <a href="">Book a resource for this event</a>
+                            <a href="TODO: Add URL">Book a resource for this event</a>
                         </p>
                     </div>
                 </div>
