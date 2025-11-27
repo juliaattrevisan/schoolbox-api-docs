@@ -5,6 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
@@ -16,6 +17,7 @@ export default {
     components: {
         RevealModal,
         SearchSelect,
+        Toast,
     },
 
     props: ["bookingCreateUrl", "formatFormDatetime", "formatDisplayDatetime"],
@@ -120,6 +122,7 @@ export default {
             this.isProcessing = true;
             const formContent = new FormData(form);
             formContent.set("detail", window.sbProps.editors["detail"].getData());
+            this.$refs.toast.activate("Saving...");
 
             try {
                 const response = await fetch(form.action, {
@@ -130,14 +133,26 @@ export default {
                         Accept: "application/json",
                     },
                 });
+                const responseData = await response.json();
                 if (response.ok) {
+                    this.$refs.modal.close();
+                    // check if errors exist?
+                    if (responseData.errors && responseData.errors.length > 0) {
+                        this.$refs.toast.timeout(
+                            "Booking created with some issues: " + responseData.errors.join(", "),
+                            false,
+                            4000,
+                        );
+                    } else {
+                        this.$refs.toast.timeout("Created", true, 2000);
+                    }
                     // TODO: Refresh page here.
                     console.info("SUCCESS! TODO: Refresh the page.");
                 } else {
-                    // TODO: Add toast for errors.
-                    console.info("ERROR! TODO: Add toast.");
+                    this.$refs.toast.timeout("Unable to create booking. " + responseData.message, false, 3000);
                 }
             } catch (error) {
+                this.$refs.toast.timeout("Unable to create event / task. " + error.message, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
