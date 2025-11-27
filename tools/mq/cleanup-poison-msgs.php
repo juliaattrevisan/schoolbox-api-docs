@@ -50,13 +50,13 @@ $app = new class extends CliTool\App {
         }
 
         // get a list of all available redis messages o.O;
-        $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:' . INSTANCE_ID . ':m:*')));
+        $redisList = $redis->keys('msg:' . INSTANCE_ID . ':m:*');
 
         $this->getLogger()->info("Checking redis data...");
         $acks = 0;
 
         foreach ($redisList as $key) {
-            $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
+            $compressed = $redis->get($key);
             $uncompress = gzuncompress($compressed);
             $msg        = unserialize($uncompress, ['allowed_classes' => Instance::ALLOWED_UNSERIALIZE_CLASSES]);
             try {
@@ -72,7 +72,7 @@ $app = new class extends CliTool\App {
                 );
                 $this->getLogger()->info('Cleaning up poison message');
                 if ($this->perform()) {
-                    $redis->executeCommand($redis->createCommand('del', [$key]));
+                    $redis->del($key);
                 }
             }
         }
