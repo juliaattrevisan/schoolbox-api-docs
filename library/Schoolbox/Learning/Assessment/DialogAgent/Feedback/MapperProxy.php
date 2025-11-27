@@ -113,7 +113,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setReviewee($dataModel->getResponse()->getLearner())
                 /* TODO Who owns this?
                  */
-                ->setReviewer($dataModel->getResponse()->getLearner())
+                ->setReviewer(null)
                 ->setCreatedAt($dataModel->getCreatedAt())
                 ->setUpdatedAt($dataModel->getUpdatedAt())
                 ->setDeletedAt($dataModel->getDeletedAt());
