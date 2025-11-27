@@ -665,7 +665,6 @@ export default {
                     <nav class="l-flex-row l-flex--align-center f-no-margins">
                         <a
                             class="icon-add f-no-margins"
-                            href="TODO: Add URL"
                             @click.prevent="showResourceBookingModal()"
                             aria-label="Add a resource booking"
                             title="Add a resource booking"
@@ -691,7 +690,7 @@ export default {
                         <i class="icon-resource-booking"></i>
                         <p>
                             No resources are booked for this event.<br />
-                            <a href="TODO: Add URL">Book a resource for this event</a>
+                            <a @click.prevent="showResourceBookingModal()">Book a resource for this event</a>
                         </p>
                     </div>
                 </div>
