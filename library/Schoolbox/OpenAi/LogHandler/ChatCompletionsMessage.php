@@ -12,7 +12,6 @@ namespace Schoolbox\OpenAi\LogHandler;
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
-use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 
 /**
  * Handle messages from OpenAI's Chat Completions API:

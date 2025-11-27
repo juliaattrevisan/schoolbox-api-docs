@@ -11,10 +11,10 @@ namespace Schoolbox\OpenAi\LogHandler;
 
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
-use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 
 /**
- * Interface for log handlers for events from OpenAI.
+ * Listener for updating an OpenAI log object, based on the content of the
+ * message stream.
  */
 interface ILogHandler
 {

@@ -11,7 +11,6 @@ namespace Schoolbox\OpenAi\LogHandler;
 
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
-use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 
 /**
  * Composite log handler: applies all of its handlers to the log sequentially.
