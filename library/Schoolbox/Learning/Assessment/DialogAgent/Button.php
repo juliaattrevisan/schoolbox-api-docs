@@ -64,7 +64,7 @@ class Button
      * @return array|null
      * @throws RouteNotFound
      */
-    public function generate(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): ?array
+    public function generate(Model $assessment, ?Participant $participant, User $viewer): ?array
     {
         /* First check if you can author something (either by creating a new response or resuming an existing response)
          */
@@ -130,7 +130,7 @@ class Button
      * @return array|null
      * @throws RouteNotFound
      */
-    private function findCreateResponseButton(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): ?array
+    private function findCreateResponseButton(Model $assessment, ?Participant $participant, User $viewer): ?array
     {
         if (null === $participant) {
             return null;
@@ -192,7 +192,7 @@ class Button
      * @return array|null
      * @throws RouteNotFound
      */
-    private function findViewResponseButton(Model $assessment, ?Participant $participant, \Schoolbox\User $viewer): ?array
+    private function findViewResponseButton(Model $assessment, ?Participant $participant, User $viewer): ?array
     {
         if (null === $participant) {
             return null;
