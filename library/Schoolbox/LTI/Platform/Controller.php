@@ -82,7 +82,12 @@ class Controller extends Base
                 $this->toolMapper,
             )->build($this->request);
         } catch (LtiExceptionInterface $e) {
-            $this->logger->error('getOidcAuthenticationRequest error: ' . $e->getMessage());
+            $this->logger->error(
+                __METHOD__ . ': error',
+                [
+                    'message' => $e->getMessage(),
+                ],
+            );
             throw $e;
         }
 
@@ -142,7 +147,12 @@ class Controller extends Base
                 KeyChainRepositoryFactory::PLATFORM_KEYCHAIN_IDENTIFIER,
             );
         } catch (OAuthServerException $e) {
-            $this->logger->error('getOauthAccessTokenRequest error: ' . $e->getMessage());
+            $this->logger->error(
+                __METHOD__ . ': error',
+                [
+                    'message' => $e->getMessage(),
+                ],
+            );
             throw $e;
         }
     }
@@ -190,7 +200,12 @@ class Controller extends Base
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/message/tool-originating-messages/#2-platform-side-launch-validation
         $result = new ToolOriginatingLaunchFactory($this->registrations)->build($this->request);
         if ($result->hasError()) {
-            $this->logger->error('getReceiveDeepLinkingResponse result error: ' . $result->getError());
+            $this->logger->error(
+                __METHOD__ . ': result error',
+                [
+                    'message' => $result->getError(),
+                ],
+            );
             throw new LtiException($result->getError());
         }
 
@@ -200,7 +215,12 @@ class Controller extends Base
         try {
             $resourceLinks = new ResourceCollectionFactory()->createFromClaim($contentItems)->normalize();
         } catch (LtiExceptionInterface $e) {
-            $this->logger->error('getReceiveDeepLinkingResponse resource links error: ' . $e->getMessage());
+            $this->logger->error(
+                __METHOD__ . ': result error',
+                [
+                    'message' => $result->getError(),
+                ],
+            );
             throw $e;
         }
 
