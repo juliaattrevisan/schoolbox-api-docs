@@ -1,11 +1,11 @@
 /**
- * Webpack configuration for development, primarily used to provide unminified
+ * Rspack configuration for development, primarily used to provide unminified
  * versions of vendor files for easier debugging in the browser as well as
  * provide the Vue dev tools browser extension proper access to our Vue apps.
  */
 
 const { merge } = require("webpack-merge");
-const common = require("./webpack.common.js");
+const common = require("./rspack.common.js");
 const { VueLoaderPlugin } = require("vue-loader"); // https://www.npmjs.com/package/vue-loader
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts"); // https://www.npmjs.com/package/webpack-remove-empty-scripts
 const MergeIntoSingleFilePlugin = require("webpack-merge-and-include-globally"); // https://www.npmjs.com/package/webpack-merge-and-include-globally
@@ -17,7 +17,7 @@ module.exports = merge(common, {
         new VueLoaderPlugin(), // to handle .vue files
         new RemoveEmptyScriptsPlugin(), // to remove .js files that are empty after exporting css
         new MergeIntoSingleFilePlugin({
-            // to merge all vendor files into a single file
+            // to merge all vendor files into a single file, also preventing rspack from encapsulating any exposed global variables
             files: {
                 "vendors.js": [
                     // Vue
