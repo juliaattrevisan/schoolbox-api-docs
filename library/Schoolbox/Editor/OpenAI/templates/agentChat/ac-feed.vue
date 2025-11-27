@@ -11,8 +11,19 @@ interface Props {
     errorPrefix?: string;
     /** Whether the user can select this response */
     allowSelection?: boolean;
+    /** Should the feed be initially scrolled to the bottom? */
+    initiallyScrolled?: boolean;
 }
 const props = defineProps<Props>();
+
+const feedAnchorEl = window.Vue.useTemplateRef<HTMLDivElement>("feedAnchorRef");
+
+window.Vue.onMounted(() => {
+    const anchorEl = feedAnchorEl.value;
+    if (props.initiallyScrolled && anchorEl) {
+        setTimeout(() => anchorEl.scrollIntoView(), 0);
+    }
+});
 </script>
 
 <template>
@@ -33,7 +44,7 @@ const props = defineProps<Props>();
                 />
             </template>
 
-            <div class="ac-feed-anchor"></div>
+            <div ref="feedAnchorRef" class="ac-feed-anchor"></div>
         </div>
     </div>
 </template>
