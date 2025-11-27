@@ -225,7 +225,10 @@ class Model extends AbstractAssessment
         foreach ($participant->getAllFeedbacks() as $feedback) {
             /* Returns the feedback directly attributed to an authoritative response
              */
-            if ($feedback->getResponse()->getAuthoritative()) {
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
+            $response = $feedback->getResponse();
+
+            if ($response->getAuthoritative()) {
                 return $feedback;
             }
         }
