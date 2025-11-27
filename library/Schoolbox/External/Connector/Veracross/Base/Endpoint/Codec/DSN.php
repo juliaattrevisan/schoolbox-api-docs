@@ -38,6 +38,24 @@ class DSN implements IDSN
 
 
     /**
+     * This character separates module configuration tuples from each other
+     */
+    private const MODULE_TUPLE_SEPARATOR = ';';
+
+
+    /**
+     * This character separates module-related tuples from option tuples
+     */
+    private const OPTION_SEPARATOR = '?';
+
+
+    /**
+     * Optional params we permitted in SUDS Config
+     */
+    private const OPTION_FORMAT = '/([^;]+)=([^;]*)/';
+
+
+    /**
      * The expected key-value tuples
      */
     private const EXPECTED_TUPLE = ['schoolroute', 'clientid', 'clientsecret', 'portalaccessname', 'region'];
@@ -52,8 +70,22 @@ class DSN implements IDSN
      */
     public function decode(#[SensitiveParameter] string $dsn): array
     {
+        $bits = explode(self::OPTION_SEPARATOR, $dsn);
+
+        $credentials = $bits[0];
+        $options = $bits[1] ?? null;
+
+        $struct = [
+            'schoolroute' => null,
+            'clientid' => null,
+            'clientsecret' => null,
+            'portalaccessname' => null,
+            'region' => null,
+            'options' => []
+        ];
+
         $matches = [];
-        preg_match(self::DSN_FORMAT, $dsn, $matches);
+        preg_match(self::DSN_FORMAT, $credentials, $matches);
 
         /* Check the dsn format matches correctly
          */
@@ -69,26 +101,75 @@ class DSN implements IDSN
             throw new DomainException('Veracross API DSN: could not decode; missing some credentials.');
         }
 
-        return [
-            'schoolroute' => $matches[1],
-            'clientid' => $matches[2],
-            'clientsecret' => $matches[3],
-            'portalaccessname' => $matches[4],
-            'region' => $matches[5]
-        ];
+        /* Pile into struct
+         */
+        $struct['schoolroute'] = $matches[1];
+        $struct['clientid'] = $matches[2];
+        $struct['clientsecret'] = $matches[3];
+        $struct['portalaccessname'] = $matches[4];
+        $struct['region'] = $matches[5];
+
+        /* Break apart optional config
+         */
+        if (null !== $options) {
+            /* No tuples, but you gave an option separator; malformed DSN
+             * Looks like there were supposed to be options, but none exist
+             */
+            if ('' === $options) {
+                throw new DomainException('Detected option separator but no options found');
+            }
+
+            $dsnParts = explode(self::MODULE_TUPLE_SEPARATOR, $options);
+
+            foreach ($dsnParts as $dsnPart) {
+                $matches = [];
+                preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
+
+                /* Not sure if this can actually happen, but as a precautionary measure, only try to inspect
+                 * $matches if it contains something. It's not likely we'd have a count of options that fails to
+                 * match the OPTION_FORMAT due to the strictness of dsn construction outside of here...but anyway
+                 */
+                if (!empty($matches)) {
+                    $struct['options'][$matches[1]] = $matches[2];
+                }
+            }
+        }
+
+        return $struct;
     }
 
 
     /**
      * Encode a dsn string
      *
-     * $parts consists of (school route, client id, client secret) tuples
+     * $parts consists of (school route, client id, client secret, portalaccessname, region) tuples
      *
      * @param array $parts
      * @return string
      */
     public function encode(#[SensitiveParameter] array $parts): string
     {
-        return "schoolroute={$parts['schoolroute']};clientid={$parts['clientid']};clientsecret={$parts['clientsecret']};portalaccessname={$parts['portalaccessname']};region={$parts['region']}";
+        $credentialsEncoding = "schoolroute={$parts['schoolroute']};clientid={$parts['clientid']};clientsecret={$parts['clientsecret']};portalaccessname={$parts['portalaccessname']};region={$parts['region']}";
+
+        /* Encode option pieces
+         */
+        $options = [];
+
+        foreach ($parts['options'] ?? [] as $key => $value) {
+            $options[] = "{$key}={$value}";
+        }
+
+        $optionEncoding = implode(self::MODULE_TUPLE_SEPARATOR, $options);
+
+        if (\count($options)) {
+            return sprintf(
+                '%s%s%s',
+                $credentialsEncoding,
+                self::OPTION_SEPARATOR,
+                $optionEncoding
+            );
+        }
+
+        return $credentialsEncoding;
     }
 }

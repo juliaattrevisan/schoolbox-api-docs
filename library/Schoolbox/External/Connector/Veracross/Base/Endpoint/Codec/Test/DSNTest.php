@@ -39,6 +39,20 @@ class DSNTest extends TestCase
                     'clientsecret' => 'j258AjDJ489G78j45nhfy1z0v8',
                     'portalaccessname' => 'facultythingy',
                     'region' => 'Australia',
+                    'options' => []
+                ]
+            ],
+            'Valid DSN 2' => [
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia?futurefamilies=1',
+                [
+                    'schoolroute' => 'api-aaabbbccc',
+                    'clientid' => 'klo25j98ASjFgVh25j0g9gs87',
+                    'clientsecret' => 'j258AjDJ489G78j45nhfy1z0v8',
+                    'portalaccessname' => 'facultythingy',
+                    'region' => 'Australia',
+                    'options' => [
+                        'futurefamilies' => 1
+                    ]
                 ]
             ],
         ];
@@ -72,6 +86,10 @@ class DSNTest extends TestCase
             'Valid DSN Re-encode 1' => [
                 'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia',
                 'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia',
+            ],
+            'Valid DSN Re-encode 2' => [
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia?futurefamilies=1',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy;region=Australia?futurefamilies=1',
             ],
         ];
     }
