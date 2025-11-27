@@ -1,9 +1,11 @@
 <script lang="ts" setup>
+import { useEventBus } from "@vueuse/core";
 import AcFeedAlert from "./ac-feed-alert.vue";
 import AcFeedRequest from "./ac-feed-request.vue";
 import AcFeedResponse from "./ac-feed-response.vue";
 import { AgentChatMessageType } from "./agentChatTypes";
 import type { AgentChatFeedMessage } from "./agentChatTypes";
+import { acPromptEventKey } from "./agentChatSymbols";
 
 interface Props {
     feed: AgentChatFeedMessage[];
@@ -15,19 +17,36 @@ interface Props {
     initiallyScrolled?: boolean;
 }
 const props = defineProps<Props>();
+const acPromptEventBus = useEventBus(acPromptEventKey);
 
-const feedAnchorEl = window.Vue.useTemplateRef<HTMLDivElement>("feedAnchorRef");
+const feedEl = window.Vue.useTemplateRef<HTMLDivElement>("feedRef");
+
+/**
+ * Scroll the anchor into view so that the feed is scrolled and fixed to the bottom
+ * @param behavior - How the scroll should behave
+ */
+function scrollFeedToBottom(behavior: ScrollBehavior): void {
+    const feed = feedEl.value;
+    if (feed) {
+        setTimeout(() => feed.scrollTo({ top: feed.scrollHeight, behavior }), 100);
+    }
+}
 
 window.Vue.onMounted(() => {
-    const anchorEl = feedAnchorEl.value;
-    if (props.initiallyScrolled && anchorEl) {
-        setTimeout(() => anchorEl.scrollIntoView(), 0);
+    if (props.initiallyScrolled) {
+        scrollFeedToBottom("instant");
+    }
+});
+
+acPromptEventBus.on(({ scrollFeed }) => {
+    if (scrollFeed) {
+        scrollFeedToBottom("smooth");
     }
 });
 </script>
 
 <template>
-    <div class="ac-feed">
+    <div ref="feedRef" class="ac-feed">
         <slot name="header"></slot>
 
         <div class="l-pad-s ac-feed-list">
@@ -44,7 +63,7 @@ window.Vue.onMounted(() => {
                 />
             </template>
 
-            <div ref="feedAnchorRef" class="ac-feed-anchor"></div>
+            <div class="ac-feed-anchor"></div>
         </div>
     </div>
 </template>
