@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent\CkEditorTextChat;
 
 use Html2Text\Html2Text;
-use Schoolbox\Editor\OpenAI\Log\Model;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\ILogHandler;
 use Schoolbox\OpenAi\LogHandler\Listener\IListener;
 use UnexpectedValueException;
 
@@ -21,7 +22,7 @@ use UnexpectedValueException;
  * If a received message is a finished response, then extract the output text
  * out of it and add it to the log.
  */
-class LogListener implements IListener
+class LogListener implements IListener, ILogHandler
 {
     /**
      * Constructor
@@ -36,7 +37,7 @@ class LogListener implements IListener
     /**
      * @inheritdoc
      */
-    public function updateLog(Model $log, Message $outputMessage, Message $rawMessage): Model
+    public function updateLog(Log\Model $log, Message $outputMessage, Message $rawMessage): Log\Model
     {
         // Chat completions only returns chunked output, and never returns a
         // summary.
@@ -87,6 +88,27 @@ class LogListener implements IListener
                 : null;
             $log->setOutputText($outputText);
         }
+        return $log;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+        ?IListener $logListener,
+    ): Log\Model {
+        return $this->updateLog($log, $outputMessage, $rawMessage);
+    }
+
+    /**
+     * The text chat agent doesn't make non-streaming requests, so just return
+     * the log as is.
+     */
+    public function handleResponse(array $responseData, Log\Model $log): Log\Model
+    {
         return $log;
     }
 }
