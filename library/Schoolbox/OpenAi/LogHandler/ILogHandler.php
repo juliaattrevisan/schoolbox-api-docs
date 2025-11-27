@@ -32,7 +32,6 @@ interface ILogHandler
      *                                       contain a structure similar to the one handled by `handleResponse`.
      * @param Message        $rawMessage     The raw message from OpenAI.
      * @param Log\Model      $log            The log object to update.
-     * @param callable|null  $streamListener A function to call for each event in the stream, as it is received.
      * @param IListener|null $logListener    A listener to call with `$outputMessage` and `$rawMessage`, for updating
      *                                       the log.
      * @return Log\Model The updated log object.
@@ -41,7 +40,6 @@ interface ILogHandler
         Message $outputMessage,
         Message $rawMessage,
         Log\Model $log,
-        ?callable $streamListener,
         ?IListener $logListener,
     ): Log\Model;
 

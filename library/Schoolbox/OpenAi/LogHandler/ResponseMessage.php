@@ -42,7 +42,6 @@ class ResponseMessage implements ILogHandler
         Message $outputMessage,
         Message $rawMessage,
         Log\Model $log,
-        ?callable $streamListener,
         ?IListener $logListener,
     ): Log\Model {
         // Prepare the message for logging
@@ -63,9 +62,6 @@ class ResponseMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $rawMessage->__toString());
-        if (is_callable($streamListener)) {
-            $streamListener($outputMessage, $log);
-        }
         if ($logListener) {
             $log = $logListener->updateLog($log, $outputMessage, $rawMessage);
         }

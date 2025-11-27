@@ -27,7 +27,6 @@ class ChatCompletionsMessage implements ILogHandler
         Message $outputMessage,
         Message $rawMessage,
         Log\Model $log,
-        ?callable $streamListener,
         ?IListener $logListener,
     ): Log\Model {
         // Chat completions messages don't have an event type:
@@ -49,9 +48,6 @@ class ChatCompletionsMessage implements ILogHandler
 
         // This chunk gets added to the log
         $log->setResponse(($log->getResponse() ?? '') . $outputMessage->__toString());
-        if (is_callable($streamListener)) {
-            $streamListener($outputMessage, $log);
-        }
         if ($logListener) {
             $log = $logListener->updateLog($log, $outputMessage, $rawMessage);
         }

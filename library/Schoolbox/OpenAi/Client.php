@@ -400,7 +400,6 @@ class Client implements IClient
                         clone $outputMessage,
                         clone $message,
                         $log,
-                        null,
                         $logListener,
                     );
                 } finally {
