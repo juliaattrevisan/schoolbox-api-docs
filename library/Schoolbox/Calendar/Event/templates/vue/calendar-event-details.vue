@@ -655,14 +655,21 @@ export default {
         <div class="small-12 medium-8 island">
             <section class="detail content">
                 <div class="title-section">
-                    <h1>Resource Bookings</h1>
+                    <h2>Resource Bookings</h2>
                 </div>
-                <div class="meta">
-                    <ul class="action-list resource-bookings-list" v-if="this.event.resourceBookings">
-                        <li class="actions-small-1" v-for="booking in this.event.resourceBookings" :key="booking.id">
-                            {{ booking.name !== "" ? booking.name : booking.resource.name }}
-                        </li>
-                    </ul>
+                <div class="content-section">
+                    <table v-if="this.event.resourceBookings">
+                        <tbody>
+                            <tr v-for="booking in this.event.resourceBookings" :key="booking.id">
+                                <td>{{ booking.name !== "" ? booking.name : booking.resource.name }}</td>
+                                <td>
+                                    <span :class="booking.status.name.toLowerCase() + ' label'">{{
+                                        booking.status.name
+                                    }}</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
         </div>
