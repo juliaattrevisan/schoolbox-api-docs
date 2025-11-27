@@ -202,7 +202,7 @@ export default {
             <h2>Add Resource Booking</h2>
             <section>
                 <label class="required" for="addBookingPurpose">Purpose</label>
-                <input id="addBookinPurpose" name="name" maxlength="255" type="text" v-model.trim="booking.name" />
+                <input id="addBookingPurpose" name="name" maxlength="255" type="text" v-model.trim="booking.name" />
                 <search-select
                     class="l-pad-m--bottom"
                     v-model:selected="resources"
