@@ -581,6 +581,7 @@ class Controller extends Base
              */
             $feedbackFields = array_fill_keys($feedbackFieldsTemplate, null);
 
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Model|null $authoritativeFeedback */
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
             if ($authoritativeFeedback) {
