@@ -63,12 +63,18 @@ function addDefaultConfig(config: PartialSbxEditorConfig): SbxEditorConfig {
  * @param config - the config to use when creating the editor
  */
 async function create(sourceElement: SbxEditorElement, config: SbxEditorConfig): Promise<void> {
-    const editorClassMap = {
-        [EditorType.CLASSIC]: ClassicEditor,
-        [EditorType.INLINE]: InlineEditor,
-    };
-
-    const editor = await editorClassMap[config.type].create(sourceElement, getConfig(config));
+    let EditorClass: typeof ClassicEditor | typeof InlineEditor;
+    switch (config.type) {
+        case EditorType.CLASSIC:
+            EditorClass = ClassicEditor;
+            break;
+        case EditorType.INLINE:
+            EditorClass = InlineEditor;
+            break;
+        default:
+            throw new Error(`Unsupported editor type: ${config.type}`);
+    }
+    const editor = await EditorClass.create(sourceElement, getConfig(config));
     onCreated(sourceElement, editor, config);
 }
 
