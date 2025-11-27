@@ -16,6 +16,10 @@ const headerStore = useHeaderStore();
 const genAiStore = useGenAiStore();
 const saveStore = useSaveStore();
 const selectedOptions = window.Vue.ref<Partial<Record<ProfileTextKeys, AiResponseItem | null>>>({});
+const hasSelectedOptions = window.Vue.computed(() => {
+    // don't show confirm button unless something selected
+    return Object.values(selectedOptions.value).some((item) => item !== null);
+});
 
 /**
  * Watch for changes to aiResponse and auto-select all options when it's regenerated
@@ -103,7 +107,7 @@ function onConfirmSelected(): void {
                     Cancel
                 </button>
                 <button
-                    v-if="!genAiStore.isProcessing && genAiStore.aiResponse"
+                    v-if="!genAiStore.isProcessing && genAiStore.aiResponse && hasSelectedOptions"
                     class="button submit l-flex__item--1"
                     type="button"
                     data-test="up-delete-unit-delete"
