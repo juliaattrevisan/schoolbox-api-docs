@@ -517,33 +517,56 @@ class Controller extends Base
             $sortBy = $this->requestQuery->get('sortBy');
             $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
 
-            $factory = (new Factory(
-                $this->userTranslator,
-                $this->userMapper,
-                $this->pastoralMapper,
-                $this->pastoralTranslator,
-                $resultType,
-                $sortBy,
-                $order,
-                $limit
-            ))->produce(
-                new Helper(
-                    $this->prepareReportData($report),
+            $reportData = $this->prepareReportData($report);
+            /* Return empty response if no report data
+             */
+            if (empty($reportData)) {
+                $this->response = $this->responseAsJson(
+                    [
+                        'data' => [
+                            'tableHeaders' => [],
+                            'results'      => [],
+                        ],
+                        'metadata' => [
+                            'count'  => 0,
+                            'cursor' => [
+                                'current' => null,
+                                'next'    => null
+                            ]
+                        ]
+                    ],
+                    true
+                );
+                return;
+            } else {
+                $factory = (new Factory(
+                    $this->userTranslator,
+                    $this->userMapper,
                     $this->pastoralMapper,
-                    $this->getConfigLoader(),
-                    $this->getUser(),
-                    $this->accessLevelCensor
-                ),
-                $tabType
-            );
+                    $this->pastoralTranslator,
+                    $resultType,
+                    $sortBy,
+                    $order,
+                    $limit
+                ))->produce(
+                    new Helper(
+                        $reportData,
+                        $this->pastoralMapper,
+                        $this->getConfigLoader(),
+                        $this->getUser(),
+                        $this->accessLevelCensor
+                    ),
+                    $tabType
+                );
 
-            if (null === $factory) {
-                throw new MapperException("Invalid type: $tabType has been given.");
+                if (null === $factory) {
+                    throw new MapperException("Invalid type: $tabType has been given.");
+                }
+
+                $records        = $factory->retrieveResults($encodedCursor);
+                $records        = $factory->process($records, $encodedCursor);
+                $this->response = $this->responseAsJson($records, true);
             }
-
-            $records        = $factory->retrieveResults($encodedCursor);
-            $records        = $factory->process($records, $encodedCursor);
-            $this->response = $this->responseAsJson($records, true);
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
@@ -671,33 +694,39 @@ class Controller extends Base
         try {
             $resultType = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
 
-            $factory = (new Factory(
-                $this->userTranslator,
-                $this->userMapper,
-                $this->pastoralMapper,
-                $this->pastoralTranslator,
-                $resultType,
-                null,
-                null,
-                null
-            ))->produce(
-                new Helper(
-                    $this->prepareReportData($report),
+            $reportData = $this->prepareReportData($report);
+            if (empty($reportData)) {
+                $records = new Collection();
+                $this->exportResultTableToCSV($report, $records, $tabType, $resultType, []);
+            } else {
+                $factory = (new Factory(
+                    $this->userTranslator,
+                    $this->userMapper,
                     $this->pastoralMapper,
-                    $this->getConfigLoader(),
-                    $this->getUser(),
-                    $this->accessLevelCensor
-                ),
-                $tabType
-            );
+                    $this->pastoralTranslator,
+                    $resultType,
+                    null,
+                    null,
+                    null
+                ))->produce(
+                    new Helper(
+                        $reportData,
+                        $this->pastoralMapper,
+                        $this->getConfigLoader(),
+                        $this->getUser(),
+                        $this->accessLevelCensor
+                    ),
+                    $tabType
+                );
 
-            if (null === $factory) {
-                throw new MapperException("Invalid type: $tabType has been given.");
+                if (null === $factory) {
+                    throw new MapperException("Invalid type: $tabType has been given.");
+                }
+
+                $totalRow = new Collection([$factory->getTotalCountRow()]);
+                $records  = $totalRow->merge($factory->retrieveResults(null));
+                $this->exportResultTableToCSV($report, $records, $tabType, $resultType, $factory->getCSVHeaders());
             }
-
-            $totalRow = new Collection([$factory->getTotalCountRow()]);
-            $records = $totalRow->merge($factory->retrieveResults(null));
-            $this->exportResultTableToCSV($report, $records, $tabType, $resultType, $factory->getCSVHeaders());
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
