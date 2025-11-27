@@ -654,9 +654,8 @@ export default {
 
         <div v-if="event.resourceBookings" class="small-12 medium-8 island">
             <section class="detail content">
-                <div class="title-section">
-                    <h2>Resource Bookings</h2>
-                </div>
+                <h2>Resource Bookings</h2>
+                <div class="meta"></div>
                 <div class="content-section">
                     <table v-if="event.resourceBookings.length > 0">
                         <tbody>
