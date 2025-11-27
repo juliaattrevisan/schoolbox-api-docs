@@ -106,19 +106,79 @@
                                                         </p>
                                                     </div>
                                                 </div>
+                                                {# clash approved booking, details #}
+                                                {% if booking.clash %}
+                                                <div class="small-12">
+                                                    <div class="warning">
+                                                        {# time, and only time (start - end) #}
+                                                        Clashes with  <time datetime="{{ booking.clash.booking.event.startDateTime.getDatabase() }}">{{ booking.clash.booking.event.startDateTime.getTimeOnly() }}</time>{% if booking.clash.booking.event.startDateTime.getShort() != booking.clash.booking.event.endDateTime.getShort() %} - <time datetime="{{ booking.clash.booking.event.endDateTime.getDatabase() }}">{{ booking.clash.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
+                                                    </div>
+                                                    <div class="small-12 tiny card">
+                                                        {# small portrait of booker #}
+                                                        <a href="/search/user/{{ booking.clash.booking.event.owner.id }}">
+                                                            {% include 'include/portrait.twig' with {user: booking.clash.booking.event.owner} only %}
+                                                        </a>
+
+                                                        {# meta to show on the side of the portrait #}
+                                                        <p class="meta">
+                                                            Requested by
+                                                            <a href="/search/user/{{ booking.clash.booking.event.owner.id }}">{{ booking.clash.booking.event.owner.formatName }}</a>
+                                                            on <time datetime="{{ booking.clash.booking.createdAt.database }}">{{ booking.clash.booking.createdAt.short }}</time>
+                                                            {% if booking.clash.booking.event.owner.id != booking.clash.booking.event.author.id %}
+                                                                by
+                                                                <a href="/search/user/{{ booking.clash.booking.event.owner.id }}">{{ booking.clash.booking.event.owner.formatName }}</a>
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
                                             </div>
 
                                             {# tot #}
                                             <nav>
                                                 <sbx-pop-out content-id="resourceManagement-status-{{ event.booking.id }}"></sbx-pop-out>
                                             </nav>
+                                            {% if booking.clash %} {# special clash tot options, special options, for modifying / approving each the original (approved) and the pending booking #}
+                                                {#
+                                                 # Modify approved booking
+                                                 # Modify clash booking
+                                                 # Approve clash booking / Reject original booking
+                                                 # Reject clash booking
+                                                 #}
                                             <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
                                                 <li>
                                                     <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
                                                        class="icon-modify">Modify Booking</a>
                                                 </li>
                                                 <li class="separator">Set Status</li>
-                                                {% if event.booking.status.ispending %}
+
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                       data-set-status="approved"
+                                                       class="icon-approve">Approved</a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
+                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                       data-set-status="pending"
+                                                       class="icon-undo">Pending</a>
+                                                </li>
+                                                <li>
+                                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                                       data-series-id="{{ event.booking.event.seriesId }}"
+                                                       data-set-status="rejected"
+                                                       class="icon-close">Rejected</a>
+                                                </li>
+                                            </ul>
+                                            {% else %} {# standard pending booking tot options #}
+                                                <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
+                                                           class="icon-modify">Modify Booking</a>
+                                                    </li>
+                                                    <li class="separator">Set Status</li>
+
                                                     <li>
                                                         <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
                                                            data-series-id="{{ event.booking.event.seriesId }}"
@@ -131,15 +191,14 @@
                                                            data-set-status="pending"
                                                            class="icon-undo">Pending</a>
                                                     </li>
-                                                {% endif %}
-                                                <li>
-                                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                                       data-series-id="{{ event.booking.event.seriesId }}"
-                                                       data-set-status="rejected"
-                                                       class="icon-close">Rejected</a>
-                                                </li>
-                                            </ul>
-
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+                                                           data-series-id="{{ event.booking.event.seriesId }}"
+                                                           data-set-status="rejected"
+                                                           class="icon-close">Rejected</a>
+                                                    </li>
+                                                </ul>
+                                            {% endif %}
                                         </li>
                                     {% endfor %}
                                     </ul>
