@@ -1267,11 +1267,13 @@ class Controller extends Base
      * Handle approval of a booking that clashes with an existing booking.
      * cancel the old booking (approved) and approve the new booking. (pending)
      * @param Model $oldBooking
-     * @param Model $newBooking
+     * @param Model $item // item so we can do perm checks on this booking (they should be both the same resource, so if you have access to one, you have access to the other)
      * @return void
      * @throws Exception
+     * @api GET /resource-booking/booking/{old}/{new}/clashApprove
+     * @since 26.0
      */
-    public function clashApprove(Model $oldBooking, Model $newBooking)
+    public function clashApprove(Model $oldBooking, Model $item)
     {
         // ensure these are a valid clash situation
         //     * Determine if this event clashes with another event
@@ -1281,13 +1283,13 @@ class Controller extends Base
         //     * if both are resource bookings, only care if one is pending
         //     * if both are resource bookings, skip if both pending or same booking id
         if (
-            $oldBooking->getId() === $newBooking->getId()
-            || $oldBooking->getResource()->getId() !== $newBooking->getResource()->getId()
+            $oldBooking->getId() === $item->getId()
+            || $oldBooking->getResource()->getId() !== $item->getResource()->getId()
             || $oldBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED
-            || $newBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED
+            || $item->getStatus()->getId() === Status\Model::STATUS_REJECTED
             || (
                 $oldBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
-                && $newBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
+                && $item->getStatus()->getId() === Status\Model::STATUS_APPROVED
             )
         ) {
             throw new Exception("Unable to approve clash booking, bookings are not clashing...");
@@ -1297,7 +1299,7 @@ class Controller extends Base
         $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
 
         // approve the new booking
-        $errorsNew = $this->changeStatus($newBooking, Status\Model::STATUS_APPROVED);
+        $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($newBooking, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
     }
 }

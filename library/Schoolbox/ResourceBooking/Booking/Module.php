@@ -92,7 +92,7 @@ class Module extends BaseModule
                 try {
                     return [
                         'oldBooking' => $this->getMapper()->findById($params['old']),
-                        'newBooking' => $this->getMapper()->findById($params['new'])
+                        'item' => $this->getMapper()->findById($params['new'])
                     ];
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     throw new NotFound();
@@ -136,7 +136,7 @@ class Module extends BaseModule
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
-            ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending'], $manageBookingRule)
+            ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending', 'clashApprove'], $manageBookingRule)
             ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule);
     }
 
