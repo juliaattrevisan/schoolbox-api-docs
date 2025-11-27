@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useMousePressed } from "@vueuse/core";
 import { getRfc3339String } from "@js/util/dateUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
@@ -115,10 +116,20 @@ const maxFeedHeight = window.Vue.ref("50vh");
 const feedRef = window.Vue.ref<InstanceType<typeof AcFeed> | null>(null);
 const feedEl = window.Vue.computed(() => feedRef.value?.feedEl as HTMLElement | null);
 
+const { pressed: mousePressed } = useMousePressed();
+
 /**
  * Update the max feed height on mount and on resize
  */
 function updateFeedHeight(): void {
+    /**
+     * Ignore if the mouse is currently held down
+     * It's possible that they are resizing the textarea, which would cause some janky behaviour otherwise
+     */
+    if (mousePressed.value) {
+        return;
+    }
+
     const footer = document.querySelector("#footer");
     const content = document.querySelector("#content");
     const container = document.querySelector("#container");
@@ -138,6 +149,14 @@ function updateFeedHeight(): void {
     maxFeedHeight.value = `${window.innerHeight - totalUsedHeight}px`;
 }
 
+/**
+ * When the mouse is released, update the feed height (in case they were resizing the textarea)
+ * slight delay to ensure things are stable first
+ */
+function onMouseUp(): void {
+    setTimeout(updateFeedHeight, 10);
+}
+
 const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
 
 window.Vue.onMounted(() => {
@@ -148,13 +167,13 @@ window.Vue.onMounted(() => {
 
     // Initialize the ResizeObserver
     resizeObserver.value = new ResizeObserver(updateFeedHeight);
-    resizeObserver.value.observe(feedEl.value);
     resizeObserver.value.observe(feedEl.value.parentElement!);
     resizeObserver.value.observe(document.querySelector("#container")!);
 
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     updateFeedHeight();
     window.addEventListener("DOMContentLoaded", updateFeedHeight, { once: true });
+    document.addEventListener("mouseup", onMouseUp);
 });
 
 window.Vue.onUnmounted(() => {
@@ -162,6 +181,8 @@ window.Vue.onUnmounted(() => {
     if (resizeObserver.value) {
         resizeObserver.value.disconnect();
     }
+    window.removeEventListener("DOMContentLoaded", updateFeedHeight);
+    document.removeEventListener("mouseup", onMouseUp);
 });
 </script>
 
