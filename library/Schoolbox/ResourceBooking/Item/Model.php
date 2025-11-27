@@ -268,7 +268,7 @@ class Model implements ISoftDeletable, JsonSerializable
      *
      * @return $this
      */
-    public function setName(string $name)
+    public function setName($name)
     {
         $this->name = $name;
         return $this;
@@ -277,7 +277,7 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
