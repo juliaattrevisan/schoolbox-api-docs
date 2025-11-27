@@ -138,13 +138,20 @@ class Helper
     {
         $result = [];
 
-        $resourceBookings = $this->resourceBookingMapper->findByColumn('event_id', $event->getId());
-
+        $resourceBookings = $this->resourceBookingMapper->findByEventId($event->getId());
         /** @var ResourceBookingModel $resourceBooking */
         foreach ($resourceBookings as $resourceBooking) {
             $result[] = [
-                'name' => $resourceBooking->getName(),
                 'id'   => $resourceBooking->getId(),
+                'name' => $resourceBooking->getName(),
+                'resource' => [
+                    'id' => $resourceBooking->getResource()->getId(),
+                    'name' => $resourceBooking->getResource()->getName(),
+                ],
+                'status' => [
+                    'id' => $resourceBooking->getStatus()->getId(),
+                    'name' => $resourceBooking->getStatus()->getName(),
+                ]
             ];
         }
 
