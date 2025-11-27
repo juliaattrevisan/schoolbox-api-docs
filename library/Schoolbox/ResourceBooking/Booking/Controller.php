@@ -1269,12 +1269,34 @@ class Controller extends Base
      * @param Model $oldBooking
      * @param Model $newBooking
      * @return void
+     * @throws Exception
      */
     public function clashApprove(Model $oldBooking, Model $newBooking)
     {
+        // ensure these are a valid clash situation
+        //     * Determine if this event clashes with another event
+        //     * if it's the same event, return false
+        //     * if different resources, return false
+        //     * if either is a rejected booking, return false
+        //     * if both are resource bookings, only care if one is pending
+        //     * if both are resource bookings, skip if both pending or same booking id
+        if (
+            $oldBooking->getId() === $newBooking->getId()
+            || $oldBooking->getResource()->getId() !== $newBooking->getResource()->getId()
+            || $oldBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED
+            || $newBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED
+            || (
+                $oldBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
+                && $newBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
+            )
+        ) {
+            throw new Exception("Unable to approve clash booking, bookings are not clashing...");
+        }
+
         // reject the old booking, so we can approve the new one.
         $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
 
+        // approve the new booking
         $errorsNew = $this->changeStatus($newBooking, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($newBooking, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
     }
