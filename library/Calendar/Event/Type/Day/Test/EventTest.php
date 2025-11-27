@@ -518,6 +518,32 @@ class EventTest extends TestCase
                 1,
                 1,
             ],
+            'approved-is-longer-than-pending-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 17:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:30:00',
+                1001,
+                BookingStatusModel::STATUS_APPROVED,
+                1002,
+                BookingStatusModel::STATUS_PENDING,
+                true,
+                1,
+                1,
+            ],
+            'pending-is-longer-than-approved-clash' => [
+                '2025-11-13 09:00:00',
+                '2025-11-13 17:00:00',
+                '2025-11-13 10:00:00',
+                '2025-11-13 10:30:00',
+                1101,
+                BookingStatusModel::STATUS_PENDING,
+                1102,
+                BookingStatusModel::STATUS_APPROVED,
+                true,
+                1,
+                1,
+            ],
         ];
     }
 
