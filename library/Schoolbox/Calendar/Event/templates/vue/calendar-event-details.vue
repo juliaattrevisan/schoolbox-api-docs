@@ -712,6 +712,6 @@ export default {
             :group-audiences="this.event.audiences.folders"
             :is-group="this.isGroupEvent"
         />
-        <add-resource-bookings-modal ref="addResourceBookingsModal" />
+        <add-resource-bookings-modal ref="addResourceBookingsModal" :resourceBookings="this.event.resourceBookings" />
     </div>
 </template>

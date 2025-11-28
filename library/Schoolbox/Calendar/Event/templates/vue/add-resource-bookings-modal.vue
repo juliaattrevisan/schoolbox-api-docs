@@ -17,7 +17,7 @@ export default {
         Toast,
     },
 
-    props: [],
+    props: ["resourceBookings"],
 
     data() {
         return {
@@ -25,7 +25,6 @@ export default {
             isProcessing: false, // To disable buttons on form submission to prevent rapid fire.
             selected: [],
             resources: [],
-            excludeResourceIds: [8, 12, 13],
         };
     },
 
@@ -70,7 +69,8 @@ export default {
          */
         getResourceSearchEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
-            return `${searchUrl}?excludeResourceIds=` + this.excludeResourceIds.join(",") + "&";
+            const excludeResourceIds = this.resourceBookings.map((booking) => booking.resource.id);
+            return `${searchUrl}?excludeResourceIds=` + excludeResourceIds.join(",") + "&";
         },
 
         /**
