@@ -63,7 +63,10 @@ Ideally, only the Docker development environment will need to be set up.
     * if using a recent Ubuntu release, the Snap store contains an up-to-date
       AWS CLI:
       ```
-      sudo snap install aws-cli
+      # Use the --classic flag when installing:
+      # this is because the AWS CLI needs to access system files and resources
+      # outside the snap's sandbox.
+      sudo snap install aws-cli --classic
       ```
   * recommended: a [Docker Credentials Store](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
     for secure storage of credentials
