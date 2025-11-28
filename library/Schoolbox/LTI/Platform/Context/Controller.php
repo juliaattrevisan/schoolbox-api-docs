@@ -30,6 +30,7 @@ use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchReques
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use OAT\Library\Lti1p3Nrps\Service\Server\Handler\MembershipServiceServerRequestHandler;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -59,67 +60,32 @@ use Schoolbox\User;
 class Controller extends BaseController
 {
     /**
-     * Repository of tool+platform registrations.
-     */
-    private RegistrationRepositoryInterface $registrations;
-
-    /**
-     * User codec, used to encode a user into a user ID when attaching mentors.
-     */
-    private UserCodec $userCodec;
-
-    /**
-     * Assessment data source, used to load an assessment's participation.
-     */
-    private AssessmentDataSource $assessmentDataSource;
-
-    /**
-     * User access mapper, used for retrieving the users within a folder.
-     */
-    private UserAccessMapper $userAccessMapper;
-
-    /**
-     * Access class, used for retrieving the user's level of access to a folder.
-     */
-    private Access $access;
-
-    /**
-     * Instance data repository, used to build resource link launch data.
-     */
-    private Instance $instance;
-
-    /**
-     * Cache for access tokens.
-     */
-    private CacheItemPoolInterface $accessTokenCache;
-
-    /**
      * Constructor
      *
-     * @param RegistrationRepositoryInterface $registrations
-     * @param UserCodec                       $userCodec
-     * @param AssessmentDataSource            $assessmentDataSource
-     * @param Instance                        $instance
-     * @param UserAccessMapper                $userAccessMapper
-     * @param Access                          $access
-     * @param CacheItemPoolInterface          $accessTokenCache
+     * @param RegistrationRepositoryInterface $registrations        Repository of tool+platform registrations.
+     * @param UserCodec                       $userCodec            User codec, used to encode a user into a user ID
+     *                                                              when attaching mentors.
+     * @param AssessmentDataSource            $assessmentDataSource Assessment data source, used to load an assessment's
+     *                                                              participation.
+     * @param Instance                        $instance             Instance data repository, used to build resource
+     *                                                              link launch data.
+     * @param UserAccessMapper                $userAccessMapper     User access mapper, used for retrieving the users
+     *                                                              within a folder.
+     * @param Access                          $access               Access class, used for retrieving the user's level
+     *                                                              of access to a folder.
+     * @param CacheItemPoolInterface          $accessTokenCache     Cache for access tokens.
+     * @param LoggerInterface                 $logger               Logger for what this controller does.
      */
     public function __construct(
-        RegistrationRepositoryInterface $registrations,
-        UserCodec $userCodec,
-        AssessmentDataSource $assessmentDataSource,
-        Instance $instance,
-        UserAccessMapper $userAccessMapper,
-        Access $access,
-        CacheItemPoolInterface $accessTokenCache
+        private RegistrationRepositoryInterface $registrations,
+        private UserCodec $userCodec,
+        private AssessmentDataSource $assessmentDataSource,
+        private Instance $instance,
+        private UserAccessMapper $userAccessMapper,
+        private Access $access,
+        private CacheItemPoolInterface $accessTokenCache,
+        private LoggerInterface $logger,
     ) {
-        $this->registrations        = $registrations;
-        $this->userCodec            = $userCodec;
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->instance             = $instance;
-        $this->userAccessMapper     = $userAccessMapper;
-        $this->access               = $access;
-        $this->accessTokenCache     = $accessTokenCache;
     }
 
     /**
@@ -216,7 +182,7 @@ class Controller extends BaseController
 
         // Return URL:
         // this is somewhere else
-        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->withScheme('https');
+        $baseUrl   = new Factory($this->getConfigLoader())->buildFullyQualified()->withScheme('https');
         $returnUrl = (clone $baseUrl)
             ->withPath(
                 $this->routeGenerator->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
@@ -277,12 +243,12 @@ class Controller extends BaseController
 
         // Access token sanity checker:
         // validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations);
+        $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
 
         // Access token validity checker:
         // validate the access token hasn't expired
         $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache),
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
         $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
@@ -304,7 +270,7 @@ class Controller extends BaseController
             ),
         );
         $handler            = new MembershipServiceServerRequestHandler($builder);
-        $server             = new ServiceServer($validator, $handler);
+        $server             = new ServiceServer($validator, $handler, logger: $this->logger);
         $this->response = $server->handle($request);
     }
 
@@ -350,7 +316,7 @@ class Controller extends BaseController
         $contextClaim        = $contextClaimFactory->buildForFolder($folder);
 
         // Claim about the platform instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance, $baseUrl))->build();
+        $platformInstanceClaim = new PlatformInstanceClaimFactory($this->instance, $baseUrl)->build();
 
         // Claim about folder memberships
         $nrpsClaim = new NrpsClaim(
@@ -411,7 +377,7 @@ class Controller extends BaseController
         ToolModel $tool,
         Component_ControllerAbstract $component
     ): LaunchPresentationClaim {
-        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
+        $baseUrl = new Factory($this->getConfigLoader())->buildFullyQualified();
         return new LaunchPresentationClaim(
             $tool->getTarget(),
             $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
