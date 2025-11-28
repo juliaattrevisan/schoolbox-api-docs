@@ -17,7 +17,12 @@ export default {
         Toast,
     },
 
-    props: ["resourceBookings"],
+    props: {
+        resourceBookings: {
+            type: Array | null,
+            default: null, // A null value indicates that the resource bookings module is disabled.
+        },
+    },
 
     data() {
         return {
@@ -69,7 +74,8 @@ export default {
          */
         getResourceSearchEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
-            const excludeResourceIds = this.resourceBookings.map((booking) => booking.resource.id);
+            const excludeResourceIds =
+                this.resourceBookings === null ? [] : this.resourceBookings.map((booking) => booking.resource.id);
             return `${searchUrl}?excludeResourceIds=${excludeResourceIds.join(",")}&`;
         },
 
