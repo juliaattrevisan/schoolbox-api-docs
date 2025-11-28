@@ -2,12 +2,16 @@
 
 namespace Schoolbox\OpenAi\Agent;
 
+use League\Flysystem\FilesystemException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
+use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\DifferentiationProfile\Model as DifferentiationProfileModel;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 
 class LearningActivityCustomisationGeneration
@@ -21,6 +25,8 @@ class LearningActivityCustomisationGeneration
     public function __construct(
         private IClient $client,
         private array $config,
+        private FilesystemProxy $filesystemProxy,
+        private ParserFactory $parserFactory,
     ) {
     }
 
@@ -49,6 +55,8 @@ class LearningActivityCustomisationGeneration
             'strategies_adjustments' => $differentiationProfileModel->getStrategiesAdjustments() ?? '',
         ];
 
+        $attachments = $this->generateFilePrompts($assessable);
+
         $payloadGenerator = new \Schoolbox\Editor\OpenAI\Payload\LearningActivityCustomisation(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
@@ -56,7 +64,7 @@ class LearningActivityCustomisationGeneration
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
             $assessable,
             $differentiationProfileModel->getStudent(),
-            '',
+            $attachments,
             json_encode($dp),
         );
 
@@ -84,5 +92,32 @@ class LearningActivityCustomisationGeneration
         }
         // Implementation for learning activity customisation generation
         return [$fieldData, 200];
+    }
+
+    private function generateFilePrompts(IAssessable $assessable): string
+    {
+        if (!is_callable([$assessable, 'getAttachedFiles'])) {
+            return '';
+        }
+
+        $processed = $assessable->getAttachedFiles()->reduce(
+        /**
+         * @throws FilesystemException
+         */
+            function (string $carry, IStorage $attachment) {
+                $parser = $this->parserFactory->produce($attachment);
+                /* Skipping unsupported file types
+                 */
+                if ($parser === null) {
+                    return $carry;
+                }
+
+                $carry .= $parser->flattenText($this->filesystemProxy->localPath($attachment));
+
+                return $carry;
+            },
+            ''
+        );
+        return $processed;
     }
 }

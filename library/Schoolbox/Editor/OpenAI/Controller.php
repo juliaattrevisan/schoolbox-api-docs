@@ -350,6 +350,8 @@ class Controller extends Base
         $agent = new LearningActivityCustomisationGeneration(
             $this->clientFactory->buildForFeature(Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION),
             $diffConfig,
+            $this->filesystemProxy,
+            $this->parserFactory,
         );
 
         $studentId = $this->requestPost->get('studentId');
@@ -381,7 +383,6 @@ class Controller extends Base
         }
 
         try {
-
             $assessment = $this->assessmentMapperProxy->findById($assessmentId);
             $differentiationProfile = $this->differentiationProfileMapper->findOneByColumn(
                 'student_id',
