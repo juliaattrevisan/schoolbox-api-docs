@@ -5,7 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
-import ResourceBookingModal from "./resource-booking-modal.vue";
+import AddResourceBookingsModal from "./add-resource-bookings-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -27,7 +27,7 @@ export default {
         AudiencesModal,
         MediaArticle,
         SearchSelect,
-        ResourceBookingModal,
+        AddResourceBookingsModal,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -452,8 +452,8 @@ export default {
             this.$refs.audiencesModal.open();
         },
 
-        showResourceBookingModal() {
-            this.$refs.resourceBookingModal.open();
+        showAddResourceBookingsModal() {
+            this.$refs.addResourceBookingsModal.open();
         },
     },
 };
@@ -661,7 +661,7 @@ export default {
                     <nav class="l-flex-row l-flex--align-center f-no-margins">
                         <a
                             class="icon-add f-no-margins"
-                            @click.prevent="showResourceBookingModal()"
+                            @click.prevent="showAddResourceBookingsModal()"
                             aria-label="Add a resource booking"
                             title="Add a resource booking"
                         >
@@ -696,7 +696,7 @@ export default {
                         <i class="icon-resource-booking"></i>
                         <p>
                             No resources are booked for this event.<br />
-                            <a @click.prevent="showResourceBookingModal()">Book resources for this event</a>
+                            <a @click.prevent="showAddResourceBookingsModal()">Book resources for this event</a>
                         </p>
                     </div>
                 </div>
@@ -712,6 +712,6 @@ export default {
             :group-audiences="this.event.audiences.folders"
             :is-group="this.isGroupEvent"
         />
-        <resource-booking-modal ref="resourceBookingModal" />
+        <add-resource-bookings-modal ref="addResourceBookingsModal" />
     </div>
 </template>

@@ -9,7 +9,7 @@ import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 
 export default {
-    name: "resource-booking-modal",
+    name: "add-resource-bookings-modal",
 
     components: {
         RevealModal,
