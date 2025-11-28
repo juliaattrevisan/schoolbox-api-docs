@@ -64,7 +64,6 @@ class LineItemGuidScoreRepository implements ScoreRepositoryInterface
             $this->ltiAssessmentMapper,
             $this->ltiScoreMapper,
             $this->userCodec,
-            $this->logger,
         );
         $scoreModel = $scoreHelper->createScoreModel($score);
         try {

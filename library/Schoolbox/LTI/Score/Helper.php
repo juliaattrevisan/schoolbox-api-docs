@@ -12,7 +12,6 @@ namespace Schoolbox\LTI\Score;
 use Alaress_Date_Format;
 use OAT\Library\Lti1p3Ags\Model\Score\ScoreInterface;
 use OutOfBoundsException;
-use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\LineItem\Model;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
@@ -43,14 +42,12 @@ class Helper
      * @param LtiScoreMapper      $ltiScoreMapper      The mapper used to save and retrieve LTI scores.
      * @param UserCodec           $userCodec           User codec, used to decode the user ID in the score into a user
      *                                                 to score.
-     * @param LoggerInterface $logger                  Logger for what this helper class does.
      */
     public function __construct(
         private LtiAssessment $ltiAssessment,
         private LtiAssessmentMapper $ltiAssessmentMapper,
         private LtiScoreMapper $ltiScoreMapper,
         private UserCodec $userCodec,
-        private LoggerInterface $logger,
     ) {
     }
 
