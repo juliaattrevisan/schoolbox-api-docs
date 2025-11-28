@@ -19,7 +19,7 @@ export default {
 
     props: {
         resourceBookings: {
-            type: Array | null,
+            type: [Array, null],
             default: null, // A null value indicates that the resource bookings module is disabled.
         },
     },
