@@ -147,6 +147,10 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
         $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
+        /* Instructor sends a message to the chat agent sandbox
+         */
+        $this->register('POST', "{$assRoute}/configure/message", 'postSandboxMessage', $canModify, $preloadAssessment);
+
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(

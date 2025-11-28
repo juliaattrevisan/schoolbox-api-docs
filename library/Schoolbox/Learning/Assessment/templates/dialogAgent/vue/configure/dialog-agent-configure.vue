@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cloneDeep } from "lodash";
+import DacSandbox from "./dac-sandbox.vue";
 
 type DialogAgentScenario = {
     title: string;
@@ -20,6 +21,9 @@ type DialogAgentAssessmentConfig = {
             title: string;
         };
     }[];
+    _routes: {
+        postSandboxMessage: string | null;
+    };
 };
 
 interface Props {
@@ -179,7 +183,19 @@ async function onSubmit(): Promise<void> {
 
         <div class="small-12 large-6 island">
             <h2 class="subheader">Sandbox</h2>
-            <section class="content">chat log thingo goes here</section>
+            <div
+                v-if="!assessmentConfigInfo._routes.postSandboxMessage || !assessmentConfigInfo.openingMessage"
+                class="empty-state"
+            >
+                <i class="icon-dialog-agent"></i>
+                <p>Sandbox will be available once the agent configuration has been saved.</p>
+            </div>
+            <section v-else class="content">
+                <dac-sandbox
+                    :opening-message="assessmentConfigInfo.openingMessage"
+                    :post-message="assessmentConfigInfo._routes.postSandboxMessage"
+                />
+            </section>
         </div>
     </div>
 </template>

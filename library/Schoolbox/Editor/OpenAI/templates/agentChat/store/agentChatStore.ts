@@ -119,6 +119,13 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     /**
+     * Reset the feed to an empty state
+     */
+    function resetFeed(): void {
+        feed.value.length = 0;
+    }
+
+    /**
      * Request a new image from the AI
      * @param config - The configuration for the request
      * @param payload - The payload to send to the AI
@@ -288,6 +295,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         feed,
         fullFeed,
         parseFeed,
+        resetFeed,
         importFeed,
         activeGeneration,
         getNextEntryKey,
