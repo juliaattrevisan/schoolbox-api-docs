@@ -11,10 +11,28 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="small-12 columns">
         <h1>Configure {{ assessment.title }}</h1>
     </div>
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {
+        assessmentId: assessment.id,
+        assessment: assessment
+    }) %}
+
+    {% if modifyRoute %}
+        <nav>
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content aria-hidden="true">
+            <li>
+                <a
+                    class="icon-modify"
+                    href="{{ modifyRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}"
+                >Modify Settings</a>
+            </li>
+        </ul>
+    {% endif %}
 </div>
 
 {% set updateRoute = routeLookupIfAuthorized(
