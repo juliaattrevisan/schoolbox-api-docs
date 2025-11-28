@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Score;
 
 use OAT\Library\Lti1p3Ags\Model\Score\ScoreInterface;
 use OAT\Library\Lti1p3Ags\Repository\ScoreRepositoryInterface;
+use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
@@ -60,10 +61,26 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             $this->logger,
         );
         $scoreModel = $scoreHelper->createScoreModel($score);
-        $scoreModel = $scoreHelper->setStudentInScoreModel($score, $scoreModel);
-        $scoreModel = $scoreHelper->setLtiAssessmentInScoreModel($scoreModel);
-        $scoreHelper->assertNoMoreRecentPreviousScore($scoreModel, null);
-        $this->ltiScoreMapper->save($scoreModel);
+        try {
+            $scoreModel = $scoreHelper->setStudentInScoreModel($score, $scoreModel);
+            $scoreModel = $scoreHelper->setLtiAssessmentInScoreModel($scoreModel);
+            $scoreHelper->assertNoMoreRecentPreviousScore($scoreModel, null);
+        } catch (OutOfBoundsException $e) {
+            $this->logger->error(
+                __METHOD__ . ': set error',
+                ['message' => $e->getMessage()],
+            );
+            throw $e;
+        }
+        try {
+            $this->ltiScoreMapper->save($scoreModel);
+        } catch (MapperException $e) {
+            $this->logger->error(
+                __METHOD__ . ': save error',
+                ['message' => $e->getMessage()],
+            );
+            throw $e;
+        }
         return $score;
     }
 }
