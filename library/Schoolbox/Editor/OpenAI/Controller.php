@@ -392,6 +392,14 @@ class Controller extends Base
                 ]
             );
 
+            /* Fully hydrate the differentiation profile with the student data
+             */
+            $differentiationProfile->setStudent(
+                $this->differentiationProfileMapper
+                    ->getJoinMapper('student')
+                    ->findById($studentId)
+            );
+
             [$response, $status] = $agent->request(
                 $this->getUser(),
                 $assessment,
