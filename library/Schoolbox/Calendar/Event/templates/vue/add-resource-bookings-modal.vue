@@ -70,7 +70,7 @@ export default {
         getResourceSearchEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
             const excludeResourceIds = this.resourceBookings.map((booking) => booking.resource.id);
-            return `${searchUrl}?excludeResourceIds=` + excludeResourceIds.join(",") + "&";
+            return `${searchUrl}?excludeResourceIds=${excludeResourceIds.join(",")}&`;
         },
 
         /**
