@@ -1,0 +1,97 @@
+/**
+ * Button style tweaks
+ * Scope: UI Uplift
+ * The following is a list of overrides applied to our existing button styles
+ * to better align with the new design system.
+ * Rather than override all styles like with checkboxes and radios,
+ * we are leaning into existing styles for now and just applying necessary tweaks.
+ * Long term we'd look to merge these styles into a single point of reference.
+ */
+
+@use "sbx-form";
+
+/**
+ * Primary button style tweaks,
+ * which is considered those with the .submit class or [type="submit"]
+ */
+.sbx-body [type="submit"],
+.sbx-body a.button.submit,
+.sbx-body button.submit {
+    background: var(--sbx-color-accent);
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+    border-radius: var(--sbx-border-radius-normal);
+    color: var(--sbx-color-foreground-primary);
+    &:hover,
+    &:active {
+        background: var(--sbx-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover
+        color: var(--sbx-color-foreground-primary); // ^foundation-fixes^ - remove the change of text colour on hover
+        filter: brightness(1.1);
+    }
+}
+
+/**
+ * Secondary button style tweaks, which are considered all other buttons
+ */
+.sbx-body button,
+.sbx-body .button,
+.sbx-body .flex-list.buttons a,
+.sbx-body .sub-nav li a,
+.sbx-body nav li.active a {
+    background: var(--sbx-color-foreground-primary);
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+    border-radius: var(--sbx-border-radius-normal);
+    color: var(--sbx-color-accent);
+    &:hover,
+    &:active {
+        background-color: var(
+            --sbx-color-foreground-primary
+        ); // ^foundation-fixes^ - remove the use of --content-ui-hover
+        color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
+        filter: brightness(1.1);
+    }
+}
+
+/**
+ * Secondary button active state, just make it bold
+ */
+.sbx-body .sub-nav li.active a {
+    font-weight: bold;
+}
+
+/**
+ * When a button sits next to an input (e.g. search bars)
+ */
+.sbx-body .input-group a.button {
+    border-left: none;
+    border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
+    line-height: 1;
+}
+
+/**
+ * A horizontal list of buttons
+ */
+.sbx-body .sub-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sbx-size-xs);
+}
+
+/**
+ * An existing flex list of buttons, just add some gap
+ */
+.flex-list.buttons {
+    gap: var(--sbx-size-xs);
+}
+
+/**
+ * Component action section buttons, giving some gap like other button groups
+ */
+.sbx-body .component-action section {
+    gap: var(--sbx-size-xs);
+    padding: var(--sbx-size-xs);
+    button,
+    .button {
+        font-weight: normal; // for better readability and consistency with other buttons
+        text-transform: none;
+    }
+}
