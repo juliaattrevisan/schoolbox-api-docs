@@ -90,7 +90,7 @@ class Mapper extends BaseMapper
      * @param string|null $ids
      * @return GenericCollection
      */
-    private function getCollection($mapper, $ids)
+    private function getCollection(BaseMapper $mapper, ?string $ids): GenericCollection
     {
         $collection = $mapper->createCollection();
 
