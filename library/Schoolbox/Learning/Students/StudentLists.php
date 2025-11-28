@@ -264,6 +264,16 @@ class StudentLists
                 'title' => 'Send Email',
             ];
         }
+        // Differentiation Profile
+        $dpRouteParam =  [
+            'student' => $user,
+            'studentId' => $user->getId()
+        ];
+        $studentSisRecord['_links']['differentiationProfile'] =
+            $this->authorizer->isPathAuthorizedForUser('differentiationProfiles.viewDifferentiationProfileData', $dpRouteParam, $this->viewer) ?
+                $this->routeGenerator->generate('differentiationProfiles.viewDifferentiationProfileData', $dpRouteParam) :
+                null;
+
         return $studentSisRecord;
     }
 }

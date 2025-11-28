@@ -46,6 +46,7 @@ Data:
         get-award-as-achievement-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToAwardAsAchievementForm') }}"
         get-set-as-goal-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}"
         get-create-learning-moment-form-endpoint="{{ routeLookup('learningMomentEvidence.redirectToCreateForm') }}"
+        differentiation-profile-enabled="Boolean({{ differentiationProfileEnabled }})"
     >
         {% block classListSlots %}
         {% endblock classListSlots %}

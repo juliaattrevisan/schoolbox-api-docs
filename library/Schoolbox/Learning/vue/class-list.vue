@@ -240,6 +240,14 @@ export default {
             type: String,
             required: true,
         },
+
+        /**
+         * Is the differentiation profile enabled?
+         */
+        differentiationProfileEnabled: {
+            type: Boolean,
+            default: false,
+        }
     },
     data() {
         return {
