@@ -130,7 +130,9 @@ function onClose(): void {
                         :key="item.terminology"
                         class="l-flex-col l-gap-xs f-no-margins"
                     >
-                        <h5>{{ item.terminology }}</h5>
+                        <h5>
+                            <strong>{{ item.terminology }}</strong>
+                        </h5>
                         <article>
                             <ul>
                                 <li v-for="(value, index) in item.value" :key="index">{{ value.name }}</li>
@@ -138,7 +140,9 @@ function onClose(): void {
                         </article>
                     </div>
                     <div v-for="item in textData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
-                        <h5>{{ item.terminology }}</h5>
+                        <h5>
+                            <strong>{{ item.terminology }}</strong>
+                        </h5>
                         <media-article :content="item.value" />
                     </div>
                 </div>
