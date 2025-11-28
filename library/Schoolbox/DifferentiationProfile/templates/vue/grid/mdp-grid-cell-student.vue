@@ -7,6 +7,7 @@ import { sbProps } from "@js/util/sbx/pageUtils";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import { useHeaderStore } from "../store/mdpHeaderStore";
 import { useLinkedRecordsStore } from "../store/mdpLinkedRecordsStore";
 import { useGenAiStore } from "../store/mdpGenAiStore";
 
@@ -15,6 +16,7 @@ const props = defineProps<{
     profile: Profile;
 }>();
 
+const headerStore = useHeaderStore();
 const linkedRecordsStore = useLinkedRecordsStore();
 const genAiStore = useGenAiStore();
 
@@ -56,7 +58,7 @@ function onGenerateSelected(): void {
             View Linked Records
         </button>
         <button
-            v-if="sbProps.aiFeatures.differentiation?.enabled"
+            v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
             class="button icon-ai f-no-margins"
             @click="onGenerateSelected"
         >

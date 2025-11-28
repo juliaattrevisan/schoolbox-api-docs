@@ -9,9 +9,14 @@ import { HeaderType } from "../../js/types/manageDifferentiationProfilesTypes";
 export const useHeaderStore = defineStore(`headerStore`, () => {
     const header = window.Vue.ref<Header[]>([]);
 
-    // Computed ref for enabled fields that match Text type
+    // To return only the text fields that are enabled for AI generation
     const enabledTextFields = window.Vue.computed(() => {
         return header.value.filter((h) => h.type === HeaderType.TEXT);
+    });
+
+    // So we don't show the AI button when no text fields are enabled
+    const hasEnabledTextFields = window.Vue.computed(() => {
+        return enabledTextFields.value.length > 0;
     });
 
     /**
@@ -66,6 +71,7 @@ export const useHeaderStore = defineStore(`headerStore`, () => {
     return {
         header,
         enabledTextFields,
+        hasEnabledTextFields,
         init,
         getTitleByKey,
     };
