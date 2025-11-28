@@ -56,7 +56,7 @@ function onGenerateSelected(): void {
             View Linked Records
         </button>
         <button
-            v-if="sbProps.aiFeatures.differentiation?.enabled"
+            v-if="sbProps.aiFeatures.differentiation.enabled"
             class="button icon-ai f-no-margins"
             @click="onGenerateSelected"
         >

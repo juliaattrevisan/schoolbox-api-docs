@@ -103,7 +103,7 @@ window.Vue.onMounted(async () => {
             >
             </textarea>
             <a
-                v-if="sbProps.aiFeatures.lessonplan?.enabled"
+                v-if="sbProps.aiFeatures.lessonplan.enabled"
                 class="icon-ai lp-field-regenerate"
                 @click="() => lpStore.openModal(props.fieldId)"
             >
