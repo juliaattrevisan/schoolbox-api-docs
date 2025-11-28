@@ -235,14 +235,14 @@ class Controller extends BaseController
     private function createResponse(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
     {
         // Validate access token
-        $validator      = new RequestAccessTokenValidator($this->registrations);
+        $validator      = new RequestAccessTokenValidator($this->registrations, $this->logger);
         $resourceServer = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache),
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
 
         // Handle the request
-        return new LtiServiceServer($validator, $handler)
+        return new LtiServiceServer($validator, $handler, $this->logger)
             ->handle($resourceServer->validateAuthenticatedRequest($this->request));
     }
 }
