@@ -117,10 +117,9 @@ class Controller extends Base
      */
     public function search(): void
     {
-        $excludedId = $this->requestQuery->get('thisId');
         $search = trim($this->requestQuery->get('query'));
         $excludeResourceIdsString = trim($this->requestQuery->get('excludeResourceIds'));
-        $excludeResourceIds = explode(',', $excludeResourceIdsString);
+        $excludeResourceIds = $excludeResourceIdsString === '' ? [] : explode(',', $excludeResourceIdsString);
         $data = $this->mapper->search(
             $search,
             $this->getUser(),
@@ -130,9 +129,7 @@ class Controller extends Base
             'name',
             'ASC',
             $excludeResourceIds
-        )->filter(function (Model $item) use ($excludedId) {
-            return $item->getId() != $excludedId;
-        })->map(function (Model $item) {
+        )->map(function (Model $item) {
             return [
                 'id'   => $item->getId(),
                 'name' => $item->getName(),
