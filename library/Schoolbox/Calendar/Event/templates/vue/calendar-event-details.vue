@@ -682,6 +682,12 @@ export default {
                                     <span :class="booking.status.name.toLowerCase() + ' label'">{{
                                         booking.status.name
                                     }}</span>
+                                    <a
+                                        href=""
+                                        class="icon-modify"
+                                        title="Modify Booking"
+                                        onclick="alert('TODO: Implement edit booking modal')"
+                                    ></a>
                                 </td>
                             </tr>
                         </tbody>
