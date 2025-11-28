@@ -700,7 +700,7 @@ export default {
                         <i class="icon-resource-booking"></i>
                         <p>
                             No resources are booked for this event.<br />
-                            <a @click.prevent="showResourceBookingModal()">Book a resource for this event</a>
+                            <a @click.prevent="showResourceBookingModal()">Book resources for this event</a>
                         </p>
                     </div>
                 </div>
