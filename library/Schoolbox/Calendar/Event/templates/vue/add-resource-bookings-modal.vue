@@ -76,8 +76,7 @@ export default {
         /**
          * Open this modal.
          */
-        open(booking) {
-            this.booking = booking;
+        open() {
             this.$refs.modal.open();
             this.selected = []; // Clear selectize contents.
             this.resources = [];
