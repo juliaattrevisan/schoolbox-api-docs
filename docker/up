@@ -103,7 +103,7 @@ function login_to_aws() {
     log "Testing if logged in to AWS (region: ${AWS_REGION})..."
     if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
         log "Not logged in to AWS: logging in"
-        AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+        AWS_CONFIG_FILE=.aws/config aws sso login --use-device-code
     else
         log "Logged in to AWS: continuing"
     fi
