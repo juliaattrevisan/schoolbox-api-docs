@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sbProps } from "@js/util/sbx/pageUtils";
 import { cloneDeep } from "lodash";
 import DacSandbox from "./dac-sandbox.vue";
 
@@ -40,6 +41,15 @@ const scenarioInfo = window.Vue.ref<DialogAgentScenario>(cloneDeep(props.scenari
 const assessmentConfigInfo = window.Vue.ref<DialogAgentAssessmentConfig>(cloneDeep(props.assessmentConfig));
 
 /**
+ * Whether the sandbox section is visible, not necessarily whether it can be used
+ * The sandbox won't be visible if the dialog agent AI feature is disabled
+ *
+ * NOTE: It's crucial that !== false is used here as sbProps.aiFeatures only gets populated for staff at the moment,
+ * but a student could visit this page. If they do, they'll just see the empty state below instead of the sandbox. that's fine for now
+ */
+const sandboxVisible = sbProps.aiFeatures.dialogagent?.enabled !== false;
+
+/**
  * Submit the new configuration
  */
 async function onSubmit(): Promise<void> {
@@ -49,7 +59,7 @@ async function onSubmit(): Promise<void> {
 
 <template>
     <div class="row">
-        <div class="small-12 large-6 island">
+        <div class="small-12 island" :class="{ 'large-6': sandboxVisible }">
             <h2 class="subheader">Settings</h2>
             <section>
                 <fieldset class="content">
@@ -181,7 +191,7 @@ async function onSubmit(): Promise<void> {
             <input v-if="props.postUpdate" type="submit" value="Save" @click.prevent="onSubmit" />
         </div>
 
-        <div class="small-12 large-6 island">
+        <div v-if="sandboxVisible" class="small-12 large-6 island">
             <h2 class="subheader">Sandbox</h2>
             <div
                 v-if="!assessmentConfigInfo._routes.postSandboxMessage || !assessmentConfigInfo.openingMessage"
