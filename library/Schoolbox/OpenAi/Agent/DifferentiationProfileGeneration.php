@@ -89,6 +89,11 @@ class DifferentiationProfileGeneration
                             return $carry;
                         }
                         $parser = $this->parserFactory->produce($attachment);
+                        /* Skipping unsupported file types
+                         */
+                        if ($parser === null) {
+                            return $carry;
+                        }
 
                         $carry .= $parser->flattenText($this->filesystemProxy->localPath($attachment));
 
