@@ -392,29 +392,40 @@ export default class MarkbookPage {
     }
 
     /**
-     * selects a mark visibility option for a given assessment
-     * @param assessmentId - The ID of the assessment
-     * @param visibilityOption - The visibility option to select: '0 for Staff Only', '1 for Staff and Students', '2 for Staff, Students and their Parents'
+     * selects a mark visibility option for a list of assessments in a array
+     * @param assessmentIds - An array of assessment IDs
+     * @param visibilityOptions - An array of visibility options to select: '0 for Staff Only', '1 for Staff and Students', '2 for Staff, Students and their Parents'
      */
-    async updateActivityMarkVisibility(
-        assessmentId: string | number,
-        visibilityOption: "0" | "1" | "2",
+    async updateMultipleActivityMarkVisibilities(
+        assessmentIds: Array<string | number>,
+        visibilityOptions: Array<"0" | "1" | "2">,
     ): Promise<void> {
-        // locate the assessment dropdown, click it and select an option
-        const assessment = this.page.locator(`td[data-assessment="${assessmentId}"]`);
-        await assessment.click();
-        await assessment.locator('select[name="markVisibility"]').selectOption({ value: visibilityOption });
-        await this.page.locator(`div[data-test-is-success="true"]`).isVisible();
+        for (let i = 0; i < assessmentIds.length; i += 1) {
+            const assessmentId = assessmentIds[i];
+            const visibilityOption = visibilityOptions[i];
+            // locate the assessment dropdown, click it and select an option
+            const assessment = this.page.locator(`td[data-assessment="${assessmentId}"]`);
+            await assessment.click();
+            await assessment.locator('select[name="markVisibility"]').selectOption({ value: visibilityOption });
+            await this.page.locator(`div[data-test-is-success="true"]`).isVisible();
+        }
     }
 
     /**
-     * Checks the visibility option selected
-     * @param assessmentId - The ID of the assessment
-     * @param visibility - The visibility to check
+     * Checks the visibility option selected for the activities passed in the array
+     * @param assessmentIds - An array of assessment IDs
+     * @param visibilities - An array of visibilities to check
      */
-    async checkVisibilityOptionSelected(assessmentId: string | number, visibility: string | number): Promise<void> {
-        const assessment = this.page.locator(`td[data-assessment="${assessmentId}"]`);
-        const selectedValue = assessment.locator('select[name="markVisibility"]');
-        await expect(selectedValue).toHaveValue(visibility.toString());
+    async checkVisibilityOptionsSelected(
+        assessmentIds: Array<string | number>,
+        visibilities: Array<string | number>,
+    ): Promise<void> {
+        for (let i = 0; i < assessmentIds.length; i += 1) {
+            const assessmentId = assessmentIds[i];
+            const visibility = visibilities[i];
+            const assessment = this.page.locator(`td[data-assessment="${assessmentId}"]`);
+            const selectedValue = assessment.locator('select[name="markVisibility"]');
+            await expect(selectedValue).toHaveValue(visibility.toString());
+        }
     }
 }
