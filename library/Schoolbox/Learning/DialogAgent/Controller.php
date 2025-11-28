@@ -251,21 +251,6 @@ class Controller extends Base
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
         $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
 
-        // if not enabled, 404
-        // TODO: imo this should be part of the route check
-        if ($aiConfig->isEnabled($agentConfig) === false) {
-            $returnCode = 404;
-
-            $problem = (new ApiProblem("Feature not enabled."))
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
-
         /**
          * For dialog agent response chats, the sessionID guid is directly tied to the response,
          * If the student has never sent a message before, a new session ID should be created
@@ -337,21 +322,6 @@ class Controller extends Base
         // ai Config
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
         $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
-
-        // if not enabled, 404
-        // TODO: imo this should be part of the route check
-        if ($aiConfig->isEnabled($agentConfig) === false) {
-            $returnCode = 404;
-
-            $problem = (new ApiProblem("Feature not enabled."))
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
 
         /**
          * For dialog agent sandbox chats, the sessionID guid is provided by the frontend,
