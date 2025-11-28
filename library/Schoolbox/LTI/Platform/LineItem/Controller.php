@@ -106,7 +106,7 @@ class Controller extends BaseController
         $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
 
         // Line item repository: consists only of a single assessment
-        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator);
+        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
 
         // Score repository: consists only of a single assessment, and its scores
         $scoreRepository = new SingleAssessmentScoreRepository(

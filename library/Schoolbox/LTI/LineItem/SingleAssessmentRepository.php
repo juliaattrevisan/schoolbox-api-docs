@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\LineItem;
 
 use Aura\Router\Generator;
 use BadMethodCallException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Url\Uri;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItem;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
@@ -24,25 +25,17 @@ use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 class SingleAssessmentRepository implements LineItemRepositoryInterface
 {
     /**
-     * The LTI assessment in this repository.
-     */
-    private LtiAssessment $ltiAssessment;
-
-    /**
-     * Router, used to generate the line item route for the assessment.
-     */
-    private Generator $routeGenerator;
-
-    /**
      * Constructor
      *
-     * @param LtiAssessment $ltiAssessment
-     * @param Generator     $routeGenerator
+     * @param LtiAssessment   $ltiAssessment  The LTI assessment in this repository.
+     * @param Generator       $routeGenerator Router, used to generate the line item route for the assessment.
+     * @param LoggerInterface $logger         Logger for what this repository does.
      */
-    public function __construct(LtiAssessment $ltiAssessment, Generator $routeGenerator)
-    {
-        $this->ltiAssessment  = $ltiAssessment;
-        $this->routeGenerator = $routeGenerator;
+    public function __construct(
+        private LtiAssessment $ltiAssessment,
+        private Generator $routeGenerator,
+        private LoggerInterface $logger,
+    ) {
     }
 
     /**
@@ -62,12 +55,20 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
             ['assessmentId' => $assessmentId],
         );
         if ($url->getPath() === $route) {
+            $this->logger->debug(
+                __METHOD__ . ': line item found',
+                $this->generateLogContext($lineItemIdentifier),
+            );
             return new LineItem(
                 $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
                 $this->ltiAssessment->getTitle(),
                 $url->getPath(),
             );
         }
+        $this->logger->debug(
+            __METHOD__ . ': line item not found',
+            $this->generateLogContext($lineItemIdentifier),
+        );
         return null;
     }
 
@@ -84,6 +85,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
         ?int $limit = null,
         ?int $offset = null
     ): LineItemCollectionInterface {
+        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext());
         throw new BadMethodCallException('findCollection() method not implemented');
     }
 
@@ -95,6 +97,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function save(LineItemInterface $lineItem): LineItemInterface
     {
+        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext());
         throw new BadMethodCallException('save() method not implemented');
     }
 
@@ -106,6 +109,23 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function delete(string $lineItemIdentifier): void
     {
+        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext());
         throw new BadMethodCallException('delete() method not implemented');
+    }
+
+    /**
+     * Generate a consistent context for log messages.
+     *
+     * @param string|null $lineItemIdentifier
+     * @return array
+     */
+    private function generateLogContext(
+        ?string $lineItemIdentifier = null,
+    ): array {
+        $context['assessmentId'] = $this->ltiAssessment->getId();
+        if (isset($lineItemIdentifier)) {
+            $context['identifier'] = $lineItemIdentifier;
+        }
+        return $context;
     }
 }
