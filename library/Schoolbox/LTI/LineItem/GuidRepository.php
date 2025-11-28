@@ -20,6 +20,7 @@ use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\LTI\Assessment\LineItem as SchoolboxLineItem;
 use Schoolbox\Mapper\Exception as MapperException;
+use Throwable;
 
 /**
  * Repository for GUID-based line items.
@@ -59,18 +60,13 @@ class GuidRepository implements LineItemRepositoryInterface
         if ($lineItem) {
             $this->logger->debug(
                 __METHOD__ . ': line item found',
-                [
-                    'identifier' => $lineItemIdentifier,
-                    'lineItemId' => $lineItem->getId(),
-                ],
+                $this->generateLogContext($lineItemIdentifier, $lineItem),
             );
             return $this->convertModelToLineItem($lineItem);
         }
         $this->logger->debug(
             __METHOD__ . ': line item not found',
-            [
-                'identifier' => $lineItemIdentifier,
-            ],
+            $this->generateLogContext($lineItemIdentifier),
         );
         return null;
     }
@@ -94,35 +90,40 @@ class GuidRepository implements LineItemRepositoryInterface
     ): LineItemCollectionInterface {
         $pb = $this->lineItemMapper->getPredicateBuilder()
             ->equals('lti_assessment_guid', $this->guid);
+        $logContext = [];
         if (isset($resourceIdentifier)) {
             $pb = $pb->equals('resource_id', $resourceIdentifier);
+            $logContext['resource_id'] = $resourceIdentifier;
         }
         if (isset($resourceLinkIdentifier)) {
             $pb = $pb->equals('resource_link_id', $resourceLinkIdentifier);
+            $logContext['resource_link_id'] = $resourceIdentifier;
         }
         if (isset($tag)) {
             $pb = $pb->equals('tag', $tag);
+            $logContext['tag'] = $resourceIdentifier;
         }
 
         $options = [];
         if (isset($limit)) {
             $options['limit'] = $limit;
+            $logContext['limit'] = $resourceIdentifier;
         }
         if (isset($offset)) {
             $options['offset'] = $offset;
+            $logContext['offset'] = $resourceIdentifier;
         }
 
         $lineItemModels = $this->lineItemMapper->findByPredicates($pb, $options);
         if (count($lineItemModels) > 0) {
             $this->logger->debug(
                 __METHOD__ . ': line items found',
-                [
-                    'count' => count($lineItemModels),
-                ],
+                $this->generateLogContext(additionalContext: ['count' => count($lineItemModels)] + $logContext),
             );
         } else {
             $this->logger->debug(
                 __METHOD__ . ': line items not found',
+                $this->generateLogContext(additionalContext: $logContext),
             );
         }
         return new LineItemCollection($lineItemModels->map($this->convertModelToLineItem(...))->getAll());
@@ -146,6 +147,7 @@ class GuidRepository implements LineItemRepositoryInterface
             $lineItemModel = $this->lineItemMapper->createModel()
                 ->setLtiAssessmentGuid($this->guid);
         }
+        /** @var SchoolboxLineItem\Model $lineItemModel */
         $lineItemModel = $lineItemModel
             ->setScoreMaximum($lineItem->getScoreMaximum())
             ->setLabel($lineItem->getLabel())
@@ -171,17 +173,13 @@ class GuidRepository implements LineItemRepositoryInterface
         } catch (MapperException $e) {
             $this->logger->error(
                 __METHOD__ . ' error: line item not saved',
-                [
-                    'message' => $e->getMessage(),
-                ],
+                $this->generateLogContext(exception: $e),
             );
             throw $e;
         }
         $this->logger->debug(
             __METHOD__ . ': line item saved',
-            [
-                'lineItemId' => $lineItemModel->getId(),
-            ],
+            $this->generateLogContext(lineItemModel: $lineItemModel),
         );
 
         // Now the line item has an ID, its identifier can be set
@@ -195,19 +193,13 @@ class GuidRepository implements LineItemRepositoryInterface
             } catch (MapperException $e) {
                 $this->logger->error(
                     __METHOD__ . ' error: identifier not added',
-                    [
-                        'message'    => $e->getMessage(),
-                        'lineItemId' => $lineItemModel->getId(),
-                    ],
+                    $this->generateLogContext(lineItemModel: $lineItemModel, exception: $e),
                 );
                 throw $e;
             }
             $this->logger->debug(
                 __METHOD__ . ': added identifier',
-                [
-                    'lineItemId' => $lineItemModel->getId(),
-                    'identifier' => $identifier,
-                ],
+                $this->generateLogContext($identifier, $lineItemModel),
             );
         }
 
@@ -230,19 +222,13 @@ class GuidRepository implements LineItemRepositoryInterface
         } catch (MapperException $e) {
             $this->logger->error(
                 __METHOD__ . ' error: line item not deleted',
-                [
-                    'message'    => $e->getMessage(),
-                    'identifier' => $lineItemIdentifier,
-                ],
+                $this->generateLogContext($lineItemIdentifier, exception: $e),
             );
             throw $e;
         }
         $this->logger->debug(
             __METHOD__ . ': line item deleted',
-            [
-                'identifier' => $lineItemIdentifier,
-                'count'      => $deleted,
-            ],
+            $this->generateLogContext($lineItemIdentifier, additionalContext: ['count' => $deleted]),
         );
     }
 
@@ -288,5 +274,33 @@ class GuidRepository implements LineItemRepositoryInterface
                 )
             )
             ->__toString();
+    }
+
+    /**
+     * Generate a consistent context for log messages.
+     *
+     * @param string|null                  $lineItemIdentifier
+     * @param SchoolboxLineItem\Model|null $lineItemModel
+     * @param Throwable|null               $exception
+     * @param array                        $additionalContext
+     * @return array
+     */
+    private function generateLogContext(
+        ?string $lineItemIdentifier = null,
+        ?SchoolboxLineItem\Model $lineItemModel = null,
+        ?Throwable $exception = null,
+        array $additionalContext = [],
+    ): array {
+        $context['guid'] = $this->guid;
+        if (isset($lineItemIdentifier)) {
+            $context['identifier'] = $lineItemIdentifier;
+        }
+        if (isset($lineItemModel)) {
+            $context['lineItemId'] = $lineItemModel->getId();
+        }
+        if (isset($exception)) {
+            $context['message'] = $exception->getMessage();
+        }
+        return $context + $additionalContext;
     }
 }
