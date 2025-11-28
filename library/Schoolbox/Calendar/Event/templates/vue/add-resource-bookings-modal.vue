@@ -107,20 +107,20 @@ export default {
                     this.$refs.modal.close();
                     if (responseData.errors && responseData.errors.length > 0) {
                         this.$refs.toast.timeout(
-                            "Booking created with some issues: " + responseData.errors.join(", "),
+                            "Booking(s) created with some issues: " + responseData.errors.join(", "),
                             false,
                             4000,
                         );
                     } else {
-                        this.$refs.toast.timeout("Created", true, 2000);
+                        this.$refs.toast.timeout("Booking(s) created", true, 2000);
                     }
-                    // TODO: Refresh page here.
-                    console.info("SUCCESS! TODO: Refresh the page.");
+                    // The new booking was successfully added, so reload the page to make it appear.
+                    window.location.reload();
                 } else {
-                    this.$refs.toast.timeout("Unable to create booking. " + responseData.message, false, 3000);
+                    this.$refs.toast.timeout("Unable to create booking(s). " + responseData.message, false, 3000);
                 }
             } catch (error) {
-                this.$refs.toast.timeout("Unable to create booking. " + error.message, false, 3000);
+                this.$refs.toast.timeout("Unable to create booking(s). " + error.message, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
