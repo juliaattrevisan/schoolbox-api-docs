@@ -137,6 +137,7 @@
         window.sbProps.aiFeatures = {};
 
         {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
+        {# TODO: technically students do see some endpoints now, but they don't need this yet... need to consider the per-feature check of who can access #}
         {% if user.current.role.staff %}
             {% for feature, aiConfig in aiFeatures %}
                 {# TODO: why does this require you to know the data structure... It really should be a class with an ->isEnabled() method #}
