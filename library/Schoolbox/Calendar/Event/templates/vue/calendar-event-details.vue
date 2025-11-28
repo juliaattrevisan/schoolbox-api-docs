@@ -37,8 +37,6 @@ export default {
     props: ["event"],
 
     data() {
-        console.info("calendar-event-details.vue data()");
-        console.info("calendar-event-details.vue data() this.event.resourceBookings: ", this.event.resourceBookings);
         return {
             currentAttendanceStatus: this.event.attendance.status.current,
             numMax: this.event.attendance.payload.attendees.max,
@@ -123,7 +121,6 @@ export default {
     },
 
     created() {
-        console.info("calendar-event-details.vue created() e");
         this.ENDPOINTS = ENDPOINTS;
         this.canRsvp = checks.canRsvp;
         this.showRsvpButtons = checks.showRsvpButtons;
@@ -136,7 +133,6 @@ export default {
         this.FORMAT_LONG_DATE_WITH_TIME = FORMAT_LONG_DATE_WITH_TIME;
         this.FORMAT_DATE_ONLY = FORMAT_DATE_ONLY;
         this.FORMAT_TIME_ONLY = FORMAT_TIME_ONLY;
-        console.info("calendar-event-details.vue created() x");
     },
 
     methods: {
