@@ -9,14 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Score;
 
-use Alaress_Date_Format;
 use OAT\Library\Lti1p3Ags\Model\Score\ScoreInterface;
 use OAT\Library\Lti1p3Ags\Repository\ScoreRepositoryInterface;
-use OutOfBoundsException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment\Mapper as LtiAssessmentMapper;
 use Schoolbox\LTI\Assessment\Score\Mapper as LtiScoreMapper;
-use Schoolbox\LTI\Assessment\Score\Model as LtiScoreModel;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -34,12 +32,14 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
      * @param LtiScoreMapper      $ltiScoreMapper      The mapper used to save and retrieve LTI scores.
      * @param UserCodec           $userCodec           User codec, used to decode the user ID in the score into a user
      *                                                 to score.
+     * @param LoggerInterface     $logger              Logger for what this repository does.
      */
     public function __construct(
         private LtiAssessment $ltiAssessment,
         private LtiAssessmentMapper $ltiAssessmentMapper,
         private LtiScoreMapper $ltiScoreMapper,
-        private UserCodec $userCodec
+        private UserCodec $userCodec,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -57,6 +57,7 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
             $this->ltiAssessmentMapper,
             $this->ltiScoreMapper,
             $this->userCodec,
+            $this->logger,
         );
         $scoreModel = $scoreHelper->createScoreModel($score);
         $scoreModel = $scoreHelper->setStudentInScoreModel($score, $scoreModel);

@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Score;
 
 use OAT\Library\Lti1p3Ags\Model\Score\ScoreInterface;
 use OAT\Library\Lti1p3Ags\Repository\ScoreRepositoryInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\LTI\Assessment;
 use Schoolbox\LTI\User\Codec as UserCodec;
@@ -36,13 +37,15 @@ class LineItemGuidScoreRepository implements ScoreRepositoryInterface
      * @param Assessment\Score\Mapper   $ltiScoreMapper      The mapper used to save and retrieve LTI scores.
      * @param UserCodec                 $userCodec           User codec, used to decode the user ID in the score into a
      *                                                       user to score.
+     * @param LoggerInterface           $logger              Logger for what this repository does.
      */
     public function __construct(
         private LtiAssessment $ltiAssessment,
         private Assessment\LineItem\Model $ltiLineItem,
         private Assessment\Mapper $ltiAssessmentMapper,
         private Assessment\Score\Mapper $ltiScoreMapper,
-        private UserCodec $userCodec
+        private UserCodec $userCodec,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -60,6 +63,7 @@ class LineItemGuidScoreRepository implements ScoreRepositoryInterface
             $this->ltiAssessmentMapper,
             $this->ltiScoreMapper,
             $this->userCodec,
+            $this->logger,
         );
         $scoreModel = $scoreHelper->createScoreModel($score);
         $scoreModel = $scoreHelper->setStudentInScoreModel($score, $scoreModel);

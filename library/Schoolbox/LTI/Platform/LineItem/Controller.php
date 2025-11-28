@@ -114,6 +114,7 @@ class Controller extends BaseController
             $this->ltiAssessmentMapper,
             $this->ltiAssessmentScoreMapper,
             $this->userCodec,
+            $this->logger,
         );
 
         // Handle the request: this validates the request body

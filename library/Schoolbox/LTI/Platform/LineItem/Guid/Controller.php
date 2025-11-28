@@ -201,7 +201,9 @@ class Controller extends BaseController
                 $this->ltiAssessmentMapper,
                 $this->ltiAssessmentScoreMapper,
                 $this->userCodec,
-            )
+                $this->logger,
+            ),
+            logger: $this->logger,
         );
         $this->response = $this->createResponse($handler);
     }
