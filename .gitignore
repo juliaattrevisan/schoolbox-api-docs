@@ -14,7 +14,7 @@ www/static/css/core/learnosity.css
 *.log
 *.swp
 vendor/
-# Webpack bundle export directory
+# Rspack bundle export directory
 www/static/js/bundle/
 node_modules/
 test/behavior/screenshots/*.png

@@ -7,7 +7,7 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import AudiencesModal from "./audiences-modal";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
-/* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
+/* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
  */
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";

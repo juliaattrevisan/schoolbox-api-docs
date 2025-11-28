@@ -9,7 +9,7 @@ import MetaItem from "@schoolboxVue/components/meta/item";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 
-/* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
+/* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
  */
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";

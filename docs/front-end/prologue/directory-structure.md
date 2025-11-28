@@ -12,7 +12,7 @@ Examples:
 
 ### library/Schoolbox/**/[Module name]/react
 
-This folder will hold any components, pages, and interfaces specific to the module. This folder will also contain an entry file for Webpack.
+This folder will hold any components, pages, and interfaces specific to the module. This folder will also contain an entry file for Rspack.
 
 #### library/Schoolbox/**/[Module name]/react/components
 

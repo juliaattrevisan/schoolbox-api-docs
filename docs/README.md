@@ -8,7 +8,7 @@ the Schoolbox product team.
 -   [MVC](mvc/readme.md)
 -   [Notifications](notifications/README.md)
 -   [Vue](vue/README.md)
--   [Webpack](webpack/README.md)
+-   [Rspack](rspack/README.md)
 
 ## Where should documentation exist?
 
