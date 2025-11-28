@@ -395,7 +395,8 @@ switch ($_POST['module']) {
                     $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
 
                     // Check cert is issued by LetsEncrypt for exact hostname
-                    if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
+                    $issuerOrganisationName = $certificateProperties['issuer']['O'] ?? null;
+                    if ($issuerOrganisationName !== "Let's Encrypt") {
                         // Not issued by LetsEncrypt
                         $isCustomCert = true;
                     } else {
