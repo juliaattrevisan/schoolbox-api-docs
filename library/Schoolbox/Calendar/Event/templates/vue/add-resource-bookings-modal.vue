@@ -25,6 +25,7 @@ export default {
             isProcessing: false, // To disable buttons on form submission to prevent rapid fire.
             selected: [],
             resources: [],
+            excludeResourceIds: [8, 12, 13],
         };
     },
 
@@ -67,9 +68,9 @@ export default {
          * Get the endpoint for the booking resource search.
          * @returns {String} The endpoint for the booking resource search.
          */
-        getBookingEndpoint() {
+        getResourceSearchEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.href).toString();
-            return `${searchUrl}?`;
+            return `${searchUrl}?excludeResourceIds=` + this.excludeResourceIds.join(",") + "&";
         },
 
         /**
@@ -144,7 +145,7 @@ export default {
                 <search-select
                     class="l-pad-m--bottom"
                     v-model:selected="resources"
-                    :endpoint="getBookingEndpoint()"
+                    :endpoint="getResourceSearchEndpoint()"
                     label="Resources"
                     label-id="resources"
                     placeholder=""

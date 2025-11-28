@@ -119,7 +119,8 @@ class Controller extends Base
     {
         $excludedId = $this->requestQuery->get('thisId');
         $search = trim($this->requestQuery->get('query'));
-        $excludeResourceIds = [8,12,13];
+        $excludeResourceIdsString = trim($this->requestQuery->get('excludeResourceIds'));
+        $excludeResourceIds = explode(',', $excludeResourceIdsString);
         $data = $this->mapper->search(
             $search,
             $this->getUser(),
