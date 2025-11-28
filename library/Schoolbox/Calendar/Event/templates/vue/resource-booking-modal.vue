@@ -115,7 +115,7 @@ export default {
                     this.$refs.toast.timeout("Unable to create booking. " + responseData.message, false, 3000);
                 }
             } catch (error) {
-                this.$refs.toast.timeout("Unable to create event / task. " + error.message, false, 3000);
+                this.$refs.toast.timeout("Unable to create booking. " + error.message, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
@@ -129,10 +129,10 @@ export default {
     <toast ref="toast"></toast>
     <reveal-modal ref="modal">
         <form
-            ref="createEventForm"
+            ref="createBookingForm"
             method="post"
             :action="bookingCreateUrl"
-            @submit.prevent="createNewBooking($refs.createEventForm)"
+            @submit.prevent="createNewBooking($refs.createBookingForm)"
             class="top"
         >
             <h2>Add Resource Bookings</h2>
