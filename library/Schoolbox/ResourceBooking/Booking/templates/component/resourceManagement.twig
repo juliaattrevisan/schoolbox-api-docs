@@ -56,13 +56,13 @@
                         <div class="expander icon-up-arrow" data-collapser="collap-{{ item.resource.id }}"></div>
                     </div>
                 </li>
-                <li class="content small-12" id="collap-{{ item.resource.id }}" data-collapse-state="uncollapsed" data-collapsable="collap-{{ item.resource.id }}">
+                <li class="content" id="collap-{{ item.resource.id }}" data-collapse-state="uncollapsed" data-collapsable="collap-{{ item.resource.id }}">
                     <ul class="information-list">
                         {% for date in item.bookingEvents %}
                         <li class="actions-small-1">
-                            <div class="">
+                            <div>
                                 {# show date card #}
-                                <div class="small-12 card l-grid l-gap-l l-grid--3-col l-mar-m--bottom">
+                                <div class="card l-flex l-flex--row l-gap-l l-flex--wrap l-mar-m--bottom">
                                     {# booking date, may have multiple bookings under this date #}
                                     <div class="text-center">
                                         {{ date.dateFormat.dayName }}
@@ -79,7 +79,7 @@
                                             <div class="list-item">
 
                                                 {# cardception #}
-                                                <div class="small-12">
+                                                <div>
                                                     {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
                                                     <div class="warning">
                                                     {% endif %}
@@ -88,7 +88,7 @@
                                                     {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
                                                     </div>
                                                     {% endif %}
-                                                    <div class="small-12 tiny card">
+                                                    <div class="tiny card">
                                                         {# small portrait of booker #}
                                                         <a href="/search/user/{{ event.booking.event.owner.id }}">
                                                             {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
