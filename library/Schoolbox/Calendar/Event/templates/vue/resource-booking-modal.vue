@@ -126,6 +126,7 @@ export default {
 </script>
 
 <template>
+    <toast ref="toast"></toast>
     <reveal-modal ref="modal">
         <form
             ref="createEventForm"
