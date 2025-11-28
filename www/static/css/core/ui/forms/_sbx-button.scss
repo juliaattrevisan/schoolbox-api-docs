@@ -45,7 +45,8 @@
 .sbx-body .button,
 .sbx-body .flex-list.buttons a,
 .sbx-body .sub-nav li a,
-.sbx-body nav li.active a {
+.sbx-body nav li.active a,
+.sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -77,7 +78,8 @@
  * When a button sits next to an input (e.g. search bars)
  * We need to tweak the rounding of the corners so they align properly
  */
-.sbx-body .input-group a.button {
+.sbx-body .input-group .button,
+.sbx-body .input-group a {
     border-left: none;
     border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
     line-height: 1;
