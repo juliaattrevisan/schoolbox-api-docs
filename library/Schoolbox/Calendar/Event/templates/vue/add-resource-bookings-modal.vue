@@ -25,9 +25,7 @@ export default {
 
     data() {
         return {
-            booking: {},
             isProcessing: false, // To disable buttons on form submission to prevent rapid fire.
-            selected: [],
             resources: [],
         };
     },
@@ -82,7 +80,6 @@ export default {
          */
         open() {
             this.$refs.modal.open();
-            this.selected = []; // Clear selectize contents.
             this.resources = [];
         },
 
