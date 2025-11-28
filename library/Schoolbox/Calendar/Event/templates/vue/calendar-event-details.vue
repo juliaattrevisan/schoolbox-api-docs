@@ -674,24 +674,28 @@ export default {
                 </div>
                 <div class="meta"></div>
                 <div class="content-section">
-                    <table v-if="event.resourceBookings.length > 0">
-                        <tbody>
-                            <tr v-for="booking in event.resourceBookings" :key="booking.id">
-                                <td>{{ booking.name !== "" ? booking.name : booking.resource.name }}</td>
-                                <td class="text-right">
-                                    <span :class="booking.status.name.toLowerCase() + ' label'">{{
-                                        booking.status.name
-                                    }}</span>
-                                    <a
-                                        href=""
-                                        class="icon-modify"
-                                        title="Modify Booking"
-                                        onclick="alert('TODO: Implement edit booking modal')"
-                                    ></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div v-if="event.resourceBookings.length > 0">
+                        <div
+                            v-for="booking in event.resourceBookings"
+                            :key="booking.id"
+                            class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom"
+                        >
+                            <div>
+                                {{ booking.name !== "" ? booking.name : booking.resource.name }}
+                            </div>
+                            <div class="text-right">
+                                <span :class="booking.status.name.toLowerCase() + ' label'">{{
+                                    booking.status.name
+                                }}</span>
+                                <a
+                                    href=""
+                                    class="icon-modify"
+                                    title="Modify Booking"
+                                    onclick="alert('TODO: Implement edit booking modal')"
+                                ></a>
+                            </div>
+                        </div>
+                    </div>
                     <div v-else class="empty-state">
                         <i class="icon-resource-booking"></i>
                         <p>
