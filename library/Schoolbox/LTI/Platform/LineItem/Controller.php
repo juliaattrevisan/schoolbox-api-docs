@@ -16,6 +16,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Lti\Model;
@@ -42,13 +43,15 @@ class Controller extends BaseController
      * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
      *                                                                  score publish request into an actual user.
      * @param CacheItemPoolInterface          $accessTokenCache         Cache for access tokens.
+     * @param LoggerInterface                 $logger                   Logger for what this controller does.
      */
     public function __construct(
         private LtiAssessment\Mapper $ltiAssessmentMapper,
         private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
         private RegistrationRepositoryInterface $registrations,
         private UserCodec $userCodec,
-        private CacheItemPoolInterface $accessTokenCache
+        private CacheItemPoolInterface $accessTokenCache,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -69,6 +72,10 @@ class Controller extends BaseController
      */
     public function getLineItemForAssessment(Model $assessment): void
     {
+        $this->logger->error(
+            __METHOD__ . ': not implemented',
+            ['assessmentId' => $assessment->getId()],
+        );
         throw new NotFound();
     }
 
@@ -88,12 +95,12 @@ class Controller extends BaseController
 
         // Access token sanity checker:
         // validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations);
+        $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
 
         // Access token validity checker
         // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
         $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache),
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
         $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
@@ -110,8 +117,12 @@ class Controller extends BaseController
         );
 
         // Handle the request: this validates the request body
-        $handler            = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
-        $server             = new ServiceServer($validator, $handler);
+        $handler = new ScoreServiceServerRequestHandler(
+            $lineItemRepository,
+            $scoreRepository,
+            logger: $this->logger,
+        );
+        $server         = new ServiceServer($validator, $handler, logger: $this->logger);
         $this->response = $server->handle($request);
     }
 }
