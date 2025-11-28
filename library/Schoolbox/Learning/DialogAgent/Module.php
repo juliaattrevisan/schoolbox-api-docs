@@ -39,6 +39,7 @@ use Schoolbox\Learning\Authorizer\Rule\IsModifyUnLocked;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -123,7 +124,7 @@ class Module extends BaseModule
          */
         $isSuper = $this->getAuthRule('isSuperuser');
         $canSubmit = $this->buildAuthRuleCanSubmit();
-        $canViewSummary = $this->buildAuthRuleCanViewSummary();
+        $canViewResponse = $this->buildAuthRuleCanViewResponse();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
 
         $canModify = new Rule\Any(
@@ -149,7 +150,7 @@ class Module extends BaseModule
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
-            $canViewSummary,
+            $canViewResponse,
             $this->buildRuleCanAction(Status::ACTION_VIEW)
         ), $preloadParticipantAndResponse);
 
@@ -238,11 +239,20 @@ class Module extends BaseModule
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException If required route param not found
      */
-    private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
+    private function buildAuthRuleCanViewResponse(): Rule\IAuthorizationRule
     {
         return new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
+            /* Only students and staff can see this, specifically excluding parents and guests.
+             * This overlaps CanViewAssessable() to some extent
+             */
+            new Rule\Any(
+                new Rule\HasRole(Role::STUDENT),
+                new Rule\HasRole(Role::STAFF),
+            ),
+            /* The rules below were yoinked from Learning/Assessment/Module.
+             */
             new CanViewAssessable(new Visibility($this->getAccess())),
             new Rule\Any(
                 // Instructor/staff viewing their own summary page
@@ -255,7 +265,7 @@ class Module extends BaseModule
                 // polite "User {studentID} is excluded from this assessment"
                 // message.
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
-            )
+            ),
         );
     }
 

@@ -8,8 +8,13 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\User;
 
 /**
  * andrew.carlton 44 minutes ago
@@ -40,10 +45,16 @@ class Button
      * Constructor.
      *
      * Contains a route generator so you can pre-build the relevant routes here
-     * @param \Aura\Router\Generator $routeGenerator
+     *
+     * @param Generator $routeGenerator
+     * @param Authorizer $authorizer
+     * @param Access $access
      */
-    public function __construct(private \Aura\Router\Generator $routeGenerator)
-    {
+    public function __construct(
+        private \Aura\Router\Generator $routeGenerator,
+        private Authorizer $authorizer,
+        private \Schoolbox\Permission\Access\Access $access
+    ) {
     }
 
 
@@ -53,171 +64,177 @@ class Button
      *
      * @param Model $assessment
      * @param null|Participant $participant
-     * @return array
+     * @param User $viewer
+     * @return array|null
+     * @throws RouteNotFound
+     * @throws Exception
+     */
+    public function generate(Model $assessment, ?Participant $participant, User $viewer): ?array
+    {
+        /* Specs have no action
+         */
+        if ($assessment->isSpecification()) {
+            return null;
+        }
+
+        /* First check if you can author something (either by creating a new response or resuming an existing response)
+         */
+        $button = $this->findCreateResponseButton($assessment, $participant, $viewer);
+
+        if ($button) {
+            return $button;
+        }
+
+        /* If you can't author anything, maybe you can view something you previously did
+         */
+        $button = $this->findViewResponseButton($assessment, $participant, $viewer);
+
+        if ($button) {
+            return $button;
+        }
+
+        /* The $viewer couldn't access either routes that would have fulfilled a call to action meaningfully:
+         * The buttons that *could* display from here are disabled.
+         *
+         * Note that assessments must be an implementation. The canonical getCreateResponseForm() auth check allows
+         * you (seemingly) to bypass this requirement. There's a deep heuristic there that maybe shines a light on
+         * other swampy ideas...
+         */
+
+        /* Students would see a disabled Begin button under the premise they'd be able to make a response someday
+         */
+        if ($this->access->isLearner($viewer, $assessment->getBaseContext()->getFolder())) {
+            return [
+                'label' => self::LABEL_START,
+                'url' => null,
+            ];
+        }
+
+        /* Staff members end up seeing a View Discussion button here when they're viewing a dialog agent's summary
+         * screen _for themselves_ which is maybe a bit weird...perhaps it should just hide the call to action.
+         * Staff aren't ever meant to do it for themselves.
+         */
+        if ($this->access->isInstructor($viewer, $assessment->getBaseContext()->getFolder())) {
+            return [
+                'label' => self::LABEL_VIEW,
+                'url' => null,
+            ];
+        }
+
+        /* Parents don't have a button at all.
+         * Guests don't have a button at all.
+         *     These two roletypes should have been precluded in Module so you should never really get here except
+         *     if you're trying to unlock something
+         *
+         * Staff don't have a button if you're looking at a specification assessment.
+         */
+        return null;
+    }
+
+
+    /**
+     * See if you can get to the Create Response screen
+     *
+     * @param Model $assessment
+     * @param Participant|null $participant
+     * @param User $viewer
+     * @return array|null
      * @throws RouteNotFound
      */
-    public function generate(Model $assessment, ?Participant $participant): array
+    private function findCreateResponseButton(Model $assessment, ?Participant $participant, User $viewer): ?array
     {
-        $now = \Alaress_Date_Format::now();
-
-        /* No participant? You might be a staff member creating this thing since that workflow also lands you at
-         * the assessment summary screen. Without a participant you can't do much here.
-         *
-         * I guess...this?
-         */
         if (null === $participant) {
-            return [
-                'label' => self::LABEL_START,
-                'responseId' => null,
-                'enabled' => false,
-                'url' => null,
-            ];
+            return null;
         }
 
-        /* If the assessment has surpassed its publish date, but not yet reached its open date,
-         * button says "Begin" in a disabled state.
-         */
-        if ($assessment->getPublishAt()->lte($now) && $assessment->getOpenAt()->gt($now)) {
-            /* Begin (disabled)
-             */
-            return [
-                'label' => self::LABEL_START,
-                'responseId' => null,
-                'enabled' => false,
-                'url' => null,
-            ];
-        }
+        $route = 'learningAssessment.getCreateResponseForm';
 
-        /* Everything below here requires you to know about an authoritative response, if extant.
-         */
-
-        /** @var null|\Schoolbox\Learning\Assessment\DialogAgent\Response\Model $authoritativeResponse */
-        $authoritativeResponse = null;
-
-        if ($participant->getAllResponses()->count()) {
-            $authoritativeResponse = $participant->getAllResponses()->filter(static function ($response) {
-                return $response->getAuthoritative();
-            })->first();
-        }
-
-        /* The assessment has surpassed its due/close date, but we need to let students see the work they did
-         * previously. This lets them use it for their own revision purposes. Note that dialog agents' Due and
-         * Close date should be the same value: this is enforced elsewhere in the swamp.
-         */
-        if ($assessment->getCloseAt()->lte($now)) {
-            if (null === $authoritativeResponse) {
-                /* No authoritative responses; the student never did the work
-                 * Button says "View" in a disabled state.
-                 */
-                return [
-                    'label' => self::LABEL_VIEW,
-                    'responseId' => null,
-                    'enabled' => false,
-                    'url' => null,
-                ];
-            } else {
-                /* If the assessment has surpassed its due date,
-                 * but this is an authoritative response,
-                 * button says "View" but lets you continue so you can look at it.
-                 */
-                return [
-                    'label' => self::LABEL_VIEW,
-                    'responseId' => $authoritativeResponse->getId(),
-                    'enabled' => true,
-                    'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
-                        'assessment' => $assessment,
-                        'assessmentId' => $assessment->getId(),
-                        'student' => $participant->getUser(),
-                        'studentId' => $participant->getUser()->getId(),
-                        'response' => $authoritativeResponse,
-                        'responseId' => $authoritativeResponse->getId()
-                    ]),
-                ];
-            }
-        }
-
-        /* Otherwise it's reached its open date, but it's not closed yet; deal with responses somewhat intricately
-         * This mega clause represents students -doing stuff-
-         */
-        if ($assessment->getOpenAt()->lte($now)) {
-            if (!$participant->getAllResponses()->count()) {
-                /* If there are no responses at all, button says "Begin"
-                 * You're about to make the first one and the first one is always authoritative.
-                 */
-                return [
-                    'label' => self::LABEL_START,
-                    'responseId' => null,
-                    'enabled' => true,
-                    'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
-                        'assessment' => $assessment,
-                        'assessmentId' => $assessment->getId(),
-                        'student' => $participant->getUser(),
-                        'studentId' => $participant->getUser()->getId(),
-                    ]),
-                ];
-            }
-
-            /* Otherwise, there are existing response(s); dig deeper.
-             *
-             * Look for an authoritative response. If there is one:
-             *     - if it has a submitted_at, button says "View"
-             *     - otherwise, button says "Resume"
-             */
-            if (null !== $authoritativeResponse) {
-                if (null !== $authoritativeResponse->getSubmittedAt()) {
-                    /* View (enabled)
-                     */
-                    return [
-                        'label' => self::LABEL_VIEW,
-                        'responseId' => $authoritativeResponse->getId(),
-                        'enabled' => true,
-                        'url' => $this->routeGenerator->generate('learningDialogAgent.getViewResponse', [
-                            'assessment' => $assessment,
-                            'assessmentId' => $assessment->getId(),
-                            'student' => $participant->getUser(),
-                            'studentId' => $participant->getUser()->getId(),
-                            'response' => $authoritativeResponse,
-                            'responseId' => $authoritativeResponse->getId()
-                        ]),
-                    ];
-                } else {
-                    /* Resume (enabled)
-                     */
-                    return [
-                        'label' => self::LABEL_RESUME,
-                        'responseId' => $authoritativeResponse->getId(),
-                        'enabled' => true,
-                        'url' => $this->routeGenerator->generate('learningAssessment.getCreateResponseForm', [
-                            'assessment' => $assessment,
-                            'assessmentId' => $assessment->getId(),
-                            'student' => $participant->getUser(),
-                            'studentId' => $participant->getUser()->getId(),
-                        ]),
-                    ];
-                }
-            }
-
-            /* Note that the else clause here would represent a scenario where the first response WAS NOT set to
-             * be authoritative, which is a mistake on our part. The first response is always authoritative and
-             * there is always at least one authoritative response per assessment (unless the student literally
-             * did nothing to contribute to this activity)
-             */
-        }
-
-        /* Assessment Duration
-         *
-         * Note that durations are -per response- and mostly enforced in frontend.
-         * Backend implements a crontab that forcibly shuts whatever the frontend couldn't.
-         * Durations don't factor into whether you can make responses or anything, it's a clerical duty.
-         */
-
-        /* Unforeseen scenario.
-         */
-        return [
-            'label' => self::LABEL_START,
-            'responseId' => null,
-            'enabled' => false,
-            'url' => null,
+        $params = [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student' => $participant->getUser(),
+            'studentId' => $participant->getUser()->getId(),
         ];
+
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $url = $this->routeGenerator->generate($route, $params);
+
+            /* See if there's an authoritative response to resume; if not, we're gonna create a new one
+             */
+            $authoritativeResponse = $participant->getAuthoritativeResponse(false);
+
+            /* Authoritative response exists and it's not yet submitted; resume it
+             */
+            if ($authoritativeResponse && !$authoritativeResponse->isSubmitted()) {
+                return [
+                    'label' => self::LABEL_RESUME,
+                    'url' => $url,
+                ];
+            }
+
+            /* Otherwise you're creating a new thing
+             */
+            return [
+                'label' => self::LABEL_START,
+                'url' => $url,
+            ];
+        }
+
+        /* You can't create a response for any one of many reasons:
+         * e.g. not open yet, due in  archived academic period, etc.
+         */
+        return null;
+    }
+
+
+    /**
+     * See if you can get to the View Response url
+     *
+     * @param Model $assessment
+     * @param Participant|null $participant
+     * @param User $viewer
+     * @return array|null
+     * @throws RouteNotFound
+     */
+    private function findViewResponseButton(Model $assessment, ?Participant $participant, User $viewer): ?array
+    {
+        if (null === $participant) {
+            return null;
+        }
+
+        /* If there's an authoritative response, you can at least view it; whether or not it's in a "published"
+         * state doesn't really matter yet
+         */
+        $authoritativeResponse = $participant->getAuthoritativeResponse(false);
+
+        if (null === $authoritativeResponse) {
+            return null;
+        }
+
+        /* If the assessment has surpassed its due date,
+         * but this is an authoritative response,
+         * button says "View" but lets you continue so you can look at it.
+         */
+        $route = 'learningDialogAgent.getViewResponse';
+
+        $params = [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student' => $participant->getUser(),
+            'studentId' => $participant->getUser()->getId(),
+            'response' => $authoritativeResponse,
+            'responseId' => $authoritativeResponse->getId()
+        ];
+
+        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $viewer)) {
+            $url = $this->routeGenerator->generate($route, $params);
+
+            return [
+                'label' => self::LABEL_VIEW,
+                'url' => $url,
+            ];
+        }
+
+        return null;
     }
 }
