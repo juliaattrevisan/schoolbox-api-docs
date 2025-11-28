@@ -275,7 +275,7 @@ function init_composer_dependencies() {
 
   if [ "$artifact_file" = "ignore" ]; then
       log "Vendor artifact up to date: updating autoload and patches";
-      composer install -o --no-interaction
+      composer install -o --no-interaction --ignore-platform-req=ext-gd
   else
       if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
           # Extract content
@@ -283,11 +283,11 @@ function init_composer_dependencies() {
           rm -fR "${vendor_dir}" 2> /dev/null;
           tar xzf "${CACHE_DIR}/${artifact_file}";
           log "Updating autoload and patches";
-          composer install -o --no-interaction
+          composer install -o --no-interaction --ignore-platform-req=ext-gd
       else
           # Still no luck, build from scratch with composer
           log "No matching vendor cache found. Building with composer";
-          "$SITE_ROOT"/tools/composer.sh
+          "$SITE_ROOT"/tools/composer.sh --ignore-platform-req=ext-gd
       fi
   fi
 
