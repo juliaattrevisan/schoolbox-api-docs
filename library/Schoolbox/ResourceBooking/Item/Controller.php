@@ -123,7 +123,7 @@ class Controller extends Base
         if ($excludeResourceIdsString !== '') {
             // Extract integers from comma-separated values in string to protect against SQL injection attacks.
             $excludeResourceIds = explode(',', $excludeResourceIdsString);
-            $excludeResourceIds = array_filter($excludeResourceIds, static fn ($id) => (int)$id);
+            $excludeResourceIds = array_filter($excludeResourceIds, static fn ($id) => (int)$id > 0);
         } else {
             $excludeResourceIds = [];
         }
