@@ -712,6 +712,10 @@ export default {
             :group-audiences="this.event.audiences.folders"
             :is-group="this.isGroupEvent"
         />
-        <add-resource-bookings-modal ref="addResourceBookingsModal" :resourceBookings="this.event.resourceBookings" />
+        <add-resource-bookings-modal
+            v-if="event.resourceBookings"
+            ref="addResourceBookingsModal"
+            :resourceBookings="this.event.resourceBookings"
+        />
     </div>
 </template>
