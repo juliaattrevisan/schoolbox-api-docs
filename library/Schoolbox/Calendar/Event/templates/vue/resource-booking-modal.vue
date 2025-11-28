@@ -37,7 +37,7 @@ export default {
          * @return {boolean}
          */
         isFormSubmittable() {
-            return this.booking.name && this.booking.name.length !== 0 && !this.isProcessing;
+            return !this.isProcessing;
         },
 
         /**
@@ -86,7 +86,6 @@ export default {
         async createNewBooking(form) {
             this.isProcessing = true;
             const formContent = new FormData(form);
-            formContent.set("detail", window.sbProps.editors["detail"].getData());
             this.$refs.toast.activate("Saving...");
 
             try {
