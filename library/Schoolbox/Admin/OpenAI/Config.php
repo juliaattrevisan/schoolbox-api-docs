@@ -235,7 +235,7 @@ class Config
         if ($config === null) {
             return false;
         }
-        return $config[self::FIELD_PROVIDER] !== Helper::ENDPOINT_TYPE_OFF;
+        return $config[self::FIELD_PROVIDER]['value'] !== Helper::ENDPOINT_TYPE_OFF;
     }
 
     /**
