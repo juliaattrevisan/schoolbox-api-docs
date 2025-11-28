@@ -79,6 +79,138 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
+    /**
+     * Apply filter for pastoral record permission based on the viewer's access level
+     *
+     * @param Builder $pb
+     * @param User    $viewer
+     *
+     * @return Builder
+     */
+    public function filterByPermission(Builder $pb, User $viewer): Builder
+    {
+        if (null === $viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
+            $pb->rawWhere(" NOT EXISTS (
+                SELECT 1 FROM `pastoral_access` pa_deny
+                WHERE pa_deny.`pastoral_id` = `p`.`id`
+                AND pa_deny.`deleted_at` IS NULL
+                AND pa_deny.`access` = :accessDeny
+                AND (
+                    pa_deny.`user_id` = :viewerId OR
+                    pa_deny.`role_id` = :viewerRoleId OR
+                    (pa_deny.`group_id` IN (
+                        SELECT `pgm`.`group_id`
+                        FROM `pastoral_group` pg
+                        LEFT JOIN `pastoral_group_member` pgm ON `pgm`.`group_id` = `pg`.`id` AND `pgm`.`deleted_at` IS NULL
+                        WHERE `pgm`.`user_id` = :viewerId AND `pg`.`deleted_at` IS NULL
+                    ))
+                )
+                AND `p`.`owner_id` <> :viewerId
+            )", [
+                'accessDeny'    => UserAccess::ACCESS_DENY,
+                'viewerId'      => $viewer->getId(),
+                'viewerRoleId'  => $viewer->getRole()->getId(),
+            ]);
+
+            $tempPb = $this->getPredicateBuilder()
+                /* The viewer should be able to see the records they've created
+                 */
+                           ->equals('p.owner_id', $viewer->getId())
+                /* If the pastoral access is set to the specific user
+                 */
+                           ->rawWhere(
+                               '(`pa`.`user_id` = :viewerId AND `pa`.`access` > :accessDeny)',
+                               [
+                               'viewerId'   => $viewer->getId(),
+                               'accessDeny' => UserAccess::ACCESS_DENY,
+                               ]
+                               /* Checking group-based permission
+                               */
+                           )->rawWhere(
+                               '(
+                                `pa`.`group_id` IN (
+                                    SELECT `pgm`.`group_id`
+                                    FROM pastoral_group pg
+                                    LEFT JOIN `pastoral_group_member` pgm ON `pgm`.`group_id` = `pg`.`id`
+                                    WHERE `pgm`.`user_id` = :viewerId
+                                    AND `pgm`.`deleted_at` IS NULL
+                                    AND `pg`.`deleted_at` IS NULL
+                                )
+                                AND `pa`.`access` > :accessDeny
+                            )',
+                               [
+                                'viewerId'   => $viewer->getId(),
+                                'accessDeny' => UserAccess::ACCESS_DENY,
+                               ]
+                           );
+
+            /* Role-based access checks
+             */
+            if ($viewer->getRole()->isStaff()) {
+                /* If the viewer is staff then return the records they have access to
+                 */
+                $tempPb->rawWhere('(
+                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                    `pa`.`access` > :accessDeny
+                 )', [
+                    'viewerRoleId'   => $viewer->getRole()->getId(),
+                    'viewerRoleType' => $viewer->getRole()->getType(),
+                    'accessDeny'    => UserAccess::ACCESS_DENY,
+                ]);
+            } else if ($viewer->getRole()->isStudent()) {
+                /* If the viewer is student, then return the records about them and have access to
+                 */
+                $tempPb->rawWhere('((
+                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                    `p`.`student_id` = :viewerRoleId AND
+                    `pa`.`access` > :accessDeny
+                 )', [
+                    'viewerRoleId'   => $viewer->getRole()->getId(),
+                    'viewerRoleType' => $viewer->getRole()->getType(),
+                    'accessDeny'    => UserAccess::ACCESS_DENY,
+                ]);
+            } else if ($viewer->getRole()->isParent()) {
+                /* If the viewer is parent then only return the records of their children and
+                 * only the ones they have access to
+                 */
+                (new \Schoolbox\External\User())->loadChildren([$viewer]);
+                $childrenIds = implode(
+                    ',',
+                    $viewer->getChildren()->getPropertyValues('id')
+                );
+                $tempPb->rawWhere("(
+                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                    `p`.`student_id` IN ($childrenIds) AND
+                    `pa`.`access` > :accessDeny
+                )", [
+                    'viewerRoleId'   => $viewer->getRole()->getId(),
+                    'viewerRoleType' => $viewer->getRole()->getType(),
+                    'accessDeny'    => UserAccess::ACCESS_DENY,
+                ]);
+            }
+
+            $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
+            $pb->all(
+                $this->getPredicateBuilder()->any(
+                    $tempPb
+                    /* Campus based access
+                    */
+                )->rawWhere('(
+                    `pa`.`match_campus` = 0 OR
+                    (
+                    `pa`.`match_campus` = 1 AND
+                    `p`.`student_id` IN (
+                        SELECT `userCampus`.`uid`
+                        FROM `userCampus`
+                        WHERE `userCampus`.`campus` IN (' . implode(',', $campusIds) . ')
+                        )
+                    )
+                )', [])
+            );
+        }
+        return $pb;
+    }
+
     public function findByFilters(
         User $viewer,
         ?array $nameSearch,
@@ -144,122 +276,7 @@ class Mapper extends BaseMapper
                  ->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
         );
 
-        if (null === $viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
-            $pb->rawWhere(" NOT EXISTS (
-                SELECT 1 FROM `pastoral_access` pa_deny
-                WHERE pa_deny.`pastoral_id` = `p`.`id`
-                AND pa_deny.`deleted_at` IS NULL
-                AND pa_deny.`access` = :accessDeny
-                AND (
-                    pa_deny.`user_id` = :viewerId OR
-                    pa_deny.`role_id` = :viewerRoleId OR
-                    (pa_deny.`group_id` IN (
-                        SELECT `pgm`.`group_id`
-                        FROM `pastoral_group` pg
-                        LEFT JOIN `pastoral_group_member` pgm ON `pgm`.`group_id` = `pg`.`id` AND `pgm`.`deleted_at` IS NULL
-                        WHERE `pgm`.`user_id` = :viewerId AND `pg`.`deleted_at` IS NULL
-                    ))
-                )
-                AND `p`.`owner_id` <> :viewerId
-            )", [
-                'accessDeny'    => UserAccess::ACCESS_DENY,
-                'viewerId'      => $viewer->getId(),
-                'viewerRoleId'  => $viewer->getRole()->getId(),
-            ]);
-
-            $tempPb = $this->getPredicateBuilder()
-                          /* The viewer should be able to see the records they've created
-                           */
-                           ->equals('p.owner_id', $viewer->getId())
-                          /* If the pastoral access is set to the specific user
-                           */
-                           ->rawWhere(
-                               '(`pa`.`user_id` = :viewerId AND `pa`.`access` > :accessDeny)',
-                               [
-                                   'viewerId'   => $viewer->getId(),
-                                   'accessDeny' => UserAccess::ACCESS_DENY,
-                               ]
-                          /* Checking group-based permission
-                           */
-                           )->rawWhere('(
-                                `pa`.`group_id` IN (
-                                    SELECT `pgm`.`group_id`
-                                    FROM pastoral_group pg
-                                    LEFT JOIN `pastoral_group_member` pgm ON `pgm`.`group_id` = `pg`.`id`
-                                    WHERE `pgm`.`user_id` = :viewerId
-                                    AND `pgm`.`deleted_at` IS NULL
-                                    AND `pg`.`deleted_at` IS NULL
-                                )
-                                AND `pa`.`access` > :accessDeny
-                            )',
-                               [
-                                   'viewerId'   => $viewer->getId(),
-                                   'accessDeny' => UserAccess::ACCESS_DENY,
-                               ]
-                );
-
-            /* Role-based access checks
-             */
-            if ($viewer->getRole()->isStaff()) {
-                /* If the viewer is staff then return the records they have access to
-                 */
-                $tempPb->rawWhere('(
-                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
-                    `pa`.`access` > :accessDeny
-                 )', [
-                    'viewerRoleId'   => $viewer->getRole()->getId(),
-                    'viewerRoleType' => $viewer->getRole()->getType(),
-                    'accessDeny'    => UserAccess::ACCESS_DENY,
-                ]);
-            } else if ($viewer->getRole()->isStudent()) {
-                /* If the viewer is student, then return the records about them and have access to
-                 */
-                $tempPb->rawWhere('((
-                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
-                    `p`.`student_id` = :viewerRoleId AND
-                    `pa`.`access` > :accessDeny
-                 )', [
-                    'viewerRoleId'   => $viewer->getRole()->getId(),
-                    'viewerRoleType' => $viewer->getRole()->getType(),
-                    'accessDeny'    => UserAccess::ACCESS_DENY,
-                ]);
-            } else if ($viewer->getRole()->isParent()) {
-                /* If the viewer is parent then only return the records of their children and
-                 * only the ones they have access to
-                 */
-                (new \Schoolbox\External\User())->loadChildren([$viewer]);
-                $childrenIds = implode(
-                    ',',
-                    $viewer->getChildren()->getPropertyValues('id')
-                );
-                $tempPb->rawWhere("(
-                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
-                    `p`.`student_id` IN ($childrenIds) AND
-                    `pa`.`access` > :accessDeny
-                )", [
-                    'viewerRoleId'   => $viewer->getRole()->getId(),
-                    'viewerRoleType' => $viewer->getRole()->getType(),
-                    'accessDeny'    => UserAccess::ACCESS_DENY,
-                ]);
-            }
-
-            $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
-            $pb->all(
-                $this->getPredicateBuilder()->any(
-                    $tempPb
-                )->rawWhere('(
-                    `pa`.`match_campus` = 0 OR
-                    (
-                    `pa`.`match_campus` = 1 AND
-                    `p`.`student_id` IN (
-                        SELECT `userCampus`.`uid`
-                        FROM `userCampus`
-                        WHERE `userCampus`.`campus` IN (' . implode(',', $campusIds) . ')
-                        )
-                    )
-                )', [])
-            );
-        }
+        $pb = $this->filterByPermission($pb, $viewer);
 
         if (!empty($cursorParams)) {
             $pb = $this->applyCursor(
