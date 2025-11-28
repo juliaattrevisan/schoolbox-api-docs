@@ -105,6 +105,7 @@
  * Component action section buttons, giving some gap like other button groups
  */
 .sbx-body .component-action section {
+    background: var(--sbx-color-foreground-primary);
     gap: var(--sbx-size-xs);
     padding: var(--sbx-size-xs);
     button,
