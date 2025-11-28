@@ -83,7 +83,9 @@ class DifferentiationProfileGeneration
                 ($record->getBodyPublic() ?? '') . "\n\n" .
                 $record->getAttachments()->reduce(
                     function (string $carry, \Schoolbox\Pastoral\Attachment\Model $attachment) {
-                        if ($attachment->isDeleted()) {
+                        /* Skip deleted or private attachments
+                         */
+                        if ($attachment->isDeleted() || !$attachment->isPublic()) {
                             return $carry;
                         }
                         $parser = $this->parserFactory->produce($attachment);
