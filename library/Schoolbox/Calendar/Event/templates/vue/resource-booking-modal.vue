@@ -17,7 +17,7 @@ export default {
         Toast,
     },
 
-    props: ["bookingCreateUrl"],
+    props: [],
 
     data() {
         return {
@@ -59,6 +59,10 @@ export default {
     },
 
     methods: {
+        getAddBookingsEndpoint() {
+            return new URL(this.ENDPOINTS.URL_BOOKINGS_ADD, window.location.href).toString();
+        },
+
         /**
          * Get the endpoint for the booking resource search.
          * @returns {String} The endpoint for the booking resource search.
@@ -131,7 +135,7 @@ export default {
         <form
             ref="createBookingForm"
             method="post"
-            :action="bookingCreateUrl"
+            :action="getAddBookingsEndpoint()"
             @submit.prevent="createNewBooking($refs.createBookingForm)"
             class="top"
         >
@@ -146,7 +150,7 @@ export default {
                     placeholder=""
                 >
                 </search-select>
-                <input type="hidden" name="resources" :value="compileResourceIds" />
+                <input type="hidden" name="resourceIds" :value="compileResourceIds" />
             </section>
             <ul class="flex-list buttons">
                 <li>
