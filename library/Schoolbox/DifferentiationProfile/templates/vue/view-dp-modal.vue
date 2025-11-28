@@ -15,20 +15,22 @@ import type { User } from "@schoolboxLibrary/types/User";
  */
 type Item = {
     terminology: string;
-    value: string | string[] | null;
+    value: string | { name: string }[] | null;
 };
 
 /**
- * Adjustment item with array value
+ * Valid adjustment item with array value
  */
-type AdjustmentItem = Item & {
-    value: string[];
+type AdjustmentItem = {
+    terminology: string;
+    value: { name: string }[];
 };
 
 /**
- * Text item with string value
+ * Valid text item with string value
  */
-type TextItem = Item & {
+type TextItem = {
+    terminology: string;
     value: string;
 };
 
@@ -131,7 +133,7 @@ function onClose(): void {
                         <h5>{{ item.terminology }}</h5>
                         <article>
                             <ul>
-                                <li v-for="(value, index) in item.value" :key="index">{{ value }}</li>
+                                <li v-for="(value, index) in item.value" :key="index">{{ value.name }}</li>
                             </ul>
                         </article>
                     </div>
