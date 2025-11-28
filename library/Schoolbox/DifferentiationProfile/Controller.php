@@ -384,7 +384,7 @@ class Controller extends Base
                     $method  = $configKey[$config->getName()];
                     $value   = call_user_func([$profile, $method]);
 
-                    if ($config->getModule() === 'adjustments' && $value instanceof Collection) {
+                    if ($config->getModule() === AdminConfigMapper::MODULE_ADJUSTMENTS && $value instanceof Collection) {
                         $value = ($value->count() > 0 ) ?
                             $value->map(fn(AdjustmentCategoriesModel|AdjustmentLevelsModel $adjustment) => [
                                 'name' => $adjustment->getName(),

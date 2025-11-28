@@ -9,6 +9,7 @@ use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Mapper;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\Admin\DifferentiationProfiles\Model as Config;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as ConfigMapper;
 use Schoolbox\User;
 
 class ModelToArray
@@ -71,7 +72,7 @@ class ModelToArray
                 $value = $model->{$configKey[$config->getName()]}();
 
                 // Convert comma-delimited strings to arrays for adjustment fields
-                if (in_array($config->getName(), ['adjustment_category', 'adjustment_level'])) {
+                if ($config->getModule() === ConfigMapper::MODULE_ADJUSTMENTS) {
                     if ($value->count() === 0) {
                         $carry[$config->getName()] = null;
                     } else {
