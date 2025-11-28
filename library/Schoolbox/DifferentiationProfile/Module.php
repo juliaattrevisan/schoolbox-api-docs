@@ -63,7 +63,7 @@ class Module extends BaseModule
             fn (array $params) => (
                 isset($params['student'])
                 && $params['student'] instanceof User
-                && null === $params['student']->getCampusCollection()
+                && null !== $params['student']->getCampusCollection()
             ) ?
                 $params['student']->getCampusCollection() :
                 $this->getMapperFactory()
