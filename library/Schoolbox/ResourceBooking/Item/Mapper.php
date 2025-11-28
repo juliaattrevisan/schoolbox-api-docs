@@ -361,8 +361,7 @@ class Mapper extends BaseMapper
         string $sort_by = 'name',
         string $sort_dir = 'ASC',
         array $excludeResourceIds = [],
-    ): Collection
-    {
+    ): Collection {
         return $this->findByPredicates(
             $this->buildSearchPredicates($keyword, $user, $category, $excludeResourceIds),
             [
@@ -388,8 +387,7 @@ class Mapper extends BaseMapper
         User $user,
         ?string $category = null,
         array $excludeResourceIds = []
-    ): int
-    {
+    ): int {
         return $this->countByPredicates(
             $this->buildSearchPredicates($keyword, $user, $category, $excludeResourceIds)
         );
@@ -409,8 +407,7 @@ class Mapper extends BaseMapper
         User $user,
         ?string $category = null,
         array $excludeResourceIds = []
-    ): Builder
-    {
+    ): Builder {
         $pb = $this->getPredicateBuilder();
 
         $hasAdminPermission =
