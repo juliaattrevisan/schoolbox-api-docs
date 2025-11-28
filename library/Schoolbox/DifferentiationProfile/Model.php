@@ -7,6 +7,7 @@
 
 namespace Schoolbox\DifferentiationProfile;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
@@ -20,8 +21,10 @@ class Model implements ISoftDeletable
     use ModelTraits\DeletedAtDate;
 
 //    private int $student_id;
-    private ?string $adjustment_category = null;
-    private ?string $adjustment_level = null;
+    private ?GenericCollection $adjustment_category = null;
+    private ?string $adjustment_category_ids = null;
+    private ?GenericCollection $adjustment_level = null;
+    private ?string $adjustment_level_ids = null;
     private ?string $overview = null;
     private ?string $interests_strengths = null;
     private ?string $needs_challenges = null;
@@ -31,27 +34,11 @@ class Model implements ISoftDeletable
     /** @var User $student */
     protected User $student;
 
-//    /**
-//     * Get student ID
-//     *
-//     * @return int
-//     */
-//    public function getStudentId(): int
-//    {
-//        return $this->student_id;
-//    }
-//
-//    /**
-//     * Set student ID
-//     *
-//     * @param int $student_id
-//     * @return self
-//     */
-//    public function setStudentId(int $student_id): self
-//    {
-//        $this->student_id = $student_id;
-//        return $this;
-//    }
+    public function __construct()
+    {
+        $this->adjustment_category = new GenericCollection(AdjustmentCategories\Model::class);
+        $this->adjustment_level = new GenericCollection(AdjustmentLevels\Model::class);
+    }
 
     /**
      * Get student
@@ -78,9 +65,9 @@ class Model implements ISoftDeletable
     /**
      * Get adjustment category
      *
-     * @return string|null
+     * @return GenericCollection|null
      */
-    public function getAdjustmentCategory(): ?string
+    public function getAdjustmentCategory(): ?GenericCollection
     {
         return $this->adjustment_category;
     }
@@ -88,21 +75,39 @@ class Model implements ISoftDeletable
     /**
      * Set adjustment category
      *
-     * @param string|null $adjustment_category
+     * @param GenericCollection|null $adjustment_category
      * @return self
      */
-    public function setAdjustmentCategory(?string $adjustment_category): self
+    public function setAdjustmentCategory(?GenericCollection $adjustment_category): self
     {
         $this->adjustment_category = $adjustment_category;
         return $this;
     }
 
     /**
-     * Get adjustment level
-     *
      * @return string|null
      */
-    public function getAdjustmentLevel(): ?string
+    public function getAdjustmentCategoryIds(): ?string
+    {
+        return $this->adjustment_category_ids;
+    }
+
+    /**
+     * @param string|null $adjustment_category_ids
+     * @return self
+     */
+    public function setAdjustmentCategoryIds(?string $adjustment_category_ids): self
+    {
+        $this->adjustment_category_ids = $adjustment_category_ids;
+        return $this;
+    }
+
+    /**
+     * Get adjustment level
+     *
+     * @return GenericCollection|null
+     */
+    public function getAdjustmentLevel(): ?GenericCollection
     {
         return $this->adjustment_level;
     }
@@ -110,12 +115,30 @@ class Model implements ISoftDeletable
     /**
      * Set adjustment level
      *
-     * @param string|null $adjustment_level
+     * @param GenericCollection|null $adjustment_level
      * @return self
      */
-    public function setAdjustmentLevel(?string $adjustment_level): self
+    public function setAdjustmentLevel(?GenericCollection $adjustment_level): self
     {
         $this->adjustment_level = $adjustment_level;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAdjustmentLevelIds(): ?string
+    {
+        return $this->adjustment_level_ids;
+    }
+
+    /**
+     * @param string|null $adjustment_level_ids
+     * @return self
+     */
+    public function setAdjustmentLevelIds(?string $adjustment_level_ids): self
+    {
+        $this->adjustment_level_ids = $adjustment_level_ids;
         return $this;
     }
 

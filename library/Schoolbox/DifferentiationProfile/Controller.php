@@ -330,8 +330,8 @@ class Controller extends Base
         try {
             /** @var Model $model */
             $model
-                ->setAdjustmentLevel($adjustment_level ? implode(',', $adjustment_level) : null)
-                ->setAdjustmentCategory($adjustment_category ? implode(',', $adjustment_category) : null)
+                ->setAdjustmentLevelIds($adjustment_level ? implode(',', $adjustment_level) : null)
+                ->setAdjustmentCategoryIds($adjustment_category ? implode(',', $adjustment_category) : null)
                 ->setOverview($post->get('overview'))
                 ->setGoals($post->get('goals'))
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))
@@ -381,13 +381,19 @@ class Controller extends Base
             $configs->reduce(function ($carry, $config) use ($profile, $configKey) {
                 /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
                 if (array_key_exists($config->getName(), $configKey)) {
-                    $method = $configKey[$config->getName()];
-                    $value = call_user_func([$profile, $method]);
+                    $method  = $configKey[$config->getName()];
+                    $value   = call_user_func([$profile, $method]);
+
+                    if ($config->getModule() === 'adjustments' && $value instanceof Collection) {
+                        $value = ($value->count() > 0 ) ?
+                            $value->map(fn(AdjustmentCategoriesModel|AdjustmentLevelsModel $adjustment) => [
+                                'name' => $adjustment->getName(),
+                            ]) : null;
+                    }
+
                     $carry[] = [
                         'terminology' => $config->getTerminology() ?? $config->getTitle(),
-                        'value'       => ($config->getModule() === 'adjustments' && !empty($value))
-                            ? explode(',', $value)
-                            : $value,
+                        'value'       => $value
                     ];
                 }
                 return $carry;

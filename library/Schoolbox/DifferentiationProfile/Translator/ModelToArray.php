@@ -72,12 +72,10 @@ class ModelToArray
 
                 // Convert comma-delimited strings to arrays for adjustment fields
                 if (in_array($config->getName(), ['adjustment_category', 'adjustment_level'])) {
-                    if ($value === null) {
+                    if ($value->count() === 0) {
                         $carry[$config->getName()] = null;
-                    } elseif (empty($value)) {
-                        $carry[$config->getName()] = [];
                     } else {
-                        $carry[$config->getName()] = array_map('intval', explode(',', $value));
+                        $carry[$config->getName()] = array_map('intval', $value->getPropertyValues('id'));
                     }
                 } else {
                     $carry[$config->getName()] = $value;
