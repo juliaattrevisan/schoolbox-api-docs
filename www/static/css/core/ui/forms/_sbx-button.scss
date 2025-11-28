@@ -11,12 +11,13 @@
 @use "sbx-form";
 
 /**
- * Primary button style tweaks,
- * which is considered those with the .submit class or [type="submit"]
+ * Primary button, which is considered those with the .submit class or [type="submit"]
+ * Also previously those buttons with the --content-ui-submit-foreground config colour
  */
 .sbx-body [type="submit"],
-.sbx-body a.button.submit,
-.sbx-body button.submit {
+.sbx-body a.submit,
+.sbx-body button.submit,
+.sbx-body .flex-list.buttons a.submit {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -27,10 +28,18 @@
         color: var(--sbx-color-foreground-primary); // ^foundation-fixes^ - remove the change of text colour on hover
         filter: brightness(1.1);
     }
+    &:focus {
+        @include sbx-form.form-input-focus;
+        background: var(--sbx-color-accent);
+        color: var(--sbx-color-foreground-primary);
+    }
+    &:disabled {
+        @include sbx-form.form-input-disabled;
+    }
 }
 
 /**
- * Secondary button style tweaks, which are considered all other buttons
+ * Secondary buttons, which are considered all other buttons
  */
 .sbx-body button,
 .sbx-body .button,
@@ -49,6 +58,12 @@
         color: var(--sbx-color-accent); // ^foundation-fixes^ - remove the change of text colour on hover
         filter: brightness(1.1);
     }
+    &:focus {
+        @include sbx-form.form-input-focus;
+    }
+    &:disabled {
+        @include sbx-form.form-input-disabled;
+    }
 }
 
 /**
@@ -60,6 +75,7 @@
 
 /**
  * When a button sits next to an input (e.g. search bars)
+ * We need to tweak the rounding of the corners so they align properly
  */
 .sbx-body .input-group a.button {
     border-left: none;
@@ -68,7 +84,7 @@
 }
 
 /**
- * A horizontal list of buttons
+ * A horizontal list of buttons, adding some gap between them
  */
 .sbx-body .sub-nav {
     display: flex;
