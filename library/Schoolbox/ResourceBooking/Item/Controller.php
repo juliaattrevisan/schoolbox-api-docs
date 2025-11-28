@@ -119,7 +119,15 @@ class Controller extends Base
     {
         $search = trim($this->requestQuery->get('query'));
         $excludeResourceIdsString = trim($this->requestQuery->get('excludeResourceIds'));
-        $excludeResourceIds = $excludeResourceIdsString === '' ? [] : explode(',', $excludeResourceIdsString);
+
+        if ($excludeResourceIdsString !== '') {
+            // Extract integers from comma-separated values in string to protect against SQL injection attacks.
+            $excludeResourceIds = explode(',', $excludeResourceIdsString);
+            $excludeResourceIds = array_filter($excludeResourceIds, static fn ($id) => (int)$id);
+        } else {
+            $excludeResourceIds = [];
+        }
+
         $data = $this->mapper->search(
             $search,
             $this->getUser(),
