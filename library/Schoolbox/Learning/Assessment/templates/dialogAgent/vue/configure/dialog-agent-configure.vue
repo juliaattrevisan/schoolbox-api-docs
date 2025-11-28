@@ -200,7 +200,7 @@ async function onSubmit(): Promise<void> {
                 <i class="icon-dialog-agent"></i>
                 <p>Sandbox will be available once the agent configuration has been saved.</p>
             </div>
-            <section v-else class="content">
+            <section v-else>
                 <dac-sandbox
                     :opening-message="assessmentConfigInfo.openingMessage"
                     :post-message="assessmentConfigInfo._routes.postSandboxMessage"

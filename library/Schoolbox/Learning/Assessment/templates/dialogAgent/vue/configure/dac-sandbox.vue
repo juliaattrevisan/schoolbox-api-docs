@@ -39,6 +39,7 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
+    <div class="content">
     <ac-feed
         class="l-mar-m--bottom"
         min-height="20rem"
@@ -46,6 +47,7 @@ window.Vue.onMounted(() => {
         :feed="acStore.fullFeed"
         error-prefix="There was a problem retrieving the response."
     />
+
     <ac-prompt
         :request-config="{
             messageRoute: props.postMessage,
@@ -55,6 +57,13 @@ window.Vue.onMounted(() => {
         prompt-placeholder="Type a response here..."
         :prompt-attributes="[]"
     />
+    </div>
+
+    <div class="component-action">
+        <section>
+            <button class="button" @click="resetFeed">Reset Sandbox</button>
+        </section>
+    </div>
 </template>
 
 <style scoped></style>
