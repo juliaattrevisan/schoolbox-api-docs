@@ -247,7 +247,7 @@ export default {
         differentiationProfileEnabled: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     data() {
         return {
