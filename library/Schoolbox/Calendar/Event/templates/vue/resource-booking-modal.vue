@@ -7,9 +7,6 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import { injectScript, isScriptAdded } from "@js/util/domUtils";
-import { EditorEvent } from "@js/editor/event/editorEvent";
-import { EditorToolbar } from "@js/editor/types/editorTypes";
 
 export default {
     name: "resource-booking-modal",
@@ -20,7 +17,7 @@ export default {
         Toast,
     },
 
-    props: ["bookingCreateUrl", "formatFormDatetime", "formatDisplayDatetime"],
+    props: ["bookingCreateUrl"],
 
     data() {
         return {
@@ -41,37 +38,6 @@ export default {
          */
         isFormSubmittable() {
             return this.booking.name && this.booking.name.length !== 0 && !this.isProcessing;
-        },
-
-        /**
-         * The booking's date, as submitted via the form.
-         *
-         * @return {string}
-         */
-        formDate() {
-            return this.booking.date ? dayjs(this.booking.date).format(this.formatFormDatetime) : "";
-        },
-
-        /**
-         * The booking's date, as displayed on the modal.
-         *
-         * @return {string}
-         */
-        displayDate() {
-            return this.booking.date ? dayjs(this.booking.date).format(this.formatDisplayDatetime) : "";
-        },
-
-        /**
-         * Compile object ids into csv
-         */
-        compileAttendeeIds() {
-            let stack = [];
-
-            for (let i = 0; i < this.selected.length; i++) {
-                stack.push(this.selected[i].id);
-            }
-
-            return stack.join(",");
         },
 
         /**
@@ -108,7 +74,6 @@ export default {
         open(booking) {
             this.booking = booking;
             this.$refs.modal.open();
-            this.initCKE();
             this.selected = []; // Clear selectize contents.
             this.resources = [];
         },
@@ -136,7 +101,6 @@ export default {
                 const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.modal.close();
-                    // check if errors exist?
                     if (responseData.errors && responseData.errors.length > 0) {
                         this.$refs.toast.timeout(
                             "Booking created with some issues: " + responseData.errors.join(", "),
@@ -158,34 +122,6 @@ export default {
                 this.isProcessing = false;
             }
         },
-
-        /**
-         * Initialise CKEditor
-         */
-        async initCKE() {
-            const editorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`;
-            if (!isScriptAdded(editorScript)) {
-                await injectScript(editorScript);
-            }
-
-            // If an editor already exists, just clear its content and avoid creating another.
-            const detailEditor = window.sbProps.editors["detail"];
-            if (detailEditor) {
-                detailEditor.setData("");
-                return;
-            }
-
-            // Otherwise set an editor up.
-            document.dispatchEvent(
-                new CustomEvent(EditorEvent.EDITOR__CREATE, {
-                    detail: {
-                        targetElements: ["#notes"],
-                        toolbar: EditorToolbar.SIMPLE,
-                        removeFromToolbar: ["link"],
-                    },
-                }),
-            );
-        },
     },
 };
 </script>
@@ -199,43 +135,8 @@ export default {
             @submit.prevent="createNewBooking($refs.createEventForm)"
             class="top"
         >
-            <h2>Add Resource Booking</h2>
+            <h2>Add Resource Bookings</h2>
             <section>
-                <label class="required" for="addBookingPurpose">Purpose</label>
-                <input id="addBookingPurpose" name="name" maxlength="255" type="text" v-model.trim="booking.name" />
-                <div class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom">
-                    <div>
-                        <label class="required" for="startDate"> From </label>
-                        <input
-                            name="startDate"
-                            id="startDate"
-                            data-datepicker
-                            data-datepicker-time
-                            data-datepicker-call="event"
-                            data-datesync-enddate="#endDate"
-                            type="text"
-                            size="15"
-                            maxlength="30"
-                            value="booking.startDateTime.local"
-                        />
-                    </div>
-                    <div>
-                        <label class="required" for="endDate"> Until </label>
-                        <input
-                            name="endDate"
-                            id="endDate"
-                            data-datepicker
-                            data-datepicker-time
-                            data-datepicker-call="event"
-                            data-datepicker-endofperiod
-                            data-datesync-startdate="#startDate"
-                            type="text"
-                            size="15"
-                            maxlength="30"
-                            value="booking.endDateTime.local"
-                        />
-                    </div>
-                </div>
                 <search-select
                     class="l-pad-m--bottom"
                     v-model:selected="resources"
@@ -246,10 +147,6 @@ export default {
                 >
                 </search-select>
                 <input type="hidden" name="resources" :value="compileResourceIds" />
-                <label class="notes">
-                    Notes
-                    <textarea id="notes" name="notes"></textarea>
-                </label>
             </section>
             <ul class="flex-list buttons">
                 <li>
