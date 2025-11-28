@@ -680,7 +680,7 @@ export default {
                                 {{ booking.name !== "" ? booking.name : booking.resource.name }}
                             </div>
                             <div class="text-right">
-                                <span :class="booking.status.name.toLowerCase() + ' label'">{{
+                                <span :class="[booking.status.name.toLowerCase(), 'label']">{{
                                     booking.status.name
                                 }}</span>
                                 <a
