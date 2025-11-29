@@ -173,7 +173,7 @@ export default {
             {{ getAddCommentButtonText }}
         </button>
         <div :style="getStyles">
-            <p class="meta">
+            <p v-if="editorHasTokens" class="meta">
                 Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                 details on creation.
             </p>
