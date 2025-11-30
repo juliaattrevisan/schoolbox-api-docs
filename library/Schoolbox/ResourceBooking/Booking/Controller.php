@@ -1088,6 +1088,19 @@ class Controller extends Base
     }
 
     /**
+     * This function is called when the form on the 'Add Resource Bookings' modal is submitted.
+     * The 'Add Resource Bookings' modal appears on the 'Event Details' page when the 'Add booking(s)' button is clicked.
+     */
+    public function addBookings(): void
+    {
+        $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', []);
+        $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
+        $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
+
+        $i = 'i';
+    }
+
+    /**
      * @param  \Schoolbox\ResourceBooking\Booking\Mapper $bookingMapper
      *
      * @return $this

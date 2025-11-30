@@ -43,6 +43,7 @@ class Module extends BaseModule
         $this->addPostRoute('update:post', $basePath, '/{id}/update')
              ->attributes(['action' => 'update']);
         $this->addRoute('bookingCalendar', $basePath, '/itemCalendar/{id}');
+        $this->addPostRoute('addBookings', $basePath, '/addBookings');
 
         // Approving or rejecting a single booking
         $this->addRoute('approve', $basePath, '/{id}/approve');
@@ -135,7 +136,7 @@ class Module extends BaseModule
 
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
+            ->addRoutePermission($authorizer, ['book', 'createBooking', 'addBookings'], $bookingCreateRule)
             ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending', 'clashApprove'], $manageBookingRule)
             ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule);
     }

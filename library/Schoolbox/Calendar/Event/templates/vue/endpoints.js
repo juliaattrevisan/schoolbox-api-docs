@@ -36,7 +36,7 @@ export const ENDPOINTS = Object.freeze({
     /* Add/edit bookings on events
      * TODO: These have not yet been implemented on the back-end.
      */
-    URL_BOOKINGS_ADD: "/resource-booking/booking/addMultiple",
+    URL_BOOKINGS_ADD: "/resource-booking/booking/addBookings",
     URL_BOOKING_EDIT: "/resource-booking/booking/edit",
 
     /**
