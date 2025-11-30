@@ -2,6 +2,7 @@
 import { cloneDeep } from "lodash";
 import { sbProps } from "@js/util/sbx/pageUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
 import DacSandbox from "./dac-sandbox.vue";
 
 type DialogAgentScenario = {
@@ -39,9 +40,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const returnUrl = getPageReturnUrl();
 
 const scenarioInfo = window.Vue.ref<DialogAgentScenario>(cloneDeep(props.scenario));
 const assessmentConfigInfo = window.Vue.ref<DialogAgentAssessmentConfig>(cloneDeep(props.assessmentConfig));
+
 
 /**
  * Whether the sandbox section is visible, not necessarily whether it can be used
@@ -253,7 +256,11 @@ async function onSubmit(): Promise<void> {
             <div v-if="submitError" class="alert-box alert">
                 {{ submitError }}
             </div>
-            <button v-if="props.postUpdate" class="button submit" @click.prevent="onSubmit">Save</button>
+
+            <ul class="flex-list buttons">
+                <li v-if="returnUrl"><a class="button" :href="returnUrl">Return</a></li>
+                <li v-if="props.postUpdate"><button class="button submit" @click.prevent="onSubmit">Save</button></li>
+            </ul>
         </div>
 
         <div v-if="sandboxVisible" class="small-12 large-6 island">
