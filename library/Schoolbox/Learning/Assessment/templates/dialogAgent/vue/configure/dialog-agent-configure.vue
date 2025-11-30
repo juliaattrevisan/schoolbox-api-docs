@@ -146,6 +146,7 @@ async function onSubmit(): Promise<void> {
                             id="dac-helpfulness"
                             v-model="assessmentConfigInfo.helpfulness"
                             name="helpfulness"
+                            required
                             :disabled="!props.postUpdate"
                         >
                             <option v-for="(name, value) in props.helpfulnessOptions" :key="value" :value="value">
@@ -165,6 +166,7 @@ async function onSubmit(): Promise<void> {
                             id="dac-language"
                             v-model="assessmentConfigInfo.language"
                             name="language"
+                            required
                             :disabled="!props.postUpdate"
                         >
                             <option v-for="language in props.languageOptions" :key="language" :value="language">
@@ -206,9 +208,9 @@ async function onSubmit(): Promise<void> {
                             id="dac-opening-message"
                             v-model="assessmentConfigInfo.openingMessage"
                             name="openingMessage"
-                            class="required"
                             style="resize: vertical"
                             rows="4"
+                            required
                             :disabled="!props.postUpdate"
                         />
                     </div>
@@ -219,9 +221,9 @@ async function onSubmit(): Promise<void> {
                             id="dac-rules"
                             v-model="assessmentConfigInfo.rules"
                             name="rules"
-                            class="required"
                             style="resize: vertical"
                             rows="4"
+                            required
                             :disabled="!props.postUpdate"
                         />
                     </div>
@@ -244,9 +246,9 @@ async function onSubmit(): Promise<void> {
                             :id="`fieldcontext-${fieldContext.id}`"
                             v-model="fieldContext.body"
                             :name="`fieldContexts[${fieldContext.id}]`"
-                            class="required"
                             style="resize: vertical"
                             rows="4"
+                            required
                             :disabled="!props.postUpdate"
                         />
                     </div>
