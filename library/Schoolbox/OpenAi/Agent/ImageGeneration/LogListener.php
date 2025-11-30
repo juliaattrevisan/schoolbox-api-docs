@@ -59,18 +59,20 @@ class LogListener implements IListener
                 $data = null;
             }
 
+            $responseId = $data['responseId'] ?? null;
+
             if (null === $data) {
                 /** couldn't decode the final message data, log an error instead - It should be impossible to end up here? */
                 $event = [
                     'status' => 'error',
-                    'responseId' => null,
+                    'responseId' => $responseId,
                     'message' => 'Failed to decode',
                 ];
             } else if (MessageEventType::COMPLETE->value === $outputMessage->eventType) {
                 /** Successful completion */
                 $event = [
                     'status' => 'success',
-                    'responseId' => $data['responseId'],
+                    'responseId' => $responseId,
                     'image' => null,
                     'message' => $data['message'],
                 ];
@@ -93,7 +95,7 @@ class LogListener implements IListener
 
                 $event = [
                     'status' => 'error',
-                    'responseId' => $data['responseId'] ?? null,
+                    'responseId' => $responseId,
                     'message' => $failureMessage,
                 ];
             }
