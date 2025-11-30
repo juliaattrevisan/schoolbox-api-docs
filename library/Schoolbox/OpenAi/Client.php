@@ -387,10 +387,9 @@ class Client implements IClient
         if (str_contains($contentType, 'text/event-stream')) {
             foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
                 // Modify the message before sending.
+                $outputMessage = clone $message;
                 if ($eventStreamListener) {
                     $outputMessage = $eventStreamListener->modifyMessage(clone $message);
-                } else {
-                    $outputMessage = clone $message;
                 }
 
                 // Not a message? Output nothing for now
@@ -428,7 +427,9 @@ class Client implements IClient
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-            $log = $logListener->handleResponse($responseJson, $log);
+            if ($logListener) {
+                $log = $logListener->handleResponse($responseJson, $log);
+            }
             $this->saveLog($log);
 
             // TODO: is this actually going to show an error state to the frontend??
