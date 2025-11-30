@@ -316,7 +316,7 @@ class Controller extends Base
     }
 
     /**
-     * Stub for update method
+     * This is called when the form on the 'Update Booking' page is submitted.
      *
      * @param Model $item
      * @throws Exception
@@ -790,7 +790,8 @@ class Controller extends Base
     }
 
     /**
-     * Stub for edit action.
+     * Generate the 'Update Booking' page.
+     * This page contains a form for editing a particular resource booking.
      *
      * @param Model $item
      */
