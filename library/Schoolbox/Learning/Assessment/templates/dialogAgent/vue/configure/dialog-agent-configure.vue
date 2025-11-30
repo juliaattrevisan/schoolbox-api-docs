@@ -2,10 +2,20 @@
 import { sbProps } from "@js/util/sbx/pageUtils";
 import { cloneDeep } from "lodash";
 import DacSandbox from "./dac-sandbox.vue";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 
 type DialogAgentScenario = {
     title: string;
     description: string;
+};
+
+type DialogAgentFieldContext = {
+    id: number;
+    body: string;
+    field: {
+        id: number;
+        title: string;
+    };
 };
 
 type DialogAgentAssessmentConfig = {
@@ -14,14 +24,7 @@ type DialogAgentAssessmentConfig = {
     useDifferentiationProfile: boolean;
     openingMessage: string | null;
     rules: string | null;
-    fieldContexts: {
-        id: number;
-        body: string;
-        field: {
-            id: number;
-            title: string;
-        };
-    }[];
+    fieldContexts: DialogAgentFieldContext[];
     _routes: {
         postSandboxMessage: string | null;
     };
@@ -57,13 +60,57 @@ const isSandboxDirty = window.Vue.computed(() => {
     return JSON.stringify(sandboxDataCache.value) !== JSON.stringify(assessmentConfigInfo.value);
 });
 
+type DialogAgentConfigureApiResponse = {
+    _routes: {
+        postSandboxMessage: string;
+    };
+};
+
+type DialogAgentConfigureApiRequest = Omit<DialogAgentAssessmentConfig, "fieldContexts" | "_routes"> & {
+    fieldContexts: Record<DialogAgentFieldContext["id"], DialogAgentFieldContext["body"]>;
+};
+
+const isSubmitting = window.Vue.ref<boolean>(false);
+const submitError = window.Vue.ref<string | null>(null);
+
 /**
  * Submit the new configuration
  */
 async function onSubmit(): Promise<void> {
-    // TODO
-    // sandboxDataCache.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
+    if (!props.postUpdate) {
+        throw new Error("unable to submit, no postUpdate route"); // shouldn't get here
+    }
 
+    // TODO: validate
+
+    isSubmitting.value = true;
+    submitError.value = null;
+
+    const fieldContexts: DialogAgentConfigureApiRequest["fieldContexts"] = {};
+    for (const fc of assessmentConfigInfo.value.fieldContexts) {
+        fieldContexts[fc.id] = fc.body;
+    }
+
+    const response = await apiRequest<DialogAgentConfigureApiResponse, DialogAgentConfigureApiRequest>({
+        method: "POST",
+        url: props.postUpdate,
+        body: {
+            helpfulness: assessmentConfigInfo.value.helpfulness,
+            language: assessmentConfigInfo.value.language,
+            useDifferentiationProfile: assessmentConfigInfo.value.useDifferentiationProfile,
+            openingMessage: assessmentConfigInfo.value.openingMessage,
+            rules: assessmentConfigInfo.value.rules,
+            fieldContexts,
+        },
+    });
+
+    isSubmitting.value = false;
+    if (!response.success) {
+        submitError.value = response.message;
+        return;
+    }
+
+    sandboxDataCache.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
     sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
 }
 </script>
@@ -79,7 +126,7 @@ async function onSubmit(): Promise<void> {
                         <article>{{ scenarioInfo.description }}</article>
                     </div>
                 </fieldset>
-                <fieldset class="content">
+                <fieldset class="content" :disabled="isSubmitting || undefined">
                     <div class="small-12 large-6 columns">
                         <label for="dac-helpfulness">
                             <span class="required-with-tip">Helpfulness</span>
@@ -177,7 +224,11 @@ async function onSubmit(): Promise<void> {
                     </div>
                 </fieldset>
 
-                <fieldset v-if="assessmentConfigInfo.fieldContexts.length" class="content">
+                <fieldset
+                    v-if="assessmentConfigInfo.fieldContexts.length"
+                    class="content"
+                    :disabled="isSubmitting || undefined"
+                >
                     <div
                         v-for="fieldContext in assessmentConfigInfo.fieldContexts"
                         :key="fieldContext.id"
@@ -199,13 +250,19 @@ async function onSubmit(): Promise<void> {
                 </fieldset>
             </section>
 
+            <div v-if="submitError" class="alert-box alert">
+                {{ submitError }}
+            </div>
             <input v-if="props.postUpdate" type="submit" value="Save" @click.prevent="onSubmit" />
         </div>
 
         <div v-if="sandboxVisible" class="small-12 large-6 island">
             <h2 class="subheader">Sandbox</h2>
+            <section v-if="isSubmitting">
+                <div class="loader"></div>
+            </section>
             <div
-                v-if="!assessmentConfigInfo._routes.postSandboxMessage || !assessmentConfigInfo.openingMessage"
+                v-else-if="!assessmentConfigInfo._routes.postSandboxMessage || !assessmentConfigInfo.openingMessage"
                 class="empty-state"
             >
                 <i class="icon-dialog-agent"></i>

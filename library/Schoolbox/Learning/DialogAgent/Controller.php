@@ -115,7 +115,7 @@ class Controller extends Base
                 'rules' => $dialogAgent->getRules(),
                 'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn ($fieldContext) => [
-                    'id' => $fieldContext->getField()->getId(),
+                    'id' => $fieldContext->getId(),
                     'body' => $fieldContext->getBody(),
                     'field' => [
                         'id' => $fieldContext->getField()->getId(),
