@@ -37,6 +37,8 @@ function resetFeed(): void {
 window.Vue.onMounted(() => {
     resetFeed();
 });
+
+defineExpose({ resetFeed });
 </script>
 
 <template>

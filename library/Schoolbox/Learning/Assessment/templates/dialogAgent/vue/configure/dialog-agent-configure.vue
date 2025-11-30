@@ -27,6 +27,8 @@ const isSubmitting = window.Vue.ref<boolean>(false);
  */
 const sandboxVisible = sbProps.aiFeatures.dialogagent?.enabled !== false;
 
+const sandboxRef = window.Vue.ref<InstanceType<typeof DacSandbox> | null>(null);
+
 /**
  * The sandbox should warn if there are unsaved changes (and hence it's not actually reflecting the current config)
  */
@@ -40,6 +42,7 @@ const isSandboxDirty = window.Vue.computed(() => {
  */
 function updateSandbox(): void {
     sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
+    sandboxRef.value?.resetFeed();
 }
 </script>
 
@@ -73,6 +76,7 @@ function updateSandbox(): void {
             </div>
             <section v-else>
                 <dac-sandbox
+                    ref="sandboxRef"
                     :opening-message="sandboxDataCache.openingMessage"
                     :post-message="sandboxDataCache._routes.postSandboxMessage"
                     :is-dirty="isSandboxDirty"
