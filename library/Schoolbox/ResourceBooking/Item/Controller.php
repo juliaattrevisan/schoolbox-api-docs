@@ -118,7 +118,7 @@ class Controller extends Base
     public function search(): void
     {
         $search = trim($this->requestQuery->get('query'));
-        $excludeResourceIdsString = trim($this->requestQuery->get('excludeResourceIds'));
+        $excludeResourceIdsString = trim($this->requestQuery->get('excludeResourceIds', ''));
 
         if ($excludeResourceIdsString !== '') {
             // Extract integers from comma-separated values in string to protect against SQL injection attacks.
