@@ -69,9 +69,6 @@ class ImageGeneration
             new ImageGeneration\EventListener(),
             new ImageGeneration\LogListener(),
         );
-
-//        $handler = new AgentChat\MessageHandler($this->client, requireFinalImage: true);
-//        return $handler->requestStream($payload, $log);
     }
 
 
