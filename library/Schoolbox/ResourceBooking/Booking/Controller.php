@@ -83,7 +83,8 @@ class Controller extends Base
 
 
     /**
-     * Creates a booking for an item.
+     * Generates the 'Book Item' page.
+     * The 'Book Item' page contains a form for creating a booking or series of bookings for a particular resource.
      *
      * @param Item\Model $item
      *
@@ -189,6 +190,7 @@ class Controller extends Base
 
     /**
      * Creates a booking for this resource.
+     * This is called when the form on the 'Book Item' page is submitted.
      *
      * @param Item\Model $item The resource to create a booking for.
      * @throws Exception
