@@ -392,7 +392,7 @@ class Client implements IClient
                     $outputMessage = $eventStreamListener->modifyMessage(clone $message);
                 }
 
-                // Not a message? Output nothing for now
+                // No output message? Output nothing
                 if (!$outputMessage) {
                     continue;
                 }
