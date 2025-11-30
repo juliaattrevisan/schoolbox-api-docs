@@ -132,15 +132,7 @@ async function onSubmit(): Promise<void> {
                 <fieldset class="content" :disabled="isSubmitting || undefined">
                     <div class="small-12 large-6 columns">
                         <label for="dac-helpfulness">
-                            <span class="required-with-tip">Helpfulness</span>
-                            <span
-                                data-tooltip
-                                class="hint has-tip tip-top"
-                                data-width="200"
-                                title="Helpfulness setting."
-                            >
-                                ?
-                            </span>
+                            <span class="required">Helpfulness</span>
                         </label>
                         <select
                             id="dac-helpfulness"
@@ -157,10 +149,7 @@ async function onSubmit(): Promise<void> {
 
                     <div class="small-12 large-6 columns">
                         <label for="dac-language">
-                            <span class="required-with-tip">Language</span>
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Language setting.">
-                                ?
-                            </span>
+                            <span class="required">Language</span>
                         </label>
                         <select
                             id="dac-language"
@@ -177,12 +166,12 @@ async function onSubmit(): Promise<void> {
 
                     <div class="small-12 columns">
                         <label for="dac-differentiation-profile">
-                            Use learner's differentiation profile to provide agent context?
+                            Use differentiation profile?
                             <span
                                 data-tooltip
                                 class="hint has-tip tip-top"
                                 data-width="200"
-                                title="Enable this to use learner's differentiation profile to provide agent context."
+                                title="Enable this to use the learner's differentiation profile to provide agent with more context."
                             >
                                 ?
                             </span>
