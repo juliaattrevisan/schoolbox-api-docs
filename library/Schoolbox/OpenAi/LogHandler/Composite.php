@@ -35,18 +35,6 @@ class Composite implements IListener
     }
 
     /**
-     * Add a new handler to the composite.
-     *
-     * @param IListener $handler
-     * @return $this
-     */
-    public function addHandler(IListener $handler): self
-    {
-        $this->handlers[] = $handler;
-        return $this;
-    }
-
-    /**
      * @inheritdoc
      */
     public function handleMessage(
