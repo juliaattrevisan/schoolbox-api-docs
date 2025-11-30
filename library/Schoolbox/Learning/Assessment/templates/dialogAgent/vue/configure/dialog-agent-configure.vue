@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { sbProps } from "@js/util/sbx/pageUtils";
 import { cloneDeep } from "lodash";
-import DacSandbox from "./dac-sandbox.vue";
+import { sbProps } from "@js/util/sbx/pageUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import DacSandbox from "./dac-sandbox.vue";
 
 type DialogAgentScenario = {
     title: string;
@@ -253,7 +253,7 @@ async function onSubmit(): Promise<void> {
             <div v-if="submitError" class="alert-box alert">
                 {{ submitError }}
             </div>
-            <input v-if="props.postUpdate" type="submit" value="Save" @click.prevent="onSubmit" />
+            <button v-if="props.postUpdate" class="button submit" @click.prevent="onSubmit">Save</button>
         </div>
 
         <div v-if="sandboxVisible" class="small-12 large-6 island">
@@ -262,7 +262,7 @@ async function onSubmit(): Promise<void> {
                 <div class="loader"></div>
             </section>
             <div
-                v-else-if="!assessmentConfigInfo._routes.postSandboxMessage || !assessmentConfigInfo.openingMessage"
+                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessage"
                 class="empty-state"
             >
                 <i class="icon-dialog-agent"></i>
@@ -270,8 +270,8 @@ async function onSubmit(): Promise<void> {
             </div>
             <section v-else>
                 <dac-sandbox
-                    :opening-message="assessmentConfigInfo.openingMessage"
-                    :post-message="assessmentConfigInfo._routes.postSandboxMessage"
+                    :opening-message="sandboxDataCache.openingMessage"
+                    :post-message="sandboxDataCache._routes.postSandboxMessage"
                     :is-dirty="isSandboxDirty"
                 />
             </section>
