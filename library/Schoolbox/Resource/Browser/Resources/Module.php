@@ -37,15 +37,6 @@ class Module extends AbstractModule
             return $this->preloadFile($params);
         };
         $getHomepageIdCallback = function ($params) {
-            if (isset($params['file']) && $params['file'] instanceof Resource\File\Model) {
-                return $params['file']->getFolder()->getId();
-            }
-            if (isset($params['link']) && $params['link'] instanceof Resource\Link) {
-                return $params['link']->getFolder()->getId();
-            }
-            throw new Unauthorized();
-        };
-        $getFolderIdCallback = function ($params): int {
             if (isset($params['sourceFolder']) && $params['sourceFolder'] instanceof Resource\Folder\Model) {
                 return $params['sourceFolder']->getId();
             }
@@ -80,20 +71,7 @@ class Module extends AbstractModule
                     new Rule\IsSuperuser(),
                     new Rule\HasHomepageAccess(
                         UserAccess::ACCESS_READ,
-                        $getFolderIdCallback,
-                        Access::getInstance()
-                    )
-                )
-            );
-
-        $hasFolderEditAccess =
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasHomepageAccess(
-                        UserAccess::ACCESS_WRITE,
-                        $getFolderIdCallback,
+                        $getHomepageIdCallback,
                         Access::getInstance()
                     )
                 )
@@ -133,7 +111,7 @@ class Module extends AbstractModule
         $this->register('GET', '/{folderId:\d+}/nodes', 'listNodes', $hasFolderReadAccess, $preloadFolder);
         $this->register('GET', '/{folderId:\d+}/info', 'showFolderInfo', $hasFolderReadAccess, $preloadFolder);
         $this->register('GET', '/file/{fileId:\d+}/info', 'showFileInfo', $hasReadAccess, $preloadFile);
-        $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasFolderEditAccess, $preloadFolder);
+        $this->register('POST', '/{folderId:\d+}/files', 'postFiles', $hasEditAccess, $preloadFolder);
 
         // I believe showMultiFileInfo is never used anywhere:
         // at any rate, there's no support for verifying permissions for
