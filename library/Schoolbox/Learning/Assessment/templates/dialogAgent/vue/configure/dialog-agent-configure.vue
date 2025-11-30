@@ -22,10 +22,11 @@ const isSubmitting = window.Vue.ref<boolean>(false);
  * Whether the sandbox section is visible, not necessarily whether it can be used
  * The sandbox won't be visible if the dialog agent AI feature is disabled
  *
- * NOTE: It's crucial that !== false is used here as sbProps.aiFeatures only gets populated for staff at the moment,
- * but a student could visit this page. If they do, they'll just see the empty state below instead of the sandbox. that's fine for now
+ * The undefined check is includes the case where the user can't see sbProps.aiFeatures (currently only staff can)
+ * however, it's possible for a student to visit and use this page so if they do, they should see the sandbox if available.
+ * If the feature isn't enabled for these users, they'll just see the empty state below instead of the sandbox. that's fine for now
  */
-const sandboxVisible = sbProps.aiFeatures.dialogagent?.enabled !== false;
+const sandboxVisible = sbProps.aiFeatures.dialogagent === undefined || sbProps.aiFeatures.dialogagent.enabled;
 
 const sandboxRef = window.Vue.ref<InstanceType<typeof DacSandbox> | null>(null);
 
