@@ -37,7 +37,7 @@ class ModelToArray
         if ($log->getFeature() === Helper::FEATURE_CHAT) {
             $logData = null; // nothing for now, but should be added later
         } elseif ($log->getFeature() === Helper::FEATURE_IMAGE) {
-            $logData = \Schoolbox\OpenAi\AgentChat\MessageHandler::translateLogData($log);
+            $logData = self::translateLogData($log);
         }
 
         $translation = [
@@ -50,5 +50,39 @@ class ModelToArray
         ];
 
         return $translation;
+    }
+
+    /**
+     * Translate a saved log's inputText and outputText back into structured data for this particular feature
+     * @param Model $log
+     * @return array{request:string,response:array}
+     */
+    private static function translateLogData(Model $log): array
+    {
+        $inputText = $log->getInputText();
+        $outputText = $log->getOutputText();
+
+        $response = null;
+        if (!empty($outputText)) {
+            try {
+                $response = json_decode($outputText, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                // noop; leave null for below
+            }
+        }
+
+        if (null === $response) {
+            /** either failed to parse, or no output at all. Fall back to an unknown output */
+            $response = [
+                'status' => 'error',
+                'responseId' => null,
+                'message' => 'Unable to retrieve response',
+            ];
+        }
+
+        return [
+            'request' => $inputText,
+            'response' => $response,
+        ];
     }
 }
