@@ -13,7 +13,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
-use Schoolbox\OpenAi\AgentChat;
+use Schoolbox\OpenAi\EventStream\ResponseListener;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
 
@@ -66,7 +66,7 @@ class ImageGeneration
             $payload,
             $log,
             null,
-            new ImageGeneration\EventListener(),
+            new ResponseListener(requireFinalImage: true),
             new ImageGeneration\LogListener(),
         );
     }

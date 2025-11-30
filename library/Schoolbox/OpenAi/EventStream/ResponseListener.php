@@ -7,25 +7,32 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\Agent\ImageGeneration;
+namespace Schoolbox\OpenAi\EventStream;
 
 use Crell\ApiProblem\ApiProblem;
 use JsonException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
-use Schoolbox\OpenAi\EventStream\IListener;
-use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\LogHandler\ResponseMessage;
 use UnexpectedValueException;
 
 /**
- * Event listener for image generation requests.
+ * Event listener for responses from OpenAI's responses API.
  *
  * Mutate the received event into something which the frontend is able to
  * consume.
  */
-class EventListener implements IListener
+class ResponseListener implements IListener
 {
+    /**
+     * Constructor
+     *
+     * @param bool $requireFinalImage Is an image required in the final response?
+     */
+    public function __construct(private bool $requireFinalImage)
+    {
+    }
+
     /**
      * The response ID which OpenAI sent for this request.
      *
@@ -149,7 +156,7 @@ class EventListener implements IListener
                 throw new SchoolboxException($outputContent['refusal'], 400);
             }
 
-            if (null === $imageBase64/* && $this->requireFinalImage*/) {
+            if (null === $imageBase64 && $this->requireFinalImage) {
                 /**
                  * No output image? probably a refusal in the form of text
                  * This could occur on the Image Generator if the system prompt specifically disallows
