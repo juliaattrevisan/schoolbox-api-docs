@@ -189,7 +189,7 @@ class Controller extends Base
     }
 
     /**
-     * Creates a booking for this resource.
+     * Creates a booking for a particular resource.
      * This is called when the form on the 'Book Item' page is submitted.
      *
      * @param Item\Model $item The resource to create a booking for.
@@ -316,6 +316,7 @@ class Controller extends Base
     }
 
     /**
+     * Updates a booking for a particular resource.
      * This is called when the form on the 'Update Booking' page is submitted.
      *
      * @param Model $item
