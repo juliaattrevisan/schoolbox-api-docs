@@ -45,7 +45,7 @@
                         <div class="card small-12">
                             <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
                                 {% if item.resource.image.hash is defined and item.resource.image.hash %}
-                                    <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
+                                    <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" alt="{{ item.resource.name }}" />
                                 {% else %}
                                     {# this icon needs to be responsive to screen size #}
                                     <span class="icon-resource-booking size-32 no-text"></span>
