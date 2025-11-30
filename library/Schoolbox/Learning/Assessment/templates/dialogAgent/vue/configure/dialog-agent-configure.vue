@@ -50,10 +50,21 @@ const assessmentConfigInfo = window.Vue.ref<DialogAgentAssessmentConfig>(cloneDe
 const sandboxVisible = sbProps.aiFeatures.dialogagent?.enabled !== false;
 
 /**
+ * The sandbox should warn if there are unsaved changes (and hence it's not actually reflecting the current config)
+ */
+const sandboxDataCache = window.Vue.ref(cloneDeep(assessmentConfigInfo.value));
+const isSandboxDirty = window.Vue.computed(() => {
+    return JSON.stringify(sandboxDataCache.value) !== JSON.stringify(assessmentConfigInfo.value);
+});
+
+/**
  * Submit the new configuration
  */
 async function onSubmit(): Promise<void> {
     // TODO
+    // sandboxDataCache.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
+
+    sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
 }
 </script>
 
@@ -204,6 +215,7 @@ async function onSubmit(): Promise<void> {
                 <dac-sandbox
                     :opening-message="assessmentConfigInfo.openingMessage"
                     :post-message="assessmentConfigInfo._routes.postSandboxMessage"
+                    :is-dirty="isSandboxDirty"
                 />
             </section>
         </div>

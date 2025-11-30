@@ -7,6 +7,7 @@ import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-pro
 interface Props {
     openingMessage: string;
     postMessage: string;
+    isDirty: boolean;
 }
 
 const props = defineProps<Props>();
@@ -40,23 +41,27 @@ window.Vue.onMounted(() => {
 
 <template>
     <div class="content">
-    <ac-feed
-        class="l-mar-m--bottom"
-        min-height="20rem"
-        max-height="70vh"
-        :feed="acStore.fullFeed"
-        error-prefix="There was a problem retrieving the response."
-    />
+        <div v-if="props.isDirty" class="alert-box highlight">
+            You have unsaved changes, this sandbox will not reflect the current configuration until you save.
+        </div>
 
-    <ac-prompt
-        :request-config="{
-            messageRoute: props.postMessage,
-            aiSessionId,
-            requireImage: false,
-        }"
-        prompt-placeholder="Type a response here..."
-        :prompt-attributes="[]"
-    />
+        <ac-feed
+            class="l-mar-m--bottom"
+            min-height="20rem"
+            max-height="70vh"
+            :feed="acStore.fullFeed"
+            error-prefix="There was a problem retrieving the response."
+        />
+
+        <ac-prompt
+            :request-config="{
+                messageRoute: props.postMessage,
+                aiSessionId,
+                requireImage: false,
+            }"
+            prompt-placeholder="Type a response here..."
+            :prompt-attributes="[]"
+        />
     </div>
 
     <div class="component-action">
