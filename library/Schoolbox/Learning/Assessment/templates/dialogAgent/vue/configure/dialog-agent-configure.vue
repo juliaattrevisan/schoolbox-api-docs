@@ -1,35 +1,9 @@
 <script setup lang="ts">
 import { cloneDeep } from "lodash";
 import { sbProps } from "@js/util/sbx/pageUtils";
-import { apiRequest } from "@js/util/sbx/apiUtils";
-import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
+import DacForm from "./dac-form.vue";
 import DacSandbox from "./dac-sandbox.vue";
-
-type DialogAgentScenario = {
-    title: string;
-    description: string;
-};
-
-type DialogAgentFieldContext = {
-    id: number;
-    body: string;
-    field: {
-        id: number;
-        title: string;
-    };
-};
-
-type DialogAgentAssessmentConfig = {
-    helpfulness: string | null;
-    language: string | null;
-    useDifferentiationProfile: boolean;
-    openingMessage: string | null;
-    rules: string | null;
-    fieldContexts: DialogAgentFieldContext[];
-    _routes: {
-        postSandboxMessage: string | null;
-    };
-};
+import type { DialogAgentAssessmentConfig, DialogAgentScenario } from "./dacTypes";
 
 interface Props {
     scenario: DialogAgentScenario;
@@ -40,11 +14,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const returnUrl = getPageReturnUrl();
 
-const scenarioInfo = window.Vue.ref<DialogAgentScenario>(cloneDeep(props.scenario));
 const assessmentConfigInfo = window.Vue.ref<DialogAgentAssessmentConfig>(cloneDeep(props.assessmentConfig));
-
+const isSubmitting = window.Vue.ref<boolean>(false);
 
 /**
  * Whether the sandbox section is visible, not necessarily whether it can be used
@@ -63,57 +35,10 @@ const isSandboxDirty = window.Vue.computed(() => {
     return JSON.stringify(sandboxDataCache.value) !== JSON.stringify(assessmentConfigInfo.value);
 });
 
-type DialogAgentConfigureApiResponse = {
-    _routes: {
-        postSandboxMessage: string;
-    };
-};
-
-type DialogAgentConfigureApiRequest = Omit<DialogAgentAssessmentConfig, "fieldContexts" | "_routes"> & {
-    fieldContexts: Record<DialogAgentFieldContext["id"], DialogAgentFieldContext["body"]>;
-};
-
-const isSubmitting = window.Vue.ref<boolean>(false);
-const submitError = window.Vue.ref<string | null>(null);
-
 /**
- * Submit the new configuration
+ * Update the sandbox cache when the form is successfully submitted
  */
-async function onSubmit(): Promise<void> {
-    if (!props.postUpdate) {
-        throw new Error("unable to submit, no postUpdate route"); // shouldn't get here
-    }
-
-    // TODO: validate
-
-    isSubmitting.value = true;
-    submitError.value = null;
-
-    const fieldContexts: DialogAgentConfigureApiRequest["fieldContexts"] = {};
-    for (const fc of assessmentConfigInfo.value.fieldContexts) {
-        fieldContexts[fc.id] = fc.body;
-    }
-
-    const response = await apiRequest<DialogAgentConfigureApiResponse, DialogAgentConfigureApiRequest>({
-        method: "POST",
-        url: props.postUpdate,
-        body: {
-            helpfulness: assessmentConfigInfo.value.helpfulness,
-            language: assessmentConfigInfo.value.language,
-            useDifferentiationProfile: assessmentConfigInfo.value.useDifferentiationProfile,
-            openingMessage: assessmentConfigInfo.value.openingMessage,
-            rules: assessmentConfigInfo.value.rules,
-            fieldContexts,
-        },
-    });
-
-    isSubmitting.value = false;
-    if (!response.success) {
-        submitError.value = response.message;
-        return;
-    }
-
-    sandboxDataCache.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
+function updateSandbox(): void {
     sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
 }
 </script>
@@ -122,140 +47,20 @@ async function onSubmit(): Promise<void> {
     <div class="row">
         <div class="small-12 island" :class="{ 'large-6': sandboxVisible }">
             <h2 class="subheader">Settings</h2>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <h3>{{ scenarioInfo.title }}</h3>
-                        <article>{{ scenarioInfo.description }}</article>
-                    </div>
-                </fieldset>
-                <fieldset class="content" :disabled="isSubmitting || undefined">
-                    <div class="small-12 large-6 columns">
-                        <label for="dac-helpfulness">
-                            <span class="required">Helpfulness</span>
-                        </label>
-                        <select
-                            id="dac-helpfulness"
-                            v-model="assessmentConfigInfo.helpfulness"
-                            name="helpfulness"
-                            required
-                            :disabled="!props.postUpdate"
-                        >
-                            <option v-for="(name, value) in props.helpfulnessOptions" :key="value" :value="value">
-                                {{ name }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="small-12 large-6 columns">
-                        <label for="dac-language">
-                            <span class="required">Language</span>
-                        </label>
-                        <select
-                            id="dac-language"
-                            v-model="assessmentConfigInfo.language"
-                            name="language"
-                            required
-                            :disabled="!props.postUpdate"
-                        >
-                            <option v-for="language in props.languageOptions" :key="language" :value="language">
-                                {{ language }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label for="dac-differentiation-profile">
-                            Use differentiation profile?
-                            <span
-                                data-tooltip
-                                class="hint has-tip tip-top"
-                                data-width="200"
-                                title="Enable this to use the learner's differentiation profile to provide agent with more context."
-                            >
-                                ?
-                            </span>
-                        </label>
-                        <div class="switch">
-                            <input
-                                id="dac-differentiation-profile"
-                                v-model="assessmentConfigInfo.useDifferentiationProfile"
-                                name="useDifferentiationProfile"
-                                type="checkbox"
-                                :disabled="!props.postUpdate"
-                            />
-                            <label for="dac-differentiation-profile">
-                                <span class="icon-approve"></span>
-                                <span class="icon-cancel"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label for="dac-opening-message" class="required">Opening Message</label>
-                        <textarea
-                            id="dac-opening-message"
-                            v-model="assessmentConfigInfo.openingMessage"
-                            name="openingMessage"
-                            style="resize: vertical"
-                            rows="4"
-                            required
-                            :disabled="!props.postUpdate"
-                        />
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label for="dac-rules" class="required">Rules</label>
-                        <textarea
-                            id="dac-rules"
-                            v-model="assessmentConfigInfo.rules"
-                            name="rules"
-                            style="resize: vertical"
-                            rows="4"
-                            required
-                            :disabled="!props.postUpdate"
-                        />
-                    </div>
-                </fieldset>
-
-                <fieldset
-                    v-if="assessmentConfigInfo.fieldContexts.length"
-                    class="content"
-                    :disabled="isSubmitting || undefined"
-                >
-                    <div
-                        v-for="fieldContext in assessmentConfigInfo.fieldContexts"
-                        :key="fieldContext.id"
-                        class="small-12 columns"
-                    >
-                        <label :for="`field-${fieldContext.field.id}`" class="required">
-                            {{ fieldContext.field.title }}
-                        </label>
-                        <textarea
-                            :id="`fieldcontext-${fieldContext.id}`"
-                            v-model="fieldContext.body"
-                            :name="`fieldContexts[${fieldContext.id}]`"
-                            style="resize: vertical"
-                            rows="4"
-                            required
-                            :disabled="!props.postUpdate"
-                        />
-                    </div>
-                </fieldset>
-            </section>
-
-            <div v-if="submitError" class="alert-box alert">
-                {{ submitError }}
-            </div>
-
-            <ul class="flex-list buttons">
-                <li v-if="returnUrl"><a class="button" :href="returnUrl">Return</a></li>
-                <li v-if="props.postUpdate"><button class="button submit" @click.prevent="onSubmit">Save</button></li>
-            </ul>
+            <dac-form
+                v-model:assessment-config="assessmentConfigInfo"
+                v-model:is-submitting="isSubmitting"
+                :scenario="props.scenario"
+                :helpfulness-options="props.helpfulnessOptions"
+                :language-options="props.languageOptions"
+                :post-update="props.postUpdate"
+                @saved="updateSandbox"
+            />
         </div>
 
         <div v-if="sandboxVisible" class="small-12 large-6 island">
             <h2 class="subheader">Sandbox</h2>
+
             <section v-if="isSubmitting">
                 <div class="loader"></div>
             </section>
