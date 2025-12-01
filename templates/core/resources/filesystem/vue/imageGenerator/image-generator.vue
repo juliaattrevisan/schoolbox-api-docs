@@ -50,7 +50,7 @@ const uploadError = window.Vue.ref<string | null>(null);
             v-if="acStore.feed.length > 0"
             :feed="acStore.fullFeed"
             class="l-mar-m--bottom"
-            style="max-height: 35vh"
+            max-height="35vh"
             allow-selection
             error-prefix="There was a problem generating the image."
         />

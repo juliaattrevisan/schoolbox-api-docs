@@ -29,6 +29,7 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
@@ -684,6 +685,7 @@ class Module extends BaseModule
         $projectResultCacheMapper   = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
         $lessonPlanTemplateMapper   = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
         $lessonPlanDataModelMapper  = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
+        $aiLogMapper                = $this->getMapperFactory()->get(AILogMapper::class);
         $dialogAgentDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class);
         $dialogAgentScenarioMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
         $linkedAssessmentsMapper    = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
@@ -992,6 +994,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $aiLogMapper,
                     $dialogAgentDataModelMapper,
                     $dialogAgentScenarioMapper,
                     $this->injector->get('dialogAgentResponseDataSource'),

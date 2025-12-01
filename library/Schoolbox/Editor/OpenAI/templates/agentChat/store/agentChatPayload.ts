@@ -9,7 +9,7 @@ import type { AgentChatImage } from "../agentChatTypes";
  */
 export enum AgentChatMessageEventType {
     /**
-     * Intermediate event - The response was created and we recieved some sign of life back from the AI
+     * Intermediate event - The response was created and we received some sign of life back from the AI
      * Includes the response ID for tracking
      */
     CREATED = "created",

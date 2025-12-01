@@ -19,6 +19,7 @@ class Status
      * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
      */
     public const string ACTION_VIEW = 'view';
+    public const string ACTION_MESSAGE = 'message';
     public const string ACTION_SOBO = 'sobo';
     public const string ACTION_RESET = 'reset';
     public const string ACTION_REOPEN = 'reopen';
@@ -58,6 +59,7 @@ class Status
                 'status' => self::STATUS_INCOMPLETE,
                 'actions' => [
                     self::ACTION_VIEW => false,
+                    self::ACTION_MESSAGE => false,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
@@ -73,6 +75,7 @@ class Status
                 'status' => self::STATUS_SUBMITTED,
                 'actions' => [
                     self::ACTION_VIEW => true,
+                    self::ACTION_MESSAGE => false,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => true,
@@ -80,6 +83,8 @@ class Status
                 ],
             ];
         }
+
+        // TODO: deal with duration eventually. still allow SOBO from staff
 
         /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
          * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
@@ -91,6 +96,7 @@ class Status
                 'status' => self::STATUS_REQUIRES_ASSISTANCE,
                 'actions' => [
                     self::ACTION_VIEW => true,
+                    self::ACTION_MESSAGE => true,
                     self::ACTION_SOBO => true,
                     self::ACTION_RESET => true,
                     self::ACTION_REOPEN => false,
@@ -105,7 +111,8 @@ class Status
             return [
                 'status' => self::STATUS_INCOMPLETE,
                 'actions' => [
-                    self::ACTION_VIEW => false,
+                    self::ACTION_VIEW => true,
+                    self::ACTION_MESSAGE => true,
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
@@ -120,6 +127,7 @@ class Status
             'status' => self::STATUS_IN_PROGRESS,
             'actions' => [
                 self::ACTION_VIEW => true,
+                self::ACTION_MESSAGE => true,
                 self::ACTION_SOBO => true,
                 self::ACTION_RESET => true,
                 self::ACTION_REOPEN => false,

@@ -11,11 +11,16 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
+use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Ramsey\Uuid\Uuid;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextModel;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -28,6 +33,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\OpenAi;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -44,6 +50,7 @@ class Controller extends Base
      *
      * @param BreadcrumbFactory $bakery
      * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param OpenAI\ClientFactory $aiClientFactory
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
@@ -52,6 +59,7 @@ class Controller extends Base
     public function __construct(
         private BreadcrumbFactory $bakery,
         private AssessmentMapperProxy $assessmentMapperProxy,
+        private OpenAI\ClientFactory $aiClientFactory,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
@@ -154,6 +162,23 @@ class Controller extends Base
          */
         $this->fieldContextMapper->save($existingFieldContexts);
 
+        /* Produce the prompt
+         * In the future this will actually go and generate another prompt as an "improvement" to compare against,
+         * but that isn't in scope for 26.0 apparently.
+         *
+         * TODO: split this out into something reusable I guess
+         */
+        $fieldReplacements = [];
+        foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
+            $fieldPlaceholder = \sprintf('<%s>', $fieldContext->getField()->getSlug());
+            $fieldReplacements[$fieldPlaceholder] = $fieldContext->getBody();
+        }
+
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+        $assessment->setPrompt(strtr($scenario->getPromptTemplate(), $fieldReplacements));
+
+        $this->assessmentMapperProxy->save($assessment, $this->getUser());
+
         /* TODO Reset the chat here
          */
 
@@ -188,6 +213,96 @@ class Controller extends Base
     {
         echo "View a response";
         // todo implement a readonly viewing mode
+    }
+
+
+    /**
+     * Send a message to the chat agent for a particular response and stream the reply
+     *
+     * @param DialogAgent $assessment
+     * @param User $student
+     * @param Response $response
+     * @throws ClientExceptionInterface
+     * @return void
+     */
+    public function postMessage(DialogAgent $assessment, User $student, Response $response): void
+    {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
+        // ai Config
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
+
+        // if not enabled, 404
+        // TODO: imo this should be part of the route check
+        if ($aiConfig->isEnabled($agentConfig) === false) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem("Feature not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
+        /**
+         * For dialog agent chats, the sessionID guid is directly tied to the response,
+         * If the student has never sent a message before, a new session ID should be created
+         */
+        $aiSessionId = $response->getSessionId();
+        if (null === $aiSessionId) {
+            $aiSessionId = Uuid::uuid4()->toString();
+            $response->setSessionId($aiSessionId);
+            // TODO: you can't actually save here as the log doesn't exist yet
+            // $this->dialogAgentResponseMapper->save($response);
+        }
+
+        $agent = new OpenAI\Agent\DialogAgentChat(
+            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $agentConfig,
+        );
+
+        try {
+            $stream = $agent->requestStream(
+                $this->getUser(),
+                $assessment->getPrompt(), // TODO: this is nullable, and a requirement to be able to chat... I expect you shouldn't even be able to get to this endpoint if it's not ready yet
+                $this->requestPost->get('userPrompt'),
+                $aiSessionId,
+                previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
+            );
+
+            /**
+             * We must wait until now to save, as the log must exist
+             * for the session ID foreign key constraint to be satisfied
+             */
+            $response
+                ->setUpdatedBy($this->getUser()->getId())
+                ->setUpdatedAt(\Alaress_Date_Format::now());
+            $this->dialogAgentResponseMapper->save($response);
+
+            // The iterable response can just be passed straight to responseAsEventStream
+            $this->response = $this->responseAsEventStream($stream);
+            return;
+        } catch (SchoolboxException $e) {
+            // TODO: when does this actually throw
+
+            // This will always be a stream
+            // Unfortunately the exception isn't raised until the response
+            // is output, which doesn't happen until after this method
+            // returns.
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($e->getCode())
+                ->asArray();
+
+            $this->response = $this
+                ->responseAsJson($problem)
+                ->withStatus($e->getCode());
+            return;
+        }
     }
 
 

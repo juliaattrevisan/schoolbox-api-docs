@@ -73,3 +73,12 @@ export function getRelativeTime(datetime: Dayjs | DateRFC3339, fullDiff: boolean
 
     return window.dayjs.duration(dayDiff, "d").humanize(true);
 }
+
+/**
+ * Convert a Date or Dayjs object to an RFC3339 formatted string
+ * @param date - The date to convert
+ * @returns - The RFC3339 formatted date string
+ */
+export function getRfc3339String(date: Date | Dayjs): DateRFC3339 {
+    return window.dayjs(date).format() as DateRFC3339;
+}

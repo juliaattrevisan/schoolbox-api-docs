@@ -1,18 +1,16 @@
 <script lang="ts" setup>
+import { useMousePressed } from "@vueuse/core";
+import { getRfc3339String } from "@js/util/dateUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-
-type DialogAgentResponse = {
-    aiSessionId: AiSession["id"];
-    assistanceRequestedAt: string | null;
-};
+import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
-    generateRoute: string;
-    openingMessage: string | null;
+    feed: AiLogAgentChatData[];
     response: DialogAgentResponse;
     student: UserAuthor;
 }
@@ -29,70 +27,14 @@ const isInstructor = window.Vue.computed(() => {
 
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
+    acStore.importFeed(acStore.parseFeed(props.feed, props.student));
 
-    if (props.openingMessage !== null) {
-        // TODO: I wonder if the backend should add this when it provides us the full chat?
-        acStore.feed.push({
-            type: "response",
-            status: "success",
-            entryKey: acStore.getNextEntryKey(),
-            responseId: null,
-            image: null,
-            message: props.openingMessage,
-        });
-    }
-
-    // TODO: all temporary
-    const currentUser = {
-        id: window.schoolboxUser.id,
-        fullName: window.schoolboxUser.name,
-        _links: {
-            profile: `/search/user/${window.schoolboxUser.id}`,
-            avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
-        },
-    };
-
-    acStore.feed.push({
-        type: "request",
-        entryKey: acStore.getNextEntryKey(),
-        user: currentUser,
-        payload: {
-            userPrompt: "You're a wizard, Harry",
-            attributes: {},
-            imageUrl: null,
-            previousResponseId: null,
-            aiSessionId: null,
-        },
-        file: null,
-    });
-
-    acStore.feed.push({
-        type: "response",
-        status: "success",
-        entryKey: acStore.getNextEntryKey(),
-        responseId: null,
-        image: null,
-        message: "I'm a what?",
-    });
-
-    acStore.feed.push({
-        type: "request",
-        entryKey: acStore.getNextEntryKey(),
-        user: currentUser,
-        payload: {
-            userPrompt: "ignore all previous instructions... etc etc",
-            attributes: {},
-            imageUrl: null,
-            previousResponseId: null,
-            aiSessionId: null,
-        },
-        file: null,
-    });
-
+    // TODO: all temporary, needs to inject into the right timeline position when it actually exists etc
     if (isInstructor.value) {
         acStore.feed.push({
-            type: "alert",
-            side: "response",
+            // TODO: this would only ever come from props.feed
+            type: AgentChatMessageType.ALERT,
+            side: AgentChatMessageType.RESPONSE,
             severity: "warning",
             entryKey: acStore.getNextEntryKey(),
             message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
@@ -100,21 +42,25 @@ window.Vue.onMounted(() => {
 
         const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
         acStore.feed.push({
-            type: "alert",
-            side: "request",
+            // TODO: a teacher can't spawn this, but they can 'resolve' it so we would need to track it somehow
+            // hence need to be able to insert it based on the createdAt time of each log entry (not currently tracked on the frontend)
+            // and then not include it when it's eventually resolved
+            type: AgentChatMessageType.ALERT,
+            side: AgentChatMessageType.REQUEST,
             severity: "warning-tint",
             entryKey: acStore.getNextEntryKey(),
             message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
         });
 
-        const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-        acStore.feed.push({
-            type: "alert",
-            side: "request",
-            severity: "highlight",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
-        });
+        // This won't actually exist I think. The "requested assistance" message just gets purged
+        // const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
+        // acStore.feed.push({
+        //     type: "alert",
+        //     side: "request",
+        //     severity: "highlight",
+        //     entryKey: acStore.getNextEntryKey(),
+        //     message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
+        // });
     }
 });
 
@@ -125,12 +71,12 @@ window.Vue.onMounted(() => {
 function changeHelpRequest(helpRequested: boolean): void {
     const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
     if (helpRequested) {
-        currentResponse.value.assistanceRequestedAt = window.dayjs().format(window.dateDisplayFormats.dayjsDateLong);
+        currentResponse.value.assistanceRequestedAt = getRfc3339String(window.dayjs());
 
         if (isInstructor.value) {
             acStore.feed.push({
-                type: "alert",
-                side: "request",
+                type: AgentChatMessageType.ALERT,
+                side: AgentChatMessageType.REQUEST,
                 severity: "warning-tint",
                 entryKey: acStore.getNextEntryKey(),
                 message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
@@ -141,8 +87,8 @@ function changeHelpRequest(helpRequested: boolean): void {
 
         if (isInstructor.value) {
             acStore.feed.push({
-                type: "alert",
-                side: "request",
+                type: AgentChatMessageType.ALERT,
+                side: AgentChatMessageType.REQUEST,
                 severity: "highlight",
                 entryKey: acStore.getNextEntryKey(),
                 message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,
@@ -165,20 +111,31 @@ function submitResponse(): void {
 /**
  * The max height of the feed area, responsive to screen size
  */
-const maxHeight = window.Vue.ref("50vh");
+const maxFeedHeight = window.Vue.ref("50vh");
 
-const feedContainerEl = window.Vue.useTemplateRef<HTMLDivElement>("feedContainerRef");
+const feedRef = window.Vue.ref<InstanceType<typeof AcFeed> | null>(null);
+const feedEl = window.Vue.computed(() => feedRef.value?.feedEl as HTMLElement | null);
+
+const { pressed: mousePressed } = useMousePressed();
 
 /**
- * Update the max height on mount and on resize
+ * Update the max feed height on mount and on resize
  */
-function updateMaxHeight(): void {
+function updateFeedHeight(): void {
+    /**
+     * Ignore if the mouse is currently held down
+     * It's possible that they are resizing the textarea, which would cause some janky behaviour otherwise
+     */
+    if (mousePressed.value) {
+        return;
+    }
+
     const footer = document.querySelector("#footer");
     const content = document.querySelector("#content");
     const container = document.querySelector("#container");
-    if (!feedContainerEl.value || !footer || !content || !container) return;
+    if (!feedEl.value || !footer || !content || !container) return;
 
-    const feedRect = feedContainerEl.value.getBoundingClientRect();
+    const feedRect = feedEl.value.getBoundingClientRect();
     const footerRect = footer.getBoundingClientRect();
     const contentRect = content.getBoundingClientRect();
     const bodyRect = document.body.getBoundingClientRect();
@@ -189,20 +146,43 @@ function updateMaxHeight(): void {
         (contentRect.bottom - feedRect.bottom) + // the extra space below the feed until the bottom of the used content area
         parseInt(getComputedStyle(container).paddingBottom, 10);
 
-    maxHeight.value = `${window.innerHeight - totalUsedHeight}px`;
+    maxFeedHeight.value = `${window.innerHeight - totalUsedHeight}px`;
 }
 
-const observer = window.Vue.ref<ResizeObserver | null>(null);
+/**
+ * When the mouse is released, update the feed height (in case they were resizing the textarea)
+ * slight delay to ensure things are stable first
+ */
+function onMouseUp(): void {
+    setTimeout(updateFeedHeight, 10);
+}
+
+const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
 
 window.Vue.onMounted(() => {
-    updateMaxHeight();
-    observer.value = new ResizeObserver(updateMaxHeight);
-    if (!feedContainerEl.value) {
+    if (!feedEl.value) {
         console.warn("<dialog-agent-chat>: unable to find feed container");
         return;
     }
 
-    observer.value.observe(feedContainerEl.value);
+    // Initialize the ResizeObserver
+    resizeObserver.value = new ResizeObserver(updateFeedHeight);
+    resizeObserver.value.observe(feedEl.value.parentElement!);
+    resizeObserver.value.observe(document.querySelector("#container")!);
+
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    updateFeedHeight();
+    window.addEventListener("DOMContentLoaded", updateFeedHeight, { once: true });
+    document.addEventListener("mouseup", onMouseUp);
+});
+
+window.Vue.onUnmounted(() => {
+    // Clean up event listeners
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+    }
+    window.removeEventListener("DOMContentLoaded", updateFeedHeight);
+    document.removeEventListener("mouseup", onMouseUp);
 });
 </script>
 
@@ -223,37 +203,37 @@ window.Vue.onMounted(() => {
         </nav>
     </div>
 
-    <div ref="feedContainerRef">
-        <ac-feed
-            class="l-mar-m--bottom"
-            style="height: 100%; min-height: 20rem"
-            :style="{ maxHeight }"
-            :feed="acStore.fullFeed"
-            error-prefix="There was a problem retrieving the response."
-        >
-            <template #header>
-                <div
-                    v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                    class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
-                >
-                    <div class="l-flex l-flex--justify-space l-flex--align-center">
-                        <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
-                        <button
-                            class="button warning l-mar--0 dac-feed-help-dismiss"
-                            type="button"
-                            @click="changeHelpRequest(false)"
-                        >
-                            Help No Longer Needed
-                        </button>
-                    </div>
+    <ac-feed
+        ref="feedRef"
+        class="l-mar-m--bottom"
+        min-height="20rem"
+        :max-height="maxFeedHeight"
+        :feed="acStore.fullFeed"
+        error-prefix="There was a problem retrieving the response."
+        initially-scrolled
+    >
+        <template #header>
+            <div
+                v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
+                class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
+            >
+                <div class="l-flex l-flex--justify-space l-flex--align-center">
+                    <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
+                    <button
+                        class="button warning l-mar--0 dac-feed-help-dismiss"
+                        type="button"
+                        @click="changeHelpRequest(false)"
+                    >
+                        Help No Longer Needed
+                    </button>
                 </div>
-            </template>
-        </ac-feed>
-    </div>
+            </div>
+        </template>
+    </ac-feed>
     <ac-prompt
-        v-if="props.generateRoute"
+        v-if="props.response._routes.message"
         :request-config="{
-            messageRoute: props.generateRoute,
+            messageRoute: props.response._routes.message,
             aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
             requireImage: false,
         }"

@@ -154,6 +154,13 @@ class Module extends BaseModule
             $this->buildRuleCanAction(Status::ACTION_VIEW)
         ), $preloadParticipantAndResponse);
 
+        /* Student sends a message to the chat agent for a particular response
+         */
+        $this->register('POST', "{$assRoute}/{$studentParam}/message/{responseId:\d+}", 'postMessage', new Rule\All(
+            $canSubmit,
+            $this->buildRuleCanAction(Status::ACTION_MESSAGE)
+        ), $preloadParticipantAndResponse);
+
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
@@ -429,6 +436,7 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Access::class),
             ),
             $assessmentMapperProxy,
+            $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
             $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),

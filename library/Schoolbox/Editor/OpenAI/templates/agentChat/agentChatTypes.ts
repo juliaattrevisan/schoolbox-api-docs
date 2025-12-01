@@ -1,14 +1,23 @@
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiLogFeatureData } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { AgentChatApiPayload } from "./store/agentChatPayload";
 
+export enum AgentChatMessageType {
+    REQUEST = "request",
+    RESPONSE = "response",
+    ALERT = "alert",
+}
+
 /** The expected data type for this feature that the AI log will restore */
-export type AiLogAgentChatData = AiLogFeatureData<
-    string,
-    | Pick<AgentChatResponseSuccess, "status" | "responseId" | "image" | "message">
+type AgentChatLogDataRequest = string;
+type AgentChatLogDataResponse =
     | Pick<AgentChatResponseError, "status" | "responseId" | "message">
->;
+    | Pick<AgentChatResponseSuccess, "status" | "responseId" | "image" | "message">;
+
+export type AiLogAgentChatData = (
+    | { type: AgentChatMessageType.REQUEST; data: AgentChatLogDataRequest }
+    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse }
+)[];
 
 export type AgentChatImage = {
     b64: string;
@@ -17,7 +26,7 @@ export type AgentChatImage = {
 };
 
 export type AgentChatRequest = {
-    type: "request";
+    type: AgentChatMessageType.REQUEST;
     entryKey: number;
     user: Pick<UserAuthor, "id" | "fullName" | "_links">;
     payload: AgentChatApiPayload;
@@ -25,7 +34,7 @@ export type AgentChatRequest = {
 };
 
 type AgentChatResponseSuccess = {
-    type: "response";
+    type: AgentChatMessageType.RESPONSE;
     status: "success";
     entryKey: number;
     /* the openai response ID so we can reference it in the next chat */
@@ -42,7 +51,7 @@ type AgentChatResponseSuccess = {
 };
 
 type AgentChatResponseError = {
-    type: "response";
+    type: AgentChatMessageType.RESPONSE;
     status: "error";
     entryKey: number;
     responseId: string | null;
@@ -50,7 +59,7 @@ type AgentChatResponseError = {
 };
 
 export type AgentChatResponseInProgress = {
-    type: "response";
+    type: AgentChatMessageType.RESPONSE;
     status: "in_progress";
     entryKey: `loading-${number}`;
     responseId: string | null;
@@ -59,8 +68,8 @@ export type AgentChatResponseInProgress = {
 };
 
 export type AgentChatAlert = {
-    type: "alert";
-    side: "response" | "request";
+    type: AgentChatMessageType.ALERT;
+    side: AgentChatMessageType.RESPONSE | AgentChatMessageType.REQUEST;
     /**
      * TODO: this aligns with a CSS class for now, but we probably need to think about this whole struct anyway
      *

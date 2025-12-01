@@ -11,13 +11,13 @@ namespace Schoolbox\OpenAi\AgentChat;
 
 /**
  * The possible event types that agentChat expects to receive during an event stream
- * This differs from the event types recieved from an AI tool, they are internal types to Agent Chat logic
+ * This differs from the event types received from an AI tool, they are internal types to Agent Chat logic
  * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/store/agentChatPayload.ts
  */
 enum MessageEventType: string
 {
     /**
-     * Intermediate event - The response was created and we recieved some sign of life back from the AI
+     * Intermediate event - The response was created and we received some sign of life back from the AI
      * Includes the response ID for tracking
      */
     case CREATED = 'created';

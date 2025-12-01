@@ -39,10 +39,7 @@ const imageSrc = window.Vue.computed(() => {
         <div>
             <img v-if="imageSrc" :src="imageSrc" />
 
-            <p
-                class="l-mar--0-bottom ac-feed-message-content"
-                :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }"
-            >
+            <p class="l-mar--0-bottom" :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }">
                 {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
             </p>
         </div>
@@ -77,7 +74,8 @@ const imageSrc = window.Vue.computed(() => {
                 <i class="icon-image"></i>
             </div>
             <p class="l-mar--0-bottom ac-feed-message-content" :class="{ 'l-mar-s--top': imageSrc !== null }">
-                {{ props.message.message }}
+                <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+                <span v-html="props.message.message"></span>
             </p>
         </div>
     </div>
@@ -91,6 +89,18 @@ const imageSrc = window.Vue.computed(() => {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    /**
+     * It's actually possible for the response to contain embedded images
+     * if the AI felt like supplying a link to an image in markdown.
+     *
+     * When that occurs, the image could be very large, so we limit the size here.
+     * Since this image won't be previewable, it can be a bit larger than the normal ones above
+     */
+    .ac-feed-message-content :deep(img) {
+        max-width: 25rem;
+        max-height: 25rem;
     }
 
     .ac-img-omitted {
@@ -126,10 +136,6 @@ const imageSrc = window.Vue.computed(() => {
 
     .ac-feed-message-loading {
         margin-top: 0.125rem;
-    }
-
-    .ac-feed-message-content {
-        white-space: pre-wrap;
     }
 }
 </style>

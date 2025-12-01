@@ -280,7 +280,9 @@ class MessageHandler
                 json_encode([
                     'responseId' => $responseId ?? $data['response']['id'] ?? null,
                     'image' => $imageBase64 ? self::translateImageData($imageBase64) : null,
-                    'message' => $outputContent['text'] ?? '',
+                    /** Markdown is allowed, convert it with scrub on output */
+                    // TODO: should the DB actually store the raw markdown instead and we always convert on output? this may be unsafe for historical logs
+                    'message' => \Scrub::markdown($outputContent['text'] ?? ''),
                 ], JSON_THROW_ON_ERROR),
                 MessageEventType::COMPLETE->value
             );
@@ -360,7 +362,7 @@ class MessageHandler
     /**
      * Translate a saved log's inputText and outputText back into structured data for this particular feature
      * @param Log\Model $log
-     * @return array{request:string,response:array}
+     * @return (array{type:'request',data:string}|array{type:'response',data:array})[]
      */
     public static function translateLogData(Log\Model $log): array
     {
@@ -385,9 +387,10 @@ class MessageHandler
             ];
         }
 
+        /** this could be extended to allow logs of more than 1 request/response per log entry, or even other new types */
         return [
-            'request' => $inputText,
-            'response' => $response,
+            ['type' => 'request', 'data' => $inputText],
+            ['type' => 'response', 'data' => $response],
         ];
     }
 }

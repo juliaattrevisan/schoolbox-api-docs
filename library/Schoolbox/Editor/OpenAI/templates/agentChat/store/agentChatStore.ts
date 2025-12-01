@@ -1,9 +1,17 @@
 import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
+import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import type { AgentChatFeedMessage, AgentChatResponseInProgress } from "../agentChatTypes";
+import { AgentChatMessageType } from "../agentChatTypes";
+import type {
+    AgentChatFeedMessage,
+    AgentChatRequest,
+    AgentChatResponse,
+    AgentChatResponseInProgress,
+    AiLogAgentChatData,
+} from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
 
@@ -62,6 +70,55 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     /**
+     * Parse a previous feed from the log format
+     * The results from this can then be used to populate the feed in the store or directly to <ac-feed>
+     * @param logEntries - The log entries to import
+     * @param user - The user who made the requests
+     * @returns The parsed feed messages
+     */
+    function parseFeed(logEntries: AiLogAgentChatData[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
+        const parsedFeed: AgentChatFeedMessage[] = [];
+
+        const messages = logEntries.flatMap((logMessages) => logMessages);
+        for (const message of messages) {
+            if (message.type === AgentChatMessageType.REQUEST) {
+                parsedFeed.push({
+                    type: AgentChatMessageType.REQUEST,
+                    entryKey: getNextEntryKey(),
+                    user,
+                    payload: {
+                        userPrompt: message.data,
+                        attributes: {}, // not currently stored in logs
+                        imageUrl: null, // not currently stored in logs
+                        previousResponseId: null, // not currently stored in logs
+                        aiSessionId: null, // not currently stored in logs
+                    },
+                    file: null, // not currently stored in logs
+                } satisfies AgentChatRequest);
+            } else if (message.type === AgentChatMessageType.RESPONSE) {
+                parsedFeed.push({
+                    ...message.data,
+                    type: AgentChatMessageType.RESPONSE,
+                    entryKey: getNextEntryKey(),
+                } satisfies AgentChatResponse);
+            } else {
+                assertUnreachable(message);
+            }
+        }
+        return parsedFeed;
+    }
+
+    /**
+     * Import a previous feed into the store
+     * @param messages - Messages to add to the feed
+     */
+    function importFeed(messages: AgentChatFeedMessage[]): void {
+        for (const message of messages) {
+            feed.value.push(message);
+        }
+    }
+
+    /**
      * Request a new image from the AI
      * @param config - The configuration for the request
      * @param payload - The payload to send to the AI
@@ -78,7 +135,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         }
 
         feed.value.push({
-            type: "request",
+            type: AgentChatMessageType.REQUEST,
             entryKey: getNextEntryKey(),
             user: {
                 id: window.schoolboxUser.id,
@@ -93,7 +150,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         });
 
         activeGeneration.value = {
-            type: "response",
+            type: AgentChatMessageType.RESPONSE,
             status: "in_progress",
             entryKey: `loading-${getNextEntryKey()}`,
             responseId: null,
@@ -108,7 +165,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                 /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
                 hasErrored = true;
                 feed.value.push({
-                    type: "response",
+                    type: AgentChatMessageType.RESPONSE,
                     status: "error",
                     entryKey: getNextEntryKey(),
                     responseId: activeGeneration.value?.responseId ?? null,
@@ -120,7 +177,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             }
 
             if (activeGeneration.value === null) {
-                /** The generation was stopped before the stream fully stopped and we recieved something extra, ignore it  */
+                /** The generation was stopped before the stream fully stopped and we received something extra, ignore it  */
                 abortController.abort();
                 return;
             }
@@ -157,7 +214,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
              * - Some other unknown error
              */
             feed.value.push({
-                type: "response",
+                type: AgentChatMessageType.RESPONSE,
                 status: "error",
                 entryKey: getNextEntryKey(),
                 responseId,
@@ -173,7 +230,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
          */
         if (config.requireImage && response.data.image === null) {
             feed.value.push({
-                type: "response",
+                type: AgentChatMessageType.RESPONSE,
                 status: "error",
                 entryKey: getNextEntryKey(),
                 responseId: response.data.responseId,
@@ -184,7 +241,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
         /** All good at this point, persist the final response in the feed */
         feed.value.push({
-            type: "response",
+            type: AgentChatMessageType.RESPONSE,
             status: "success",
             entryKey: getNextEntryKey(),
             responseId: response.data.responseId,
@@ -204,7 +261,9 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      */
     async function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): Promise<void> {
         // only show successful responses that contain images
-        const finalFeedItems = feed.value.filter((item) => item.type === "response" && item.status === "success");
+        const finalFeedItems = feed.value.filter(
+            (item) => item.type === AgentChatMessageType.RESPONSE && item.status === "success",
+        );
 
         const slides: GalleryItem[] = [];
         let selectedIndex = 0;
@@ -228,6 +287,8 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     return {
         feed,
         fullFeed,
+        parseFeed,
+        importFeed,
         activeGeneration,
         getNextEntryKey,
         getPreviousResponseId,

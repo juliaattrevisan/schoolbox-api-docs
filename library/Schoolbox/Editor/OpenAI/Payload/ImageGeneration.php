@@ -7,32 +7,32 @@ class ImageGeneration
     /**
      * These three params control wildness and output length
      */
-    private const TEMPERATURE = 0.7;
-    private const TOP_P = 0.9;
-    private const MAX_OUTPUT_TOKENS = 20000;
+    private const float TEMPERATURE = 0.7;
+    private const float TOP_P = 0.9;
+    private const int MAX_OUTPUT_TOKENS = 20000;
 
 
     /**
      * We always use this model for image generation, it's not configurable
      */
-    public const OPENAI_IMAGE_MODEL = 'gpt-image-1';
+    public const string OPENAI_IMAGE_MODEL = 'gpt-image-1';
 
-    private const PARTIAL_IMAGE_QTY = 3;
-    private const IMAGE_OUTPUT_FORMAT = 'png';
-    private const IMAGE_INPUT_DETAIL = 'auto';
+    private const int PARTIAL_IMAGE_QTY = 3;
+    private const string IMAGE_OUTPUT_FORMAT = 'png';
+    private const string IMAGE_INPUT_DETAIL = 'auto';
 
     /**
      * Hardcoded system prompt for the image style to be embedded to PROMPT_SYSTEM_PERSONA via [IMAGE_STYLE]
      * Use %s as the placeholder for the style name
      */
-    private const PROMPT_SYSTEM_IMAGE_STYLE = "The image must be in the style of '%s'.";
+    private const string PROMPT_SYSTEM_IMAGE_STYLE = "The image must be in the style of '%s'.";
 
     /**
      * Hardcoded system prompt to set the behaviour of the AI, possible placeholders are:
      * [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
      * [IMAGE_STYLE] - replaced with the selected image style, if any
      */
-    private const PROMPT_SYSTEM_PERSONA = "
+    private const string PROMPT_SYSTEM_PERSONA = "
         You are an AI image generation tool.
         Your only purpose is to create images based on the user's provided description.
         You will not engage in conversation, answer questions, or perform any tasks other than image generation.
@@ -53,8 +53,8 @@ class ImageGeneration
      * These labels are used by the frontend to display the options
      * They match the available sizes from OpenAI, see https://platform.openai.com/docs/guides/image-generation#size-and-quality-options
      */
-    private const ATTRIBUTE_KEY_SIZE = 'size';
-    private const AVAILABLE_SIZES = [
+    private const string ATTRIBUTE_KEY_SIZE = 'size';
+    private const array AVAILABLE_SIZES = [
         '1024x1024' => 'Square (1x1)',
         '1536x1024' => 'Landscape (3x2)',
         '1024x1536' => 'Portrait (2x3)',
@@ -67,8 +67,8 @@ class ImageGeneration
      * These labels are used by the frontend to display the options
      * There's no equivalent to this in the OpenAI AI, we just inject it into the prompt
      */
-    private const ATTRIBUTE_KEY_STYLE = 'style';
-    private const AVAILABLE_STYLES = [
+    private const string ATTRIBUTE_KEY_STYLE = 'style';
+    private const array AVAILABLE_STYLES = [
         'background' => 'Background',
         'cartoon' => 'Cartoon',
         'oil_painting' => 'Oil Painting',

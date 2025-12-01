@@ -17,11 +17,6 @@ export enum AiFeature {
     LEARNING_ACTIVITY_CUSTOMISATION = "learningactivitycustomisation",
 }
 
-export type AiLogFeatureData<TInputText, TOutputText> = {
-    request: TInputText;
-    response: TOutputText;
-};
-
 type AiLogFeatureDataMap = {
     [AiFeature.CHAT]: null;
     [AiFeature.LESSON_PLAN]: null;

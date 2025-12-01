@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { useTemplateRefsList } from "@vueuse/core";
+import { useEventBus, useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import { useAgentChatStore } from "./store/agentChatStore";
 import type { AgentChatRequestConfig } from "./store/agentChatStore";
 import type { AgentChatPromptAttribute } from "./agentChatTypes";
+import { acPromptEventKey } from "./agentChatSymbols";
 
 interface Props {
     requestConfig: AgentChatRequestConfig;
@@ -18,6 +19,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
+const acPromptEventBus = useEventBus(acPromptEventKey);
 
 const currentFile = window.Vue.ref<FileDropFile | null>(null);
 const prompt = window.Vue.ref<string>("");
@@ -63,6 +65,13 @@ async function sendRequest(): Promise<void> {
     if (attributeEls.value.some((el) => !el.reportValidity())) {
         return; // some attributes are required and not set yet, can't send the request
     }
+
+    /**
+     * Trigger the feed to be scrolled down to show the new message
+     * This is only done on the user's action, not when the AI responds
+     * as to not interrupt the user if they scrolled back up to read something else
+     */
+    acPromptEventBus.emit({ scrollFeed: true });
 
     const isSuccess = await acStore.sendRequest(
         props.requestConfig,
