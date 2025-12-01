@@ -46,12 +46,7 @@ export function useGetStudentPastoralCounts(
             if (typeof responseJson !== "object" || responseJson === null) {
                 throw new Error("Unexpected response format");
             }
-            if (typeof responseJson === "object" && responseJson !== null) {
-                // get data
-                studentPastoralCounts.value = responseJson;
-            } else {
-                throw new Error("Unexpected response format");
-            }
+            studentPastoralCounts.value = responseJson;
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
             if (isAbortError(error)) {

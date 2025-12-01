@@ -36,7 +36,7 @@ export function usePerformAction(
                 await includeParticipants(modifyList.value);
                 break;
             case "exclude":
-                await excludeParticipants(modifyList.value, selectedList);
+                await excludeParticipants(modifyList.value);
                 break;
             case "includeInExisting":
                 await includeParticipantInExistingPlan();

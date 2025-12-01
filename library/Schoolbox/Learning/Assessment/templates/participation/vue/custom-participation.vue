@@ -134,7 +134,7 @@ function onDPSelected(participant: Participant): void {
         <div id="pop-out-container"></div>
         <cp-bottom-drawer
             v-model:selected-list="selectedList"
-            :routes="routes"
+            :routes="props.routes"
             :assessment-id="props.assessmentId"
             :customisations="props.customisations"
             @action-selected="onActionSelected"

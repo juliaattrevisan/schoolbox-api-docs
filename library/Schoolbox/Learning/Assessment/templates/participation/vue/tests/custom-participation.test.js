@@ -12,7 +12,6 @@ const defaultProps = {
     routes: {
         getStudentsPastoralCountsUrl: "",
         getLearningPlanNewUrl: "",
-        getAssessmentParticipation: "",
         getAssessmentParticipationNewActivity: "",
         getAssessmentParticipationCopyActivity: "",
         includeInExistingCustomisation: "",

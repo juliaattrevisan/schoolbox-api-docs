@@ -46,18 +46,11 @@ export function useExcludeParticipant(loadError: Ref<string | null>): {
     /**
      * Excludes the selected participants.
      * @param participants - The participants to exclude.
-     * @param selectedList - Reactive ref to the selected participants list to clear after exclusion.
      * @returns A promise that resolves when all exclusions are complete.
      */
-    async function excludeParticipants(
-        participants: Participant[],
-        selectedList?: ReturnType<typeof window.Vue.ref<Participant[]>>,
-    ): Promise<void> {
+    async function excludeParticipants(participants: Participant[]): Promise<void> {
         try {
             await Promise.all(participants.map((participant) => excludeParticipant(participant)));
-            if (selectedList) {
-                selectedList.value = [];
-            }
         } catch (error) {
             if (error instanceof Error && hasErrorMessage(error)) {
                 loadError.value = error.message;

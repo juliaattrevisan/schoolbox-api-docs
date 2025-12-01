@@ -68,7 +68,7 @@ async function load(): Promise<void> {
             );
         }
         data.value = response.data || [];
-        data.value = data.value.filter((item) => item.value !== null); // filter out that have a null or empty value
+        data.value = data.value.filter((item) => item.value !== null); // filter out items that have a null value
         adjustmentData.value = data.value.filter((item) => Array.isArray(item.value)) as AdjustmentItem[]; // adjustments are arrays
         textData.value = data.value.filter((item) => !Array.isArray(item.value)) as TextItem[]; // leaving just text items
         toast.timeout({ text: `${locale.differentiationProfile.translate(false, true)} successfully retrieved` });
