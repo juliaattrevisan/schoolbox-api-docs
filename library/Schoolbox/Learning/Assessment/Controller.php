@@ -1225,6 +1225,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['editorTemplates'] = $this->editorTemplateHelper !== null
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',
             $data

@@ -8,10 +8,12 @@
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Database\Predicate\Builder;
+use PDOStatement;
 use Schoolbox\Filter\Filters\DifferentiationProfile;
 use Schoolbox\Filter\Filters\DifferentiationProfile\Name\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -24,6 +26,19 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * Configuration mapping between config keys and corresponding model getter methods
+     */
+    public const CONFIG_METHOD_MAPPING = [
+        'adjustment_category' => 'getAdjustmentCategory',
+        'adjustment_level' => 'getAdjustmentLevel',
+        'overview' => 'getOverview',
+        'interests_strengths' => 'getInterestsStrengths',
+        'needs_challenges' => 'getNeedsChallenges',
+        'strategies_adjustments' => 'getStrategiesAdjustments',
+        'goals' => 'getGoals',
+    ];
+
     public const int DEFAULT_LIMIT = 20;
     /**
      * Setup mapper
@@ -34,8 +49,6 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('student_id', UserMapper::class, 'id', null, null, 'student', 'student');
-        $this->uses('adjustment_category', self::TYPE_STRING);
-        $this->uses('adjustment_level', self::TYPE_STRING);
         $this->uses('overview', self::TYPE_STRING);
         $this->uses('interests_strengths', self::TYPE_STRING);
         $this->uses('needs_challenges', self::TYPE_STRING);
@@ -44,6 +57,62 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        /** adjustments */
+        $this->uses('adjustment_category', self::TYPE_STRING, null, 'adjustmentCategoryIds');
+        $this->uses('adjustment_level', self::TYPE_STRING, null, 'adjustmentLevelIds');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+            $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
+            $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
+            $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
+            $collection->add($model);
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Get collection from comma-delimited ids or names
+     * Note: this is synonymous to how we do it in the Pastoral Report Mapper
+     *
+     * @param BaseMapper $mapper
+     * @param string|null $ids
+     * @return GenericCollection
+     */
+    private function getCollection(BaseMapper $mapper, ?string $ids): GenericCollection
+    {
+        $collection = $mapper->createCollection();
+
+        $ids = trim((string)$ids);
+
+        if (!empty($ids)) {
+            $array = explode(",", $ids);
+
+            foreach ($array as $id) {
+                try {
+                    if (is_numeric($id)) {
+                        $object = $mapper->findById($id);
+                    } else {
+                        $object = $mapper->findOneByColumn('name', $id);
+                    }
+                    $collection->add($object);
+                } catch (MapperException $e) {
+                }
+            }
+        }
+
+        return $collection;
     }
 
     /**
@@ -203,6 +272,8 @@ class Mapper extends BaseMapper
                 $model = $this->createModel();
             }
             $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
+            $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
+            $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
             $collection->add($model);
         }
 

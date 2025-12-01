@@ -20,6 +20,8 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+    public const string MODULE_ADJUSTMENTS = 'adjustments';
+    public const string MODULE_DETAILS = 'details';
     /**
      * @inheritDoc
      */

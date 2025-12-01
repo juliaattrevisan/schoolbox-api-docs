@@ -42,6 +42,14 @@ export type CustomisedPlan = Plan & {
 };
 
 /**
+ * The expected payload for an adjustment in the student's differentiation profile
+ */
+export type Adjustment = {
+    terminology: string;
+    value: string;
+};
+
+/**
  * The expected payload for each participant in the activity
  */
 export type Participant = {
@@ -56,6 +64,6 @@ export type Participant = {
     _links: {
         exclude: string;
         include: string;
-        learningPlanNew: string;
+        differentiationProfile: string | null;
     };
 };

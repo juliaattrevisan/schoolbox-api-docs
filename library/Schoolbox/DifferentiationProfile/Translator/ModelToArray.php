@@ -6,8 +6,10 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Collection;
+use Schoolbox\DifferentiationProfile\Mapper;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\Admin\DifferentiationProfiles\Model as Config;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as ConfigMapper;
 use Schoolbox\User;
 
 class ModelToArray
@@ -61,15 +63,7 @@ class ModelToArray
             'deleted_at'            => $model->getDeletedAt()?->getShort(),
         ];
 
-        $configKey = [
-            'adjustment_category' => 'getAdjustmentCategory',
-            'adjustment_level' => 'getAdjustmentLevel',
-            'overview' => 'getOverview',
-            'interests_strengths' => 'getInterestsStrengths',
-            'needs_challenges' => 'getNeedsChallenges',
-            'strategies_adjustments' => 'getStrategiesAdjustments',
-            'goals' => 'getGoals',
-        ];
+        $configKey = Mapper::CONFIG_METHOD_MAPPING;
 
         /* filtering out and only get the enabled config values
          */
@@ -78,13 +72,11 @@ class ModelToArray
                 $value = $model->{$configKey[$config->getName()]}();
 
                 // Convert comma-delimited strings to arrays for adjustment fields
-                if (in_array($config->getName(), ['adjustment_category', 'adjustment_level'])) {
-                    if ($value === null) {
+                if ($config->getModule() === ConfigMapper::MODULE_ADJUSTMENTS) {
+                    if ($value->count() === 0) {
                         $carry[$config->getName()] = null;
-                    } elseif (empty($value)) {
-                        $carry[$config->getName()] = [];
                     } else {
-                        $carry[$config->getName()] = array_map('intval', explode(',', $value));
+                        $carry[$config->getName()] = array_map('intval', $value->getPropertyValues('id'));
                     }
                 } else {
                     $carry[$config->getName()] = $value;

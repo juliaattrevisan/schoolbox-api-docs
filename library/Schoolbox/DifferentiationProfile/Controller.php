@@ -11,6 +11,7 @@ namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\Filter\Mapper;
 use Schoolbox\L10n\RosettaStone;
@@ -265,7 +266,7 @@ class Controller extends Base
             }
         } else {
             $model = $this->mapper->createModel()
-                ->setStudent($student);
+                                  ->setStudent($student);
         }
 
         $adjustment_level = $post->get('adjustment_level');
@@ -327,8 +328,8 @@ class Controller extends Base
         try {
             /** @var Model $model */
             $model
-                ->setAdjustmentLevel($adjustment_level ? implode(',', $adjustment_level) : null)
-                ->setAdjustmentCategory($adjustment_category ? implode(',', $adjustment_category) : null)
+                ->setAdjustmentLevelIds($adjustment_level ? implode(',', $adjustment_level) : null)
+                ->setAdjustmentCategoryIds($adjustment_category ? implode(',', $adjustment_category) : null)
                 ->setOverview($post->get('overview'))
                 ->setGoals($post->get('goals'))
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))
@@ -346,5 +347,55 @@ class Controller extends Base
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
         }
+    }
+
+    /**
+     * View differentiation profile data for a student
+     *
+     * @param User $student
+     * @return void
+     * @throws Exception
+     */
+    public function viewDifferentiationProfileData(User $student): void
+    {
+        try {
+            $profile = $this->mapper->findOneByColumn(
+                'student_id',
+                $student->getId(),
+                [
+                    'order' => ['updated_at' => DifferentiationProfileMapper::SORT_ORDER_DESC],
+                ]
+            );
+        } catch (Exception\NotFound $e) {
+            $this->sendJsonError('Differentiation profile record not found for the student.', 404);
+            return;
+        }
+
+        $configs = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1)->indexBy('name');
+
+        $configKey = DifferentiationProfileMapper::CONFIG_METHOD_MAPPING;
+
+        $this->response = $this->responseAsJson(
+            $configs->reduce(function ($carry, $config) use ($profile, $configKey) {
+                /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
+                if (array_key_exists($config->getName(), $configKey)) {
+                    $method  = $configKey[$config->getName()];
+                    $value   = call_user_func([$profile, $method]);
+
+                    if ($config->getModule() === AdminConfigMapper::MODULE_ADJUSTMENTS && $value instanceof Collection) {
+                        $value = ($value->count() > 0 ) ?
+                            $value->map(fn(AdjustmentCategoriesModel|AdjustmentLevelsModel $adjustment) => [
+                                'name' => $adjustment->getName(),
+                            ]) : null;
+                    }
+
+                    $carry[] = [
+                        'terminology' => $config->getTerminology() ?? $config->getTitle(),
+                        'value'       => $value
+                    ];
+                }
+                return $carry;
+            }, [])
+        );
     }
 }

@@ -10,12 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use http\Exception\UnexpectedValueException;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -47,10 +50,43 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
+            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
                 UserAccess::ACCESS_WRITE
-            )
+            ),
+        );
+
+        $hasCampusPerms =  new Rule\HasServicePermission(
+            UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+            UserAccess::ACCESS_WRITE,
+            fn (array $params) => (
+                isset($params['student'])
+                && $params['student'] instanceof User
+                && null !== $params['student']->getCampusCollection()
+            ) ?
+                $params['student']->getCampusCollection() :
+                $this->getMapperFactory()
+                     ->get(UserMapper::class)
+                     ->findById($params['studentId'])->getCampusCollection()
+        );
+
+        $updateProfilePerms = new Rule\All(
+            $getPerms,
+            $hasCampusPerms
+        );
+
+        $getProfilePerms = new Rule\All(
+            $getPerms,
+            new Rule\Callback(function (array $params): void {
+                try {
+                    $this->getMapperFactory()->get(DifferentiationProfileMapper::class)
+                        ->findOneByColumn('student_id', $params['studentId']);
+                } catch (\Exception $e) {
+                    throw new Unauthorized('Differentiation profile does not exist.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                }
+            }),
+            $hasCampusPerms
         );
 
         /* Only superusers can receive data from the form
@@ -72,7 +108,15 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/edit/{studentId}',
             'postDifferentiationProfileData',
-            $getPerms,
+            $updateProfilePerms,
+            \Closure::fromCallable([$this, 'preloadStudent'])
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/view/{studentId}',
+            'viewDifferentiationProfileData',
+            $getProfilePerms,
             \Closure::fromCallable([$this, 'preloadStudent'])
         );
     }
