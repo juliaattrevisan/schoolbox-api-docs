@@ -3,6 +3,7 @@
 /* eslint-disable eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
+import locale from "@js/terminology/rosettaStone";
 
 export default {
     name: "class-list",
@@ -625,6 +626,9 @@ export default {
                             </th>
                             <td></td>
                             <th>Name</th>
+                            <th class="show-for-medium-up" v-if="differentiationEnabled">
+                                {{ locale.differentiationProfile.translate(false, true) }}
+                            </th>
                             <th class="show-for-large-up">{{ yearLevelLabel }}</th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
@@ -725,6 +729,16 @@ export default {
                                         </li>
                                     </slot>
                                 </ul>
+                            </td>
+                            <td class="show-for-medium-up" v-if="differentiationEnabled">
+                                <button
+                                    v-if="student._links.differentiationProfile"
+                                    class="sbx-link-button"
+                                    type="button"
+                                    @click.prevent="onDPSelected"
+                                >
+                                    View {{ locale.differentiationProfile.translate(false, true) }}
+                                </button>
                             </td>
                             <td class="show-for-large-up">{{ student.yearlevel }}</td>
                             <td class="show-for-medium-up" v-if="showTutorGroupColumn">
