@@ -1282,17 +1282,23 @@ class Controller extends Base
         //     * if either is a rejected booking, return false
         //     * if both are resource bookings, only care if one is pending
         //     * if both are resource bookings, skip if both pending or same booking id
+        if ($oldBooking->getId() === $item->getId()) {
+            throw new Exception("Cannot approve clash: bookings have the same ID.");
+        }
+        if ($oldBooking->getResource()->getId() !== $item->getResource()->getId()) {
+            throw new Exception("Cannot approve clash: bookings are for different resources.");
+        }
+        if ($oldBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED) {
+            throw new Exception("Cannot approve clash: the old booking is rejected.");
+        }
+        if ($item->getStatus()->getId() === Status\Model::STATUS_REJECTED) {
+            throw new Exception("Cannot approve clash: the new booking is rejected.");
+        }
         if (
-            $oldBooking->getId() === $item->getId()
-            || $oldBooking->getResource()->getId() !== $item->getResource()->getId()
-            || $oldBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED
-            || $item->getStatus()->getId() === Status\Model::STATUS_REJECTED
-            || (
-                $oldBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
-                && $item->getStatus()->getId() === Status\Model::STATUS_APPROVED
-            )
+            $oldBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
+            && $item->getStatus()->getId() === Status\Model::STATUS_APPROVED
         ) {
-            throw new Exception("Unable to approve clash booking, bookings are not clashing...");
+            throw new Exception("Cannot approve clash: both bookings are already approved.");
         }
 
         // reject the old booking, so we can approve the new one.

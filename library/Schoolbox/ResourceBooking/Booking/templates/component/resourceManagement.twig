@@ -84,7 +84,23 @@
                                                     <div class="warning">
                                                     {% endif %}
                                                     {# time, and only time (start - end) #}
-                                                    <time datetime="{{ event.booking.event.startDateTime.getDatabase() }}">{{ event.booking.event.startDateTime.getTimeOnly() }}</time>{% if event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %} - <time datetime="{{ event.booking.event.endDateTime.getDatabase() }}">{{ event.booking.event.endDateTime.getTimeOnly() }} {% if booking.clash and event.booking.status.ispending %}<div class="icon-alert warning">&nbsp;</div> {% endif %}</time>{% endif %}
+                                                        {# Precompute time and alert icon for readability #}
+                                                        {% set showEndTime = event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %}
+                                                        {% set startTime = event.booking.event.startDateTime.getTimeOnly() %}
+                                                        {% set startDateTime = event.booking.event.startDateTime.getDatabase() %}
+                                                        {% set endTime = event.booking.event.endDateTime.getTimeOnly() %}
+                                                        {% set endDateTime = event.booking.event.endDateTime.getDatabase() %}
+                                                        {% set showAlertIcon = booking.clash and event.booking.status.ispending %}
+                                                        <time datetime="{{ startDateTime }}">{{ startTime }}</time>
+                                                        {% if showEndTime %}
+                                                            -
+                                                            <time datetime="{{ endDateTime }}">
+                                                                {{ endTime }}
+                                                                {% if showAlertIcon %}
+                                                                    <div class="icon-alert warning">&nbsp;</div>
+                                                                {% endif %}
+                                                            </time>
+                                                        {% endif %}
                                                     {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
                                                     </div>
                                                     {% endif %}
