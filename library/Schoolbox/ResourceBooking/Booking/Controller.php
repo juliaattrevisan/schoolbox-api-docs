@@ -1312,6 +1312,12 @@ class Controller extends Base
         // reject the old booking, so we can approve the new one.
         $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
 
+        // if errors then exit here
+        if (!empty($errorsOld)) {
+            $this->setUpdateStatusResponse($oldBooking, $this->getStatusChangeCallbackUrl(), $errorsOld);
+            return;
+        }
+
         // approve the new booking
         $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
