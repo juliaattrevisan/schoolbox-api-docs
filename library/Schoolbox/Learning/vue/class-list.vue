@@ -244,7 +244,7 @@ export default {
         /**
          * Is the differentiation profile enabled?
          */
-        differentiationProfileEnabled: {
+        differentiationEnabled: {
             type: Boolean,
             default: false,
         },
