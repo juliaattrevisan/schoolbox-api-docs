@@ -46,7 +46,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
-        <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onAddSelected">
+        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onAddSelected">
             <h2 data-test="up-add-units-title">Create {{ locale.unit.translate(true, true) }}</h2>
             <div class="c-vert-scroll-container l-flex-col l-gap-s">
                 <div class="l-flex-col l-gap-s">
