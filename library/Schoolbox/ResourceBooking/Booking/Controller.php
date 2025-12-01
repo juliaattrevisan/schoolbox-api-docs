@@ -1265,7 +1265,7 @@ class Controller extends Base
 
     /**
      * Handle approval of a booking that clashes with an existing booking.
-     * cancel the old booking (approved) and approve the new booking. (pending)
+     * rejects the old booking (approved) and approve the new booking. (pending)
      * @param Model $oldBooking
      * @param Model $item // item as we do route perm checks on $item so we can leverage that for the new booking
      *                    (both old booking and item (new booking) should be both the same resource, so if you have access to one, you have access to the other)
