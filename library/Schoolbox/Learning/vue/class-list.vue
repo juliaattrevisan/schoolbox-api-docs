@@ -4,6 +4,7 @@
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import locale from "@js/terminology/rosettaStone";
+import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
 
 export default {
     name: "class-list",
@@ -266,6 +267,8 @@ export default {
             currentClassCode: null,
             emailGroupsWithSelection: this.emailGroups,
             emailFormBeingSubmitted: false,
+            studentWithDP: null,
+            studentWithDPRoute: null,
         };
     },
     mounted: function () {
@@ -458,6 +461,14 @@ export default {
                 return true;
             }
             return student.classCodes.includes(this.currentClassCode);
+        },
+
+        /**
+         * To open the differentiation profile view
+         */
+        onDPSelected(student) {
+            this.studentWithDPRoute = student._links.differentiationProfile ?? "";
+            this.studentWithDP = student;
         },
     },
     computed: {
@@ -735,7 +746,7 @@ export default {
                                     v-if="student._links.differentiationProfile"
                                     class="sbx-link-button"
                                     type="button"
-                                    @click.prevent="onDPSelected"
+                                    @click.prevent="onDPSelected(student)"
                                 >
                                     View {{ locale.differentiationProfile.translate(false, true) }}
                                 </button>
@@ -802,4 +813,5 @@ export default {
             </div>
         </div>
     </div>
+    <view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
 </template>
