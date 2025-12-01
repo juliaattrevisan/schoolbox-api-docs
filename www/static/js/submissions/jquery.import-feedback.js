@@ -153,7 +153,9 @@
             const textarea = $(form).find('textarea[name="comment"]');
             const editor = window.sbProps.editors[textarea[0]?.id];
             if (editor) {
-                editor.setData(value);
+                // ensure newlines are preserved in the editor
+                const replaceNewlines = value.replace(/\n/g, "<br>");
+                editor.setData(replaceNewlines);
             } else {
                 // No editor? It may be hidden or not initialised yet, set the value directly instead
                 textarea.val(value).change();
