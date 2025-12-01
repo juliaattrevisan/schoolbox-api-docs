@@ -15,6 +15,7 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
 use Schoolbox\OpenAi\EventStream\ResponseListener;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\OpenAi\LogHandler\ResponsesApi\LogOutputText;
 use Schoolbox\User;
 
 /**
@@ -67,7 +68,7 @@ class ImageGeneration
             $log,
             null,
             new ResponseListener(requireFinalImage: true),
-            new ImageGeneration\LogListener(),
+            new LogOutputText(),
         );
     }
 

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\Agent\ImageGeneration;
+namespace Schoolbox\OpenAi\LogHandler\ResponsesApi;
 
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Editor\OpenAI\Log;
@@ -17,16 +17,18 @@ use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;
 
 /**
- * Semi-standard log listener for messages from Responses API requests:
+ * Semi-standard log listener for logging output text from messages from
+ * Responses API requests:
  * https://platform.openai.com/docs/api-reference/responses-streaming
  *
  * If an output message is a finished response, then extract the output text
  * out of it and add it to the log.
  *
  * This expects that the output message has been generated with the
- * `\Schoolbox\OpenAi\EventStream\ResponseListener` event listener.
+ * `\Schoolbox\OpenAi\EventStream\ResponseListener` event listener: thus, it
+ * will not log output text from non-streaming requests.
  */
-class LogListener implements IListener
+class LogOutputText implements IListener
 {
     /**
      * The following AgentChat\MessageEventType events indicate the end of a response

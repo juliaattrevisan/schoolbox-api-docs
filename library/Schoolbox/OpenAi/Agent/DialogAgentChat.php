@@ -15,6 +15,7 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
 use Schoolbox\OpenAi\EventStream\ResponseListener;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\OpenAi\LogHandler\ResponsesApi\LogOutputText;
 use Schoolbox\User;
 
 /**
@@ -71,7 +72,7 @@ class DialogAgentChat
             $log,
             null,
             new ResponseListener(requireFinalImage: false),
-            new ImageGeneration\LogListener(),
+            new LogOutputText(),
         );
     }
 
