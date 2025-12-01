@@ -468,7 +468,9 @@ class Calendar extends DeprecatedModel
 
                 /* If you have write access to the event
                  */
-                if ($this->getPerm($currentEvent) > 1) {
+                $eventPermission = $this->getPerm($currentEvent);
+
+                if ($eventPermission > UserAccess::ACCESS_READ) {
                     $event->setIsEditable(true);
                 } else {
                     $event->setIsEditable(false);
@@ -488,11 +490,11 @@ class Calendar extends DeprecatedModel
 
                 $event->setCompleted((bool)$currentEvent['completed']);
 
-                /* only set path if user has read access, historically this doesn't accept null
-                 * and the frontend uses a falsey check so empty string is probably okay for now...
+                /* Only set path if user has read access. setPath() doesn't accept
+                 * and the frontend uses a falsey check, so empty string is used when access is denied.
                  */
                 $event->setPath(
-                    $this->getPerm($currentEvent) >= UserAccess::ACCESS_READ
+                    $eventPermission >= UserAccess::ACCESS_READ
                         ? '/calendar/event/' . $currentEvent['id']
                         : ''
                 );
