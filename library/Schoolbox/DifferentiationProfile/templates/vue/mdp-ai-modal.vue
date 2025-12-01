@@ -72,7 +72,7 @@ function onConfirmSelected(): void {
                     </loading-cards>
                 </template>
             </div>
-            <div v-else-if="genAiStore.aiResponse" class="c-vert-scroll-container l-flex-col l-gap-s l-pad-s">
+            <div v-else-if="genAiStore.aiResponse" class="c-vert-scroll-container l-flex-col l-gap-s">
                 <div v-for="item in genAiStore.aiResponse" :key="item.key" class="l-flex-col l-gap-s">
                     <div>
                         <input

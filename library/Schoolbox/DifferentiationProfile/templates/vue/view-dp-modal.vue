@@ -123,7 +123,7 @@ function onClose(): void {
                     {{ student.lastname }}
                 </h2>
             </div>
-            <div class="c-vert-scroll-container l-flex-col l-gap-s l-pad-s">
+            <div class="c-vert-scroll-container l-flex-col l-gap-s">
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <div
                         v-for="item in adjustmentData"
