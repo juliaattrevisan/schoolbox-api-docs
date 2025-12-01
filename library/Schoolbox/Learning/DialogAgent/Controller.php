@@ -192,9 +192,13 @@ class Controller extends Base
          * In the future this will actually go and generate another prompt as an "improvement" to compare against,
          * but that isn't in scope for 26.0 apparently.
          *
-         * TODO: split this out into something reusable I guess
+         * TODO: split this out into something reusable I guess (and make tokens somewhat less arbitrary)
          */
-        $fieldReplacements = [];
+        $fieldReplacements = [
+            '<opening_message>' => $assessment->getOpeningMessage(),
+            '<rules>' => $assessment->getRules(),
+            '<language>' => $assessment->getLanguage(),
+        ];
         foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
             $fieldPlaceholder = \sprintf('<%s>', $fieldContext->getField()->getSlug());
             $fieldReplacements[$fieldPlaceholder] = $fieldContext->getBody();
