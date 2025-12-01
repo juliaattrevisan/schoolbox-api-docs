@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
@@ -14,6 +15,8 @@ const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
 const aiSessionId = window.Vue.ref<string>(""); // immediately set by resetFeed()
+
+const isConfirmModalOpen = window.Vue.ref<boolean>(false);
 
 /**
  * Reset the feed to the initial state (just an opening message)
@@ -32,6 +35,8 @@ function resetFeed(): void {
         responseId: null,
         image: null,
     });
+
+    isConfirmModalOpen.value = false;
 }
 
 window.Vue.onMounted(() => {
@@ -68,9 +73,18 @@ defineExpose({ resetFeed });
 
     <div class="component-action">
         <section>
-            <button class="button" @click="resetFeed">Reset Sandbox</button>
+            <button class="button" @click="isConfirmModalOpen = true">Reset Sandbox</button>
         </section>
     </div>
+
+    <basic-modal v-model:is-open="isConfirmModalOpen" has-background-click size="s">
+        <h2>Please Confirm</h2>
+        <p>Are you sure you want to reset the sandbox? This will clear all existing messages.</p>
+        <ul class="flex-list buttons">
+            <li><button class="button submit" @click="resetFeed">Reset</button></li>
+            <li><button class="button" @click="isConfirmModalOpen = false">Cancel</button></li>
+        </ul>
+    </basic-modal>
 </template>
 
 <style scoped></style>
