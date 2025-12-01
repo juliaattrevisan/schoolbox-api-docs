@@ -13,7 +13,7 @@ use Crell\ApiProblem\ApiProblem;
 use JsonException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
-use Schoolbox\OpenAi\LogHandler\ResponseMessage;
+use Schoolbox\OpenAi\LogHandler\ResponsesApi\LogDiagnostics;
 use UnexpectedValueException;
 
 /**
@@ -84,7 +84,7 @@ class ResponseListener implements IListener
         $eventType = $rawMessage->eventType;
         $data = $rawMessage->getDataAsArray();
 
-        if (\in_array($eventType, ResponseMessage::EVENT_TYPES_FINISHED)) {
+        if (\in_array($eventType, LogDiagnostics::EVENT_TYPES_FINISHED)) {
             /**
              * Event type 'error' is a special case, it likely won't be accompanied by the usual OpenAI response structure
              */

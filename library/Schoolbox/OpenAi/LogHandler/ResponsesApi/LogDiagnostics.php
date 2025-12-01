@@ -7,14 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\LogHandler;
+namespace Schoolbox\OpenAi\LogHandler\ResponsesApi;
 
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\IListener;
 
 /**
- * Handle streamed messages and full response bodies from OpenAI's Response API:
+ * Log diagnostic data for streamed messages and full response bodies from
+ * OpenAI's Response API:
  * https://platform.openai.com/docs/api-reference/responses
  *
  * If a streamed message or response body contains any of the following data,
@@ -30,7 +32,7 @@ use Schoolbox\OpenAi\EventStream\Message;
  * This log handler should apply to all Response API requests, regardless of
  * the agent which makes them.
  */
-class ResponseMessage implements IListener
+class LogDiagnostics implements IListener
 {
     /**
      * The following event types indicate that the response API has finished

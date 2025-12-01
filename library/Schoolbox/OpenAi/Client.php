@@ -81,7 +81,7 @@ class Client implements IClient
         return $this->handleNonStreamedResponse(
             $response,
             $log,
-            new LogHandler\ResponseMessage(),
+            new LogHandler\ResponsesApi\LogDiagnostics(),
         );
     }
 
@@ -102,7 +102,7 @@ class Client implements IClient
 
         // Use the standard response log listener,
         // plus whatever one was passed in.
-        $logListeners = [new LogHandler\ResponseMessage()];
+        $logListeners = [new LogHandler\ResponsesApi\LogDiagnostics()];
         if ($logListener) {
             $logListeners[] = $logListener;
         }
