@@ -17,10 +17,13 @@ use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;
 
 /**
- * Log listener for image generation requests.
+ * Semi-standard log listener for Responses API requests.
  *
- * If a message is a finished response, then extract the output text out of it
- * and add it to the log.
+ * If a streamed message is a finished response, then extract the output text
+ * out of it and add it to the log.
+ *
+ * This expects that the output message has been generated with the
+ * `\Schoolbox\OpenAi\EventStream\ResponseListener` event listener.
  */
 class LogListener implements IListener
 {
@@ -109,8 +112,8 @@ class LogListener implements IListener
     }
 
     /**
-     * The image generation agent doesn't make non-streaming requests, so just
-     * return the log as is.
+     * This listener depends on streamed messages for generating its output
+     * text: non-streaming requests just return the log as is.
      */
     public function handleResponse(array $responseData, Log\Model $log): Log\Model
     {
