@@ -1093,7 +1093,7 @@ class Controller extends Base
                     ->setBookingStartAt($event->getStartDateTime())
                     ->setBookingEndAt($event->getEndDateTime())
                     ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
-                    ->setName($resource->getName())
+                    ->setName($resource->getName());
 
                 $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
                 $bookingStatusId = (
