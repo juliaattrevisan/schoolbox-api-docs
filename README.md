@@ -70,12 +70,6 @@ Ideally, only the Docker development environment will need to be set up.
       ```
   * recommended: a [Docker Credentials Store](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
     for secure storage of credentials
-* add these lines to `/etc/hosts` or its Windows equivalent
-  (usually `C:\Windows\System32\drivers\etc\hosts`)
-  ```
-  127.0.0.1 docker.dev.schoolbox.cloud
-  127.0.0.1 docker2.dev.schoolbox.cloud
-  ```
 * create `docker.env`, and override any configuration in `docker.default.env`
   if needed:
   * the default settings should work for most development requirements, but
