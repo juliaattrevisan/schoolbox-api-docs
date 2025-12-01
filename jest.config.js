@@ -16,6 +16,7 @@ module.exports = {
         "^@schoolboxBadge(.*)$": "<rootDir>/library/Schoolbox/Learning/Badge$1",
         "^@schoolboxAssessment(.*)$": "<rootDir>/library/Schoolbox/Assessment$1",
         "^@schoolboxVue(.*)$": "<rootDir>/vue$1",
+        "^@schoolboxLibrary(.*)$": "<rootDir>/library/Schoolbox$1",
         "^@js(.*)$": "<rootDir>/www/static/js$1",
         "^.+\\.(css|scss)$": "<rootDir>/jest-cssStub.js",
     },

@@ -7,14 +7,18 @@ beforeEach(() => {});
 
 const defaultProps = {
     allParticipants,
-    getStudentsPastoralCountsUrl: "",
-    getLearningPlanNewUrl: "",
-    getAssessmentParticipation: "",
-    getAssessmentParticipationNewActivity: "",
-    getAssessmentParticipationCopyActivity: "",
+    pastoralEnabled: false,
+    differentiationEnabled: false,
+    routes: {
+        getStudentsPastoralCountsUrl: "",
+        getLearningPlanNewUrl: "",
+        getAssessmentParticipation: "",
+        getAssessmentParticipationNewActivity: "",
+        getAssessmentParticipationCopyActivity: "",
+        includeInExistingCustomisation: "",
+    },
     assessmentId: 0,
     customisations: [],
-    includeInExistingCustomisation: "",
 };
 
 test("all five participants are visible", () => {
