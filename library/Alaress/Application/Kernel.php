@@ -2154,7 +2154,7 @@ abstract class Kernel
                 $config = $di->get('config');
                 /** @var ToolModel[] $ltiTools */
                 $ltiTools = $di->get('lti.tools');
-                return (new KeyChainRepositoryFactory($config))->build($ltiTools);
+                return new KeyChainRepositoryFactory($config)->build($ltiTools);
             })
         );
         $di->set(
@@ -2203,14 +2203,32 @@ abstract class Kernel
                 $redis = $di->get('redis.storage');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
+                /** @var LoggerInterface $logger */
+                $logger = $di->get('lti.logger');
 
                 return new RedisAdapter(
                     $redis,
                     'accessToken.' . INSTANCE_ID,
                     0,
-                    new MarshallerAdapter(new Codec(new ClientRepository($registrationRepository))),
+                    new MarshallerAdapter(
+                        new Codec(new ClientRepository($registrationRepository, null, $logger)),
+                    ),
                 );
             })
+        );
+        $di->set(
+            'lti.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    null,
+                    STDOUT,
+                    $config->get(ConfigMapper::NAME_LTI_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'lti.' . INSTANCE_ID,
+                ],
+            ),
         );
 
         // OIDC things which aren't related to LTI

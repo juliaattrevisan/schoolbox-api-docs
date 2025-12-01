@@ -12,6 +12,12 @@ namespace Schoolbox\Learning\Assessment\Lti\Decorator;
 trait LtiTrait
 {
     /**
+     * The GUID of the assessment: set outside of the standard mapper save
+     * process.
+     */
+    protected ?string $guid = null;
+
+    /**
      * The assessment URL
      */
     protected ?string $ltiAssessmentUrl = null;
@@ -45,6 +51,24 @@ trait LtiTrait
      * The maximum score for the line item (if any).
      */
     protected ?float $lineItemScoreMaximum = null;
+
+    /**
+     * @return string|null
+     */
+    public function getGuid(): ?string
+    {
+        return $this->guid;
+    }
+
+    /**
+     * @param string|null $guid
+     * @return $this
+     */
+    public function setGuid(?string $guid): self
+    {
+        $this->guid = $guid;
+        return $this;
+    }
 
     /**
      * @return string|null

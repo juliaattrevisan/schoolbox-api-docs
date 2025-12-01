@@ -16,6 +16,7 @@ use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Lti\Model;
@@ -32,56 +33,31 @@ use Schoolbox\LTI\User\Codec as UserCodec;
 class Controller extends BaseController
 {
     /**
-     * LTI assessment mapper, for retrieving the assessment's details.
-     */
-    private LtiAssessment\Mapper $ltiAssessmentMapper;
-
-    /**
-     * LTI score mapper, for writing a mark for the assessment.
-     */
-    private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper;
-
-    /**
-     * Repository of tool+platform registrations.
-     */
-    private RegistrationRepositoryInterface $registrations;
-
-    /**
-     * User codec, used to decode a user ID in the score publish request into
-     * an actual user.
-     */
-    private UserCodec $userCodec;
-
-    /**
-     * Cache for access tokens.
-     */
-    private CacheItemPoolInterface $accessTokenCache;
-
-    /**
      * Constructor
      *
-     * @param LtiAssessment\Mapper            $ltiAssessmentMapper
-     * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper
-     * @param RegistrationRepositoryInterface $registrations
-     * @param UserCodec                       $userCodec
-     * @param CacheItemPoolInterface          $accessTokenCache
+     * @param LtiAssessment\Mapper            $ltiAssessmentMapper      LTI assessment mapper, for retrieving the
+     *                                                                  assessment's details.
+     * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper LTI score mapper, for writing a mark for the
+     *                                                                  assessment.
+     * @param RegistrationRepositoryInterface $registrations            Repository of tool+platform registrations.
+     * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
+     *                                                                  score publish request into an actual user.
+     * @param CacheItemPoolInterface          $accessTokenCache         Cache for access tokens.
+     * @param LoggerInterface                 $logger                   Logger for what this controller does.
      */
     public function __construct(
-        LtiAssessment\Mapper $ltiAssessmentMapper,
-        LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
-        RegistrationRepositoryInterface $registrations,
-        UserCodec $userCodec,
-        CacheItemPoolInterface $accessTokenCache
+        private LtiAssessment\Mapper $ltiAssessmentMapper,
+        private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
+        private RegistrationRepositoryInterface $registrations,
+        private UserCodec $userCodec,
+        private CacheItemPoolInterface $accessTokenCache,
+        private LoggerInterface $logger,
     ) {
-        $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
-        $this->ltiAssessmentScoreMapper = $ltiAssessmentScoreMapper;
-        $this->registrations            = $registrations;
-        $this->userCodec                = $userCodec;
-        $this->accessTokenCache         = $accessTokenCache;
     }
 
     /**
      * LTI line item service endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
      * Currently, this does nothing: however it must exist so that the resource
      * link launch request can generate a score publish service endpoint.
@@ -96,11 +72,16 @@ class Controller extends BaseController
      */
     public function getLineItemForAssessment(Model $assessment): void
     {
+        $this->logger->error(
+            __METHOD__ . ': not implemented',
+            ['assessmentId' => $assessment->getId()],
+        );
         throw new NotFound();
     }
 
     /**
      * Score publish service endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#score-publish-service
      *
      * @api   POST /lti-platform/line-item/assessment/{assessmentId}/scores
      * @since 21.1.0
@@ -114,18 +95,18 @@ class Controller extends BaseController
 
         // Access token sanity checker:
         // validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations);
+        $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
 
         // Access token validity checker
         // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
         $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache),
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
         );
         $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
 
         // Line item repository: consists only of a single assessment
-        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator);
+        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
 
         // Score repository: consists only of a single assessment, and its scores
         $scoreRepository = new SingleAssessmentScoreRepository(
@@ -133,11 +114,16 @@ class Controller extends BaseController
             $this->ltiAssessmentMapper,
             $this->ltiAssessmentScoreMapper,
             $this->userCodec,
+            $this->logger,
         );
 
         // Handle the request: this validates the request body
-        $handler            = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
-        $server             = new ServiceServer($validator, $handler);
+        $handler = new ScoreServiceServerRequestHandler(
+            $lineItemRepository,
+            $scoreRepository,
+            logger: $this->logger,
+        );
+        $server         = new ServiceServer($validator, $handler, logger: $this->logger);
         $this->response = $server->handle($request);
     }
 }

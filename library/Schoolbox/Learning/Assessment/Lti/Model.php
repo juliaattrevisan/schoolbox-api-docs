@@ -70,6 +70,11 @@ class Model extends AbstractAssessment
     private ?string $ltiAssessmentText = null;
 
     /**
+     * The GUID of the LTI assessment, if it has one.
+     */
+    private ?string $guid = null;
+
+    /**
      * The LTI tool with which the LTI assessment URL was selected.
      *
      * An LTI resource link launch request must be associated with an LTI tool
@@ -194,6 +199,7 @@ class Model extends AbstractAssessment
         $this->ltiAssessmentTitle   = $source->ltiAssessmentTitle;
         $this->ltiAssessmentUrl     = $source->ltiAssessmentUrl;
         $this->ltiTool              = $source->ltiTool;
+        $this->guid                 = $source->guid;
         return $this;
     }
 
@@ -302,6 +308,24 @@ class Model extends AbstractAssessment
     public function setLtiAssessmentText(?string $ltiAssessmentText): self
     {
         $this->ltiAssessmentText = $ltiAssessmentText;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGuid(): ?string
+    {
+        return $this->guid;
+    }
+
+    /**
+     * @param string|null $guid
+     * @return $this
+     */
+    public function setGuid(?string $guid): self
+    {
+        $this->guid = $guid;
         return $this;
     }
 

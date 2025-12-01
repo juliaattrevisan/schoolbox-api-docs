@@ -114,6 +114,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('lti.accessTokenCache'),
+            $this->injector->get('lti.logger'),
         );
     }
 }

@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Assessment\Score;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\LTI\Assessment\LineItem\Model as LTILineItemModel;
 use Schoolbox\LTI\Assessment\Model as LTIAssessmentModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -167,6 +168,11 @@ class Model implements ISoftDeletable
     private LTIAssessmentModel $ltiAssessment;
 
     /**
+     * The LTI line item to which this score is attached, if any.
+     */
+    private ?LTILineItemModel $ltiLineItem = null;
+
+    /**
      * The student to whom this score is given.
      */
     private User $student;
@@ -275,6 +281,24 @@ class Model implements ISoftDeletable
     public function setLtiAssessment(LTIAssessmentModel $ltiAssessment): self
     {
         $this->ltiAssessment = $ltiAssessment;
+        return $this;
+    }
+
+    /**
+     * @return LTILineItemModel|null
+     */
+    public function getLtiLineItem(): ?LTILineItemModel
+    {
+        return $this->ltiLineItem;
+    }
+
+    /**
+     * @param LTILineItemModel|null $ltiLineItem
+     * @return $this
+     */
+    public function setLtiLineItem(?LTILineItemModel $ltiLineItem): self
+    {
+        $this->ltiLineItem = $ltiLineItem;
         return $this;
     }
 

@@ -71,7 +71,8 @@
 
         <iframe id="lti-frame{{ componentInstanceId }}"
                 style="height: {{ height }}px; display: none"
-                src="about:blank" frameborder="0">
+                src="about:blank" frameborder="0"
+                allow="autoplay; camera; encrypted-media; geolocation; microphone; midi; clipboard-write; display-capture; fullscreen">
         </iframe>
         <section class="content" style="display: none" >
         <a id="lti-link{{ componentInstanceId }}"
@@ -126,7 +127,9 @@
                     style="height: {{ height }}px;"
                     {% endif %}
                     src="{{ src }}?context=componentInstance-{{ componentInstanceId }}"
-                    frameborder="0"></iframe>
+                    frameborder="0"
+                    allow="autoplay; camera; encrypted-media; geolocation; microphone; midi; clipboard-write; display-capture; fullscreen"
+            ></iframe>
         {% elseif provider.isTargetWindow %}
             <section class="content">
                 <a id="lti-link{{ componentInstanceId }}"

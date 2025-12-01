@@ -357,6 +357,7 @@ class Factory
         $this->setCompletionMessage($post['completion_message'] ?? '');
 
         // LTI needs this to instantiate correctly
+        $this->setGuid($post['guid'] ?? null);
         $this->setLtiAssessmentUrl($post['ltiAssessmentUrl'] ?? null);
         $this->setLtiAssessmentTitle($post['ltiAssessmentTitle'] ?? null);
         $this->setLtiAssessmentText($post['ltiAssessmentText'] ?? null);
@@ -555,7 +556,8 @@ class Factory
                 $this->getLtiToolId(),
                 $this->getCustomFields(),
                 $this->getLineItemResourceId(),
-                $this->getLineItemScoreMaximum()
+                $this->getLineItemScoreMaximum(),
+                $this->getGuid(),
             );
         } elseif ($assessment instanceof LessonPlan\Model) {
             $decorator = new LessonPlan\Decorator\Decorator(

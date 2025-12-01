@@ -37,7 +37,6 @@ class ConfigurationFactory extends \OAT\Library\Lti1p3Core\Security\Jwt\Configur
             );
         };
 
-        $configuration->setBuilderFactory($builderFactory);
-        return $configuration;
+        return $configuration->withBuilderFactory($builderFactory);
     }
 }

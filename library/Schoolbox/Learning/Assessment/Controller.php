@@ -276,6 +276,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $assessment->setLearnosityReference(Uuid::generate());
         }
 
+        // Unfortunately each different type of assessment needs to be handled
+        // uniquely in this method, because type is passed in the query string.
+        if (
+            AssessmentType::TYPE_LTI_ASSESSMENT === $type
+            && $assessment instanceof \Schoolbox\Learning\Assessment\Lti\Model
+        ) {
+            // Use Learnosity's GUID generator for better or worse,
+            // because it's used above.
+            // Consider replacing with Ramsey UUID?
+            $assessment->setGuid($assessment->getGuid() ?? Uuid::generate());
+        }
+
         // create a dynamic plan on the assessment to get started
         $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(\Schoolbox\Assessment\Participant\Plan\Mapper::PLAN_TYPE_DYNAMIC));
 
