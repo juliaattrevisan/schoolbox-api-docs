@@ -117,7 +117,7 @@
                                                             on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
                                                             {% if event.booking.event.owner.id != event.booking.event.author.id %}
                                                                 by
-                                                                <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                                                                <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
                                                             {% endif %}
                                                         </p>
                                                     </div>
@@ -142,7 +142,7 @@
                                                             on <time datetime="{{ booking.clash.booking.createdAt.database }}">{{ booking.clash.booking.createdAt.short }}</time>
                                                             {% if booking.clash.booking.event.owner.id != booking.clash.booking.event.author.id %}
                                                                 by
-                                                                <a href="/search/user/{{ booking.clash.booking.event.owner.id }}">{{ booking.clash.booking.event.owner.formatName }}</a>
+                                                                <a href="/search/user/{{ booking.clash.booking.author.owner.id }}">{{ booking.clash.booking.event.author.formatName }}</a>
                                                             {% endif %}
                                                         </p>
                                                     </div>
