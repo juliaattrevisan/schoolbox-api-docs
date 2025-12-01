@@ -123,30 +123,32 @@
                                                     </div>
                                                 </div>
                                                 {# clash approved booking, details #}
-                                                {% if booking.clash %}
-                                                <div class="small-12">
-                                                    <div class="warning">
-                                                        {# time, and only time (start - end) #}
-                                                        Clashes with  <time datetime="{{ booking.clash.booking.event.startDateTime.getDatabase() }}">{{ booking.clash.booking.event.startDateTime.getTimeOnly() }}</time>{% if booking.clash.booking.event.startDateTime.getShort() != booking.clash.booking.event.endDateTime.getShort() %} - <time datetime="{{ booking.clash.booking.event.endDateTime.getDatabase() }}">{{ booking.clash.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
-                                                    </div>
-                                                    <div class="small-12 tiny card">
-                                                        {# small portrait of booker #}
-                                                        <a href="/search/user/{{ booking.clash.booking.event.owner.id }}">
-                                                            {% include 'include/portrait.twig' with {user: booking.clash.booking.event.owner} only %}
-                                                        </a>
+                                                {% if booking.clash is not empty %}
+                                                    {% for clash in booking.clash %}
+                                                        <div class="small-12">
+                                                            <div class="warning">
+                                                                {# time, and only time (start - end) #}
+                                                                Clashes with  <time datetime="{{ clash.booking.event.startDateTime.getDatabase() }}">{{ clash.booking.event.startDateTime.getTimeOnly() }}</time>{% if clash.booking.event.startDateTime.getShort() != clash.booking.event.endDateTime.getShort() %} - <time datetime="{{ clash.booking.event.endDateTime.getDatabase() }}">{{ clash.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
+                                                            </div>
+                                                            <div class="small-12 tiny card">
+                                                                {# small portrait of booker #}
+                                                                <a href="/search/user/{{ clash.booking.event.owner.id }}">
+                                                                    {% include 'include/portrait.twig' with {user: clash.booking.event.owner} only %}
+                                                                </a>
 
-                                                        {# meta to show on the side of the portrait #}
-                                                        <p class="meta">
-                                                            Requested by
-                                                            <a href="/search/user/{{ booking.clash.booking.event.owner.id }}">{{ booking.clash.booking.event.owner.formatName }}</a>
-                                                            on <time datetime="{{ booking.clash.booking.createdAt.database }}">{{ booking.clash.booking.createdAt.short }}</time>
-                                                            {% if booking.clash.booking.event.owner.id != booking.clash.booking.event.author.id %}
-                                                                by
-                                                                <a href="/search/user/{{ booking.clash.booking.author.owner.id }}">{{ booking.clash.booking.event.author.formatName }}</a>
-                                                            {% endif %}
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                                                {# meta to show on the side of the portrait #}
+                                                                <p class="meta">
+                                                                    Requested by
+                                                                    <a href="/search/user/{{ clash.booking.event.owner.id }}">{{ clash.booking.event.owner.formatName }}</a>
+                                                                    on <time datetime="{{ clash.booking.createdAt.database }}">{{ clash.booking.createdAt.short }}</time>
+                                                                    {% if clash.booking.event.owner.id != clash.booking.event.author.id %}
+                                                                        by
+                                                                        <a href="/search/user/{{ clash.booking.author.owner.id }}">{{ clash.booking.event.author.formatName }}</a>
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
                                                 {% endif %}
                                             </div>
 
@@ -162,21 +164,31 @@
                                                  # Reject clash booking
                                                  #}
                                             <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
-                                                <li>
-                                                    <a href="{{ routeLookup('resourceBooking.edit', {id: booking.clash.booking.id}) }}?returnUrl={{ returnUrl }}"
-                                                       class="icon-modify">Modify approved booking</a>
-                                                </li>
+                                                {% if booking.clash | length == 1 %}
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.edit', {id: booking.clash.booking.id}) }}?returnUrl={{ returnUrl }}"
+                                                           class="icon-modify">Modify approved booking</a>
+                                                    </li>
+                                                {% endif %}
                                                 <li>
                                                     <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
                                                        class="icon-modify">Modify clash booking</a>
                                                 </li>
+                                                {% if booking.clash | length > 1 %}
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}"
+                                                           class="icon-modify">Manage clashes on Calendar</a>
+                                                    </li>
+                                                {% endif %}
                                                 <li class="separator">Set Status</li>
 
-                                                <li>
-                                                    <a href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash.booking.id, new: event.booking.id}) }}"
-                                                       data-set-status="approved"
-                                                       class="icon-approve">Approve clash booking / Reject original booking</a>
-                                                </li>
+                                                {% if booking.clash | length == 1 %}
+                                                    <li>
+                                                        <a href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash.booking.id, new: event.booking.id}) }}"
+                                                           data-set-status="approved"
+                                                           class="icon-approve">Approve clash booking / Reject original booking</a>
+                                                    </li>
+                                                {% endif %}
                                                 <li>
                                                     <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
                                                        data-series-id="{{ event.booking.event.seriesId }}"
