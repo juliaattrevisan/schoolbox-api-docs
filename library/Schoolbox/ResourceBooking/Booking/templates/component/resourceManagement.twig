@@ -178,7 +178,7 @@
                                             <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
                                                 {% if booking.clash | length == 1 %}
                                                     <li>
-                                                        <a href="{{ routeLookup('resourceBooking.edit', {id: booking.clash.booking.id}) }}?returnUrl={{ returnUrl }}"
+                                                        <a href="{{ routeLookup('resourceBooking.edit', {id: booking.clash[0].booking.id}) }}?returnUrl={{ returnUrl }}"
                                                            class="icon-modify">Modify approved booking</a>
                                                     </li>
                                                 {% endif %}
@@ -196,7 +196,7 @@
 
                                                 {% if booking.clash | length == 1 %}
                                                     <li>
-                                                        <a href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash.booking.id, new: event.booking.id}) }}"
+                                                        <a href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash[0].booking.id, new: event.booking.id}) }}"
                                                            data-set-status="approved"
                                                            class="icon-approve">Approve clash booking / Reject original booking</a>
                                                     </li>
