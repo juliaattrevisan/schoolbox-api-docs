@@ -1300,6 +1300,13 @@ class Controller extends Base
         ) {
             throw new Exception("Cannot approve clash: both bookings are already approved.");
         }
+        // Ensure old booking is approved and new booking is pending
+        if (
+            $oldBooking->getStatus()->getId() !== Status\Model::STATUS_APPROVED
+            || $item->getStatus()->getId() !== Status\Model::STATUS_PENDING
+        ) {
+            throw new Exception("Unable to approve clash booking, only allowed when old booking is approved and new booking is pending.");
+        }
 
         // reject the old booking, so we can approve the new one.
         $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
