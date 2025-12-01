@@ -7,20 +7,29 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\LogHandler;
+namespace Schoolbox\OpenAi\LogHandler\ChatCompletionsApi;
 
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\IListener;
 
 /**
- * Handle messages from OpenAI's Chat Completions API:
+ * Log diagnostic data for streamed messages and response bodies from
+ * OpenAI's Chat Completions API:
  * https://platform.openai.com/docs/api-reference/chat-streaming
+ *
+ * If a streamed message or response body contains any of the following data,
+ * then add it to the log:
+ * * model used to handle the request
+ * * token usage for the request
+ * * error message
+ * * status code (generated from the status of the message or response)
  *
  * This log handler should apply to all Chat Completions API requests,
  * regardless of the agent which makes them.
  */
-class ChatCompletionsMessage implements IListener
+class LogDiagnostics implements IListener
 {
     /**
      * Handle the message by writing it directly to the log.

@@ -127,7 +127,7 @@ class Client implements IClient
         return $this->handleNonStreamedResponse(
             $response,
             $log,
-            new LogHandler\ChatCompletionsMessage(),
+            new LogHandler\ChatCompletionsApi\LogDiagnostics(),
         );
     }
 
@@ -148,7 +148,7 @@ class Client implements IClient
 
         // Use the standard chat completion log listener,
         // plus whatever one was passed in.
-        $logListeners = [new LogHandler\ChatCompletionsMessage()];
+        $logListeners = [new LogHandler\ChatCompletionsApi\LogDiagnostics()];
         if ($logListener) {
             $logListeners[] = $logListener;
         }
