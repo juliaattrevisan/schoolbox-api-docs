@@ -57,7 +57,7 @@ class ModelToArray
      * @param Model $log
      * @return (array{type:'request',data:string}|array{type:'response',data:array})[]
      */
-    private static function translateLogData(Model $log): array
+    public static function translateLogData(Model $log): array
     {
         $inputText = $log->getInputText();
         $outputText = $log->getOutputText();
