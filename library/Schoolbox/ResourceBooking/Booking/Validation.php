@@ -134,7 +134,16 @@ class Validation
      * Attempts to validate the creation or update of a booking from post data.
      *
      * @param Item\Model   $resource
-     * @param Values|array       $postData
+     * @param Values|array $postData Example:
+     *        [
+     *            'override_validation' => '1' or blank or unset
+     *            'startDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
+     *            'endDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
+     *            'campus' => 0 or campusId
+     *            'repeat_until' => '1' or blank
+     *            'related_item' => array of ['resource_id' => int, 'notes' => string]
+     *            'repeat' => '1' or blank
+     *        ]
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
      *                                      Leave it out of conflict checks.
      * @return array<string, array<string, array<string>>> Example:

@@ -77,12 +77,10 @@ class Controller extends Base
      */
     protected $statusMapper;
 
-
     /**
      * @var \Schoolbox\External\Event\Mapper
      */
     protected \Schoolbox\External\Event\Mapper $externalEventMapper;
-
 
     /**
      * Generates the 'Book Item' page.
@@ -646,7 +644,6 @@ class Controller extends Base
         return $booking;
     }
 
-
     /**
      * Outputs the calendar for this item.
      *
@@ -1063,16 +1060,74 @@ class Controller extends Base
             throw new SchoolboxException('Event not found');
         }
 
-        $items = $this->resourceMapper->findByColumn('id', $resourceIds);
+        $resourceById = $this->resourceMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
-        foreach ($items as $item) {
-            [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed(
-                $item,
-                [] // TODO: Fill this array.
+        $validationResultsByResourceId = [];
+        foreach ($resourceById as $resourceId => $resource) {
+            $startDateString = $event->getStartDateTime()?->getLocal();
+            $endDateString = $event->getEndDateTime()?->getLocal();
+
+            $validationResultsByResourceId[$resourceId] = $this->validateItemIgnoringClashesIfClashesAllowed(
+                $resource,
+                [
+                    'startDate' => $startDateString,
+                    'endDate' => $endDateString,
+                    'campus' => 0,
+                ]
             );
         }
 
-        $i = 'i';
+        // Create bookings depending on validation results.
+        $nBookingsNotCreated = 0;
+        foreach ($validationResultsByResourceId as $resourceId => $validationResults) {
+            [$errors, $clashBookingStartDatesAsKeys] = $validationResults;
+            if (empty($errors)) {
+                // Build the booking.
+                // Do not set start/end times because these are intended to be the same as in the linked event row.
+                $resource = $resourceById[$resourceId];
+                $booking = new Model()
+                    ->setEvent($event)
+                    ->setResource($resource)
+                    ->setBookingStartAt($event->getStartDateTime())
+                    ->setBookingEndAt($event->getEndDateTime())
+                    ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
+                    ->setName($resource->getName());
+
+                $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
+                if (
+                    $bookingStartDateTime !== null &&
+                    array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
+                ) {
+                    // Set status to pending because this booking has a clash.
+                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                }
+
+                $bookingList = new Collection();
+                $bookingList->add($booking);
+
+                $this->bookingMapper->save($bookingList);
+            } else {
+                ++$nBookingsNotCreated;
+            }
+        }
+
+        if ($nBookingsNotCreated === 0) {
+            $errorMessage = ''; // All bookings were created.
+            $code = 200;
+        } elseif ($nBookingsNotCreated !== count($resourceIds)) {
+            $errorMessage = "$nBookingsNotCreated booking" . ($nBookingsNotCreated === 1 ? '' : 's') . ' could not be created';
+            $code = 200;
+        } else {
+            $errorMessage = 'Could not create any bookings';
+            $code = 400;
+        }
+
+        $responseData = [];
+        if ($errorMessage !== '') {
+            $responseData['errors'] = [$errorMessage];
+        }
+
+        $this->response = $this->responseAsJson($responseData)->withStatus($code); // TODO: Use constant instead of hard-coding 200.
     }
 
     /**
@@ -1235,7 +1290,6 @@ class Controller extends Base
         return $this;
     }
 
-
     /**
      * @return \Schoolbox\External\Event\Mapper
      */
@@ -1243,7 +1297,6 @@ class Controller extends Base
     {
         return $this->externalEventMapper;
     }
-
 
     /**
      * @param Mapper $externalEventMapper
