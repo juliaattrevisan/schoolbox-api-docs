@@ -99,23 +99,49 @@ class Controller extends Base
             return $instance->getField()->getId();
         });
 
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
-            'scenario' => $this->scenarioMapper->findById($assessment->getScenarioId()),
-            'fieldContexts' => $fieldContexts,
-            'helpfulness' => [
+            'scenario' => [
+                'title' => $scenario->getTitle(),
+                'description' => $scenario->getDescription(),
+            ],
+            'assessmentConfig' => [
+                'helpfulness' => $dialogAgent->getHelpfulness(),
+                'language' => $dialogAgent->getLanguage(),
+                'openingMessage' => $dialogAgent->getOpeningMessage(),
+                'rules' => $dialogAgent->getRules(),
+                'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
+                'fieldContexts' => $fieldContexts->map(fn ($fieldContext) => [
+                    'id' => $fieldContext->getId(),
+                    'body' => $fieldContext->getBody(),
+                    'field' => [
+                        'id' => $fieldContext->getField()->getId(),
+                        'title' => $fieldContext->getField()->getTitle(),
+                    ],
+                ])->reindex(),
+                '_routes' => [
+                    'postSandboxMessage' => $this->getRouteIfAuthorized('learningDialogAgent.postSandboxMessage', [
+                        'assessmentId' => $assessment->getId(),
+                        'assessment' => $assessment,
+                    ]),
+                ],
+            ],
+            'helpfulnessOptions' => [
                 DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
                 DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
                 DialogAgentDataModel::HELPFULNESS_EXTREME => 'Extreme',
             ],
-            'languages' => [
-                'available' => Language::AVAILABLE,
-                'selected' => $assessment->getLanguage() ?? Language::DEFAULT,
-            ]
+            'languageOptions' => Language::AVAILABLE,
         ];
 
-        $this->response = $this->responseFromTemplate('@learningDialogAgent/update.twig', $data, sprintf('Configure %s', $assessment->getTitle()));
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/configure.twig',
+            $data,
+            \sprintf('Configure %s', $assessment->getTitle())
+        );
     }
 
 
@@ -166,9 +192,13 @@ class Controller extends Base
          * In the future this will actually go and generate another prompt as an "improvement" to compare against,
          * but that isn't in scope for 26.0 apparently.
          *
-         * TODO: split this out into something reusable I guess
+         * TODO: split this out into something reusable I guess (and make tokens somewhat less arbitrary)
          */
-        $fieldReplacements = [];
+        $fieldReplacements = [
+            '<opening_message>' => $assessment->getOpeningMessage(),
+            '<rules>' => $assessment->getRules(),
+            '<language>' => $assessment->getLanguage(),
+        ];
         foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
             $fieldPlaceholder = \sprintf('<%s>', $fieldContext->getField()->getSlug());
             $fieldReplacements[$fieldPlaceholder] = $fieldContext->getBody();
@@ -182,23 +212,14 @@ class Controller extends Base
         /* TODO Reset the chat here
          */
 
-        /* Respond to synchronous POST with redirect
-         */
-        $returnUrlEncoded = $this->requestPost['returnUrl'] ?? '';
-
-        if ($returnUrlEncoded !== '') {
-            $returnUrl = Redirect::decode($returnUrlEncoded);
-        } else {
-            /* If no return URL supplied, redirect to configuration page, under the assumption that you'll
-             * probably want to try out your changes to the dialog agent configuration...
-             */
-            $returnUrl = $this->getRouteIfAuthorized('learningDialogAgent.getUpdateForm', [
-                'assessmentId' => $assessment->getId(),
-                'assessment' => $assessment,
-            ]);
-        }
-
-        $this->response = $this->redirectAfterPost($returnUrl);
+        $this->response = $this->responseAsJson([
+            '_routes' => [
+                'postSandboxMessage' => $this->getRouteIfAuthorized('learningDialogAgent.postSandboxMessage', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]),
+            ],
+        ]);
     }
 
 
@@ -234,23 +255,8 @@ class Controller extends Base
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
         $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
 
-        // if not enabled, 404
-        // TODO: imo this should be part of the route check
-        if ($aiConfig->isEnabled($agentConfig) === false) {
-            $returnCode = 404;
-
-            $problem = (new ApiProblem("Feature not enabled."))
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
-
         /**
-         * For dialog agent chats, the sessionID guid is directly tied to the response,
+         * For dialog agent response chats, the sessionID guid is directly tied to the response,
          * If the student has never sent a message before, a new session ID should be created
          */
         $aiSessionId = $response->getSessionId();
@@ -283,6 +289,73 @@ class Controller extends Base
                 ->setUpdatedBy($this->getUser()->getId())
                 ->setUpdatedAt(\Alaress_Date_Format::now());
             $this->dialogAgentResponseMapper->save($response);
+
+            // The iterable response can just be passed straight to responseAsEventStream
+            $this->response = $this->responseAsEventStream($stream);
+            return;
+        } catch (SchoolboxException $e) {
+            // TODO: when does this actually throw
+
+            // This will always be a stream
+            // Unfortunately the exception isn't raised until the response
+            // is output, which doesn't happen until after this method
+            // returns.
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($e->getCode())
+                ->asArray();
+
+            $this->response = $this
+                ->responseAsJson($problem)
+                ->withStatus($e->getCode());
+            return;
+        }
+    }
+
+
+    /**
+     * Send a message to the chat agent for a particular assessment (configuration sandbox) and stream the reply
+     *
+     * @param DialogAgent $assessment
+     * @return void
+     */
+    public function postSandboxMessage(DialogAgent $assessment): void
+    {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
+        // ai Config
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
+
+        /**
+         * For dialog agent sandbox chats, the sessionID guid is provided by the frontend,
+         * it needs to be reset each time the page is reloaded or the sandbox is reset.
+         */
+        $aiSessionId = $this->requestPost->get('aiSessionId');
+        if (!$aiSessionId || !Uuid::isValid($aiSessionId)) {
+            $problem = new ApiProblem("AI Session id is required and must be a valid UUID.")
+                ->setStatus(400)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(400);
+
+            return;
+        }
+
+        $agent = new OpenAI\Agent\DialogAgentChat(
+            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $agentConfig,
+        );
+
+        try {
+            $stream = $agent->requestStream(
+                $this->getUser(),
+                $assessment->getPrompt(), // TODO: this is nullable, and a requirement to be able to chat... I expect you shouldn't even be able to get to this endpoint if it's not ready yet
+                $this->requestPost->get('userPrompt'),
+                $aiSessionId,
+                previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
+            );
 
             // The iterable response can just be passed straight to responseAsEventStream
             $this->response = $this->responseAsEventStream($stream);

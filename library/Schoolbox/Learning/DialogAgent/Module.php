@@ -18,7 +18,9 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent;
@@ -126,6 +128,7 @@ class Module extends BaseModule
         $canSubmit = $this->buildAuthRuleCanSubmit();
         $canViewResponse = $this->buildAuthRuleCanViewResponse();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
+        $isAIFeatureEnabled = new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIALOGAGENT, $this->getConfig());
 
         $canModify = new Rule\Any(
             $isSuper,
@@ -147,6 +150,13 @@ class Module extends BaseModule
         $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
         $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
 
+        /* Instructor sends a message to the chat agent sandbox
+         */
+        $this->register('POST', "{$assRoute}/configure/message", 'postSandboxMessage', new Rule\All(
+            $isAIFeatureEnabled,
+            $canModify,
+        ), $preloadAssessment);
+
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
@@ -157,6 +167,7 @@ class Module extends BaseModule
         /* Student sends a message to the chat agent for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{responseId:\d+}", 'postMessage', new Rule\All(
+            $isAIFeatureEnabled,
             $canSubmit,
             $this->buildRuleCanAction(Status::ACTION_MESSAGE)
         ), $preloadParticipantAndResponse);
@@ -450,7 +461,6 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 

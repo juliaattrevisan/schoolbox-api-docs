@@ -20,6 +20,20 @@ export function getReturnUrl(url?: string | undefined): string {
 }
 
 /**
+ * @returns The decoded return URL from the current URL's returnUrl parameter
+ */
+export function getPageReturnUrl(): string | null {
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedReturnUrl = urlParams.get("returnUrl");
+
+    if (!encodedReturnUrl) {
+        return null;
+    }
+
+    return window.atob(encodedReturnUrl);
+}
+
+/**
  * Determines if URLs have significantly changed by comparing paths, hashes, and query parameters
  * Can be used to determine for example if we are just loading more results,
  * in which case it's not considered a significant change.

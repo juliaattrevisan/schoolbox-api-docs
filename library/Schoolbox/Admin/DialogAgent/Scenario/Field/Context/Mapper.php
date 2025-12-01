@@ -18,6 +18,7 @@ use Schoolbox\Mapper\Exception;
  * @method Model createModel($idValue = null)
  * @method GenericCollection|Model[] findAll($options = [])
  * @method Model findById($identifierValue)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
  */

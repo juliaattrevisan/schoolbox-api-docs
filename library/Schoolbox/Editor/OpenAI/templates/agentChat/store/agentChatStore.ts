@@ -30,7 +30,10 @@ export type AgentChatRequestConfig = {
 export const useAgentChatStore = defineStore("agentChat", () => {
     const feed = window.Vue.ref<AgentChatFeedMessage[]>([]);
 
-    const activeGeneration = window.Vue.ref<AgentChatResponseInProgress | null>(null);
+    const activeGeneration = window.Vue.ref<{
+        response: AgentChatResponseInProgress;
+        abortController: AbortController;
+    } | null>(null);
 
     /** When allowing selection of a particular entry (such as in the image generator), the selected entry */
     const selectedFeedEntry = window.Vue.ref<AgentChatFeedMessage["entryKey"] | null>(null);
@@ -43,7 +46,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             return feed.value;
         }
 
-        return [...feed.value, activeGeneration.value];
+        return [...feed.value, activeGeneration.value.response];
     });
 
     /**
@@ -119,6 +122,18 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     /**
+     * Reset the feed to an empty state
+     */
+    function resetFeed(): void {
+        feed.value.length = 0;
+        if (activeGeneration.value !== null) {
+            activeGeneration.value.abortController.abort();
+        }
+        activeGeneration.value = null;
+        selectedFeedEntry.value = null;
+    }
+
+    /**
      * Request a new image from the AI
      * @param config - The configuration for the request
      * @param payload - The payload to send to the AI
@@ -150,55 +165,68 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         });
 
         activeGeneration.value = {
-            type: AgentChatMessageType.RESPONSE,
-            status: "in_progress",
-            entryKey: `loading-${getNextEntryKey()}`,
-            responseId: null,
-            image: null,
-            message: "",
+            response: {
+                type: AgentChatMessageType.RESPONSE,
+                status: "in_progress",
+                entryKey: `loading-${getNextEntryKey()}`,
+                responseId: null,
+                image: null,
+                message: "",
+            },
+            abortController: new AbortController(),
         };
 
         let hasErrored = false;
-        const abortController = new AbortController();
-        const response = await generateImage(config.messageRoute, payload, abortController.signal, (event) => {
-            if (event.data.success === false) {
-                /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
-                hasErrored = true;
-                feed.value.push({
-                    type: AgentChatMessageType.RESPONSE,
-                    status: "error",
-                    entryKey: getNextEntryKey(),
-                    responseId: activeGeneration.value?.responseId ?? null,
-                    message: event.data.message,
-                });
-                activeGeneration.value = null;
-                abortController.abort();
-                return;
-            }
+        const response = await generateImage(
+            config.messageRoute,
+            payload,
+            activeGeneration.value.abortController.signal,
+            (event) => {
+                if (event.data.success === false) {
+                    /** Any arbitrary error has occured, could be a network error, server error on our side or the AI side, or something else */
+                    hasErrored = true;
+                    feed.value.push({
+                        type: AgentChatMessageType.RESPONSE,
+                        status: "error",
+                        entryKey: getNextEntryKey(),
+                        responseId: activeGeneration.value?.response.responseId ?? null,
+                        message: event.data.message,
+                    });
+                    activeGeneration.value?.abortController.abort();
+                    activeGeneration.value = null;
+                    return;
+                }
 
-            if (activeGeneration.value === null) {
-                /** The generation was stopped before the stream fully stopped and we received something extra, ignore it  */
-                abortController.abort();
-                return;
-            }
+                if (activeGeneration.value === null) {
+                    /** The generation was stopped before the stream fully stopped and we received something extra, ignore it  */
+                    return;
+                }
 
-            if (event.eventType === AgentChatMessageEventType.CREATED) {
-                /** Usually the first message we will receive from the AI, take note of the response ID so we can re-use it later */
-                activeGeneration.value.responseId = event.data.data.responseId;
-            } else if (event.eventType === AgentChatMessageEventType.PARTIAL_IMAGE) {
-                /** A partial image has been generated by the AI, show it! */
-                activeGeneration.value.image = event.data.data.image;
-            } else if (event.eventType === AgentChatMessageEventType.DELTA) {
-                /** A delta of text output from the AI, append it to the current message to show the user that something is happening */
-                activeGeneration.value.message += event.data.data.delta;
-            }
+                if (event.eventType === AgentChatMessageEventType.CREATED) {
+                    /** Usually the first message we will receive from the AI, take note of the response ID so we can re-use it later */
+                    activeGeneration.value.response.responseId = event.data.data.responseId;
+                } else if (event.eventType === AgentChatMessageEventType.PARTIAL_IMAGE) {
+                    /** A partial image has been generated by the AI, show it! */
+                    activeGeneration.value.response.image = event.data.data.image;
+                } else if (event.eventType === AgentChatMessageEventType.DELTA) {
+                    /** A delta of text output from the AI, append it to the current message to show the user that something is happening */
+                    activeGeneration.value.response.message += event.data.data.delta;
+                }
 
-            /** Ignore any other message types, we don't need them (except for the final event, but apiUtils handles that) */
-        });
+                /** Ignore any other message types, we don't need them (except for the final event, but apiUtils handles that) */
+            },
+        );
 
-        const responseId = activeGeneration.value?.responseId ?? null;
+        if (activeGeneration.value === null) {
+            // Already handled in the onMessage callback, or cancelled from somewhere else (i.e. resetting the feed)
+            // we shouldn't add anything more to the feed
+            return false;
+        }
+
+        const responseId = activeGeneration.value?.response.responseId ?? null;
+
+        activeGeneration.value.abortController.abort();
         activeGeneration.value = null;
-        abortController.abort();
 
         if (hasErrored) {
             // Already handled in the onMessage callback
@@ -288,6 +316,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         feed,
         fullFeed,
         parseFeed,
+        resetFeed,
         importFeed,
         activeGeneration,
         getNextEntryKey,

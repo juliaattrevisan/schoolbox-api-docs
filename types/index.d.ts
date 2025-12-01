@@ -130,7 +130,10 @@ declare global {
         /**
          * From jquery.alaressValidate.js
          */
-        alaressValidate(options?: Record<string, unknown>): JQuery;
+        alaressValidate(options?: Record<string, unknown>): JQuery & {
+            destroy(): void;
+            form(): boolean;
+        };
         /**
          * From jquery.resourceAttach.js
          */

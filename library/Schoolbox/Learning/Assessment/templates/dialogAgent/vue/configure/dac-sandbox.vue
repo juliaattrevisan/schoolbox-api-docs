@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
+import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
+
+interface Props {
+    openingMessage: string;
+    postMessage: string;
+    isDirty: boolean;
+}
+
+const props = defineProps<Props>();
+const acStore = useAgentChatStore();
+
+const aiSessionId = window.Vue.ref<string>(""); // immediately set by resetFeed()
+
+const isConfirmModalOpen = window.Vue.ref<boolean>(false);
+
+/**
+ * Reset the feed to the initial state (just an opening message)
+ */
+function resetFeed(): void {
+    /** each new chat gets a unique session ID (uuidv4) */
+    aiSessionId.value = crypto.randomUUID();
+
+    acStore.resetFeed();
+
+    acStore.feed.push({
+        type: AgentChatMessageType.RESPONSE,
+        status: "success",
+        entryKey: acStore.getNextEntryKey(),
+        message: props.openingMessage,
+        responseId: null,
+        image: null,
+    });
+
+    isConfirmModalOpen.value = false;
+}
+
+window.Vue.onMounted(() => {
+    resetFeed();
+});
+
+defineExpose({ resetFeed });
+</script>
+
+<template>
+    <div class="content">
+        <div v-if="props.isDirty" class="alert-box highlight">
+            You have unsaved changes, this sandbox will not reflect the current configuration until you save.
+        </div>
+
+        <ac-feed
+            class="l-mar-m--bottom"
+            min-height="20rem"
+            max-height="70vh"
+            :feed="acStore.fullFeed"
+            error-prefix="There was a problem retrieving the response."
+        />
+
+        <ac-prompt
+            :request-config="{
+                messageRoute: props.postMessage,
+                aiSessionId,
+                requireImage: false,
+            }"
+            prompt-placeholder="Type a response here..."
+            :prompt-attributes="[]"
+        />
+    </div>
+
+    <div class="component-action">
+        <section>
+            <button class="button" @click="isConfirmModalOpen = true">Reset Sandbox</button>
+        </section>
+    </div>
+
+    <basic-modal v-model:is-open="isConfirmModalOpen" has-background-click size="s">
+        <h2>Please Confirm</h2>
+        <p>Are you sure you want to reset the sandbox? This will clear all existing messages.</p>
+        <ul class="flex-list buttons">
+            <li><button class="button submit" @click="resetFeed">Reset</button></li>
+            <li><button class="button" @click="isConfirmModalOpen = false">Cancel</button></li>
+        </ul>
+    </basic-modal>
+</template>
+
+<style scoped></style>
