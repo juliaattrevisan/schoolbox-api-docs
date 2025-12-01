@@ -295,24 +295,24 @@ class Controller extends Base
      * Updates a booking for a particular resource.
      * This is called when the form on the 'Update Booking' page is submitted.
      *
-     * @param Model $item
+     * @param Model $booking
      * @throws MapperException
      */
-    public function update(Model $item)
+    public function update(Model $booking): void
     {
-        $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
-        $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
+        $originalStart = clone $booking->getEvent()->getStartDateTime()->getDateTimeObject();
+        $originalEnd   = clone $booking->getEvent()->getEndDateTime()->getDateTimeObject();
 
         $code = 200;
-        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($item->getResource());
+        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($booking->getResource());
 
         if (empty($errors)) {
-            $item
+            $booking
                 ->setName($this->requestPost['name'])
                 ->setNotes($this->requestPost['notes']);
             $bookingSeries = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
             $series = $bookingSeries->getUpdatedSeries(
-                $item,
+                $booking,
                 Alaress_Date_Format::newLocal($this->requestPost['startDate'])->getDateTimeObject(),
                 Alaress_Date_Format::newLocal($this->requestPost['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
@@ -321,11 +321,11 @@ class Controller extends Base
 
             // Get the date and time changes from original booking
             $startDelta = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getStartDateTime()->getDateTimeObject(),
+                $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
                 $originalStart
             );
             $endDelta   = Interval::createFromDateTimeDifference(
-                $item->getEvent()->getEndDateTime()->getDateTimeObject(),
+                $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
                 $originalEnd
             );
 
@@ -380,7 +380,7 @@ class Controller extends Base
 
             // Now delete deleted series
             $deletedSeries = $bookingSeries->getDeletedSeries(
-                $item,
+                $booking,
                 Alaress_Date_Format::newLocal($this->requestPost['startDate'])->getDateTimeObject(),
                 Alaress_Date_Format::newLocal($this->requestPost['endDate'])->getDateTimeObject(),
                 $this->getRelatedItemsFromForm(),
@@ -407,7 +407,7 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             $this->response = $this->responseAsJson(
                 [
-                    'item' => $item,
+                    'item' => $booking,
                     'errors' => $errors,
                     'bookedPendingBecauseClashes' => count($clashBookingStartDatesAsKeys) > 0,
                     'returnUrl' => $returnUrl,
