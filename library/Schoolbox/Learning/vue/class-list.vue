@@ -8,6 +8,9 @@ import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/
 
 export default {
     name: "class-list",
+    components: {
+        ViewDpModal,
+    },
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -267,8 +270,9 @@ export default {
             currentClassCode: null,
             emailGroupsWithSelection: this.emailGroups,
             emailFormBeingSubmitted: false,
+            locale: locale,
             studentWithDP: null,
-            studentWithDPRoute: null,
+            studentWithDPRoute: "",
         };
     },
     mounted: function () {
