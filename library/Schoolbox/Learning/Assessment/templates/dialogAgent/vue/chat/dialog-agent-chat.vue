@@ -187,7 +187,7 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <div class="actions-small-1 l-mar-s--bottom">
+    <div class="actions-small-1 l-mar-s--bottom no-print">
         <button
             v-if="!isInstructor && currentResponse.assistanceRequestedAt === null"
             class="button"
@@ -230,16 +230,18 @@ window.Vue.onUnmounted(() => {
             </div>
         </template>
     </ac-feed>
-    <ac-prompt
-        v-if="props.response._routes.message"
-        :request-config="{
-            messageRoute: props.response._routes.message,
-            aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
-            requireImage: false,
-        }"
-        prompt-placeholder="Type a response here..."
-        :prompt-attributes="[]"
-    />
+    <div class="no-print">
+        <ac-prompt
+            v-if="props.response._routes.message"
+            :request-config="{
+                messageRoute: props.response._routes.message,
+                aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
+                requireImage: false,
+            }"
+            prompt-placeholder="Type a response here..."
+            :prompt-attributes="[]"
+        />
+    </div>
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 </template>
 
@@ -247,5 +249,31 @@ window.Vue.onUnmounted(() => {
 /** force the button to have white text, honestly idk about this but we're going with it for now */
 .dac-feed-help-dismiss {
     color: white;
+}
+
+/* styles for printing (scoped) */
+@media print {
+    .no-print {
+        display: none;
+    }
+
+    :deep(.ac-feed-alert) {
+        display: none;
+    }
+}
+</style>
+
+<style>
+/* styles for printing (global) */
+@media print {
+    #container,
+    .island {
+        padding: 0; /* to get more of the page estate */
+    }
+
+    .breadcrumb,
+    #footer {
+        display: none !important;
+    }
 }
 </style>
