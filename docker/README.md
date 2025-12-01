@@ -129,7 +129,15 @@ In order to fix this:
     lsof -i :$PORT
     ```
 - once the service is found, either:
-  - stop the service
+  - stop the service:
+    - Docker:
+      ```
+      docker stop $SERVICE
+      ```
+    - non-Docker: consider uninstalling the service, or stopping it manually:
+      ```
+      sudo service $SERVICE stop
+      ```
   - change the port which Schoolbox uses in `docker.env`:
     see the `*_PUBLISHED_PORT` variables in `docker.default.env`, and change
     the port to one which doesn't conflict
