@@ -202,7 +202,9 @@ class Controller extends Base
         $bookingList = null;
 
         $code = 200;
-        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($item);
+        [$errors, $clashBookingStartDatesAsKeys] = (
+            $this->validateItemIgnoringClashesIfClashesAllowed($item, $this->requestPost->getArrayCopy())
+        );
 
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
@@ -304,7 +306,11 @@ class Controller extends Base
         $originalEnd   = clone $booking->getEvent()->getEndDateTime()->getDateTimeObject();
 
         $code = 200;
-        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($booking->getResource());
+        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed(
+            $booking->getResource(),
+            $this->requestPost->getArrayCopy(),
+            $booking
+        );
 
         if (empty($errors)) {
             $booking
@@ -1060,7 +1066,10 @@ class Controller extends Base
         $items = $this->resourceMapper->findByColumn('id', $resourceIds);
 
         foreach ($items as $item) {
-            [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($item);
+            [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed(
+                $item,
+                [] // TODO: Fill this array.
+            );
         }
 
         $i = 'i';

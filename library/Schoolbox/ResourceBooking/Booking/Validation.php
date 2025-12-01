@@ -164,7 +164,7 @@ class Validation
         Item\Model $resource,
         Values|array $postData,
         ?Booking $existingBooking = null
-    ) {
+    ): array {
         // Check:
         // Beginning and end of booking are valid datetime
         // (These checks can't be overridden.)
