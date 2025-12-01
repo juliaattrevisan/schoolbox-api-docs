@@ -85,7 +85,7 @@ class LogListener implements IListener
                 $problem = ApiProblem::fromArray($data);
 
                 /** @see /www/static/js/util/sbx/apiUtils.ts */
-                $failureMessage = 'An unexpected error occured';
+                $failureMessage = 'An unexpected error occurred';
                 if ($problem->getTitle()) {
                     $failureMessage = $problem->getTitle();
                 }
