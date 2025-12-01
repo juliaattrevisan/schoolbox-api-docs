@@ -379,6 +379,7 @@ class Controller extends Base
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
                 'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
+                'differentiationProfileEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
             ], $folder->getName(), 'classes');
     }
 
