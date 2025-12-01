@@ -63,7 +63,7 @@ class ConfigTest extends TestCase
         $cfg = new Config();
 
         $this->expectException(TypeError::class);
-        $cfg->isEnabled([Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI]);
+        $this->assertFalse($cfg->isEnabled([Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI]));
     }
 
     // test isEnabled with null config
