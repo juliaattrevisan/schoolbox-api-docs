@@ -14,8 +14,18 @@ use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
 
 /**
- * Handle messages from OpenAI's Response API:
- * https://platform.openai.com/docs/api-reference/responses-streaming
+ * Handle streamed messages and full response bodies from OpenAI's Response API:
+ * https://platform.openai.com/docs/api-reference/responses
+ *
+ * If a streamed message or response body contains any of the following data,
+ * then add it to the log:
+ * * model used to handle the request
+ * * token usage for the request
+ * * error message
+ * * status code (generated from the status of the message or response)
+ *
+ * Also, this log handler adds the full stream or response body to the log:
+ * excluding any image data which may be present.
  *
  * This log handler should apply to all Response API requests, regardless of
  * the agent which makes them.

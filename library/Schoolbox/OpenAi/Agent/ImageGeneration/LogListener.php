@@ -17,9 +17,10 @@ use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;
 
 /**
- * Semi-standard log listener for Responses API requests.
+ * Semi-standard log listener for messages from Responses API requests:
+ * https://platform.openai.com/docs/api-reference/responses-streaming
  *
- * If a streamed message is a finished response, then extract the output text
+ * If an output message is a finished response, then extract the output text
  * out of it and add it to the log.
  *
  * This expects that the output message has been generated with the
