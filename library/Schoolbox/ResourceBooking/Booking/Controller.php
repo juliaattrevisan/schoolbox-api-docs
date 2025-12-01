@@ -1093,6 +1093,7 @@ class Controller extends Base
      */
     public function addBookings(): void
     {
+        $eventId = $this->requestPost->getInt('eventId');
         $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', []);
         $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
