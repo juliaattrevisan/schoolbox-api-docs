@@ -46,10 +46,6 @@ class DialogAgentChat
             Course Name: [COURSE_NAME]
             Unit Name: [UNIT_NAME]
             Curriculum: [CURRICULUM_CONTENT]
-            Learning Activity Name: [ACTIVITY_NAME]
-            Learning Activity Description: [ACTIVITY_DESCRIPTION]
-            Learning Activity Attachment: [ACTIVITY_ATTACHMENT]
-            Student Year Level: [STUDENT_YEAR_LEVEL]
     ";
 
 
