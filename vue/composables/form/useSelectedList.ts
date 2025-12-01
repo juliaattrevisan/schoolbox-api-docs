@@ -5,7 +5,12 @@ import type { Ref } from "vue";
  * @param items - Reactive ref containing the list of all items
  * @returns Object containing checkbox list state and computed properties
  */
-export function useSelectedList<T>(items: Ref<T[]>) {
+export function useSelectedList<T>(items: Ref<T[]>): {
+    showCheckboxes: Ref<boolean>;
+    selectedList: Ref<T[]>;
+    allSelected: Ref<boolean>;
+    isIndeterminate: Ref<boolean>;
+} {
     const selectedList = window.Vue.ref<T[]>([]) as Ref<T[]>; // currently selected items (checkboxes in the list)
 
     /**

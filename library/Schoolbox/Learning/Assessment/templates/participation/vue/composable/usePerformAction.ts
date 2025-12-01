@@ -3,13 +3,23 @@ import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for performing actions on participants with interaction checking
+ * @param selectedList - Reactive ref to the currently selected participants
+ * @param excludeParticipants - Function to exclude participants
+ * @param includeParticipants - Function to include participants
+ * @param includeParticipantInExistingPlan - Function to include participants in existing plans
+ * @returns isConfirmModifyOpen, participantsWithInteractions, onActionSelected, onConfirmActionSelected
  */
 export function usePerformAction(
     selectedList: Ref<Participant[]>,
     excludeParticipants: (participants: Participant[], selectedList?: Ref<Participant[]>) => Promise<void>,
     includeParticipants: (participants: Participant[]) => Promise<void>,
     includeParticipantInExistingPlan: () => Promise<void>,
-) {
+): {
+    isConfirmModifyOpen: Ref<boolean>;
+    participantsWithInteractions: Ref<Participant[]>;
+    onActionSelected: (participants: Participant[], action: string, $isSingleModify: boolean) => void;
+    onConfirmActionSelected: () => Promise<void>;
+} {
     const isConfirmModifyOpen = window.Vue.ref(false);
     const modifyAction = window.Vue.ref<string>("");
     const modifyList = window.Vue.ref<Participant[]>([]); // array of participants to modify

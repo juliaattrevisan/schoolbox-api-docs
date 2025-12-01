@@ -4,8 +4,13 @@ import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
  * Composable for including participants in activities
+ * @param loadError - Reactive ref to store any loading errors
+ * @returns includeParticipant, includeParticipants
  */
-export function useIncludeParticipant(loadError: Ref<string | null>) {
+export function useIncludeParticipant(loadError: Ref<string | null>): {
+    includeParticipant: (participant: Participant) => Promise<void>;
+    includeParticipants: (participants: Participant[]) => Promise<void>;
+} {
     /**
      * Includes a participant.
      * @param participant - The participant to include.
@@ -16,7 +21,6 @@ export function useIncludeParticipant(loadError: Ref<string | null>) {
         const response = await postIncludeParticipant(participant._links.include, {
             includeResponse: true,
         });
-
         if (!response.success) {
             const error = response.message ?? "";
             loadError.value = error;
@@ -24,7 +28,6 @@ export function useIncludeParticipant(loadError: Ref<string | null>) {
             toast.timeout({ text: error, isSuccess: false });
             return;
         }
-
         participant.excludedAt = null; // Resetting the exclusion timestamp
         participant.plan.name = null; // Resetting the plan
         participant.customisedPlan = null; // Resetting the customised plan
