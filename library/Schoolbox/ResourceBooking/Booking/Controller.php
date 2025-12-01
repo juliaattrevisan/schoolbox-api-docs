@@ -27,6 +27,7 @@ use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -196,38 +197,12 @@ class Controller extends Base
      * @param Item\Model $item The resource to create a booking for.
      * @throws MapperException
      */
-    public function createBooking(Item\Model $item)
+    public function createBooking(Item\Model $item): void
     {
         $bookingList = null;
 
-        // Validate this item.
-        $code   = 200;
-        $validation = new Validation(
-            $this->getUser(),
-            $this->getBookingMapper(),
-            $this->getStatusMapper(),
-            $this->getTermMapper(),
-            $this->getExternalTimetableHandler(),
-            $this->getCampusMapper(),
-            $this->getConfigLoader(),
-            $this->getExternalEventMapper()
-        );
-        $errors = $validation->validateBookingFromPostData($item, $this->requestPost, null);
-
-        // If clashes are allowed on the booking, and all validation errors are clash errors...
-        $clashBookingStartDatesAsKeys = [];
-        if (
-            count($errors) > 0 && $item->getAllowClashBookings() &&
-            $validation->validationErrorsAreAllClashes($errors)
-        ) {
-            // Remember the start dates of clash bookings.
-            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
-            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
-                $clashBookingStartDatesAsKeys[$startDate] = null;
-            }
-            // Ignore errors since all were clashes and clashes are allowed.
-            $errors = [];
-        }
+        $code = 200;
+        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($item);
 
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
@@ -328,35 +303,8 @@ class Controller extends Base
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
-        // Perform validation, but leave this booking out of calculations.
-        $code   = 200;
-        $validation = new Validation(
-            $this->getUser(),
-            $this->getBookingMapper(),
-            $this->getStatusMapper(),
-            $this->getTermMapper(),
-            $this->getExternalTimetableHandler(),
-            $this->getCampusMapper(),
-            $this->getConfigLoader(),
-            $this->getExternalEventMapper()
-        );
-        $itemResource = $item->getResource();
-        $errors = $validation->validateBookingFromPostData($itemResource, $this->requestPost, $item);
-
-        // If clashes are allowed on the booking, and all validation errors are clash errors...
-        $clashBookingStartDatesAsKeys = [];
-        if (
-            count($errors) > 0 && $itemResource->getAllowClashBookings() &&
-            $validation->validationErrorsAreAllClashes($errors)
-        ) {
-            // Remember the start dates of clash bookings.
-            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
-            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
-                $clashBookingStartDatesAsKeys[$startDate] = null;
-            }
-            // Ignore errors since all were clashes and clashes are allowed.
-            $errors = [];
-        }
+        $code = 200;
+        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($item->getResource());
 
         if (empty($errors)) {
             $item
@@ -1092,7 +1040,8 @@ class Controller extends Base
      * This function is called when the form on the 'Add Resource Bookings' modal is submitted.
      * The 'Add Resource Bookings' modal appears on the 'Event Details' page when the 'Add booking(s)' button is clicked.
      *
-     * @throws SchoolboxException
+     * @throws Deleted
+     * @throws MapperException
      */
     public function addBookings(): void
     {
@@ -1108,7 +1057,13 @@ class Controller extends Base
             throw new SchoolboxException('Event not found');
         }
 
-        $resources = $this->resourceMapper->findByColumn('id', $resourceIds);
+        $items = $this->resourceMapper->findByColumn('id', $resourceIds);
+
+        foreach ($items as $item) {
+            [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed($item);
+        }
+
+        $i = 'i';
     }
 
     /**
