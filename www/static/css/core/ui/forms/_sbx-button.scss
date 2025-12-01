@@ -113,3 +113,25 @@
         text-transform: none;
     }
 }
+
+/**
+ * Icon only buttons
+ * These need to be treated differently to standard buttons
+ * as they have no text content and so need a border to define their shape
+ */
+.sbx-body button.button[class*="icon-"] {
+    border: none;
+}
+
+.sbx-body button.button[class*="icon-"]:not(:empty) {
+    border: var(--sbx-border-width-normal) solid var(--sbx-color-accent); // add border back in for icon and text buttons
+}
+
+/**
+ * Specific style for the search button to match design
+ */
+.sbx-body .c-filter-search-term__button {
+    background-color: var(--sbx-color-accent);
+    border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
+    height: auto;
+}
