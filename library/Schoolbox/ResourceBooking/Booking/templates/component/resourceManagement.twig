@@ -155,7 +155,7 @@
                                                                     on <time datetime="{{ clash.booking.createdAt.database }}">{{ clash.booking.createdAt.short }}</time>
                                                                     {% if clash.booking.event.owner.id != clash.booking.event.author.id %}
                                                                         by
-                                                                        <a href="/search/user/{{ clash.booking.author.owner.id }}">{{ clash.booking.event.author.formatName }}</a>
+                                                                        <a href="/search/user/{{ clash.booking.event.author.id }}">{{ clash.booking.event.author.formatName }}</a>
                                                                     {% endif %}
                                                                 </p>
                                                             </div>

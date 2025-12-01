@@ -1308,6 +1308,11 @@ class Controller extends Base
             throw new Exception("Unable to approve clash booking, only allowed when old booking is approved and new booking is pending.");
         }
 
+        // Ensure the bookings actually clash (overlap in time)
+        if (!$this->isClash($oldBooking, $item)) {
+            throw new Exception("Cannot approve clash: bookings do not overlap in time.");
+        }
+
         // reject the old booking, so we can approve the new one.
         $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
 
