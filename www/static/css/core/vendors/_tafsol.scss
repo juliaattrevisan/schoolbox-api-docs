@@ -220,71 +220,6 @@ body {
     }
 }
 
-// Tabs styles
-.tabs {
-    background-color: var(--card-bg);
-    border-bottom: var(--border);
-    display: flex;
-    overflow-x: auto;
-    overflow-y: clip;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    & .active a {
-        border-bottom-width: 3px !important;
-        border-color: var(--sbx-color-accent);
-        font-weight: 600;
-    }
-
-    & a {
-        white-space: nowrap;
-
-        .active &:not([data-test^="homepage-component-palette-tab"]) {
-            border-bottom: 3px solid var(--sbx-color-accent) !important;
-        }
-    }
-}
-
-.tabs.vertical {
-    flex-direction: column;
-
-    & .tab-title:first-child {
-        & a {
-            border-top-left-radius: var(--sbx-border-radius-normal);
-        }
-    }
-}
-
-/* Tabs component styles */
-.component-tabs {
-    & .tabs {
-        border: var(--border);
-        border-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-radius: var(--sbx-border-radius-normal);
-    }
-
-    & .tabs-content {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        border-top: 0;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-
-        & > .content li {
-            box-shadow: none !important;
-
-            & [data-component-palette] {
-                border-radius: var(--sbx-border-radius-normal);
-                padding: 1rem 2rem;
-            }
-        }
-    }
-}
-
 /* ==========================================================================
    6. Empty States, Lists & Content Cards
    ========================================================================== */
@@ -1373,16 +1308,6 @@ input[type="radio"] + .block {
 .component-container.Component_Homepage_BreadcrumbController {
     border: none !important;
     box-shadow: none !important;
-}
-
-ul#tabs-sub-1 > li,
-ul#tabs-sub-2 > li,
-ul#tabs-sub-3 > li,
-ul#tabs-sub-4 > li,
-ul#tabs-sub-5 > li,
-ul#tabs-sub-6 > li {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
 }
 
 #component-lock-switch label {
