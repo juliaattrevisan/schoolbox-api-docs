@@ -34,13 +34,13 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig($browserCacheTimeoutConfigName
 //
 // Get the code, then the image path from the code.
 $code = 500;
-switch ($_GET['code']) {
+switch ($_GET['code'] ?? null) {
     case 403:
     case 404:
     case 500:
     case 503:
     case 504:
-        $code = (int)$_GET['code'];
+        $code = (int)($_GET['code'] ?? 500);
         break;
 
     default:
@@ -93,8 +93,9 @@ switch ($transformType) {
 
     case Image\Transformation\MyImage::getSlug():
     default:
-        $width      = (int)$_GET['width'] ?: 100;
-        $height     = (int)$_GET['height'] ?: 100;
+        // Use null-coalescing to avoid "Undefined array key" warnings
+        $width      = (int)($_GET['width'] ?? 100);
+        $height     = (int)($_GET['height'] ?? 100);
         $transforms = new Image\Transformation\MyImage();
         $transform  = $transforms->retrieve($width, $height);
         $cache_key  = $transforms->getCacheKey($width, $height);
