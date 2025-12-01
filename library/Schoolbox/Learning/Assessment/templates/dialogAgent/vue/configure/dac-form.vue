@@ -158,32 +158,6 @@ async function onSubmit(): Promise<void> {
                         </label>
                     </div>
                 </div>
-
-                <div class="small-12 columns">
-                    <label for="dac-opening-message" class="required">Opening Message</label>
-                    <textarea
-                        id="dac-opening-message"
-                        v-model="assessmentConfig.openingMessage"
-                        name="openingMessage"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
-                    />
-                </div>
-
-                <div class="small-12 columns">
-                    <label for="dac-rules" class="required">Rules</label>
-                    <textarea
-                        id="dac-rules"
-                        v-model="assessmentConfig.rules"
-                        name="rules"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
-                    />
-                </div>
             </fieldset>
 
             <fieldset
@@ -203,6 +177,34 @@ async function onSubmit(): Promise<void> {
                         :id="`fieldcontext-${fieldContext.id}`"
                         v-model="fieldContext.body"
                         :name="`fieldContexts[${fieldContext.id}]`"
+                        style="resize: vertical"
+                        rows="4"
+                        required
+                        :disabled="!props.postUpdate"
+                    />
+                </div>
+            </fieldset>
+
+            <fieldset class="content" :disabled="isSubmitting || undefined">
+                <div class="small-12 columns">
+                    <label for="dac-opening-message" class="required">Opening Message</label>
+                    <textarea
+                        id="dac-opening-message"
+                        v-model="assessmentConfig.openingMessage"
+                        name="openingMessage"
+                        style="resize: vertical"
+                        rows="4"
+                        required
+                        :disabled="!props.postUpdate"
+                    />
+                </div>
+
+                <div class="small-12 columns">
+                    <label for="dac-rules" class="required">Rules</label>
+                    <textarea
+                        id="dac-rules"
+                        v-model="assessmentConfig.rules"
+                        name="rules"
                         style="resize: vertical"
                         rows="4"
                         required
