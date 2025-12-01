@@ -128,7 +128,19 @@
                                                         <div class="small-12">
                                                             <div class="warning">
                                                                 {# time, and only time (start - end) #}
-                                                                Clashes with  <time datetime="{{ clash.booking.event.startDateTime.getDatabase() }}">{{ clash.booking.event.startDateTime.getTimeOnly() }}</time>{% if clash.booking.event.startDateTime.getShort() != clash.booking.event.endDateTime.getShort() %} - <time datetime="{{ clash.booking.event.endDateTime.getDatabase() }}">{{ clash.booking.event.endDateTime.getTimeOnly() }}</time>{% endif %}
+                                                                {# Precompute time and alert icon for readability #}
+                                                                {% set showEndTime = clash.booking.event.startDateTime.getShort() != clash.booking.event.endDateTime.getShort() %}
+                                                                {% set startTime = clash.booking.event.startDateTime.getTimeOnly() %}
+                                                                {% set startDateTime = clash.booking.event.startDateTime.getDatabase() %}
+                                                                {% set endTime = clash.booking.event.endDateTime.getTimeOnly() %}
+                                                                {% set endDateTime = clash.booking.event.endDateTime.getDatabase() %}
+                                                                <time datetime="{{ startDateTime }}">{{ startTime }}</time>
+                                                                {% if showEndTime %}
+                                                                    -
+                                                                    <time datetime="{{ endDateTime }}">
+                                                                        {{ endTime }}
+                                                                    </time>
+                                                                {% endif %}
                                                             </div>
                                                             <div class="small-12 tiny card">
                                                                 {# small portrait of booker #}
