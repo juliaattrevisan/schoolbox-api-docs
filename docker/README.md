@@ -41,7 +41,7 @@ Some fields have also changed name:
 - `aws_bucket_prefix` is now `cdn_bucket_prefix`
 
 Not all Vagrant configuration fields are relevant in Docker: if it's not in
-`docker.default.ini`, it won't be relevant to Docker.
+`docker.default.env`, it won't be relevant to Docker.
 
 ### Task daemon
 
@@ -89,11 +89,73 @@ https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non
 
 ## Troubleshooting
 
+### First, view the logs
+
 `docker/logs` will show the logs for all containers within the Docker
 environment: remember it's possible to filter logs to a single container by
 providing the container name.
 
-If the environment gets into a bad state, it can be rebuilt like so:
+### Port collisions
+
+When running Schoolbox on a host which is already running other services (e.g.
+another web server, or another Docker environment which provides another web
+server), the ports that those other services use may conflict with the ports
+used by Schoolbox.
+
+The message will be something like this on `docker/up`:
+```
+Error response from daemon: failed to set up container networking...:
+failed to bind host port for 0.0.0.0:8000:172.18.0.6:80/tcp: address already in use
+```
+
+Common culprits are:
+- another web server on the host
+- another Docker environment which provides a web server
+
+In order to fix this:
+- determine the conflicting port:
+  - from the above error message, the binding is
+    `0.0.0.0:8000:172.18.0.6:80/tcp`, which binds from:
+    - your host (0.0.0.0) and port (8000), to;
+    - the container on the Docker network (172.18.0.6) and its port (80)
+    - using the TCP protocol
+- determine which service on your host is using the conflicting port:
+  - Docker services may be found with:
+    ```
+    docker ps --filter publish=$PORT
+    ```
+  - non-Docker services may be found with:
+    ```
+    lsof -i :$PORT
+    ```
+- once the service is found, either:
+  - stop the service:
+    - Docker:
+      ```
+      docker stop $SERVICE
+      ```
+    - non-Docker: consider uninstalling the service, or stopping it manually:
+      ```
+      sudo service $SERVICE stop
+      ```
+  - change the port which Schoolbox uses in `docker.env`:
+    see the `*_PUBLISHED_PORT` variables in `docker.default.env`, and change
+    the port to one which doesn't conflict
+
+### AWS authentication errors
+
+Occasionally the `docker/up` process will fail to authenticate, due to an old
+stale session:
+```
+Credentials were refreshed, but the refreshed credentials are still expired.
+```
+
+Try logging out with `aws sso logout` before running `docker/up` again.
+
+### Rebuilding all containers
+
+If the environment gets into a bad state, and it can't be resolved any other
+way, it can be rebuilt like so:
 ```bash
 # -v removes volumes, including database data
 docker/down -v
@@ -104,3 +166,7 @@ docker system prune
 # restart and rebuild containers
 docker/up --build
 ```
+
+This may also be necessary when switching between master and develop branches,
+if the base image definition in `docker/base-images/php-frankenphp` has diverged
+between the two branches.

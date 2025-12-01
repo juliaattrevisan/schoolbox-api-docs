@@ -2,6 +2,16 @@
 # Stops all notif daemons.
 # If an INSTANCE_ID env var is present, just stop for that instance, else stop for all instances
 
+if [ "${HOST_TYPE}" = "docker" ]; then
+    echo "The Docker environment runs notif daemons within separate containers: they cannot be stopped with this script."
+    echo "Try the following in your host (not a container) instead:"
+    echo ""
+    echo "    docker/compose stop schoolbox-digestd schoolbox-mobiled schoolbox-socketd schoolbox-scheduled"
+    echo "    docker/compose start schoolbox-digestd schoolbox-mobiled schoolbox-socketd schoolbox-scheduled"
+    echo ""
+    exit 1;
+fi
+
 # Stop all schoolbox notif daemons (supports both old+new single/multi instance style)
 for daemon in digestd scheduled mobiled belld; do
     # Old single-instance style

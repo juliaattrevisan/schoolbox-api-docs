@@ -10,8 +10,8 @@ declare MARIADB_MAJOR_VERSION
 declare REDIS_MAJOR_VERSION
 declare RABBITMQ_MAJOR_VERSION
 declare ETHERPAD_MAJOR_VERSION
-declare MARIADB_PUBLISHED_PORT
-declare MARIADB_PUBLISHED_PORT
+declare HTTP_PUBLISHED_PORT
+declare HTTPS_PUBLISHED_PORT
 declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
 declare RABBITMQ_MANAGEMENT_PUBLISHED_PORT
@@ -103,7 +103,7 @@ function login_to_aws() {
     log "Testing if logged in to AWS (region: ${AWS_REGION})..."
     if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
         log "Not logged in to AWS: logging in"
-        AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+        AWS_CONFIG_FILE=.aws/config aws sso login --use-device-code
     else
         log "Logged in to AWS: continuing"
     fi
@@ -178,6 +178,8 @@ function build_docker_compose_env() {
     PHP_MAJOR_VERSION=\"${PHP_MAJOR_VERSION}\"
     MARIADB_MAJOR_VERSION=\"${MARIADB_MAJOR_VERSION}\"
     REDIS_MAJOR_VERSION=\"${REDIS_MAJOR_VERSION}\"
+    HTTP_PUBLISHED_PORT=\"${HTTP_PUBLISHED_PORT}\"
+    HTTPS_PUBLISHED_PORT=\"${HTTPS_PUBLISHED_PORT}\"
     MARIADB_PUBLISHED_PORT=\"${MARIADB_PUBLISHED_PORT}\"
     REDIS_STORAGE_PUBLISHED_PORT=\"${REDIS_STORAGE_PUBLISHED_PORT}\"
     REDIS_CACHE_PUBLISHED_PORT=\"${REDIS_CACHE_PUBLISHED_PORT}\"

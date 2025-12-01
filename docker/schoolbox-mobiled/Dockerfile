@@ -10,4 +10,4 @@ FROM ${BASE_PHP_IMAGE}
 
 WORKDIR /usr/share/schoolbox
 
-CMD php /usr/share/schoolbox/tools/mobile/mobiled.php -vvv
+CMD ["php", "/usr/share/schoolbox/tools/mobile/mobiled.php", "-vvv"]
