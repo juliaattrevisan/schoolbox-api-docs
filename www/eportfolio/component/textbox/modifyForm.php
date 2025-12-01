@@ -15,10 +15,11 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$action              = $_POST['action'];
-$ownerId             = $_POST['userId'];
-$pageId              = $_POST['pageId'];
-$componentInstanceId = $_POST['componentInstanceId'];
+/* Replace direct array accesses with safe defaults to avoid notices */
+$action              = $_POST['action'] ?? null;
+$ownerId             = $_POST['userId'] ?? null;
+$pageId              = $_POST['pageId'] ?? null;
+$componentInstanceId = $_POST['componentInstanceId'] ?? null;
 
 /* All three vars need to exist before you can continue:
  * $_SESSION['user'], $ownerId, $pageId
@@ -39,7 +40,8 @@ try {
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
-    $content = $_POST['content'];
+    /* default content to empty string if not provided */
+    $content = $_POST['content'] ?? '';
 
     $componentInstanceMapper = Component_InstanceMapper::getInstance();
 
