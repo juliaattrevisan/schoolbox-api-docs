@@ -18,6 +18,7 @@ use Calendar\Event\Type\EventBase;
 use Calendar_Api_Config_Mapper;
 use DateTime;
 use External_Timetable;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -25,7 +26,7 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -193,7 +194,7 @@ class Controller extends Base
      * This is called when the form on the 'Book Item' page is submitted.
      *
      * @param Item\Model $item The resource to create a booking for.
-     * @throws Exception
+     * @throws MapperException
      */
     public function createBooking(Item\Model $item)
     {
@@ -320,7 +321,7 @@ class Controller extends Base
      * This is called when the form on the 'Update Booking' page is submitted.
      *
      * @param Model $item
-     * @throws Exception
+     * @throws MapperException
      */
     public function update(Model $item)
     {
@@ -542,7 +543,7 @@ class Controller extends Base
      * @param ?int $campusId
      *
      * @return Collection
-     * @throws Exception
+     * @throws MapperException
      * @todo make this a mapper method
      */
     protected function saveBookingsForRecurrences(
@@ -672,7 +673,7 @@ class Controller extends Base
      * @param  Calendar\Event $event
      *
      * @return Model
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     protected function getBookingFromEvent(Item\Model $resource, Calendar\Event $event)
     {
@@ -698,7 +699,7 @@ class Controller extends Base
      * @param Item\Model $item
      * @throws \DomainException
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Exception
+     * @throws MapperException
      */
     public function bookingCalendar(Item\Model $item)
     {
@@ -1090,6 +1091,8 @@ class Controller extends Base
     /**
      * This function is called when the form on the 'Add Resource Bookings' modal is submitted.
      * The 'Add Resource Bookings' modal appears on the 'Event Details' page when the 'Add booking(s)' button is clicked.
+     *
+     * @throws SchoolboxException
      */
     public function addBookings(): void
     {
@@ -1098,7 +1101,14 @@ class Controller extends Base
         $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
 
-        $i = 'i';
+        try {
+            $event = $this->getEventMapper()->findById($eventId);
+        } catch (MapperException) {
+            // Can't find event, so cannot add bookings.
+            throw new SchoolboxException('Event not found');
+        }
+
+        $resources = $this->resourceMapper->findByColumn('id', $resourceIds);
     }
 
     /**
