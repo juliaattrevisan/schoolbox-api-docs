@@ -11,7 +11,7 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Config\Config;
+use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
@@ -43,19 +43,31 @@ class Module extends BaseModule
         /* This /openai/ route is used by Little Robot Dude from the ckeditor
          * directly, to produce its output
          */
-        $this->register('POST', '', 'postAiAssistant', $isStaff);
+        $this->register('POST', '', 'postAiAssistant', new Rule\All(
+            $isStaff,
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_TEXT_CHAT, $this->getConfig()),
+        ));
 
         /* Lesson Plan field generators
          */
-        $this->register('POST', '/lesson-plan', 'postLessonPlan', $isStaff);
+        $this->register('POST', '/lesson-plan', 'postLessonPlan', new Rule\All(
+            $isStaff,
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_LESSONPLAN, $this->getConfig()),
+        ));
 
         /* Image generation: for OpenAI only
          */
-        $this->register('POST', '/image', 'postImage', $isStaff);
+        $this->register('POST', '/image', 'postImage', new Rule\All(
+            $isStaff,
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_IMAGE_GENERATION, $this->getConfig()),
+        ));
 
         /* Differentiation Profile generation
          */
-        $this->register('POST', '/differentiation-profile', 'postDifferentiation', $hasDifferentiationProfileService);
+        $this->register('POST', '/differentiation-profile', 'postDifferentiation', new Rule\All(
+            $hasDifferentiationProfileService,
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIFFERENTIATION, $this->getConfig()),
+        ));
     }
 
 

@@ -31,15 +31,15 @@ class ConfigTest extends TestCase
     {
         return [
             'OpenAI enabled' => [
-                [Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI],
+                [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OPENAI]],
                 true,
             ],
             'Azure enabled' => [
-                [Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_AZURE],
+                [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_AZURE]],
                 true,
             ],
             'Provider off' => [
-                [Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OFF],
+                [Config::FIELD_PROVIDER => ['value' => Helper::ENDPOINT_TYPE_OFF]],
                 false,
             ],
         ];
@@ -55,8 +55,19 @@ class ConfigTest extends TestCase
         $this->assertSame($expected, $cfg->isEnabled($config));
     }
 
+    /**
+     * Test that isEnabled throws error when provider is not an array
+     */
+    public function testIsEnabledWithDirectProviderValue(): void
+    {
+        $cfg = new Config();
+
+        $this->expectException(TypeError::class);
+        $this->assertFalse($cfg->isEnabled([Config::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI]));
+    }
+
     // test isEnabled with null config
-    public function testIsEnabledWithNullThrowsTypeError(): void
+    public function testIsEnabledWithNullReturnsFalse(): void
     {
         $cfg = new Config();
         $this->assertFalse($cfg->isEnabled(null));

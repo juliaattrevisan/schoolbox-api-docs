@@ -73,20 +73,6 @@ class Controller extends Base
         $aiConfig = new Config();
         $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_LESSONPLAN));
 
-        // if not enabled, 404
-        if ($aiConfig->isEnabled($lpConfig) === false) {
-            $returnCode = 404;
-
-            $problem = new ApiProblem("Lesson Plan AI is not enabled.")
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
-
         try {
             /** gen a sessionID guid for keeping track of what is happening
              * for lessonplan each ai request is a new session
@@ -285,19 +271,6 @@ class Controller extends Base
 
         $aiConfig = new Config();
         $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIFFERENTIATION));
-
-        if ($aiConfig->isEnabled($diffConfig) === false) {
-            $returnCode = 404;
-
-            $problem = (new ApiProblem("AI Differentiation is not enabled."))
-                ->setStatus($returnCode)
-                ->asArray();
-
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($returnCode);
-
-            return;
-        }
 
         $aiSessionId = (string)Uuid::uuid4();
 

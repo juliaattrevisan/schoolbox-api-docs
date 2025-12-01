@@ -14,6 +14,7 @@ import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
 import type { SelectizeSelectorOptions } from "@js/vendors/selectize/selectizeSelectorTypes";
+import type { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
@@ -57,7 +58,11 @@ declare global {
             };
             editors: Partial<Record<string, SbxEditor>>;
             gradeGradientEnabled: boolean;
-            aiFeatures: Partial<Record<string, { enabled: boolean; model: string | undefined }>>;
+            aiFeatures: Partial<{
+                [K in AiFeature]: K extends AiFeature.CHAT // only some features have model info
+                    ? { enabled: true; model: string } | { enabled: false }
+                    : { enabled: boolean };
+            }>;
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
             lightGalleries: Record<string, LightGallery | undefined>;
