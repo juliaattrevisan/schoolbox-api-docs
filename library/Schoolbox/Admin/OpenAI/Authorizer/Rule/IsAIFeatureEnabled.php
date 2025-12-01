@@ -37,7 +37,10 @@ class IsAIFeatureEnabled implements IAuthorizationRule
         $featureConfig = $aiConfig->decode((string)$this->configLoader->get($this->featureConfigName));
 
         if (!$aiConfig->isEnabled($featureConfig)) {
-            throw new Unauthorized("AI feature is not enabled");
+            throw new Unauthorized(sprintf(
+                'AI feature %s is not enabled',
+                $this->featureConfigName
+            ));
         }
     }
 }
