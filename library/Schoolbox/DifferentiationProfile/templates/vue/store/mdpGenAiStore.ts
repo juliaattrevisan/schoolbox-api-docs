@@ -43,7 +43,7 @@ export const useGenAiStore = defineStore(`genAiStore`, () => {
             const { key } = field as { key: ProfileTextKeys };
             if (key in responseData && responseData[key] !== undefined) {
                 filteredData.push({
-                    response: responseData[key] || null,
+                    response: responseData[key] || null, // set to null if the response is empty
                     title: field.title,
                     key,
                 });

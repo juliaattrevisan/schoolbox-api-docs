@@ -20,6 +20,26 @@ export const useSaveStore = defineStore(`saveStore`, () => {
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
     /**
+     * Update the profile with the keys to save and return the body for the save request
+     * @param profile - the profile to save
+     * @param toSave - object containing specific keys to update in the profile
+     * @returns - body to send in the save request
+     */
+    function getSaveBody<K extends ProfileKeys>(
+        profile: Profile,
+        toSave: Partial<Record<K, Profile[K]>>,
+    ): Partial<Profile> {
+        const body: Partial<Profile> = { ...profile };
+        (Object.keys(toSave) as K[]).forEach((key) => {
+            const value = toSave[key];
+            if (value !== undefined) {
+                body[key] = value;
+            }
+        });
+        return body;
+    }
+
+    /**
      * Update a profile with the provided keys
      * @param profile - the profile to update
      * @param toSave - object containing specific keys to update in the profile
@@ -50,16 +70,15 @@ export const useSaveStore = defineStore(`saveStore`, () => {
         try {
             isSaving.value = true;
             loadError.value = null;
-            updateProfile(profile, toSave);
-            const response = await apiRequest<SaveResponse, Profile>({
+            const response = await apiRequest<SaveResponse, Partial<Profile>>({
                 url: profile._routes.edit,
                 method: "POST",
-                body: profile,
+                body: getSaveBody(profile, toSave),
             });
             if (!response.success) {
                 throw new Error(response.message || "Failed to save");
             }
-            updateProfile(profile, { ...response.data });
+            updateProfile(profile, { ...toSave, ...response.data });
             toast.timeout({ text: `${locale.differentiationProfile.proper()} successfully updated` });
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";

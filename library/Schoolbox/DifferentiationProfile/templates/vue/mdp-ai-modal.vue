@@ -16,6 +16,10 @@ const headerStore = useHeaderStore();
 const genAiStore = useGenAiStore();
 const saveStore = useSaveStore();
 const selectedOptions = window.Vue.ref<Partial<Record<ProfileTextKeys, AiResponseItem | null>>>({});
+const hasSelectedOptions = window.Vue.computed(() => {
+    // don't show confirm button unless something selected
+    return Object.values(selectedOptions.value).some((item) => item !== null);
+});
 
 /**
  * Watch for changes to aiResponse and auto-select all options when it's regenerated
@@ -26,7 +30,11 @@ window.Vue.watch(
         if (newResponse && Array.isArray(newResponse)) {
             const newSelectedOptions: Partial<Record<ProfileTextKeys, AiResponseItem | null>> = {};
             newResponse.forEach((item: AiResponseItem) => {
-                newSelectedOptions[item.key] = item;
+                // filter out those that have an empty string as a response
+                // as they shouldn't be selectable
+                if (item.response !== null && item.response !== "") {
+                    newSelectedOptions[item.key] = item;
+                }
             });
             selectedOptions.value = newSelectedOptions;
         } else if (newResponse === null) {
@@ -76,6 +84,7 @@ function onConfirmSelected(): void {
                 <div v-for="item in genAiStore.aiResponse" :key="item.key" class="l-flex-col l-gap-s">
                     <div>
                         <input
+                            v-if="item.response !== null && item.response !== ''"
                             :id="`ai-response-${item.key}`"
                             v-model="selectedOptions[item.key]"
                             :true-value="item"
@@ -91,7 +100,8 @@ function onConfirmSelected(): void {
                         >
                     </div>
                     <!-- eslint-disable-next-line vue/no-v-html - This is sanitized by the backend already -->
-                    <div v-html="item.response"></div>
+                    <div v-if="item.response !== null && item.response !== ''" v-html="item.response"></div>
+                    <p v-else class="meta">No response provided.</p>
                 </div>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
@@ -103,7 +113,7 @@ function onConfirmSelected(): void {
                     Cancel
                 </button>
                 <button
-                    v-if="!genAiStore.isProcessing && genAiStore.aiResponse"
+                    v-if="!genAiStore.isProcessing && genAiStore.aiResponse && hasSelectedOptions"
                     class="button submit l-flex__item--1"
                     type="button"
                     data-test="up-delete-unit-delete"
