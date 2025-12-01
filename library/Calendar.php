@@ -482,7 +482,9 @@ class Calendar extends DeprecatedModel
 
                 /* If you have write access to the event
                  */
-                if ($this->getPerm($currentEvent) > 1) {
+                $eventPermission = $this->getPerm($currentEvent);
+
+                if ($eventPermission > UserAccess::ACCESS_READ) {
                     $event->setIsEditable(true);
                 } else {
                     $event->setIsEditable(false);
@@ -501,7 +503,15 @@ class Calendar extends DeprecatedModel
                 $event->setMaxAttendees($currentEvent['max_attendees']);
 
                 $event->setCompleted((bool)$currentEvent['completed']);
-                $event->setPath('/calendar/event/' . $currentEvent['id']);
+
+                /* Only set path if user has read access. setPath() doesn't accept
+                 * and the frontend uses a falsey check, so empty string is used when access is denied.
+                 */
+                $event->setPath(
+                    $eventPermission >= UserAccess::ACCESS_READ
+                        ? '/calendar/event/' . $currentEvent['id']
+                        : ''
+                );
 
                 $isPublished     = $event->isPublishedAtDate(Alaress_Date_Format::now());
                 $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner($viewer->getId()) || $event->isEditable();
