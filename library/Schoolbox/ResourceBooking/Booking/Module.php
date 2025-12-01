@@ -134,11 +134,19 @@ class Module extends BaseModule
         $isOwnerRule->setMapper($this->getMapper());
         $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule, $isItemModeratorRule);
 
+        // Add bookings rule:
+        // This is different from the $bookingCreateRule because 'add bookings' adds multiple bookings, for multiple
+        // resources.  Because this rule concerns multiple resources, the $canBookRule is unsuitable (the $canBookRule
+        // is only suitable if the id of the booking item (the resource) can be read from the path.
+        // The permission check for each resource must instead be done in the controller.
+        $addBookingsRule = new Rule\IsLoggedIn(); // TODO: Fix this rule (test with Jack Coles).
+
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, ['book', 'createBooking', 'addBookings'], $bookingCreateRule)
+            ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
             ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending', 'clashApprove'], $manageBookingRule)
-            ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule);
+            ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule)
+            ->addRoutePermission($authorizer, ['addBookings'], $addBookingsRule);
     }
 
     /**
