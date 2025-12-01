@@ -213,7 +213,7 @@ class Controller extends Base
             $event->setDetail($this->requestPost['notes']);
 
             // Build the booking
-            $booking = $this->getBookingFromEvent($item, $event);
+            $booking = $this->getBookingFromEvent($item, $event); // Booking status is set here.
             $booking
                 ->setName($this->requestPost['name'])
                 ->setNotes($this->requestPost['notes']);
@@ -349,13 +349,14 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
+                // Figure out the new booking status.
                 $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
                 if (
                     $bookingStartDateTime !== null &&
                     array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
                 ) {
                     // Set status to pending because this booking has a clash.
-                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                    $bookingStatusId = Status\Model::STATUS_PENDING;
                 } else {
                     if (
                         $booking->getResource()->isUserModerator($this->getUser())
@@ -365,18 +366,19 @@ class Controller extends Base
                          * and you created the booking in the first place,
                          * set it to Approved - otherwise you'll end up approving your own request anyway
                          */
-                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                        $bookingStatusId = Status\Model::STATUS_APPROVED;
                     } elseif (
                         ($moderationId === Item\ModerationType\Model::TYPE_MODERATED || $moderationId === Item\ModerationType\Model::TYPE_MANAGED) &&
                         $statusId === Status\Model::STATUS_APPROVED &&
                         $isTimeChanged
                     ) {
-                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                        $bookingStatusId = Status\Model::STATUS_PENDING;
                     } else {
                         // Otherwise set the status as if we were creating a non-clashing booking.
-                        $booking->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)));
+                        $bookingStatusId = $this->getStatusIdForNonClashBooking($booking);
                     }
                 }
+                $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
 
                 $bookingList->add($booking);
             }
@@ -549,13 +551,13 @@ class Controller extends Base
                     $newBooking = clone $booking;
                     $newBooking->setEvent($event);
                     $eventStartDateTime = $event->getStartDateTime();
-                    $newBookingStatus = (
+                    $newBookingStatusId = (
                         $eventStartDateTime !== null &&
                         array_key_exists($eventStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
                         ? Status\Model::STATUS_PENDING
-                        : $this->getStatusForNonClashBooking($booking)
+                        : $this->getStatusIdForNonClashBooking($booking)
                     );
-                    $newBooking->setStatus($this->getStatusMapper()->createModel($newBookingStatus));
+                    $newBooking->setStatus($this->getStatusMapper()->createModel($newBookingStatusId));
                     $newList->add($newBooking);
                 }
             } else {
@@ -633,7 +635,7 @@ class Controller extends Base
         $booking
             ->setEvent($event)
             ->setResource($resource)
-            ->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)))
+            ->setStatus($this->getStatusMapper()->createModel($this->getStatusIdForNonClashBooking($booking)))
             ->setName($this->requestPost['name'])
             ->setNotes($this->requestPost['notes'])
             ->setRelatedBookingList(new GenericCollection(Model::class))
@@ -1014,7 +1016,7 @@ class Controller extends Base
      * @param Model $booking
      * @return int
      */
-    private function getStatusForNonClashBooking(Model $booking): int
+    private function getStatusIdForNonClashBooking(Model $booking): int
     {
         $resource = $booking->getResource();
         $event = $booking->getEvent();
@@ -1091,16 +1093,18 @@ class Controller extends Base
                     ->setBookingStartAt($event->getStartDateTime())
                     ->setBookingEndAt($event->getEndDateTime())
                     ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
-                    ->setName($resource->getName());
+                    ->setName($resource->getName())
 
                 $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
-                if (
-                    $bookingStartDateTime !== null &&
-                    array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
-                ) {
-                    // Set status to pending because this booking has a clash.
-                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
-                }
+                $bookingStatusId = (
+                    (
+                        $bookingStartDateTime !== null &&
+                        array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
+                    )
+                    ? Status\Model::STATUS_PENDING // Set status to pending because this booking has a clash.
+                    : $this->getStatusIdForNonClashBooking($booking)
+                );
+                $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
 
                 $bookingList = new Collection();
                 $bookingList->add($booking);
