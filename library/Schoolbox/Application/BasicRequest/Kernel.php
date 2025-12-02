@@ -582,6 +582,21 @@ class Kernel extends WebKernelAbstract
             )
         );
 
+        //Differentiation profiles cache
+        $di->set(
+            'ai.response.cache',
+            $di->lazy(
+                function () use ($di) {
+                    return new Psr16Cache(
+                        new RedisAdapter(
+                            $di->get('redis.cache'),
+                            'differentiationProfiles.' . INSTANCE_ID,
+                        )
+                    );
+                }
+            )
+        );
+
         // Filesystems
         $di->set(
             'filesystem.storage',

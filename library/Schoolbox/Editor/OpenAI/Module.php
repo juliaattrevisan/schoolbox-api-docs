@@ -89,7 +89,8 @@ class Module extends BaseModule
             $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
             $this->getMapperFactory()->get(DifferentiationAdminMapper::class),
-            $this->injector->get('assessmentDataSource')
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('ai.response.cache')
         );
     }
 }

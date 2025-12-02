@@ -13,6 +13,7 @@ use Crell\ApiProblem\ApiProblem;
 use Html2Text\Html2Text;
 use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -33,7 +34,6 @@ use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Smalot\PdfParser\Parser;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -47,6 +47,9 @@ use Smalot\PdfParser\Parser;
  */
 class Controller extends Base
 {
+    const DIFFERENTIATION_PROFILE_CACHE_KEY = 'ai_differentiation_profile_%d_student_%d';
+    const DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL = 604800; // 7 days
+
     /**
      * Controller constructor.
      */
@@ -59,6 +62,7 @@ class Controller extends Base
         private DifferentiationProfileMapper $differentiationProfileMapper,
         private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
         private MapperProxy $assessmentMapperProxy,
+        private CacheInterface $aiCache,
     ) {
     }
 
@@ -348,9 +352,7 @@ class Controller extends Base
             return;
         }
 
-        $aiSessionId = (string)Uuid::uuid4();
-
-        $studentId = $this->requestPost->get('studentId');
+        $studentId = $this->requestPost->getInt('studentId');
         if (!$studentId) {
             $returnCode = 400;
 
@@ -364,7 +366,7 @@ class Controller extends Base
             return;
         }
 
-        $assessmentId = $this->requestPost->get('assessmentId');
+        $assessmentId = $this->requestPost->getInt('assessmentId');
         if (!$assessmentId) {
             $returnCode = 400;
 
@@ -377,6 +379,25 @@ class Controller extends Base
 
             return;
         }
+
+        $cacheKey = sprintf(
+            self::DIFFERENTIATION_PROFILE_CACHE_KEY,
+            $assessmentId,
+            $studentId
+        );
+
+        $cache = $this->aiCache->get($cacheKey);
+
+        /* Early return if we have a cached response
+         */
+        if (null !== $cache) {
+            $this->response = $this->responseAsJson($cache)
+                                   ->withStatus(200);
+
+            return;
+        }
+
+        $aiSessionId = (string)Uuid::uuid4();
 
         try {
             $assessment = $this->assessmentMapperProxy->findById($assessmentId);
@@ -418,6 +439,16 @@ class Controller extends Base
                 $differentiationProfile,
                 $aiSessionId,
             );
+
+            if (200 === $status) {
+                /* Cache successful responses
+                 */
+                $this->aiCache->set(
+                    $cacheKey,
+                    $response,
+                    self::DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL
+                );
+            }
 
             $this->response = $this->responseAsJson($response)->withStatus($status);
             return;
