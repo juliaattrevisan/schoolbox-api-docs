@@ -119,15 +119,15 @@ class Mapper extends BaseMapper
                 /* If the pastoral access is set to the specific user
                  */
                            ->rawWhere(
-                               '(`pa`.`user_id` = :viewerId AND `pa`.`access` > :accessDeny)',
-                               [
-                               'viewerId'   => $viewer->getId(),
-                               'accessDeny' => UserAccess::ACCESS_DENY,
-                               ]
-                               /* Checking group-based permission
-                               */
-                           )->rawWhere(
-                               '(
+                    '(`pa`.`user_id` = :viewerId AND `pa`.`access` > :accessDeny)',
+                    [
+                        'viewerId'   => $viewer->getId(),
+                        'accessDeny' => UserAccess::ACCESS_DENY,
+                    ]
+                /* Checking group-based permission
+                */
+                )->rawWhere(
+                    '(
                                 `pa`.`group_id` IN (
                                     SELECT `pgm`.`group_id`
                                     FROM pastoral_group pg
@@ -138,11 +138,11 @@ class Mapper extends BaseMapper
                                 )
                                 AND `pa`.`access` > :accessDeny
                             )',
-                               [
-                                'viewerId'   => $viewer->getId(),
-                                'accessDeny' => UserAccess::ACCESS_DENY,
-                               ]
-                           );
+                    [
+                        'viewerId'   => $viewer->getId(),
+                        'accessDeny' => UserAccess::ACCESS_DENY,
+                    ]
+                );
 
             /* Role-based access checks
              */
@@ -185,13 +185,14 @@ class Mapper extends BaseMapper
                         (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
                         `p`.`student_id` IN $childrenPlaceHolder AND
                         `pa`.`access` > :accessDeny
-                    )", array_merge (
-                      [
-                          'viewerRoleId'   => $viewer->getRole()->getId(),
-                          'viewerRoleType' => $viewer->getRole()->getType(),
-                          'accessDeny'     => UserAccess::ACCESS_DENY,
-                      ],
-                      Builder::getArrayParameters($childrenIds, 'parentChildId')
+                    )",
+                        array_merge(
+                            [
+                                'viewerRoleId'   => $viewer->getRole()->getId(),
+                                'viewerRoleType' => $viewer->getRole()->getType(),
+                                'accessDeny'     => UserAccess::ACCESS_DENY,
+                            ],
+                            Builder::getArrayParameters($childrenIds, 'parentChildId')
                         )
                     );
                 }
@@ -319,10 +320,10 @@ class Mapper extends BaseMapper
 
         $limit = null === $limit ? '' : "LIMIT {$limit}";
         $orderBy = "ORDER BY " . ((null === $order) ? '' : implode(', ', array_map(
-            fn($col, $dir) => "{$col} {$dir}",
-            array_keys($order),
-            $order,
-        )) . ',') . ' p.student_id asc';
+                    fn($col, $dir) => "{$col} {$dir}",
+                    array_keys($order),
+                    $order,
+                )) . ',') . ' p.student_id asc';
 
         $query = "{$this->getSelectString()}
                 {$this->getFromString()}
