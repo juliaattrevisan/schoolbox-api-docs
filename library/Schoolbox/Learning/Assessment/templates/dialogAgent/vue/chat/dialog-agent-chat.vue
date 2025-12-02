@@ -219,13 +219,13 @@ window.Vue.onUnmounted(() => {
         <template #header>
             <div
                 v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
+                class="alert-box highlight l-mar--0 l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
                     <button
                         v-if="currentResponse._routes.assistanceResolve"
-                        class="button warning l-mar--0 dac-feed-help-dismiss"
+                        class="button highlight l-mar--0"
                         type="button"
                         :disabled="isHelpRequestChanging"
                         @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
@@ -257,11 +257,6 @@ window.Vue.onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-/** force the button to have white text, honestly idk about this but we're going with it for now */
-.dac-feed-help-dismiss {
-    color: white;
-}
-
 /* styles for printing (scoped) */
 @media print {
     .no-print {
