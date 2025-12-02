@@ -413,7 +413,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         // dirty yes, but look at \Schoolbox\Calendar\EventMapper::populateGuests
         $bookingMapper = ResourceBookingMapper::getInstance();
         // first check if there are any bookings for this event
-        $bookings = $bookingMapper->findByColumn('event_id', $event->getId(), ['deleted' => true]);
+        $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
         // also delete all related resource bookings for this event
         $bookingMapper->delete($bookings);
     }
