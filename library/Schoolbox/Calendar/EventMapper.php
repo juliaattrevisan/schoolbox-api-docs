@@ -160,6 +160,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
+
         $this->registerPersistSearchIndexCallbacks();
     }
 
@@ -397,6 +399,22 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->createRoles($event);
         $this->createCampus($event);
         $this->createSource($event);
+    }
+
+    /**
+     * Post-soft-delete hook method
+     *
+     * @param Event $event
+     * @throws MapperException
+     */
+    protected function postDelete(Event $event): void
+    {
+        // dirty yes, but look at \Schoolbox\Calendar\EventMapper::populateGuests
+        $bookingMapper = Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
+        // first check if there are any booking for this event
+        $bookings = $bookingMapper->findByColumn('event_id', $event->getId(), ['deleted' => true]);
+        // also delete all related resource bookings for this event
+        $bookingMapper->delete($bookings);
     }
 
     /**

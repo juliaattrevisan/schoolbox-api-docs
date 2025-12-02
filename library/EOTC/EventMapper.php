@@ -13,6 +13,7 @@ namespace EOTC;
 use Alaress_Date_Format;
 use EOTC\ActivityLog\Mapper as ActivityLogMapper;
 use EOTC\ListGroup\Collection as ListGroupCollection;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper as CalendarEventMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
@@ -415,6 +416,17 @@ class EventMapper extends CalendarEventMapper
      * @param Event $event
      */
     protected function postSave($event)
+    {
+        /* noop
+         */
+    }
+
+    /**
+     * Post-delete hook method
+     *
+     * @param Event $event
+     */
+    protected function postDelete(Event $event): void
     {
         /* noop
          */
