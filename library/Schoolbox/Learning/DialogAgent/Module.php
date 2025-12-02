@@ -157,6 +157,10 @@ class Module extends BaseModule
             $canModify,
         ), $preloadAssessment);
 
+        /* Get the status of a particular response
+         */
+        $this->register('GET', "{$assRoute}/{$studentParam}/status/{$responseParam}", 'getStatus', $canViewResponse, $preloadParticipantAndResponse);
+
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
@@ -166,7 +170,7 @@ class Module extends BaseModule
 
         /* Student sends a message to the chat agent for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/message/{responseId:\d+}", 'postMessage', new Rule\All(
+        $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
             $canSubmit,
             $this->buildRuleCanAction(Status::ACTION_MESSAGE)

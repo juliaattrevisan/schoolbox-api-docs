@@ -82,20 +82,34 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
     isHelpRequestChanging.value = false;
 
     if (!response.success) {
-        // TODO: If a student requests assistance, then the instructor resolves it somewhere else, you'd get a 403 here.
-        // handling that is a bit messy, the best way is likely to have an endpoint where the frontend can query the current ApiDialogAgentActionResponse from
-        // if (
-        //     typeof response.data === "object" &&
-        //     response.data !== null &&
-        //     "status" in response.data &&
-        //     response.data.status === 403
-        // ) {
-        //     // fetch the latest ApiDialogAgentActionResponse since we need the updated routes/state/etc
-        //     return;
-        // }
+        let errorMessage: string | null = response.message;
+
+        /**
+         * If a student requests assistance, then the instructor resolves it somewhere else, you'd get a 403 here.
+         * When that occurs (a 403), attempt to find the latest response data to sync back up.
+         */
+        if (
+            typeof response.data === "object" &&
+            response.data !== null &&
+            "status" in response.data &&
+            response.data.status === 403 &&
+            props.response._routes.status
+        ) {
+            const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
+                method: "GET",
+                url: props.response._routes.status,
+            });
+
+            if (statusResponse.success) {
+                currentResponse.value = statusResponse.data.response;
+                return;
+            }
+
+            errorMessage = statusResponse.message;
+        }
 
         const requestRoute = currentResponse.value._routes[DialogAgentResponseAction.ACTION_ASSISTANCE_REQUEST];
-        helpRequestError.value = `Unable to ${endpoint === requestRoute ? "request for assistance" : "resolve assistance request"}: ${response.message}`;
+        helpRequestError.value = `Unable to ${endpoint === requestRoute ? "request for assistance" : "resolve assistance request"}: ${errorMessage}`;
         return;
     }
 

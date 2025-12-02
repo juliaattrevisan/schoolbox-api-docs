@@ -16,6 +16,7 @@ export type DialogAgentResponse = {
     assistanceRequestedAt: DateRFC3339 | null;
     submittedAt: DateRFC3339 | null;
     _routes: {
+        status?: string | null;
         [DialogAgentResponseAction.ACTION_VIEW]?: string | null;
         [DialogAgentResponseAction.ACTION_MESSAGE]?: string | null;
         [DialogAgentResponseAction.ACTION_SOBO]?: string | null;
