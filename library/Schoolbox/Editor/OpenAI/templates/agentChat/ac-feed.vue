@@ -115,4 +115,16 @@ defineExpose({ feedEl });
     overflow-anchor: auto;
     height: 1px;
 }
+
+@media print {
+    .ac-feed {
+        border: none;
+    }
+
+    .ac-feed-list-wrapper {
+        max-height: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+}
 </style>
