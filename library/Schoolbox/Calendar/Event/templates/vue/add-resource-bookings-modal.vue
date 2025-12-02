@@ -4,16 +4,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-
-interface BookingResource {
-    id: number;
-    name: string;
-}
-
-interface Booking {
-    id: number;
-    resource: BookingResource;
-}
+import { type Booking, type BookingResource } from "./resourceBookingTypes";
 
 interface ToastComponent {
     activate: (message: string) => void;
