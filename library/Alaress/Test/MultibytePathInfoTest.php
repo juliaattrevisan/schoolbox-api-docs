@@ -88,15 +88,20 @@ class MultibytePathInfoTest extends TestCase
         ];
     }
 
-
     /**
      * @param string      $input
      * @param string|null $expectedDirname
+     * @param string|null $expectedBasename
+     * @param string|null $expectedExtension
+     * @param string|null $expectedFilename
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteDirname(
         string $input,
         ?string $expectedDirname,
+        ?string $expectedBasename,
+        ?string $expectedExtension,
+        ?string $expectedFilename,
     ) {
         $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_DIRNAME);
         $this->assertSame($expectedDirname, $info);
@@ -106,12 +111,16 @@ class MultibytePathInfoTest extends TestCase
      * @param string      $input
      * @param string|null $expectedDirname
      * @param string|null $expectedBasename
+     * @param string|null $expectedExtension
+     * @param string|null $expectedFilename
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteBasename(
         string $input,
         ?string $expectedDirname,
         ?string $expectedBasename,
+        ?string $expectedExtension,
+        ?string $expectedFilename,
     ) {
         $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_BASENAME);
         $this->assertSame($expectedBasename, $info);
@@ -122,6 +131,7 @@ class MultibytePathInfoTest extends TestCase
      * @param string|null $expectedDirname
      * @param string|null $expectedBasename
      * @param string|null $expectedExtension
+     * @param string|null $expectedFilename
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteExtension(
@@ -129,6 +139,7 @@ class MultibytePathInfoTest extends TestCase
         ?string $expectedDirname,
         ?string $expectedBasename,
         ?string $expectedExtension,
+        ?string $expectedFilename,
     ) {
         $info = pathinfo(parse_url($input, PHP_URL_PATH), PATHINFO_EXTENSION);
         $this->assertSame($expectedExtension, $info);

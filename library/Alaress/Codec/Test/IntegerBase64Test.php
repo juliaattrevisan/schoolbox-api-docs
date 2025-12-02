@@ -109,10 +109,11 @@ class IntegerBase64Test extends TestCase
     /**
      * Test that encoding then decoding a value results in the same value.
      *
-     * @param int|null $rawValue
+     * @param int|null    $rawValue
+     * @param string|null $_
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
-    public function testLosslessEncode(?int $rawValue): void
+    public function testLosslessEncode(?int $rawValue, ?string $_): void
     {
         $codec = new Base64();
         $this->assertSame($rawValue, $codec->decode($codec->encode($rawValue)));
