@@ -160,7 +160,7 @@ class Mapper extends BaseMapper
             } else if ($viewer->getRole()->isStudent()) {
                 /* If the viewer is student, then return the records about them and have access to
                  */
-                $tempPb->rawWhere('((
+                $tempPb->rawWhere('(
                     (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
                     `p`.`student_id` = :viewerRoleId AND
                     `pa`.`access` > :accessDeny
