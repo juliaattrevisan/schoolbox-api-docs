@@ -133,13 +133,7 @@ readonly class Helper
                     'id' => $resourceBooking->getResource()->getId(),
                     'name' => $resourceBooking->getResource()->getName(),
                 ],
-                'status' => [
-                    'id' => $resourceBooking->getStatus()->getId(),
-                    'name' => $resourceBooking->getStatus()->getName(),
-                    'isApproved' => $resourceBooking->getStatus()->isApproved(),
-                    'isPending' => $resourceBooking->getStatus()->isPending(),
-                    'isRejected' => $resourceBooking->getStatus()->isRejected(),
-                ]
+                'status' => $resourceBooking->getStatus()->jsonSerialize()
             ];
         }
 
