@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Sentry\Tracing\Operation;
 
+use Alaress\Sentry\Tracing\MemoryHelper;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
@@ -59,13 +60,7 @@ class Pop implements IOperation
 
         // If span has both memory usage at start and end:
         // also add memory delta to span data
-        $memoryAtStart = $currentSpan->getData()['memory.usage_at_start'] ?? null;
-        $memoryAtEnd   = $currentSpan->getData()['memory.usage_at_end'] ?? null;
-        if (isset($memoryAtStart, $memoryAtEnd)) {
-            $currentSpan->setData([
-                'memory.delta' => $memoryAtEnd - $memoryAtStart,
-            ]);
-        }
+        MemoryHelper::addMemoryDeltaData($currentSpan);
 
         $currentSpan->finish($this->context->getEndTimestamp());
 
