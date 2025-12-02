@@ -97,7 +97,6 @@ export default {
                 const response = await fetch(form.action, {
                     method: form.method,
                     body: formContent,
-                    responseType: "json",
                     headers: {
                         Accept: "application/json",
                     },
