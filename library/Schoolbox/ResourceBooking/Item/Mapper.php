@@ -378,7 +378,7 @@ class Mapper extends BaseMapper
      * @param string     $keyword
      * @param User       $user
      * @param ?string    $category
-     * @param array<int> $excludeResourceIds Ids of resources to exclude from search results
+     * @param array<int> $excludeResourceIds - Ids of resources to exclude from search results
      * @return int
      * @throws \PDOException
      */
