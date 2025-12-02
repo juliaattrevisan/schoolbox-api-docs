@@ -194,7 +194,9 @@ class Tracer
             $transactionContext->setSource($source);
         }
         $transactionContext->setStartTimestamp($startTimestamp ?? microtime(true));
-        $transactionContext->setData($data);
+        $transactionContext->setData(
+            $data + MemoryHelper::buildStartSpanData(),
+        );
 
         // Clear the current transaction state, before setting a new one.
         $this->stackChanges = [];
@@ -395,7 +397,7 @@ class Tracer
         $spanContext->setOp($operation);
         $spanContext->setOrigin($origin);
         $spanContext->setStartTimestamp($startTimestamp ?? microtime(true));
-        $spanContext->setData($data);
+        $spanContext->setData($data + MemoryHelper::buildStartSpanData());
 
         $this->stackChanges[] = new Operation\Push($spanContext);
         return $spanContext;
@@ -475,6 +477,7 @@ class Tracer
         $spanContext = new SpanContext();
         $spanContext->setEndTimestamp($endTimestamp ?? microtime(true));
         $spanContext->setStatus($status);
+        $spanContext->setData(MemoryHelper::buildEndSpanData());
         $this->stackChanges[] = new Operation\Pop($spanContext);
     }
 
@@ -519,6 +522,10 @@ class Tracer
                 $leftoverSpan = array_pop($this->spanStack);
                 $leftoverSpan->finish($endTimestamp);
             }
+
+            // Add memory usage at transaction end
+            $transaction->setData(MemoryHelper::buildEndSpanData());
+            MemoryHelper::addMemoryDeltaData($transaction);
 
             $transaction->setStatus($status);
             $transaction->finish($endTimestamp);
