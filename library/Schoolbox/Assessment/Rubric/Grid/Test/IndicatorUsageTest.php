@@ -435,12 +435,14 @@ class IndicatorUsageTest extends TestCase
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
      * @param float|null                $expectedLeft
+     * @param float|null                $_
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestApplyDescriptorMinValuesData')]
     public function testApplyDescriptorMinValuesLeft(
         RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
-        ?float $expectedLeft
+        ?float $expectedLeft,
+        ?float $_,
     ): void {
         $indicatorUsage->applyDescriptorMinValues(true);
         $descriptor = $indicatorUsage->retrieveDescriptor($levelIndex);

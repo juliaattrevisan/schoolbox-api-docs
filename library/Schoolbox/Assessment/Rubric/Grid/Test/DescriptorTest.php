@@ -162,9 +162,10 @@ class DescriptorTest extends TestCase
      *
      * @param Descriptor $descriptor
      * @param float|null $expectedLeft
+     * @param float|null $_
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveLeftRightValue')]
-    public function testRetrieveLeftValue(Descriptor $descriptor, ?float $expectedLeft): void
+    public function testRetrieveLeftValue(Descriptor $descriptor, ?float $expectedLeft, ?float $_): void
     {
         $this->assertSame($expectedLeft, $descriptor->retrieveLeftValue());
     }
