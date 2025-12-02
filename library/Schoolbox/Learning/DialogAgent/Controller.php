@@ -16,11 +16,11 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Ramsey\Uuid\Uuid;
 use Aura\Router\Exception\RouteNotFound;
-use DebugBar\DebugBarException;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextModel;
+use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper as CriteriaMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
@@ -540,11 +540,12 @@ class Controller extends Base
 
         /* Compile scenario field names as header elements
          */
-        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+        $criteriaMapper = CriteriaMapper::getInstance();
+        $criteria = $criteriaMapper->findByColumn('scenario_id', $assessment->getScenarioId());
 
         $fields = [];
 
-        foreach ($scenario->getFields() as $field) {
+        foreach ($criteria as $field) {
             $fields[] = $field->getTitle();
         }
 
