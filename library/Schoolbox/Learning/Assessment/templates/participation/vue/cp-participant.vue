@@ -4,6 +4,7 @@
  */
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import { sbProps } from "@js/util/sbx/pageUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
@@ -127,6 +128,16 @@ function onOpenIncludeInExistingModal(): void {
                 @click.prevent="onDPSelected"
             >
                 View {{ locale.differentiationProfile.translate(false, true) }}
+            </button>
+        </td>
+        <td v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled">
+            <button
+                v-if="props.participant._links.differentiationProfile"
+                class="button icon-ai f-no-margins"
+                type="button"
+                @click.prevent="onDPSelected"
+            >
+                Generate Suggested Customisation
             </button>
         </td>
         <td>

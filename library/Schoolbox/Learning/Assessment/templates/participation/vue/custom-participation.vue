@@ -4,6 +4,7 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import { sbProps } from "@js/util/sbx/pageUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import type { User } from "@schoolboxLibrary/types/User";
@@ -106,6 +107,14 @@ function onDPSelected(participant: Participant): void {
                         <th>Name</th>
                         <th v-if="props.differentiationEnabled">
                             {{ locale.differentiationProfile.translate(false, true) }}
+                        </th>
+                        <th
+                            v-if="
+                                props.differentiationEnabled &&
+                                sbProps.aiFeatures.learningactivitycustomisation?.enabled
+                            "
+                        >
+                            Suggested Customisation
                         </th>
                         <th>Customisation</th>
                         <td></td>
