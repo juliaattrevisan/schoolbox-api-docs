@@ -189,24 +189,31 @@ class Mapper extends BaseMapper
                 ]);
             }
 
-            $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
-            $pb->all(
-                $this->getPredicateBuilder()->any(
-                    $tempPb
-                    /* Campus based access
-                    */
-                )->rawWhere('(
+            $tempPb = $this->getPredicateBuilder()->any($tempPb);
+
+            if ($viewer->getCampusCollection()->count() > 0) {
+                $campusIds         = $viewer->getCampusCollection()->getPropertyValues('id');
+                $campusPlaceHolder = Builder::getArrayPlaceholders($campusIds, 'campusId');
+
+                /* Campus based access
+                 */
+                $tempPb->rawWhere(
+                    "(
                     `pa`.`match_campus` = 0 OR
                     (
                     `pa`.`match_campus` = 1 AND
                     `p`.`student_id` IN (
                         SELECT `userCampus`.`uid`
                         FROM `userCampus`
-                        WHERE `userCampus`.`campus` IN (' . implode(',', $campusIds) . ')
+                        WHERE `userCampus`.`campus` IN $campusPlaceHolder
                         )
                     )
-                )', [])
-            );
+                )",
+                    Builder::getArrayParameters($campusIds, 'campusId')
+                );
+
+                $pb->all($tempPb);
+            }
         }
         return $pb;
     }
