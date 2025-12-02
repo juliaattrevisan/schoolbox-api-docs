@@ -13,8 +13,8 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
+use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
-use Schoolbox\OpenAi\EventStream\ResponseListener;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
 
