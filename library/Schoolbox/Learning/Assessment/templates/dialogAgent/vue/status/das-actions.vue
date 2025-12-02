@@ -148,7 +148,7 @@ async function onReopen(): Promise<void> {
 async function onResolve(): Promise<void> {
     const toastContext = `assistance request from ${props.participant.user.fullName}`;
     await triggerAction(
-        DialogAgentResponseAction.ACTION_RESOLVE,
+        DialogAgentResponseAction.ACTION_ASSISTANCE_RESOLVE,
         `Resolving ${toastContext}...`,
         `Resolved ${toastContext}`,
         `Failed to resolve ${toastContext}`,
@@ -182,7 +182,7 @@ async function onResolve(): Promise<void> {
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
-    <li v-if="props.participant.response?._routes.resolve">
+    <li v-if="props.participant.response?._routes.assistanceResolve">
         <button class="icon-medical" @click="onResolve">
             {{ `Resolve Assistance Request` }}
         </button>

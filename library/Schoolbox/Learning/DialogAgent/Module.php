@@ -157,6 +157,10 @@ class Module extends BaseModule
             $canModify,
         ), $preloadAssessment);
 
+        /* Get the status of a particular response
+         */
+        $this->register('GET', "{$assRoute}/{$studentParam}/status/{$responseParam}", 'getStatus', $canViewResponse, $preloadParticipantAndResponse);
+
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
@@ -166,7 +170,7 @@ class Module extends BaseModule
 
         /* Student sends a message to the chat agent for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/message/{responseId:\d+}", 'postMessage', new Rule\All(
+        $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
             $canSubmit,
             $this->buildRuleCanAction(Status::ACTION_MESSAGE)
@@ -174,13 +178,20 @@ class Module extends BaseModule
 
         /* Student requests assistance for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
+        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
+            $canSubmit,
+            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST)
+        ), $preloadParticipantAndResponse);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
+         * This action could be from an instructor or from the student dismissing it themself
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{$responseParam}", 'postAssistanceResolve', new Rule\All(
-            $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_RESOLVE)
+            new Rule\Any(
+                $canWrite,
+                $canSubmit,
+            ),
+            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE)
         ), $preloadParticipantAndResponse);
 
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state

@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { useMousePressed } from "@vueuse/core";
-import { getRfc3339String } from "@js/util/dateUtils";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
+import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
+import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
     feed: AiLogAgentChatData[];
@@ -64,39 +65,55 @@ window.Vue.onMounted(() => {
     }
 });
 
+const isHelpRequestChanging = window.Vue.ref(false);
+const helpRequestError = window.Vue.ref<string | null>(null);
+
 /**
  * When a learner clicks "Request Teacher Help" or "Help No Longer Needed"
- * @param helpRequested - Whether this should ask for help, or clear the flag
+ * @param endpoint - The endpoint to call
  */
-function changeHelpRequest(helpRequested: boolean): void {
-    const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-    if (helpRequested) {
-        currentResponse.value.assistanceRequestedAt = getRfc3339String(window.dayjs());
+async function changeHelpRequest(endpoint: string): Promise<void> {
+    isHelpRequestChanging.value = true;
+    helpRequestError.value = null;
+    const response = await apiRequest<ApiDialogAgentActionResponse>({
+        method: "POST",
+        url: endpoint,
+    });
+    isHelpRequestChanging.value = false;
 
-        if (isInstructor.value) {
-            acStore.feed.push({
-                type: AgentChatMessageType.ALERT,
-                side: AgentChatMessageType.REQUEST,
-                severity: "warning-tint",
-                entryKey: acStore.getNextEntryKey(),
-                message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-            });
-        }
-    } else {
-        currentResponse.value.assistanceRequestedAt = null;
+    if (!response.success) {
+        let errorMessage: string | null = response.message;
 
-        if (isInstructor.value) {
-            acStore.feed.push({
-                type: AgentChatMessageType.ALERT,
-                side: AgentChatMessageType.REQUEST,
-                severity: "highlight",
-                entryKey: acStore.getNextEntryKey(),
-                message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,
+        /**
+         * If a student requests assistance, then the instructor resolves it somewhere else, you'd get a 403 here.
+         * When that occurs (a 403), attempt to find the latest response data to sync back up.
+         */
+        if (
+            typeof response.data === "object" &&
+            response.data !== null &&
+            "status" in response.data &&
+            response.data.status === 403 &&
+            props.response._routes.status
+        ) {
+            const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
+                method: "GET",
+                url: props.response._routes.status,
             });
+
+            if (statusResponse.success) {
+                currentResponse.value = statusResponse.data.response;
+                return;
+            }
+
+            errorMessage = statusResponse.message;
         }
+
+        const requestRoute = currentResponse.value._routes[DialogAgentResponseAction.ACTION_ASSISTANCE_REQUEST];
+        helpRequestError.value = `Unable to ${endpoint === requestRoute ? "request for assistance" : "resolve assistance request"}: ${errorMessage}`;
+        return;
     }
 
-    console.warn("TODO"); // TODO
+    currentResponse.value = response.data.response;
 }
 
 /**
@@ -189,12 +206,13 @@ window.Vue.onUnmounted(() => {
 <template>
     <div class="actions-small-1 l-mar-s--bottom no-print">
         <button
-            v-if="!isInstructor && currentResponse.assistanceRequestedAt === null"
+            v-if="!isInstructor && currentResponse._routes.assistanceRequest"
             class="button"
             type="button"
-            @click="changeHelpRequest(true)"
+            :disabled="isHelpRequestChanging"
+            @click="changeHelpRequest(currentResponse._routes.assistanceRequest)"
         >
-            Request Teacher Help
+            {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
             <button class="button submit icon-approve" type="submit" @click="submitResponse">
@@ -215,18 +233,25 @@ window.Vue.onUnmounted(() => {
         <template #header>
             <div
                 v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                class="alert-box warning-tint l-mar--0 l-pad-xs l-pad-m--left"
+                class="alert-box highlight l-mar--0 l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
                     <button
-                        class="button warning l-mar--0 dac-feed-help-dismiss"
+                        v-if="currentResponse._routes.assistanceResolve"
+                        class="button highlight l-mar--0"
                         type="button"
-                        @click="changeHelpRequest(false)"
+                        :disabled="isHelpRequestChanging"
+                        @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
                     >
                         Help No Longer Needed
                     </button>
                 </div>
+            </div>
+
+            <div v-if="helpRequestError" class="alert-box alert">
+                <span>{{ helpRequestError }}</span>
+                <a href="#" class="close" @click.prevent="helpRequestError = null">×</a>
             </div>
         </template>
     </ac-feed>
@@ -246,11 +271,6 @@ window.Vue.onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-/** force the button to have white text, honestly idk about this but we're going with it for now */
-.dac-feed-help-dismiss {
-    color: white;
-}
-
 /* styles for printing (scoped) */
 @media print {
     .no-print {

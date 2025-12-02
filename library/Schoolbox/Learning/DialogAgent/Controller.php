@@ -394,7 +394,8 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $this->translatePayload($response);
+        /** Respond as JSON with a consistent translated response data */
+        $this->getStatus($response);
     }
 
 
@@ -413,7 +414,8 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $this->translatePayload($response);
+        /** Respond as JSON with a consistent translated response data */
+        $this->getStatus($response);
     }
 
 
@@ -434,7 +436,8 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $this->translatePayload($response);
+        /** Respond as JSON with a consistent translated response data */
+        $this->getStatus($response);
     }
 
 
@@ -455,7 +458,8 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
-        $this->translatePayload($response);
+        /** Respond as JSON with a consistent translated response data */
+        $this->getStatus($response);
     }
 
 
@@ -491,17 +495,19 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($newResponse);
 
-        $this->translatePayload($newResponse);
+        /** Respond as JSON with a consistent translated response data */
+        $this->getStatus($newResponse);
     }
 
 
     /**
-     * Returns a json payload conversion of $response
+     * Provides a json payload conversion of $response including routes/status
+     * Used for asyncronous calls when the response state may have changed
      *
      * @param Response $response
      * @return void
      */
-    private function translatePayload(Response $response): void
+    public function getStatus(Response $response): void
     {
         $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
