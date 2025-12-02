@@ -19,10 +19,13 @@ use Schoolbox\OpenAi\LogHandler\ResponsesApi\LogDiagnostics;
 use UnexpectedValueException;
 
 /**
- * Event listener for responses from OpenAI's responses API.
+ * Event listener for responses from messages from Responses API requests
+ * (https://platform.openai.com/docs/api-reference/responses-streaming), if
+ * those requests are considered agent chats (discussions between a user and an
+ * AI agent).
  *
- * Mutate the received event into something which the frontend is able to
- * consume.
+ * This listener takes a received message, and returns a message which the agent
+ * chat frontend is able to consume.
  */
 class ResponseListener implements IListener
 {

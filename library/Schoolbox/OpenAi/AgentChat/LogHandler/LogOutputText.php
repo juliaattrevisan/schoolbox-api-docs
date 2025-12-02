@@ -17,9 +17,10 @@ use Schoolbox\OpenAi\LogHandler\IListener;
 use UnexpectedValueException;
 
 /**
- * Semi-standard log listener for logging output text from messages from
- * Responses API requests:
- * https://platform.openai.com/docs/api-reference/responses-streaming
+ * Log listener for logging output text from messages from Responses API
+ * requests (https://platform.openai.com/docs/api-reference/responses-streaming)
+ * if those requests are considered agent chats (discussions between a user and
+ * an AI agent).
  *
  * If an output message is a finished response, then extract the output text
  * out of it and add it to the log.
