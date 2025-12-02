@@ -558,9 +558,9 @@ class Controller extends Base
          */
         fputcsv($fp, array_merge([
             'User ID',
-            'External ID',
-            'Firstname',
-            'Lastname',
+            'Student External ID',
+            'Student First Name',
+            'Student Last Name',
             'Status'
         ], array_values($fields)), escape: '');
 
