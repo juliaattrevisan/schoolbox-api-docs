@@ -462,6 +462,7 @@ class Mapper extends BaseMapper
         ?Alaress_Date_Format $from = null,
         ?Alaress_Date_Format $to = null
     ): array {
+        // First, fetch the assessments which the student is participating in
         $pb = $this->getPredicateBuilder();
         $pb->isNull('a.deleted_at');
         // Filter task/dueWork/quiz by term dates
@@ -474,69 +475,93 @@ class Mapper extends BaseMapper
                 LEFT JOIN {$this->getJoinSql('plans', 'a', 'pp')}
                 JOIN {$this->getJoinSql('plans.participants', 'pp', 'p')} AND p.user_id = :userId
             ";
+            $pb->putParam('userId', $student->getId());
         }
-        $pb->putParam('userId', $student->getId()); // For join
 
         $where = implode(' AND ', $pb->getWhere());
         $query = "
             SELECT DISTINCT a.id
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('task', 'a', 't', true)}
-            JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
                   {$planJoin}
             WHERE {$where}
-
-            UNION
-
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
-            JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
-                  {$planJoin}
-            WHERE {$where}
-
-            UNION
-
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
-            JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
-                  {$planJoin}
-            WHERE {$where}
-
-            UNION
-
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
-            JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
-                  {$planJoin}
-            WHERE {$where}
-
-            UNION
-
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
-            JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
-                  {$planJoin}
-            WHERE {$where}
-            
-            UNION
-            
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('dialogAgent', 'a', 'da', true)}
-            JOIN  {$this->getJoinSql('dialogAgent.responses', 'da', 'dr')} AND dr.learner_id = :userId
-                  {$planJoin}
-            WHERE {$where}
-
-            ORDER BY id ASC
         ";
-
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($pb->getParams());
-        return array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
+        $assessmentIds = array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        // Then, find the interactions within those assessments:
+        // search by chunks to avoid issues with large numbers of IN parameters
+        $finalAssessmentIds = [];
+        foreach (array_chunk($assessmentIds, 100) as $chunk) {
+            $pb    = $this->getPredicateBuilder()
+                          ->in('a.id', $chunk)
+                          ->putParam('userId', $student->getId());
+            $where = implode(' AND ', $pb->getWhere());
+            $query = "
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('task', 'a', 't', true)}
+                JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
+                WHERE {$where}
+
+                UNION
+
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
+                JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
+                WHERE {$where}
+
+                UNION
+
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
+                JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
+                WHERE {$where}
+
+                UNION
+
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
+                JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
+                WHERE {$where}
+
+                UNION
+
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
+                JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
+                WHERE {$where}
+
+                UNION
+
+                SELECT DISTINCT a.id
+                FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                JOIN  {$this->getJoinSql('dialogAgent', 'a', 'da', true)}
+                JOIN  {$this->getJoinSql('dialogAgent.responses', 'da', 'dr')} AND dr.learner_id = :userId
+                WHERE {$where}
+
+                ORDER BY id ASC
+            ";
+
+            $statement = $this->getDatabase()->prepare($query);
+            $statement->execute($pb->getParams());
+            $finalAssessmentIds = array_merge(
+                $finalAssessmentIds,
+                array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id'),
+            );
+        }
+
+        // Preserve uniqueness and ordering of IDs
+        $finalAssessmentIds = array_unique($finalAssessmentIds);
+        sort($finalAssessmentIds);
+        return $finalAssessmentIds;
     }
 
     /**
