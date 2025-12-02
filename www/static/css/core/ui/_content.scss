@@ -229,6 +229,7 @@ $container-bg: white;
     }
 
     // Label colors for resource booking
+    // (Colors for this section were copied from 'Label colors' above - 'approved' to match 'reviewed' etc.)
     &.approved {
         @include label($bg: tint($success-color, 74%));
         color: $success-color;
