@@ -538,32 +538,6 @@ label .feed .mini.unit-heading {
 }
 
 /* ==========================================================================
-   13. Pagination & Breadcrumbs
-   ========================================================================== */
-
-// Pagination styles
-.pagination {
-    & li {
-        &:not(:last-child) {
-            margin-right: 8px;
-        }
-
-        &.active {
-            & a {
-                background-color: var(--sbx-color-accent) !important;
-                color: var(--sbx-color-accent-text) !important;
-            }
-        }
-
-        & a {
-            border-radius: var(--sbx-border-radius-normal) !important;
-            padding-block: 0.4rem !important;
-            padding-inline: 0.8rem !important;
-        }
-    }
-}
-
-/* ==========================================================================
    14. Forms, Filters & Inputs
    ========================================================================== */
 
