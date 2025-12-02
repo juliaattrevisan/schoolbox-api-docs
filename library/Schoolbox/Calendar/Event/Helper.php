@@ -151,6 +151,9 @@ class Helper
                 'status' => [
                     'id' => $resourceBooking->getStatus()->getId(),
                     'name' => $resourceBooking->getStatus()->getName(),
+                    'isApproved' => $resourceBooking->getStatus()->isApproved(),
+                    'isPending' => $resourceBooking->getStatus()->isPending(),
+                    'isRejected' => $resourceBooking->getStatus()->isRejected(),
                 ]
             ];
         }

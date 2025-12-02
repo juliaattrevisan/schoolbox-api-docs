@@ -680,9 +680,15 @@ export default {
                                 {{ booking.name !== "" ? booking.name : booking.resource.name }}
                             </div>
                             <div class="text-right">
-                                <span :class="[booking.status.name.toLowerCase(), 'label']">{{
-                                    booking.status.name
-                                }}</span>
+                                <span
+                                    class="label"
+                                    :class="{
+                                        pending: booking.status.isPending,
+                                        approved: booking.status.isApproved,
+                                        rejected: booking.status.isRejected,
+                                    }"
+                                    >{{ booking.status.name }}</span
+                                >
                                 <a
                                     href=""
                                     class="icon-modify"
