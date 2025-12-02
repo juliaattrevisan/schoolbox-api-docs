@@ -16,7 +16,10 @@
         }
 
         & a {
+            background: var(--sbx-color-foreground-primary) !important;
+            border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
             border-radius: var(--sbx-border-radius-normal) !important;
+            color: var(--sbx-color-accent);
             padding-block: 0.4rem !important;
             padding-inline: 0.8rem !important;
 
