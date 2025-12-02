@@ -7,6 +7,7 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 
 interface BookingResource {
     id: number;
+    name: string;
 }
 
 interface Booking {
@@ -139,7 +140,8 @@ export default defineComponent({
                     this.toast.timeout("Unable to create booking(s).", false, 3000);
                 }
             } catch (error) {
-                this.toast.timeout(`Unable to create booking(s). ${error.message}`, false, 3000);
+                const message = error instanceof Error ? error.message : String(error);
+                this.toast.timeout(`Unable to create booking(s). ${message}`, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
@@ -157,7 +159,7 @@ export default defineComponent({
             method="post"
             :action="getAddBookingsEndpoint()"
             class="top"
-            @submit.prevent="createNewBooking($refs.createBookingForm)"
+            @submit.prevent="createNewBooking($refs.createBookingForm as HTMLFormElement)"
         >
             <h2>Add Resource Bookings</h2>
             <section>
