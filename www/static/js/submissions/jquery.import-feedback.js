@@ -154,7 +154,7 @@
             const editor = window.sbProps.editors[textarea[0]?.id];
             if (editor) {
                 // ensure newlines are preserved in the editor
-                const valueWithReplacedNewlines = value.replace(/\n/g, "<br>");
+                const valueWithReplacedNewlines = value.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, "$1<br>$2");
                 editor.setData(valueWithReplacedNewlines);
             } else {
                 // No editor? It may be hidden or not initialised yet, set the value directly instead
