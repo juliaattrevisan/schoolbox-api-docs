@@ -83,6 +83,14 @@ function onDPSelected(participant: Participant): void {
 }
 
 // #endregion Differentiation Profiles
+
+// #region AI Suggested Customisation
+/**
+ * To view the AI suggested customisation for a participant
+ * @param participant - The participant whose AI suggested customisation is to be viewed
+ */
+function onAISelected(participant: Participant): void {}
+// #endregion AI Suggested Customisation
 </script>
 
 <template>
@@ -133,6 +141,7 @@ function onDPSelected(participant: Participant): void {
                         :customisations="props.customisations"
                         :differentiation-enabled="props.differentiationEnabled"
                         @view-differentiation-profile="onDPSelected"
+                        @view-ai="onAISelected"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
                     />

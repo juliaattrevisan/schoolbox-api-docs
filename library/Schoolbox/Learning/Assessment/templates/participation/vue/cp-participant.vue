@@ -23,6 +23,7 @@ const selectedList = defineModel<Participant[]>("selectedList", { default: [] })
 
 const emit = defineEmits<{
     (event: "viewDifferentiationProfile", participant: Participant): void;
+    (event: "viewAI", participant: Participant): void;
     (event: "actionSelected", participants: Participant[], action: string, isSingle: boolean): void;
     (event: "openIncludeInExistingModal", isSingle: boolean, participant: Participant | null): void;
 }>();
@@ -55,6 +56,13 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
  */
 function onDPSelected(): void {
     emit("viewDifferentiationProfile", props.participant);
+}
+
+/**
+ * To generate or view the AI suggested customisation
+ */
+function onAISelected(): void {
+    emit("viewAI", props.participant);
 }
 
 /**
@@ -135,7 +143,7 @@ function onOpenIncludeInExistingModal(): void {
                 v-if="props.participant._links.differentiationProfile"
                 class="button icon-ai f-no-margins"
                 type="button"
-                @click.prevent="onDPSelected"
+                @click.prevent="onAISelected"
             >
                 Generate Suggested Customisation
             </button>
