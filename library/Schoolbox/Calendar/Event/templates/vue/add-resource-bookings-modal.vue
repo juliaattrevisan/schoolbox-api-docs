@@ -39,7 +39,7 @@ export default {
          * @return {boolean}
          */
         isFormSubmittable() {
-            return !this.isProcessing;
+            return !this.isProcessing && this.resources.length > 0;
         },
 
         /**
