@@ -102,6 +102,7 @@ class EventMapper extends CalendarEventMapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /* Assemble event pieces
              */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row);
 
             /* Author
@@ -257,7 +258,7 @@ class EventMapper extends CalendarEventMapper
         /* Hydrate or die
          */
         foreach ($statement as $row) {
-            /** @var Event $eventItem */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row, 'e');
 
             /* Accumulate the metadata for this event
@@ -361,7 +362,7 @@ class EventMapper extends CalendarEventMapper
         /* Hydrate or die
          */
         foreach ($statement as $row) {
-            /** @var Event $eventItem */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row, 'e');
 
             /** @var User $teacherInChargeItem */
@@ -452,6 +453,8 @@ class EventMapper extends CalendarEventMapper
         if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
             return;
         }
+
+        /** @var \EOTC\Event $event */
 
         // Because of the mapper caching problem, order of operations in this area had to be re-ordered a couple of times.
         $event->setMetadata($metadata);
