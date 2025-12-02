@@ -5,19 +5,13 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 
-interface Resource {
-    id: string | number;
-    [key: string]: unknown;
-}
-
 interface BookingResource {
     id: number;
-    [key: string]: unknown;
 }
 
 interface Booking {
+    id: number;
     resource: BookingResource;
-    [key: string]: unknown;
 }
 
 interface ToastComponent {
@@ -32,7 +26,6 @@ interface ModalComponent {
 
 interface BookingResponse {
     errors?: string[];
-    [key: string]: unknown;
 }
 
 export default defineComponent({
@@ -53,7 +46,7 @@ export default defineComponent({
         },
     },
 
-    data(): { isProcessing: boolean; resources: Resource[] } {
+    data(): { isProcessing: boolean; resources: BookingResource[] } {
         return {
             isProcessing: false, // To disable buttons on form submission to prevent rapid fire.
             resources: [],
@@ -146,11 +139,7 @@ export default defineComponent({
                     this.toast.timeout("Unable to create booking(s).", false, 3000);
                 }
             } catch (error) {
-                this.toast.timeout(
-                    `Unable to create booking(s). ${error.message}`,
-                    false,
-                    3000,
-                );
+                this.toast.timeout(`Unable to create booking(s). ${error.message}`, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
