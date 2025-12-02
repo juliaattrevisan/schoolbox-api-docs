@@ -86,14 +86,12 @@ class ValidSQLOperationTest extends TestCase
         return [
             'Simple SELECT query with semi-colon' => [
                 'SELECT * FROM luYearLevel;',
-                true
             ],
             'Simple SELECT query with leading semi-colon' => [
                 ';SELECT * FROM luYearLevel;'
             ],
             'Simple DELETE query' => [
                 'DELETE FROM dbo.Students WHERE ID = 54',
-                false
             ],
             'Simple DROP query' => [
                 'DROP TABLE luYearLevel'

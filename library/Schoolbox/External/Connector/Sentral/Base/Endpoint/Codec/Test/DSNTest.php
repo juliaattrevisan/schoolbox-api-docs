@@ -183,7 +183,6 @@ class DSNTest extends TestCase
             'Re-encode 1' => [
                 'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
                 'key=qwrSDFh823468;tenant=ABC12345abc?parentRelationIds=00,01,02,20',
-                'key=qwrSDFh823468;tenant=ABC12345abc',
             ],
         ];
     }
