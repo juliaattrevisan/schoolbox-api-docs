@@ -39,6 +39,11 @@ test.describe("Manage Differentiation Profiles", () => {
             const dpModal = page.getByTestId("view-dp-modal-fields-container");
             await expect(dpModal).toBeVisible();
             await expect(dpModal).toContainText(textToType);
+            tester.isGoingTo(
+                "confirm Marios DP is the only one shown by confirming the text 'View Differentiation Profile' is only shown once on the page",
+            );
+            const viewDpTexts = page.getByText("View Differentiation Profile");
+            await expect(viewDpTexts).toHaveCount(1);
         } finally {
             await manageDifferentiationProfiles.resetDefaults(db, studentId);
         }
@@ -64,6 +69,11 @@ test.describe("Manage Differentiation Profiles", () => {
             const dpModal = page.getByTestId("view-dp-modal-fields-container");
             await expect(dpModal).toBeVisible();
             await expect(dpModal).toContainText(textToType);
+            tester.isGoingTo(
+                "confirm Janas DP is the only one shown by confirming the text 'View Differentiation Profile' is only shown once on the page",
+            );
+            const viewDpTexts = page.getByText("View Differentiation Profile");
+            await expect(viewDpTexts).toHaveCount(1);
         } finally {
             await manageDifferentiationProfiles.resetDefaults(db, studentId);
         }
