@@ -174,13 +174,20 @@ class Module extends BaseModule
 
         /* Student requests assistance for a particular response
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', $canSubmit, $preloadParticipantAndResponse);
+        $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
+            $canSubmit,
+            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST)
+        ), $preloadParticipantAndResponse);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
+         * This action could be from an instructor or from the student dismissing it themself
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{$responseParam}", 'postAssistanceResolve', new Rule\All(
-            $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_RESOLVE)
+            new Rule\Any(
+                $canWrite,
+                $canSubmit,
+            ),
+            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE)
         ), $preloadParticipantAndResponse);
 
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state

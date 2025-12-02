@@ -9,7 +9,8 @@ export enum DialogAgentResponseAction {
     ACTION_MESSAGE = "message",
     ACTION_SOBO = "sobo",
     ACTION_REOPEN = "reopen",
-    ACTION_RESOLVE = "resolve",
+    ACTION_ASSISTANCE_RESOLVE = "assistanceResolve",
+    ACTION_ASSISTANCE_REQUEST = "assistanceRequest",
     ACTION_RESET = "reset",
 }
 

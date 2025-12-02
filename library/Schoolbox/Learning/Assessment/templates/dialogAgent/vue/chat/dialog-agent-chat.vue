@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { useMousePressed } from "@vueuse/core";
-import { getRfc3339String } from "@js/util/dateUtils";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
+import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
+import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
     feed: AiLogAgentChatData[];
@@ -66,37 +67,20 @@ window.Vue.onMounted(() => {
 
 /**
  * When a learner clicks "Request Teacher Help" or "Help No Longer Needed"
- * @param helpRequested - Whether this should ask for help, or clear the flag
+ * @param endpoint - The endpoint to call
  */
-function changeHelpRequest(helpRequested: boolean): void {
-    const assistanceTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-    if (helpRequested) {
-        currentResponse.value.assistanceRequestedAt = getRfc3339String(window.dayjs());
+async function changeHelpRequest(endpoint: string): Promise<void> {
+    const response = await apiRequest<ApiDialogAgentActionResponse>({
+        method: "POST",
+        url: endpoint,
+    });
 
-        if (isInstructor.value) {
-            acStore.feed.push({
-                type: AgentChatMessageType.ALERT,
-                side: AgentChatMessageType.REQUEST,
-                severity: "warning-tint",
-                entryKey: acStore.getNextEntryKey(),
-                message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-            });
-        }
-    } else {
-        currentResponse.value.assistanceRequestedAt = null;
-
-        if (isInstructor.value) {
-            acStore.feed.push({
-                type: AgentChatMessageType.ALERT,
-                side: AgentChatMessageType.REQUEST,
-                severity: "highlight",
-                entryKey: acStore.getNextEntryKey(),
-                message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceTime}`,
-            });
-        }
+    if (!response.success) {
+        // TODO
+        return;
     }
 
-    console.warn("TODO"); // TODO
+    currentResponse.value = response.data.response;
 }
 
 /**
@@ -189,10 +173,10 @@ window.Vue.onUnmounted(() => {
 <template>
     <div class="actions-small-1 l-mar-s--bottom no-print">
         <button
-            v-if="!isInstructor && currentResponse.assistanceRequestedAt === null"
+            v-if="!isInstructor && currentResponse._routes.assistanceRequest"
             class="button"
             type="button"
-            @click="changeHelpRequest(true)"
+            @click="changeHelpRequest(currentResponse._routes.assistanceRequest)"
         >
             Request Teacher Help
         </button>
@@ -220,9 +204,10 @@ window.Vue.onUnmounted(() => {
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
                     <button
+                        v-if="currentResponse._routes.assistanceResolve"
                         class="button warning l-mar--0 dac-feed-help-dismiss"
                         type="button"
-                        @click="changeHelpRequest(false)"
+                        @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
                     >
                         Help No Longer Needed
                     </button>

@@ -23,7 +23,8 @@ class Status
     public const string ACTION_SOBO = 'sobo';
     public const string ACTION_RESET = 'reset';
     public const string ACTION_REOPEN = 'reopen';
-    public const string ACTION_RESOLVE = 'resolve';
+    public const string ACTION_ASSISTANCE_REQUEST = 'assistanceRequest';
+    public const string ACTION_ASSISTANCE_RESOLVE = 'assistanceResolve';
 
 
     /**
@@ -63,7 +64,8 @@ class Status
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVE => false,
+                    self::ACTION_ASSISTANCE_REQUEST => false,
+                    self::ACTION_ASSISTANCE_RESOLVE => false,
                 ],
             ];
         }
@@ -79,7 +81,8 @@ class Status
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => true,
-                    self::ACTION_RESOLVE => false,
+                    self::ACTION_ASSISTANCE_REQUEST => false,
+                    self::ACTION_ASSISTANCE_RESOLVE => false,
                 ],
             ];
         }
@@ -97,10 +100,13 @@ class Status
                 'actions' => [
                     self::ACTION_VIEW => true,
                     self::ACTION_MESSAGE => true,
+                    // TODO: A student could request assistance prior to having a session ID,
+                    // which would then turn ON the SOBO/RESET options... I doubt we want that...
                     self::ACTION_SOBO => true,
                     self::ACTION_RESET => true,
                     self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVE => true,
+                    self::ACTION_ASSISTANCE_REQUEST => false,
+                    self::ACTION_ASSISTANCE_RESOLVE => true,
                 ],
             ];
         }
@@ -116,7 +122,8 @@ class Status
                     self::ACTION_SOBO => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
-                    self::ACTION_RESOLVE => false,
+                    self::ACTION_ASSISTANCE_REQUEST => true,
+                    self::ACTION_ASSISTANCE_RESOLVE => false,
                 ],
             ];
         }
@@ -131,7 +138,8 @@ class Status
                 self::ACTION_SOBO => true,
                 self::ACTION_RESET => true,
                 self::ACTION_REOPEN => false,
-                self::ACTION_RESOLVE => false,
+                self::ACTION_ASSISTANCE_REQUEST => true,
+                self::ACTION_ASSISTANCE_RESOLVE => false,
             ],
         ];
     }
