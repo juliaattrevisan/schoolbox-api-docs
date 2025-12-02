@@ -50,13 +50,7 @@ export default {
          * Compile object ids into csv
          */
         compileResourceIds() {
-            let stack = [];
-
-            for (let i = 0; i < this.resources.length; i++) {
-                stack.push(this.resources[i].id);
-            }
-
-            return stack.join(",");
+            return this.resources.map((resource) => resource.id).join(",");
         },
     },
 
