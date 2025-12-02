@@ -120,7 +120,7 @@ export default {
                     // The new booking was successfully added, so reload the page to make it appear.
                     window.location.reload();
                 } else {
-                    this.$refs.toast.timeout("Unable to create booking(s). " + responseData.message, false, 3000);
+                    this.$refs.toast.timeout("Unable to create booking(s).", false, 3000);
                 }
             } catch (error) {
                 this.$refs.toast.timeout("Unable to create booking(s). " + error.message, false, 3000);
