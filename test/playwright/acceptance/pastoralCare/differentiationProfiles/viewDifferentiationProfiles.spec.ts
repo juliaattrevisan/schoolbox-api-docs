@@ -40,7 +40,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await expect(dpModal).toBeVisible();
             await expect(dpModal).toContainText(textToType);
             tester.isGoingTo(
-                "confirm Marios DP is the only one shown by confirming the text 'View Differentiation Profile' is only shown once on the page",
+                "confirm Mario's DP is the only one shown by confirming the text 'View Differentiation Profile' is only shown once on the page",
             );
             const viewDpTexts = page.getByText("View Differentiation Profile");
             await expect(viewDpTexts).toHaveCount(1);
@@ -95,7 +95,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await expect(dpModal).toBeVisible();
             await expect(dpModal).toContainText(textToType);
             tester.isGoingTo(
-                "confirm Janas DP is the only one shown by confirming the text 'View Differentiation Profile' is only shown once on the page",
+                "confirm Jana's DP is the only one shown by confirming the text 'View Differentiation Profile' is only shown once on the page",
             );
             const viewDpTexts = page.getByText("View Differentiation Profile");
             await expect(viewDpTexts).toHaveCount(1);
@@ -122,7 +122,7 @@ test.describe("Manage Differentiation Profiles", () => {
             tester.isGoingTo("Visit 9A English (9ENGA) class list");
             await page.goto("/learning/class/83");
             tester.isGoingTo("Verify that the differentiation profile modal button is not shown for Penelope Li");
-            const viewDpButton = page.getByTestId(`cp-participant-${studentId}-view-differentiation-profile`);
+            const viewDpButton = page.getByTestId(`class-list-${studentId}-view-differentiation-profile`);
             await expect(viewDpButton).not.toBeVisible();
         } finally {
             await manageDifferentiationProfiles.resetDefaults(db, studentId);
