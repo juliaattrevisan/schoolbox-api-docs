@@ -174,19 +174,27 @@ class Mapper extends BaseMapper
                  * only the ones they have access to
                  */
                 (new \Schoolbox\External\User())->loadChildren([$viewer]);
-                $childrenIds = implode(
-                    ',',
-                    $viewer->getChildren()->getPropertyValues('id')
-                );
-                $tempPb->rawWhere("(
-                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
-                    `p`.`student_id` IN ($childrenIds) AND
-                    `pa`.`access` > :accessDeny
-                )", [
-                    'viewerRoleId'   => $viewer->getRole()->getId(),
-                    'viewerRoleType' => $viewer->getRole()->getType(),
-                    'accessDeny'    => UserAccess::ACCESS_DENY,
-                ]);
+                if ($viewer->getChildren()->count() > 0) {
+                    $childrenIds = $viewer->getChildren()->getPropertyValues('id');
+                    $childrenPlaceHolder = Builder::getArrayPlaceholders(
+                        $childrenIds,
+                        'parentChildId'
+                    );
+                    $tempPb->rawWhere(
+                        "(
+                        (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                        `p`.`student_id` IN $childrenPlaceHolder AND
+                        `pa`.`access` > :accessDeny
+                    )", array_merge (
+                      [
+                          'viewerRoleId'   => $viewer->getRole()->getId(),
+                          'viewerRoleType' => $viewer->getRole()->getType(),
+                          'accessDeny'     => UserAccess::ACCESS_DENY,
+                      ],
+                      Builder::getArrayParameters($childrenIds, 'parentChildId')
+                        )
+                    );
+                }
             }
 
             $tempPb = $this->getPredicateBuilder()->any($tempPb);
