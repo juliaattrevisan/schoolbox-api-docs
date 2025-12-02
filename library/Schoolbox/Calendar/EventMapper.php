@@ -22,6 +22,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -410,8 +411,8 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     protected function postDelete(Event $event): void
     {
         // dirty yes, but look at \Schoolbox\Calendar\EventMapper::populateGuests
-        $bookingMapper = Schoolbox\ResourceBooking\Booking\Mapper::getInstance();
-        // first check if there are any booking for this event
+        $bookingMapper = ResourceBookingMapper::getInstance();
+        // first check if there are any bookings for this event
         $bookings = $bookingMapper->findByColumn('event_id', $event->getId(), ['deleted' => true]);
         // also delete all related resource bookings for this event
         $bookingMapper->delete($bookings);

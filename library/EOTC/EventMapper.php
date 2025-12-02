@@ -422,13 +422,13 @@ class EventMapper extends CalendarEventMapper
     }
 
     /**
-     * Post-delete hook method
+     * Post-soft-delete hook method
      *
      * @param Event $event
      */
     protected function postDelete(Event $event): void
     {
-        /* noop
+        /* noop EOTC doesn't have to do anything special on delete
          */
     }
 
