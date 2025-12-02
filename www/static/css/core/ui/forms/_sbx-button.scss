@@ -116,7 +116,7 @@
 /**
  * Icon only buttons
  * These need to be treated differently to standard buttons
- * as they have no text content and so need a border to define their shape
+ * as they have no text content and so don't need a border to define their shape
  */
 .sbx-body button.button[class*="icon-"] {
     border: none;
