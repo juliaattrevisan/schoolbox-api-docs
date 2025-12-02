@@ -149,4 +149,29 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.resetDefaults(db, studentId);
         }
     });
+
+    test("Verify modal visibility on custom participation", async ({ tester, page, db }) => {
+        const studentId = 63; // Mario Izzo
+        const fieldKey = "overview";
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+        try {
+            await manageDifferentiationProfiles.initDefaults(db);
+            tester.isGoingTo("Add some text to Mario Izzo's overview field");
+            await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
+            const textToType = "Mario has a fondness for anything relating to snakes! 🐍";
+            await page.keyboard.type(textToType);
+            await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
+            tester.isGoingTo("Visit Student Participation - TKAM Final Assessment: Essay");
+            await page.goto("/learning/assessments/659/participation");
+            tester.isGoingTo("Open the differentiation profile modal for Mario Izzo");
+            const viewDpButton = page.getByTestId(`cp-participant-${studentId}-view-differentiation-profile`);
+            await viewDpButton.click();
+            tester.isGoingTo("Verify that the differentiation profile modal is visible and contains the text added");
+            const dpModal = page.getByTestId("view-dp-modal-fields-container");
+            await expect(dpModal).toBeVisible();
+            await expect(dpModal).toContainText(textToType);
+        } finally {
+            await manageDifferentiationProfiles.resetDefaults(db, studentId);
+        }
+    });
 });
