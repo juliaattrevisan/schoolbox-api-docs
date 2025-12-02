@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\LogHandler\ResponsesApi;
+namespace Schoolbox\OpenAi\AgentChat\LogHandler;
 
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Editor\OpenAI\Log;
