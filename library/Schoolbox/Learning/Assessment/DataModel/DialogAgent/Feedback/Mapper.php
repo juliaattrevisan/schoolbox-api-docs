@@ -30,7 +30,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('dialog_agent_feedback');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('dialog_agent_id', self::TYPE_INTEGER, null, 'dialogAgent');
         $this->uses('response_id', self::TYPE_INTEGER, null, 'response');
         $this->uses('criteria_id', self::TYPE_INTEGER, null, 'criteria');
         $this->uses('body', self::TYPE_STRING, null, 'body');
