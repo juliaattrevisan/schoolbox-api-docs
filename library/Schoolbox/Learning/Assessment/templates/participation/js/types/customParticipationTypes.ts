@@ -9,6 +9,7 @@ export type Routes = {
     getAssessmentParticipationNewActivity: string;
     getAssessmentParticipationCopyActivity: string;
     includeInExistingCustomisation: string;
+    genAI: string;
 };
 
 /**

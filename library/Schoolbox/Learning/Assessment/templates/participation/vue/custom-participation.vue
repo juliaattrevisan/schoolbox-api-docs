@@ -85,11 +85,13 @@ function onDPSelected(participant: Participant): void {
 // #endregion Differentiation Profiles
 
 // #region AI Suggested Customisation
+
 /**
  * To view the AI suggested customisation for a participant
- * @param participant - The participant whose AI suggested customisation is to be viewed
+ * @param participant - The participant whose AI suggested customisation is to be viewed or generated
  */
 function onAISelected(participant: Participant): void {}
+
 // #endregion AI Suggested Customisation
 </script>
 
