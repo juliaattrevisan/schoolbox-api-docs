@@ -721,7 +721,7 @@ export default {
         <add-resource-bookings-modal
             v-if="event.resourceBookings"
             ref="addResourceBookingsModal"
-            :resourceBookings="this.event.resourceBookings"
+            :resource-bookings="this.event.resourceBookings"
         />
     </div>
 </template>
