@@ -45,6 +45,15 @@
         {% if not assessment.isSpecification and viewCustomParticipationRoute %}
             <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
         {% endif %}
+
+        {# Display the Export CSV link here I guess #}
+        {% set exportRoute = routeLookupIfAuthorized('learningDialogAgent.getExport', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) %}
+        {% if assessment.isImplementation and exportRoute %}
+            <li><a class="icon-export" href="{{ exportRoute }}">Export CSV</a></li>
+        {% endif %}
     </ul>
 </div>
 
