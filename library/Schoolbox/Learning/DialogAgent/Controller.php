@@ -533,15 +533,11 @@ class Controller extends Base
     /**
      * Export the status of everyone's Response(s) and Feedback(s) for the given assessment.
      *
-     * @param IAssessable $assessment
+     * @param DialogAgent $assessment
      * @return void
      */
-    public function getExport(IAssessable $assessment): void
+    public function getExport(DialogAgent $assessment): void
     {
-        /* For phpstorm ;(
-         */
-        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Model $assessment $fp */
-
         /* Set up a file pointer
          */
         $fp = fopen('php://temp', 'w');
