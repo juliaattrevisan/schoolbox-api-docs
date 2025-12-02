@@ -199,20 +199,34 @@ class Controller extends Base
             return;
         }
 
+        $pb = $this->mapper->filterByPermission(
+            $this->mapper->getPredicateBuilder(),
+            $this->getUser()
+        );
+
+        $where = '';
+        if (\count($pb->getWhere())) {
+            $where = 'AND ' . implode(' AND ', $pb->getWhere());
+        }
+
         $query = "
             SELECT p.id
             FROM pastoral p
+            LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
             LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
             LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
             WHERE p.student_id = :studentId
             AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
             AND p.deleted_at IS NULL
             AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
+            {$where}
         ";
 
-        $params      = [
+        $params      = array_merge([
             'studentId' => $studentId,
-        ];
+        ], $pb->getParams());
+
+
         $pastoralIds = $this->pastoralMapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
 
         $cursor = new MapperCursor(
