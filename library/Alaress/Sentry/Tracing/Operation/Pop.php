@@ -55,6 +55,7 @@ class Pop implements IOperation
         if ($this->context->getStatus()) {
             $currentSpan->setStatus($this->context->getStatus());
         }
+        $currentSpan->setData($this->context->getData() ?? []);
         $currentSpan->finish($this->context->getEndTimestamp());
 
         $previousSpan = !empty($spanStack)
