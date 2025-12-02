@@ -40,4 +40,10 @@
         margin-inline-end: 1rem;
         padding-inline: 0;
     }
+
+    & li a:focus-visible {
+        outline: 1px solid var(--sbx-color-accent);
+        outline-offset: 1px;
+        border-radius: var(--sbx-border-radius-normal);
+    }
 }

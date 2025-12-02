@@ -22,6 +22,11 @@
 
     & a {
         white-space: nowrap;
+
+        &:focus-visible {
+            outline: 1px solid var(--sbx-color-accent);
+            outline-offset: -1px;
+        }
     }
 }
 
