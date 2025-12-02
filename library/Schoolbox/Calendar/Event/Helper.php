@@ -19,23 +19,8 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Campus;
 use Schoolbox\Mapper\Exception;
 
-class Helper
+readonly class Helper
 {
-    /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
-    /**
-     * @var ResourceBookingMapper
-     */
-    private ResourceBookingMapper $resourceBookingMapper;
-
     /**
      * Helper constructor.
      *
@@ -43,11 +28,11 @@ class Helper
      * @param FolderMapper $folderMapper
      * @param ResourceBookingMapper $resourceBookingMapper
      */
-    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper, ResourceBookingMapper $resourceBookingMapper)
-    {
-        $this->roleMapper = $roleMapper;
-        $this->folderMapper = $folderMapper;
-        $this->resourceBookingMapper = $resourceBookingMapper;
+    public function __construct(
+        private RoleMapper $roleMapper,
+        private FolderMapper $folderMapper,
+        private ResourceBookingMapper $resourceBookingMapper
+    ) {
     }
 
     /**
@@ -83,7 +68,7 @@ class Helper
         foreach ($event->getRoleCollection()->getAll() as $role) {
             try {
                 $result[] = $this->roleMapper->findById($role->getRoleId());
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // noop
             }
         }
