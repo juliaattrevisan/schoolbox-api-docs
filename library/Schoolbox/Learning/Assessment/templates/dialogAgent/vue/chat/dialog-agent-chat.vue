@@ -65,18 +65,25 @@ window.Vue.onMounted(() => {
     }
 });
 
+const isHelpRequestChanging = window.Vue.ref(false);
+const helpRequestError = window.Vue.ref<string | null>(null);
+
 /**
  * When a learner clicks "Request Teacher Help" or "Help No Longer Needed"
  * @param endpoint - The endpoint to call
  */
 async function changeHelpRequest(endpoint: string): Promise<void> {
+    isHelpRequestChanging.value = true;
+    helpRequestError.value = null;
     const response = await apiRequest<ApiDialogAgentActionResponse>({
         method: "POST",
         url: endpoint,
     });
+    isHelpRequestChanging.value = false;
 
     if (!response.success) {
-        // TODO
+        const requestRoute = currentResponse.value._routes[DialogAgentResponseAction.ACTION_ASSISTANCE_REQUEST];
+        helpRequestError.value = `Unable to ${endpoint === requestRoute ? "request for assistance" : "resolve assistance request"}: ${response.message}`;
         return;
     }
 
@@ -176,9 +183,10 @@ window.Vue.onUnmounted(() => {
             v-if="!isInstructor && currentResponse._routes.assistanceRequest"
             class="button"
             type="button"
+            :disabled="isHelpRequestChanging"
             @click="changeHelpRequest(currentResponse._routes.assistanceRequest)"
         >
-            Request Teacher Help
+            {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
             <button class="button submit icon-approve" type="submit" @click="submitResponse">
@@ -207,11 +215,17 @@ window.Vue.onUnmounted(() => {
                         v-if="currentResponse._routes.assistanceResolve"
                         class="button warning l-mar--0 dac-feed-help-dismiss"
                         type="button"
+                        :disabled="isHelpRequestChanging"
                         @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
                     >
                         Help No Longer Needed
                     </button>
                 </div>
+            </div>
+
+            <div v-if="helpRequestError" class="alert-box alert">
+                <span>{{ helpRequestError }}</span>
+                <a href="#" class="close" @click.prevent="helpRequestError = null">×</a>
             </div>
         </template>
     </ac-feed>
