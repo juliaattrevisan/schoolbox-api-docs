@@ -363,7 +363,7 @@ class Mapper extends BaseMapper
         array $excludeResourceIds = [],
     ): Collection {
         return $this->findByPredicates(
-            $this->buildSearchPredicates($keyword, $user, $category, $excludeResourceIds),
+            $this->buildSearchPredicate($keyword, $user, $category, $excludeResourceIds),
             [
                 'order' => [$sort_by => $sort_dir],
                 'limit' => intval($limit),
@@ -389,7 +389,7 @@ class Mapper extends BaseMapper
         array $excludeResourceIds = []
     ): int {
         return $this->countByPredicates(
-            $this->buildSearchPredicates($keyword, $user, $category, $excludeResourceIds)
+            $this->buildSearchPredicate($keyword, $user, $category, $excludeResourceIds)
         );
     }
 
@@ -402,7 +402,7 @@ class Mapper extends BaseMapper
      * @param array<int> $excludeResourceIds Ids of resources to exclude from search results
      * @return Builder
      */
-    private function buildSearchPredicates(
+    private function buildSearchPredicate(
         string $keyword,
         User $user,
         ?string $category = null,
