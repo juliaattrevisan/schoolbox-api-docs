@@ -87,8 +87,8 @@ CREATE TABLE `dialog_agent` (
 -- Something the teacher writes for a particular field
 CREATE TABLE `dialog_agent_scenario_field_context` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `scenario_field_id` INT NOT NULL,
     `dialog_agent_id` INT NOT NULL,
+    `scenario_field_id` INT NOT NULL,
     `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
@@ -203,6 +203,7 @@ CREATE TABLE `dialog_agent_feedback` (
     `dialog_agent_id` INT NOT NULL,
     `response_id` INT NOT NULL,
     `criteria_id` INT NOT NULL,
+    `learner_id` INT UNSIGNED NOT NULL,
     `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
