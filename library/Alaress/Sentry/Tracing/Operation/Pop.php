@@ -56,6 +56,17 @@ class Pop implements IOperation
             $currentSpan->setStatus($this->context->getStatus());
         }
         $currentSpan->setData($this->context->getData());
+
+        // If span has both memory usage at start and end:
+        // also add memory delta to span data
+        $memoryAtStart = $currentSpan->getData()['memory.usage_at_start'] ?? null;
+        $memoryAtEnd   = $currentSpan->getData()['memory.usage_at_end'] ?? null;
+        if (isset($memoryAtStart, $memoryAtEnd)) {
+            $currentSpan->setData([
+                'memory.delta' => $memoryAtEnd - $memoryAtStart,
+            ]);
+        }
+
         $currentSpan->finish($this->context->getEndTimestamp());
 
         $previousSpan = !empty($spanStack)
