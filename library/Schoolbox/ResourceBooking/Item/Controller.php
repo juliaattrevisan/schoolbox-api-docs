@@ -129,14 +129,9 @@ class Controller extends Base
         }
 
         $data = $this->mapper->search(
-            $search,
-            $this->getUser(),
-            null,
-            0,
-            20,
-            'name',
-            'ASC',
-            $excludeResourceIds
+            keyword: $search,
+            user: $this->getUser(),
+            excludeResourceIds: $excludeResourceIds
         )->map(function (Model $item) {
             return [
                 'id'   => $item->getId(),
