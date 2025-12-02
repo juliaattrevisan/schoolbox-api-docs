@@ -20,7 +20,11 @@ export default {
     props: {
         // This component should only be included if the resource bookings module is enabled.
         // So resourceBookings should always be set.
-        resourceBookings: Array,
+        resourceBookings: {
+            type: Array,
+            required: true,
+            default: () => [],
+        },
     },
 
     data() {
