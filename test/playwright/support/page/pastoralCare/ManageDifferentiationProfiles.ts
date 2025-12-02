@@ -98,4 +98,15 @@ export default class ManageDifferentiationProfiles {
         const successToast = this.page.getByText("Differentiation Profile successfully updated");
         await expect(successToast).toBeVisible();
     }
+
+    /**
+     * Initialize the page by enabling it, adding pastoral types, logging in as admin, and navigating to the page
+     * @param db - Database helper instance
+     */
+    async initPage(db: DatabaseHelper): Promise<void> {
+        await this.enablePage(db);
+        await this.addPastoralTypes();
+        await this.tester.loginAsAdmin();
+        await this.navigateToPage();
+    }
 }
