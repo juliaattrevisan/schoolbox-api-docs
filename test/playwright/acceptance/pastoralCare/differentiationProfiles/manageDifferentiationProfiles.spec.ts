@@ -174,4 +174,29 @@ test.describe("Manage Differentiation Profiles", () => {
             await manageDifferentiationProfiles.resetDefaults(db, studentId);
         }
     });
+
+    test("Verify modal visibility on class list", async ({ tester, page, db }) => {
+        const studentId = 25; // Jana Reed
+        const fieldKey = "goals";
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+        try {
+            await manageDifferentiationProfiles.initDefaults(db);
+            tester.isGoingTo("Add some text to Jana Reed's goals field");
+            await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
+            const textToType = "Jana wants to improve her public speaking skills.";
+            await page.keyboard.type(textToType);
+            await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
+            tester.isGoingTo("Visit 9A English (9ENGA) class list");
+            await page.goto("/learning/class/83");
+            tester.isGoingTo("Open the differentiation profile modal for Jana Reed");
+            const viewDpButton = page.getByTestId(`class-list-${studentId}-view-differentiation-profile`);
+            await viewDpButton.click();
+            tester.isGoingTo("Verify that the differentiation profile modal is visible and contains the text added");
+            const dpModal = page.getByTestId("view-dp-modal-fields-container");
+            await expect(dpModal).toBeVisible();
+            await expect(dpModal).toContainText(textToType);
+        } finally {
+            await manageDifferentiationProfiles.resetDefaults(db, studentId);
+        }
+    });
 });

@@ -750,6 +750,7 @@ export default {
                                     v-if="student._links.differentiationProfile"
                                     class="sbx-link-button"
                                     type="button"
+                                    :data-test="`class-list-${student.id}-view-differentiation-profile`"
                                     @click.prevent="onDPSelected(student)"
                                 >
                                     View {{ locale.differentiationProfile.translate(false, true) }}
