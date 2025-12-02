@@ -388,9 +388,13 @@ class Controller extends Base
 
         $cache = $this->aiCache->get($cacheKey);
 
+        /* Allow bypassing the cache if regenerating
+         */
+        $bypassCache = $this->requestPost->getBool('regenerate', false);
+
         /* Early return if we have a cached response
          */
-        if (null !== $cache) {
+        if (null !== $cache && !$bypassCache) {
             $this->response = $this->responseAsJson($cache)
                                    ->withStatus(200);
 
