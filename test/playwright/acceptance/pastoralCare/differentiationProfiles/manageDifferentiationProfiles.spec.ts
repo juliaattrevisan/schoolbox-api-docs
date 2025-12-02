@@ -73,7 +73,7 @@ test.describe("Manage Differentiation Profiles", () => {
     test("Verify profiles can be shown", async ({ tester, page, db }) => {
         try {
             const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
-            await manageDifferentiationProfiles.initPage(db);
+            await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
             const container = page.getByTestId("manage-differentiation-profiles-container");
             const marioIzzo = container.getByText("Izzo, Mario");
@@ -100,7 +100,7 @@ test.describe("Manage Differentiation Profiles", () => {
     test("verify name filter", async ({ tester, page, db }) => {
         try {
             const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
-            await manageDifferentiationProfiles.initPage(db);
+            await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Click on the name filter button");
             await page.getByTestId("sbx-pop-out-filter-component-36-button").click();
             tester.isGoingTo("Type 'reed' in the name filter input");
@@ -137,7 +137,7 @@ test.describe("Manage Differentiation Profiles", () => {
         const fieldKey = "overview";
         try {
             const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
-            await manageDifferentiationProfiles.initPage(db);
+            await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Add some text to Mario Izzo's overview field");
             await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
             const textToType = "Mario has a fondness for anything relating to snakes! 🐍";
@@ -170,7 +170,7 @@ test.describe("Manage Differentiation Profiles", () => {
         const fieldKey = "adjustment_category";
         try {
             const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
-            await manageDifferentiationProfiles.initPage(db);
+            await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Add some adjustment to the category field");
             await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
             await page.click('label[for="checkbox-1-adjustment_category-63"]');
