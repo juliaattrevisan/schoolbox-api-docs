@@ -19,6 +19,8 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as DifferentiationProfileAdminMapper;
+use Schoolbox\DifferentiationProfile\Translator\ProfileToArray;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -55,6 +57,7 @@ class Controller extends Base
         private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
         private DifferentiationProfileMapper $differentiationProfileMapper,
+        private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
         private MapperProxy $assessmentMapperProxy,
     ) {
     }
@@ -347,13 +350,6 @@ class Controller extends Base
 
         $aiSessionId = (string)Uuid::uuid4();
 
-        $agent = new LearningActivityCustomisationGeneration(
-            $this->clientFactory->buildForFeature(Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION),
-            $diffConfig,
-            $this->filesystemProxy,
-            $this->parserFactory,
-        );
-
         $studentId = $this->requestPost->get('studentId');
         if (!$studentId) {
             $returnCode = 400;
@@ -398,6 +394,22 @@ class Controller extends Base
                 $this->differentiationProfileMapper
                     ->getJoinMapper('student')
                     ->findById($studentId)
+            );
+
+            $translator = new ProfileToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->differentiationProfileAdminMapper
+                    ->findByColumn('is_enabled', 1),
+            );
+
+            $agent = new LearningActivityCustomisationGeneration(
+                $this->clientFactory->buildForFeature(Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION),
+                $diffConfig,
+                $this->filesystemProxy,
+                $this->parserFactory,
+                $translator,
             );
 
             [$response, $status] = $agent->request(

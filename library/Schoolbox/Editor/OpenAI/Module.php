@@ -12,10 +12,10 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as DifferentiationAdminMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -88,6 +88,7 @@ class Module extends BaseModule
             new ParserFactory(),
             $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
+            $this->getMapperFactory()->get(DifferentiationAdminMapper::class),
             $this->injector->get('assessmentDataSource')
         );
     }

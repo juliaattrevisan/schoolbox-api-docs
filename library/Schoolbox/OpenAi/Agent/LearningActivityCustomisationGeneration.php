@@ -7,6 +7,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\DifferentiationProfile\Model as DifferentiationProfileModel;
+use Schoolbox\DifferentiationProfile\Translator\ProfileToArray;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\OpenAi\IClient;
@@ -27,6 +28,7 @@ class LearningActivityCustomisationGeneration
         private array $config,
         private FilesystemProxy $filesystemProxy,
         private ParserFactory $parserFactory,
+        private ProfileToArray $profileToArray,
     ) {
     }
 
@@ -44,17 +46,6 @@ class LearningActivityCustomisationGeneration
         DifferentiationProfileModel $differentiationProfileModel,
         ?string $aiSessionId = null,
     ): array {
-
-        $dp = [
-            'adjustment_level' => $differentiationProfileModel->getAdjustmentLevel() ?? '',
-            'adjustment_category' => $differentiationProfileModel->getAdjustmentCategory() ?? '',
-            'overview' => $differentiationProfileModel->getOverview() ?? '',
-            'goals' => $differentiationProfileModel->getGoals() ?? '',
-            'interests_strengths' => $differentiationProfileModel->getInterestsStrengths() ?? '',
-            'needs_challenges' => $differentiationProfileModel->getNeedsChallenges() ?? '',
-            'strategies_adjustments' => $differentiationProfileModel->getStrategiesAdjustments() ?? '',
-        ];
-
         $attachments = $this->generateFilePrompts($assessable);
 
         $payloadGenerator = new \Schoolbox\Editor\OpenAI\Payload\LearningActivityCustomisation(
@@ -65,7 +56,7 @@ class LearningActivityCustomisationGeneration
             $assessable,
             $differentiationProfileModel->getStudent(),
             $attachments,
-            json_encode($dp),
+            json_encode(call_user_func($this->profileToArray, $differentiationProfileModel)),
         );
 
         $payload = $payloadGenerator->generate();
