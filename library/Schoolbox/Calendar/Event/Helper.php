@@ -126,15 +126,7 @@ readonly class Helper
         $resourceBookings = $this->resourceBookingMapper->findByEventId($event->getId());
         /** @var ResourceBookingModel $resourceBooking */
         foreach ($resourceBookings as $resourceBooking) {
-            $result[] = [
-                'id'   => $resourceBooking->getId(),
-                'name' => $resourceBooking->getName(),
-                'resource' => [
-                    'id' => $resourceBooking->getResource()->getId(),
-                    'name' => $resourceBooking->getResource()->getName(),
-                ],
-                'status' => $resourceBooking->getStatus()->jsonSerialize()
-            ];
+            $result[] = $resourceBooking->jsonSerialize();
         }
 
         return $result;
