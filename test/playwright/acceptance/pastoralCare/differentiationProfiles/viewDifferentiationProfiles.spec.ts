@@ -1,0 +1,71 @@
+/**
+ * Tests for the manage differentiation profiles page
+ *
+ * Prerequisites:
+ * 1. Provision sales.tar.gz data
+ *
+ * Execute: npx playwright test viewDifferentiationProfiles.spec.ts
+ */
+
+import { test, expect } from "@schoolboxTest/playwright/support/integrations";
+import ManageDifferentiationProfiles from "@schoolboxTest/playwright/support/page/pastoralCare/ManageDifferentiationProfiles";
+import AdminDifferentiationProfiles from "@schoolboxTest/playwright/support/page/admin/differentiation-profiles/AdminDifferentiationProfiles";
+
+test.describe.configure({ mode: "parallel" });
+
+test.describe("Manage Differentiation Profiles", () => {
+    test.beforeEach(async ({ tester }) => {
+        tester.isGoingTo("Login as admin");
+        await tester.loginAsAdmin();
+    });
+
+    test("Verify modal visibility on custom participation", async ({ tester, page, db }) => {
+        const studentId = 63; // Mario Izzo
+        const fieldKey = "overview";
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+        try {
+            await manageDifferentiationProfiles.initDefaults(db);
+            tester.isGoingTo("Add some text to Mario Izzo's overview field");
+            await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
+            const textToType = "Mario has a fondness for anything relating to snakes! 🐍";
+            await page.keyboard.type(textToType);
+            await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
+            tester.isGoingTo("Visit Student Participation - TKAM Final Assessment: Essay");
+            await page.goto("/learning/assessments/659/participation");
+            tester.isGoingTo("Open the differentiation profile modal for Mario Izzo");
+            const viewDpButton = page.getByTestId(`cp-participant-${studentId}-view-differentiation-profile`);
+            await viewDpButton.click();
+            tester.isGoingTo("Verify that the differentiation profile modal is visible and contains the text added");
+            const dpModal = page.getByTestId("view-dp-modal-fields-container");
+            await expect(dpModal).toBeVisible();
+            await expect(dpModal).toContainText(textToType);
+        } finally {
+            await manageDifferentiationProfiles.resetDefaults(db, studentId);
+        }
+    });
+
+    test("Verify modal visibility on class list", async ({ tester, page, db }) => {
+        const studentId = 25; // Jana Reed
+        const fieldKey = "goals";
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+        try {
+            await manageDifferentiationProfiles.initDefaults(db);
+            tester.isGoingTo("Add some text to Jana Reed's goals field");
+            await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
+            const textToType = "Jana wants to improve her public speaking skills.";
+            await page.keyboard.type(textToType);
+            await manageDifferentiationProfiles.clickSaveButton(studentId, fieldKey);
+            tester.isGoingTo("Visit 9A English (9ENGA) class list");
+            await page.goto("/learning/class/83");
+            tester.isGoingTo("Open the differentiation profile modal for Jana Reed");
+            const viewDpButton = page.getByTestId(`class-list-${studentId}-view-differentiation-profile`);
+            await viewDpButton.click();
+            tester.isGoingTo("Verify that the differentiation profile modal is visible and contains the text added");
+            const dpModal = page.getByTestId("view-dp-modal-fields-container");
+            await expect(dpModal).toBeVisible();
+            await expect(dpModal).toContainText(textToType);
+        } finally {
+            await manageDifferentiationProfiles.resetDefaults(db, studentId);
+        }
+    });
+});
