@@ -71,8 +71,8 @@ test.describe("Manage Differentiation Profiles", () => {
     });
 
     test("Verify profiles can be shown", async ({ tester, page, db }) => {
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         try {
-            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
             await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Verify that Mario Izzo and Ms Penelope Li are visible on the page");
             const container = page.getByTestId("manage-differentiation-profiles-container");
@@ -81,25 +81,13 @@ test.describe("Manage Differentiation Profiles", () => {
             await expect(marioIzzo).toBeVisible();
             await expect(msPenelopeLi).toBeVisible();
         } finally {
-            tester.isGoingTo("Clean up: Reset data state");
-            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
-            await db.updateInDatabase(
-                "lu_pastoral_type",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Bullying" },
-            );
-            await db.updateInDatabase(
-                "lu_pastoral_subtype",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Award/Achievement" },
-            );
+            await manageDifferentiationProfiles.resetDefaults(db);
         }
     });
 
     test("verify name filter", async ({ tester, page, db }) => {
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         try {
-            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
             await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Click on the name filter button");
             await page.getByTestId("sbx-pop-out-filter-component-36-button").click();
@@ -116,27 +104,15 @@ test.describe("Manage Differentiation Profiles", () => {
             await expect(msJanaReed).toBeVisible();
             await expect(mrLeonReed).toBeVisible();
         } finally {
-            tester.isGoingTo("Clean up: Reset data state");
-            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
-            await db.updateInDatabase(
-                "lu_pastoral_type",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Bullying" },
-            );
-            await db.updateInDatabase(
-                "lu_pastoral_subtype",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Award/Achievement" },
-            );
+            await manageDifferentiationProfiles.resetDefaults(db);
         }
     });
 
     test("Verify text cell edit", async ({ tester, page, db }) => {
         const studentId = 63; // Mario Izzo
         const fieldKey = "overview";
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         try {
-            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
             await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Add some text to Mario Izzo's overview field");
             await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
@@ -148,28 +124,15 @@ test.describe("Manage Differentiation Profiles", () => {
             const overviewCell = page.getByTestId(`lazy-grid-row-cell-0-4-${fieldKey}`);
             await expect(overviewCell).toContainText(textToType);
         } finally {
-            tester.isGoingTo("Clean up: Reset data state");
-            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
-            await db.updateInDatabase(
-                "lu_pastoral_type",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Bullying" },
-            );
-            await db.updateInDatabase(
-                "lu_pastoral_subtype",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Award/Achievement" },
-            );
-            await db.dontHaveInDatabase("differentiation_profiles", { student_id: studentId });
+            await manageDifferentiationProfiles.resetDefaults(db, studentId);
         }
     });
 
     test("Verify adjustment cell edit", async ({ tester, page, db }) => {
         const studentId = 63; // Mario Izzo
         const fieldKey = "adjustment_category";
+        const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         try {
-            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
             await manageDifferentiationProfiles.initDefaults(db);
             tester.isGoingTo("Add some adjustment to the category field");
             await manageDifferentiationProfiles.clickModifyButton(studentId, fieldKey);
@@ -183,20 +146,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await expect(overviewCell).toContainText("Cognitive");
             await expect(overviewCell).toContainText("Social / Emotional");
         } finally {
-            tester.isGoingTo("Clean up: Reset data state");
-            await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
-            await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
-            await db.updateInDatabase(
-                "lu_pastoral_type",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Bullying" },
-            );
-            await db.updateInDatabase(
-                "lu_pastoral_subtype",
-                { contribute_differentiation_profile: 0 },
-                { "name like": "Award/Achievement" },
-            );
-            await db.dontHaveInDatabase("differentiation_profiles", { student_id: studentId });
+            await manageDifferentiationProfiles.resetDefaults(db, studentId);
         }
     });
 });
