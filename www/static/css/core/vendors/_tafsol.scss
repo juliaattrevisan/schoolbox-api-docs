@@ -220,71 +220,6 @@ body {
     }
 }
 
-// Tabs styles
-.tabs {
-    background-color: var(--card-bg);
-    border-bottom: var(--border);
-    display: flex;
-    overflow-x: auto;
-    overflow-y: clip;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    & .active a {
-        border-bottom-width: 3px !important;
-        border-color: var(--sbx-color-accent);
-        font-weight: 600;
-    }
-
-    & a {
-        white-space: nowrap;
-
-        .active &:not([data-test^="homepage-component-palette-tab"]) {
-            border-bottom: 3px solid var(--sbx-color-accent) !important;
-        }
-    }
-}
-
-.tabs.vertical {
-    flex-direction: column;
-
-    & .tab-title:first-child {
-        & a {
-            border-top-left-radius: var(--sbx-border-radius-normal);
-        }
-    }
-}
-
-/* Tabs component styles */
-.component-tabs {
-    & .tabs {
-        border: var(--border);
-        border-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-radius: var(--sbx-border-radius-normal);
-    }
-
-    & .tabs-content {
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        border-top: 0;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-
-        & > .content li {
-            box-shadow: none !important;
-
-            & [data-component-palette] {
-                border-radius: var(--sbx-border-radius-normal);
-                padding: 1rem 2rem;
-            }
-        }
-    }
-}
-
 /* ==========================================================================
    6. Empty States, Lists & Content Cards
    ========================================================================== */
@@ -599,73 +534,6 @@ label .feed .mini.unit-heading {
 
     & span:last-child a {
         color: var(--sbx-color-text-primary);
-    }
-}
-
-/* ==========================================================================
-   13. Pagination & Breadcrumbs
-   ========================================================================== */
-
-// Pagination styles
-.pagination {
-    & li {
-        &:not(:last-child) {
-            margin-right: 8px;
-        }
-
-        &.active {
-            & a {
-                background-color: var(--sbx-color-accent) !important;
-                color: var(--sbx-color-accent-text) !important;
-            }
-        }
-
-        & a {
-            border-radius: var(--sbx-border-radius-normal) !important;
-            padding-block: 0.4rem !important;
-            padding-inline: 0.8rem !important;
-        }
-    }
-}
-
-// Breadcrumb styles
-.breadcrumb {
-    display: flex;
-    margin-inline-start: 1rem !important;
-
-    & li {
-        &:not(.active) a::after {
-            background-color: var(--sbx-color-foreground-secondary);
-            border: 0;
-            clip-path: polygon(40% 0, 60% 50%, 40% 100%, 0% 100%, 25% 50%, 0% 0%);
-            content: "";
-            display: inline-block;
-            height: 10px !important;
-            margin-inline-start: 1rem;
-            position: static;
-            width: 10px !important;
-        }
-
-        &.active :where(span, a),
-        &.active :where(span, a) {
-            &::before,
-            &::after {
-                content: none !important;
-            }
-            padding-inline: 0;
-        }
-
-        & a::before {
-            content: none;
-        }
-    }
-
-    & li a,
-    & span {
-        background-color: transparent !important;
-        float: none;
-        margin-inline-end: 1rem;
-        padding-inline: 0;
     }
 }
 
@@ -1375,18 +1243,8 @@ input[type="radio"] + .block {
     box-shadow: none !important;
 }
 
-ul#tabs-sub-1 > li,
-ul#tabs-sub-2 > li,
-ul#tabs-sub-3 > li,
-ul#tabs-sub-4 > li,
-ul#tabs-sub-5 > li,
-ul#tabs-sub-6 > li {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
 #component-lock-switch label {
-    background-color: #4c5bb1;
+    background-color: var(--sbx-color-accent);
 }
 
 #component-lock-switch label .icon-locked::before {

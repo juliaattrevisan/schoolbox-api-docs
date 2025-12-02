@@ -44,7 +44,6 @@
 .sbx-body .button,
 .sbx-body .flex-list.buttons a,
 .sbx-body .sub-nav li a,
-.sbx-body nav li.active a,
 .sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
@@ -117,7 +116,7 @@
 /**
  * Icon only buttons
  * These need to be treated differently to standard buttons
- * as they have no text content and so need a border to define their shape
+ * as they have no text content and so don't need a border to define their shape
  */
 .sbx-body button.button[class*="icon-"] {
     border: none;
@@ -134,11 +133,4 @@
     background-color: var(--sbx-color-accent);
     border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
     height: auto;
-}
-
-/**
- * List items inside flex-list should have margin for spacing (in pantry)
- */
-.sbx-body .flex-list li {
-    margin: 5px;
 }
