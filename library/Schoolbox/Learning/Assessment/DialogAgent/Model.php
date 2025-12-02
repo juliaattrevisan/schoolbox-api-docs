@@ -222,6 +222,8 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly): ?IFeedback
     {
+        $this->assertSameAssessment($participant);
+
         foreach ($participant->getAllFeedbacks() as $feedback) {
             /* Returns the feedback directly attributed to an authoritative response
              */
