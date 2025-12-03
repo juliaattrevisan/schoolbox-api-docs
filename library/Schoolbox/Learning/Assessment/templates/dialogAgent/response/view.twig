@@ -22,6 +22,16 @@
             {% import '@learning/macro/dueDate.twig' as dueDate %}
             {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
             <ul class="meta">
+                <li class="icon-user">
+                    {{ locale.dialogAgent.proper }} with
+
+                    {% if student._links.profile is defined %}
+                        <a href="{{ student._links.profile }}">{{ student.fullName }}</a>
+                    {% else %}
+                        {{ student.fullName }}
+                    {% endif %}
+                </li>
+
                 {% if response.isSubmitted %}
                     <li class="icon-calendar">
                         Submitted <time title="{{ response.submittedAt.database }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
