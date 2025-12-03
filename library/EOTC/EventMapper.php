@@ -13,6 +13,7 @@ namespace EOTC;
 use Alaress_Date_Format;
 use EOTC\ActivityLog\Mapper as ActivityLogMapper;
 use EOTC\ListGroup\Collection as ListGroupCollection;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper as CalendarEventMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Campus;
@@ -101,6 +102,7 @@ class EventMapper extends CalendarEventMapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             /* Assemble event pieces
              */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row);
 
             /* Author
@@ -256,7 +258,7 @@ class EventMapper extends CalendarEventMapper
         /* Hydrate or die
          */
         foreach ($statement as $row) {
-            /** @var Event $eventItem */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row, 'e');
 
             /* Accumulate the metadata for this event
@@ -360,7 +362,7 @@ class EventMapper extends CalendarEventMapper
         /* Hydrate or die
          */
         foreach ($statement as $row) {
-            /** @var Event $eventItem */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row, 'e');
 
             /** @var User $teacherInChargeItem */
@@ -420,6 +422,17 @@ class EventMapper extends CalendarEventMapper
          */
     }
 
+    /**
+     * Post-soft-delete hook method
+     *
+     * @param Event $event
+     */
+    protected function postDelete(Event $event): void
+    {
+        /* noop EOTC doesn't have to do anything special on delete
+         */
+    }
+
 
     /**
      * Some caching issue prevents metadata being correctly formed.
@@ -440,6 +453,8 @@ class EventMapper extends CalendarEventMapper
         if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
             return;
         }
+
+        /** @var \EOTC\Event $event */
 
         // Because of the mapper caching problem, order of operations in this area had to be re-ordered a couple of times.
         $event->setMetadata($metadata);
