@@ -693,7 +693,8 @@ export default {
                                     href=""
                                     class="icon-modify"
                                     title="Modify Booking"
-                                    onclick="alert('TODO: Implement edit booking modal')"
+                                    aria-label="Modify Booking"
+                                    onclick="alert('TODO: Implement edit booking modal (SA-21381)')"
                                 ></a>
                             </div>
                         </div>
