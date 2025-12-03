@@ -43,7 +43,9 @@
     {%- set noResultsTitleSuffix = 'completed this task' -%}
     {% set markedPastTense = 'assessed' %}
 {% elseif isDialogAgent %}
-    {# TODO I had to make up the langauge for this on the spot... #}
+    {# TODO I had to make up the langauge for this on the spot...
+     # Note that css currently enforces text-transform:lowercase on everything here inside .legend
+     #}
     {%- set submitTitleSuffix    = 'completed this ' ~ locale.dialogAgent -%}
     {%- set markedTitleSuffix    = 'feedback generation' -%}
     {%- set noResultsTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
