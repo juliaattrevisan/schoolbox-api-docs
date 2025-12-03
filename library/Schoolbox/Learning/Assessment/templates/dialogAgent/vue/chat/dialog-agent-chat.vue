@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useMousePressed } from "@vueuse/core";
+import locale from "@js/terminology/rosettaStone";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -10,11 +11,13 @@ import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
+import DasActions from "../status/das-actions.vue";
 
 interface Props {
     feed: AiLogAgentChatData[];
     response: DialogAgentResponse;
     student: UserAuthor;
+    summaryRoute?: string | null;
     returnUrl: string;
     readonly: boolean;
 }
@@ -218,10 +221,29 @@ window.Vue.onUnmounted(() => {
     window.removeEventListener("DOMContentLoaded", updateFeedHeight);
     document.removeEventListener("mouseup", onMouseUp);
 });
+
+/**
+ * Reload the page after an action so that changes are reflected
+ * This could be expanded to properly load back the state,
+ * but since twig renders some stuff at the moment, this is good enough for now
+ */
+function onAction(): void {
+    window.location.reload();
+}
 </script>
 
 <template>
-    <div v-if="!props.readonly" class="actions-small-1 l-mar-s--bottom no-print">
+    <Teleport v-if="props.readonly" to="#header-options">
+        <das-actions
+            :user="props.student"
+            :response="currentResponse"
+            :summary-route="props.summaryRoute"
+            :show-view="false"
+            @update-response="onAction"
+        />
+    </Teleport>
+
+    <div v-else class="actions-small-1 l-mar-s--bottom no-print">
         <button
             v-if="currentResponse._routes.assistanceRequest"
             class="button"
@@ -232,15 +254,7 @@ window.Vue.onUnmounted(() => {
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button
-                class="button submit icon-approve"
-                type="submit"
-                :disabled="isSubmitting || undefined"
-                @click="isSubmitModalOpen = true"
-            >
-                {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
-                <!-- TODO: `Submit on behalf of ${props.student.fullName}` in SA-21415 -->
-            </button>
+            <button class="button submit icon-approve" type="submit" @click="isSubmitModalOpen = true">Submit</button>
         </nav>
     </div>
 
@@ -296,8 +310,8 @@ window.Vue.onUnmounted(() => {
     <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
         <h2>Confirm Submission</h2>
         <p>
-            Are you sure you want to finalise this response? Once submitted, you will not be able to make further
-            changes.
+            Are you sure you want to finalise this {{ locale.dialogAgent.singular() }}? Once submitted, you will not be
+            able to make further changes.
         </p>
         <div v-if="submitError" class="alert-box alert">
             <span>{{ submitError }}</span>
