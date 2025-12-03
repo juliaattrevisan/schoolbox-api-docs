@@ -175,6 +175,16 @@ class Model extends AbstractAssessment
 
 
     /**
+     * @inheritdoc
+     */
+    public function canInstructorCreateResponse(User $instructor, User $submittedOnBehalfOf)
+    {
+        // Project containers cannot have IResponses directly on them. Only their sub-assessments can.
+        return false;
+    }
+
+
+    /**
      * Dialog Agents never have marks.
      *
      * @param Participant $participant
