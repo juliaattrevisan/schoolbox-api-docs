@@ -478,7 +478,7 @@ class Controller extends Assessment\Controller
         ];
 
         $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response.twig',
+            '@learningAssessment/dialogAgent/response/create.twig',
             $data
         );
     }

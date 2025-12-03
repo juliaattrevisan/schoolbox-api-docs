@@ -300,7 +300,7 @@ class Controller extends Base
         ];
 
         $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response.twig',
+            '@learningAssessment/dialogAgent/response/view.twig',
             $data,
             \sprintf(
                 'Response for %s in %s',

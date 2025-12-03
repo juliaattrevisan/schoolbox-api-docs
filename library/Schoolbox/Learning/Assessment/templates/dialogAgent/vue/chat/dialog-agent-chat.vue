@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import locale from "@js/terminology/rosettaStone";
 import { useMousePressed } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
