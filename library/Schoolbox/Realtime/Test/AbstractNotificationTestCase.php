@@ -95,15 +95,14 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
     private $failureCount = 0;
 
     /**
-     * @param string $name
+     * Set up Redis and list factory instances.
+     *
+     * @return void
      */
-    public function __construct($name = null)
+    public function setUp(): void
     {
-        parent::__construct($name);
-
-        // TODO should this be the cache or storage?
-        $this->redis = Redis::getStorageClientInstance();
-        $this->redisQueue = Redis::getSignalQueueClientInstance();
+        $this->redis       = Redis::getStorageClientInstance();
+        $this->redisQueue  = Redis::getSignalQueueClientInstance();
         $this->listFactory = new ListFactory(INSTANCE_ID, $this->redis);
     }
 
