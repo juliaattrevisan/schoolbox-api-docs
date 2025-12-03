@@ -131,8 +131,14 @@ class Module extends BaseModule
             }
         });
 
+        /**
+         * For a learner to be able to submit, you must meet the normal criteria, as well as:
+         * - The current status of the response allows it to be submitted
+         * - The response must be authoritative, you can't change the state of non-auth responses
+         */
         $canSubmit = new Rule\All(
             $this->buildAuthRuleCanSubmit(),
+            $this->buildRuleCanAction(Status::ACTION_SUBMIT),
             $isAuthoritativeResponse,
         );
 
