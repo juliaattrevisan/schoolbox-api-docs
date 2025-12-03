@@ -247,7 +247,9 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config strict_templates "'1'" \
 --config summative_report_enabled "'1'" \
 --config title "'Schoolbox [vagrant]'" \
---config ups_groups_enabled "'1'"; then
+--config ups_groups_enabled "'1'" \
+--config presidio_analysis_host "'http://localhost:5002'" \
+--config presidio_anonymisation_host "'http://localhost:5001'"; then
   error "Unable to install instance. Exiting."
   exit 1
 fi
