@@ -6,17 +6,26 @@ import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import { type Booking, type BookingResource } from "./resourceBookingTypes";
 
+/**
+ * This is necessary to avoid type errors because the Toast component is written in Javascript, not Typescript.
+ */
 interface ToastComponent {
     activate: (message: string) => void;
     timeout: (message: string, success: boolean, duration: number) => void;
 }
 
-interface ModalComponent {
+/**
+ * This is necessary to avoid type errors because the RevealModal component is written in Javascript, not Typescript.
+ */
+interface RevealModalComponent {
     open: () => void;
     close: () => void;
 }
 
-interface BookingResponse {
+/**
+ * This defines the server response to an ENDPOINTS.URL_BOOKINGS_ADD request.
+ */
+interface AddBookingsResponse {
     errors?: string[];
 }
 
@@ -68,8 +77,8 @@ export default defineComponent({
             return this.$refs.toast as ToastComponent;
         },
 
-        modal(): ModalComponent {
-            return this.$refs.modal as ModalComponent;
+        modal(): RevealModalComponent {
+            return this.$refs.modal as RevealModalComponent;
         },
     },
 
@@ -113,7 +122,7 @@ export default defineComponent({
                         Accept: "application/json",
                     },
                 });
-                const responseData = (await response.json()) as BookingResponse;
+                const responseData = (await response.json()) as AddBookingsResponse;
                 if (response.ok) {
                     this.modal.close();
                     if (responseData.errors && responseData.errors.length > 0) {
