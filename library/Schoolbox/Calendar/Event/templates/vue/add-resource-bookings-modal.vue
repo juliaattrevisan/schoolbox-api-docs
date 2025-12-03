@@ -94,6 +94,7 @@ export default defineComponent({
         getResourceSearchEndpoint(): string {
             const searchUrl = new URL(ENDPOINTS.URL_BOOKING_SELECTIZE as string, window.location.href).toString();
             const excludeResourceIds = (this.resourceBookings as Booking[]).map((booking) => booking.resource.id);
+            // The trailing '&' on the URL below is necessary because the SearchSelect component will add a 'query=' suffix.
             return `${searchUrl}?excludeResourceIds=${encodeURIComponent(excludeResourceIds.join(","))}&`;
         },
 
