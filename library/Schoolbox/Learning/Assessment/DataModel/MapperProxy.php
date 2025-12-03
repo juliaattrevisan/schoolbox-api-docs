@@ -794,8 +794,15 @@ class MapperProxy
      */
     public function findAllByCourseSpecificationId(int $courseSpecId, array $options = []): GenericCollection
     {
+        // Find all unit specs for this course spec,
+        // then return all assessables for those unit specs.
+        $unitSpecMapper = $this->baseMapper->getJoinMapper('assessment_course_unit_specification');
+        $unitSpecIds    = $unitSpecMapper->findIdsbyColumn('course_specification_id', $courseSpecId);
+        if (empty($unitSpecIds)) {
+            return $this->createCollection();
+        }
         $builder = $this->convertOptionsToPredicateBuilder($options, false)
-                        ->equals('usc.id', $courseSpecId);
+                        ->in('us.id', $unitSpecIds);
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
