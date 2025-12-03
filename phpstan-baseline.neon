@@ -901,12 +901,6 @@ parameters:
 			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
 
 		-
-			message: '#^Offset ''letters'' on array\{fileYear\: mixed, enteredGrades\: int\<1, max\>, letters\: array\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: library/Custom/Dsfg/AchievementReport/SchoolGrades/GradeSummary.php
-
-		-
 			message: '#^Offset ''availableGrades'' on non\-empty\-array\<''achievedGrades''\|''availableGrades''\|''enteredGrades''\|''letters'', mixed\> on left side of \?\?\= always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
@@ -3421,12 +3415,6 @@ parameters:
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
-			message: '#^Offset ''response'' on array\{mark\: mixed, normalisedMark\: float\|null, comment\: mixed, date\: mixed, instructor\: array\{id\: int, title\: mixed, firstName\: mixed, preferredName\: mixed, lastName\: mixed, externalId\: mixed\}\|null, rubric\: array\|null, learner\: array\{id\: int, title\: mixed, firstName\: mixed, preferredName\: mixed, lastName\: mixed, externalId\: mixed\}, feedback\: array\{mark\: mixed, normalisedMark\: float\|null, comment\: mixed, date\: mixed, instructor\: array\{id\: int, title\: mixed, firstName\: mixed, preferredName\: mixed, lastName\: mixed, externalId\: mixed\}\|null, rubric\: array\|null, id\: int\}, \.\.\.\} on left side of \?\?\= always exists and is always null\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/API/Helper.php
-
-		-
 			message: '#^PHPDoc tag @var with type Alaress_Date_Format is not subtype of native type null\.$#'
 			identifier: varTag.nativeType
 			count: 1
@@ -5579,12 +5567,6 @@ parameters:
 			identifier: instanceof.alwaysTrue
 			count: 1
 			path: library/Schoolbox/Realtime/Subscription/Redis/Subscription.php
-
-		-
-			message: '#^Method Schoolbox\\Realtime\\Test\\AbstractNotificationTestCase\:\:__construct\(\) overrides @final method Alaress\\Async\\Test\\AbstractTestCase\:\:__construct\(\)\.$#'
-			identifier: method.parentMethodFinalByPhpDoc
-			count: 1
-			path: library/Schoolbox/Realtime/Test/AbstractNotificationTestCase.php
 
 		-
 			message: '#^Method Schoolbox\\Realtime\\Timetable\\TimetableNotifier\:\:process\(\) should return string but returns int\.$#'

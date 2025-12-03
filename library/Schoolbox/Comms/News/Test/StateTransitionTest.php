@@ -213,11 +213,12 @@ class StateTransitionTest extends TestCase
      * Tests we cannot submit an article already awaiting moderation
      *
      * @param Model $article
+     * @param User  $_
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
-    public function testInvalidTransitionSubmitAwaitingModeration(Model $article): void
+    public function testInvalidTransitionSubmitAwaitingModeration(Model $article, User $_): void
     {
         $article->submit();
         $this->expectException(InvalidTransitionException::class);
@@ -229,11 +230,12 @@ class StateTransitionTest extends TestCase
      * Tests we cannot submit an article already awaiting moderation
      *
      * @param Model $article
+     * @param User  $_
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
-    public function testInvalidTransitionSubmitExpired(Model $article): void
+    public function testInvalidTransitionSubmitExpired(Model $article, User $_): void
     {
         $article->submit();
         $article->approve(self::getModerator());
@@ -265,11 +267,12 @@ class StateTransitionTest extends TestCase
      * Tests we cannot un-submit a draft
      *
      * @param Model $article
+     * @param User  $_
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
-    public function testInvalidTransitionUnSubmitDraft(Model $article): void
+    public function testInvalidTransitionUnSubmitDraft(Model $article, User $_): void
     {
         $this->expectException(InvalidTransitionException::class);
         $article->unSubmit();
@@ -280,11 +283,12 @@ class StateTransitionTest extends TestCase
      * Tests we cannot archive a draft
      *
      * @param Model $article
+     * @param User  $_
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
-    public function testInvalidTransitionUnArchiveDraft(Model $article): void
+    public function testInvalidTransitionUnArchiveDraft(Model $article, User $_): void
     {
         $this->expectException(InvalidTransitionException::class);
         $article->archive();
@@ -295,11 +299,12 @@ class StateTransitionTest extends TestCase
      * Tests we cannot archive an article awaiting moderation
      *
      * @param Model $article
+     * @param User  $_
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
-    public function testInvalidTransitionUnArchiveAwaitingMod(Model $article): void
+    public function testInvalidTransitionUnArchiveAwaitingMod(Model $article, User $_): void
     {
         $article->submit();
         $this->expectException(InvalidTransitionException::class);

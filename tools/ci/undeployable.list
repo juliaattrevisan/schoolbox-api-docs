@@ -28,3 +28,5 @@ Gemfile*
 .bowerrc
 npm-shrinkwrap.json
 .env
+patches/
+patches.lock.json

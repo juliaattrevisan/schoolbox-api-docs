@@ -95,10 +95,11 @@ class JsonBase64Test extends TestCase
     /**
      * Test that encoding then decoding a value results in the same value.
      *
-     * @param mixed  $rawValue
+     * @param mixed       $rawValue
+     * @param string|null $_
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
-    public function testLosslessEncode($rawValue): void
+    public function testLosslessEncode($rawValue, ?string $_): void
     {
         $codec = new Base64();
         self::assertSame($rawValue, $codec->decode($codec->encode($rawValue)));
