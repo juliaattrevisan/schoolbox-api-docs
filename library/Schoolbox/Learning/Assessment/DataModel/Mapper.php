@@ -1054,12 +1054,13 @@ class Mapper extends BaseMapper
     private function hydrateSelectRecursive(PDOStatement $statement, bool $hydrateProjectContext = true)
     {
         /** @var Collection|Model[] $modelList */
-        $modelList         = $this->createCollection();
-        $dueWorkIds        = [];
-        $projectIds        = [];
-        $taskIds           = [];
-        $contextProjectIds = [];
-        $lessonPlanIds     = [];
+        $modelList          = $this->createCollection();
+        $dueWorkIds         = [];
+        $projectIds         = [];
+        $taskIds            = [];
+        $contextUnitSpecIds = [];
+        $contextProjectIds  = [];
+        $lessonPlanIds      = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -1151,8 +1152,7 @@ class Mapper extends BaseMapper
                 // Folder
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
             } elseif ($row['us.id']) {
-                // Unit spec
-                // Be sure to hydrate course spec's folder, too
+                // Unit spec: deeper joins will be hydrated later
                 /** @var UnitSpec\Model $unitSpec */
                 $unitSpec = $this->hydrateJoin(
                     $row,
@@ -1160,30 +1160,31 @@ class Mapper extends BaseMapper
                     'us'
                 );
 
-                /** @var Folder\Model $unitSpecFolder */
-                $unitSpecFolder = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification.folder',
-                    'usf',
-                );
-                $unitSpec->setFolder($unitSpecFolder);
-
-                /** @var CourseSpec\Model $courseSpec */
-                $courseSpec = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification.course',
-                    'usc',
-                );
-
-                /** @var Folder\Model $courseSpecFolder */
-                $courseSpecFolder = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification.course.folder',
-                    'uscf',
-                );
-
-                $courseSpec->setFolder($courseSpecFolder);
-                $unitSpec->setCourse($courseSpec);
+//                /** @var Folder\Model $unitSpecFolder */
+//                $unitSpecFolder = $this->hydrateJoin(
+//                    $row,
+//                    'assessment_course_unit_specification.folder',
+//                    'usf',
+//                );
+//                $unitSpec->setFolder($unitSpecFolder);
+//
+//                /** @var CourseSpec\Model $courseSpec */
+//                $courseSpec = $this->hydrateJoin(
+//                    $row,
+//                    'assessment_course_unit_specification.course',
+//                    'usc',
+//                );
+//
+//                /** @var Folder\Model $courseSpecFolder */
+//                $courseSpecFolder = $this->hydrateJoin(
+//                    $row,
+//                    'assessment_course_unit_specification.course.folder',
+//                    'uscf',
+//                );
+//
+//                $courseSpec->setFolder($courseSpecFolder);
+//                $unitSpec->setCourse($courseSpec);
+                $contextUnitSpecIds[] = $row['us.id'];
                 $context = $unitSpec;
             } elseif ($row['ui.id']) {
                 // Unit impl
@@ -1238,14 +1239,15 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
-        /* TODO Maybe augment with something here; can't remember what
-         */
+        // Augment all contexts
+        $modelList = $this->augmentListWithUnitSpecContexts($modelList, $contextUnitSpecIds);
 
         // Project contexts
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
             $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
         }
+
         // Folder codes for all contexts
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
@@ -1778,6 +1780,33 @@ class Mapper extends BaseMapper
                         $submodel->setAttachments($files[$submodel->getId()]);
                     } else {
                         $submodel->setAttachments($this->getJoinMapper('lessonPlan.files')->createCollection());
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with context unit specs.
+     *
+     * @param Collection<Model> $modelList
+     * @param array             $unitSpecIds
+     * @return Collection<Model>
+     */
+    private function augmentListWithUnitSpecContexts(Collection $modelList, array $unitSpecIds): Collection
+    {
+        if (!empty($unitSpecIds)) {
+            /** @var UnitSpec\Mapper $contextUnitSpecMapper */
+            $contextUnitSpecMapper = $this->getJoinMapper('assessment_course_unit_specification');
+            $contextUnitSpecs      = $contextUnitSpecMapper->findByColumn('id', $unitSpecIds)->indexBy('id');
+
+            foreach ($modelList as $model) {
+                $context = $model->getAssessmentContext();
+                if ($context instanceof UnitSpec\Model) {
+                    $hydratedContext = $contextUnitSpecs[$context->getId()] ?? null;
+                    if ($hydratedContext instanceof UnitSpec\Model) {
+                        $model->setAssessmentContext($hydratedContext);
                     }
                 }
             }
