@@ -15,7 +15,9 @@ class ComparisionTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('dataStrings')]
     public function testCompareString(string $a, string $b, bool $expected)
     {
-        $comparison = $this->getObjectForTrait(Comparison::class);
+        $comparison = new class {
+            use Comparison;
+        };
         $this->assertEquals($expected, $comparison->compareStrings($a, $b));
     }
 
