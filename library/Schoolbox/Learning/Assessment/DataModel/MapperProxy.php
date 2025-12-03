@@ -934,34 +934,6 @@ class MapperProxy
     }
 
     /**
-     * Finds all assessables that have been imported into a folder through a
-     * course import.
-     *
-     * This method does not currently load participants or the rubric grid.
-     *
-     * @deprecated Use `findAllForFolderId` to find assessables in a folder,
-     *             along with any that are in a unit import on that folder.
-     *
-     * @param int   $folderId
-     * @param array $options
-     * @return GenericCollection|IAssessable[]
-     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
-     * @throws TypeError If a PredicateBuilder method is called with wrong data type
-     * @throws LogicException If cyclic graph detected during translation
-     */
-    public function findAllByCourseImplementationFolderId($folderId, array $options = [])
-    {
-        try {
-            // uicf.id = Unit Implementation Course Folder ID
-            $builder = $this->convertOptionsToPredicateBuilder($options, false)
-                            ->equals('uicf.id', $folderId);
-            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
-        } catch (UnderflowException $e) {
-            return $this->createCollection();
-        }
-    }
-
-    /**
      * Finds all assessables that are part of the given project.
      *
      * This method does not load participants or the rubric grid - see
