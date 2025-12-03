@@ -7,6 +7,6 @@ models:
   # default model
   - lang_code: en
     model_name: en_core_web_lg
-  # big slow but accurate model
-  - lang_code: en_complex
-    model_name: en_core_web_trf
+#  # big slow but accurate model: disabled for now
+#  - lang_code: en_complex
+#    model_name: en_core_web_trf
