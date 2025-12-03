@@ -470,14 +470,15 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
-            'response' => $responseTranslator->__invoke($response),
+            'response' => $response,
+            'responseData' => $responseTranslator->__invoke($response),
             'interactionLocked' => $isInteractionLocked,
             'readonly' => false, /* student is creating/resuming a response, it's not read only */
             'returnUrl' => $returnUrl,
         ];
 
         $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response/create.twig',
+            '@learningAssessment/dialogAgent/response.twig',
             $data
         );
     }
