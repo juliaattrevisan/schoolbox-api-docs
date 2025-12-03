@@ -661,7 +661,7 @@ export default {
                     <nav class="l-flex-row l-flex--align-center f-no-margins">
                         <a
                             class="icon-add f-no-margins"
-                            id="addResourceBookingsLink"
+                            href="#"
                             @click.prevent="showAddResourceBookingsModal()"
                             aria-label="Add resource bookings"
                             title="Add resource bookings"
@@ -691,7 +691,7 @@ export default {
                                     >{{ booking.status.name }}</span
                                 >
                                 <a
-                                    href="#addResourceBookingsLink"
+                                    href="#"
                                     class="icon-modify"
                                     title="Modify Booking"
                                     aria-label="Modify Booking"
@@ -704,7 +704,9 @@ export default {
                         <i class="icon-resource-booking"></i>
                         <p>
                             No resources are booked for this event.<br />
-                            <a @click.prevent="showAddResourceBookingsModal()">Book resources for this event</a>
+                            <a href="#" @click.prevent="showAddResourceBookingsModal()"
+                                >Book resources for this event</a
+                            >
                         </p>
                     </div>
                 </div>
