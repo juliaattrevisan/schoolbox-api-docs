@@ -661,6 +661,7 @@ export default {
                     <nav class="l-flex-row l-flex--align-center f-no-margins">
                         <a
                             class="icon-add f-no-margins"
+                            id="addResourceBookingsLink"
                             @click.prevent="showAddResourceBookingsModal()"
                             aria-label="Add resource bookings"
                             title="Add resource bookings"
@@ -690,7 +691,7 @@ export default {
                                     >{{ booking.status.name }}</span
                                 >
                                 <a
-                                    href=""
+                                    href="#addResourceBookingsLink"
                                     class="icon-modify"
                                     title="Modify Booking"
                                     aria-label="Modify Booking"
