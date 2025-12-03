@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
-import { apiRequest } from "@js/util/sbx/apiUtils";
+import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentParticipant } from "./dialogAgentStatusTypes";
@@ -92,7 +92,26 @@ async function triggerAction(
         url: props.participant.response._routes[action],
     });
 
-    if (!response.success) {
+    let updatedData: ApiDialogAgentActionResponse | null = null;
+    if (response.success) {
+        updatedData = response.data;
+    } else if (getApiProblemStatus(response) === 403 && props.participant.response._routes.status) {
+        /**
+         * If this action fails due to a status change elsewhere, then you'd get a 403 here.
+         * When that occurs, attempt to find the latest response data to sync back up.
+         */
+        const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
+            method: "GET",
+            url: props.participant.response._routes.status,
+        });
+
+        /** If the action we tried to do is still available, then there's some other issue. Otherwise update the stored data */
+        if (statusResponse.success && !statusResponse.data.response._routes[action]) {
+            updatedData = statusResponse.data;
+        }
+    }
+
+    if (updatedData === null) {
         toast.timeout({ text: failureMessage, isSuccess: false });
         return;
     }
@@ -100,7 +119,7 @@ async function triggerAction(
     toast.timeout({ text: successMessage, isSuccess: true });
 
     // Update the stored participant data
-    emit("updateParticipant", response.data);
+    emit("updateParticipant", updatedData);
 }
 
 /**
