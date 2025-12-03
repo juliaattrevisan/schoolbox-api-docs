@@ -112,7 +112,7 @@ mariadb schoolbox -e "$use_redis_persistent_instance_sql"
 
 # May need to composer install here:
 # develop vendor build won't have Composer changes made in this PR
-composer install -o
+tools/composer.sh
 
 # Set data dirs in config table + run upgrade + schema repair scripts
 cd tools || exit 1
