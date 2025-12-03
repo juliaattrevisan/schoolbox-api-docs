@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use InvalidArgumentException;
+use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -133,6 +134,17 @@ class Model extends AbstractAssessment
 
         // Not open?
         if (!$this->isOpen($learner)) {
+            return false;
+        }
+
+        /* Check for full configuration via any mapper's internal db reference
+         *
+         * This is a bit gruesome but there seems to be no other way obtain such an instance without changing the entire
+         * swamp usage o this method. Anyway, I chose the most appropriate mapper possible.
+         */
+        $fieldContextCheck = new ValidConfiguration(FieldContextMapper::getInstance()->getDatabase());
+
+        if (!$fieldContextCheck->isSatisfiedBy($this)) {
             return false;
         }
 
