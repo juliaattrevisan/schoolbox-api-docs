@@ -818,8 +818,15 @@ class MapperProxy
      */
     public function findAllByCourseImplementationId(int $courseImplId, array $options = []): GenericCollection
     {
+        // Find all unit impls for this course impl,
+        // then return all assessables for those unit impls.
+        $unitImplMapper = $this->baseMapper->getJoinMapper('assessment_course_unit_implementation');
+        $unitImplIds    = $unitImplMapper->findIdsbyColumn('course_implementation_id', $courseImplId);
+        if (empty($unitImplIds)) {
+            return $this->createCollection();
+        }
         $builder = $this->convertOptionsToPredicateBuilder($options, false)
-                        ->equals('uic.id', $courseImplId);
+                        ->in('ui.id', $unitImplIds);
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
