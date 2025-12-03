@@ -8,19 +8,29 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\Deleted;
+use Alaress\Database\Connector\IConnector;
 
 class ValidConfiguration
 {
     /**
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper $fieldContextMapper
-     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper $dialogAgentDataModelMapper
+     * This lets you use an Internal Database instance to do the relatively trivial evaluation
      */
-    public function __construct(
-        private \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper $fieldContextMapper,
-        private \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper $dialogAgentDataModelMapper,
-    ) {
+    private const string QUERY = "
+        SELECT COUNT(dasfc.id) AS numInvalid
+        FROM dialog_agent_scenario_field_context dasfc
+        INNER JOIN dialog_agent da ON dasfc.dialog_agent_id = da.id
+        WHERE da.deleted_at IS NULL
+        AND dasfc.deleted_at IS NULL
+        AND (dasfc.body IS NULL OR 0 = LENGTH(TRIM(dasfc.body)))
+        AND da.assessment_id = :assessmentId
+    ";
+
+
+    /**
+     * @param IConnector $db
+     */
+    public function __construct(private IConnector $db)
+    {
     }
 
 
@@ -32,8 +42,6 @@ class ValidConfiguration
      *
      * @param Model $assessment
      * @return bool
-     * @throws Exception
-     * @throws Deleted
      */
     public function isSatisfiedBy(Model $assessment): bool
     {
@@ -43,23 +51,15 @@ class ValidConfiguration
             return false;
         }
 
-        /* Assessment instances don't know about their sub-object's ids :(
-         */
-        $dialogAgentId = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId();
-
         /* Find all the contexts that an instructor was supposed to provide for each field in the scenario
          * These are used by the AI to evaluate learners' inputs
          */
-        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId);
+        $statement = $this->db->prepare(self::QUERY);
 
-        foreach ($fieldContexts as $fieldContext) {
-            if ('' === trim((string)$fieldContext->getBody())) {
-                return false;
-            }
-        }
+        $statement->execute([
+            'assessmentId' => $assessment->getId()
+        ]);
 
-        /* I guess you passed the barest minimum then
-         */
-        return true;
+        return (int)$statement->fetch()['numInvalid'] === 0;
     }
 }
