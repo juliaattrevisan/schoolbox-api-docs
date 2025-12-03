@@ -52,7 +52,7 @@
             {%- elseif isDialogAgent -%}
                 {# TODO I had to make up the langauge for this on the spot... #}
                 {% set submitTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
-                {% set markedTitleSuffix = 'AI-based feedback generation' -%}
+                {% set markedTitleSuffix = 'feedback generation' -%}
                 {% set markedPastTense = 'evaluated' %}
             {%- else -%}
                 {% set submitTitleSuffix = '' -%}
