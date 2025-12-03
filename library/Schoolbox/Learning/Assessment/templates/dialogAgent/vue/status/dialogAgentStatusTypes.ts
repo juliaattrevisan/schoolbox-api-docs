@@ -19,7 +19,7 @@ export type DialogAgentResponse = {
         status?: string | null;
         [DialogAgentResponseAction.ACTION_VIEW]?: string | null;
         [DialogAgentResponseAction.ACTION_MESSAGE]?: string | null;
-        [DialogAgentResponseAction.ACTION_SOBO]?: string | null;
+        [DialogAgentResponseAction.ACTION_SUBMIT]?: string | null;
         [DialogAgentResponseAction.ACTION_REOPEN]?: string | null;
         [DialogAgentResponseAction.ACTION_ASSISTANCE_REQUEST]?: string | null;
         [DialogAgentResponseAction.ACTION_ASSISTANCE_RESOLVE]?: string | null;

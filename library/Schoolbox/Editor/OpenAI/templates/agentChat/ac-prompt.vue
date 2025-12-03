@@ -8,6 +8,7 @@ import type { AgentChatPromptAttribute } from "./agentChatTypes";
 import { acPromptEventKey } from "./agentChatSymbols";
 
 interface Props {
+    disabled?: boolean;
     requestConfig: AgentChatRequestConfig;
     /** Whether or not to allow a file to be uploaded for image context */
     allowFileDrop?: boolean;
@@ -94,10 +95,15 @@ async function sendRequest(): Promise<void> {
 
 /**
  * The form is disabled if:
+ * - the entire component is disabled
  * - there is an active generation in progress
  * - an invalid image was uploaded (the user must remove it first)
  */
 const isFormDisabled = window.Vue.computed(() => {
+    if (props.disabled) {
+        return true;
+    }
+
     if (acStore.activeGeneration !== null) {
         return true;
     }
@@ -117,6 +123,7 @@ const isFormDisabled = window.Vue.computed(() => {
         v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
         accept="image/jpeg,image/png,image/gif,image/webp"
+        :disabled="props.disabled"
     />
 
     <label>

@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 export type ConfirmableAction = (typeof confirmableActions)[number];
 const confirmableActions = [
-    DialogAgentResponseAction.ACTION_SOBO,
+    DialogAgentResponseAction.ACTION_SUBMIT,
     DialogAgentResponseAction.ACTION_RESET,
     DialogAgentResponseAction.ACTION_REOPEN,
 ] as const;
@@ -106,10 +106,10 @@ async function triggerAction(
 /**
  * When the user clicks on "Submit on behalf of"
  */
-async function onSobo(): Promise<void> {
+async function onSubmit(): Promise<void> {
     const toastContext = `on behalf of ${props.participant.user.fullName}`;
     await triggerAction(
-        DialogAgentResponseAction.ACTION_SOBO,
+        DialogAgentResponseAction.ACTION_SUBMIT,
         `Submitting ${toastContext}`,
         `Submitted ${toastContext}`,
         `Failed to submit ${toastContext}`,
@@ -167,8 +167,8 @@ async function onResolve(): Promise<void> {
             {{ `${locale.dialogAgent.proper()} History` }}
         </a>
     </li>
-    <li v-if="props.participant.response?._routes.sobo">
-        <button class="icon-approve" @click="onSobo">
+    <li v-if="props.participant.response?._routes.submit">
+        <button class="icon-approve" @click="onSubmit">
             {{ `Submit on behalf of ${props.participant.user.fullName}` }}
         </button>
     </li>

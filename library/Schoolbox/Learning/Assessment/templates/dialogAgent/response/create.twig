@@ -4,11 +4,11 @@
  # This is where students get to interact with the dialog agent's chosen scenario, using all of that scenario
  # context fields that the staff entered to evaluate the conversation
  #
- # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
- # @param \Schoolbox\User $student        The student who will be creating the response
- # @param Participant $participant        A participant instance for $student, if extant
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
- # @param array $response                 Info about the response that we are creating/resuming
+ # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
+ # @param array $feed                     The agent chat feed data current response
+ # @param array $student                  Array of author info about the student creating the response
+ # @param array $response                 Array about the response that we are creating/resuming
  # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
  # @param string $returnUrl               A redirect destination
  #}
@@ -30,6 +30,7 @@
                     :feed="{{ feed |json_encode }}"
                     :response="{{ response |json_encode }}"
                     :student="{{ student |json_encode }}"
+                    return-url="{{ returnUrl }}"
                 />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentChat.js?v={{ config.site_version }}"></script>

@@ -465,15 +465,12 @@ class Controller extends Assessment\Controller
         $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
 
         $data = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    sprintf('Create Response for %s', $assessment->getTitle()),
-                ]
-            ),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                \sprintf('Create Response for %s', $assessment->getTitle()),
+            ]),
             'assessment' => $assessment,
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
-            'participant' => $participant,
             'response' => $responseTranslator->__invoke($response),
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
@@ -487,100 +484,18 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * TODO This is when students hit the submit button to finalise their dialog agent discussion
-     *  Currently a placeholder to spawn data
+     * In dialog agent land, a response must already exist to submit against it,
+     * since the logic is identical to SOBO, this is done inside Learning\DialogAgent\Controller instead
+     * to take advantage of the auth rules in that module.
      *
      * @param IAssessable $assessment
-     * @param User $student
-     * @return void
-     * @throws Deleted
-     * @throws Exception
-     * @throws RouteNotFound
+     * @param User        $student
+     * @throws Exception\NotFound
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
-        // TODO: this endpoint needs thought, it shouldn't be *creating* a response because you would already have one to be submitting against
-        // perhaps this is actually where postMessage should be?
-
-        $requestPost = $this->requestPost;
-
-        /* If an existing responseId was provided, update that instance
-         * Otherwise spawn a new instance, configure that, and save it.
-         */
-        if ($requestPost->get('responseId')) {
-            $response = $this->dialogAgentResponseMapper->findByColumnList([
-                'id' => $requestPost->get('responseId'),
-                'dialog_agent_id' => $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId(),
-                'learner_id' => $student->getId()
-            ])->first();
-
-            /* Intentionally dies if the responseId is not authored by $student for this $assessment instance.
-             * This should stop people from stealing some other guy's response, and also prevent them from stealing
-             * their own response to a different assessment and repurposing it here.
-             */
-            if (null === $response) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-            }
-
-            // TODO: you shouldn't be able to edit a submitted response, but I think this would let you at the moment
-        } else {
-            // TODO: this would allow for multiple draft responses, which is probably not what we want
-            // instead, perhaps it should validate that the response you *should* be editing is the one you're actually editing?
-            // i.e. the same logic as getCreateResponseForm's existingResponse lookup, as theoretically you should never have two drafts
-
-            $response = $this->dialogAgentResponseMapper->createModel()
-                ->setSubmittedOnBehalfOf($student)
-                ->setCreatedBy($this->getUser()->getId())
-                ->setCreatedAt(\Alaress_Date_Format::now());
-        }
-
-        $participant = $assessment->getParticipant($student);
-
-        /* If this is the only response for this participant, make it authoritative
-         * otherwise you end up with draft responses but none are counted as the one that matters
-         * and places such as the status page will assume that there isn't any response in progress
-         */
-        $otherResponses = $participant->getAllResponses()->filter(fn($resp) => $resp->getId() !== $response->getId());
-        if ($otherResponses->count() === 0) {
-            $response->setAuthoritative(true);
-        }
-
-        /* TODO populate with whatever snake did
-         */
-        $response->setAssessable($assessment)
-            ->setUpdatedBy($this->getUser()->getId())
-            ->setUpdatedAt(\Alaress_Date_Format::now());
-
-        // TODO TEMPORARY, the session ID should actually be delt with only by the backend since it should be able to track it by the response ID
-        // When we recieve a request to send a message, it needs to:
-        // - find the response by ID (unless it's already done by the module, or we're just using this endpoint)
-        // - if there is no session ID yet, create one and store it against the response BUT DON'T SAVE YET, a foreign key constraint will fail if the AI log doesn't have that ID yet...
-        // - send the message to the AI and log against the session ID
-        // - once the AI has responded, save the response. This is also where you'll probably change "startedAt" and update updatedAt again I guess, also dealing with duration somehow before all this
-        $response->setSessionId($this->requestPost->get('sessionId'));
-
-        $this->dialogAgentResponseMapper->save($response);
-
-        /* TODO this probably isn't tne nicest way to generate a redirected url
-         *  There *has* to be a cleaner way than this, esp. since returnUrl is a const in the Redirect
-         *  class itself, but is magically being written here.
-         *
-         * Also if this is intended as final submission, we'd need to mark it as submitted.
-         * However, I most expect this will be both for messaging the AI (i.e. each message you send) as well as final submission
-         * Hence, it probably doesn't even need to redirect (or shouldn't) until final submission, or let the frontend deal with that?
-         */
-        $this->response = $this->redirectFound(
-            $this->routeGenerator->generate(
-                'learningAssessment.getSummary',
-                [
-                    'assessmentId' => $assessment->getId(),
-                    'studentId'    => $student->getId()
-                ]
-            ) . (
-            ($requestPost->get('returnUrl') === null) ? '' :
-                '?returnUrl=' .  Redirect::encode($requestPost->get('returnUrl'))
-            )
-        );
+        // this page does not exist
+        throw new Exception\NotFound();
     }
 
 

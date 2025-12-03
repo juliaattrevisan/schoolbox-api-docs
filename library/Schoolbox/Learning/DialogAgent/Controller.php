@@ -263,8 +263,14 @@ class Controller extends Base
         if (null === $aiSessionId) {
             $aiSessionId = Uuid::uuid4()->toString();
             $response->setSessionId($aiSessionId);
-            // TODO: you can't actually save here as the log doesn't exist yet
-            // $this->dialogAgentResponseMapper->save($response);
+
+            /**
+             * The first message represents the "start" of a response, so you can have a draft response but it still be
+             * in the "incomplete" state until the first message is sent, then it progresses to "in progress".
+             *
+             * You must end up here at least once per response (when the first message is sent)
+             */
+            $response->setStartedAt(\Alaress_Date_Format::now());
         }
 
         $agent = new OpenAI\Agent\DialogAgentChat(
@@ -420,14 +426,15 @@ class Controller extends Base
 
 
     /**
-     * Forcibly submit a student's authoritative response
+     * Either a student hits the submit button to finalise their dialog agent discussion,
+     * or an instructor forcibly finalises a response on behalf of the student.
      *
      * @param IAssessable $assessment
      * @param User $student
      * @param Response $response
      * @return void
      */
-    public function postSobo(IAssessable $assessment, User $student, Response $response): void
+    public function postSubmit(IAssessable $assessment, User $student, Response $response): void
     {
         $response
             ->setSubmittedAt(\Alaress_Date_Format::now())

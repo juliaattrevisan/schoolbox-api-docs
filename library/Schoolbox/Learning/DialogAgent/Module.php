@@ -108,12 +108,6 @@ class Module extends BaseModule
                 throw new NotFound();
             }
 
-            /* You can't operate on a non-authoritative response: you're not doing that one anymore
-             */
-            if (!$response->getAuthoritative()) {
-                throw new NotFound();
-            }
-
             /* Add this response to the tuple we previously obtained and return that:
              * a matching response exists for this person
              */
@@ -125,10 +119,28 @@ class Module extends BaseModule
         /* Shortcuts to Authorization Rule constructs
          */
         $isSuper = $this->getAuthRule('isSuperuser');
-        $canSubmit = $this->buildAuthRuleCanSubmit();
         $canViewResponse = $this->buildAuthRuleCanViewResponse();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
         $isAIFeatureEnabled = new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIALOGAGENT, $this->getConfig());
+
+        $isAuthoritativeResponse = new Rule\Callback(function (array $params): void {
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
+            $response = $params['response'] ?? null;
+            if (null === $response || !$response->getAuthoritative()) {
+                throw new NotFound('This action can only be performed on an authoritative response');
+            }
+        });
+
+        /**
+         * For a learner to be able to submit, you must meet the normal criteria, as well as:
+         * - The current status of the response allows it to be submitted
+         * - The response must be authoritative, you can't change the state of non-auth responses
+         */
+        $canSubmit = new Rule\All(
+            $this->buildAuthRuleCanSubmit(),
+            $this->buildRuleCanAction(Status::ACTION_SUBMIT),
+            $isAuthoritativeResponse,
+        );
 
         $canModify = new Rule\Any(
             $isSuper,
@@ -197,9 +209,12 @@ class Module extends BaseModule
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
          * with details about who did the sobo
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/sobo/{$responseParam}", 'postSobo', new Rule\All(
-            $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_SOBO)
+        $this->register('POST', "{$assRoute}/{$studentParam}/submit/{$responseParam}", 'postSubmit', new Rule\All(
+            new Rule\Any(
+                $canWrite,
+                $canSubmit
+            ),
+            $this->buildRuleCanAction(Status::ACTION_SUBMIT)
         ), $preloadParticipantAndResponse);
 
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response

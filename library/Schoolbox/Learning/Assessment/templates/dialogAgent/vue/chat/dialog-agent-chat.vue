@@ -2,6 +2,7 @@
 import { useMousePressed } from "@vueuse/core";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
@@ -14,6 +15,7 @@ interface Props {
     feed: AiLogAgentChatData[];
     response: DialogAgentResponse;
     student: UserAuthor;
+    returnUrl: string;
 }
 
 const props = defineProps<Props>();
@@ -116,13 +118,33 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
     currentResponse.value = response.data.response;
 }
 
+const isSubmitModalOpen = window.Vue.ref(false);
+const isSubmitting = window.Vue.ref(false);
+const submitError = window.Vue.ref<string | null>(null);
+
 /**
  * When a learner or instructor clicks the submit button inside the modal
  */
-function submitResponse(): void {
-    // TODO: show a modal first, for students and/or staff?
+async function submitResponse(): Promise<void> {
+    if (!currentResponse.value._routes.submit) {
+        throw new Error("unable to submit, missing submit route"); // shouldn't get here
+    }
 
-    console.warn("TODO"); // TODO
+    isSubmitting.value = true;
+    submitError.value = null;
+    const response = await apiRequest<ApiDialogAgentActionResponse>({
+        method: "POST",
+        url: currentResponse.value._routes.submit,
+    });
+
+    if (!response.success) {
+        isSubmitting.value = false;
+        submitError.value = response.message;
+        return;
+    }
+
+    /** If successful, redirect to the return URL - keep isSubmitting as true as the page will soon unload */
+    window.location.href = props.returnUrl;
 }
 
 /**
@@ -215,15 +237,21 @@ window.Vue.onUnmounted(() => {
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button class="button submit icon-approve" type="submit" @click="submitResponse">
-                {{ isInstructor ? `Submit on behalf of ${props.student.fullName}` : "Submit" }}
+            <button
+                class="button submit icon-approve"
+                type="submit"
+                :disabled="isSubmitting || undefined"
+                @click="isSubmitModalOpen = true"
+            >
+                {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
+                <!-- TODO: `Submit on behalf of ${props.student.fullName}` in SA-21415 -->
             </button>
         </nav>
     </div>
 
     <ac-feed
         ref="feedRef"
-        class="l-mar-m--bottom"
+        class="l-mar-m--bottom ac-feed"
         min-height="20rem"
         :max-height="maxFeedHeight"
         :feed="acStore.fullFeed"
@@ -233,7 +261,7 @@ window.Vue.onUnmounted(() => {
         <template #header>
             <div
                 v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                class="alert-box highlight l-mar--0 l-pad-xs l-pad-m--left"
+                class="alert-box highlight l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
@@ -265,12 +293,37 @@ window.Vue.onUnmounted(() => {
             }"
             prompt-placeholder="Type a response here..."
             :prompt-attributes="[]"
+            :disabled="isSubmitting"
         />
     </div>
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
+
+    <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
+        <h2>Confirm Submission</h2>
+        <p>
+            Are you sure you want to finalise this response? Once submitted, you will not be able to make further
+            changes.
+        </p>
+        <div v-if="submitError" class="alert-box alert">
+            <span>{{ submitError }}</span>
+            <a href="#" class="close" @click.prevent="submitError = null">×</a>
+        </div>
+        <ul class="flex-list buttons">
+            <li>
+                <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
+                    {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
+                </button>
+            </li>
+            <li><button class="button" @click="isSubmitModalOpen = false">Cancel</button></li>
+        </ul>
+    </basic-modal>
 </template>
 
 <style scoped lang="scss">
+.ac-feed .alert-box {
+    margin-bottom: 0;
+}
+
 /* styles for printing (scoped) */
 @media print {
     .no-print {
