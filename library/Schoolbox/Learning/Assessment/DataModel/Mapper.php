@@ -1059,6 +1059,7 @@ class Mapper extends BaseMapper
         $projectIds         = [];
         $taskIds            = [];
         $contextUnitSpecIds = [];
+        $contextUnitImplIds = [];
         $contextProjectIds  = [];
         $lessonPlanIds      = [];
 
@@ -1190,20 +1191,21 @@ class Mapper extends BaseMapper
                 // Unit impl
                 /** @var UnitImpl\Model $unitImpl */
                 $unitImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
-                /** @var CourseImpl\Model $courseImpl */
-                $courseImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
-                                   ->setFolder(
-                                       $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
-                                   );
-                $unitImpl->setCourse($courseImpl);
-                $courseImpl->getUnits()[$unitImpl->getId()] = $unitImpl;
-                /** @var UnitSpec\Model $unitSpec */
-                $unitSpec = $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
-                                 ->setFolder(
-                                     $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
-                                 );
-                $unitImpl->setSpecification($unitSpec);
-                $unitSpec->getUnitImplementations()[$unitImpl->getId()] = $unitImpl;
+//                /** @var CourseImpl\Model $courseImpl */
+//                $courseImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
+//                                   ->setFolder(
+//                                       $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
+//                                   );
+//                $unitImpl->setCourse($courseImpl);
+//                $courseImpl->getUnits()[$unitImpl->getId()] = $unitImpl;
+//                /** @var UnitSpec\Model $unitSpec */
+//                $unitSpec = $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
+//                                 ->setFolder(
+//                                     $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
+//                                 );
+//                $unitImpl->setSpecification($unitSpec);
+//                $unitSpec->getUnitImplementations()[$unitImpl->getId()] = $unitImpl;
+                $contextUnitImplIds[] = $row['ui.id'];
                 $context = $unitImpl;
             } elseif ($row['pa.id']) {
                 // Project
@@ -1241,8 +1243,7 @@ class Mapper extends BaseMapper
 
         // Augment all contexts
         $modelList = $this->augmentListWithUnitSpecContexts($modelList, $contextUnitSpecIds);
-
-        // Project contexts
+        $modelList = $this->augmentListWithUnitImplContexts($modelList, $contextUnitImplIds);
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
             $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
@@ -1813,6 +1814,34 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
+
+    /**
+     * Augments the list from hydrateSelect() with context unit implementations.
+     *
+     * @param Collection<Model> $modelList
+     * @param array             $unitImplIds
+     * @return Collection<Model>
+     */
+    private function augmentListWithUnitImplContexts(Collection $modelList, array $unitImplIds): Collection
+    {
+        if (!empty($unitImplIds)) {
+            /** @var UnitImpl\Mapper $contextUnitImplMapper */
+            $contextUnitImplMapper = $this->getJoinMapper('assessment_course_unit_implementation');
+            $contextUnitImpls      = $contextUnitImplMapper->findByColumn('id', $unitImplIds)->indexBy('id');
+
+            foreach ($modelList as $model) {
+                $context = $model->getAssessmentContext();
+                if ($context instanceof UnitImpl\Model) {
+                    $hydratedContext = $contextUnitImpls[$context->getId()] ?? null;
+                    if ($hydratedContext instanceof UnitImpl\Model) {
+                        $model->setAssessmentContext($hydratedContext);
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
 
     /**
      * Augments the list from hydrateSelect() with context projects.
