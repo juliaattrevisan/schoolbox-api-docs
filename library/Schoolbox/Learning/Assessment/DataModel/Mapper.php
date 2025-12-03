@@ -565,8 +565,12 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Selecting from the assessment table also returns whatever assessable
-     * object is joined onto it.
+     * Selecting from the assessment table also returns:
+     * * whatever actual activity (due work, quiz, etc.) is joined onto it
+     * * the assessment's context
+     *
+     * `hydrateSelect` will then hydrate the activity's and context's
+     * sub-objects.
      *
      * @return string
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
@@ -605,7 +609,15 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
+        ";
+    }
 
+    /**
+     * @return string
+     */
+    public function getFromString(): string
+    {
+        return "
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
