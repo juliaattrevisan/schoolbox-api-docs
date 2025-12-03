@@ -134,13 +134,14 @@ async function submitResponse(): Promise<void> {
         method: "POST",
         url: currentResponse.value._routes.submit,
     });
-    isSubmitting.value = false;
 
     if (!response.success) {
+        isSubmitting.value = false;
         submitError.value = response.message;
         return;
     }
 
+    /** If successful, redirect to the return URL - keep isSubmitting as true as the page will soon unload */
     window.location.href = props.returnUrl;
 }
 
