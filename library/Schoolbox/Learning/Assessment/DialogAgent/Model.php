@@ -261,9 +261,26 @@ class Model extends AbstractAssessment
     {
         $this->assertSameAssessment($participant);
 
+        /* Check if a response exists; if there isn't one, we don't need a feedback for it
+         */
+        $response = $this->getAuthoritativeResponse($participant, true);
+
+        if (!$response) {
+            return false;
+        }
+
+        /* Check that it's been submitted too
+         */
+        if (!$response->isSubmitted()) {
+            return false;
+        }
+
+        /* Authoritative response exists and is submitted; see if there's a feedback for it already.
+         * If not, then we need it
+         */
         $feedback = $this->getAuthoritativeFeedback($participant, true);
 
-        return (bool)$feedback;
+        return null === $feedback;
     }
 
 
