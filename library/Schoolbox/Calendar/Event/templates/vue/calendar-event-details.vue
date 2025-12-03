@@ -662,8 +662,8 @@ export default {
                         <a
                             class="icon-add f-no-margins"
                             @click.prevent="showAddResourceBookingsModal()"
-                            aria-label="Add a resource booking"
-                            title="Add a resource booking"
+                            aria-label="Add resource bookings"
+                            title="Add resource bookings"
                         >
                         </a>
                     </nav>
