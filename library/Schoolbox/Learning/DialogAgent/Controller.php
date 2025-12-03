@@ -22,6 +22,7 @@ use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMap
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextModel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\Editor\OpenAI\Log\ModelToArray as AILogModelToArray;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -272,7 +273,7 @@ class Controller extends Base
 
             /* Assume they have the right log type since sessionId came from the response */
             foreach ($logEntries as $log) {
-                $feed->add(\Schoolbox\OpenAi\AgentChat\MessageHandler::translateLogData($log));
+                $feed->add(AILogModelToArray::translateLogData($log));
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere

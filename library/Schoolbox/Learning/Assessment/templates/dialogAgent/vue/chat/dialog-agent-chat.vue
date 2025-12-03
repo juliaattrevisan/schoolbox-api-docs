@@ -7,19 +7,15 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
-import DasActions from "../status/das-actions.vue";
 
 interface Props {
     feed: AiLogAgentChatData[];
     response: DialogAgentResponse;
     student: UserAuthor;
-    summaryRoute?: string | null;
     returnUrl: string;
-    readonly: boolean;
 }
 
 const props = defineProps<Props>();
@@ -27,48 +23,9 @@ const acStore = useAgentChatStore();
 
 const currentResponse = window.Vue.ref<DialogAgentResponse>(props.response);
 
-/** If the current user isn't the student, they're the instructor I guess */
-const isInstructor = window.Vue.computed(() => {
-    return props.student.id !== window.schoolboxUser.id;
-});
-
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
-
-    // TODO: all temporary, needs to inject into the right timeline position when it actually exists etc
-    if (props.readonly && isInstructor.value) {
-        acStore.feed.push({
-            // TODO: this would only ever come from props.feed
-            type: AgentChatMessageType.ALERT,
-            side: AgentChatMessageType.RESPONSE,
-            severity: "warning",
-            entryKey: acStore.getNextEntryKey(),
-            message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
-        });
-
-        const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
-        acStore.feed.push({
-            // TODO: a teacher can't spawn this, but they can 'resolve' it so we would need to track it somehow
-            // hence need to be able to insert it based on the createdAt time of each log entry (not currently tracked on the frontend)
-            // and then not include it when it's eventually resolved
-            type: AgentChatMessageType.ALERT,
-            side: AgentChatMessageType.REQUEST,
-            severity: "warning-tint",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-        });
-
-        // This won't actually exist I think. The "requested assistance" message just gets purged
-        // const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-        // acStore.feed.push({
-        //     type: "alert",
-        //     side: "request",
-        //     severity: "highlight",
-        //     entryKey: acStore.getNextEntryKey(),
-        //     message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
-        // });
-    }
 });
 
 const isHelpRequestChanging = window.Vue.ref(false);
@@ -221,29 +178,10 @@ window.Vue.onUnmounted(() => {
     window.removeEventListener("DOMContentLoaded", updateFeedHeight);
     document.removeEventListener("mouseup", onMouseUp);
 });
-
-/**
- * Reload the page after an action so that changes are reflected
- * This could be expanded to properly load back the state,
- * but since twig renders some stuff at the moment, this is good enough for now
- */
-function onAction(): void {
-    window.location.reload();
-}
 </script>
 
 <template>
-    <Teleport v-if="props.readonly" to="#header-options">
-        <das-actions
-            :user="props.student"
-            :response="currentResponse"
-            :summary-route="props.summaryRoute"
-            :show-view="false"
-            @update-response="onAction"
-        />
-    </Teleport>
-
-    <div v-else class="actions-small-1 l-mar-s--bottom no-print">
+    <div class="actions-small-1 l-mar-s--bottom no-print">
         <button
             v-if="currentResponse._routes.assistanceRequest"
             class="button"
@@ -269,7 +207,7 @@ function onAction(): void {
     >
         <template #header>
             <div
-                v-if="!props.readonly && currentResponse.assistanceRequestedAt !== null"
+                v-if="currentResponse.assistanceRequestedAt !== null"
                 class="alert-box highlight l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
@@ -294,7 +232,7 @@ function onAction(): void {
     </ac-feed>
     <div class="no-print">
         <ac-prompt
-            v-if="!props.readonly && props.response._routes.message"
+            v-if="props.response._routes.message"
             :request-config="{
                 messageRoute: props.response._routes.message,
                 aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
