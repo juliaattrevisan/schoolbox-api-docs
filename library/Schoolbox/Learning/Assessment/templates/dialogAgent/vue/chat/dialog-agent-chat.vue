@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import locale from "@js/terminology/rosettaStone";
 import { useMousePressed } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
@@ -308,23 +309,33 @@ function onAction(): void {
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 
     <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
-        <h2>Confirm Submission</h2>
-        <p>
-            Are you sure you want to finalise this {{ locale.dialogAgent.singular() }}? Once submitted, you will not be
-            able to make further changes.
-        </p>
-        <div v-if="submitError" class="alert-box alert">
-            <span>{{ submitError }}</span>
-            <a href="#" class="close" @click.prevent="submitError = null">×</a>
-        </div>
-        <ul class="flex-list buttons">
-            <li>
-                <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
-                    {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
-                </button>
-            </li>
-            <li><button class="button" @click="isSubmitModalOpen = false">Cancel</button></li>
-        </ul>
+        <template v-if="props.response._routes.submit">
+            <h2>Confirm Submission</h2>
+            <p>
+                Are you sure you want to finalise this {{ locale.dialogAgent.singular() }}? Once submitted, you will not
+                be able to make further changes.
+            </p>
+            <div v-if="submitError" class="alert-box alert">
+                <span>{{ submitError }}</span>
+                <a href="#" class="close" @click.prevent="submitError = null">×</a>
+            </div>
+            <ul class="flex-list buttons">
+                <li>
+                    <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
+                        {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
+                    </button>
+                </li>
+                <li><button class="button" @click="isSubmitModalOpen = false">Cancel</button></li>
+            </ul>
+        </template>
+        <template v-else>
+            <h2>Nothing To Submit</h2>
+            <p>
+                You haven't made any responses for this {{ locale.dialogAgent.singular() }} yet. Please complete the
+                {{ locale.activity.singular() }} and try again.
+            </p>
+            <button class="button full-width" @click="isSubmitModalOpen = false">Close</button>
+        </template>
     </basic-modal>
 </template>
 
