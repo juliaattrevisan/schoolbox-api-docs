@@ -60,8 +60,15 @@
     &:focus {
         @include sbx-form.form-input-focus;
     }
-    &:disabled {
+    &:disabled,
+    [type="submit"]:disabled,
+    .flex-list.buttons a.submit:disabled,
+    .flex-list.buttons button.submit:disabled,
+    a.submit:disabled,
+    button.submit:disabled {
         @include sbx-form.form-input-disabled;
+        border: none !important;
+        border-radius: var(--sbx-border-radius-normal) !important;
     }
 }
 

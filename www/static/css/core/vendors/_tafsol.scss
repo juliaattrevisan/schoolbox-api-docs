@@ -747,6 +747,7 @@ input[type="radio"] + .block {
             & button {
                 background-color: transparent !important;
                 border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+                border-radius: var(--sbx-border-radius-normal);
                 color: var(--sbx-color-accent) !important;
             }
         }
@@ -756,6 +757,7 @@ input[type="radio"] + .block {
             & button {
                 background-color: var(--sbx-color-accent);
                 border: 1px solid var(--sbx-color-accent);
+                border-radius: var(--sbx-border-radius-normal);
                 color: var(--sbx-color-accent-text);
             }
         }
