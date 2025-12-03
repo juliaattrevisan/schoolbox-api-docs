@@ -466,8 +466,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('resource', 'r')},
                 {$this->getJoinColumnString('status', 's')}
             FROM {$this->getTable()} b
-            JOIN {$this->getJoinSql('resource', 'b', 'r')}
-            JOIN {$this->getJoinSql('status', 'b', 's')}
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            INNER JOIN {$this->getJoinSql('status', 'b', 's')}
             WHERE b.event_id=:eventId
             AND b.deleted_at IS NULL
             AND r.deleted_at IS NULL
