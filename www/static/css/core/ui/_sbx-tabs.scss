@@ -29,6 +29,20 @@
     }
 }
 
+/**
+* Vertical tabs
+* We need this for badge creation modal
+ **/
+
+.tabs.vertical {
+    flex-direction: column;
+
+    & .tab-title:first-child {
+        & a {
+            border-top-left-radius: var(--sbx-border-radius-normal);
+        }
+    }
+}
 /* Tabs component styles */
 .component-tabs {
     & .tabs {
