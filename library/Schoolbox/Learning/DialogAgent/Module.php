@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
+use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -170,13 +171,17 @@ class Module extends BaseModule
 
         /* Get the status of a particular response
          */
-        $this->register('GET', "{$assRoute}/{$studentParam}/status/{$responseParam}", 'getStatus', $canViewResponse, $preloadParticipantAndResponse);
+        $this->register('GET', "{$assRoute}/{$studentParam}/status/{$responseParam}", 'getStatus', new Rule\All(
+            $canViewResponse,
+            $this->buildIsConfiguredAuthRule()
+        ), $preloadParticipantAndResponse);
 
         /* View a response (readonly mode)
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
             $canViewResponse,
-            $this->buildRuleCanAction(Status::ACTION_VIEW)
+            $this->buildRuleCanAction(Status::ACTION_VIEW),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
         /* Student sends a message to the chat agent for a particular response
@@ -184,14 +189,16 @@ class Module extends BaseModule
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
             $canInteractWithResponse,
-            $this->buildRuleCanAction(Status::ACTION_MESSAGE)
+            $this->buildRuleCanAction(Status::ACTION_MESSAGE),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
             $canInteractWithResponse,
-            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST)
+            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
         /* A student who asked for assistance got their situation resolved and can have the assistance request cleared.
@@ -202,7 +209,8 @@ class Module extends BaseModule
                 $canWrite,
                 $canInteractWithResponse,
             ),
-            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE)
+            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
         /* Either a student hits the submit button to finalise their dialog agent discussion,
@@ -214,14 +222,16 @@ class Module extends BaseModule
                 $canSubmit,
             ),
             $isAuthoritativeResponse,
-            $this->buildRuleCanAction(Status::ACTION_SUBMIT)
+            $this->buildRuleCanAction(Status::ACTION_SUBMIT),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{$responseParam}", 'postReopen', new Rule\All(
             $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_REOPEN)
+            $this->buildRuleCanAction(Status::ACTION_REOPEN),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
         /* Resets a dialog agent for a particular person. This creates a new authoritative response instance,
@@ -229,8 +239,28 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/reset/{$responseParam}", 'postReset', new Rule\All(
             $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_RESET)
+            $this->buildRuleCanAction(Status::ACTION_RESET),
+            $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
+    }
+
+
+    /**
+     * Ensure the Dialog Agent is fully configured first
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function buildIsConfiguredAuthRule(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params): void {
+                if ((new DialogAgent\ValidConfiguration($this->injector->get('databaseInternal')))->isSatisfiedBy($params['assessment'])) {
+                    return;
+                }
+
+                throw new Misconfigured();
+            })
+        );
     }
 
 
