@@ -3,3 +3,18 @@
 {% if config.advanced_ui_enabled %}
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/sbx-core.css?v={{ config.site_version }}" />
 {% endif %}
+
+{# OLD icon font #}
+{% if not config.advanced_ui_enabled %}
+<style>
+@font-face {
+    font-family: "schoolbox";
+    src:
+        url("{{ CDN_PREFIX }}/fonts/schoolbox.ttf?ttda0c") format("truetype"),
+        url("{{ CDN_PREFIX }}/fonts/schoolbox.woff?ttda0c") format("woff"),
+        url("{{ CDN_PREFIX }}/fonts/schoolbox.svg?ttda0c#schoolbox") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+</style>
+{% endif %}

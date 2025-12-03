@@ -1,0 +1,9 @@
+/* default = old icon font */
+:root {
+    --sbx-icon-font-family: "schoolbox";
+}
+
+/* new UI overrides it */
+.sbx-body {
+    --sbx-icon-font-family: "sbx-icons";
+}
