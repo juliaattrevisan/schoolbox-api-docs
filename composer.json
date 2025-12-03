@@ -163,5 +163,10 @@
     },
     "extra": {
         "patches-file": "patches.json"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "composer patches-repatch --no-scripts"
+        ]
     }
 }
