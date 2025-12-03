@@ -439,13 +439,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         if (isset($diff['startDateTime'])) {
             $newStartDateTime = new Alaress_Date_Format($diff['startDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
             $oldStartDateTime = new Alaress_Date_Format($diff['startDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
-            $startDiff = $oldStartDateTime->diffInMinutes($newStartDateTime);
+            $startDiff = $oldStartDateTime->diffInMinutes($newStartDateTime, false);
         }
         $endDiff = null;
         if (isset($diff['endDateTime'])) {
             $newEndDateTime = new Alaress_Date_Format($diff['endDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
             $oldEndDateTime = new Alaress_Date_Format($diff['endDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
-            $endDiff = $oldEndDateTime->diffInMinutes($newEndDateTime);
+            $endDiff = $oldEndDateTime->diffInMinutes($newEndDateTime, false);
         }
 
         $bookingMapper = ResourceBookingMapper::getInstance();
