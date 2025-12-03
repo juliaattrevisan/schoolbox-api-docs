@@ -282,6 +282,11 @@ class FilesystemProxy
             $storage->getExtension(),
         );
         if (!file_exists($localCachePath)) {
+            // Ensure the directory exists before writing the file
+            $directory = dirname($localCachePath);
+            if (!is_dir($directory) && !mkdir($directory, 0775, true) && !is_dir($directory)) {
+                throw new UnableToWriteFile("Local cache directory could not be created.");
+            }
             if (false === file_put_contents($localCachePath, $fileContent)) {
                 throw new UnableToWriteFile("Local cache file could not be saved.");
             }
