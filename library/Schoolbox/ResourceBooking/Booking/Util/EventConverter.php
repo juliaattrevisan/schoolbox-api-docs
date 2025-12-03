@@ -20,7 +20,6 @@ use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter
 {
-
     /**
      * The event type for bookings.
      *
