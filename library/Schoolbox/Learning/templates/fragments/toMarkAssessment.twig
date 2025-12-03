@@ -11,6 +11,7 @@
 #}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {# Enable insertion of non IAssessable instance data transfer objects #}
 {% set isTask = isTask ?? assessment is task %}
@@ -18,28 +19,12 @@
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
 {% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
 
-{# A default icon catch-all #}
-{% set icon = 'due-work' %}
-
-{# Specific icon representations for each learning activity
- # TODO SURELY there must be a less annoying way to do this...like asking the assessment itself for its prescribed icon?!
- #}
-{% if isTask %}
-    {% set icon = 'task' %}
-{% elseif isQuiz %}
-    {% set icon = 'quiz' %}
-{% elseif isDueWork %}
-    {% set icon = 'due-work' %}
-{% elseif isDialogAgent %}
-    {% set icon = 'dialog-agent' %}
-{% endif %}
-
 <section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt ? assessment.dueAt.unixTimeStamp : '' }}">
     <div class="content collapsible">
         <div class="card small-8 medium-6 no-pad">
             {#- Dessicator -#}
             <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
-            <i class="size-32 icon-{{ icon }}"></i>
+            <i class="size-32 {{ icon.renderClass(assessment) }}"></i>
             <div class="card-content">
                 <h3>
                     {#- Dessicator -#}
@@ -51,6 +36,7 @@
             </div>
         </div>
         <div class="card medium-6">
+            {# Each learning activity has its own special language #}
             {%- if isQuiz -%}
                 {%- set submitTitleSuffix = 'attempted this quiz' -%}
                 {%- set markedTitleSuffix = 'review' -%}

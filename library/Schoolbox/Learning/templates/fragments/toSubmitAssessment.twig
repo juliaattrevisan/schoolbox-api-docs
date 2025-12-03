@@ -12,14 +12,20 @@
 #}
 {% import 'sub/assessmentContext.twig' as assessmentContext %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 {# Enable insertion of non IAssessable instance data transfer objects #}
 {% set isTask    = isTask    ?? assessment is task %}
 {% set isQuiz    = isQuiz    ?? assessment is quiz %}
 {% set isDueWork = isDueWork ?? assessment is dueWork %}
+{% set isDialogAgent = isDialogAgent ?? assessment is dialogAgent %}
 
-{%- set icon  = isTask ? 'task' : (isQuiz ? 'quiz' : 'due-work') -%}
 {%- set state = isQuiz ? 'unattempted' : 'unsubmitted' -%}
+
+{# Each learning activity has its own special language #}
+{% set submitTitleSuffix = '' -%}
+{% set markedTitleSuffix = '' -%}
+{% set markedPastTense = '' %}
 
 {%- if isQuiz %}
     {%- set submitTitleSuffix    = 'attempted this quiz' -%}
@@ -36,10 +42,12 @@
     {%- set markedTitleSuffix    = 'teacher assessment' -%}
     {%- set noResultsTitleSuffix = 'completed this task' -%}
     {% set markedPastTense = 'assessed' %}
-{%- else -%}
-    {% set submitTitleSuffix = '' -%}
-    {% set markedTitleSuffix = '' -%}
-    {% set markedPastTense = '' %}
+{% elseif isDialogAgent %}
+    {# TODO I had to make up the langauge for this on the spot... #}
+    {%- set submitTitleSuffix    = 'completed this ' ~ locale.dialogAgent -%}
+    {%- set markedTitleSuffix    = 'AI-based feedback generation' -%}
+    {%- set noResultsTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
+    {% set markedPastTense = 'evaluated' %}
 {%- endif -%}
 
 {# Round the percentage values to prevent things like '66.666666%' being displayed. #}
@@ -51,7 +59,7 @@
         <div class="card small-8 medium-6 columns no-pad">
             {#- Dessicator -#}
             <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"></span>
-            <i class="size-32 icon-{{ icon }}"></i>
+            <i class="size-32 {{ icon.renderClass(assessment) }}"></i>
             <div class="card-content">
                 <h3>
                     {#- Dessicator -#}
