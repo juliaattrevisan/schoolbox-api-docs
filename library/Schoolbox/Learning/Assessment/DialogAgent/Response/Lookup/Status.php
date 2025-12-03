@@ -20,7 +20,7 @@ class Status
      */
     public const string ACTION_VIEW = 'view';
     public const string ACTION_MESSAGE = 'message';
-    public const string ACTION_SOBO = 'sobo';
+    public const string ACTION_SUBMIT = 'submit';
     public const string ACTION_RESET = 'reset';
     public const string ACTION_REOPEN = 'reopen';
     public const string ACTION_ASSISTANCE_REQUEST = 'assistanceRequest';
@@ -61,7 +61,7 @@ class Status
                 'actions' => [
                     self::ACTION_VIEW => false,
                     self::ACTION_MESSAGE => false,
-                    self::ACTION_SOBO => false,
+                    self::ACTION_SUBMIT => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
                     self::ACTION_ASSISTANCE_REQUEST => false,
@@ -78,7 +78,7 @@ class Status
                 'actions' => [
                     self::ACTION_VIEW => true,
                     self::ACTION_MESSAGE => false,
-                    self::ACTION_SOBO => false,
+                    self::ACTION_SUBMIT => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => true,
                     self::ACTION_ASSISTANCE_REQUEST => false,
@@ -101,8 +101,8 @@ class Status
                     self::ACTION_VIEW => true,
                     self::ACTION_MESSAGE => true,
                     // TODO: A student could request assistance prior to having a session ID,
-                    // which would then turn ON the SOBO/RESET options... I doubt we want that...
-                    self::ACTION_SOBO => true,
+                    // which would then turn ON the SUBMIT/RESET options... I doubt we want that...
+                    self::ACTION_SUBMIT => true,
                     self::ACTION_RESET => true,
                     self::ACTION_REOPEN => false,
                     self::ACTION_ASSISTANCE_REQUEST => false,
@@ -119,7 +119,7 @@ class Status
                 'actions' => [
                     self::ACTION_VIEW => true,
                     self::ACTION_MESSAGE => true,
-                    self::ACTION_SOBO => false,
+                    self::ACTION_SUBMIT => false,
                     self::ACTION_RESET => false,
                     self::ACTION_REOPEN => false,
                     self::ACTION_ASSISTANCE_REQUEST => true,
@@ -135,7 +135,7 @@ class Status
             'actions' => [
                 self::ACTION_VIEW => true,
                 self::ACTION_MESSAGE => true,
-                self::ACTION_SOBO => true,
+                self::ACTION_SUBMIT => true,
                 self::ACTION_RESET => true,
                 self::ACTION_REOPEN => false,
                 self::ACTION_ASSISTANCE_REQUEST => true,

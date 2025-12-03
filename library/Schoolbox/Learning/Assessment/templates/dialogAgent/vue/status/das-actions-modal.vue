@@ -17,14 +17,14 @@ const emit = defineEmits(["confirm", "cancel"]);
 <template>
     <h2>
         Confirm
-        <template v-if="props.action === DialogAgentResponseAction.ACTION_SOBO"> Submission </template>
+        <template v-if="props.action === DialogAgentResponseAction.ACTION_SUBMIT"> Submission </template>
         <template v-else-if="props.action === DialogAgentResponseAction.ACTION_RESET"> Reset </template>
         <template v-else-if="props.action === DialogAgentResponseAction.ACTION_REOPEN"> Reopen </template>
         <template v-else>{{ assertUnreachable(props.action) }}</template>
     </h2>
 
     <p>
-        <template v-if="props.action === DialogAgentResponseAction.ACTION_SOBO">
+        <template v-if="props.action === DialogAgentResponseAction.ACTION_SUBMIT">
             You are about to submit the active {{ locale.dialogAgent.singular() }} on behalf of
             {{ props.participant.user.fullName }}.
         </template>

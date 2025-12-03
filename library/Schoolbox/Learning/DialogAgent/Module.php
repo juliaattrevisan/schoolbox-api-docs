@@ -197,9 +197,12 @@ class Module extends BaseModule
         /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
          * with details about who did the sobo
          */
-        $this->register('POST', "{$assRoute}/{$studentParam}/sobo/{$responseParam}", 'postSobo', new Rule\All(
-            $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_SOBO)
+        $this->register('POST', "{$assRoute}/{$studentParam}/submit/{$responseParam}", 'postSubmit', new Rule\All(
+            new Rule\Any(
+                $canWrite,
+                $canSubmit
+            ),
+            $this->buildRuleCanAction(Status::ACTION_SUBMIT)
         ), $preloadParticipantAndResponse);
 
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
