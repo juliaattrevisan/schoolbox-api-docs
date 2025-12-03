@@ -2,6 +2,7 @@
 import { useMousePressed } from "@vueuse/core";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
@@ -117,6 +118,7 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
     currentResponse.value = response.data.response;
 }
 
+const isSubmitModalOpen = window.Vue.ref(false);
 const isSubmitting = window.Vue.ref(false);
 const submitError = window.Vue.ref<string | null>(null);
 
@@ -239,7 +241,7 @@ window.Vue.onUnmounted(() => {
                 class="button submit icon-approve"
                 type="submit"
                 :disabled="isSubmitting || undefined"
-                @click="submitResponse"
+                @click="isSubmitModalOpen = true"
             >
                 {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
                 <!-- TODO: `Submit on behalf of ${props.student.fullName}` in SA-21415 -->
@@ -279,11 +281,6 @@ window.Vue.onUnmounted(() => {
                 <span>{{ helpRequestError }}</span>
                 <a href="#" class="close" @click.prevent="helpRequestError = null">×</a>
             </div>
-
-            <div v-if="submitError" class="alert-box alert">
-                <span>{{ submitError }}</span>
-                <a href="#" class="close" @click.prevent="submitError = null">×</a>
-            </div>
         </template>
     </ac-feed>
     <div class="no-print">
@@ -300,6 +297,26 @@ window.Vue.onUnmounted(() => {
         />
     </div>
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
+
+    <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
+        <h2>Confirm Submission</h2>
+        <p>
+            Are you sure you want to finalise this response? Once submitted, you will not be able to make further
+            changes.
+        </p>
+        <div v-if="submitError" class="alert-box alert">
+            <span>{{ submitError }}</span>
+            <a href="#" class="close" @click.prevent="submitError = null">×</a>
+        </div>
+        <ul class="flex-list buttons">
+            <li>
+                <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
+                    {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
+                </button>
+            </li>
+            <li><button class="button" @click="isSubmitModalOpen = false">Cancel</button></li>
+        </ul>
+    </basic-modal>
 </template>
 
 <style scoped lang="scss">
