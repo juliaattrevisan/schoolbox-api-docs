@@ -22,6 +22,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -384,11 +385,10 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      * Post-save hook method
      *
      * @param Event $event
+     * @param Event|null $previous
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
-    protected function postSave($event)
+    protected function postSave(Event $event, ?Event $previous = null)
     {
         // Clear attendance if it has changed from true to false
         if ($event->getAttendanceDirty()) {
@@ -400,6 +400,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->createRoles($event);
         $this->createCampus($event);
         $this->createSource($event);
+
+        // update attached resource bookings
+        $this->updateBookings($event, $previous);
     }
 
     /**
@@ -416,6 +419,43 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
         // also delete all related resource bookings for this event
         $bookingMapper->delete($bookings);
+    }
+
+    /**
+     * Update all resource bookings (start / end times) attached to this event
+     *
+     * @param Event $event
+     * @param Event|null $previous
+     * @return void
+     * @throws MapperException
+     */
+    protected function updateBookings(Event $event, ?Event $previous = null)
+    {
+        // get the diff between the old and new event
+        $diff = $this->diff($event, $previous);
+
+        // get the time diff in minutes
+        $startDiff = null;
+        if (isset($diff['startDateTime'])) {
+            $newStartDateTime = new Alaress_Date_Format($diff['startDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
+            $oldStartDateTime = new Alaress_Date_Format($diff['startDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
+            $startDiff = $oldStartDateTime->diffInMinutes($newStartDateTime);
+        }
+        $endDiff = null;
+        if (isset($diff['endDateTime'])) {
+            $newEndDateTime = new Alaress_Date_Format($diff['endDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
+            $oldEndDateTime = new Alaress_Date_Format($diff['endDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
+            $endDiff = $oldEndDateTime->diffInMinutes($newEndDateTime);
+        }
+
+        $bookingMapper = ResourceBookingMapper::getInstance();
+        $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
+        foreach ($bookings as $booking) {
+            /** @var ResourceBookingModel $booking */
+            $booking->setBookingStartAt($booking->getBookingStartAt()?->addMinutes($startDiff));
+            $booking->setBookingEndAt($booking->getBookingEndAt()?->addMinutes($endDiff));
+            $bookingMapper->save($booking);
+        }
     }
 
     /**
