@@ -142,6 +142,10 @@
     margin: 5px;
 }
 
+/**
+ * Chips component buttons
+ * These need to hide the checkbox input to match design
+ */
 .sbx-body .c-chips li > input[type="checkbox"] {
     display: none;
 }
