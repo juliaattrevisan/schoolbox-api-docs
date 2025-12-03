@@ -13,7 +13,8 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
-use Schoolbox\OpenAi\AgentChat;
+use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
+use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
 
@@ -66,8 +67,13 @@ class DialogAgentChat
         /** Immediately save the log so the dialog agent response can be associated without failing a foreign key constraint */
         $this->client->saveLog($log);
 
-        $handler = new AgentChat\MessageHandler($this->client, requireFinalImage: false);
-        return $handler->requestStream($payload, $log);
+        return $this->client->createResponseStream(
+            $payload,
+            $log,
+            null,
+            new ResponseListener(requireFinalImage: false),
+            new LogOutputText(),
+        );
     }
 
 

@@ -13,9 +13,10 @@ use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
 
 /**
- * Interface for log handlers for events from OpenAI.
+ * Listener for updating an OpenAI log object, based on the content of the
+ * message stream.
  */
-interface ILogHandler
+interface IListener
 {
     /**
      * Handle this message, by writing it to a log.
@@ -26,13 +27,18 @@ interface ILogHandler
      * * extracting the value from `$message` before it's added to the log's
      *   response
      *
-     * @param Message       $message        The message from OpenAI.
-     *                                      This may contain a structure similar to the one handled by `handleResponse`.
-     * @param Log\Model     $log            The log object to update.
-     * @param callable|null $streamListener A function to call for each event in the stream, as it is received.
+     * @param Message   $outputMessage The message to output to the response body.
+     *                                 This may have been modified after it was received from OpenAI, and may contain a
+     *                                 structure similar to the one handled by `handleResponse`.
+     * @param Message   $rawMessage    The raw message from OpenAI.
+     * @param Log\Model $log           The log object to update.
      * @return Log\Model The updated log object.
      */
-    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model;
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+    ): Log\Model;
 
     /**
      * Handle a full response from OpenAI, by writing it to a log.

@@ -7,17 +7,32 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\LogHandler;
+namespace Schoolbox\OpenAi\LogHandler\ResponsesApi;
 
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\IListener;
 
 /**
- * Handle messages from OpenAI's Response API:
- * https://platform.openai.com/docs/api-reference/responses-streaming
+ * Log diagnostic data for streamed messages and full response bodies from
+ * OpenAI's Response API:
+ * https://platform.openai.com/docs/api-reference/responses
+ *
+ * If a streamed message or response body contains any of the following data,
+ * then add it to the log:
+ * * model used to handle the request
+ * * token usage for the request
+ * * error message
+ * * status code (generated from the status of the message or response)
+ *
+ * Also, this log handler adds the full stream or response body to the log:
+ * excluding any image data which may be present.
+ *
+ * This log handler should apply to all Response API requests, regardless of
+ * the agent which makes them.
  */
-class ResponseMessage implements ILogHandler
+class LogDiagnostics implements IListener
 {
     /**
      * The following event types indicate that the response API has finished
@@ -37,29 +52,29 @@ class ResponseMessage implements ILogHandler
     /**
      * Handle the message by stripping image data when writing to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
-    {
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+    ): Log\Model {
         // Prepare the message for logging
-        $eventType = $message->eventType;
+        $eventType = $rawMessage->eventType;
         $rawData   = [];
         try {
-            $rawData      = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $rawData      = json_decode($rawMessage->data, true, 512, JSON_THROW_ON_ERROR);
             $filteredData = $this->filterResponseForLogging($eventType, $rawData);
             if (isset($filteredData['response'])) {
                 $filteredData['response'] = $this->filterImageGenerationOutput($filteredData['response']);
             }
 
             // Override message data before writing it
-            $message->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
+            $rawMessage->data = json_encode($filteredData, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
         }
 
         // This chunk gets added to the log
-        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
-        if (is_callable($streamListener)) {
-            $streamListener($message, $log);
-        }
+        $log->setResponse(($log->getResponse() ?? '') . $rawMessage->__toString());
         if (isset($rawData['response'])) {
             // Handle information about the response
             $log = $this->logUsage($rawData['response'], $log);

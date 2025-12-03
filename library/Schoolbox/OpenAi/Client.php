@@ -81,7 +81,7 @@ class Client implements IClient
         return $this->handleNonStreamedResponse(
             $response,
             $log,
-            new LogHandler\ResponseMessage(),
+            new LogHandler\ResponsesApi\LogDiagnostics(),
         );
     }
 
@@ -92,18 +92,26 @@ class Client implements IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?callable $streamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
+        ?LogHandler\IListener $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_RESPONSES);
         $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
+
+        // Use the standard response log listener,
+        // plus whatever one was passed in.
+        $logListeners = [new LogHandler\ResponsesApi\LogDiagnostics()];
+        if ($logListener) {
+            $logListeners[] = $logListener;
+        }
         return $this->handleStreamedResponse(
             $response,
             $log,
-            new LogHandler\ResponseMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
-            $streamListener,
+            $eventStreamListener,
+            new LogHandler\Composite(...$logListeners),
         );
     }
 
@@ -119,7 +127,7 @@ class Client implements IClient
         return $this->handleNonStreamedResponse(
             $response,
             $log,
-            new LogHandler\ChatCompletionsMessage(),
+            new LogHandler\ChatCompletionsApi\LogDiagnostics(),
         );
     }
 
@@ -130,18 +138,26 @@ class Client implements IClient
         array $payload,
         Log\Model $log,
         ?int $chunkSize = null,
-        ?callable $streamListener = null,
+        ?EventStream\IListener $eventStreamListener = null,
+        ?LogHandler\IListener $logListener = null,
     ): iterable {
         $url      = $this->generateUrl(self::ENDPOINT_CHAT_COMPLETIONS);
         $log      = $log->setEndpoint($url->__toString());
         $request  = new Request('POST', $url, $this->authHeaders);
         $response = $this->sendRequest($request, $payload, $log, true);
+
+        // Use the standard chat completion log listener,
+        // plus whatever one was passed in.
+        $logListeners = [new LogHandler\ChatCompletionsApi\LogDiagnostics()];
+        if ($logListener) {
+            $logListeners[] = $logListener;
+        }
         return $this->handleStreamedResponse(
             $response,
             $log,
-            new LogHandler\ChatCompletionsMessage(),
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
-            $streamListener,
+            $eventStreamListener,
+            new LogHandler\Composite(...$logListeners),
         );
     }
 
@@ -320,9 +336,9 @@ class Client implements IClient
      * Request a non-streamed response from the AI provider, and handle the
      * logging and exceptions appropriately.
      *
-     * @param ResponseInterface      $response   The response from the AI provider.
-     * @param Log\Model              $log        The log to write to.
-     * @param LogHandler\ILogHandler $logHandler The log handler to use for the response.
+     * @param ResponseInterface    $response   The response from the AI provider.
+     * @param Log\Model            $log        The log to write to.
+     * @param LogHandler\IListener $logHandler The log handler to use for the response.
      * @return ResponseInterface The response from the AI provider.
      * @throws JsonException   if somehow the response body couldn't be decoded
      * @throws MapperException if somehow the log couldn't be saved
@@ -330,7 +346,7 @@ class Client implements IClient
     private function handleNonStreamedResponse(
         ResponseInterface $response,
         Log\Model $log,
-        LogHandler\ILogHandler $logHandler,
+        LogHandler\IListener $logHandler,
     ): ResponseInterface {
         // Do something with the response:
         // extract the body, and also log it.
@@ -350,39 +366,57 @@ class Client implements IClient
      * Request a streamed response from the AI provider, and handle the logging
      * and exceptions appropriately.
      *
-     * @param ResponseInterface      $response       The response from the AI provider.
-     * @param Log\Model              $log            The log to write to.
-     * @param LogHandler\ILogHandler $logHandler     The log handler to use for each message.
-     * @param int                    $chunkSize      How many bytes to read from each stream iteration.
-     * @param callable|null          $streamListener A function to call for each event in the stream, as it is received.
-     * @return iterable<EventStream\Message> Each message in the stream as it's received.
+     * @param ResponseInterface          $response            The response from the AI provider.
+     * @param Log\Model                  $log                 The log to write to.
+     * @param int                        $chunkSize           How many bytes to read from each stream iteration.
+     * @param EventStream\IListener|null $eventStreamListener If set: use this to modify the message from OpenAI before
+     *                                                        sending to the stream.
+     * @param LogHandler\IListener|null  $logListener         The log handler to use for each message.
+     * @return iterable<string> Each message in the stream as it's received.
      * @throws MapperException if somehow the log couldn't be saved
      */
     private function handleStreamedResponse(
         ResponseInterface $response,
         Log\Model $log,
-        LogHandler\ILogHandler $logHandler,
         int $chunkSize,
-        ?callable $streamListener = null,
+        ?EventStream\IListener $eventStreamListener,
+        ?LogHandler\IListener $logListener,
     ): iterable {
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {
             foreach ($this->readEvents($response->getBody(), $chunkSize) as $message) {
+                // Modify the message before sending.
+                $outputMessage = clone $message;
+                if ($eventStreamListener) {
+                    $outputMessage = $eventStreamListener->modifyMessage(clone $message);
+                }
+
+                // No output message? Output nothing
+                if (!$outputMessage) {
+                    continue;
+                }
+
                 // The log should be saved in an incomplete form whenever an
                 // event is read, so in the case of failure something is logged.
 
                 // Update the log, and save it:
                 // even if that raises an exception, still save the log
-                try {
-                    // logHandler may modify the message, so clone it so we can yield later
-                    $logHandler->handleMessage(clone $message, $log, $streamListener);
-                } finally {
-                    $this->saveLog($log);
+                if ($logListener) {
+                    try {
+                        // logHandler may modify the message, so clone it so we can yield later
+                        $log = $logListener->handleMessage(
+                            clone $outputMessage,
+                            clone $message,
+                            $log,
+                        );
+                    } finally {
+                        $this->saveLog($log);
+                    }
                 }
 
                 // Yield after logging as if the parent throws or returns early it would otherwise not be logged
-                yield $message;
+                yield $outputMessage->__toString();
             }
 
             // If nothing happened: set a default return code, and save log
@@ -393,13 +427,15 @@ class Client implements IClient
             // we got
             $responseBody = $response->getBody()->getContents();
             $responseJson = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-            $log = $logHandler->handleResponse($responseJson, $log);
+            if ($logListener) {
+                $log = $logListener->handleResponse($responseJson, $log);
+            }
             $this->saveLog($log);
 
             // TODO: is this actually going to show an error state to the frontend??
             // Convert it to a single message I guess, if finalising the log
             // didn't raise an exception?
-            yield new EventStream\Message($responseBody);
+            yield new EventStream\Message($responseBody)->__toString();
         }
     }
 }

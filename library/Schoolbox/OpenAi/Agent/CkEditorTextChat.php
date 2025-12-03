@@ -12,11 +12,8 @@ namespace Schoolbox\OpenAi\Agent;
 use Html2Text\Html2Text;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log;
-use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Agent for generating text chat responses via OpenAI, for CKEditor's AI
@@ -71,10 +68,11 @@ class CkEditorTextChat
         );
 
         /* Immediately pass on all streamed messages without any changes as CKEditor expects the raw response format */
-        $stream = $this->client->createChatCompletionStream($payload, $log, streamListener: $this->listenForOutputText(...));
-        foreach ($stream as $message) {
-            yield $message->__toString();
-        }
+        return $this->client->createChatCompletionStream(
+            $payload,
+            $log,
+            logListener: new CkEditorTextChat\LogListener($this->html2Text),
+        );
     }
 
     /**
@@ -119,69 +117,5 @@ class CkEditorTextChat
             }
         }
         return null;
-    }
-
-    /**
-     * Callback method for message stream.
-     *
-     * If this message is a finished response, then extract the output text out
-     * of it and add it to the log.
-     *
-     * @param Message   $message
-     * @param Log\Model $log
-     * @return void
-     */
-    private function listenForOutputText(Message $message, Log\Model $log): void
-    {
-        // Chat completions only returns chunked output, and never returns a
-        // summary.
-        // Need to reconstitute output text from the chunks.
-        try {
-            $decodedMessage = $message->getDataAsArray();
-            foreach (($decodedMessage['choices'] ?? []) as $choice) {
-                $content = $choice['delta']['content'] ?? null;
-                if (isset($content)) {
-                    $log->setOutputText($log->getOutputText() . $content);
-                }
-            }
-            return;
-        } catch (UnexpectedValueException) {
-            // Not valid data: nothing can be done.
-            // However the stream may return a `[DONE]` event:
-            // that needs to be handled, and used to convert the content into
-            // plain text (it's HTML)
-        }
-
-        if ($message->data === '[DONE]') {
-            // The stream has finished:
-            // make a best effort to convert HTML to plain text.
-            // This assumes that the output:
-            // * is actually Markdown
-            // * contains actual HTML within ```html``` blocks
-
-            // First up, remove the markdown wrappers:
-            // assume anything within is HTML
-            // If there's no markdown: assume the whole thing is HTML
-            $htmlParts = [];
-            if (preg_match_all('/```html(?P<html>.*?)```/s', $log->getOutputText(), $matches)) {
-                $htmlParts = $matches['html'];
-            } else {
-                $htmlParts[] = $log->getOutputText();
-            }
-
-            // Now, for each HTML part: get its text only
-            $outputTextParts = [];
-            foreach ($htmlParts as $html) {
-                // Then: use HTML2Text to remove all tags and header content
-                $this->html2Text->setHtml($html);
-                $outputTextParts[] = $this->html2Text->getText();
-            }
-
-            // Finally: reconstitute the output text
-            $outputText = !empty($outputTextParts)
-                ? implode("\n\n", $outputTextParts)
-                : null;
-            $log->setOutputText($outputText);
-        }
     }
 }

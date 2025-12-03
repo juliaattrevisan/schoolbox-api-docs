@@ -17,6 +17,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\Editor\OpenAI\Log\ModelToArray;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
@@ -452,7 +453,7 @@ class Controller extends Assessment\Controller
 
             /* Assume they have the right log type since sessionId came from the response */
             foreach ($logEntries as $log) {
-                $feed->add(\Schoolbox\OpenAi\AgentChat\MessageHandler::translateLogData($log));
+                $feed->add(ModelToArray::translateLogData($log));
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere

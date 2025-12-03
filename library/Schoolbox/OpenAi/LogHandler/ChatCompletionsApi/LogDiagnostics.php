@@ -7,23 +7,38 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\OpenAi\LogHandler;
+namespace Schoolbox\OpenAi\LogHandler\ChatCompletionsApi;
 
 use JsonException;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\OpenAi\EventStream\Message;
+use Schoolbox\OpenAi\LogHandler\IListener;
 
 /**
- * Handle messages from OpenAI's Chat Completions API:
+ * Log diagnostic data for streamed messages and response bodies from
+ * OpenAI's Chat Completions API:
  * https://platform.openai.com/docs/api-reference/chat-streaming
+ *
+ * If a streamed message or response body contains any of the following data,
+ * then add it to the log:
+ * * model used to handle the request
+ * * token usage for the request
+ * * error message
+ * * status code (generated from the status of the message or response)
+ *
+ * This log handler should apply to all Chat Completions API requests,
+ * regardless of the agent which makes them.
  */
-class ChatCompletionsMessage implements ILogHandler
+class LogDiagnostics implements IListener
 {
     /**
      * Handle the message by writing it directly to the log.
      */
-    public function handleMessage(Message $message, Log\Model $log, ?callable $streamListener = null): Log\Model
-    {
+    public function handleMessage(
+        Message $outputMessage,
+        Message $rawMessage,
+        Log\Model $log,
+    ): Log\Model {
         // Chat completions messages don't have an event type:
         // just write the message data directly to the log.
 
@@ -36,16 +51,13 @@ class ChatCompletionsMessage implements ILogHandler
             //   handled uniquely
 
             // Omit partial and completed image data from the output
-            $rawData = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $rawData = json_decode($outputMessage->data, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
         }
 
         // This chunk gets added to the log
-        $log->setResponse(($log->getResponse() ?? '') . $message->__toString());
-        if (is_callable($streamListener)) {
-            $streamListener($message, $log);
-        }
+        $log->setResponse(($log->getResponse() ?? '') . $outputMessage->__toString());
 
         // Otherwise, handle the data from the message as if it were a response
         $this->handleResponse($rawData, $log);
