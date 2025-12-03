@@ -8,8 +8,10 @@
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
  # @param array $student                  Array of author info about the student creating the response
- # @param array $response                 Array about the response that we are creating/resuming
- # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
+ # @param DialogAgent\Response $response  The response that we are creating/resuming
+ # @param array $responseData             Array about the response that we are creating/resuming
+ # @param bool $readonly                  True when viewing the response in read-only mode (false when a learner is creating/resuming)
+ # @param bool $interactionLocked         Is the assessment due in an archived term?
  # @param string $returnUrl               A redirect destination
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -18,6 +20,32 @@
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
+
+        {% if readonly or interactionLocked %}
+            {% import '@learning/macro/dueDate.twig' as dueDate %}
+            {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
+            <ul class="meta">
+                {% if response.isSubmitted %}
+                    <li class="icon-calendar">
+                        Submitted <time title="{{ response.submittedAt.database }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
+                    </li>
+
+                    <li class="icon-time-value">
+                        {% set startedAt = response.startedAt ?? response.createdAt %}
+                        {% set endedAt = response.submittedAt ?? NOW %}
+                        Time taken: {{ duration.secondsToHoursAndMinutes(startedAt.diffInSeconds(endedAt, true)) }}
+                    </li>
+                {% elseif response.startedAt %}
+                    <li class="icon-calendar">
+                        <em>Response in progress - started <time title="{{ response.startedAt.database }}">{{ response.startedAt.relativeDayWithoutMidnight }}</time></em>
+                    </li>
+                {% endif %}
+
+                {% if interactionLocked %}
+                    <li class="icon-archive"> {{ locale.term.proper }} has been archived </li>
+                {% endif %}
+            </ul>
+        {% endif %}
     </div>
 </div>
 
@@ -28,9 +56,10 @@
             <div id="dialog-agent-chat-container" data-test="dialog-agent-chat-container">
                 <dialog-agent-chat
                     :feed="{{ feed |json_encode }}"
-                    :response="{{ response |json_encode }}"
+                    :response="{{ responseData |json_encode }}"
                     :student="{{ student |json_encode }}"
                     return-url="{{ returnUrl }}"
+                    {% if readonly %} readonly {% endif %}
                 />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentChat.js?v={{ config.site_version }}"></script>

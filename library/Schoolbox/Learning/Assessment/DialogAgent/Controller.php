@@ -457,7 +457,6 @@ class Controller extends Assessment\Controller
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
-            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
         }
 
         $userTranslator = new User\Translator\Author\ModelToArray();
@@ -472,7 +471,8 @@ class Controller extends Assessment\Controller
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
             'response' => $responseTranslator->__invoke($response),
-            'readonly' => $isInteractionLocked,
+            'interactionLocked' => $isInteractionLocked,
+            'readonly' => false, /* student is creating/resuming a response, it's not read only */
             'returnUrl' => $returnUrl,
         ];
 

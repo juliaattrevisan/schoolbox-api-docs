@@ -16,6 +16,7 @@ interface Props {
     response: DialogAgentResponse;
     student: UserAuthor;
     returnUrl: string;
+    readonly: boolean;
 }
 
 const props = defineProps<Props>();
@@ -33,7 +34,7 @@ window.Vue.onMounted(() => {
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
 
     // TODO: all temporary, needs to inject into the right timeline position when it actually exists etc
-    if (isInstructor.value) {
+    if (props.readonly && isInstructor.value) {
         acStore.feed.push({
             // TODO: this would only ever come from props.feed
             type: AgentChatMessageType.ALERT,
@@ -220,9 +221,9 @@ window.Vue.onUnmounted(() => {
 </script>
 
 <template>
-    <div class="actions-small-1 l-mar-s--bottom no-print">
+    <div v-if="!props.readonly" class="actions-small-1 l-mar-s--bottom no-print">
         <button
-            v-if="!isInstructor && currentResponse._routes.assistanceRequest"
+            v-if="currentResponse._routes.assistanceRequest"
             class="button"
             type="button"
             :disabled="isHelpRequestChanging"
@@ -254,7 +255,7 @@ window.Vue.onUnmounted(() => {
     >
         <template #header>
             <div
-                v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
+                v-if="!props.readonly && currentResponse.assistanceRequestedAt !== null"
                 class="alert-box highlight l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
@@ -279,7 +280,7 @@ window.Vue.onUnmounted(() => {
     </ac-feed>
     <div class="no-print">
         <ac-prompt
-            v-if="props.response._routes.message"
+            v-if="!props.readonly && props.response._routes.message"
             :request-config="{
                 messageRoute: props.response._routes.message,
                 aiSessionId: null /* session ID is already attached to a response and handled in the backend */,

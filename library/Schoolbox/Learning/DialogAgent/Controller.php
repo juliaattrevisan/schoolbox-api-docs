@@ -21,6 +21,7 @@ use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextModel;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -51,6 +52,7 @@ class Controller extends Base
      * @param BreadcrumbFactory $bakery
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param OpenAI\ClientFactory $aiClientFactory
+     * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
@@ -60,6 +62,7 @@ class Controller extends Base
         private BreadcrumbFactory $bakery,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private OpenAI\ClientFactory $aiClientFactory,
+        private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
@@ -233,8 +236,78 @@ class Controller extends Base
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
     {
-        echo "View a response";
-        // todo implement a readonly viewing mode
+        $participant = $assessment->getParticipant($student);
+
+        /* Prepare a redirection url
+         */
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+
+        /**
+         * Build up the existing feed from the logs.
+         * Also add extra messages such as the opening message as if they were real messages if available
+         */
+        $feed = new \Schoolbox\Collection();
+
+        if (trim((string)$assessment->getOpeningMessage()) !== '') {
+            // TODO: opening message is actually a required field, handle that properly (maybe it should influence the ability to get here, like prompt also should?)
+            $feed->add([
+                'type' => 'response',
+                'data' => [
+                    'status' => 'success',
+                    'responseId' => null,
+                    'image' => null,
+                    'message' => (string)$assessment->getOpeningMessage()
+                ],
+            ]);
+        }
+
+        if ($response->getSessionId()) {
+            $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
+                'order' => [ 'created_at' => 'ASC' ]
+            ]);
+
+            /* Assume they have the right log type since sessionId came from the response */
+            foreach ($logEntries as $log) {
+                $feed->add(\Schoolbox\OpenAi\AgentChat\MessageHandler::translateLogData($log));
+            }
+
+            // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
+        }
+
+        $userTranslator = new User\Translator\Author\ModelToArray();
+        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
+
+        $data = [
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+            ])->add(['Response']),
+            'assessment' => $assessment,
+            'feed' => $feed,
+            'student' => $userTranslator->__invoke($student),
+            'participant' => $participant,
+            'response' => $response,
+            'responseData' => $responseTranslator->__invoke($response),
+            'interactionLocked' => false, // TODO
+            'readonly' => true, /* this page is always readonly since it's viewing an existing response */
+            'returnUrl' => $returnUrl,
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/response/create.twig',
+            $data,
+            \sprintf(
+                'Response for %s in %s',
+                $student->getFullName(),
+                $assessment->getTitle(),
+            )
+        );
     }
 
 

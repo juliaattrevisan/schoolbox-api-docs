@@ -22,6 +22,7 @@ use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
 use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent;
@@ -504,6 +505,7 @@ class Module extends BaseModule
             ),
             $assessmentMapperProxy,
             $this->injector->get('ai.clientFactory'),
+            $this->getMapperFactory()->get(AILogMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
             $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
