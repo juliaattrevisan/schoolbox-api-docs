@@ -215,7 +215,7 @@ class Button
          * but this is an authoritative response,
          * button says "View" but lets you continue so you can look at it.
          */
-        $route = 'learningDialogAgent.getViewResponse';
+        $route = 'learningDialogAgent.getParticularResponse';
 
         $params = [
             'assessment' => $assessment,

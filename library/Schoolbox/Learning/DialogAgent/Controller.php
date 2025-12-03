@@ -226,11 +226,12 @@ class Controller extends Base
     /**
      * View a response's chat log in a readonly mode
      *
-     * @param IAssessable $assessment
+     * @param DialogAgent $assessment
      * @param User $student
+     * @param Response $response
      * @return void
      */
-    public function getViewResponse(IAssessable $assessment, User $student): void
+    public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
     {
         echo "View a response";
         // todo implement a readonly viewing mode

@@ -9,7 +9,7 @@
     student: participant.user
 }) %}
 
-{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgentResponse.getParticularResponse', {
+{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgent.getParticularResponse', {
     assessmentId: currentInteraction.assessable.id,
     studentId:    participant.user.id,
     responseId:   currentInteraction.id,

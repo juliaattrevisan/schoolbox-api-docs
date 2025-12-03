@@ -178,7 +178,7 @@ class Module extends BaseModule
 
         /* View a response (readonly mode)
          */
-        $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getViewResponse', new Rule\All(
+        $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getParticularResponse', new Rule\All(
             $canViewResponse,
             $this->buildRuleCanAction(Status::ACTION_VIEW),
             $this->buildIsConfiguredAuthRule()
