@@ -272,16 +272,9 @@ class Model extends AbstractAssessment
          */
         $this->assertSameAssessment($participant);
 
-        $response = $this->getAuthoritativeResponse($participant, true);
+        $feedback = $this->getAuthoritativeFeedback($participant, true);
 
-        /* TODO How to figure this out?
-            $feedback = $this->getAuthoritativeFeedback($participant, true);
-            if (!$feedback) {
-                return true;
-            }
-        */
-
-        return (bool)$response;
+        return (bool)$feedback;
     }
 
 
