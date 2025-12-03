@@ -38,7 +38,8 @@ class Controller extends Base
         private CourseConfigMapper $courseConfigMapper,
         private HomepageTemplateMapper $homepageTemplateMapper,
         private RoleMapper $roleMapper,
-        private CourseTemplateMapper $courseTemplateMapper
+        private CourseTemplateMapper $courseTemplateMapper,
+        private \Component_InstanceMapper $instanceMapper,
     ) {
     }
 
