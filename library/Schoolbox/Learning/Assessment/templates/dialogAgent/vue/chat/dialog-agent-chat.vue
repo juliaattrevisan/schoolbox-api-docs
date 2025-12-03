@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useMousePressed } from "@vueuse/core";
-import { apiRequest } from "@js/util/sbx/apiUtils";
+import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
@@ -86,15 +86,9 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
 
         /**
          * If a student requests assistance, then the instructor resolves it somewhere else, you'd get a 403 here.
-         * When that occurs (a 403), attempt to find the latest response data to sync back up.
+         * When that occurs, attempt to find the latest response data to sync back up.
          */
-        if (
-            typeof response.data === "object" &&
-            response.data !== null &&
-            "status" in response.data &&
-            response.data.status === 403 &&
-            props.response._routes.status
-        ) {
+        if (getApiProblemStatus(response) === 403 && props.response._routes.status) {
             const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
                 method: "GET",
                 url: props.response._routes.status,

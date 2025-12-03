@@ -453,3 +453,20 @@ export function buildApiRequest<TResponseData, TBody extends ApiRequestBodyBase 
         return apiRequest<TResponseData, TBody>({ ...options, url: targetUrl, body });
     };
 }
+
+/**
+ * Retrieve the 'status' from a response that likely has an error in the form of an ApiProblem, if available
+ * @param response The response
+ * @returns The status code if present
+ */
+export function getApiProblemStatus(response: ApiBaseResponse<unknown>): number | null {
+    if (!response.data || typeof response.data !== "object") {
+        return null; // response is not an object
+    }
+
+    if (!("status" in response.data) || typeof response.data.status !== "number") {
+        return null; // no status field, or invalid status
+    }
+
+    return response.data.status;
+}
