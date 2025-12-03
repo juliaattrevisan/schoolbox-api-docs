@@ -134,3 +134,14 @@
     border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
     height: auto;
 }
+
+/**
+ * List items inside flex-list should have margin for spacing (in pantry)
+ */
+.sbx-body .flex-list li {
+    margin: 5px;
+}
+
+.sbx-body .c-chips li > input[type="checkbox"] {
+    display: none;
+}
