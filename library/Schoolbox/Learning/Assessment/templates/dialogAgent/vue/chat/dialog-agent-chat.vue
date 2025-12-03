@@ -14,6 +14,7 @@ interface Props {
     feed: AiLogAgentChatData[];
     response: DialogAgentResponse;
     student: UserAuthor;
+    returnUrl: string;
 }
 
 const props = defineProps<Props>();
@@ -116,13 +117,31 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
     currentResponse.value = response.data.response;
 }
 
+const isSubmitting = window.Vue.ref(false);
+const submitError = window.Vue.ref<string | null>(null);
+
 /**
  * When a learner or instructor clicks the submit button inside the modal
  */
-function submitResponse(): void {
-    // TODO: show a modal first, for students and/or staff?
+async function submitResponse(): Promise<void> {
+    if (!currentResponse.value._routes.submit) {
+        throw new Error("unable to submit, missing submit route"); // shouldn't get here
+    }
 
-    console.warn("TODO"); // TODO
+    isSubmitting.value = true;
+    submitError.value = null;
+    const response = await apiRequest<ApiDialogAgentActionResponse>({
+        method: "POST",
+        url: currentResponse.value._routes.submit,
+    });
+    isSubmitting.value = false;
+
+    if (!response.success) {
+        submitError.value = response.message;
+        return;
+    }
+
+    window.location.href = props.returnUrl;
 }
 
 /**
@@ -215,15 +234,21 @@ window.Vue.onUnmounted(() => {
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button class="button submit icon-approve" type="submit" @click="submitResponse">
-                {{ isInstructor ? `Submit on behalf of ${props.student.fullName}` : "Submit" }}
+            <button
+                class="button submit icon-approve"
+                type="submit"
+                :disabled="isSubmitting || undefined"
+                @click="submitResponse"
+            >
+                {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
+                <!-- TODO: `Submit on behalf of ${props.student.fullName}` in SA-21415 -->
             </button>
         </nav>
     </div>
 
     <ac-feed
         ref="feedRef"
-        class="l-mar-m--bottom"
+        class="l-mar-m--bottom ac-feed"
         min-height="20rem"
         :max-height="maxFeedHeight"
         :feed="acStore.fullFeed"
@@ -233,7 +258,7 @@ window.Vue.onUnmounted(() => {
         <template #header>
             <div
                 v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
-                class="alert-box highlight l-mar--0 l-pad-xs l-pad-m--left"
+                class="alert-box highlight l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
                     <span>Help Requested! Your teacher will be informed. You can keep working while you wait.</span>
@@ -253,6 +278,11 @@ window.Vue.onUnmounted(() => {
                 <span>{{ helpRequestError }}</span>
                 <a href="#" class="close" @click.prevent="helpRequestError = null">×</a>
             </div>
+
+            <div v-if="submitError" class="alert-box alert">
+                <span>{{ submitError }}</span>
+                <a href="#" class="close" @click.prevent="submitError = null">×</a>
+            </div>
         </template>
     </ac-feed>
     <div class="no-print">
@@ -265,12 +295,17 @@ window.Vue.onUnmounted(() => {
             }"
             prompt-placeholder="Type a response here..."
             :prompt-attributes="[]"
+            :disabled="isSubmitting"
         />
     </div>
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 </template>
 
 <style scoped lang="scss">
+.ac-feed .alert-box {
+    margin-bottom: 0;
+}
+
 /* styles for printing (scoped) */
 @media print {
     .no-print {

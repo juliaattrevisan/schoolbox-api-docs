@@ -464,15 +464,12 @@ class Controller extends Assessment\Controller
         $responseTranslator = new Response\Translator\ModelToArray($responseLinksTranslator);
 
         $data = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
-                [
-                    sprintf('Create Response for %s', $assessment->getTitle()),
-                ]
-            ),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
+                \sprintf('Create Response for %s', $assessment->getTitle()),
+            ]),
             'assessment' => $assessment,
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
-            'participant' => $participant,
             'response' => $responseTranslator->__invoke($response),
             'readonly' => $isInteractionLocked,
             'returnUrl' => $returnUrl,
