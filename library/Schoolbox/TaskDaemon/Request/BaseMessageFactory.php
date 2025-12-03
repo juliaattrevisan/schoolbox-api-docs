@@ -163,9 +163,9 @@ abstract class BaseMessageFactory
      * The token created for them won't be valid after this date.
      *
      * @param Alaress_Date_Format|null $tokenExpiry
-     * @return $this
+     * @return self
      */
-    public function setTokenExpiry(?Alaress_Date_Format $tokenExpiry): static
+    public function setTokenExpiry(?Alaress_Date_Format $tokenExpiry): self
     {
         $clone = clone $this;
         $clone->tokenExpiry = $tokenExpiry;
