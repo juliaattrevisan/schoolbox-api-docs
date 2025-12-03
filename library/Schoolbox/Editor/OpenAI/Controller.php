@@ -15,6 +15,7 @@ use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Admin\DifferentiationProfiles\Model;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
@@ -299,20 +300,28 @@ class Controller extends Base
 
             return;
         }
-
-        $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
-
-        $agent = new DifferentiationProfileGeneration(
-            $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
-            $diffConfig,
-            $this->filesystemProxy,
-            $this->parserFactory,
-        );
-
         try {
+            $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
+
+            $agent = new DifferentiationProfileGeneration(
+                $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
+                $diffConfig,
+                $this->filesystemProxy,
+                $this->parserFactory,
+            );
+
+            $enabledFields = $this->differentiationProfileAdminMapper
+                ->findByColumnList(
+                    [
+                        'module' => DifferentiationProfileAdminMapper::MODULE_DETAILS,
+                        'is_enabled' => 1,
+                    ],
+                );
+
             [$response, $status] = $agent->request(
                 $this->getUser(),
                 $records,
+                $enabledFields,
                 $aiSessionId,
             );
 
