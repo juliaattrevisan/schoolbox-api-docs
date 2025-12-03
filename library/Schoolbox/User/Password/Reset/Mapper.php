@@ -82,7 +82,7 @@ class Mapper extends BaseMapper
         if (!empty($model->getToken())) {
             return true;
         }
-        while (empty($model->getToken()) && $i < 1000) {
+        while ($i < 1000) {
             $token = bin2hex(openssl_random_pseudo_bytes(32));
             if ($this->countByColumn('token', $token) === 0) {
                 $model->setToken($token);
