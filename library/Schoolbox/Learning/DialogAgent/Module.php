@@ -119,12 +119,10 @@ class Module extends BaseModule
         /* Shortcuts to Authorization Rule constructs
          */
         $isSuper = $this->getAuthRule('isSuperuser');
-        $canSubmit = $this->buildAuthRuleCanSubmit();
         $canViewResponse = $this->buildAuthRuleCanViewResponse();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
         $isAIFeatureEnabled = new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIALOGAGENT, $this->getConfig());
 
-        // TODO: should this be part of $canSubmit?
         $isAuthoritativeResponse = new Rule\Callback(function (array $params): void {
             /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
             $response = $params['response'] ?? null;
@@ -132,6 +130,11 @@ class Module extends BaseModule
                 throw new NotFound('This action can only be performed on an authoritative response');
             }
         });
+
+        $canSubmit = new Rule\All(
+            $this->buildAuthRuleCanSubmit(),
+            $isAuthoritativeResponse,
+        );
 
         $canModify = new Rule\Any(
             $isSuper,
@@ -175,7 +178,6 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
-            $isAuthoritativeResponse,
             $canSubmit,
             $this->buildRuleCanAction(Status::ACTION_MESSAGE)
         ), $preloadParticipantAndResponse);
@@ -183,7 +185,6 @@ class Module extends BaseModule
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
-            $isAuthoritativeResponse,
             $canSubmit,
             $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST)
         ), $preloadParticipantAndResponse);
@@ -203,7 +204,6 @@ class Module extends BaseModule
          * with details about who did the sobo
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/submit/{$responseParam}", 'postSubmit', new Rule\All(
-            $isAuthoritativeResponse,
             new Rule\Any(
                 $canWrite,
                 $canSubmit
