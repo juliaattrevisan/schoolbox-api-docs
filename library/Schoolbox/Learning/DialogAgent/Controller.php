@@ -577,6 +577,11 @@ class Controller extends Base
              */
             $feedbackFields = array_fill_keys($feedbackFieldsTemplate, null);
 
+            /* An authoritative response might not even exist; you'd be Incomplete.
+             * Or, an authoritative response exists, but not an authoritative feedback; you're In Progress.
+             */
+            $authoritativeResponse = $participant->getAuthoritativeResponse(true);
+
             /** @var \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Model|null $authoritativeFeedback */
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
@@ -593,7 +598,7 @@ class Controller extends Base
                 $participant->getUser()->getExternalId(),
                 $participant->getUser()->getFirstName(),
                 $participant->getUser()->getLastName(),
-                $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse()),
+                $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse() ?? $authoritativeResponse),
             ], array_values($feedbackFields)), escape: '');
         }
 
