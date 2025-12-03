@@ -405,11 +405,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
      * Post-soft-delete hook method
      *
-     * @param Event $event
+     * @param object $event
      * @throws MapperException
      */
-    protected function postDelete(Event $event): void
+    protected function postDelete(object $event): void
     {
+        /** @var Event $event */
+
         // dirty yes, but look at \Schoolbox\Calendar\EventMapper::populateGuests
         $bookingMapper = ResourceBookingMapper::getInstance();
         // first check if there are any bookings for this event
