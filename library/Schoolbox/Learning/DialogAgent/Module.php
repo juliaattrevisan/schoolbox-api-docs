@@ -120,6 +120,7 @@ class Module extends BaseModule
          */
         $isSuper = $this->getAuthRule('isSuperuser');
         $canViewResponse = $this->buildAuthRuleCanViewResponse();
+        $canSubmit = $this->buildAuthRuleCanSubmit();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
         $isAIFeatureEnabled = new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIALOGAGENT, $this->getConfig());
 
@@ -132,13 +133,11 @@ class Module extends BaseModule
         });
 
         /**
-         * For a learner to be able to submit, you must meet the normal criteria, as well as:
-         * - The current status of the response allows it to be submitted
-         * - The response must be authoritative, you can't change the state of non-auth responses
+         * For a learner to be able to interact with a response, they must meet the canonical "can submit" criteria,
+         * and the response must be authoritative.
          */
-        $canSubmit = new Rule\All(
-            $this->buildAuthRuleCanSubmit(),
-            $this->buildRuleCanAction(Status::ACTION_SUBMIT),
+        $canInteractWithResponse = new Rule\All(
+            $canSubmit,
             $isAuthoritativeResponse,
         );
 
@@ -184,14 +183,14 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
-            $canSubmit,
+            $canInteractWithResponse,
             $this->buildRuleCanAction(Status::ACTION_MESSAGE)
         ), $preloadParticipantAndResponse);
 
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
-            $canSubmit,
+            $canInteractWithResponse,
             $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST)
         ), $preloadParticipantAndResponse);
 
@@ -201,19 +200,20 @@ class Module extends BaseModule
         $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{$responseParam}", 'postAssistanceResolve', new Rule\All(
             new Rule\Any(
                 $canWrite,
-                $canSubmit,
+                $canInteractWithResponse,
             ),
             $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE)
         ), $preloadParticipantAndResponse);
 
-        /* Forcibly submit on behalf of a student, causing their authoritative response to be in a submitted state
-         * with details about who did the sobo
+        /* Either a student hits the submit button to finalise their dialog agent discussion,
+         * or an instructor forcibly finalises a response on behalf of the student
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/submit/{$responseParam}", 'postSubmit', new Rule\All(
             new Rule\Any(
                 $canWrite,
-                $canSubmit
+                $canSubmit,
             ),
+            $isAuthoritativeResponse,
             $this->buildRuleCanAction(Status::ACTION_SUBMIT)
         ), $preloadParticipantAndResponse);
 
