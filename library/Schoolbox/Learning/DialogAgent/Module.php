@@ -132,14 +132,21 @@ class Module extends BaseModule
         });
 
         /**
-         * For a learner to be able to submit, you must meet the normal criteria, as well as:
+         * For a learner to be able to respond, they must meet the normal criteria,
+         * and the response must be authoritative.
+         */
+        $canRespond = new Rule\All(
+            $this->buildAuthRuleCanSubmit(),
+            $isAuthoritativeResponse,
+        );
+
+        /**
+         * For a learner to be able to submit, they must be able to respond and:
          * - The current status of the response allows it to be submitted
-         * - The response must be authoritative, you can't change the state of non-auth responses
          */
         $canSubmit = new Rule\All(
-            $this->buildAuthRuleCanSubmit(),
+            $canRespond,
             $this->buildRuleCanAction(Status::ACTION_SUBMIT),
-            $isAuthoritativeResponse,
         );
 
         $canModify = new Rule\Any(
@@ -184,14 +191,14 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
-            $canSubmit,
+            $canRespond,
             $this->buildRuleCanAction(Status::ACTION_MESSAGE)
         ), $preloadParticipantAndResponse);
 
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
-            $canSubmit,
+            $canRespond,
             $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST)
         ), $preloadParticipantAndResponse);
 
@@ -201,7 +208,7 @@ class Module extends BaseModule
         $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{$responseParam}", 'postAssistanceResolve', new Rule\All(
             new Rule\Any(
                 $canWrite,
-                $canSubmit,
+                $canRespond,
             ),
             $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE)
         ), $preloadParticipantAndResponse);
@@ -212,7 +219,7 @@ class Module extends BaseModule
         $this->register('POST', "{$assRoute}/{$studentParam}/submit/{$responseParam}", 'postSubmit', new Rule\All(
             new Rule\Any(
                 $canWrite,
-                $canSubmit
+                $canSubmit,
             ),
             $this->buildRuleCanAction(Status::ACTION_SUBMIT)
         ), $preloadParticipantAndResponse);
