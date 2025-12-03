@@ -101,7 +101,7 @@ const filteredParticipants = window.Vue.computed(() => {
                         :key="participant.id"
                         :participant="participant"
                         :criteria="props.criteria"
-                        @update-participant="(data) => applyParticipantUpdates(participant, data)"
+                        @update-response="(data) => applyParticipantUpdates(participant, data)"
                     />
                 </tbody>
             </table>

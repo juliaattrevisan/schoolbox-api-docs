@@ -2,18 +2,28 @@
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import type { UserAuthor, UserCC } from "@schoolboxLibrary/types/User";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
-import type { ApiDialogAgentActionResponse, DialogAgentParticipant } from "./dialogAgentStatusTypes";
+import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "./dialogAgentStatusTypes";
 import DasActionsModal from "./das-actions-modal.vue";
 
 interface Props {
-    participant: DialogAgentParticipant;
+    user: UserCC | UserAuthor;
+    response: DialogAgentResponse | null;
+    summaryRoute?: string | null;
+    showView?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    summaryRoute: null,
+    showView: true,
+    showSubmit: false,
+});
 const emit = defineEmits<{
-    (e: "updateParticipant", data: ApiDialogAgentActionResponse): void;
+    (e: "updateResponse", data: ApiDialogAgentActionResponse): void;
 }>();
+
+const isSameUser = window.Vue.computed(() => props.user.id === window.schoolboxUser.id);
 
 export type ConfirmableAction = (typeof confirmableActions)[number];
 const confirmableActions = [
@@ -78,7 +88,7 @@ async function triggerAction(
     failureMessage: string,
 ): Promise<void> {
     // If the URL for this action doesn't exist, no permission - shouldn't get here
-    if (!props.participant.response?._routes[action]) throw new Error(`${action} not permitted`);
+    if (!props.response?._routes[action]) throw new Error(`${action} not permitted`);
 
     // Prompt for confirmation if needed
     if (isConfirmableAction(action) && !(await confirmAction(action))) {
@@ -89,20 +99,20 @@ async function triggerAction(
     const toast = window.sbProps.toastActivate(waitingMessage);
     const response = await apiRequest<ApiDialogAgentActionResponse>({
         method: "POST",
-        url: props.participant.response._routes[action],
+        url: props.response._routes[action],
     });
 
     let updatedData: ApiDialogAgentActionResponse | null = null;
     if (response.success) {
         updatedData = response.data;
-    } else if (getApiProblemStatus(response) === 403 && props.participant.response._routes.status) {
+    } else if (getApiProblemStatus(response) === 403 && props.response._routes.status) {
         /**
          * If this action fails due to a status change elsewhere, then you'd get a 403 here.
          * When that occurs, attempt to find the latest response data to sync back up.
          */
         const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
             method: "GET",
-            url: props.participant.response._routes.status,
+            url: props.response._routes.status,
         });
 
         /** If the action we tried to do is still available, then there's some other issue. Otherwise update the stored data */
@@ -119,14 +129,14 @@ async function triggerAction(
     toast.timeout({ text: successMessage, isSuccess: true });
 
     // Update the stored participant data
-    emit("updateParticipant", updatedData);
+    emit("updateResponse", updatedData);
 }
 
 /**
  * When the user clicks on "Submit on behalf of"
  */
 async function onSubmit(): Promise<void> {
-    const toastContext = `on behalf of ${props.participant.user.fullName}`;
+    const toastContext = isSameUser.value ? locale.dialogAgent.proper() : `on behalf of ${props.user.fullName}`;
     await triggerAction(
         DialogAgentResponseAction.ACTION_SUBMIT,
         `Submitting ${toastContext}`,
@@ -139,7 +149,7 @@ async function onSubmit(): Promise<void> {
  * When the user clicks on "Reset"
  */
 async function onReset(): Promise<void> {
-    const toastContext = `${locale.dialogAgent.proper()} for ${props.participant.user.fullName}`;
+    const toastContext = `${locale.dialogAgent.proper()} for ${props.user.fullName}`;
     await triggerAction(
         DialogAgentResponseAction.ACTION_RESET,
         `Resetting ${toastContext}...`,
@@ -152,7 +162,7 @@ async function onReset(): Promise<void> {
  * When the user clicks on "Reopen"
  */
 async function onReopen(): Promise<void> {
-    const toastContext = `${locale.dialogAgent.proper()} for ${props.participant.user.fullName}`;
+    const toastContext = `${locale.dialogAgent.proper()} for ${props.user.fullName}`;
     await triggerAction(
         DialogAgentResponseAction.ACTION_REOPEN,
         `Reopening ${toastContext}...`,
@@ -165,7 +175,7 @@ async function onReopen(): Promise<void> {
  * When the user clicks on "Resolve Assistance Request"
  */
 async function onResolve(): Promise<void> {
-    const toastContext = `assistance request from ${props.participant.user.fullName}`;
+    const toastContext = `assistance request from ${props.user.fullName}`;
     await triggerAction(
         DialogAgentResponseAction.ACTION_ASSISTANCE_RESOLVE,
         `Resolving ${toastContext}...`,
@@ -176,32 +186,32 @@ async function onResolve(): Promise<void> {
 </script>
 
 <template>
-    <li v-if="props.participant.response?._routes.view">
-        <a :href="props.participant.response._routes.view" class="icon-view">
+    <li v-if="props.showView && props.response?._routes.view">
+        <a :href="props.response._routes.view" class="icon-view">
             {{ `View ${locale.dialogAgent.proper()}` }}
         </a>
     </li>
-    <li v-if="props.participant._routes.summary">
-        <a :href="props.participant._routes.summary" class="icon-history">
+    <li v-if="props.summaryRoute">
+        <a :href="props.summaryRoute" class="icon-history">
             {{ `${locale.dialogAgent.proper()} History` }}
         </a>
     </li>
-    <li v-if="props.participant.response?._routes.submit">
+    <li v-if="props.response?._routes.submit">
         <button class="icon-approve" @click="onSubmit">
-            {{ `Submit on behalf of ${props.participant.user.fullName}` }}
+            {{ isSameUser ? `Submit ${locale.dialogAgent.proper()}` : `Submit on behalf of ${props.user.fullName}` }}
         </button>
     </li>
-    <li v-if="props.participant.response?._routes.reset">
+    <li v-if="props.response?._routes.reset">
         <button class="icon-refresh" @click="onReset">
             {{ `Reset ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
-    <li v-if="props.participant.response?._routes.reopen">
+    <li v-if="props.response?._routes.reopen">
         <button class="icon-undo" @click="onReopen">
             {{ `Reopen ${locale.dialogAgent.proper()}` }}
         </button>
     </li>
-    <li v-if="props.participant.response?._routes.assistanceResolve">
+    <li v-if="props.response?._routes.assistanceResolve">
         <button class="icon-medical" @click="onResolve">
             {{ `Resolve Assistance Request` }}
         </button>
@@ -210,7 +220,7 @@ async function onResolve(): Promise<void> {
     <basic-modal v-model:is-open="isConfirmModalOpen" has-background-click>
         <das-actions-modal
             v-if="actionToConfirm !== null"
-            :participant="props.participant"
+            :user="props.user"
             :action="actionToConfirm.action"
             @confirm="actionToConfirm.resolve(true)"
             @cancel="actionToConfirm.resolve(false)"
