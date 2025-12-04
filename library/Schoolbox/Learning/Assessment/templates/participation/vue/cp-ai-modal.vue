@@ -41,6 +41,7 @@ async function load(): Promise<void> {
     try {
         isProcessing.value = true;
         loadError.value = null;
+        aiResponse.value = null;
         controller = new AbortController();
         const response = await apiRequest<AIResponse, { assessmentId: number; studentId: number | null }>({
             url: props.route,
@@ -99,13 +100,21 @@ function onCancel(): void {
 function onConfirm(): void {
     // next step
 }
+
+/**
+ * To regenerate the AI content
+ */
+function onRegenerate(): void {
+    void load();
+}
 </script>
 
 <template>
     <basic-modal v-model:is-open="isOpen">
         <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
-            <div class="l-flex-col l-gap-s f-no-margins">
+            <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
                 <h2>Suggested Customisation</h2>
+                <button v-if="aiResponse" class="button icon-ai" @click.prevent="onRegenerate">Regenerate</button>
             </div>
             <request-error v-if="loadError" :further-info="loadError" />
             <div v-else-if="isProcessing">
