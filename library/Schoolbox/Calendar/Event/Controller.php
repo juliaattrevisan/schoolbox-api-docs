@@ -1036,7 +1036,7 @@ class Controller extends Base
         $endDiff = $oldEndDateTime?->diffInMinutes($event->getEndDateTime(), false);
 
         // get all bookings for this event
-        $bookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
+        $bookings = $this->bookingMapper->getForAllEventIds([$event->getId()]);
 
         // clashes?
         $validation = new Validation(
@@ -1054,7 +1054,7 @@ class Controller extends Base
         $errors = [];
 
         // update each booking, and check for clashes
-        foreach ($bookings as $booking) {
+        foreach ($bookings[$event->getId()] as $booking) {
             /** @var ResourceBookingModel $booking */
 
             $newStart = $booking->getBookingStartAt()?->addMinutes($startDiff);
@@ -1099,7 +1099,7 @@ class Controller extends Base
         }
 
         // save the lot
-        $this->bookingMapper->save($bookings);
+        $this->bookingMapper->save($bookings[$event->getId()]);
 
         return $errors;
     }
