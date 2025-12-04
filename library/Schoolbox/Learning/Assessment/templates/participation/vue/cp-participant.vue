@@ -224,7 +224,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                Copy Activity
+                                Copy {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
@@ -236,7 +236,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                New Activity
+                                New {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                     </template>

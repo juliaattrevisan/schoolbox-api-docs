@@ -25,13 +25,13 @@ const props = defineProps<{
     assessmentId: number;
 }>();
 
+const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 const studentId = defineModel<number | null>("student-id", { default: null });
 
 const emit = defineEmits<{
     (event: "customiseActivity"): void;
 }>();
 
-const isOpen = window.Vue.ref(false);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 const aiResponse = window.Vue.ref<AIResponse | null>(null);
@@ -85,10 +85,10 @@ window.Vue.watch(studentId, (newStudentId) => {
  * When the modal is closed trigger to clear the studentId
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
-    if (!newIsOpen) {
-        studentId.value = null;
-        aiResponse.value = null;
-    }
+    // if (!newIsOpen) {
+    //     studentId.value = null;
+    //     aiResponse.value = null;
+    // }
 });
 
 /**

@@ -2,6 +2,8 @@
 /**
  * Custom Participation Bottom Drawer Component
  */
+
+import locale from "@js/terminology/rosettaStone";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
@@ -108,7 +110,7 @@ function clearSelection(): void {
                             )
                         "
                     >
-                        Copy Activity
+                        Copy {{ locale.activity.translate(false, true) }}
                     </button>
                 </div>
                 <div class="l-flex__item--1-auto">
@@ -121,7 +123,7 @@ function clearSelection(): void {
                             )
                         "
                     >
-                        New Activity
+                        New {{ locale.activity.translate(false, true) }}
                     </button>
                 </div>
             </template>
