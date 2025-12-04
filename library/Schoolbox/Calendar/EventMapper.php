@@ -24,6 +24,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -448,14 +449,61 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             $endDiff = $oldEndDateTime->diffInMinutes($newEndDateTime, false);
         }
 
+        // get other mappers...
+        /** @var CampusMapper $campusMapper */
+        $campusMapper = $this->getJoinMapper('event_campus');
         $bookingMapper = ResourceBookingMapper::getInstance();
+        /** @var Schoolbox\ResourceBooking\Booking\Status\Mapper $bookingStatusMapper */
+        $bookingStatusMapper = $bookingMapper->getJoinMapper('status');
+        $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
+        $externalEvents = \Schoolbox\External\Event\Mapper::getInstance();
+        $externalTimetable = self::getDi()->get('externalTimetable');
+
+        // get all bookings for this event
         $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
+
+        // clashes?
+        $validation = new Validation(
+            $this->getSessionUser(),
+            $bookingMapper,
+            $bookingStatusMapper,
+            $termMapper,
+            $externalTimetable,
+            $campusMapper,
+            $this->getConfigLoader(),
+            $externalEvents,
+        );
+
+        // update each booking, and check for clashes
         foreach ($bookings as $booking) {
             /** @var ResourceBookingModel $booking */
-            $booking->setBookingStartAt($booking->getBookingStartAt()?->addMinutes($startDiff));
-            $booking->setBookingEndAt($booking->getBookingEndAt()?->addMinutes($endDiff));
-            $bookingMapper->save($booking);
+
+            $newStart = $booking->getBookingStartAt()?->addMinutes($startDiff);
+            $newEnd = $booking->getBookingEndAt()?->addMinutes($endDiff);
+
+            $clashErrors = $validation->validateForClashes(
+                $booking->getResource(),
+                $newStart->getDateTimeObject(), // We need a different kind of date object.
+                $newEnd->getDateTimeObject(), // We need a different kind of date object.
+                $booking
+            );
+
+            if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
+                // found clash can we allow them?
+                if ($booking->getResource()->getAllowClashBookings()) {
+                    $booking->setStatus($bookingStatusMapper->createModel(Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+                } else {
+                    // found clash, but no clash allowed
+                    throw new MapperException("Cannot update booking for resource '" . $booking->getResource()->getName() . "' due to a scheduling conflict.");
+                }
+            }
+
+            $booking->setBookingStartAt($newStart);
+            $booking->setBookingEndAt($newEnd);
         }
+
+        // save the lot
+        $bookingMapper->save($bookings);
     }
 
     /**
