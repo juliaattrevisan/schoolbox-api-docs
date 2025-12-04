@@ -17,6 +17,7 @@ interface Props {
         };
         participants: DialogAgentParticipant[];
     }[];
+    exportRoute: string;
     isSpecification?: boolean;
 }
 
@@ -28,6 +29,30 @@ const participantSearchFilter = window.Vue.ref<string>("");
 const filters = window.Vue.ref<Record<DialogAgentResponseStatus, boolean>>(
     fromEntriesOf(Object.values(DialogAgentResponseStatus).map((status) => [status, true])),
 );
+
+const exportRouteFiltered = window.Vue.computed(() => {
+    /** No export links on specification assessments, or when export route is unavailable */
+    if (!props.exportRoute || props.isSpecification) {
+        return null;
+    }
+
+    /** If all filters are enabled, just keep the base route */
+    if (Object.values(filters.value).every((isEnabled) => isEnabled)) {
+        return props.exportRoute;
+    }
+
+    /** Otherwise extend the export route so that that it respects the current filters */
+    const url = new URL(props.exportRoute, window.location.origin);
+    url.searchParams.set("participantSearch", participantSearchFilter.value);
+
+    for (const [status, isEnabled] of Object.entries(filters.value)) {
+        if (isEnabled) {
+            url.searchParams.append(`status[]`, status);
+        }
+    }
+
+    return url.toString();
+});
 
 /**
  * Reset all filters to show everything again
@@ -53,6 +78,10 @@ function toggleCollapse(assessmentId: number): void {
 </script>
 
 <template>
+    <Teleport v-if="exportRouteFiltered" to="#header-options">
+        <li><a class="icon-export" :href="exportRouteFiltered">Export CSV</a></li>
+    </Teleport>
+
     <!-- TODO: bulk actions -->
 
     <div class="row">
