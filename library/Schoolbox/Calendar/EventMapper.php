@@ -385,12 +385,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
      * Post-save hook method
      *
-     * @param Event $event
-     * @param Event|null $previous
+     * @param object $event
+     * @param object|null $previous
      * @throws MapperException
      */
-    protected function postSave(Event $event, ?Event $previous = null)
+    protected function postSave(object $event, ?object $previous = null)
     {
+        /** @var Event $event */
         // Clear attendance if it has changed from true to false
         if ($event->getAttendanceDirty()) {
              $this->removeAttendanceByEvent($event);
