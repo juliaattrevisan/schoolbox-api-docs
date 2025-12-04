@@ -24,6 +24,10 @@ declare site_root              # No trailing slash, eg '/usr/share/schoolbox'
 declare is_primary_host        # One of [0|1]
 declare instance_list          # Set of instances for this host
 
+# Circuit breaker configuration
+readonly CIRCUIT_BREAKER_DIR="/var/lock/schoolbox-upgrade"
+readonly CIRCUIT_BREAKER_TIMEOUT=86400  # 24 hours in seconds
+
 # Logging helpers
 function debug(){
   if [[ $verbose == '1' ]]; then
@@ -35,6 +39,45 @@ function log(){
 }
 function error(){
   $LOG $L_ERROR "$1"
+}
+
+# Circuit breaker helpers
+# Check if circuit breaker is active for a specific instance
+function check_instance_circuit_breaker() {
+  local instance_id=$1
+  local breaker_file="${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
+
+  if [[ -f "$breaker_file" ]]; then
+    local last_failure=$(cat "$breaker_file")
+    local current_time=$(date +%s)
+    local time_diff=$((current_time - last_failure))
+
+    if [[ $time_diff -lt $CIRCUIT_BREAKER_TIMEOUT ]]; then
+      local hours_remaining=$(( (CIRCUIT_BREAKER_TIMEOUT - time_diff) / 3600 ))
+      error "Circuit breaker active for instance '$instance_id'. Last failure was ${time_diff}s ago. Skipping upgrade (retry in ${hours_remaining}h)."
+      return 1  # Circuit breaker is active
+    else
+      log "Circuit breaker timeout expired for instance '$instance_id'. Removing lock and proceeding..."
+      clear_instance_circuit_breaker "$instance_id"
+      return 0  # Circuit breaker expired, can proceed
+    fi
+  fi
+  return 0  # No circuit breaker, can proceed
+}
+
+# Trigger circuit breaker for a specific instance
+function trigger_instance_circuit_breaker() {
+  local instance_id=$1
+  mkdir -p "$CIRCUIT_BREAKER_DIR"
+  date +%s > "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
+  error "Circuit breaker triggered for instance '$instance_id'. Upgrade will not run again for 24 hours."
+  # TODO: Send Slack alert here
+}
+
+# Clear circuit breaker for a specific instance
+function clear_instance_circuit_breaker() {
+  local instance_id=$1
+  rm -f "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
 }
 
 # Renders the help message
