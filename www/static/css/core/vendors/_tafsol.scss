@@ -831,20 +831,6 @@ input[type="radio"] + .block {
         overflow: hidden;
     }
 }
-.v-card-list {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-
-    &::before,
-    &::after {
-        content: none !important;
-    }
-
-    & > div {
-        margin: 0 !important;
-    }
-}
 
 .c-search-page__filters {
     border: var(--border);
