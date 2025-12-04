@@ -20,7 +20,6 @@ import { useExcludeParticipant } from "./composable/useExcludeParticipant";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 import { useIncludeInExisting } from "./composable/useIncludeInExisting";
 import { usePerformAction } from "./composable/usePerformAction";
-import AssessmentCalendar from "@schoolboxLibrary/Learning/Assessment/Calendar/vue/assessment-calendar.vue";
 
 const props = defineProps<{
     allParticipants: Participant[];
