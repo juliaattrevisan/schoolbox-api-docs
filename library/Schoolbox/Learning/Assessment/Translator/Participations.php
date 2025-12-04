@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -49,6 +50,7 @@ class Participations
     /**
      * @param Participant $participation
      * @return array
+     * @throws InvalidArgumentException
      */
     public function __invoke(Participant $participation): array
     {
@@ -80,7 +82,7 @@ class Participations
             'id'         => $participation->getId(),
             'user'       => $participant,
             'plan'       => call_user_func($this->planTranslator, $participation->getPlan()),
-            'cachedDifferentiationProfile' => $this->aiCache->get($cacheKey),
+            'cachedSuggestedCustomisation' => $this->aiCache->get($cacheKey),
             'createdAt'  => $participation->getCreatedAt()?->toRfc3339String(),
             'updatedAt'  => $participation->getUpdatedAt()?->toRfc3339String(),
             'excludedAt' => $participation->getExcludedAt()?->toRfc3339String(),
