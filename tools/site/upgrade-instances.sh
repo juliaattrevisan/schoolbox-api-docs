@@ -235,10 +235,18 @@ function upgrade_instances(){
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
   {
+    # Check circuit breaker FIRST for this instance
+    if ! check_instance_circuit_breaker "$i"; then
+      continue
+    fi
+
     # Ensure instance's log file's directory exists
     mkdir -p /var/log/schoolbox/"$i"
     instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
     log "Upgrade starting for instance '$i' - logging to $instance_log_file";
+
+    # Track if instance upgrade fails
+    instance_failed=0
 
     # TODO, consider case where:
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
@@ -248,12 +256,12 @@ function upgrade_instances(){
     if [[ $verbose == 1 ]]; then
       args+=(--verbose)
     fi
-    "$site_root"/tools/site/create-data-dirs.sh "${args[@]}" >> "$instance_log_file" 2>&1
+    "$site_root"/tools/site/create-data-dirs.sh "${args[@]}" >> "$instance_log_file" 2>&1 || instance_failed=1
 
-    if [[ $is_primary_host == '1' ]]; then
+    if [[ $is_primary_host == '1' && $instance_failed == 0 ]]; then
     {
       echo "Running update scripts."
-      INSTANCE_ID="$i" "$site_root"/tools/update-sql.sh
+      INSTANCE_ID="$i" "$site_root"/tools/update-sql.sh || instance_failed=1
       # Ensure instance has JWT keys deployed. TODO, should be run once only on install, not on upgrade
       INSTANCE_ID="$i" php "$site_root"/tools/token/generateKeyPair.php --quiet
     } >> "$instance_log_file" 2>&1
@@ -287,7 +295,14 @@ function upgrade_instances(){
         fi
       fi
     fi
-    log "Upgrade complete for instance '$i'";
+    # Check if instance upgrade succeeded or failed
+    if [[ $instance_failed == 1 ]]; then
+      error "Upgrade failed for instance '$i'"
+      trigger_instance_circuit_breaker "$i"
+    else
+      log "Upgrade complete for instance '$i'"
+      clear_instance_circuit_breaker "$i"
+    fi
 
     # Bring instance back online.
     # Note site_up runs an SQL UPDATE, so it only makes sense to call site_up on the primary host (only primary hosts have databases).
