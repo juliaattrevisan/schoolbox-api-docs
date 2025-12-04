@@ -54,72 +54,6 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
-     * @var Error\Mapper
-     */
-    private $errorMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-
-    /**
-     * @var EventMapper
-     */
-    private $eventMapper;
-
-
-    /**
-     * @var EventTypeMapper
-     */
-    private $eventTypeMapper;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
-     * @var Attendance\Mapper
-     */
-    private $attendanceMapper;
-
-
-    /**
-     * @var FolderAccess
-     */
-    private FolderAccess $folderAccess;
-
-
-    /**
-     * @var Validator
-     */
-    private Validator $validator;
-
-
-    /**
-     * Helper for editor templates.
-     */
-    private EditorTemplateHelper $editorTemplateHelper;
-
-
-    /**
      * Controller constructor.
      *
      * @param Error\Mapper      $errorMapper
@@ -135,29 +69,18 @@ class Controller extends Base
      * @param EditorTemplateHelper    $editorTemplateHelper
      */
     public function __construct(
-        Error\Mapper $errorMapper,
-        RoleMapper $roleMapper,
-        Folder\Mapper $folderMapper,
-        EventMapper $eventMapper,
-        EventTypeMapper $eventTypeMapper,
-        CampusMapper $campusMapper,
-        UserMapper $userMapper,
-        Attendance\Mapper $attendanceMapper,
-        FolderAccess $folderAccess,
-        Validator $validator,
-        EditorTemplateHelper $editorTemplateHelper,
+        private Error\Mapper $errorMapper,
+        private RoleMapper $roleMapper,
+        private Folder\Mapper $folderMapper,
+        private EventMapper $eventMapper,
+        private EventTypeMapper $eventTypeMapper,
+        private CampusMapper $campusMapper,
+        private UserMapper $userMapper,
+        private Attendance\Mapper $attendanceMapper,
+        private FolderAccess $folderAccess,
+        private Validator $validator,
+        private EditorTemplateHelper $editorTemplateHelper, //Helper for editor templates
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->roleMapper = $roleMapper;
-        $this->folderMapper = $folderMapper;
-        $this->eventMapper = $eventMapper;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->campusMapper = $campusMapper;
-        $this->userMapper = $userMapper;
-        $this->attendanceMapper = $attendanceMapper;
-        $this->folderAccess = $folderAccess;
-        $this->validator = $validator;
-        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
