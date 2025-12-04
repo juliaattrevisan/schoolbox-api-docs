@@ -359,6 +359,8 @@ class Controller extends Base
                     $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
                 }
 
+                $status = $authoritativeResponse?->getCurrentStatus() ?? Status::INCOMPLETE;
+
                 $participantCarousel[] = [
                     'id' => $participant->getUser()->getId(),
                     'value' => $this->getRouteIfAuthorized('learningDialogAgent.getParticularResponse', [
@@ -368,7 +370,8 @@ class Controller extends Base
                         'studentId' => $participant->getUser()->getId(),
                     ]),
                     'user' => $userTranslator->__invoke($participant->getUser()),
-                    'response' => $authoritativeResponse ? $responseTranslator->__invoke($authoritativeResponse) : null,
+                    'status' => $status,
+                    'statusLabel' => $status->translate(),
                 ];
             }
         }
