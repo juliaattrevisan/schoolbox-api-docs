@@ -1,4 +1,5 @@
-/* default = old icon font */
+/*@font-face lives in skin.twig, so this file just updates the variables—no re-declaration needed.*/
+
 :root {
     --sbx-icon-font-family: "schoolbox";
 }
