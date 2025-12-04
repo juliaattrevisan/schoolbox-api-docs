@@ -36,7 +36,7 @@
                                 <div class="card small-12">
                                     {% if updateRoute %}
                                         <a href="{{ updateRoute }}">
-                                            <h3>{{ report.title }}</h3>
+                                            <h3 data-test="summative-report-title-{{ report.title }}">{{ report.title }}</h3>
                                         </a>
                                         {% else %}
                                         <h3>{{ report.title }}</h3>
@@ -56,21 +56,21 @@
                             <nav>
                                 {% set previewRoute = routeLookupIfAuthorized('adminSummativeReport.getPreview', {report: report, reportId: report.id}) %}
                                 {% if previewRoute %}
-                                    <a class="icon-eye" href="{{ previewRoute }}" title="Preview Report" data-preview></a>
+                                    <a class="icon-eye" href="{{ previewRoute }}" title="Preview Report" data-test="summative-report-preview-{{ report.title }}" data-preview></a>
                                 {% endif %}
 
                                 {% set generateRoute = routeLookupIfAuthorized('adminSummativeReport.getGenerate', {report: report, reportId: report.id}) %}
                                 {% if generateRoute %}
-                                <a class="icon-download" href="{{ generateRoute }}" title="Download"></a>
+                                <a class="icon-download" href="{{ generateRoute }}" title="Download" data-test="summative-report-download-{{ report.title }}"></a>
                                 {% endif %}
 
                                 {% if updateRoute %}
-                                    <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
+                                    <a class="icon-modify" href="{{ updateRoute }}" title="Modify" data-test="summative-report-modify-{{ report.title }}"></a>
                                 {% endif %}
 
                                 {% set dupeRoute = routeLookupIfAuthorized('adminSummativeReport.getDuplicate', {report: report, reportId: report.id}) %}
                                 {% if dupeRoute %}
-                                <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate"></a>
+                                <a class="icon-copy" href="{{ dupeRoute }}" title="Duplicate" data-test="summative-report-copy-{{ report.title }}"></a>
                                 {% endif %}
 
                                 {% set deleteRoute = routeLookupIfAuthorized('adminSummativeReport.postDelete', {report: report, reportId: report.id}) %}
@@ -124,7 +124,7 @@
                                             });
                                         });
                                     </script>
-                                    <a class="icon-delete" href="{{ deleteRoute }}" title="Delete" data-delete="{{ report.id }}"></a>
+                                    <a class="icon-delete" href="{{ deleteRoute }}" title="Delete" data-delete="{{ report.id }}" data-test="summative-report-delete-{{ report.title }}"></a>
                                 {% endif %}
                             </nav>
                         </li>
