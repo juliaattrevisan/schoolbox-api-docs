@@ -417,6 +417,35 @@ class Controller extends Base
 
 
     /**
+     * Redirect user to the view page for the first participant in the assessment list
+     *
+     * @param DialogAgent $assessment
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getFirstParticipantResponse(DialogAgent $assessment)
+    {
+        $participants = $assessment->getAllParticipants()->filter(fn($participant) => !$participant->isExcluded());
+        $firstParticipant = $participants->first()?->getUser();
+
+        if ($firstParticipant instanceof User) {
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate('learningDialogAgent.getParticularResponse', [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'student' => $firstParticipant,
+                    'studentId' => $firstParticipant->getId(),
+                ]),
+            );
+            return;
+        }
+
+        /* If the participant list is empty, nothing can be shown */
+        throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+
+    /**
      * Send a message to the chat agent for a particular response and stream the reply
      *
      * @param DialogAgent $assessment

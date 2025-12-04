@@ -31,12 +31,14 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\NextRoutes;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\LockedChecker;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
+use Schoolbox\Learning\Authorizer\Rule\HasParticipant;
 use Schoolbox\Learning\Authorizer\Rule\IsAssessmentOpen;
 use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
@@ -208,6 +210,14 @@ class Module extends BaseModule
             $this->buildRuleCanAction(NextRoutes::ACTION_VIEW),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndOptionalResponse);
+
+        /* Redirecting route to find the first participant in the assessment
+         */
+        $this->register('GET', "{$assRoute}/responses/view", 'getFirstParticipantResponse', new Rule\All(
+            $canWrite,
+            new IsImplementation(),
+            new HasParticipant(),
+        ), $preloadAssessment);
 
         /* Student sends a message to the chat agent for a particular response
          */
