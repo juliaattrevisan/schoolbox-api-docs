@@ -648,7 +648,7 @@ class Controller extends Base
         /* Manufacture outcome format
          */
         $filename = sprintf(
-            'discussion_%s_status_%s',
+            'discussion_%s_status_%s.csv',
             $assessment->getId(),
             \Alaress_Date_Format::now()->getDatabase()
         );
@@ -658,7 +658,7 @@ class Controller extends Base
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
             ->withHeader('Content-Length', strlen($contents))
-            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}.csv\"")
+            ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}\"")
         ;
     }
 }
