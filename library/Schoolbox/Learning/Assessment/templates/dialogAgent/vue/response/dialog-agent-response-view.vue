@@ -12,7 +12,6 @@ interface Props {
     response: DialogAgentResponse;
     student: UserAuthor;
     summaryRoute?: string | null;
-    returnUrl: string;
 }
 
 const props = defineProps<Props>();
