@@ -257,7 +257,7 @@ class Mapper extends BaseMapper
         if (empty($options['order']['sequence'])) {
             $options['order']['sequence'] = 'asc';
         }
-        return $this->executeSelect($this->getSelectStringForParticipant($student), $this->getFromString(), $pb, [], $options)->indexBy('id');
+        return $this->executeSelect($this->getSelectString(), $this->getFromStringForParticipant($student), $pb, [], $options)->indexBy('id');
     }
 
     /**
@@ -809,15 +809,15 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Returns a SELECT string suitable for predicates that query the participant or plan tables.
+     * Returns a FROM string suitable for predicates that query the participant or plan tables.
      *
      * @param User $user
      * @return string
      * @throws BaseMapper\DefinitionException
      */
-    protected function getSelectStringForParticipant(User $user): string
+    protected function getFromStringForParticipant(User $user): string
     {
-        return $this->getSelectString() . "
+        return $this->getFromString() . "
             LEFT JOIN participant_plan pp ON pp.assessment_id = assessment.id
             LEFT JOIN participant ON participant.participant_plan_id = pp.id AND participant.user_id = {$user->getId()}
         ";
