@@ -87,10 +87,11 @@ class Module extends BaseModule
             $this->injector->get('filesystem.storageProxy'),
             new ParserFactory(),
             $this->injector->get('ai.clientFactory'),
+            new \Schoolbox\Presidio\ClientFactory($this->injector->get('config'), $this->injector->get('httpClient'))->build(),
             $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
             $this->getMapperFactory()->get(DifferentiationAdminMapper::class),
             $this->injector->get('assessmentDataSource'),
-            $this->injector->get('ai.response.cache')
+            $this->injector->get('ai.response.cache'),
         );
     }
 }

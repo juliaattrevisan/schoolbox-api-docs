@@ -34,7 +34,9 @@ use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Presidio\Client;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\User;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -57,6 +59,7 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
+        private Client $presidioClient,
         private DifferentiationProfileMapper $differentiationProfileMapper,
         private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
         private MapperProxy $assessmentMapperProxy,
@@ -297,14 +300,19 @@ class Controller extends Base
 
             return;
         }
+
         try {
             $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
+
+            /** @var User $student */
+            $student = $this->differentiationProfileMapper->getJoinMapper('student')->findById($studentId);
 
             $agent = new DifferentiationProfileGeneration(
                 $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
                 $diffConfig,
                 $this->filesystemProxy,
                 $this->parserFactory,
+                $this->presidioClient,
             );
 
             $enabledFields = $this->differentiationProfileAdminMapper
@@ -319,6 +327,7 @@ class Controller extends Base
                 $this->getUser(),
                 $records,
                 $enabledFields,
+                $student,
                 $aiSessionId,
             );
 
