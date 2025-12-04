@@ -52,10 +52,10 @@
     <dialog-agent-status
         :criteria="{{ criteria|json_encode }}"
         :assessments="{{ assessments|json_encode }}"
-        :export-route="'{{ routeLookupIfAuthorized('learningDialogAgent.getExport', {
+        export-route="{{ routeLookupIfAuthorized('learningDialogAgent.getExport', {
             assessmentId: assessment.id,
             assessment: assessment
-        }) }}'"
+        }) }}"
         {% if assessment.isSpecification %}is-specification{% endif %}
     >
         <template #meta>
