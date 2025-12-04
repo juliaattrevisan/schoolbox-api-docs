@@ -1019,7 +1019,7 @@ class Mapper extends BaseMapper
      * Retrieves a list of assessments, along with their joined objects.
      *
      * @param PDOStatement $statement
-     * @return Collection|Model[]
+     * @return GenericCollection|Model[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
@@ -1031,13 +1031,13 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      * @param bool         $hydrateProjectContext
-     * @return Collection|Model[]
+     * @return GenericCollection|Model[]
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      */
     private function hydrateSelectRecursive(PDOStatement $statement, bool $hydrateProjectContext = true)
     {
-        /** @var Collection|Model[] $modelList */
+        /** @var GenericCollection|Model[] $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
         $projectIds        = [];
