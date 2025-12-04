@@ -253,18 +253,15 @@ class Controller extends Base
          */
         $feed = new \Schoolbox\Collection();
 
-        if (trim((string)$assessment->getOpeningMessage()) !== '') {
-            // TODO: opening message is actually a required field, handle that properly (maybe it should influence the ability to get here, like prompt also should?)
-            $feed->add([
-                'type' => 'response',
-                'data' => [
-                    'status' => 'success',
-                    'responseId' => null,
-                    'image' => null,
-                    'message' => (string)$assessment->getOpeningMessage()
-                ],
-            ]);
-        }
+        $feed->add([
+            'type' => 'response',
+            'data' => [
+                'status' => 'success',
+                'responseId' => null,
+                'image' => null,
+                'message' => $assessment->getOpeningMessage()
+            ],
+        ]);
 
         if ($response->getSessionId()) {
             $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
