@@ -23,6 +23,7 @@ declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
 declare DEFAULT_INSTANCE_ID
 declare AWS_REGION
 declare AWS_START_URL
+declare AWS_SSO_AUTO_OPEN_BROWSER
 declare PHPSTORM_SERVER_NAME
 declare SENTRY_DSN
 declare SENTRY_ERROR_SAMPLE_RATE
@@ -103,7 +104,15 @@ function login_to_aws() {
     log "Testing if logged in to AWS (region: ${AWS_REGION})..."
     if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
         log "Not logged in to AWS: logging in"
-        AWS_CONFIG_FILE=.aws/config aws sso login --use-device-code
+        # Check whether to open a browser or not
+        if [ "${AWS_SSO_AUTO_OPEN_BROWSER}" -eq 0 ]; then
+            AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+        elif [ "$(id -u)" -eq 0 ]; then
+            log "Running as root, but AWS_SSO_AUTO_OPEN_BROWSER is on: ignoring"
+            AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+        else
+            AWS_CONFIG_FILE=.aws/config aws sso login --use-device-code
+        fi
     else
         log "Logged in to AWS: continuing"
     fi
