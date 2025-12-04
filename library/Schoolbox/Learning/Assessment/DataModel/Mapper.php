@@ -1152,14 +1152,12 @@ class Mapper extends BaseMapper
             $modelList->add($model);
         }
 
-        // Augment all activity sub-objects (due work, task, quiz, etc.)
-        $modelList = $this->augmentListWithTasks($modelList);
+        // Augment all activity sub-objects (due work, task, quiz, etc.),
+        // only if their entire object structure hasn't already been hydrated:
+        // this excludes tasks, lesson plans, dialog agents and projects.
         $modelList = $this->augmentListWithDueWorks($modelList);
         $modelList = $this->augmentListWithQuizzes($modelList);
         $modelList = $this->augmentListWithLtiAssessments($modelList);
-        $modelList = $this->augmentListWithLessonPlans($modelList);
-        $modelList = $this->augmentListWithDialogAgents($modelList);
-        $modelList = $this->augmentListWithProjects($modelList);
 
         // Load related 1-M models
         // Due work files and Kami worksheet
