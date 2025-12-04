@@ -6,12 +6,13 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpGenAi from "./cp-gen-ai.vue";
-import type { AIResponse } from "../js/types/customParticipationTypes";
+import type { AIResponse, Routes } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
-    route: string;
+    routes: Routes;
     assessmentId: number;
 }>();
 
@@ -22,6 +23,7 @@ const newLoad = window.Vue.ref(true); // to indicate whether to load new AI cont
 const aiResponse = window.Vue.ref<AIResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
 const status = window.Vue.ref<"view" | "selectType">("view"); // to track the current status of the modal
 const typePicked = window.Vue.ref("modify"); // to track the type of customisation picked
+const proceedText = window.Vue.ref("Proceed");
 
 /**
  * To display the view/generate customisation modal when a student is selected
@@ -68,11 +70,17 @@ function onBack(): void {
 }
 
 /**
- * To use the suggested AI content
+ * To use the suggested AI content and navigate to the appropriate activity page
  */
 function onConfirm(): void {
-    // isViewCustomisationOpen.value = false;
-    // isSelectTypeOpen.value = true;
+    proceedText.value = "Proceeding...";
+    if (typePicked.value === "modify") {
+        window.location.href = `${props.routes.getLearningPlanNewUrl}?student=${studentId.value}&${getReturnUrl()}`;
+    } else if (typePicked.value === "copy") {
+        window.location.href = `${props.routes.getAssessmentParticipationCopyActivity}?student=${studentId.value}&original=${props.assessmentId}&${getReturnUrl()}`;
+    } else if (typePicked.value === "new") {
+        window.location.href = `${props.routes.getAssessmentParticipationNewActivity}?student=${studentId.value}&original=${props.assessmentId}&${getReturnUrl()}`;
+    }
 }
 </script>
 
@@ -81,7 +89,7 @@ function onConfirm(): void {
         <cp-gen-ai
             v-if="status === 'view'"
             v-model:ai-response="aiResponse"
-            :route="props.route"
+            :route="props.routes.genAI"
             :assessment-id="props.assessmentId"
             :student-id="studentId"
             :new-load="newLoad"
@@ -115,7 +123,7 @@ function onConfirm(): void {
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" data-test="" @click.prevent="onBack">Back</button>
                 <button class="button submit l-flex__item--1" type="button" data-test="" @click.prevent="onConfirm">
-                    Proceed
+                    {{ proceedText }}
                 </button>
             </div>
         </form>

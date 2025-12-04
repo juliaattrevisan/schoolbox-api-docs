@@ -183,7 +183,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
     <cp-suggested-customisation-modal
         v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
         v-model:student-id="currentStudentId"
-        :route="props.routes.genAI"
+        :routes="props.routes"
         :assessment-id="props.assessmentId"
     />
 </template>
