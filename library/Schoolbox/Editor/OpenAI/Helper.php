@@ -68,6 +68,11 @@ class Helper
      */
     private const IMAGE_DATA_OMITTED = 'omitted';
 
+    /**
+     * Cache key pattern and default TTL for differentiation profiles
+     */
+    public const string DIFFERENTIATION_PROFILE_CACHE_KEY = 'ai_differentiation_profile_%d_student_%d';
+    public const int DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL = 604800; // 7 days
 
     /**
      * Controller constructor.

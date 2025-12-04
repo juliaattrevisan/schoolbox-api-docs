@@ -48,9 +48,6 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
  */
 class Controller extends Base
 {
-    const DIFFERENTIATION_PROFILE_CACHE_KEY = 'ai_differentiation_profile_%d_student_%d';
-    const DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL = 604800; // 7 days
-
     /**
      * Controller constructor.
      */
@@ -390,7 +387,7 @@ class Controller extends Base
         }
 
         $cacheKey = sprintf(
-            self::DIFFERENTIATION_PROFILE_CACHE_KEY,
+            Helper::DIFFERENTIATION_PROFILE_CACHE_KEY,
             $assessmentId,
             $studentId
         );
@@ -459,7 +456,7 @@ class Controller extends Base
                 $this->aiCache->set(
                     $cacheKey,
                     $response,
-                    self::DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL
+                    Helper::DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL
                 );
             }
 

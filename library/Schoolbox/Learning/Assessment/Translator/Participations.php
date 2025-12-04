@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\Assessment\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
+use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
@@ -32,7 +34,7 @@ class Participations
      * @param User               $currentUser
      * @param ParticipationPlans $planTranslator
      * @param ?Collection        $customisedAssessments
-     *
+     * @param ?CacheInterface    $aiCache
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -40,6 +42,7 @@ class Participations
         protected User $currentUser,
         private ParticipationPlans $planTranslator,
         private ?Collection $customisedAssessments = null,
+        private ?CacheInterface $aiCache = null,
     ) {
     }
 
@@ -67,10 +70,17 @@ class Participations
             }
         }
 
+        $cacheKey = sprintf(
+            Helper::DIFFERENTIATION_PROFILE_CACHE_KEY,
+            $assess->getId(),
+            $participant->getId()
+        );
+
         return [
             'id'         => $participation->getId(),
             'user'       => $participant,
             'plan'       => call_user_func($this->planTranslator, $participation->getPlan()),
+            'cachedDifferentiationProfile' => $this->aiCache->get($cacheKey),
             'createdAt'  => $participation->getCreatedAt()?->toRfc3339String(),
             'updatedAt'  => $participation->getUpdatedAt()?->toRfc3339String(),
             'excludedAt' => $participation->getExcludedAt()?->toRfc3339String(),
