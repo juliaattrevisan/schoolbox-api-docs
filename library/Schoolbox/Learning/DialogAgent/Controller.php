@@ -99,9 +99,7 @@ class Controller extends Base
          */
         $dialogAgent = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
-        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->indexByCallback(static function (FieldContextModel $instance) {
-            return $instance->getField()->getId();
-        });
+        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId());
 
         $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
@@ -239,12 +237,13 @@ class Controller extends Base
     {
         $participant = $assessment->getParticipant($student);
 
-        /* Prepare a redirection url
+        /* Prepare a redirection url if one was provided
+         * This will be used after any actions are made (i.e. resetting the chat/submitting the response/etc)
+         * If not provided, no redirection will occur and the page will just reload
          */
+        $returnUrl = null;
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
-        } else {
-            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
 
         /**
@@ -293,7 +292,6 @@ class Controller extends Base
             'response' => $response,
             'responseData' => $responseTranslator->__invoke($response),
             'interactionLocked' => false, // TODO
-            'readonly' => true, /* this page is always readonly since it's viewing an existing response */
             'returnUrl' => $returnUrl,
         ];
 

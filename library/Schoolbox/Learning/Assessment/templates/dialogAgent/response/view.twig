@@ -9,6 +9,7 @@
  # @param array $student                  Array of author info about the student who owns the response
  # @param DialogAgent\Response $response  The response that we are viewing
  # @param array|null $responseData        Array about the response that we are viewing
+ # @param string|null $returnUrl          An optional redirect destination, otherwise actions reload the page
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -77,6 +78,7 @@
                     :response="{{ responseData |json_encode }}"
                     :student="{{ student |json_encode }}"
                     summary-route="{{ summaryRoute }}"
+                    return-url="{{ returnUrl }}"
                 />
             </div>
             <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentResponse.js?v={{ config.site_version }}"></script>

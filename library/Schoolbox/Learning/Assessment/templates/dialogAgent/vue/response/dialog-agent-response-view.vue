@@ -12,6 +12,7 @@ interface Props {
     response: DialogAgentResponse;
     student: UserAuthor;
     summaryRoute?: string | null;
+    returnUrl?: string | null;
 }
 
 const props = defineProps<Props>();
@@ -61,11 +62,17 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Reload the page after an action so that changes are reflected
+ * Reload/redirect the page after an action so that changes are reflected
  * This could be expanded to properly load back the state,
  * but since twig renders some stuff at the moment, this is good enough for now
  */
 function onAction(): void {
+    /** If there's a returnUrl, go to it */
+    if (props.returnUrl) {
+        window.location.href = props.returnUrl;
+        return;
+    }
+
     window.location.reload();
 }
 </script>
