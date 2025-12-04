@@ -1019,7 +1019,7 @@ class Mapper extends BaseMapper
      * Retrieves a list of assessments, along with their joined objects.
      *
      * @param PDOStatement $statement
-     * @return GenericCollection|Model[]
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
@@ -1031,13 +1031,13 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      * @param bool         $hydrateProjectContext
-     * @return GenericCollection|Model[]
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      */
     private function hydrateSelectRecursive(PDOStatement $statement, bool $hydrateProjectContext = true)
     {
-        /** @var GenericCollection|Model[] $modelList */
+        /** @var GenericCollection<Model> $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
         $projectIds        = [];
@@ -1049,7 +1049,6 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
@@ -1481,15 +1480,17 @@ class Mapper extends BaseMapper
      * For any projects found in $modelList, identified by $projectIds, find their sub-assessments
      * and load them into the projects.
      *
-     * @param Collection|Model[] $modelList
-     * @param array      $projectIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $projectIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      * @throws UnderflowException
      */
-    private function augmentListWithProjectSubAssessments(Collection $modelList, array $projectIds)
-    {
+    private function augmentListWithProjectSubAssessments(
+        GenericCollection $modelList,
+        array $projectIds,
+    ): GenericCollection {
         // Project sub-assessments
         if (!\count($projectIds)) {
             return $modelList;
@@ -1532,13 +1533,13 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with Curriculum Nodes
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    protected function augmentListWithCurriculumNodes($modelList)
+    protected function augmentListWithCurriculumNodes(GenericCollection $modelList): GenericCollection
     {
         if (count($modelList) === 0) {
             return $modelList;
@@ -1588,13 +1589,13 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with due work files.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $dueWorkIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $dueWorkIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithDueWorkFiles($modelList, $dueWorkIds)
+    protected function augmentListWithDueWorkFiles(GenericCollection $modelList, array $dueWorkIds): GenericCollection
     {
         if (!empty($dueWorkIds)) {
             // Retrieve and sort list of duework files
@@ -1624,12 +1625,14 @@ class Mapper extends BaseMapper
      * Augments the list from hydrateSelect() with due work Kami worksheet
      * templates.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $dueWorkIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $dueWorkIds
+     * @return GenericCollection<Model>
      */
-    protected function augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds)
-    {
+    protected function augmentListWithDueWorkKamiWorksheetTemplates(
+        GenericCollection $modelList,
+        array $dueWorkIds,
+    ): GenericCollection {
         if (!empty($dueWorkIds)) {
             // Retrieve and sort list of Kami docs
             $kamiDocuments = $this->getJoinMapper('duework.kamiWorksheetTemplate')
@@ -1651,13 +1654,13 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with task files.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $taskIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $taskIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithTaskFiles($modelList, $taskIds)
+    protected function augmentListWithTaskFiles(GenericCollection $modelList, array $taskIds): GenericCollection
     {
         if (!empty($taskIds)) {
             // Retrieve and sort list of duework files
@@ -1687,14 +1690,16 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with Lesson Plan Files.
      *
-     * @param Collection $modelList
-     * @param array|int[]        $lessonPlanIds
-     * @return Collection
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $lessonPlanIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithLessonPlanFiles(Collection $modelList, array $lessonPlanIds)
-    {
+    protected function augmentListWithLessonPlanFiles(
+        GenericCollection $modelList,
+        array $lessonPlanIds,
+    ): GenericCollection {
         if (!empty($lessonPlanIds)) {
             /* Retrieve and sort list of Lesson Plan Files
              */
@@ -1723,12 +1728,14 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with context unit specs.
      *
-     * @param Collection<Model> $modelList
-     * @param array             $unitSpecIds
-     * @return Collection<Model>
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $unitSpecIds
+     * @return GenericCollection<Model>
      */
-    private function augmentListWithUnitSpecContexts(Collection $modelList, array $unitSpecIds): Collection
-    {
+    private function augmentListWithUnitSpecContexts(
+        GenericCollection $modelList,
+        array $unitSpecIds,
+    ): GenericCollection {
         if (!empty($unitSpecIds)) {
             /** @var UnitSpec\Mapper $contextUnitSpecMapper */
             $contextUnitSpecMapper = $this->getJoinMapper('assessment_course_unit_specification');
@@ -1750,12 +1757,14 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with context unit implementations.
      *
-     * @param Collection<Model> $modelList
-     * @param array             $unitImplIds
-     * @return Collection<Model>
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>             $unitImplIds
+     * @return GenericCollection<Model>
      */
-    private function augmentListWithUnitImplContexts(Collection $modelList, array $unitImplIds): Collection
-    {
+    private function augmentListWithUnitImplContexts(
+        GenericCollection $modelList,
+        array $unitImplIds,
+    ): GenericCollection {
         if (!empty($unitImplIds)) {
             /** @var UnitImpl\Mapper $contextUnitImplMapper */
             $contextUnitImplMapper = $this->getJoinMapper('assessment_course_unit_implementation');
@@ -1778,12 +1787,14 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with context projects.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $contextProjectIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>        $contextProjectIds
+     * @return GenericCollection<Model>
      */
-    protected function augmentListWithProjectContexts($modelList, $contextProjectIds)
-    {
+    protected function augmentListWithProjectContexts(
+        GenericCollection $modelList,
+        array $contextProjectIds,
+    ): GenericCollection {
         if (!empty($contextProjectIds)) {
             // A project loaded as a context should not contain sub-assessments.
             // It should also not be cached, so if I _do_ need to load the
@@ -1818,6 +1829,7 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
+
     /**
      * Augments the list from hydrateSelect() with their context's folder codes.
      *
@@ -1825,11 +1837,11 @@ class Mapper extends BaseMapper
      * onto in getSelectString() due to the number of optional 1-M joins this
      * would require.
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
-    protected function augmentListWithFolderCodes($modelList)
+    protected function augmentListWithFolderCodes(GenericCollection $modelList): GenericCollection
     {
         $folderIds = [];
         // Pass 1: load folder IDs for all non-projects
@@ -1863,10 +1875,10 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with their specification assessments.
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      */
-    protected function augmentListWithSpecifications($modelList)
+    protected function augmentListWithSpecifications(GenericCollection $modelList): GenericCollection
     {
         $specificationIds = [];
 
@@ -1900,12 +1912,12 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with their grade groups.
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model>$modelList
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception
      */
-    protected function augmentListWithGradeGroups($modelList)
+    protected function augmentListWithGradeGroups(GenericCollection $modelList): GenericCollection
     {
         // Just load grade groups one by one - let the model cache do its thing
         /** @var SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper */
@@ -1947,13 +1959,13 @@ class Mapper extends BaseMapper
     /**
      * Assign Lesson Plan Fields to each Lesson Plan instance
      *
-     * @param Collection $modelList
-     * @param array      $lessonPlanIds
-     * @return Collection
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $lessonPlanIds
+     * @return GenericCollection<Model>
      * @throws Exception
      * @throws Deleted
      */
-    private function augmentWithLessonPlanFields(Collection $modelList, array $lessonPlanIds): Collection
+    private function augmentWithLessonPlanFields(GenericCollection $modelList, array $lessonPlanIds): GenericCollection
     {
         /* Fetch all the Lesson Plan Fields used by this Lesson Plan
          */
@@ -1987,14 +1999,16 @@ class Mapper extends BaseMapper
     /**
      * Assign Lesson Plan Linked assessments to each Lesson Plan instance
      *
-     * @param Collection $modelList
-     * @param array      $lessonPlanIds
-     * @return Collection
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $lessonPlanIds
+     * @return GenericCollection<Model>
      * @throws Exception
      * @throws Deleted
      */
-    private function augmentWithLessonPlanAssessments(Collection $modelList, array $lessonPlanIds): Collection
-    {
+    private function augmentWithLessonPlanAssessments(
+        GenericCollection $modelList,
+        array $lessonPlanIds,
+    ): GenericCollection {
         // Project sub-assessments
         if (!\count($lessonPlanIds)) {
             return $modelList;
