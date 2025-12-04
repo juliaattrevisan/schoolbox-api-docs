@@ -13,7 +13,7 @@ import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
-import CpAiModal from "./cp-ai-modal.vue";
+import CpSuggestedCustomisationModal from "./cp-suggested-customisation-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
@@ -180,7 +180,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
         :participants-with-interactions="participantsWithInteractions"
         @confirm="onConfirmActionSelected"
     />
-    <cp-ai-modal
+    <cp-suggested-customisation-modal
         v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
         v-model:student-id="currentStudentId"
         :route="props.routes.genAI"
