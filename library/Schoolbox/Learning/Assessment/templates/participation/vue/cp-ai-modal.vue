@@ -1,6 +1,8 @@
 <script setup lang="ts">
 /**
  * To display or regenerate AI content for a studentId customisation
+ * This modal is displayed both on a Student Participation page as well
+ * as on the modify/new/copy activity pages.
  */
 
 import locale from "@js/terminology/rosettaStone";
@@ -24,6 +26,11 @@ const props = defineProps<{
 }>();
 
 const studentId = defineModel<number | null>("student-id", { default: null });
+
+const emit = defineEmits<{
+    (event: "customiseActivity"): void;
+}>();
+
 const isOpen = window.Vue.ref(false);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
@@ -98,7 +105,7 @@ function onCancel(): void {
  * To use the suggested AI content
  */
 function onConfirm(): void {
-    // next step
+    emit("customiseActivity");
 }
 
 /**
