@@ -23,7 +23,7 @@ const selectedList = defineModel<Participant[]>("selectedList", { default: [] })
 
 const emit = defineEmits<{
     (event: "viewDifferentiationProfile", participant: Participant): void;
-    (event: "viewAI", participant: Participant): void;
+    (event: "viewSuggestedCustomisation", participant: Participant): void;
     (event: "actionSelected", participants: Participant[], action: string, isSingle: boolean): void;
     (event: "openIncludeInExistingModal", isSingle: boolean, participant: Participant | null): void;
 }>();
@@ -54,15 +54,15 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 /**
  * To open the differentiation profile view
  */
-function onDPSelected(): void {
+function onViewDP(): void {
     emit("viewDifferentiationProfile", props.participant);
 }
 
 /**
  * To generate or view the AI suggested customisation
  */
-function onAISelected(): void {
-    emit("viewAI", props.participant);
+function onViewSuggestedCustomisation(): void {
+    emit("viewSuggestedCustomisation", props.participant);
 }
 
 /**
@@ -132,8 +132,7 @@ function onOpenIncludeInExistingModal(): void {
                 v-if="props.participant._links.differentiationProfile"
                 class="button f-no-margins"
                 type="button"
-                :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
-                @click.prevent="onDPSelected"
+                @click.prevent="onViewDP"
             >
                 View {{ locale.differentiationProfile.translate(false, true) }}
             </button>
@@ -143,7 +142,7 @@ function onOpenIncludeInExistingModal(): void {
                 v-if="props.participant._links.differentiationProfile"
                 class="button icon-ai f-no-margins"
                 type="button"
-                @click.prevent="onAISelected"
+                @click.prevent="onViewSuggestedCustomisation"
             >
                 Generate Suggested Customisation
             </button>

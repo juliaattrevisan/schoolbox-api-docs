@@ -13,12 +13,14 @@ import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
+import CpAiModal from "./cp-ai-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 import { useIncludeInExisting } from "./composable/useIncludeInExisting";
 import { usePerformAction } from "./composable/usePerformAction";
+import AssessmentCalendar from "@schoolboxLibrary/Learning/Assessment/Calendar/vue/assessment-calendar.vue";
 
 const props = defineProps<{
     allParticipants: Participant[];
@@ -77,7 +79,7 @@ const studentWithDPRoute = window.Vue.ref<string>("");
  * Display the differentiation profile for a participant
  * @param participant - The participant whose differentiation profile is to be viewed
  */
-function onDPSelected(participant: Participant): void {
+function onViewDP(participant: Participant): void {
     studentWithDPRoute.value = participant._links.differentiationProfile ?? "";
     studentWithDP.value = participant.user;
 }
@@ -86,11 +88,15 @@ function onDPSelected(participant: Participant): void {
 
 // #region AI Suggested Customisation
 
+const currentStudentId = window.Vue.ref<number | null>(null);
+
 /**
  * To view the AI suggested customisation for a participant
  * @param participant - The participant whose AI suggested customisation is to be viewed or generated
  */
-function onAISelected(participant: Participant): void {}
+function onViewSuggestedCustomisation(participant: Participant): void {
+    currentStudentId.value = participant.user.id;
+}
 
 // #endregion AI Suggested Customisation
 </script>
@@ -142,8 +148,8 @@ function onAISelected(participant: Participant): void {}
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
                         :differentiation-enabled="props.differentiationEnabled"
-                        @view-differentiation-profile="onDPSelected"
-                        @view-ai="onAISelected"
+                        @view-differentiation-profile="onViewDP"
+                        @view-suggested-customisation="onViewSuggestedCustomisation"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
                     />
@@ -174,5 +180,11 @@ function onAISelected(participant: Participant): void {}
         v-model:is-open="isConfirmModifyOpen"
         :participants-with-interactions="participantsWithInteractions"
         @confirm="onConfirmActionSelected"
+    />
+    <cp-ai-modal
+        v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
+        v-model:student-id="currentStudentId"
+        :route="props.routes.genAI"
+        :assessment-id="props.assessmentId"
     />
 </template>

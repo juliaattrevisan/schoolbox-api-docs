@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display or regenerate AI content for a assessmentId customisation
+ * To display or regenerate AI content for a studentId customisation
  */
 
 import locale from "@js/terminology/rosettaStone";
@@ -11,38 +11,23 @@ import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { User } from "@schoolboxLibrary/types/User";
 
 /**
- * The returned DP item type
+ * The expected AI response type
  */
-type Item = {
-    terminology: string;
-    value: string | { name: string }[] | null;
-};
-
-/**
- * Valid adjustment item with array value
- */
-type AdjustmentItem = {
-    terminology: string;
-    value: { name: string }[];
-};
-
-/**
- * Valid text item with string value
- */
-type TextItem = {
-    terminology: string;
-    value: string;
+type AIResponse = {
+    suggested_considerations: string;
+    suggested_learning_activity_update: string;
 };
 
 const props = defineProps<{
     route: string;
+    assessmentId: number;
 }>();
 
-const assessmentId = defineModel<number | null>("assessmentId", { default: null });
-const studentId = defineModel<number | null>("studentId", { default: null });
+const studentId = defineModel<number | null>("student-id", { default: null });
 const isOpen = window.Vue.ref(false);
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
+const responseData = window.Vue.ref<AIResponse | null>(null);
 // const data = window.Vue.ref<Item[]>([]);
 // const adjustmentData = window.Vue.ref<AdjustmentItem[]>([]);
 // const textData = window.Vue.ref<TextItem[]>([]);
@@ -58,24 +43,18 @@ async function load(): Promise<void> {
     try {
         isProcessing.value = true;
         loadError.value = null;
-        const response = await apiRequest({
+        const response = await apiRequest<AIResponse, { assessmentId: number; studentId: number | null }>({
             url: props.route,
             method: "POST",
             body: {
-                assessmentId: assessmentId.value,
+                assessmentId: props.assessmentId,
                 studentId: studentId.value,
             },
         });
         if (!response.success) {
-            throw new Error(
-                response.message || `Failed to retrieve ${locale.differentiationProfile.translate(false, true)}`,
-            );
+            throw new Error(response.message || `Failed to retrieve customisation`);
         }
-        debugger;
-        // data.value = response.data || [];
-        // data.value = data.value.filter((item) => item.value !== null); // filter out items that have a null value
-        // adjustmentData.value = data.value.filter((item) => Array.isArray(item.value)) as AdjustmentItem[]; // adjustments are arrays
-        // textData.value = data.value.filter((item) => !Array.isArray(item.value)) as TextItem[]; // leaving just text items
+        responseData.value = response.data || null;
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
         loadError.value = errorMessage;
@@ -85,21 +64,21 @@ async function load(): Promise<void> {
 }
 
 /**
- * Open/close the modal based on assessmentId changes
+ * Open/close the modal based on studentId changes
  */
-window.Vue.watch(assessmentId, (newUser) => {
-    isOpen.value = newUser !== null;
-    if (newUser) {
+window.Vue.watch(studentId, (newStudentId) => {
+    isOpen.value = newStudentId !== null;
+    if (newStudentId && newStudentId !== null) {
         void load();
     }
 });
 
 /**
- * When the modal is closed trigger to clear the assessmentId
+ * When the modal is closed trigger to clear the studentId
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (!newIsOpen) {
-        assessmentId.value = null;
+        studentId.value = null;
     }
 });
 
@@ -107,7 +86,7 @@ window.Vue.watch(isOpen, (newIsOpen) => {
  * Handle close action
  */
 function onClose(): void {
-    assessmentId.value = null;
+    studentId.value = null;
 }
 </script>
 
@@ -119,33 +98,25 @@ function onClose(): void {
             :data-title="locale.differentiationProfile.translate(false, true)"
             :further-info="loadError"
         />
-        <div v-else-if="assessmentId && data.length > 0" class="l-flex-col l-gap-m f-no-margins">
+        <div v-else-if="studentId && responseData" class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
-                <h2></h2>
+                <h2>Suggested Customisation</h2>
             </div>
             <div class="c-vert-scroll-container l-flex-col l-gap-s">
-                <!-- <div class="l-flex-col l-gap-s f-no-margins">
-                    <div
-                        v-for="item in adjustmentData"
-                        :key="item.terminology"
-                        class="l-flex-col l-gap-xs f-no-margins"
-                    >
-                        <h5>
-                            <strong>{{ item.terminology }}</strong>
-                        </h5>
-                        <article>
-                            <ul>
-                                <li v-for="(value, index) in item.value" :key="index">{{ value.name }}</li>
-                            </ul>
-                        </article>
+                <div class="l-flex-col l-gap-s f-no-margins">
+                    <div class="l-flex-col l-gap-xs f-no-margins">
+                        <h3>
+                            <strong>Considerations</strong>
+                        </h3>
+                        <media-article :content="responseData?.suggested_considerations as string" />
                     </div>
-                    <div v-for="item in textData" :key="item.terminology" class="l-flex-col l-gap-xs f-no-margins">
-                        <h5>
-                            <strong>{{ item.terminology }}</strong>
-                        </h5>
-                        <media-article :content="item.value" />
+                    <div class="l-flex-col l-gap-xs f-no-margins">
+                        <h3>
+                            <strong>Suggested Learning {{ locale.activity.translate(false, true) }} Update</strong>
+                        </h3>
+                        <media-article :content="responseData?.suggested_learning_activity_update as string" />
                     </div>
-                </div> -->
+                </div>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="onClose">Close</button>
