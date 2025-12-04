@@ -404,7 +404,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->createSource($event);
 
         // update attached resource bookings
-        $this->updateBookings($event, $previous);
+//        $this->updateBookings($event, $previous);
     }
 
     /**
@@ -423,89 +423,84 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $bookingMapper->delete($bookings);
     }
 
-    /**
-     * Update all resource bookings (start / end times) attached to this event
-     *
-     * @param Event $event
-     * @param Event|null $previous
-     * @return void
-     * @throws MapperException
-     */
-    protected function updateBookings(Event $event, ?Event $previous = null)
-    {
-        // get the diff between the old and new event
-        $diff = $this->diff($event, $previous);
-
-        // get the time diff in minutes
-        $startDiff = null;
-        if (isset($diff['startDateTime'])) {
-            $newStartDateTime = new Alaress_Date_Format($diff['startDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
-            $oldStartDateTime = new Alaress_Date_Format($diff['startDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
-            $startDiff = $oldStartDateTime->diffInMinutes($newStartDateTime, false);
-        }
-        $endDiff = null;
-        if (isset($diff['endDateTime'])) {
-            $newEndDateTime = new Alaress_Date_Format($diff['endDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
-            $oldEndDateTime = new Alaress_Date_Format($diff['endDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
-            $endDiff = $oldEndDateTime->diffInMinutes($newEndDateTime, false);
-        }
-
-        // get other mappers...
-        /** @var CampusMapper $campusMapper */
-        $campusMapper = $this->getJoinMapper('event_campus');
-        $bookingMapper = ResourceBookingMapper::getInstance();
-        /** @var Schoolbox\ResourceBooking\Booking\Status\Mapper $bookingStatusMapper */
-        $bookingStatusMapper = $bookingMapper->getJoinMapper('status');
-        $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
-        $externalEvents = \Schoolbox\External\Event\Mapper::getInstance();
-        $externalTimetable = self::getDi()->get('externalTimetable');
-
-        // get all bookings for this event
-        $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
-
-        // clashes?
-        $validation = new Validation(
-            $this->getSessionUser(),
-            $bookingMapper,
-            $bookingStatusMapper,
-            $termMapper,
-            $externalTimetable,
-            $campusMapper,
-            $this->getConfigLoader(),
-            $externalEvents,
-        );
-
-        // update each booking, and check for clashes
-        foreach ($bookings as $booking) {
-            /** @var ResourceBookingModel $booking */
-
-            $newStart = $booking->getBookingStartAt()?->addMinutes($startDiff);
-            $newEnd = $booking->getBookingEndAt()?->addMinutes($endDiff);
-
-            $clashErrors = $validation->validateForClashes(
-                $booking->getResource(),
-                $newStart->getDateTimeObject(), // We need a different kind of date object.
-                $newEnd->getDateTimeObject(), // We need a different kind of date object.
-                $booking
-            );
-
-            if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
-                // found clash can we allow them?
-                if ($booking->getResource()->getAllowClashBookings()) {
-                    $booking->setStatus($bookingStatusMapper->createModel(Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
-                } else {
-                    // found clash, but no clash allowed
-                    throw new MapperException("Cannot update booking for resource '" . $booking->getResource()->getName() . "' due to a scheduling conflict.");
-                }
-            }
-
-            $booking->setBookingStartAt($newStart);
-            $booking->setBookingEndAt($newEnd);
-        }
-
-        // save the lot
-        $bookingMapper->save($bookings);
-    }
+//    /**
+//     * Update all resource bookings (start / end times) attached to this event
+//     *
+//     * @param Event $event
+//     * @param Event|null $previous
+//     * @return void
+//     * @throws MapperException
+//     */
+//    protected function updateBookings(Event $event, ?Event $previous = null)
+//    {
+//        // get the diff between the old and new event
+//        $diff = $this->diff($event, $previous);
+//
+//        // get the time diff in minutes
+//        $startDiff = null;
+//        if (isset($diff['startDateTime'])) {
+//            $newStartDateTime = new Alaress_Date_Format($diff['startDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
+//            $oldStartDateTime = new Alaress_Date_Format($diff['startDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
+//            $startDiff = $oldStartDateTime->diffInMinutes($newStartDateTime, false);
+//        }
+//        $endDiff = null;
+//        if (isset($diff['endDateTime'])) {
+//            $newEndDateTime = new Alaress_Date_Format($diff['endDateTime'][0], Alaress_Date_Format::DATABASE_FORMAT);
+//            $oldEndDateTime = new Alaress_Date_Format($diff['endDateTime'][1], Alaress_Date_Format::DATABASE_FORMAT);
+//            $endDiff = $oldEndDateTime->diffInMinutes($newEndDateTime, false);
+//        }
+//
+//        // get other mappers...
+//        /** @var CampusMapper $campusMapper */
+//        $campusMapper = $this->getJoinMapper('event_campus');
+//        $bookingMapper = ResourceBookingMapper::getInstance();
+//        /** @var Schoolbox\ResourceBooking\Booking\Status\Mapper $bookingStatusMapper */
+//        $bookingStatusMapper = $bookingMapper->getJoinMapper('status');
+//        $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
+//        $externalEvents = \Schoolbox\External\Event\Mapper::getInstance();
+//        $externalTimetable = self::getDi()->get('externalTimetable');
+//
+//        // get all bookings for this event
+//        $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
+//
+//        // clashes?
+//        $validation = new Validation(
+//            $this->getSessionUser(),
+//            $bookingMapper,
+//            $bookingStatusMapper,
+//            $termMapper,
+//            $externalTimetable,
+//            $campusMapper,
+//            $this->getConfigLoader(),
+//            $externalEvents,
+//        );
+//
+//        // update each booking, and check for clashes
+//        foreach ($bookings as $booking) {
+//            /** @var ResourceBookingModel $booking */
+//
+//            $newStart = $booking->getBookingStartAt()?->addMinutes($startDiff);
+//            $newEnd = $booking->getBookingEndAt()?->addMinutes($endDiff);
+//
+//            $clashErrors = $validation->validateForClashes(
+//                $booking->getResource(),
+//                $newStart->getDateTimeObject(), // We need a different kind of date object.
+//                $newEnd->getDateTimeObject(), // We need a different kind of date object.
+//                $booking
+//            );
+//
+//            if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
+//                // set status to pending if there are clashes (even if the resource can NOT have clashes...)
+//                $booking->setStatus($bookingStatusMapper->createModel(Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+//            }
+//
+//            $booking->setBookingStartAt($newStart);
+//            $booking->setBookingEndAt($newEnd);
+//        }
+//
+//        // save the lot
+//        $bookingMapper->save($bookings);
+//    }
 
     /**
     * Get all the events in the series

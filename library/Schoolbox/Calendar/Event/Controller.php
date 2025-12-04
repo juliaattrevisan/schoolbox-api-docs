@@ -31,10 +31,14 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
+use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\User\Translator\ModelToArray as UserTranslator;
@@ -897,6 +901,8 @@ class Controller extends Base
         // Do not modify anything except the event's start/end/allDay
         $start  = new Alaress_Date_Format($this->requestPost->get('start'), \DateTime::ATOM);
         $end    = new Alaress_Date_Format($this->requestPost->get('end'), \DateTime::ATOM);
+        $oldStart = $event->getStartDateTime();
+        $oldEnd = $event->getEndDateTime();
         $allDay = $this->requestPost->getBool('allDay');
         if ($allDay) {
             $event->setStartDate($start->getDatabase());
@@ -930,6 +936,17 @@ class Controller extends Base
             $event->getAccess(),
             $eventRelations
         );
+
+        // Move any resource bookings attached to this event
+        $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+
+        // If there were booking errors, return them
+        if (count($bookingErrors)) {
+            $this->response = $this->responseAsJson(
+                ['errors' => $bookingErrors],
+            )->withStatus(200);
+            return;
+        }
 
         // Return empty '200 OK' regardless of whether JSON was requested.
         $this->response = $this->responseEmpty()->withStatus(200);
@@ -1046,5 +1063,83 @@ class Controller extends Base
             $userArrays[] = $translator->convertLinkedUser($user);
         }
         return $userArrays;
+    }
+
+
+    /**
+     * Update all resource bookings (start / end times) attached to this event
+     *
+     * @param Event $event
+     * @param ?Alaress_Date_Format $oldStartDateTime
+     * @param ?Alaress_Date_Format $oldEndDateTime
+     * @param User $user
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws MapperException
+     * @throws NotFoundExceptionInterface
+     */
+    private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user)
+    {
+        // get the time diff in minutes
+        $startDiff = $oldStartDateTime?->diffInMinutes($event->getStartDateTime(), false);
+        $endDiff = $oldEndDateTime?->diffInMinutes($event->getEndDateTime(), false);
+
+        // get other mappers...
+        $bookingMapper = ResourceBookingMapper::getInstance();
+        /** @var \Schoolbox\ResourceBooking\Booking\Status\Mapper $bookingStatusMapper */
+        $bookingStatusMapper = $bookingMapper->getJoinMapper('status');
+        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
+        $externalEvents = \Schoolbox\External\Event\Mapper::getInstance();
+        $externalTimetable = $this->getDi()->get('externalTimetable');
+
+        // get all bookings for this event
+        $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
+
+        // clashes?
+        $validation = new Validation(
+            $user,
+            $bookingMapper,
+            $bookingStatusMapper,
+            $termMapper,
+            $externalTimetable,
+            $this->campusMapper,
+            $this->getConfigLoader(),
+            $externalEvents,
+        );
+
+        // collect errors
+        $errors = [];
+
+        // update each booking, and check for clashes
+        foreach ($bookings as $booking) {
+            /** @var ResourceBookingModel $booking */
+
+            $newStart = $booking->getBookingStartAt()?->addMinutes($startDiff);
+            $newEnd = $booking->getBookingEndAt()?->addMinutes($endDiff);
+
+            $clashErrors = $validation->validateForClashes(
+                $booking->getResource(),
+                $newStart->getDateTimeObject(), // We need a different kind of date object.
+                $newEnd->getDateTimeObject(), // We need a different kind of date object.
+                $booking
+            );
+
+            if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
+                $errors[] = $clashErrors;
+                // set status to pending if there are clashes (even if the resource can NOT have clashes...)
+                $booking->setStatus($bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+            }
+
+            // if booking is managed, then set back to pending, for more approved...
+            // TODO
+
+            $booking->setBookingStartAt($newStart);
+            $booking->setBookingEndAt($newEnd);
+        }
+
+        // save the lot
+        $bookingMapper->save($bookings);
+
+        return $errors;
     }
 }
