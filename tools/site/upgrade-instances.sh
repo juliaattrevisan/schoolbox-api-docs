@@ -71,7 +71,31 @@ function trigger_instance_circuit_breaker() {
   mkdir -p "$CIRCUIT_BREAKER_DIR"
   date +%s > "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
   error "Circuit breaker triggered for instance '$instance_id'. Upgrade will not run again for 24 hours."
-  # TODO: Send Slack alert here
+  send_slack_alert "$instance_id"
+}
+
+# Send Slack alert via email
+function send_slack_alert() {
+  local instance_id=$1
+  local log_file="/var/log/schoolbox/${instance_id}/upgrade.log"
+  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local email="operations-aaaaaxwus43lmb5z5amyxounpy@alaress.slack.com" # address for #operations in Slack
+
+  local subject="[ALERT] Schoolbox upgrade failed for ${instance_id}"
+  local body="Schoolbox upgrade failed and circuit breaker activated.
+
+Instance: ${instance_id}
+Timestamp: ${timestamp}
+Log file: ${log_file}
+
+The upgrade script will not run again for this instance for 24 hours.
+Manual intervention required.
+
+To manually reset the circuit breaker:
+  rm /var/lock/schoolbox-upgrade/${instance_id}.lock
+"
+
+  echo "$body" | mail -aFrom:ist@schoolbox.com.au -s "$subject" "$email"
 }
 
 # Clear circuit breaker for a specific instance
