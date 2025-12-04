@@ -538,14 +538,18 @@ class Controller extends Base
      */
     public function getExport(DialogAgent $assessment): void
     {
-        /* TODO No selections specified = all statuses allowed, normally; but I'm not sure it truly applies in this case.
-         *  I'll do it anyway I suppose
+        /* No selections specified = all statuses allowed, normally; but I'm not sure it truly applies in this case.
+         * I'll do it anyway I suppose
          */
+        $requestedStatuses = $this->requestQuery->get('status') ?? [];
 
+        if (!\count($requestedStatuses)) {
+            $requestedStatuses = Status::STATUSES;
+        }
 
         /* Filter output to whatever was chosen in the frontend.
          */
-        $requestedStatuses = array_fill_keys($this->requestQuery->get('status'), true);
+        $requestedStatuses = array_fill_keys($requestedStatuses, true);
 
         /* Set up a file pointer
          */
@@ -581,11 +585,6 @@ class Controller extends Base
         /* Compile everyone's authoritative response status and authoritative feedback content
          */
         foreach ($assessment->getAllParticipants() as $participant) {
-            /* Make the same number of elements as $fields for now; these will eventually have feedback criteria in them
-             * but they should correspond 1:1 with $fields that we defined above
-             */
-            $feedbackFields = array_fill_keys($feedbackFieldsTemplate, null);
-
             /* An authoritative response might not even exist; you'd be Incomplete.
              * Or, an authoritative response exists, but not an authoritative feedback; you're In Progress.
              */
@@ -594,27 +593,36 @@ class Controller extends Base
             /** @var \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Model|null $authoritativeFeedback */
             $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
 
+            /* Check the status of this response and ensure it matches the ones provided in the querystring param
+             */
+            $currentStatus = $statusChecker->calculate($authoritativeFeedback?->getResponse() ?? $authoritativeResponse)['status'];
+
+            if (!($requestedStatuses[$currentStatus] ?? false)) {
+                continue;
+            }
+
+            /* Make the same number of elements as $fields for now; these will eventually have feedback criteria in them
+             * but they should correspond 1:1 with $fields that we defined above
+             */
+            $feedbackFields = array_fill_keys($feedbackFieldsTemplate, null);
+
+            /* Compute outcomes for each criterion
+             */
             if ($authoritativeFeedback) {
                 foreach ($authoritativeFeedback->getCriteria() as $feedbackCriteria) {
                     $feedbackFields[$feedbackCriteria->getCriteriaId()] = $feedbackCriteria->getBody();
                 }
             }
 
-            /* Check the status of this response and ensure it matches the ones provided in the querystring param
-             */
-            $currentStatus = $statusChecker->calculate($authoritativeFeedback?->getResponse() ?? $authoritativeResponse)['status'];
-
             /* Slam them all together if they're part of the requested set of states
              */
-            if ($requestedStatuses[$currentStatus] ?? false) {
-                fputcsv($fp, array_merge([
-                    $participant->getUser()->getId(),
-                    $participant->getUser()->getExternalId(),
-                    $participant->getUser()->getFirstName(),
-                    $participant->getUser()->getLastName(),
-                    $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse() ?? $authoritativeResponse),
-                ], array_values($feedbackFields)), escape: '');
-            }
+            fputcsv($fp, array_merge([
+                $participant->getUser()->getId(),
+                $participant->getUser()->getExternalId(),
+                $participant->getUser()->getFirstName(),
+                $participant->getUser()->getLastName(),
+                $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse() ?? $authoritativeResponse),
+            ], array_values($feedbackFields)), escape: '');
         }
 
         /* Rewind before obtaining stream contents

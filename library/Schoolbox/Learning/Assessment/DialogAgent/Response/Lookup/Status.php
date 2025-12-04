@@ -39,6 +39,17 @@ class Status
 
 
     /**
+     * Data equivalents of each status, phrased programmatically
+     */
+    public const array STATUSES = [
+        self::STATUS_INCOMPLETE,
+        self::STATUS_IN_PROGRESS,
+        self::STATUS_REQUIRES_ASSISTANCE,
+        self::STATUS_SUBMITTED
+    ];
+
+
+    /**
      * Human-readable equivalents of each status
      *
      * You might find this convenient to access as a public prop, in which case you can elevate it
