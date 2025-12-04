@@ -584,16 +584,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('work_type', 'wt')},
-                {$this->getJoinColumnString('duework.mark_type', 'mt')},
-                {$this->getJoinColumnString('duework.instructor_mark_type', 'imt')},
-                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
-                {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
-                {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')},
-                {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')},
                 {$this->getJoinColumnString('quiz', 'q')},
-                {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
-                {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
                 {$this->getJoinColumnString('project', 'p')},
@@ -615,19 +607,11 @@ class Mapper extends BaseMapper
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
-            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
-            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
+            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
+            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
-            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
-            LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-            LEFT JOIN {$this->getJoinSql('duework.instructor_mark_type', 'd', 'imt')}
-            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
-            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
-            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
-            LEFT JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
-            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
-            LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -1080,36 +1064,20 @@ class Mapper extends BaseMapper
             }
             // Due work?
             if ($row['d.id']) {
-                $model->setDueWork(
-                    $this->hydrateJoin($row, 'duework', 'd')
-                        ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
-                        ->setInstructorMarkType($this->hydrateJoin($row, 'duework.instructor_mark_type', 'imt'))
-                        ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
-                        ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
-                        ->setWorksheetTemplate(
-                            $this->hydrateJoin($row, 'duework.worksheetTemplate', 'dueworkWorksheetTemplate')
-                                 ?->setMimeType($this->hydrateJoin($row, 'duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
-                        )
-                );
+                $model->setDueWork($this->hydrateJoin($row, 'duework', 'd'));
                 $dueWorkIds[] = $row['d.id'];
             } else {
                 $model->setDueWork(null);
             }
             // Quiz?
             if ($row['q.assess_id']) {
-                $model->setQuiz(
-                    $this->hydrateJoin($row, 'quiz', 'q')
-                        ->setMarkType($this->hydrateJoin($row, 'quiz.mark_type_id', 'qmt'))
-                );
+                $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
             } else {
                 $model->setQuiz(null);
             }
             // LTI assessment?
             if ($row['l.id']) {
-                $model->setLtiAssessment(
-                    $this->hydrateJoin($row, 'ltiAssessment', 'l')
-                        ->setLtiTool($this->hydrateJoin($row, 'ltiAssessment.ltiTool', 'ltool'))
-                );
+                $model->setLtiAssessment($this->hydrateJoin($row, 'ltiAssessment', 'l'));
             } else {
                 $model->setLtiAssessment(null);
             }
@@ -1183,6 +1151,16 @@ class Mapper extends BaseMapper
 
             $modelList->add($model);
         }
+
+        // Augment all activity sub-objects (due work, task, quiz, etc.)
+        $modelList = $this->augmentListWithTasks($modelList);
+        $modelList = $this->augmentListWithDueWorks($modelList);
+        $modelList = $this->augmentListWithQuizzes($modelList);
+        $modelList = $this->augmentListWithLtiAssessments($modelList);
+        $modelList = $this->augmentListWithLessonPlans($modelList);
+        $modelList = $this->augmentListWithDialogAgents($modelList);
+        $modelList = $this->augmentListWithProjects($modelList);
+
         // Load related 1-M models
         // Due work files and Kami worksheet
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
