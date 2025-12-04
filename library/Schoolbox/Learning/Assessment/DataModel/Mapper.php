@@ -1054,14 +1054,14 @@ class Mapper extends BaseMapper
     private function hydrateSelectRecursive(PDOStatement $statement, bool $hydrateProjectContext = true)
     {
         /** @var Collection|Model[] $modelList */
-        $modelList          = $this->createCollection();
-        $dueWorkIds         = [];
-        $projectIds         = [];
-        $taskIds            = [];
-        $contextUnitSpecIds = [];
-        $contextUnitImplIds = [];
-        $contextProjectIds  = [];
-        $lessonPlanIds      = [];
+        $modelList         = $this->createCollection();
+        $dueWorkIds        = [];
+        $projectIds        = [];
+        $taskIds           = [];
+        $unitSpecIds       = [];
+        $unitImplIds       = [];
+        $contextProjectIds = [];
+        $lessonPlanIds     = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -1155,62 +1155,18 @@ class Mapper extends BaseMapper
             } elseif ($row['us.id']) {
                 // Unit spec: deeper joins will be hydrated later
                 /** @var UnitSpec\Model $unitSpec */
-                $unitSpec = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification',
-                    'us'
-                );
-
-//                /** @var Folder\Model $unitSpecFolder */
-//                $unitSpecFolder = $this->hydrateJoin(
-//                    $row,
-//                    'assessment_course_unit_specification.folder',
-//                    'usf',
-//                );
-//                $unitSpec->setFolder($unitSpecFolder);
-//
-//                /** @var CourseSpec\Model $courseSpec */
-//                $courseSpec = $this->hydrateJoin(
-//                    $row,
-//                    'assessment_course_unit_specification.course',
-//                    'usc',
-//                );
-//
-//                /** @var Folder\Model $courseSpecFolder */
-//                $courseSpecFolder = $this->hydrateJoin(
-//                    $row,
-//                    'assessment_course_unit_specification.course.folder',
-//                    'uscf',
-//                );
-//
-//                $courseSpec->setFolder($courseSpecFolder);
-//                $unitSpec->setCourse($courseSpec);
-                $contextUnitSpecIds[] = $row['us.id'];
-                $context = $unitSpec;
+                $unitSpec      = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us');
+                $unitSpecIds[] = $row['us.id'];
+                $context       = $unitSpec;
             } elseif ($row['ui.id']) {
-                // Unit impl
+                // Unit impl: deeper joins will be hydrated later
                 /** @var UnitImpl\Model $unitImpl */
-                $unitImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
-//                /** @var CourseImpl\Model $courseImpl */
-//                $courseImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
-//                                   ->setFolder(
-//                                       $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
-//                                   );
-//                $unitImpl->setCourse($courseImpl);
-//                $courseImpl->getUnits()[$unitImpl->getId()] = $unitImpl;
-//                /** @var UnitSpec\Model $unitSpec */
-//                $unitSpec = $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
-//                                 ->setFolder(
-//                                     $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
-//                                 );
-//                $unitImpl->setSpecification($unitSpec);
-//                $unitSpec->getUnitImplementations()[$unitImpl->getId()] = $unitImpl;
-                $contextUnitImplIds[] = $row['ui.id'];
-                $context = $unitImpl;
+                $unitImpl      = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
+                $unitImplIds[] = $row['ui.id'];
+                $context       = $unitImpl;
             } elseif ($row['pa.id']) {
-                // Project
-                $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
-                // Load context for this project itself
+                // Project: this project's assessments will be hydrated later
+                $context             = $this->hydrateJoin($row, 'project_assessment', 'pa');
                 $contextProjectIds[] = $row['pa.assessment_id'];
             }
 
@@ -1242,8 +1198,8 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
         // Augment all contexts
-        $modelList = $this->augmentListWithUnitSpecContexts($modelList, $contextUnitSpecIds);
-        $modelList = $this->augmentListWithUnitImplContexts($modelList, $contextUnitImplIds);
+        $modelList = $this->augmentListWithUnitSpecContexts($modelList, $unitSpecIds);
+        $modelList = $this->augmentListWithUnitImplContexts($modelList, $unitImplIds);
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
             $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
