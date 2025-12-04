@@ -130,6 +130,23 @@ async function createNewBooking(): Promise<void> {
                 </search-select>
                 <input type="hidden" name="resourceIds" :value="compileResourceIds" />
             </section>
+            <template v-if="eventSeriesId">
+                <hr />
+                <h3>This event is part of a series</h3>
+                <p>Would you like to effect only this event, or all in the series?</p>
+                <div class="radiolist l-grid l-gap-l l-grid--2-col">
+                    <input id="radioOnlyThisEvent" type="radio" name="eventSeriesOption" value="onlyThisEvent" />
+                    <label for="radioOnlyThisEvent">Only this event</label>
+                    <input
+                        id="radioAllEventsInSeries"
+                        type="radio"
+                        name="eventSeriesOption"
+                        value="allEventsInSeries"
+                    />
+                    <label for="radioAllEventsInSeries">All events in series</label>
+                </div>
+                <hr />
+            </template>
             <ul class="flex-list buttons">
                 <li>
                     <input
