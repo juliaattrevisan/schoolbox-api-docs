@@ -34,8 +34,23 @@
         background: var(--sbx-color-accent);
         color: var(--sbx-color-foreground-primary);
     }
-    &:disabled {
+    &:disabled,
+    &.disabled,
+    button:disabled,
+    button.disabled,
+    [type="submit"]:disabled,
+    [type="submit"].disabled {
         @include sbx-form.form-input-disabled;
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        background-color: var(--sbx-color-foreground-secondary) !important;
+        color: var(--sbx-color-accent) !important;
+        pointer-events: none;
+        &:hover,
+        &:active {
+            background-color: var(--sbx-color-foreground-secondary) !important;
+            color: var(--sbx-color-accent) !important;
+            filter: none !important;
+        }
     }
 }
 
@@ -64,14 +79,22 @@
         @include sbx-form.form-input-focus;
     }
     &:disabled,
+    &.disabled,
+    button:disabled,
+    button.disabled,
     [type="submit"]:disabled,
-    .flex-list.buttons a.submit:disabled,
-    .flex-list.buttons button.submit:disabled,
-    a.submit:disabled,
-    button.submit:disabled {
+    [type="submit"].disabled {
         @include sbx-form.form-input-disabled;
-        border: none !important;
-        border-radius: var(--sbx-border-radius-normal) !important;
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        background-color: var(--sbx-color-foreground-secondary) !important;
+        color: var(--sbx-color-accent) !important;
+        pointer-events: none;
+        &:hover,
+        &:active {
+            background-color: var(--sbx-color-foreground-secondary) !important;
+            color: var(--sbx-color-accent) !important;
+            filter: none !important;
+        }
     }
 }
 
