@@ -738,34 +738,6 @@ input[type="radio"] + .block {
 // Modal styles
 .reveal-modal {
     border-radius: var(--sbx-border-radius-normal);
-
-    & .buttons {
-        gap: 1rem;
-
-        & li:first-child {
-            & a,
-            & button {
-                background-color: transparent !important;
-                border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-                border-radius: var(--sbx-border-radius-normal);
-                color: var(--sbx-color-accent) !important;
-            }
-        }
-
-        & li:last-child {
-            & a,
-            & button {
-                background-color: var(--sbx-color-accent);
-                border: 1px solid var(--sbx-color-accent);
-                border-radius: var(--sbx-border-radius-normal);
-                color: var(--sbx-color-accent-text);
-            }
-        }
-    }
-
-    .buttons-container {
-        margin-left: 0 !important;
-    }
 }
 
 .tooltip {

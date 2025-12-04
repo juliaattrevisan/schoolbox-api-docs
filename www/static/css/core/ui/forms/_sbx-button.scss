@@ -17,7 +17,8 @@
 .sbx-body [type="submit"],
 .sbx-body a.submit,
 .sbx-body button.submit,
-.sbx-body .flex-list.buttons a.submit {
+.sbx-body .flex-list.buttons a.submit,
+.sbx-body .flex-list.buttons button.submit {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -43,7 +44,9 @@
  */
 .sbx-body .button,
 .sbx-body .flex-list.buttons a,
+.sbx-body .flex-list.buttons button,
 .sbx-body .sub-nav li a,
+.sbx-body nav li.active a,
 .sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
@@ -103,7 +106,7 @@
  * An existing flex list of buttons, just add some gap
  */
 .flex-list.buttons {
-    gap: var(--sbx-size-xs);
+    gap: var(--sbx-size-s);
 }
 
 /**
@@ -123,10 +126,9 @@
 /**
  * Icon only buttons
  * These need to be treated differently to standard buttons
- * as they have no text content and so don't need a border to define their shape
+ * as they have no text content and so need a border to define their shape
  */
-.sbx-body button.button[class*="icon-"],
-.sbx-body a.button.dz-remove {
+.sbx-body button.button[class*="icon-"] {
     border: none;
 }
 
