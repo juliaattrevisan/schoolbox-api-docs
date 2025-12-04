@@ -316,26 +316,6 @@ article:has(img) p > img {
     }
 }
 
-.discussion .reply, //discussion thread styles
-.discussion .child,
-.threaded .reply,
-.threaded .child {
-    border-left: 0;
-    border-top: none;
-
-    & .card {
-        & img {
-            margin-inline-end: 0;
-            width: 2.5rem;
-        }
-
-        & p {
-            grid-row: span 2;
-            margin-bottom: 0;
-        }
-    }
-}
-
 .activity-feed {
     & .grade {
         border-radius: var(--sbx-border-radius-normal);
