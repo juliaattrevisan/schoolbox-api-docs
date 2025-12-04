@@ -110,12 +110,12 @@ function onConfirm(): void {
             <request-error v-if="loadError" :further-info="loadError" />
             <div v-else-if="isProcessing">
                 <loading-cards :rows="1" :show-image="false">
-                    <h3>&nbsp;</h3>
+                    <span class="title-placeholder"></span>
                     <p></p>
                     <p></p>
                 </loading-cards>
                 <loading-cards :rows="1" :show-image="false">
-                    <h3>&nbsp;</h3>
+                    <span class="title-placeholder"></span>
                     <p></p>
                     <p></p>
                 </loading-cards>
