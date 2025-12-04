@@ -554,8 +554,12 @@ class Controller extends Base
         $validRequestPost = $this->validator->validateForPostModify($event, $this->requestPost);
 
         // cache old start and end for resource booking move
-        $oldStart = clone $event->getStartDateTime();
-        $oldEnd = clone $event->getEndDateTime();
+        $existingEvent = $oldStart = $oldEnd = false;
+        if ($event->getId()) {
+            $oldStart = clone $event->getStartDateTime();
+            $oldEnd = clone $event->getEndDateTime();
+            $existingEvent = false;
+        }
 
         /* Check owner still exists
          * If not - pass ownership to the author
@@ -771,8 +775,10 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
-        // Move any resource bookings attached to this event
-        $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+        if ($existingEvent) {
+            // Move any resource bookings attached to this event
+            $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+        }
 
         if ($this->isJsonRequest()) {
             $this->eventMapper->populateGuests($event); // Reload guests to ensure the response matches the database representation.
@@ -816,7 +822,7 @@ class Controller extends Base
                     ),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees(),
-                    'bookingErrors' => $bookingErrors,
+                    'bookingErrors' => $bookingErrors ?? [],
                 ]
             );
         } else {
