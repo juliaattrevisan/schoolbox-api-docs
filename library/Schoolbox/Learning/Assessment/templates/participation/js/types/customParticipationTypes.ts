@@ -79,3 +79,11 @@ export type Participant = {
         differentiationProfile: string | null;
     };
 };
+
+/**
+ * The expected AI response type when generating suggested customisations
+ */
+export type AIResponse = {
+    suggested_considerations: string;
+    suggested_learning_activity_update: string;
+};

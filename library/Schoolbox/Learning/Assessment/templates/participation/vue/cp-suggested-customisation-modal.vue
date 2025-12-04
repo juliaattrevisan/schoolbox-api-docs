@@ -7,7 +7,8 @@
 
 import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import CpAiModal from "./cp-ai-modal.vue";
+import CpGenAi from "./cp-gen-ai.vue";
+import type { AIResponse } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     route: string;
@@ -16,21 +17,30 @@ const props = defineProps<{
 
 const studentId = defineModel<number | null>("student-id", { default: null });
 
-const emit = defineEmits<{
-    (event: "customiseActivity"): void;
-}>();
-
-const isViewCustomisationOpen = window.Vue.ref(false);
-const isSelectTypeOpen = window.Vue.ref(false);
-const picked = window.Vue.ref("modify");
+const isOpen = window.Vue.ref(false);
+const newLoad = window.Vue.ref(true); // to indicate whether to load new AI content, as we may be returning from another status without changing student
+const aiResponse = window.Vue.ref<AIResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
+const status = window.Vue.ref<"view" | "selectType">("view"); // to track the current status of the modal
+const typePicked = window.Vue.ref("modify"); // to track the type of customisation picked
 
 /**
  * To display the view/generate customisation modal when a student is selected
  */
 window.Vue.watch(studentId, (newStudentId) => {
     if (newStudentId) {
-        isViewCustomisationOpen.value = true;
-        isSelectTypeOpen.value = false;
+        newLoad.value = true;
+        isOpen.value = true;
+    }
+});
+
+/**
+ * When the modal is closed trigger to clear the studentId
+ */
+window.Vue.watch(isOpen, (newIsOpen) => {
+    if (!newIsOpen) {
+        studentId.value = null;
+        newLoad.value = true;
+        status.value = "view";
     }
 });
 
@@ -38,16 +48,23 @@ window.Vue.watch(studentId, (newStudentId) => {
  * To move to the next step of customising the activity
  */
 function onCustomiseActivity(): void {
-    isViewCustomisationOpen.value = false;
-    isSelectTypeOpen.value = true;
+    status.value = "selectType";
 }
 
 /**
- *
+ * Close the modal, resetting state to cancel any operation
+ */
+function onCancel(): void {
+    isOpen.value = false;
+    studentId.value = null;
+}
+
+/**
+ * To go back to viewing the suggested customisation
  */
 function onBack(): void {
-    isViewCustomisationOpen.value = true;
-    isSelectTypeOpen.value = false;
+    newLoad.value = false; // to prevent reloading AI content when the cp-gen-ai component is mounted again
+    status.value = "view";
 }
 
 /**
@@ -60,32 +77,35 @@ function onConfirm(): void {
 </script>
 
 <template>
-    <cp-ai-modal
-        v-model:is-open="isViewCustomisationOpen"
-        v-model:student-id="studentId"
-        :route="props.route"
-        :assessment-id="props.assessmentId"
-        @customise-activity="onCustomiseActivity"
-    />
-    <basic-modal v-model:is-open="isSelectTypeOpen">
-        <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
+    <basic-modal v-model:is-open="isOpen">
+        <cp-gen-ai
+            v-if="status === 'view'"
+            v-model:ai-response="aiResponse"
+            :route="props.route"
+            :assessment-id="props.assessmentId"
+            :student-id="studentId"
+            :new-load="newLoad"
+            @cancel="onCancel"
+            @customise-activity="onCustomiseActivity"
+        />
+        <form v-else-if="status === 'selectType'" class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
             <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
                 <h2>Select Customisation</h2>
             </div>
             <div>
                 <ul class="option-list">
                     <li>
-                        <input id="cp-modify" v-model="picked" type="radio" value="modify" />
+                        <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
                         <label for="cp-modify" class="icon-modify f-no-icon-color">Modify</label>
                     </li>
                     <li>
-                        <input id="cp-copy" v-model="picked" type="radio" value="copy" />
+                        <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
                         <label for="cp-copy" class="icon-copy f-no-icon-color"
                             >Copy {{ locale.activity.translate(false, true) }}</label
                         >
                     </li>
                     <li>
-                        <input id="cp-new" v-model="picked" type="radio" value="new" />
+                        <input id="cp-new" v-model="typePicked" type="radio" value="new" />
                         <label for="cp-new" class="icon-submissions f-no-icon-color"
                             >New {{ locale.activity.translate(false, true) }}</label
                         >
