@@ -538,6 +538,15 @@ class Controller extends Base
      */
     public function getExport(DialogAgent $assessment): void
     {
+        /* TODO No selections specified = all statuses allowed, normally; but I'm not sure it truly applies in this case.
+         *  I'll do it anyway I suppose
+         */
+
+
+        /* Filter output to whatever was chosen in the frontend.
+         */
+        $requestedStatuses = array_fill_keys($this->requestQuery->get('status'), true);
+
         /* Set up a file pointer
          */
         $fp = fopen('php://temp', 'w');
@@ -591,15 +600,21 @@ class Controller extends Base
                 }
             }
 
-            /* Slam them all together
+            /* Check the status of this response and ensure it matches the ones provided in the querystring param
              */
-            fputcsv($fp, array_merge([
-                $participant->getUser()->getId(),
-                $participant->getUser()->getExternalId(),
-                $participant->getUser()->getFirstName(),
-                $participant->getUser()->getLastName(),
-                $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse() ?? $authoritativeResponse),
-            ], array_values($feedbackFields)), escape: '');
+            $currentStatus = $statusChecker->calculate($authoritativeFeedback?->getResponse() ?? $authoritativeResponse)['status'];
+
+            /* Slam them all together if they're part of the requested set of states
+             */
+            if ($requestedStatuses[$currentStatus] ?? false) {
+                fputcsv($fp, array_merge([
+                    $participant->getUser()->getId(),
+                    $participant->getUser()->getExternalId(),
+                    $participant->getUser()->getFirstName(),
+                    $participant->getUser()->getLastName(),
+                    $statusChecker->getHumanReadableStatus($authoritativeFeedback?->getResponse() ?? $authoritativeResponse),
+                ], array_values($feedbackFields)), escape: '');
+            }
         }
 
         /* Rewind before obtaining stream contents
