@@ -409,7 +409,9 @@ function install_instance() {
     --config logs_dir "'/var/log/schoolbox/${INSTANCE_ID}'" \
     --config purifier_cache_dir "'/var/lib/schoolbox/${INSTANCE_ID}/purifier'" \
     --config twig_cache_dir "'/var/lib/schoolbox/${INSTANCE_ID}/twig'" \
-    --config backup_dir "'/var/lib/schoolbox/${INSTANCE_ID}/backups'";
+    --config backup_dir "'/var/lib/schoolbox/${INSTANCE_ID}/backups'" \
+    --config presidio_analysis_host "'http://presidio-analyzer:3000'" \
+    --config presidio_anonymisation_host "'http://presidio-anonymizer:3000'";
   then
     error "Unable to install instance. Exiting."
     exit 1

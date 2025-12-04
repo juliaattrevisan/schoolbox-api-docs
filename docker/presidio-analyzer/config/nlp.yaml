@@ -1,0 +1,12 @@
+# Should just be able to override the models, and use other defaults.
+# If that doesn't suffice, see:
+# * https://github.com/microsoft/presidio/blob/main/presidio-analyzer/presidio_analyzer/conf/default.yaml
+# * https://microsoft.github.io/presidio/analyzer/analyzer_engine_provider/#using-multiple-files
+nlp_engine_name: spacy
+models:
+  # default model
+  - lang_code: en
+    model_name: en_core_web_lg
+#  # big slow but accurate model: disabled for now
+#  - lang_code: en_complex
+#    model_name: en_core_web_trf

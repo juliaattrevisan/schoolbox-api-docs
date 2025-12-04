@@ -54,9 +54,9 @@ class ClientFactory
     /**
      * Constructor
      *
-     * @param IConfigLoader $config     Configuration: used to determine how to create an AI client.
-     * @param Mapper        $logMapper  Log: used for logging calls to AI providers.
-     * @param HttpClient    $httpClient HTTP client: used for sending calls to AI providers.
+     * @param IConfigLoader       $config         Configuration: used to determine how to create an AI client.
+     * @param Mapper              $logMapper      Log: used for logging calls to AI providers.
+     * @param HttpClient          $httpClient     HTTP client: used for sending calls to AI providers.
      */
     public function __construct(
         private IConfigLoader $config,

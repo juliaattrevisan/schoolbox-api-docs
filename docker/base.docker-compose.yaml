@@ -432,6 +432,15 @@ services:
         ETHERPAD_MAJOR_VERSION : ${ETHERPAD_MAJOR_VERSION}
     env_file: ./schoolbox-etherpad/default.env
 
+  presidio-analyzer:
+    container_name: presidio-analyzer
+    build:
+      context: ./presidio-analyzer
+
+  presidio-anonymizer:
+    container_name: presidio-anonymizer
+    image: mcr.microsoft.com/presidio-anonymizer
+
   clamav:
     container_name: clamav
     build:
