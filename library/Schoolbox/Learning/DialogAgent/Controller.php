@@ -539,15 +539,16 @@ class Controller extends Base
     public function getExport(DialogAgent $assessment): void
     {
         /* No selections specified = all statuses allowed, normally; but I'm not sure it truly applies in this case.
-         * I'll do it anyway I suppose
+         *
+         * When all filters were activated, such as when you first visit Staus screen, &status is never sent,
+         * causing that to be null. That should default to Status:STATUSES
+         *
+         * When all filters were deactivated, the grid in the user interface is empty, but this also means &status is
+         * never sent, causing it to also be null. This will default to Status::STATUSES too. This means you'll get an
+         * unexpected output when you've turned off all the filters and then exported to csv, but I don't understand why
+         * you'd want to generate an empty csv: most of the time you'd have at least one of them selected.
          */
-        $requestedStatuses = $this->requestQuery->get('status') ?? [];
-
-        /* Temporarily implemented to match user experience in the ui
-         */
-//        if (!\count($requestedStatuses)) {
-//            $requestedStatuses = Status::STATUSES;
-//        }
+        $requestedStatuses = $this->requestQuery->get('status') ?? Status::STATUSES;
 
         /* Filter output to whatever was chosen in the frontend.
          */
