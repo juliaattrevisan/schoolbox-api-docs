@@ -24,6 +24,13 @@ export default class CreateLessonPlanTemplate {
     }
 
     /**
+     * navigate to Create Lesson Plan Template page
+     */
+    async goto(): Promise<void> {
+        await this.page.goto(CreateLessonPlanTemplate.URL);
+    }
+
+    /**
      * type a lesson plan template title
      * @param templateName - the name of the template
      */
@@ -49,6 +56,17 @@ export default class CreateLessonPlanTemplate {
         const templateField = `input#field-title-new${templateFieldNumber}`;
         await this.page.waitForSelector(templateField);
         await this.page.fill(templateField, templateFieldTitle);
+    }
+
+    /**
+     * type a field description
+     * @param templateFieldNumber - the number of the field
+     * @param description - the description text for the template
+     */
+    async typeDescription(templateFieldNumber: number, description: string): Promise<void> {
+        const templateField = `textarea#field-description-new${templateFieldNumber}`;
+        await this.page.waitForSelector(templateField);
+        await this.page.fill(templateField, description);
     }
 
     /**

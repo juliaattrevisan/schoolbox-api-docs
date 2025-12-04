@@ -74,6 +74,7 @@ window.Vue.onMounted(async () => {
                         data-tooltip
                         data-width="800"
                         class="has-tip hint"
+                        :data-test="`lp-description-field-hint-${field.title}`"
                         :title="field.description.replace(/(\r\n)+/g, '<br>')"
                     >
                         ?
