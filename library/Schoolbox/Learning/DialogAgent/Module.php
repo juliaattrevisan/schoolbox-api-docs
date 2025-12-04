@@ -74,13 +74,13 @@ class Module extends BaseModule
             return $this->preloadAssessmentAndStudent($params);
         };
 
-        /* Preload a participant+response via (assessment id, student id, response id) tuple,
+        /* Preload a participant+optional response via (assessment id, student id, response id) tuple,
          * returning an (assessment, student, response) tuple.
          *
          * This seems pretty long-winded for some reason: there might have been an easier way to ensure ownership
          */
-        $preloadParticipantAndResponse = function ($params) {
-            $tuple = $this->preloadAssessmentAndStudent($params);
+        $preloadParticipantAndOptionalResponse = function ($params) use ($preloadParticipant) {
+            $tuple = $preloadParticipant($params);
 
             /** @var DialogAgent\Model $assessment */
             $assessment = $tuple['assessment'];
@@ -88,34 +88,43 @@ class Module extends BaseModule
             /** @var User $student */
             $student = $tuple['student'];
 
-            /* Ensure that the provided $responseId actually belongs to the student
-             */
-            $participant = $assessment->getParticipantIfExtant($student);
+            $response = null;
+            if (isset($params['responseId'])) {
+                $participant = $assessment->getParticipantIfExtant($student);
 
-            /* This person has been excluded from the assessment or is no longer participating
-             */
-            if (null === $participant) {
-                throw new NotFound();
+                /* This person has been excluded from the assessment or is no longer participating */
+                if (null === $participant) {
+                    throw new NotFound();
+                }
+
+                /* Explore $participant's responses to find an identifier that exists for them.
+                 * If one doesn't exist, they're requesting someone else's response id
+                 */
+                /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
+                $response = $participant->getAllResponses()->getBy('id', $params['responseId']);
+
+                /* responseId doesn't belong to the participant (or maybe wasn't hydrated properly) */
+                if (null === $response) {
+                    throw new NotFound();
+                }
             }
 
-            // TODO: $participant->getAuthoritativeResponse() could possibly be used to simplify these
-
-            /* Explore $participant's responses to find an identifier that exists for them.
-             * If one doesn't exist, they're requesting someone else's response id
-             */
-            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
-            $response = $participant->getAllResponses()->getBy('id', $params['responseId']);
-
-            /* responseId doesn't belong to the participant (or maybe wasn't hydrated properly)
-             */
-            if (null === $response) {
-                throw new NotFound();
-            }
-
-            /* Add this response to the tuple we previously obtained and return that:
-             * a matching response exists for this person
-             */
+            /* Add this response to the tuple we previously obtained and return that */
             $tuple['response'] = $response;
+
+            return $tuple;
+        };
+
+        /* Preload a participant+response
+         * Same as $preloadParticipantAndOptionalResponse, but ensures response exists
+         */
+        $preloadParticipantAndResponse = function ($params) use ($preloadParticipantAndOptionalResponse) {
+            $tuple = $preloadParticipantAndOptionalResponse($params);
+
+            /* no response found */
+            if (null === $tuple['response']) {
+                throw new NotFound();
+            }
 
             return $tuple;
         };
@@ -170,6 +179,7 @@ class Module extends BaseModule
         $assRoute  = '/{assessmentId:\d+}';
         $studentParam  = '{studentId:\d+}';
         $responseParam = '{responseId:\d+}';
+        $optionalResponseParam = '{/responseId:\d+}';
 
         /* Create a dialog agent's configuration
          */
@@ -191,12 +201,13 @@ class Module extends BaseModule
         ), $preloadParticipantAndResponse);
 
         /* View a response (readonly mode)
+         * or fall back to the authoritative response if responseId is not specified
          */
-        $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getParticularResponse', new Rule\All(
+        $this->register('GET', "{$assRoute}/{$studentParam}/view{$optionalResponseParam}", 'getParticularResponse', new Rule\All(
             $canViewResponse,
             $this->buildRuleCanAction(NextRoutes::ACTION_VIEW),
             $this->buildIsConfiguredAuthRule()
-        ), $preloadParticipantAndResponse);
+        ), $preloadParticipantAndOptionalResponse);
 
         /* Student sends a message to the chat agent for a particular response
          */
@@ -521,6 +532,9 @@ class Module extends BaseModule
         /** @var AssessmentMapperProxy $assessmentMapperProxy */
         $assessmentMapperProxy = $this->injector->get('assessmentDataSource');
 
+        /** @var Participant\DataSource */
+        $participantDataSource = $this->injector->get('participantDataSource');
+
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy $responseMapperProxy */
         $responseMapperProxy = $this->injector->get('dialogAgentResponseDataSource');
 
@@ -539,6 +553,7 @@ class Module extends BaseModule
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),
             $this->injector->get('taskd.messageProducer'),
+            $participantDataSource,
             $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(AILogMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
