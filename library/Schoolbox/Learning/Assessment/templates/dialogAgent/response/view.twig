@@ -33,7 +33,7 @@
 
                 {% if response.isSubmitted %}
                     <li class="icon-calendar">
-                        Submitted <time title="{{ response.submittedAt.database }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
+                        Submitted <time title="{{ response.submittedAt.local }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
                     </li>
 
                     <li class="icon-time-value">
@@ -43,7 +43,7 @@
                     </li>
                 {% elseif response.startedAt %}
                     <li class="icon-calendar">
-                        <em>Response in progress - started <time title="{{ response.startedAt.database }}">{{ response.startedAt.relativeDayWithoutMidnight }}</time></em>
+                        <em>Response in progress - started <time title="{{ response.startedAt.local }}">{{ response.startedAt.relativeDayWithoutMidnight }}</time></em>
                     </li>
                 {% endif %}
 
