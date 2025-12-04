@@ -29,6 +29,7 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -37,6 +38,7 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
+use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
@@ -60,17 +62,22 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param Error\Mapper      $errorMapper
-     * @param RoleMapper        $roleMapper
-     * @param Folder\Mapper     $folderMapper
-     * @param EventMapper       $eventMapper
-     * @param EventTypeMapper   $eventTypeMapper
-     * @param CampusMapper      $campusMapper
-     * @param UserMapper        $userMapper
+     * @param Mapper $errorMapper
+     * @param RoleMapper $roleMapper
+     * @param Folder\Mapper $folderMapper
+     * @param EventMapper $eventMapper
+     * @param EventTypeMapper $eventTypeMapper
+     * @param CampusMapper $campusMapper
+     * @param UserMapper $userMapper
      * @param Attendance\Mapper $attendanceMapper
-     * @param FolderAccess      $folderAccess
-     * @param Validator         $validator
-     * @param EditorTemplateHelper    $editorTemplateHelper
+     * @param FolderAccess $folderAccess
+     * @param Validator $validator
+     * @param EditorTemplateHelper $editorTemplateHelper
+     * @param ResourceBookingMapper $bookingMapper
+     * @param ResourceBookingStatusMapper $bookingStatusMapper
+     * @param TermMapper $termMapper
+     * @param ExternalEventMapper $externalEventMapper
+     * @param External_Timetable $externalTimetable
      */
     public function __construct(
         private Error\Mapper $errorMapper,
@@ -1064,10 +1071,28 @@ class Controller extends Base
                 $errors[] = $clashErrors;
                 // set status to pending if there are clashes (even if the resource can NOT have clashes...)
                 $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+            } else {
+                // if booking is managed, then set back to pending, for more approved...
+                // If item is moderated, already approved and time changed, set item to need approval again.
+                $moderationId = $booking->getResource()->getModerationType()->getId();
+                $statusId = $booking->getStatus()->getId();
+                if (
+                    $booking->getResource()->isUserModerator($this->getUser())
+                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                ) {
+                    /* If you're a Moderator and can moderate this request,
+                     * and you created the booking in the first place,
+                     * set it to Approved - otherwise you'll end up approving your own request anyway
+                     */
+                    $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_APPROVED));
+                } elseif (
+                    ($moderationId === ResourceBookingModerationTypeModel::TYPE_MODERATED || $moderationId === ResourceBookingModerationTypeModel::TYPE_MANAGED) &&
+                    $statusId === \Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_APPROVED
+                ) {
+                    $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+                }
+                // if not moderated or managed, keep approved status
             }
-
-            // if booking is managed, then set back to pending, for more approved...
-            // TODO
 
             $booking->setBookingStartAt($newStart);
             $booking->setBookingEndAt($newEnd);
