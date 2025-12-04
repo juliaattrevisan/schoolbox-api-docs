@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use DateTimeInterface;
+use External_Timetable;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
@@ -38,6 +39,9 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\External\Event\Mapper as ExternalEventMapper;
 use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -80,6 +84,11 @@ class Controller extends Base
         private FolderAccess $folderAccess,
         private Validator $validator,
         private EditorTemplateHelper $editorTemplateHelper, //Helper for editor templates
+        private ResourceBookingMapper $bookingMapper,
+        private ResourceBookingStatusMapper $bookingStatusMapper,
+        private TermMapper $termMapper,
+        private ExternalEventMapper $externalEventMapper,
+        private External_Timetable $externalTimetable,
     ) {
     }
 
@@ -1005,9 +1014,7 @@ class Controller extends Base
      * @param ?Alaress_Date_Format $oldEndDateTime
      * @param User $user
      * @return array
-     * @throws ContainerExceptionInterface
      * @throws MapperException
-     * @throws NotFoundExceptionInterface
      */
     private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user)
     {
@@ -1015,27 +1022,19 @@ class Controller extends Base
         $startDiff = $oldStartDateTime?->diffInMinutes($event->getStartDateTime(), false);
         $endDiff = $oldEndDateTime?->diffInMinutes($event->getEndDateTime(), false);
 
-        // get other mappers...
-        $bookingMapper = ResourceBookingMapper::getInstance();
-        /** @var \Schoolbox\ResourceBooking\Booking\Status\Mapper $bookingStatusMapper */
-        $bookingStatusMapper = $bookingMapper->getJoinMapper('status');
-        $termMapper = \Schoolbox\Assessment\Term\Mapper::getInstance();
-        $externalEvents = \Schoolbox\External\Event\Mapper::getInstance();
-        $externalTimetable = $this->getDi()->get('externalTimetable');
-
         // get all bookings for this event
-        $bookings = $bookingMapper->findByColumn('event_id', $event->getId());
+        $bookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
 
         // clashes?
         $validation = new Validation(
             $user,
-            $bookingMapper,
-            $bookingStatusMapper,
-            $termMapper,
-            $externalTimetable,
+            $this->bookingMapper,
+            $this->bookingStatusMapper,
+            $this->termMapper,
+            $this->externalTimetable,
             $this->campusMapper,
             $this->getConfigLoader(),
-            $externalEvents,
+            $this->externalEventMapper,
         );
 
         // collect errors
@@ -1058,7 +1057,7 @@ class Controller extends Base
             if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
                 $errors[] = $clashErrors;
                 // set status to pending if there are clashes (even if the resource can NOT have clashes...)
-                $booking->setStatus($bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+                $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
             }
 
             // if booking is managed, then set back to pending, for more approved...
@@ -1069,7 +1068,7 @@ class Controller extends Base
         }
 
         // save the lot
-        $bookingMapper->save($bookings);
+        $this->bookingMapper->save($bookings);
 
         return $errors;
     }

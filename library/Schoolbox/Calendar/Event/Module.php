@@ -20,15 +20,19 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\External\Event\Mapper as ExternalEventMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
@@ -129,6 +133,11 @@ class Module extends BaseModule
                 EditorTemplatesCategoryModel::CALENDAR_EVENTS,
                 $this->injector->get('user')
             ),
+            $this->getMapperFactory()->get(ResourceBookingMapper::class),
+            $this->getMapperFactory()->get(ResourceBookingStatusMapper::class),
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getMapperFactory()->get(ExternalEventMapper::class),
+            $this->injector->get('externalTimetable'),
         );
     }
 
