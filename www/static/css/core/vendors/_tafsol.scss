@@ -1385,5 +1385,6 @@ section {
 //added to fix some styling issue
 .f-dropdown li :is(a, button),
 .f-dropdown li :is(a, button)::before {
+    background: var(--sbx-color-foreground-primary);
     color: var(--sbx-color-accent);
 }

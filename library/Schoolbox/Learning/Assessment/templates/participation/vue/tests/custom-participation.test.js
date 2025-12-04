@@ -5,6 +5,18 @@ import { allParticipants } from "./allParticipantsData";
 
 beforeEach(() => {});
 
+// Mock the locale
+jest.mock("@js/terminology/rosettaStone", () => ({
+    activity: {
+        translate: jest.fn((plural, capitalised) => {
+            if (plural && capitalised) return "Activities";
+            if (plural && !capitalised) return "activities";
+            if (!plural && capitalised) return "Activity";
+            return "activity";
+        }),
+    },
+}));
+
 const defaultProps = {
     allParticipants,
     pastoralEnabled: false,
