@@ -263,21 +263,18 @@ export default class AssessmentForm {
 
     /**
      * Sets visibility
-     * @param visibility - The visibility to set
+     * @param visibility - The visibility to set: VISIBILITY_STAFF_ONLY, VISIBILITY_STAFF_AND_STUDENT, VISIBILITY_ALL
      */
     async setVisibility(visibility: string): Promise<void> {
-        const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
-        await visibilitySelectEl.click();
         await this.page.locator(`select[name="visibility"]`).selectOption({ value: visibility });
     }
 
     /**
-     * Navigates to the activity modify page for the activities passed in the array and
-     * Checks the visibility mark option selected for the activities passed in the array
-     * @param assessmentIds - The assessment IDs to check
-     * @param visibility - The visibility to check
+     * For each assessment ID, navigates to its modify page and verifies that the expected visibility option is selected.
+     * @param assessmentIds - Array of assessment IDs to check.
+     * @param visibility -  Array of expected visibility option labels, corresponding to each assessment ID.
      */
-    async checkVisibilityOptionsSelected(assessmentIds: number[], visibility: string[]): Promise<void> {
+    async assessmentModifyCheckVisibilityOptionsSelected(assessmentIds: number[], visibility: string[]): Promise<void> {
         for (let i = 0; i < assessmentIds.length; i += 1) {
             const assessmentId = assessmentIds[i];
             await this.gotoAssessmentModifyPage(assessmentId.toString());

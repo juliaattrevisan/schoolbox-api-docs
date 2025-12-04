@@ -26,6 +26,8 @@ test.describe("Markbook mark visibility sync between mark books and activity mod
     const classId = 83;
     // course id for year 9 english
     const courseId = 6;
+    // Filter in the course mark book - Folders id
+    const filterFoldersIdCourseMarkbook = 14;
 
     test.beforeEach(async ({ tester, page }) => {
         markbookPage = new MarkbookPage(page);
@@ -35,133 +37,131 @@ test.describe("Markbook mark visibility sync between mark books and activity mod
         await tester.impersonate(teacher);
     });
 
+    test.afterEach(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("clean up - reset the course markbook filters");
+        await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkId });
+        await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkSpecId });
+        await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizId });
+        await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizSpecId });
+        await db.updateInDatabase(
+            "filter_selection",
+            { selected: 0 },
+            {
+                filter_id: 14,
+                user_id: 22,
+                page: "courseMarkbook",
+                selected: 1,
+            },
+        );
+    });
+
     test("Mark visibility reflects across the course mark book and activity page: visibility updated via class mark book", async ({
         tester,
-        db,
     }) => {
-        try {
-            tester.isGoingTo(
-                "navigate to the class markbook, update the due work mark visibility to staff only and the quiz mark visibility to students and staff",
-            );
-            await markbookPage.gotoClassMarkbook(classId.toString());
-            await commonPage.resetFiltersToDefault();
-            await markbookPage.updateMultipleActivityMarkVisibilities([dueWorkId, quizId], ["0", "1"]);
+        tester.isGoingTo(
+            "navigate to the class markbook, update the due work mark visibility to staff only and the quiz mark visibility to students and staff",
+        );
+        await markbookPage.gotoClassMarkbook(classId.toString());
+        await commonPage.resetFiltersToDefault();
+        await markbookPage.updateMultipleActivityMarkVisibilities(
+            [dueWorkId, quizId],
+            [MarkbookPage.VISIBILITY_STAFF_ONLY.toString(), MarkbookPage.VISIBILITY_STAFF_AND_STUDENT],
+        );
 
-            tester.isGoingTo("check the due work and quiz mark visibility is reflected in the activity modify page");
-            await assessmentForm.checkVisibilityOptionsSelected(
-                [dueWorkId, quizId],
-                ["Staff Only", "Staff and Students"],
-            );
+        tester.isGoingTo("check the due work and quiz mark visibility is reflected in the activity modify page");
+        await assessmentForm.assessmentModifyCheckVisibilityOptionsSelected(
+            [dueWorkId, quizId],
+            ["Staff Only", "Staff and Students"],
+        );
 
-            tester.isGoingTo("check the due work and quiz mark visibility is reflected in the course mark book");
-            await markbookPage.gotoCourseMarkbook(courseId.toString());
-            await commonPage.selectFilterOption("14", "83"); // filtering by class 9A English
-            await markbookPage.checkVisibilityOptionsSelected([dueWorkSpecId, quizSpecId], ["0", "1"]);
-        } finally {
-            tester.isGoingTo("clean up - reset the course markbook filters");
-            await db.updateInDatabase(
-                "filter_selection",
-                { selected: 0 },
-                { filter_id: 14, user_id: 22, page: "courseMarkbook", selected: 1 },
-            );
-            await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkId });
-            await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkSpecId });
-            await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizId });
-            await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizSpecId });
-        }
+        tester.isGoingTo("check the due work and quiz mark visibility is reflected in the course mark book");
+        await markbookPage.gotoCourseMarkbook(courseId.toString());
+        await commonPage.selectFilterOption(filterFoldersIdCourseMarkbook.toString(), classId.toString()); // filtering by class 9A English
+        await markbookPage.checkVisibilityOptionsSelected(
+            [dueWorkSpecId, quizSpecId],
+            [MarkbookPage.VISIBILITY_STAFF_ONLY.toString(), MarkbookPage.VISIBILITY_STAFF_AND_STUDENT.toString()],
+        );
     });
 
     test("Mark visibility reflects across the class mark book and activity page: visibility updated via course mark book", async ({
         tester,
-        db,
     }) => {
-        try {
-            tester.isGoingTo(
-                "navigate to the course markbook, update the due work mark visibility to staff only and the quiz mark visibility to students and staff",
-            );
-            await markbookPage.gotoCourseMarkbook(courseId.toString());
-            await commonPage.selectFilterOption("14", "83"); // filtering by class 9A English
-            await markbookPage.updateMultipleActivityMarkVisibilities([dueWorkSpecId, quizSpecId], ["0", "1"]);
+        tester.isGoingTo(
+            "navigate to the course markbook, update the due work mark visibility to staff only and the quiz mark visibility to students and staff",
+        );
+        await markbookPage.gotoCourseMarkbook(courseId.toString());
+        await commonPage.selectFilterOption(filterFoldersIdCourseMarkbook.toString(), classId.toString()); // filtering by class 9A English
+        await markbookPage.updateMultipleActivityMarkVisibilities(
+            [dueWorkSpecId, quizSpecId],
+            [MarkbookPage.VISIBILITY_STAFF_ONLY.toString(), MarkbookPage.VISIBILITY_STAFF_AND_STUDENT],
+        );
 
-            tester.isGoingTo("check the due work and quiz mark visibility is reflected in the activity modify page");
-            await assessmentForm.checkVisibilityOptionsSelected(
-                [dueWorkId, quizId],
-                ["Staff Only", "Staff and Students"],
-            );
+        tester.isGoingTo("check the due work and quiz mark visibility is reflected in the activity modify page");
+        await assessmentForm.assessmentModifyCheckVisibilityOptionsSelected(
+            [dueWorkId, quizId],
+            ["Staff Only", "Staff and Students"],
+        );
 
-            tester.isGoingTo("check the due work and quiz mark visibility is reflected in the class mark book");
-            await markbookPage.gotoClassMarkbook(classId.toString());
-            await markbookPage.checkVisibilityOptionsSelected([dueWorkId, quizId], ["0", "1"]);
-        } finally {
-            tester.isGoingTo("clean up - reset the course markbook filters");
-            await db.updateInDatabase(
-                "filter_selection",
-                { selected: 0 },
-                { filter_id: 14, user_id: 22, page: "courseMarkbook", selected: 1 },
-            );
-            await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkId });
-            await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkSpecId });
-            await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizId });
-            await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizSpecId });
-        }
+        tester.isGoingTo("check the due work and quiz mark visibility is reflected in the class mark book");
+        await markbookPage.gotoClassMarkbook(classId.toString());
+        await markbookPage.checkVisibilityOptionsSelected(
+            [dueWorkId, quizId],
+            [MarkbookPage.VISIBILITY_STAFF_ONLY.toString(), MarkbookPage.VISIBILITY_STAFF_AND_STUDENT],
+        );
     });
 
     test("Mark visibility reflects across the class mark book and activity page: visibility updated via activity modify page", async ({
         tester,
-        db,
         page,
     }) => {
-        try {
-            tester.isGoingTo(
-                "navigate to the quiz(class level) and due work(course level) modify pages, update to staff and students and staff only the visibility",
-            );
-            await markbookPage.gotoClassMarkbook(classId.toString());
-            await commonPage.resetFiltersToDefault();
-            await markbookPage.openAssessmentDropdown(quizId);
-            await markbookPage.clickAssessmentDropdownItem(quizId, "modify");
-            await assessmentForm.setVisibility("1");
-            await assessmentForm.update();
-            await expect(page.getByTestId("panel-apply-filters-button")).toBeVisible(); // wait for page to load
+        tester.isGoingTo(
+            "navigate to the quiz (class level) and due work (course level) modify pages, update the quiz visibility to 'Staff and Students' and the due work visibility to 'Staff Only'",
+        );
+        await markbookPage.gotoClassMarkbook(classId.toString());
+        await commonPage.resetFiltersToDefault();
+        await markbookPage.openAssessmentDropdown(quizId);
+        await markbookPage.clickAssessmentDropdownItem(quizId, "modify");
+        await assessmentForm.setVisibility(AssessmentForm.VISIBILITY_STAFF_AND_STUDENT.toString());
+        await assessmentForm.update();
+        await expect(page.getByTestId("panel-apply-filters-button")).toBeVisible(); // wait for page to load
+        await page.waitForLoadState("networkidle"); // wait for page to load
 
-            await markbookPage.gotoCourseMarkbook(courseId.toString());
-            await commonPage.selectFilterOption("14", "83"); // filtering by class 9A English
-            await markbookPage.openAssessmentDropdown(dueWorkSpecId);
-            await markbookPage.clickAssessmentDropdownItem(dueWorkSpecId, "modify");
-            await assessmentForm.setVisibility("0");
-            await assessmentForm.update();
-            await expect(page.getByTestId("panel-apply-filters-button")).toBeVisible(); // wait for page to load
+        await markbookPage.gotoCourseMarkbook(courseId.toString());
+        await commonPage.selectFilterOption(filterFoldersIdCourseMarkbook.toString(), classId.toString()); // filtering by class 9A English
+        await markbookPage.openAssessmentDropdown(dueWorkSpecId);
+        await markbookPage.clickAssessmentDropdownItem(dueWorkSpecId, "modify");
+        await assessmentForm.setVisibility(AssessmentForm.VISIBILITY_STAFF_ONLY.toString());
+        await assessmentForm.update();
+        await expect(page.getByTestId("panel-apply-filters-button")).toBeVisible(); // wait for page to load
+        await page.waitForLoadState("networkidle"); // wait for page to load
 
-            tester.isGoingTo(
-                "check the quiz mark visibility is reflected in the markbook pages and the due work is not reflected",
-            );
-            await markbookPage.gotoClassMarkbook(classId.toString());
-            await markbookPage.checkVisibilityOptionsSelected([quizId], ["1"]);
-            await markbookPage.checkVisibilityOptionsSelected([dueWorkId], ["2"]);
+        tester.isGoingTo(
+            "check the quiz mark visibility is reflected in the markbook pages and the due work is not reflected",
+        );
+        await markbookPage.gotoClassMarkbook(classId.toString());
+        await markbookPage.checkVisibilityOptionsSelected(
+            [quizId],
+            [MarkbookPage.VISIBILITY_STAFF_AND_STUDENT.toString()],
+        );
+        await markbookPage.checkVisibilityOptionsSelected([dueWorkId], [MarkbookPage.VISIBILITY_ALL.toString()]);
 
-            await markbookPage.gotoCourseMarkbook(courseId.toString());
-            await markbookPage.checkVisibilityOptionsSelected([quizSpecId], ["1"]);
-            await markbookPage.checkVisibilityOptionsSelected([dueWorkSpecId], ["2"]);
+        await markbookPage.gotoCourseMarkbook(courseId.toString());
+        await markbookPage.checkVisibilityOptionsSelected(
+            [quizSpecId],
+            [MarkbookPage.VISIBILITY_STAFF_AND_STUDENT.toString()],
+        );
+        await markbookPage.checkVisibilityOptionsSelected([dueWorkSpecId], [MarkbookPage.VISIBILITY_ALL.toString()]);
 
-            tester.isGoingTo("check the quiz mark visibility is not reflected in the quiz course level modify page");
-            await assessmentForm.gotoAssessmentModifyPage(quizSpecId.toString());
-            await assessmentForm.checkVisibilityOptionsSelected([quizSpecId], ["Staff, Students and their Parents"]);
+        tester.isGoingTo("check the quiz mark visibility is not reflected in the quiz course level modify page");
+        await assessmentForm.assessmentModifyCheckVisibilityOptionsSelected(
+            [quizSpecId],
+            ["Staff, Students and their Parents"],
+        );
 
-            tester.isGoingTo(
-                "check the due work mark visibility is not reflected in the due work class level modify page",
-            );
-            await assessmentForm.gotoAssessmentModifyPage(dueWorkId.toString());
-            await assessmentForm.checkVisibilityOptionsSelected([dueWorkId], ["Staff, Students and their Parents"]);
-        } finally {
-            tester.isGoingTo("clean up - reset the course markbook filters");
-            await db.updateInDatabase(
-                "filter_selection",
-                { selected: 0 },
-                { filter_id: 14, user_id: 22, page: "courseMarkbook", selected: 1 },
-            );
-            await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkId });
-            await db.updateInDatabase("submission_box", { mark_visibility: 2 }, { assessment_id: dueWorkSpecId });
-            await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizId });
-            await db.updateInDatabase("assess", { mark_visibility: 2 }, { assessment_id: quizSpecId });
-        }
+        tester.isGoingTo("check the due work mark visibility is not reflected in the due work class level modify page");
+        await assessmentForm.assessmentModifyCheckVisibilityOptionsSelected(
+            [dueWorkId],
+            ["Staff, Students and their Parents"],
+        );
     });
 });
