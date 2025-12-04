@@ -42,7 +42,7 @@ class NextRoutes
          */
         if (null === $authoritativeResponse) {
             return [
-                self::ACTION_VIEW => false,
+                self::ACTION_VIEW => true,
                 self::ACTION_MESSAGE => false,
                 self::ACTION_SUBMIT => false,
                 self::ACTION_RESET => false,
