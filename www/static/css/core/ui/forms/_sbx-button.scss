@@ -27,6 +27,7 @@
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
     color: var(--sbx-color-foreground-primary);
+    margin: var(--sbx-size-s);
     &:hover,
     &:active {
         background: var(--sbx-color-accent); // ^foundation-fixes^ - remove the use of --content-ui-hover

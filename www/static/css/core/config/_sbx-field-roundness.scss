@@ -1,0 +1,18 @@
+:root {
+    --sbx-config-field-roundess: var(--sbx-border-radius-normal);
+}
+
+.sbx-body {
+    select,
+    .island .content,
+    .island .calendar-list li.row,
+    .calendar-list .island li.row,
+    .island .calendar-list label,
+    .calendar-list .island label,
+    .island .matching-pairs p,
+    .matching-pairs .island p,
+    .island .resource-browser .meta-panel,
+    .resource-browser .island .meta-panel {
+        border-radius: var(--sbx-config-field-roundess);
+    }
+}
