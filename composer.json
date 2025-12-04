@@ -122,7 +122,7 @@
         "ext-sockets": "*",
         "psr/http-message": "2.0 as 1.1",
         "cweagans/composer-patches": "^2.0.0",
-        "symfony/cache": "^7.2",
+        "symfony/cache": "^8.0.0",
         "psr/simple-cache": "^3.0",
         "clue/redis-react": "^2.8",
         "php-debugbar/php-debugbar": "^2.2",
