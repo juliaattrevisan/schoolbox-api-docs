@@ -94,7 +94,7 @@
         "symfony/mime": "^7.1.0",
         "symfony/mailer": "^7.1.0",
         "symfony/yaml": "^7.1.0",
-        "symfony/lock": "^7.1.0",
+        "symfony/lock": "^8.0.0",
         "phpxmlrpc/phpxmlrpc": "^4.6",
         "psr/container": "^2.0.2",
         "enqueue/enqueue": "^0.10.15",
