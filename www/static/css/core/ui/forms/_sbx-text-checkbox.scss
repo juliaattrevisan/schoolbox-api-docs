@@ -50,6 +50,14 @@
         transform: scale(1);
     }
 
+    /**
+    * We don't always use a label with a checkbox
+    * so ensure empty labels don't impact the display flow
+    */
+    & + label:empty {
+        display: none;
+    }
+
     /* focus / disabled use shared mixins like text input */
     &:focus {
         @include sbx-form.form-input-focus;
