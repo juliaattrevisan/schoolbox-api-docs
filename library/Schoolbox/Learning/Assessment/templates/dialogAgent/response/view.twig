@@ -1,15 +1,14 @@
 {##
- # Create Response screen for Dialog Agents
+ # View Response screen for Dialog Agents
  #
- # This is where students get to interact with the dialog agent's chosen scenario, using all of that scenario
- # context fields that the staff entered to evaluate the conversation
+ # This is where instructors can view a learner's response, or learners can view their own submitted response
  #
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
- # @param array $student                  Array of author info about the student creating the response
- # @param DialogAgent\Response $response  The response that we are creating/resuming
- # @param array $responseData             Array about the response that we are creating/resuming
+ # @param array $student                  Array of author info about the student who owns the response
+ # @param DialogAgent\Response $response  The response that we are viewing
+ # @param array|null $responseData        Array about the response that we are viewing
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
