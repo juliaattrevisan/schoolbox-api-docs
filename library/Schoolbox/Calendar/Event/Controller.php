@@ -558,7 +558,7 @@ class Controller extends Base
         if ($event->getId()) {
             $oldStart = clone $event->getStartDateTime();
             $oldEnd = clone $event->getEndDateTime();
-            $existingEvent = false;
+            $existingEvent = true;
         }
 
         /* Check owner still exists
