@@ -91,7 +91,7 @@
         "oat-sa/lib-lti1p3-deep-linking": "^4.1",
         "oat-sa/lib-lti1p3-nrps": "^8.0",
         "apple/apn-push": "^3.1",
-        "symfony/mime": "^7.1.0",
+        "symfony/mime": "^8.0.0",
         "symfony/mailer": "^8.0.0",
         "symfony/yaml": "^7.1.0",
         "symfony/lock": "^8.0.0",
