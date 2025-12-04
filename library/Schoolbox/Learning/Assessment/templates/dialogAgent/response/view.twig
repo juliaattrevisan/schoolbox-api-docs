@@ -37,9 +37,7 @@
                     </li>
 
                     <li class="icon-time-value">
-                        {% set startedAt = response.startedAt ?? response.createdAt %}
-                        {% set endedAt = response.submittedAt ?? NOW %}
-                        Time taken: {{ duration.secondsToHoursAndMinutes(startedAt.diffInSeconds(endedAt, true)) }}
+                        Time taken: {{ duration.secondsToHoursAndMinutes(response.timeTaken) }}
                     </li>
                 {% elseif response.startedAt %}
                     <li class="icon-calendar">
