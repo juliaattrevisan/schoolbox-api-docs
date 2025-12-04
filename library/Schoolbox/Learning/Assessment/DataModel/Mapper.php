@@ -1739,7 +1739,11 @@ class Mapper extends BaseMapper
         if (!empty($unitSpecIds)) {
             /** @var UnitSpec\Mapper $contextUnitSpecMapper */
             $contextUnitSpecMapper = $this->getJoinMapper('assessment_course_unit_specification');
-            $contextUnitSpecs      = $contextUnitSpecMapper->findByColumn('id', $unitSpecIds)->indexBy('id');
+            $contextUnitSpecs      = $contextUnitSpecMapper->findByColumn(
+                'id',
+                $unitSpecIds,
+                ['deleted' => true],
+            )->indexBy('id');
 
             foreach ($modelList as $model) {
                 $context = $model->getAssessmentContext();
@@ -1768,7 +1772,11 @@ class Mapper extends BaseMapper
         if (!empty($unitImplIds)) {
             /** @var UnitImpl\Mapper $contextUnitImplMapper */
             $contextUnitImplMapper = $this->getJoinMapper('assessment_course_unit_implementation');
-            $contextUnitImpls      = $contextUnitImplMapper->findByColumn('id', $unitImplIds)->indexBy('id');
+            $contextUnitImpls      = $contextUnitImplMapper->findByColumn(
+                'id',
+                $unitImplIds,
+                ['deleted' => true],
+            )->indexBy('id');
 
             foreach ($modelList as $model) {
                 $context = $model->getAssessmentContext();
