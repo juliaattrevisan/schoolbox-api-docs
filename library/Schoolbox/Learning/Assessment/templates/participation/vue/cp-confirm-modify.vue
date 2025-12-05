@@ -11,7 +11,7 @@ withDefaults(
         showParticipants?: boolean;
     }>(),
     {
-        showParticipants: true,
+        showParticipants: true, // set to false when we already know the single participant involved
     },
 );
 
@@ -40,13 +40,10 @@ function onConfirm(): void {
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Please confirm</h2>
             <p class="f-no-margins">
-                <template v-if="showParticipants">
+                <slot name="status-text">
                     The following student(s) have submissions and/or feedback for this
                     {{ locale.assessment.singular() }}.
-                </template>
-                <template v-else>
-                    The student has submissions and/or feedback for this {{ locale.assessment.singular() }}.
-                </template>
+                </slot>
             </p>
             <div v-if="showParticipants" class="l-flex-col l-gap-xs">
                 <div
@@ -67,8 +64,10 @@ function onConfirm(): void {
                 </div>
             </div>
             <p>
-                Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions and/or
-                feedback. Proceed?
+                <slot name="confirm-text">
+                    Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions
+                    and/or feedback. Proceed?
+                </slot>
             </p>
         </div>
         <div class="l-flex l-gap-xs f-no-margins">

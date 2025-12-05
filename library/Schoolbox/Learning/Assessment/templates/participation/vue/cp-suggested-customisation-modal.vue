@@ -5,6 +5,7 @@
  * notify if existing customisation or feedback already exists.
  */
 
+import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpGenAi from "./cp-gen-ai.vue";
 import CpSelectActivity from "./cp-select-activity.vue";
@@ -105,7 +106,11 @@ function onConfirm(): void {
             :show-participants="false"
             @cancel="onCancel"
             @confirm="onConfirm"
-        />
+        >
+            <template #status-text>
+                The student has submissions and/or feedback for this {{ locale.assessment.singular() }}.
+            </template>
+        </cp-confirm-modify>
         <cp-select-activity
             v-else-if="status === 'selectType'"
             :routes="props.routes"
