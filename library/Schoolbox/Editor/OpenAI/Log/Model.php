@@ -267,6 +267,10 @@ class Model
      */
     public function getLogFormat(): ?LogFormat
     {
+        if (null === $this->logFormat) {
+            return null;
+        }
+
         return LogFormat::tryFrom($this->logFormat);
     }
 

@@ -33,11 +33,6 @@ type AiLogFormatDataMap = {
     [AiLogFormat.AGENT_CHAT]: AiLogAgentChatData;
 };
 
-export type AiLogFeatureData<TInputText, TOutputText> = {
-    request: TInputText;
-    response: TOutputText;
-};
-
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/Session/ModelToArray.php */
 export type AiSessionLog = {
     id: number;
