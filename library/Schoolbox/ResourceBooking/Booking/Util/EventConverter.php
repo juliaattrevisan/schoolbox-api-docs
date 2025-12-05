@@ -50,8 +50,8 @@ class EventConverter
         $event->setEventId($eventItem->getId());
 
         // use the booking times (if they exist) otherwise fall back to the event times
-        $event->setStartTime($booking->getBookingStartAt() ?: $eventItem->getStartDateTime());
-        $event->setEndTime($booking->getBookingEndAt() ?: $eventItem->getEndDateTime());
+        $event->setStartTime($booking->getBookingStartAt() ?? $eventItem->getStartDateTime());
+        $event->setEndTime($booking->getBookingEndAt() ?? $eventItem->getEndDateTime());
 
         $event->setPublishDate($eventItem->getPublishDateTime());
 

@@ -561,7 +561,8 @@ class Controller extends Base
         $validRequestPost = $this->validator->validateForPostModify($event, $this->requestPost);
 
         // cache old start and end for resource booking move
-        $existingEvent = $oldStart = $oldEnd = false;
+        $existingEvent = false;
+        $oldStart = $oldEnd = null;
         if ($event->getId()) {
             $oldStart = clone $event->getStartDateTime();
             $oldEnd = clone $event->getEndDateTime();
@@ -782,6 +783,7 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
+        $bookingErrors = [];
         if ($existingEvent) {
             // Move any resource bookings attached to this event
             $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
