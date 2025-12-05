@@ -1,0 +1,70 @@
+<script setup lang="ts">
+/**
+ * Custom Participation Confirm Modify Component
+ */
+import locale from "@js/terminology/rosettaStone";
+import type { Participant } from "../js/types/customParticipationTypes";
+
+defineProps<{
+    participants: Participant[];
+}>();
+
+const emit = defineEmits<{
+    (event: "confirm"): void;
+    (event: "cancel"): void;
+}>();
+
+/**
+ * Handle cancel action
+ */
+function onCancel(): void {
+    emit("cancel");
+}
+
+/**
+ * Handle confirm action
+ */
+function onConfirm(): void {
+    emit("confirm");
+}
+</script>
+
+<template>
+    <div class="l-flex-col l-gap-m f-no-margins">
+        <div class="l-flex-col l-gap-s f-no-margins">
+            <h2>Please confirm</h2>
+            <p class="f-no-margins">
+                The following student(s) have submissions and/or feedback for this
+                {{ locale.assessment.singular() }}.
+            </p>
+            <div class="l-flex-col l-gap-xs">
+                <div
+                    v-for="participant in participants"
+                    :key="participant.user.id"
+                    class="l-flex l-gap-s l-align-center"
+                >
+                    <img
+                        :src="`/portrait.php?id=${participant.user.id}&size=square32`"
+                        :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
+                    />
+                    <p>
+                        {{
+                            participant.user.preferredName ? participant.user.preferredName : participant.user.firstname
+                        }}
+                        {{ participant.user.lastname }}
+                    </p>
+                </div>
+            </div>
+            <p>
+                Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions and/or
+                feedback. Proceed?
+            </p>
+        </div>
+        <div class="l-flex l-gap-xs f-no-margins">
+            <button class="button submit l-flex__item--1" @click.prevent="onConfirm">Yes</button>
+            <button class="button l-flex__item--1" @click.prevent="onCancel">Cancel</button>
+        </div>
+    </div>
+</template>
+
+<style scoped></style>
