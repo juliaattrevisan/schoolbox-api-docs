@@ -132,15 +132,15 @@ HELP;
         /* We're going be doing this more than a few times: prepare it only once, for speed */
         $updateStatement = $db->prepareQuery("
             UPDATE openai_log
-            SET `log_type` = :log_type, `input_text` = :input, `output_text` = :output
+            SET `log_format` = :log_format, `input_text` = :input, `output_text` = :output
             WHERE `id` = :id;
         ");
 
-        /* Find all image generation logs that haven't already been migrated (any without a log_type) */
+        /* Find all image generation logs that haven't already been migrated (any without a log_format) */
         $imageLogQuery = sprintf(
             "SELECT id, prompt, response
             FROM openai_log
-            WHERE log_type IS NULL AND feature = '%s';",
+            WHERE log_format IS NULL AND feature = '%s';",
             Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE
         );
 
@@ -177,7 +177,7 @@ HELP;
             }
 
             $updateStatement->execute([
-                'log_type' => Schoolbox\Editor\OpenAI\Log\LogType::AGENT_CHAT->value,
+                'log_format' => Schoolbox\Editor\OpenAI\Log\LogFormat::AGENT_CHAT->value,
                 'input'    => $log->getInputText(),
                 'output'   => $log->getOutputText(),
                 'id'       => $log->getId(),

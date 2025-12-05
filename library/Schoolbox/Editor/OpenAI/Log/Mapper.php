@@ -46,7 +46,7 @@ class Mapper extends BaseMapper
         $this->uses('model', self::TYPE_STRING);
         $this->uses('endpoint', self::TYPE_STRING);
         $this->uses('feature', self::TYPE_STRING);
-        $this->uses('log_type', self::TYPE_STRING, self::COLUMN_ENUM, null, [...LogType::cases(), null]);
+        $this->uses('log_format', self::TYPE_STRING, self::COLUMN_ENUM, null, [...LogFormat::cases(), null]);
         $this->uses('response', self::TYPE_STRING);
         $this->uses('return_code', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);
@@ -208,7 +208,7 @@ class Mapper extends BaseMapper
                 {$this->getTable()}.id AS id,
                 session_id,
                 feature,
-                log_type,
+                log_format,
                 prompt,
                 return_code,
                 {$this->getTable()}.created_at,

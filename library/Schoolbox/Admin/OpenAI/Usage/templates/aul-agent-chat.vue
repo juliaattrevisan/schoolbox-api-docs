@@ -2,10 +2,10 @@
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import type { AgentChatFeedMessage } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import type { AiLogType, AiSessionLogApiResponse } from "./payload";
+import type { AiLogFormat, AiSessionLogApiResponse } from "./payload";
 
 interface Props {
-    sessionLog: AiSessionLogApiResponse<AiLogType.AGENT_CHAT>;
+    sessionLog: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT>;
 }
 
 const props = defineProps<Props>();

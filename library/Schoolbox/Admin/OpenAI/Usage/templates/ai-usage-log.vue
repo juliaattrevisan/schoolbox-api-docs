@@ -8,7 +8,7 @@ import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import { AiLogType } from "./payload";
+import { AiLogFormat } from "./payload";
 import type {
     AiSessionId,
     AiFeature,
@@ -47,12 +47,12 @@ const selectedSessionId = window.Vue.ref<AiSessionId | null>(null);
 const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
 type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
-    [KLogType in AiLogType]: {
-        logType: KLogType;
-        session: AiSession<KLogType, TFeature>;
-        log: AiSessionLogApiResponse<KLogType, TFeature>;
+    [KLogFormat in AiLogFormat]: {
+        logFormat: KLogFormat;
+        session: AiSession<KLogFormat, TFeature>;
+        log: AiSessionLogApiResponse<KLogFormat, TFeature>;
     };
-}[AiLogType];
+}[AiLogFormat];
 
 type AiSelectedSessionInfoLoading = Pick<AiSelectedSessionInfo, "session">;
 
@@ -73,7 +73,7 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
         return { session: sessionInfo };
     }
 
-    const info = { logType: sessionInfo.logType, session: sessionInfo, log: logInfo };
+    const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: logInfo };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
@@ -286,7 +286,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             </td>
                             <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.id !== null && session.logType !== null && session._routes.getLog">
+                                <nav v-if="session.id !== null && session.logFormat !== null && session._routes.getLog">
                                     <a
                                         class="icon-eye"
                                         :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"
@@ -333,7 +333,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
                 <div v-else class="l-mar-m">
                     <aul-agent-chat
-                        v-if="selectedSessionInfo.logType === AiLogType.AGENT_CHAT"
+                        v-if="selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT"
                         :session-log="selectedSessionInfo.log"
                     />
                     <div v-else class="empty-state">
