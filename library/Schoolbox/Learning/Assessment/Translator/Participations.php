@@ -82,7 +82,7 @@ class Participations
             'id'         => $participation->getId(),
             'user'       => $participant,
             'plan'       => call_user_func($this->planTranslator, $participation->getPlan()),
-            'cachedSuggestedCustomisation' => $this->aiCache->get($cacheKey),
+            'cachedDifferentiationProfile' => $this->aiCache?->get($cacheKey),
             'createdAt'  => $participation->getCreatedAt()?->toRfc3339String(),
             'updatedAt'  => $participation->getUpdatedAt()?->toRfc3339String(),
             'excludedAt' => $participation->getExcludedAt()?->toRfc3339String(),
