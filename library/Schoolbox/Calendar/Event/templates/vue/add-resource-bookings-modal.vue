@@ -4,7 +4,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import { type Booking, type BookingResource } from "./resourceBookingTypes";
+import type { Booking, BookingResource } from "./resourceBookingTypes";
 
 /**
  * This is necessary to avoid type errors because the Toast component is written in Javascript, not Typescript.
