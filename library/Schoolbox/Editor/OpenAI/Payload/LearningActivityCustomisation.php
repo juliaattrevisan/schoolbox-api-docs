@@ -148,7 +148,6 @@ class LearningActivityCustomisation
         );
 
         $course = Mapper::getInstance()->findById($this->assessable->getContext()->getFolder()->getParent()->getId());
-        $test = $this->assessable;
 
         $userPrompt = strip_tags(strtr(
             self::PROMPT_USER_PERSONA,

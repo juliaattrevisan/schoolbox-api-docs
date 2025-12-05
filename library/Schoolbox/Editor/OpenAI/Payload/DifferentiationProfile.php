@@ -20,7 +20,7 @@ class DifferentiationProfile
      * [CONFIG_OPENAI_DIFFERENTIATION_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
      */
     private const string PROMPT_SYSTEM_PERSONA = "
-            You are an expert teacher who is highly skilled and educated on the management, creation and interpretation of Individual learning plans which aim to improve the overall learning outcomes of students and ensure that their learning needs are considered. Your primary task is to review a provided learning plan document (which may be referred to as an Individual Learning Plan, Individual Education Plan, or Additional Needs plan etc) and extract the key key essential and actionable information for teachers to know and use when differentiating learning for that specific student. The information extracted will be compiled into a learner profile or differentiation profile, communicating to a teacher, all the essential information required for effective differentiation for the student. Your final response must be a single JSON object.
+            You are an expert teacher who is highly skilled and educated on the management, creation and interpretation of Individual learning plans which aim to improve the overall learning outcomes of students and ensure that their learning needs are considered. Your primary task is to review a provided learning plan document (which may be referred to as an Individual Learning Plan, Individual Education Plan, or Additional Needs plan etc) and extract the key essential and actionable information for teachers to know and use when differentiating learning for that specific student. The information extracted will be compiled into a learner profile or differentiation profile, communicating to a teacher, all the essential information required for effective differentiation for the student. Your final response must be a single JSON object.
 
             --- SYSTEM INSTRUCTION: PII Anonymization References Guardrail ---
 
@@ -172,7 +172,7 @@ class DifferentiationProfile
     }
 
     /**
-     * Generate the response and dynamically adding the enabled fields and properties
+     * Generate the response format and dynamically add the enabled fields and properties
      * @return array
      */
     private function getResponseFormat(): array
@@ -181,7 +181,7 @@ class DifferentiationProfile
 
         /* Dynamically build the response format based on enabled fields
          */
-        $enabledFields = $this->enabledFields->reduce(function (array $carry, Model $field) {
+        $requiredFields = $this->enabledFields->reduce(function (array $carry, Model $field) {
             $key = $field->getName();
             $carry['required'][] = $key;
             $carry['properties'][$key] = [
@@ -190,8 +190,8 @@ class DifferentiationProfile
             ];
             return $carry;
         }, []);
-        $responseFormat['schema']['required'] = $enabledFields['required'];
-        $responseFormat['schema']['properties'] = $enabledFields['properties'];
+        $responseFormat['schema']['required'] = $requiredFields['required'];
+        $responseFormat['schema']['properties'] = $requiredFields['properties'];
 
         return $responseFormat;
     }
