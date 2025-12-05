@@ -35,11 +35,7 @@
         color: var(--sbx-color-foreground-primary);
     }
     &:disabled,
-    &.disabled,
-    button:disabled,
-    button.disabled,
-    [type="submit"]:disabled,
-    [type="submit"].disabled {
+    &.disabled {
         @include sbx-form.form-input-disabled;
         border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
         background-color: var(--sbx-color-foreground-secondary) !important;
@@ -79,11 +75,7 @@
         @include sbx-form.form-input-focus;
     }
     &:disabled,
-    &.disabled,
-    button:disabled,
-    button.disabled,
-    [type="submit"]:disabled,
-    [type="submit"].disabled {
+    &.disabled {
         @include sbx-form.form-input-disabled;
         border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
         background-color: var(--sbx-color-foreground-secondary) !important;
