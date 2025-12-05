@@ -54,6 +54,7 @@ class AutosubmitTool extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_EXPIRED,
+            self::OPT_LONG_DURATION,
         ];
     }
 
@@ -95,12 +96,14 @@ HELP;
         $this->getLogger()->info('Dialog Agent Autosubmit');
         $this->getLogger()->info('');
 
-        if ($this->getOpt(self::OPT_LONG_EXPIRED)) {
-            $this->autosubmitExpirededActivities();
+        if ($this->getOpt(self::OPT_LONG_DURATION)) {
+            $this->getLogger()->info('');
+            $this->autosubmitDurationExceeded();
         }
 
-        if ($this->getOpt(self::OPT_LONG_DURATION)) {
-            $this->autosubmitDurationExceeded();
+        if ($this->getOpt(self::OPT_LONG_EXPIRED)) {
+            $this->getLogger()->info('');
+            $this->autosubmitExpirededActivities();
         }
 
         $this->getLogger()->info('');
@@ -181,9 +184,9 @@ HELP;
          */
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT 
-                dar.id, dar.learner_id,
+                dar.id, dar.learner_id, dar.started_at, dar.submitted_at, dar.created_at,
                 a.title, a.due_date,
-                da.assessment_id
+                da.assessment_id, da.duration
             FROM assessment a
             INNER JOIN dialog_agent da ON da.assessment_id = a.id
             INNER JOIN dialog_agent_response dar ON dar.dialog_agent_id = da.id
@@ -200,11 +203,26 @@ HELP;
         $n = 0;
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /* TODO: Check if the duration exceeded the allotted amount
-             *  If it did, process it
-             *  Otherwise, skip it for now
+            /* Manually hydrate a Response\Model instance to get access to the universal calculator
              */
-            $response = new \Schoolbox\Learning\Assessment\DialogAgent\Response\Model();
+            $createdAt = new \Alaress_Date_Format($row['created_at'], \Alaress_Date_Format::DATABASE_FORMAT);
+            $submittedAt = $row['submitted_at'] ? new \Alaress_Date_Format($row['submitted_at'], \Alaress_Date_Format::DATABASE_FORMAT) : null;
+            $startedAt = $row['started_at'] ? new \Alaress_Date_Format($row['started_at'], \Alaress_Date_Format::DATABASE_FORMAT) : null;
+
+            $response = new \Schoolbox\Learning\Assessment\DialogAgent\Response\Model()
+                ->setStartedAt($startedAt)
+                ->setSubmittedAt($submittedAt)
+                ->setCreatedAt($createdAt);
+
+            /* Find out how long this took
+             */
+            $timeTaken = $response->getTimeTaken();
+
+            /* Check if it exceeded the duration allotted; if there's still time, just keep going
+             */
+            if ($timeTaken < $row['duration']) {
+                continue;
+            }
 
             $n++;
 
