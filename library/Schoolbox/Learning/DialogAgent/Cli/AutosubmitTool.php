@@ -168,4 +168,70 @@ HELP;
             $this->getLogger()->info('No unsubmitted responses found.');
         }
     }
+
+
+    /**
+     * Autosubmits responses that have exceeded their allotted durations
+     *
+     * @return void
+     */
+    private function autosubmitDurationExceeded(): void
+    {
+        /* Find all the unsubmitted responses to dialog agents that enforce a duration per response
+         */
+        $statement = $this->getDatabaseInternal()->prepare("
+            SELECT 
+                dar.id, dar.learner_id,
+                a.title, a.due_date,
+                da.assessment_id
+            FROM assessment a
+            INNER JOIN dialog_agent da ON da.assessment_id = a.id
+            INNER JOIN dialog_agent_response dar ON dar.dialog_agent_id = da.id
+            INNER JOIN user u ON dar.learner_id = u.id
+            WHERE da.duration IS NOT NULL
+            AND da.duration > 0
+            AND dar.submitted_at IS NULL
+        ");
+
+        $statement->execute();
+
+        $updateStatement = null;
+
+        $n = 0;
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            /* TODO: Check if the duration exceeded the allotted amount
+             *  If it did, process it
+             *  Otherwise, skip it for now
+             */
+
+            $n++;
+
+            /* Prepare a reusable query only if it was never set up previously
+             */
+            if (null === $updateStatement && $this->perform()) {
+                $updateStatement = $this->getDatabaseInternal()->prepare(self::QUERY_UPDATE);
+            }
+
+            if ($this->perform()) {
+                $updateStatement->execute([
+                    'id' => $row['id'],
+                    'submittedAt' => $row['due_date'],
+                    'submittedBy' => $row['learner_id'],
+                ]);
+            }
+
+            $this->getLogger()->info(sprintf(
+                'Submitting response id %s for user %s in discussion activity "%s" (%s)',
+                $row['id'],
+                $row['learner_id'],
+                $row['title'],
+                $row['assessment_id']
+            ));
+        }
+
+        if (!$n) {
+            $this->getLogger()->info('No unsubmitted responses found.');
+        }
+    }
 }
