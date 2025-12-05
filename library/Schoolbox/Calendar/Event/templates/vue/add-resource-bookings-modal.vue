@@ -21,6 +21,7 @@ const isModalOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
 const resources = window.Vue.ref<Resource[]>([]);
 const isFormSubmittable = window.Vue.computed(() => !isProcessing.value && resources.value.length > 0);
+const createBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("createBookingForm");
 
 /**
  * Compile object ids into csv
@@ -63,16 +64,18 @@ defineExpose({
 
 /**
  * Post the booking creation form.
- * @param form The form that's being submitted
  */
-async function createNewBooking(form: HTMLFormElement): Promise<void> {
+async function createNewBooking(): Promise<void> {
+    if (!createBookingFormEl.value) {
+        throw new Error("Missing createBookingFormEl."); // Shouldn't get here.
+    }
     isProcessing.value = true;
-    const formContent = new FormData(form);
+    const formContent = new FormData(createBookingFormEl.value);
     const toast = window.sbProps.toastActivate("Saving...");
 
     try {
-        const response = await fetch(form.action, {
-            method: form.method,
+        const response = await fetch(createBookingFormEl.value.action, {
+            method: createBookingFormEl.value.method,
             body: formContent,
             headers: {
                 Accept: "application/json",
@@ -111,7 +114,7 @@ async function createNewBooking(form: HTMLFormElement): Promise<void> {
             method="post"
             :action="getAddBookingsEndpoint()"
             class="top"
-            @submit.prevent="createNewBooking($refs.createBookingForm as HTMLFormElement)"
+            @submit.prevent="createNewBooking()"
         >
             <h2>Add Resource Bookings</h2>
             <section>
