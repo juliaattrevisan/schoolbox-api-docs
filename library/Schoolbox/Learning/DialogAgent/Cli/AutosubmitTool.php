@@ -156,7 +156,7 @@ HELP;
             }
 
             $this->getLogger()->info(sprintf(
-                'Submitting response id %s for user %s in discussion activity "%s" (%s)',
+                'Submitting response id %s for user %s in discussion activity "%s" (%s) - activity expired.',
                 $row['id'],
                 $row['learner_id'],
                 $row['title'],
@@ -165,7 +165,7 @@ HELP;
         }
 
         if (!$n) {
-            $this->getLogger()->info('No unsubmitted responses found.');
+            $this->getLogger()->info('No unsubmitted responses found for expired activities.');
         }
     }
 
@@ -222,7 +222,7 @@ HELP;
             }
 
             $this->getLogger()->info(sprintf(
-                'Submitting response id %s for user %s in discussion activity "%s" (%s)',
+                'Submitting response id %s for user %s in discussion activity "%s" (%s) - duration exceeded.',
                 $row['id'],
                 $row['learner_id'],
                 $row['title'],
@@ -231,7 +231,7 @@ HELP;
         }
 
         if (!$n) {
-            $this->getLogger()->info('No unsubmitted responses found.');
+            $this->getLogger()->info('No unsubmitted responses found for excessive durations.');
         }
     }
 }
