@@ -10,12 +10,12 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import type { CustomisedSuggestionResponse } from "../js/types/customParticipationTypes";
+import type { CustomisedSuggestionResponse, Participant } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     route: string;
     assessmentId: number;
-    studentId: number | null;
+    participant: Participant | null;
     newLoad: boolean;
 }>();
 
@@ -52,7 +52,7 @@ async function load(): Promise<void> {
             signal: controller.signal,
             body: {
                 assessmentId: props.assessmentId,
-                studentId: props.studentId,
+                studentId: props.participant?.user.id ?? null,
             },
         });
         if (!response.success) {
@@ -94,10 +94,10 @@ function onRegenerate(): void {
 /**
  * On mounted check if we need to load AI content,
  * we may not need to if we are revisiting without
- * selecting a new student
+ * selecting a new participant
  */
 window.Vue.onMounted(() => {
-    if (props.newLoad && props.studentId) {
+    if (props.newLoad && props.participant) {
         void load();
     }
 });
@@ -122,7 +122,7 @@ window.Vue.onMounted(() => {
                 <p></p>
             </loading-cards>
         </div>
-        <div v-else-if="studentId && aiResponse" class="l-flex-col l-gap-m f-no-margins">
+        <div v-else-if="participant && aiResponse" class="l-flex-col l-gap-m f-no-margins">
             <div class="c-vert-scroll-container l-flex-col l-gap-s">
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <div class="l-flex-col l-gap-xs f-no-margins">

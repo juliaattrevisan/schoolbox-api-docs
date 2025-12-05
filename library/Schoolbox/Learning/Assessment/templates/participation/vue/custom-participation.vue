@@ -87,14 +87,14 @@ function onViewDP(participant: Participant): void {
 
 // #region AI Suggested Customisation
 
-const currentStudentId = window.Vue.ref<number | null>(null);
+const currentParticipant = window.Vue.ref<Participant | null>(null);
 
 /**
  * To view the AI suggested customisation for a participant
  * @param participant - The participant whose AI suggested customisation is to be viewed or generated
  */
 function onViewSuggestedCustomisation(participant: Participant): void {
-    currentStudentId.value = participant.user.id;
+    currentParticipant.value = participant;
 }
 
 // #endregion AI Suggested Customisation
@@ -182,7 +182,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
     />
     <cp-suggested-customisation-modal
         v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
-        v-model:student-id="currentStudentId"
+        v-model:participant="currentParticipant"
         :routes="props.routes"
         :assessment-id="props.assessmentId"
     />

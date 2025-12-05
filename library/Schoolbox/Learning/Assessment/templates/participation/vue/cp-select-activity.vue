@@ -5,12 +5,12 @@
 
 import locale from "@js/terminology/rosettaStone";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import type { Routes } from "../js/types/customParticipationTypes";
+import type { Participant, Routes } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     routes: Routes;
     assessmentId: number;
-    studentId: number | null;
+    participant: Participant | null;
 }>();
 
 const emit = defineEmits<{
@@ -32,12 +32,13 @@ function onBack(): void {
  */
 function onConfirm(): void {
     proceedText.value = "Proceeding...";
+    const studentId = props.participant?.user.id ?? null;
     if (typePicked.value === "modify") {
-        window.location.href = `${props.routes.getLearningPlanNewUrl}?student=${props.studentId}&${getReturnUrl()}`;
+        window.location.href = `${props.routes.getLearningPlanNewUrl}?student=${studentId}&${getReturnUrl()}`;
     } else if (typePicked.value === "copy") {
-        window.location.href = `${props.routes.getAssessmentParticipationCopyActivity}?student=${props.studentId}&original=${props.assessmentId}&${getReturnUrl()}`;
+        window.location.href = `${props.routes.getAssessmentParticipationCopyActivity}?student=${studentId}&original=${props.assessmentId}&${getReturnUrl()}`;
     } else if (typePicked.value === "new") {
-        window.location.href = `${props.routes.getAssessmentParticipationNewActivity}?student=${props.studentId}&original=${props.assessmentId}&${getReturnUrl()}`;
+        window.location.href = `${props.routes.getAssessmentParticipationNewActivity}?student=${studentId}&original=${props.assessmentId}&${getReturnUrl()}`;
     }
 }
 </script>

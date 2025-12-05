@@ -8,14 +8,14 @@
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpGenAi from "./cp-gen-ai.vue";
 import CpSelectActivity from "./cp-select-activity.vue";
-import type { CustomisedSuggestionResponse, Routes } from "../js/types/customParticipationTypes";
+import type { CustomisedSuggestionResponse, Participant, Routes } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     routes: Routes;
     assessmentId: number;
 }>();
 
-const studentId = defineModel<number | null>("student-id", { default: null });
+const participant = defineModel<Participant | null>("participant", { default: null });
 
 const isOpen = window.Vue.ref(false);
 const newLoad = window.Vue.ref(true); // to indicate whether to load new AI content, as we may be returning from another status without changing student
@@ -23,21 +23,21 @@ const aiResponse = window.Vue.ref<CustomisedSuggestionResponse | null>(null); //
 const status = window.Vue.ref<"view" | "selectType">("view"); // to track the current status of the modal
 
 /**
- * To display the view/generate customisation modal when a student is selected
+ * To display the view/generate customisation modal when a participant is selected
  */
-window.Vue.watch(studentId, (newStudentId) => {
-    if (newStudentId) {
+window.Vue.watch(participant, (newParticipant) => {
+    if (newParticipant) {
         newLoad.value = true;
         isOpen.value = true;
     }
 });
 
 /**
- * When the modal is closed trigger to clear the studentId
+ * When the modal is closed trigger to clear the participant
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (!newIsOpen) {
-        studentId.value = null;
+        participant.value = null;
         newLoad.value = true;
         status.value = "view";
     }
@@ -55,7 +55,7 @@ function onCustomiseActivity(): void {
  */
 function onCancel(): void {
     isOpen.value = false;
-    studentId.value = null;
+    participant.value = null;
 }
 
 /**
@@ -74,7 +74,7 @@ function onBack(): void {
             v-model:ai-response="aiResponse"
             :route="props.routes.genAI"
             :assessment-id="props.assessmentId"
-            :student-id="studentId"
+            :participant="participant"
             :new-load="newLoad"
             @cancel="onCancel"
             @customise-activity="onCustomiseActivity"
@@ -83,7 +83,7 @@ function onBack(): void {
             v-else-if="status === 'selectType'"
             :routes="props.routes"
             :assessment-id="props.assessmentId"
-            :student-id="studentId"
+            :participant="participant"
             @back="onBack"
         />
     </basic-modal>

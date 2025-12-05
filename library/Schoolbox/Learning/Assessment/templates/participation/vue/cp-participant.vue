@@ -144,7 +144,7 @@ function onOpenIncludeInExistingModal(): void {
                 type="button"
                 @click.prevent="onViewSuggestedCustomisation"
             >
-                Generate Suggested Customisation
+                {{ props.participant.cachedSuggestedCustomisation ? "View" : "Generate" }} Suggested Customisation
             </button>
         </td>
         <td>
