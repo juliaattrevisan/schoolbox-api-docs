@@ -3,7 +3,6 @@
  * Scope: UI Uplift
  */
 .breadcrumb {
-    display: flex;
     margin-inline-start: 1rem !important;
 
     & li {
@@ -36,7 +35,6 @@
     & li a,
     & span {
         background-color: transparent !important;
-        float: none;
         margin-inline-end: 1rem;
         padding-inline: 0;
     }
