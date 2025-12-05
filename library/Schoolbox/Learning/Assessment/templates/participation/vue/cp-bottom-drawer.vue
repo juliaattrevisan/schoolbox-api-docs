@@ -65,7 +65,7 @@ function clearSelection(): void {
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <template v-if="hasCustomisedInSelection">
                 <button
-                    class="icon-close submit"
+                    class="icon-close button"
                     data-test="custom-participation-remove-customisation"
                     @click.prevent="handleActionSelected(selectedList, 'removeCustomisation')"
                 >
@@ -73,59 +73,54 @@ function clearSelection(): void {
                 </button>
             </template>
             <template v-else>
-                <div class="l-flex__item--1-auto">
-                    <button
-                        class="icon-modify submit"
-                        @click.prevent="
-                            handleActionSelected(
-                                selectedList,
-                                `${props.routes.getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
-                            )
-                        "
-                    >
-                        Modify
-                    </button>
-                </div>
-                <div class="l-flex__item--1-auto">
-                    <button
-                        class="icon-staff-students submit"
-                        @click.prevent="handleActionSelected(selectedList, 'exclude')"
-                    >
-                        Exclude
-                    </button>
-                </div>
-                <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
-                    <button class="icon-list submit" @click.prevent="handleOpenIncludeInExistingModal">
-                        Include in Existing Customisation
-                    </button>
-                </div>
-                <div v-if="props.routes.getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
-                    <button
-                        class="icon-copy submit"
-                        data-test="custom-participation-copy-activity"
-                        @click.prevent="
-                            handleActionSelected(
-                                selectedList,
-                                `${props.routes.getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
-                            )
-                        "
-                    >
-                        Copy {{ locale.activity.translate(false, true) }}
-                    </button>
-                </div>
-                <div class="l-flex__item--1-auto">
-                    <button
-                        class="icon-submissions submit"
-                        @click.prevent="
-                            handleActionSelected(
-                                selectedList,
-                                `${props.routes.getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
-                            )
-                        "
-                    >
-                        New {{ locale.activity.translate(false, true) }}
-                    </button>
-                </div>
+                <button
+                    class="icon-modify button l-flex__item--1-auto"
+                    @click.prevent="
+                        handleActionSelected(
+                            selectedList,
+                            `${props.routes.getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
+                        )
+                    "
+                >
+                    Modify
+                </button>
+                <button
+                    class="icon-staff-students button l-flex__item--1-auto"
+                    @click.prevent="handleActionSelected(selectedList, 'exclude')"
+                >
+                    Exclude
+                </button>
+                <button
+                    v-if="props.customisations.length > 0"
+                    class="icon-list button l-flex__item--1-auto"
+                    @click.prevent="handleOpenIncludeInExistingModal"
+                >
+                    Include in Existing Customisation
+                </button>
+                <button
+                    v-if="props.routes.getAssessmentParticipationCopyActivity"
+                    class="icon-copy button l-flex__item--1-auto"
+                    data-test="custom-participation-copy-activity"
+                    @click.prevent="
+                        handleActionSelected(
+                            selectedList,
+                            `${props.routes.getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
+                        )
+                    "
+                >
+                    Copy {{ locale.activity.translate(false, true) }}
+                </button>
+                <button
+                    class="icon-submissions button l-flex__item--1-auto"
+                    @click.prevent="
+                        handleActionSelected(
+                            selectedList,
+                            `${props.routes.getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${props.assessmentId}&${getReturnUrl()}`,
+                        )
+                    "
+                >
+                    New {{ locale.activity.translate(false, true) }}
+                </button>
             </template>
         </div>
     </bottom-drawer>
