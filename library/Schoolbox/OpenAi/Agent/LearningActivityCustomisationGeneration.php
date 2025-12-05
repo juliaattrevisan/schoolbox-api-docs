@@ -60,7 +60,7 @@ class LearningActivityCustomisationGeneration
             $differentiationProfileModel->getStudent(),
             $course,
             $attachments,
-            json_encode(call_user_func($this->profileToArray, $differentiationProfileModel)),
+            json_encode(call_user_func($this->profileToArray, $differentiationProfileModel, JSON_THROW_ON_ERROR)),
         );
 
         $payload = $payloadGenerator->generate();
