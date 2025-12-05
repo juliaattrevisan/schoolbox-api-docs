@@ -22,7 +22,6 @@ $kernel = new Kernel(
         private const OPT_LONG_HELP = 'help';
         private const OPT_LONG_PUBLIC_KEY = 'key:';
         private const OPT_LONG_HOST = 'host:';
-        private const OPT_LONG_PORT = 'port:';
 
         /**
          * @inheritdoc
@@ -41,15 +40,37 @@ $kernel = new Kernel(
                 self::OPT_LONG_HELP,
                 self::OPT_LONG_PUBLIC_KEY,
                 self::OPT_LONG_HOST,
-                self::OPT_LONG_PORT,
             ];
         }
 
         public function run(): void
         {
+            if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+                echo <<<HELP
+NAME
+    create-devkit-lti-tool.php - create a LTI tool configuration for use with the LTI Devkit
+
+SYNOPSIS
+    create-devkit-lti-tool.php [--host HOST] [--port PORT] [--key KEY]
+
+DESCRIPTION
+    This script is used to create an LTI tool configuration for use with the LTI Devkit. Once finished, outputs the
+    deployment ID of the tool.
+
+    Also enables LTI assessments, LTI debug mode and the 3rd party assessment homepage component.
+
+    It should only be used for development purposes.
+
+OPTIONS
+    -h, --help              Print this help text and exit
+    --host                  The host the devkit is running on. May include a port number.
+    --key                   The devkit's public key: may be found in its `config/keys/public.key` file.
+HELP;
+                exit(CliKernelAbstract::EXIT_STATUS_OK);
+            }
+
             // Create the LTI tool configuration
             $host      = $this->getOpt(self::OPT_LONG_HOST);
-            $port      = $this->getOptAsInt(self::OPT_LONG_PORT);
             $publicKey = $this->getOpt(self::OPT_LONG_PUBLIC_KEY);
             if (!isset($host)) {
                 $this->getLogger()->error('No host specified: provide with the `--host` flag');
@@ -62,7 +83,7 @@ $kernel = new Kernel(
 
             $this->getLogger()->info('Creating LTI tool configuration');
             $deploymentId  = Uuid::uuid4()->toString();
-            $baseUrl       = new Uri($host)->withPort($port);
+            $baseUrl       = new Uri($host);
             $oidcUrl       = $baseUrl->withPath(rtrim($baseUrl->getPath(), '/') . '/lti1p3/oidc/initiation');
             $launchUrl     = $baseUrl->withPath(rtrim($baseUrl->getPath(), '/') . '/tool/launch');
             $ltiToolMapper = Mapper::getInstance();
