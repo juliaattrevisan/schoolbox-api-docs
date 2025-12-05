@@ -6,6 +6,8 @@ import type { Booking, Resource } from "./resourceBookingTypes";
 
 interface Props {
     resourceBookings: Booking[];
+    eventId: number;
+    eventSeriesId: number | null;
 }
 
 const props = defineProps<Props>();
