@@ -204,6 +204,7 @@ HELP;
              *  If it did, process it
              *  Otherwise, skip it for now
              */
+            $response = new \Schoolbox\Learning\Assessment\DialogAgent\Response\Model();
 
             $n++;
 
