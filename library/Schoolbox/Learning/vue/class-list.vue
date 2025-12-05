@@ -748,7 +748,7 @@ export default {
                             <td class="show-for-medium-up" v-if="differentiationEnabled">
                                 <button
                                     v-if="student._links.differentiationProfile"
-                                    class="sbx-link-button"
+                                    class="button"
                                     type="button"
                                     :data-test="`class-list-${student.id}-view-differentiation-profile`"
                                     @click.prevent="onDPSelected(student)"
