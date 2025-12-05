@@ -35,7 +35,7 @@ const compileResourceIds = window.Vue.computed(() =>
  * @returns a URL.
  */
 function getAddBookingsEndpoint(): string {
-    return new URL(ENDPOINTS.URL_BOOKINGS_ADD as string, window.location.href).toString();
+    return new URL(ENDPOINTS.URL_BOOKINGS_ADD, window.location.href).toString();
 }
 
 /**
