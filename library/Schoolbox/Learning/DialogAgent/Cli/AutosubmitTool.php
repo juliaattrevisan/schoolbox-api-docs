@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\DialogAgent\Cli;
 
 use Schoolbox\Application\CliTool;
 
-
 /**
  * Dialog Agent Autosubmit
  *
@@ -57,9 +56,9 @@ discussion but neglect to officially submit their response to the activity. This
 to the end datetime of the activity on behalf of the student when the activity reaches its due/close date (these dates
 are synonymous specifically in Dialog Agents). The student will be presumed to be the person who submitted it since we
 don't have a "system user" to do that.
-
  
 Usage:    autosubmit.php --perform [-vvv]
+
 
 HELP;
             exit;
@@ -73,7 +72,7 @@ HELP;
 
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT 
-                dar.id, dar.learner_id, dar.authoritative,
+                dar.id, dar.learner_id,
                 a.title, a.due_date,
                 da.assessment_id
             FROM assessment a
@@ -126,6 +125,5 @@ HELP;
             $this->getLogger()->info('Planning finished.');
             $this->getLogger()->info('');
         }
-
     }
 }
