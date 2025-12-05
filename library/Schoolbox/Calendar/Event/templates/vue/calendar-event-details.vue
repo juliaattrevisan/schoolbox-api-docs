@@ -702,12 +702,8 @@ export default {
                     </div>
                     <div v-else class="empty-state">
                         <i class="icon-resource-booking"></i>
-                        <p>
-                            No resources are booked for this event.<br />
-                            <a href="#" @click.prevent="showAddResourceBookingsModal()"
-                                >Book resources for this event</a
-                            >
-                        </p>
+                        <p>No resources are booked for this event.</p>
+                        <a href="#" @click.prevent="showAddResourceBookingsModal()">Book resources for this event</a>
                     </div>
                 </div>
             </section>
