@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -130,7 +131,7 @@ class Module extends BaseModule
             /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
             $response = $params['response'] ?? null;
             if (null === $response || !$response->getAuthoritative()) {
-                throw new NotFound('This action can only be performed on an authoritative response');
+                throw new Unauthorized('This action can only be performed on an authoritative response');
             }
         });
 
