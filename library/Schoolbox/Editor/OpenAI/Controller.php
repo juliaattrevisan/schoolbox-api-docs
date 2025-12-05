@@ -437,8 +437,6 @@ class Controller extends Base
             );
 
             $translator = new ProfileToArray(
-                $this->getRouter()->getGenerator(),
-                $this->getAuthorizer(),
                 $this->getUser(),
                 $this->differentiationProfileAdminMapper
                     ->findByColumn('is_enabled', 1),
