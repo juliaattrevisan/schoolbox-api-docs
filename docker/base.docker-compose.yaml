@@ -400,8 +400,8 @@ services:
     build:
       context: ./devkit-lti1p3-phpfpm
     env_file:
-      - path: ./devkit-lti1p3-phpfpm/default.env
-        required: true
+      - path: ./devkit-lti1p3-phpfpm/.env
+#        required: true
     volumes:
       - ../../devkit-lti1p3:/var/www/html
     working_dir: /var/www/html
