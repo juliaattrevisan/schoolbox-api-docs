@@ -185,3 +185,11 @@
 .island .row.actions-small-5 > nav a[class^="icon-"]:hover {
     border-radius: var(--sbx-border-radius-normal) !important;
 }
+
+/**
+ * Dropdown list buttons
+ * These need to have a transparent background because action buttons inside dropdowns should have same style as other buttons
+ */
+.sbx-body ul.f-dropdown li button {
+    background-color: transparent;
+}
