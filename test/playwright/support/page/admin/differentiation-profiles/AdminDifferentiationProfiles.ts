@@ -46,6 +46,23 @@ export default class AdminDifferentiationProfiles {
     }
 
     /**
+     * Toggles the differentiation profiles off, validates terminology is not visible, saves and verifies persistence
+     */
+    async toggleOff(): Promise<void> {
+        this.tester.isGoingTo("Toggle the differentiation profiles off");
+        await this.page.getByTestId("differentiation-profiles-toggle").click();
+        this.tester.isGoingTo("Validate that the text 'Terminology' is no longer visible on the page");
+        await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).not.toBeVisible();
+        await this.clickSave();
+        this.tester.isGoingTo("Refresh the page");
+        await this.page.reload();
+        this.tester.isGoingTo("Validate that the text 'Terminology' is no longer visible on the page after refresh");
+        await expect(this.page.getByTestId("differentiation-profiles-header-Terminology")).not.toBeVisible();
+        this.tester.isGoingTo("Verify that the checkbox is still unchecked");
+        await expect(this.page.getByTestId("differentiation-profiles-toggle")).not.toBeChecked();
+    }
+
+    /**
      * Renames a field by updating its input value, saving, and verifying persistence
      * @param fieldType - The field type (e.g., 'terminology')
      * @param fieldIndex - The field index (e.g., '1')

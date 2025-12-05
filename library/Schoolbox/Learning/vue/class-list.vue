@@ -3,9 +3,14 @@
 /* eslint-disable eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
+import locale from "@js/terminology/rosettaStone";
+import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
 
 export default {
     name: "class-list",
+    components: {
+        ViewDpModal,
+    },
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -265,6 +270,9 @@ export default {
             currentClassCode: null,
             emailGroupsWithSelection: this.emailGroups,
             emailFormBeingSubmitted: false,
+            locale: locale,
+            studentWithDP: null,
+            studentWithDPRoute: "",
         };
     },
     mounted: function () {
@@ -458,6 +466,14 @@ export default {
             }
             return student.classCodes.includes(this.currentClassCode);
         },
+
+        /**
+         * To open the differentiation profile view
+         */
+        onDPSelected(student) {
+            this.studentWithDPRoute = student._links.differentiationProfile ?? "";
+            this.studentWithDP = student;
+        },
     },
     computed: {
         showCheckboxes: function () {
@@ -625,6 +641,9 @@ export default {
                             </th>
                             <td></td>
                             <th>Name</th>
+                            <th class="show-for-medium-up" v-if="differentiationEnabled">
+                                {{ locale.differentiationProfile.translate(false, true) }}
+                            </th>
                             <th class="show-for-large-up">{{ yearLevelLabel }}</th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
@@ -726,6 +745,17 @@ export default {
                                     </slot>
                                 </ul>
                             </td>
+                            <td class="show-for-medium-up" v-if="differentiationEnabled">
+                                <button
+                                    v-if="student._links.differentiationProfile"
+                                    class="sbx-link-button"
+                                    type="button"
+                                    :data-test="`class-list-${student.id}-view-differentiation-profile`"
+                                    @click.prevent="onDPSelected(student)"
+                                >
+                                    View {{ locale.differentiationProfile.translate(false, true) }}
+                                </button>
+                            </td>
                             <td class="show-for-large-up">{{ student.yearlevel }}</td>
                             <td class="show-for-medium-up" v-if="showTutorGroupColumn">
                                 {{ student.StudentTutorDescription }}
@@ -788,4 +818,5 @@ export default {
             </div>
         </div>
     </div>
+    <view-dp-modal v-model:student="studentWithDP" :route="studentWithDPRoute" />
 </template>

@@ -5,6 +5,7 @@
 
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import { getFirstName } from "@js/util/sbx/userUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
@@ -119,11 +120,11 @@ function onClose(): void {
         <div v-else-if="student && data.length > 0" class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>
-                    {{ locale.differentiationProfile.translate(false, true) }} for {{ student.givenName }}
+                    {{ locale.differentiationProfile.translate(false, true) }} for {{ getFirstName(student) }}
                     {{ student.lastname }}
                 </h2>
             </div>
-            <div class="c-vert-scroll-container l-flex-col l-gap-s">
+            <div class="c-vert-scroll-container l-flex-col l-gap-s" data-test="view-dp-modal-fields-container">
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <div
                         v-for="item in adjustmentData"

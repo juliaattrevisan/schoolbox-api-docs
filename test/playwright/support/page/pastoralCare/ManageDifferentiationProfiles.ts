@@ -64,6 +64,41 @@ export default class ManageDifferentiationProfiles {
     }
 
     /**
+     * Initialize the page by enabling it, adding pastoral types, logging in as admin, and navigating to the page
+     * @param db - Database helper instance
+     */
+    async initDefaults(db: DatabaseHelper): Promise<void> {
+        await this.enablePage(db);
+        await this.addPastoralTypes();
+        await this.tester.loginAsAdmin();
+        await this.navigateToPage();
+    }
+
+    /**
+     * Reset the database to default state by disabling differentiation profiles and cleaning up related data
+     * @param db - Database helper instance
+     * @param studentId - Optional student ID to clean up differentiation profiles for
+     */
+    async resetDefaults(db: DatabaseHelper, studentId?: number): Promise<void> {
+        this.tester.isGoingTo("Clean up: Reset data state");
+        await db.updateInDatabase("config", { value: 0 }, { "name like": "differentiation_profiles_enabled" });
+        await db.dontHaveInDatabase("userAccess", { uid: 1, service: 16 });
+        await db.updateInDatabase(
+            "lu_pastoral_type",
+            { contribute_differentiation_profile: 0 },
+            { "name like": "Bullying" },
+        );
+        await db.updateInDatabase(
+            "lu_pastoral_subtype",
+            { contribute_differentiation_profile: 0 },
+            { "name like": "Award/Achievement" },
+        );
+        if (studentId !== undefined) {
+            await db.dontHaveInDatabase("differentiation_profiles", { student_id: studentId });
+        }
+    }
+
+    /**
      * Click a modify button
      * @param studentId - The ID of the student
      * @param fieldKey - The key of the field
