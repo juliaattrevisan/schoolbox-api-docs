@@ -24,15 +24,15 @@ const isFormSubmittable = window.Vue.computed(() => !isProcessing.value && resou
 const createBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("createBookingForm");
 
 /**
- * Compile object ids into csv
- * @returns string - a comma-separated string of resourceIds.
+ * Compile object ids into csv.
+ * @returns a comma-separated string of resourceIds.
  */
 const compileResourceIds = window.Vue.computed(() =>
     resources.value.map((resource: Resource) => resource.id).join(","),
 );
 
 /**
- * @returns string
+ * @returns a URL.
  */
 function getAddBookingsEndpoint(): string {
     return new URL(ENDPOINTS.URL_BOOKINGS_ADD as string, window.location.href).toString();
