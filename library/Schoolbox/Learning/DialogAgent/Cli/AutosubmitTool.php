@@ -9,11 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\DialogAgent\Cli;
 
-use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Url\Factory;
+
 
 /**
  * Dialog Agent Autosubmit
@@ -24,7 +21,20 @@ use Schoolbox\Url\Factory;
 class AutosubmitTool extends CliTool\App
 {
     // --help: print help
-    private const OPT_LONG_HELP = 'help';
+    private const string OPT_LONG_HELP = 'help';
+
+
+    /**
+     * A prepared statement that we'll reuse throughout this tool
+     */
+    private const string QUERY_UPDATE = "
+        UPDATE dialog_agent_response
+        SET 
+            submitted_at = :submittedAt,
+            submitted_by = :submittedBy
+        WHERE id = :id
+        LIMIT 1
+    ";
 
 
     /** @inheritdoc */
@@ -60,5 +70,62 @@ HELP;
         $this->getLogger()->info('');
         $this->getLogger()->info('Dialog Agent Autosubmit');
         $this->getLogger()->info('');
+
+        $statement = $this->getDatabaseInternal()->prepare("
+            SELECT 
+                dar.id, dar.learner_id, dar.authoritative,
+                a.title, a.due_date,
+                da.assessment_id
+            FROM assessment a
+            INNER JOIN dialog_agent da ON da.assessment_id = a.id
+            INNER JOIN dialog_agent_response dar ON dar.dialog_agent_id = da.id
+            INNER JOIN user u ON dar.learner_id = u.id
+            WHERE (a.close_date < NOW() OR a.due_date < NOW())
+            AND dar.submitted_at IS NULL
+        ");
+
+        $statement->execute();
+
+        $updateStatement = null;
+
+        $n = 0;
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $n++;
+
+            /* Prepare a reusable query only if it was never set up previously
+             */
+            if (null === $updateStatement && $this->perform()) {
+                $updateStatement = $this->getDatabaseInternal()->prepare(self::QUERY_UPDATE);
+            }
+
+            if ($this->perform()) {
+                $updateStatement->execute([
+                    'id' => $row['id'],
+                    'submittedAt' => $row['due_date'],
+                    'submittedBy' => $row['learner_id'],
+                ]);
+            }
+
+            $this->getLogger()->info(sprintf(
+                'Submitting response id %s for user %s in discussion activity "%s" (%s)',
+                $row['id'],
+                $row['learner_id'],
+                $row['title'],
+                $row['assessment_id']
+            ));
+        }
+
+        if (!$n) {
+            $this->getLogger()->info('No unsubmitted responses found.');
+        }
+
+        $this->getLogger()->info('');
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+            $this->getLogger()->info('');
+        }
+
     }
 }
