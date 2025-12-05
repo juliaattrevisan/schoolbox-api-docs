@@ -24,6 +24,12 @@ class AutosubmitTool extends CliTool\App
 
 
     /**
+     * For activities that have expired (reached their due/close datetime)
+     */
+    private const string OPT_LONG_EXPIRED = 'expired';
+
+
+    /**
      * A prepared statement that we'll reuse throughout this tool
      */
     private const string QUERY_UPDATE = "
@@ -41,6 +47,7 @@ class AutosubmitTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_EXPIRED,
         ];
     }
 
@@ -57,7 +64,7 @@ to the end datetime of the activity on behalf of the student when the activity r
 are synonymous specifically in Dialog Agents). The student will be presumed to be the person who submitted it since we
 don't have a "system user" to do that.
  
-Usage:    autosubmit.php --perform [-vvv]
+Usage:    autosubmit.php --expired --perform [-vvv]
 
 
 HELP;
@@ -70,6 +77,26 @@ HELP;
         $this->getLogger()->info('Dialog Agent Autosubmit');
         $this->getLogger()->info('');
 
+        if ($this->getOpt(self::OPT_LONG_EXPIRED)) {
+            $this->autosubmitConcludedActivities();
+        }
+
+        $this->getLogger()->info('');
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+            $this->getLogger()->info('');
+        }
+    }
+
+
+    /**
+     * Autosubmits responses associated with activities that reached due/close datetime.
+     *
+     * @return void
+     */
+    private function autosubmitConcludedActivities(): void
+    {
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT 
                 dar.id, dar.learner_id,
@@ -117,13 +144,6 @@ HELP;
 
         if (!$n) {
             $this->getLogger()->info('No unsubmitted responses found.');
-        }
-
-        $this->getLogger()->info('');
-
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
-            $this->getLogger()->info('');
         }
     }
 }
