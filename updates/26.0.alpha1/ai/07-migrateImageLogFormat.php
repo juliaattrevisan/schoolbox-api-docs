@@ -144,14 +144,9 @@ HELP;
             Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE
         );
 
-        $logs = $db->executeQuery($imageLogQuery)->fetchAll(); // TODO: might not want to fetch all... memory considerations?
+        $logIterator = $db->getQueryIterator($imageLogQuery);
 
-        if (count($logs) === 0) {
-            $this->getLogger()->info('No image generation logs to migrate');
-            return;
-        }
-
-        foreach ($logs as $logData) {
+        foreach ($logIterator as $logData) {
             $log = new Log\Model()
                 ->setId($logData['id'])
                 ->setPrompt($logData['prompt'])
