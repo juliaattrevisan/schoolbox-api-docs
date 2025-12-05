@@ -2,7 +2,7 @@
  * Pagination Styles
  * Scope: UI Uplift
  */
-.pagination {
+.sbx-body .pagination {
     & li {
         &:not(:last-child) {
             margin-right: 8px;
@@ -15,7 +15,8 @@
             }
         }
 
-        & a {
+        & a,
+        button {
             background: var(--sbx-color-foreground-primary) !important;
             border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
             border-radius: var(--sbx-border-radius-normal) !important;
