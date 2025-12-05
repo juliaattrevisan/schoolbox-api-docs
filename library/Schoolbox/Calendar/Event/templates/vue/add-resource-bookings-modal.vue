@@ -4,6 +4,12 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Booking, Resource } from "./resourceBookingTypes";
 
+interface Props {
+    resourceBookings: Booking[];
+}
+
+const props = defineProps<Props>();
+
 /**
  * This defines the server response to an ENDPOINTS.URL_BOOKINGS_ADD request.
  */
@@ -13,9 +19,8 @@ interface AddBookingsResponse {
 
 const isModalOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
-const resourceBookings = window.Vue.ref<Booking[]>([]);
 const resources = window.Vue.ref<Resource[]>([]);
-const isFormSubmittable = window.Vue.computed(() => !isProcessing && resources.value.length > 0);
+const isFormSubmittable = window.Vue.computed(() => !isProcessing.value && resources.value.length > 0);
 
 /**
  * Compile object ids into csv
@@ -38,7 +43,7 @@ function getAddBookingsEndpoint(): string {
  */
 function getResourceSearchEndpoint(): string {
     const searchUrl = new URL(ENDPOINTS.URL_BOOKING_SELECTIZE as string, window.location.href).toString();
-    const excludeResourceIds = resourceBookings.value.map((booking) => booking.resource.id);
+    const excludeResourceIds = props.resourceBookings.map((booking) => booking.resource.id);
     // The trailing '&' on the URL below is necessary because the SearchSelect component will add a 'query=' suffix.
     return `${searchUrl}?excludeResourceIds=${encodeURIComponent(excludeResourceIds.join(","))}&`;
 }
@@ -100,7 +105,7 @@ async function createNewBooking(form: HTMLFormElement): Promise<void> {
 </script>
 
 <template>
-    <basic-modal v-model:is-open="isModalOpen" has-background-click>
+    <basic-modal v-model:is-open="isModalOpen" :has-background-click="true">
         <form
             ref="createBookingForm"
             method="post"
