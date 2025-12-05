@@ -1,26 +1,8 @@
-<script lang="ts">
-import { defineComponent } from "vue";
-import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+<script lang="ts" setup>
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-import type { Booking, BookingResource } from "./resourceBookingTypes";
-
-/**
- * This is necessary to avoid type errors because the Toast component is written in Javascript, not Typescript.
- */
-interface ToastComponent {
-    activate: (message: string) => void;
-    timeout: (message: string, success: boolean, duration: number) => void;
-}
-
-/**
- * This is necessary to avoid type errors because the RevealModal component is written in Javascript, not Typescript.
- */
-interface RevealModalComponent {
-    open: () => void;
-    close: () => void;
-}
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import type { Booking, Resource } from "./resourceBookingTypes";
 
 /**
  * This defines the server response to an ENDPOINTS.URL_BOOKINGS_ADD request.
@@ -29,132 +11,96 @@ interface AddBookingsResponse {
     errors?: string[];
 }
 
-export default defineComponent({
-    name: "AddResourceBookingsModal",
+const isModalOpen = window.Vue.ref<boolean>(false);
+const isProcessing = window.Vue.ref<boolean>(false);
+const resourceBookings = window.Vue.ref<Booking[]>([]);
+const resources = window.Vue.ref<Resource[]>([]);
+const isFormSubmittable = window.Vue.computed(() => !isProcessing && resources.value.length > 0);
 
-    components: {
-        RevealModal,
-        SearchSelect,
-        Toast,
-    },
+/**
+ * Compile object ids into csv
+ * @returns string - a comma-separated string of resourceIds.
+ */
+const compileResourceIds = window.Vue.computed(() =>
+    resources.value.map((resource: Resource) => resource.id).join(","),
+);
 
-    props: {
-        // This component should only be included if the resource bookings module is enabled.
-        // So resourceBookings should always be set.
-        resourceBookings: {
-            type: Array,
-            required: true,
-        },
-    },
+/**
+ * @returns string
+ */
+function getAddBookingsEndpoint(): string {
+    return new URL(ENDPOINTS.URL_BOOKINGS_ADD as string, window.location.href).toString();
+}
 
-    data(): { isProcessing: boolean; resources: BookingResource[] } {
-        return {
-            isProcessing: false, // To disable buttons on form submission to prevent rapid fire.
-            resources: [],
-        };
-    },
+/**
+ * Get the endpoint for the booking resource search.
+ * @returns The endpoint for the booking resource search.
+ */
+function getResourceSearchEndpoint(): string {
+    const searchUrl = new URL(ENDPOINTS.URL_BOOKING_SELECTIZE as string, window.location.href).toString();
+    const excludeResourceIds = resourceBookings.value.map((booking) => booking.resource.id);
+    // The trailing '&' on the URL below is necessary because the SearchSelect component will add a 'query=' suffix.
+    return `${searchUrl}?excludeResourceIds=${encodeURIComponent(excludeResourceIds.join(","))}&`;
+}
 
-    computed: {
-        window: (): Window => window,
+/**
+ * Open this modal.
+ */
+function open(): void {
+    isModalOpen.value = true;
+    resources.value = [];
+}
 
-        /**
-         * Can the booking form be submitted?
-         * @returns whether the form is submittable.
-         */
-        isFormSubmittable(): boolean {
-            return !this.isProcessing && this.resources.length > 0;
-        },
-
-        /**
-         * Compile object ids into csv
-         * @returns a comma-separated string of resourceIds.
-         */
-        compileResourceIds(): string {
-            return this.resources.map((resource) => resource.id).join(",");
-        },
-
-        toast(): ToastComponent {
-            return this.$refs.toast as ToastComponent;
-        },
-
-        modal(): RevealModalComponent {
-            return this.$refs.modal as RevealModalComponent;
-        },
-    },
-
-    methods: {
-        getAddBookingsEndpoint(): string {
-            return new URL(ENDPOINTS.URL_BOOKINGS_ADD as string, window.location.href).toString();
-        },
-
-        /**
-         * Get the endpoint for the booking resource search.
-         * @returns The endpoint for the booking resource search.
-         */
-        getResourceSearchEndpoint(): string {
-            const searchUrl = new URL(ENDPOINTS.URL_BOOKING_SELECTIZE as string, window.location.href).toString();
-            const excludeResourceIds = (this.resourceBookings as Booking[]).map((booking) => booking.resource.id);
-            // The trailing '&' on the URL below is necessary because the SearchSelect component will add a 'query=' suffix.
-            return `${searchUrl}?excludeResourceIds=${encodeURIComponent(excludeResourceIds.join(","))}&`;
-        },
-
-        /**
-         * Open this modal.
-         */
-        open(): void {
-            this.modal.open();
-            this.resources = [];
-        },
-
-        /**
-         * Post the booking creation form.
-         * @param form The form that's being submitted
-         */
-        async createNewBooking(form: HTMLFormElement): Promise<void> {
-            this.isProcessing = true;
-            const formContent = new FormData(form);
-            this.toast.activate("Saving...");
-
-            try {
-                const response = await fetch(form.action, {
-                    method: form.method,
-                    body: formContent,
-                    headers: {
-                        Accept: "application/json",
-                    },
-                });
-                const responseData = (await response.json()) as AddBookingsResponse;
-                if (response.ok) {
-                    this.modal.close();
-                    if (responseData.errors && responseData.errors.length > 0) {
-                        this.toast.timeout(
-                            `Booking(s) created with some issues: ${responseData.errors.join(", ")}`,
-                            false,
-                            4000,
-                        );
-                    } else {
-                        this.toast.timeout("Booking(s) created", true, 2000);
-                    }
-                    // The new booking was successfully added, so reload the page to make it appear.
-                    window.location.reload();
-                } else {
-                    this.toast.timeout("Unable to create booking(s).", false, 3000);
-                }
-            } catch (error) {
-                const message = error instanceof Error ? error.message : String(error);
-                this.toast.timeout(`Unable to create booking(s). ${message}`, false, 3000);
-                console.warn(error);
-            } finally {
-                this.isProcessing = false;
-            }
-        },
-    },
+// Expose functions for parent components
+defineExpose({
+    open,
 });
+
+/**
+ * Post the booking creation form.
+ * @param form The form that's being submitted
+ */
+async function createNewBooking(form: HTMLFormElement): Promise<void> {
+    isProcessing.value = true;
+    const formContent = new FormData(form);
+    const toast = window.sbProps.toastActivate("Saving...");
+
+    try {
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: formContent,
+            headers: {
+                Accept: "application/json",
+            },
+        });
+        const responseData = (await response.json()) as AddBookingsResponse;
+        if (response.ok) {
+            isModalOpen.value = false;
+            if (responseData.errors && responseData.errors.length > 0) {
+                toast.timeout({
+                    text: `Booking(s) created with some issues: ${responseData.errors.join(", ")}`,
+                    isSuccess: false,
+                });
+            } else {
+                toast.timeout({ text: "Booking(s) created", isSuccess: true });
+            }
+            // The new booking was successfully added, so reload the page to make it appear.
+            window.location.reload();
+        } else {
+            toast.timeout({ text: "Unable to create booking(s).", isSuccess: false });
+        }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        toast.timeout({ text: `Unable to create booking(s). ${message}`, isSuccess: false });
+        console.warn(error);
+    } finally {
+        isProcessing.value = false;
+    }
+}
 </script>
 
 <template>
-    <toast ref="toast"></toast>
-    <reveal-modal ref="modal">
+    <basic-modal v-model:is-open="isModalOpen" has-background-click>
         <form
             ref="createBookingForm"
             method="post"
@@ -186,5 +132,5 @@ export default defineComponent({
                 </li>
             </ul>
         </form>
-    </reveal-modal>
+    </basic-modal>
 </template>
