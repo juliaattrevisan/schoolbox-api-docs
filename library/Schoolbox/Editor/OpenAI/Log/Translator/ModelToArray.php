@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\OpenAI\Log\Translator;
 
 use Schoolbox\User;
-use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Editor\OpenAI\Log\Model;
 
@@ -35,12 +34,9 @@ class ModelToArray
      */
     public function __invoke(Model $log): array
     {
-        // TODO: log types will need to be stored in the DB due to dialog agent having multiple ways to render, currently not implemented yet
-        $logFormat = null;
         $logData = null;
-        if (Helper::FEATURE_IMAGE === $log->getFeature() || Helper::FEATURE_DIALOGAGENT === $log->getFeature()) {
-            $logFormat = LogFormat::AGENT_CHAT;
-            $logData = self::translateLogData($log);
+        if ($log->getLogFormat() === LogFormat::AGENT_CHAT) {
+            $logData = self::translateAgentChatLogData($log);
         }
 
         $translation = [
@@ -49,7 +45,7 @@ class ModelToArray
             'feature' => $log->getFeature(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $this->userTranslator->__invoke($log->getUser()),
-            'logFormat' => $logFormat?->value,
+            'logFormat' => $log->getLogFormat()?->value,
             'data' => $logData,
         ];
 
@@ -61,7 +57,7 @@ class ModelToArray
      * @param Model $log
      * @return (array{type:'request',data:string}|array{type:'response',data:array})[]
      */
-    public static function translateLogData(Model $log): array
+    public static function translateAgentChatLogData(Model $log): array
     {
         $inputText = $log->getInputText();
         $outputText = $log->getOutputText();

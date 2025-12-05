@@ -37,18 +37,12 @@ class ModelToArray
      */
     public function __invoke(Model $log): array
     {
-        // TODO: log types will need to be stored in the DB due to dialog agent having multiple ways to render, currently not implemented yet
-        $logFormat = null;
-        if (Helper::FEATURE_IMAGE === $log->getFeature() || Helper::FEATURE_DIALOGAGENT === $log->getFeature()) {
-            $logFormat = LogFormat::AGENT_CHAT;
-        }
-
         $routes = $this->linkTranslator->__invoke($log);
 
         return [
             'id' => $log->getSessionId(),
             'feature' => $log->getFeature(),
-            'logFormat' => $logFormat?->value,
+            'logFormat' => $log->getLogFormat()?->value,
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $this->userTranslator->__invoke($log->getUser()),
             'returnCode' => $log->getReturnCode(),
