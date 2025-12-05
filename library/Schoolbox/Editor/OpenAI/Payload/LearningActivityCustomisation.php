@@ -177,7 +177,7 @@ class LearningActivityCustomisation
                 ],
                 [
                     'role' => 'user',
-                    'content' => strip_tags($userPrompt),
+                    'content' => $userPrompt,
                 ],
             ],
             'stream' => false,

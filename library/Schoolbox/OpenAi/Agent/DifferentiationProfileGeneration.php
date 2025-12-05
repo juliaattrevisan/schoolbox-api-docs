@@ -134,6 +134,8 @@ class DifferentiationProfileGeneration
                     ''
                 )
         );
-        return preg_replace("/\s+/", " ", implode("\n", $processed->getAll()));
+        /* Removing excessive whitespace but preserves the line breaks
+         */
+        return preg_replace("/[ \t]+/", " ", implode("\n", $processed->getAll()));
     }
 }
