@@ -130,7 +130,6 @@ HELP;
         }
     },
     [
-        CliKernelAbstract::OPTION_LEVEL  => Monolog\Level::Info->value,
         CliKernelAbstract::OPTION_ERRORS => E_ALL,
     ]
 );
