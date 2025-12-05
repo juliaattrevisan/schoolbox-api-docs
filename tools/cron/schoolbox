@@ -152,4 +152,7 @@ MAILTO="ist+cron@schoolbox.com.au"
 # Start logging in ultra-verbose mode for now, so the log contains exactly what was deleted.
 0 2 * * * www-data /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/gc-storage.php -vvvp -n10000 --batch=100 --max-time=10800 >> /var/log/schoolbox/garbage-collect.log 2>&1
 
+# Dialog Agent Autosubmit: every morning at 0100 to capture all those midnight finishers
+0 1 * * * www-data /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/assessment/dialogAgent/autosubmit.php --perform >> /var/log/schoolbox/dialogagent-autosubmit.log 2>&1
+
 # End of file - do not delete
