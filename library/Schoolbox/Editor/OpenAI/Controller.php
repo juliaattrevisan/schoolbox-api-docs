@@ -346,6 +346,17 @@ class Controller extends Base
                 ->withStatus($returnCode);
 
             return;
+        } catch (\Throwable $e ) {
+            $returnCode = 500;
+
+            $problem = (new ApiProblem("An unexpected error occurred."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
         }
     }
 
@@ -478,6 +489,17 @@ class Controller extends Base
             $returnCode = 404;
 
             $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        } catch (\Throwable $e ) {
+            $returnCode = 500;
+
+            $problem = (new ApiProblem("An unexpected error occurred."))
                 ->setStatus($returnCode)
                 ->asArray();
 
