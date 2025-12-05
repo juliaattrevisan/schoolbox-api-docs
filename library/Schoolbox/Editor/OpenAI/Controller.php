@@ -346,7 +346,7 @@ class Controller extends Base
                 ->withStatus($returnCode);
 
             return;
-        } catch (\Throwable $e ) {
+        } catch (\Throwable $e) {
             $returnCode = 500;
 
             $problem = (new ApiProblem("An unexpected error occurred."))
@@ -496,7 +496,7 @@ class Controller extends Base
                                    ->withStatus($returnCode);
 
             return;
-        } catch (\Throwable $e ) {
+        } catch (\Throwable $e) {
             $returnCode = 500;
 
             $problem = (new ApiProblem("An unexpected error occurred."))
