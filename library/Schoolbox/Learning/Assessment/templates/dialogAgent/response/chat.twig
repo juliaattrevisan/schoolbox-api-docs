@@ -22,10 +22,10 @@
     </div>
 </div>
 
-{# Apparently we _really_ want this to be a centered snowflake #}
-<div class="row l-flex l-flex--center">
-    <div class="small-12 island" style="max-width: 64em"> {# $medium-breakpoint: 64em #}
-        <section class="content">
+<div class="row">
+    <div class="small-12 island">
+        {# Apparently we _really_ want this to be a centered snowflake #}
+        <section class="content c-max-width--medium l-mar--auto-horiz">
             <div id="dialog-agent-response-container" data-test="dialog-agent-response-container">
                 <dialog-agent-response-chat
                     :feed="{{ feed |json_encode }}"
