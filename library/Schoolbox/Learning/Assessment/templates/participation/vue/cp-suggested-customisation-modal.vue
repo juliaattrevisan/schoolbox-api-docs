@@ -5,7 +5,6 @@
  * notify if existing customisation or feedback already exists.
  */
 
-import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpGenAi from "./cp-gen-ai.vue";
 import CpSelectActivity from "./cp-select-activity.vue";
