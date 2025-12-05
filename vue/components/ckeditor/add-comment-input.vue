@@ -28,7 +28,10 @@ export default {
         },
     },
 
-    inject: ["editorTemplates", "editorHasTokens"],
+    inject: {
+        editorTemplates: { default: [] },
+        editorHasTokens: { default: false },
+    },
 
     data() {
         return {
@@ -170,6 +173,10 @@ export default {
             {{ getAddCommentButtonText }}
         </button>
         <div :style="getStyles">
+            <p v-if="editorHasTokens" class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
             <textarea
                 :id="`comment-${uniqueId}`"
                 ref="comment"
