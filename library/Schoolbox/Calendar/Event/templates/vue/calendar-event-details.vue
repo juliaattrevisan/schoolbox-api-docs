@@ -675,7 +675,7 @@ export default {
                         <div
                             v-for="booking in event.resourceBookings"
                             :key="booking.id"
-                            class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom"
+                            class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
                         >
                             <div>
                                 {{ booking.name !== "" ? booking.name : booking.resource.name }}
