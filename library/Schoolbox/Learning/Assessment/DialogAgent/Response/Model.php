@@ -22,6 +22,17 @@ class Model extends AbstractResponse
     use DeletedBy;
 
     /**
+     * Consts correlating to the status enum used by frontend world
+     * Not to be confused with the progress tick classes, despite them currently being the same strings
+     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
+     */
+    public const string STATUS_INCOMPLETE = 'incomplete';
+    public const string STATUS_IN_PROGRESS = 'in-progress';
+    public const string STATUS_REQUIRES_ASSISTANCE = 'requires-assistance';
+    public const string STATUS_SUBMITTED = 'submitted';
+
+
+    /**
      * @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
      */
     private ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent = null;
@@ -55,6 +66,53 @@ class Model extends AbstractResponse
      * @var \Alaress_Date_Format|null
      */
     private ?\Alaress_Date_Format $assistanceRequestedAt = null;
+
+
+    /**
+     * Interrogate this instance for the current state that it's in
+     *
+     * @return string
+     */
+    public function getCurrentStatus(): string
+    {
+        /* Submitted: disregard all other statuses
+         */
+        if (null !== $this->getSubmittedAt()) {
+            return self::STATUS_SUBMITTED;
+        }
+
+        // TODO: deal with duration eventually. still allow SOBO from staff
+
+        /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
+         * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
+         *
+         * If assistance was requested and the response is still in progress, send a special status
+         */
+        if (null !== $this->getAssistanceRequestedAt()) {
+            return self::STATUS_REQUIRES_ASSISTANCE;
+        }
+
+        /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
+         */
+        if (null === $this->getSessionId()) {
+            return self::STATUS_INCOMPLETE;
+        }
+
+        /* Otherwise we're just doing the stuff
+         */
+        return self::STATUS_IN_PROGRESS;
+    }
+
+
+    /**
+     * Returns a human-readable equivalent of the current status
+     *
+     * @return string
+     */
+    public function getCurrentStatusHR(): string
+    {
+        return StatusEnum::from($this->getCurrentStatus())->value;
+    }
 
 
     /* Getters/Setters
