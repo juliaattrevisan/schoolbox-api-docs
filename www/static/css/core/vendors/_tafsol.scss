@@ -1136,13 +1136,6 @@ input[type="radio"] + .block {
 }
 
 .island > .no-pad {
-    & > .profile {
-        background-color: #fff;
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        box-shadow: var(--sbx-shadow-m);
-    }
-
     & .full-width {
         padding-inline-end: 0;
     }
