@@ -16,10 +16,10 @@ const props = defineProps<{
     route: string;
     assessmentId: number;
     participant: Participant | null;
-    newLoad: boolean;
 }>();
 
 const emit = defineEmits<{
+    (event: "newResponse", response: CustomisedSuggestionResponse): void;
     (event: "cancel"): void;
     (event: "customiseActivity"): void;
 }>();
@@ -45,7 +45,7 @@ async function load(): Promise<void> {
         controller = new AbortController();
         const response = await apiRequest<
             CustomisedSuggestionResponse,
-            { assessmentId: number; studentId: number | null }
+            { assessmentId: number; studentId: number | null; regenerate: number }
         >({
             url: props.route,
             method: "POST",
@@ -53,12 +53,14 @@ async function load(): Promise<void> {
             body: {
                 assessmentId: props.assessmentId,
                 studentId: props.participant?.user.id ?? null,
+                regenerate: 1,
             },
         });
         if (!response.success) {
             throw new Error(response.message || `Failed to retrieve customisation`);
         }
         aiResponse.value = response.data || null;
+        emit("newResponse", response.data);
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
         loadError.value = errorMessage;
@@ -94,10 +96,10 @@ function onRegenerate(): void {
 /**
  * On mounted check if we need to load AI content,
  * we may not need to if we are revisiting without
- * selecting a new participant
+ * selecting a new participant or requesting regeneration
  */
 window.Vue.onMounted(() => {
-    if (props.newLoad && props.participant) {
+    if (props.participant && aiResponse.value === null) {
         void load();
     }
 });

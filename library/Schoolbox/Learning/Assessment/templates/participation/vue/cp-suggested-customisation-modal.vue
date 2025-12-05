@@ -18,7 +18,6 @@ const props = defineProps<{
 const participant = defineModel<Participant | null>("participant", { default: null });
 
 const isOpen = window.Vue.ref(false);
-const newLoad = window.Vue.ref(true); // to indicate whether to load new AI content, as we may be returning from another status without changing student
 const aiResponse = window.Vue.ref<CustomisedSuggestionResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
 const status = window.Vue.ref<"view" | "selectType">("view"); // to track the current status of the modal
 
@@ -27,8 +26,10 @@ const status = window.Vue.ref<"view" | "selectType">("view"); // to track the cu
  */
 window.Vue.watch(participant, (newParticipant) => {
     if (newParticipant) {
-        newLoad.value = true;
         isOpen.value = true;
+    }
+    if (newParticipant && newParticipant.cachedSuggestedCustomisation) {
+        aiResponse.value = newParticipant.cachedSuggestedCustomisation;
     }
 });
 
@@ -38,16 +39,17 @@ window.Vue.watch(participant, (newParticipant) => {
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (!newIsOpen) {
         participant.value = null;
-        newLoad.value = true;
         status.value = "view";
     }
 });
 
 /**
- * To move to the next step of customising the activity
+ * When a new AI response is generated, store it against the participant\
+ * so it can be reused if the modal is reopened for the same participant
+ * @param newResponse The new AI response generated
  */
-function onCustomiseActivity(): void {
-    status.value = "selectType";
+function onNewResponse(newResponse: CustomisedSuggestionResponse): void {
+    participant.value!.cachedSuggestedCustomisation = newResponse;
 }
 
 /**
@@ -59,10 +61,16 @@ function onCancel(): void {
 }
 
 /**
+ * To move to the next step of customising the activity
+ */
+function onCustomiseActivity(): void {
+    status.value = "selectType";
+}
+
+/**
  * To go back to viewing the suggested customisation
  */
 function onBack(): void {
-    newLoad.value = false; // to prevent reloading AI content when the cp-gen-ai component is mounted again
     status.value = "view";
 }
 </script>
@@ -75,7 +83,7 @@ function onBack(): void {
             :route="props.routes.genAI"
             :assessment-id="props.assessmentId"
             :participant="participant"
-            :new-load="newLoad"
+            @new-response="onNewResponse"
             @cancel="onCancel"
             @customise-activity="onCustomiseActivity"
         />
