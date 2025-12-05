@@ -288,7 +288,6 @@ class Controller extends Base
             'assessment' => $assessment,
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
-            'participant' => $participant,
             'response' => $response,
             'responseData' => $responseTranslator->__invoke($response),
             'interactionLocked' => false, // TODO

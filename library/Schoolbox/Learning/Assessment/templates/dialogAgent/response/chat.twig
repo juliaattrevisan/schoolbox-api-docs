@@ -7,9 +7,10 @@
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
- # @param array $student                  Array of author info about the student creating the response
+ # @param array $student                  Array of author info about the student who owns the response
  # @param DialogAgent\Response $response  The response that we are creating/resuming
- # @param array $responseData             Array about the response that we are creating/resuming
+ # @param array $responseData             Array translation of the response to pass to Vue
+ # @param bool $interactionLocked         Is the assessment due in an archived term?
  # @param string $returnUrl               A redirect destination
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}

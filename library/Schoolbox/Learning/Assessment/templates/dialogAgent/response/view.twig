@@ -8,7 +8,8 @@
  # @param array $feed                     The agent chat feed data current response
  # @param array $student                  Array of author info about the student who owns the response
  # @param DialogAgent\Response $response  The response that we are viewing
- # @param array|null $responseData        Array about the response that we are viewing
+ # @param array $responseData             Array translation of the response to pass to Vue
+ # @param bool $interactionLocked         Is the assessment due in an archived term?
  # @param string|null $returnUrl          An optional redirect destination, otherwise actions reload the page
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -18,49 +19,45 @@
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
 
-        {% if readonly or interactionLocked %}
-            {% import '@learning/macro/dueDate.twig' as dueDate %}
-            {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
-            <ul class="meta">
-                <li class="icon-user">
-                    {{ locale.dialogAgent.proper }} with
+        {% import '@learning/macro/dueDate.twig' as dueDate %}
+        {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
+        <ul class="meta">
+            <li class="icon-user">
+                {{ locale.dialogAgent.proper }} with
 
-                    {% if student._links.profile is defined %}
-                        <a href="{{ student._links.profile }}">{{ student.fullName }}</a>
-                    {% else %}
-                        {{ student.fullName }}
-                    {% endif %}
+                {% if student._links.profile is defined %}
+                    <a href="{{ student._links.profile }}">{{ student.fullName }}</a>
+                {% else %}
+                    {{ student.fullName }}
+                {% endif %}
+            </li>
+
+            {% if response.isSubmitted %}
+                <li class="icon-calendar">
+                    Submitted <time title="{{ response.submittedAt.local }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
                 </li>
 
-                {% if response.isSubmitted %}
-                    <li class="icon-calendar">
-                        Submitted <time title="{{ response.submittedAt.local }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
-                    </li>
+                <li class="icon-time-value">
+                    Time taken: {{ duration.secondsToHoursAndMinutes(response.timeTaken) }}
+                </li>
+            {% elseif response.startedAt %}
+                <li class="icon-calendar">
+                    <em>Response in progress - started <time title="{{ response.startedAt.local }}">{{ response.startedAt.relativeDayWithoutMidnight }}</time></em>
+                </li>
+            {% endif %}
 
-                    <li class="icon-time-value">
-                        Time taken: {{ duration.secondsToHoursAndMinutes(response.timeTaken) }}
-                    </li>
-                {% elseif response.startedAt %}
-                    <li class="icon-calendar">
-                        <em>Response in progress - started <time title="{{ response.startedAt.local }}">{{ response.startedAt.relativeDayWithoutMidnight }}</time></em>
-                    </li>
-                {% endif %}
-
-                {% if interactionLocked %}
-                    <li class="icon-archive"> {{ locale.term.proper }} has been archived </li>
-                {% endif %}
-            </ul>
-        {% endif %}
+            {% if interactionLocked %}
+                <li class="icon-archive"> {{ locale.term.proper }} has been archived </li>
+            {% endif %}
+        </ul>
     </div>
 
-    {% if readonly or interactionLocked %}
-        <nav>
-            <sbx-pop-out content-id="header-options"></sbx-pop-out>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-            {# Populated by the Teleport in <dialog-agent-chat> #}
-        </ul>
-    {% endif %}
+    <nav>
+        <sbx-pop-out content-id="header-options"></sbx-pop-out>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        {# Populated by the Teleport in <dialog-agent-chat> #}
+    </ul>
 </div>
 
 {# Apparently we _really_ want this to be a centered snowflake #}
