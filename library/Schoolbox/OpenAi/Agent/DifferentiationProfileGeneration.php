@@ -47,12 +47,6 @@ class DifferentiationProfileGeneration
 
         $attachments = $this->generateFilePrompts($pastoralRecords);
 
-//        $attachments = $this->presidioClient->anonymise(
-//            $attachments,
-//            $this->presidioClient->analyse($attachments),
-//            new Anonymiser\Hash(),
-//        );
-
         /* Deny list to force the anonymisation of the student's name
          * we will enforce anonymise student's full name, first name and preferred name
          */
