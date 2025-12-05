@@ -27,6 +27,7 @@ class Model
     private ?string $model = null;
     private ?string $endpoint = null;
     private ?string $feature = null;
+    private ?string $logType = null;
     private ?string $response = null;
     private ?int $returnCode = null;
     private ?string $errorMessage = null;
@@ -258,6 +259,25 @@ class Model
     public function setFeature(?string $feature): self
     {
         $this->feature = $feature;
+        return $this;
+    }
+
+    /**
+     * @return LogType|null
+     */
+    public function getLogType(): ?LogType
+    {
+        return LogType::tryFrom($this->logType);
+    }
+
+    /**
+     * @param string|LogType|null $logType
+     * @return $this
+     */
+    public function setLogType(string|LogType|null $logType): self
+    {
+        $this->logType = $logType instanceof LogType ? $logType->value : $logType;
+
         return $this;
     }
 
