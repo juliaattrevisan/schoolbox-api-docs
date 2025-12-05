@@ -102,6 +102,7 @@ function onConfirm(): void {
         <cp-confirm-modify
             v-else-if="status === 'confirm'"
             :participants="participant ? [participant] : []"
+            :show-participants="false"
             @cancel="onCancel"
             @confirm="onConfirm"
         />

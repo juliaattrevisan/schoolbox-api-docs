@@ -5,9 +5,15 @@
 import locale from "@js/terminology/rosettaStone";
 import type { Participant } from "../js/types/customParticipationTypes";
 
-defineProps<{
-    participants: Participant[];
-}>();
+withDefaults(
+    defineProps<{
+        participants: Participant[];
+        showParticipants?: boolean;
+    }>(),
+    {
+        showParticipants: true,
+    },
+);
 
 const emit = defineEmits<{
     (event: "confirm"): void;
@@ -34,10 +40,15 @@ function onConfirm(): void {
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Please confirm</h2>
             <p class="f-no-margins">
-                The following student(s) have submissions and/or feedback for this
-                {{ locale.assessment.singular() }}.
+                <template v-if="showParticipants">
+                    The following student(s) have submissions and/or feedback for this
+                    {{ locale.assessment.singular() }}.
+                </template>
+                <template v-else>
+                    The student has submissions and/or feedback for this {{ locale.assessment.singular() }}.
+                </template>
             </p>
-            <div class="l-flex-col l-gap-xs">
+            <div v-if="showParticipants" class="l-flex-col l-gap-xs">
                 <div
                     v-for="participant in participants"
                     :key="participant.user.id"
