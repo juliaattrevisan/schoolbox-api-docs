@@ -43,10 +43,11 @@ function getAddBookingsEndpoint(): string {
  * @returns The endpoint for the booking resource search.
  */
 function getResourceSearchEndpoint(): string {
-    const searchUrl = new URL(ENDPOINTS.URL_BOOKING_SELECTIZE as string, window.location.href).toString();
+    const searchUrl = new URL(ENDPOINTS.URL_BOOKING_SELECTIZE, window.location.origin);
     const excludeResourceIds = props.resourceBookings.map((booking) => booking.resource.id);
+    searchUrl.searchParams.append("excludeResourceIds", excludeResourceIds.join(","));
     // The trailing '&' on the URL below is necessary because the SearchSelect component will add a 'query=' suffix.
-    return `${searchUrl}?excludeResourceIds=${encodeURIComponent(excludeResourceIds.join(","))}&`;
+    return `${searchUrl.toString()}&`;
 }
 
 /**
