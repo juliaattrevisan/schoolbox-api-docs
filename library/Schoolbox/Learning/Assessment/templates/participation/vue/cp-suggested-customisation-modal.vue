@@ -65,7 +65,6 @@ function onCancel(): void {
  * To move to the next step of customising the activity
  */
 function onCustomiseActivity(): void {
-    debugger;
     if (participant.value?.hasInteraction) {
         status.value = "confirm";
     } else {
@@ -81,17 +80,10 @@ function onBack(): void {
 }
 
 /**
- * Handle confirm from the confirm step
+ * Confirm we still want to modify existing customisation
  */
 function onConfirm(): void {
     status.value = "selectType";
-}
-
-/**
- * Handle cancel from the confirm step
- */
-function onCancelConfirm(): void {
-    status.value = "view";
 }
 </script>
 
@@ -110,8 +102,8 @@ function onCancelConfirm(): void {
         <cp-confirm-modify
             v-else-if="status === 'confirm'"
             :participants="participant ? [participant] : []"
+            @cancel="onCancel"
             @confirm="onConfirm"
-            @cancel="onCancelConfirm"
         />
         <cp-select-activity
             v-else-if="status === 'selectType'"
