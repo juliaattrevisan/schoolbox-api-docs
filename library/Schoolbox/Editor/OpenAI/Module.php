@@ -18,6 +18,7 @@ use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -90,6 +91,7 @@ class Module extends BaseModule
             new \Schoolbox\Presidio\ClientFactory($this->injector->get('config'), $this->injector->get('httpClient'))->build(),
             $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
             $this->getMapperFactory()->get(DifferentiationAdminMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->injector->get('ai.response.cache'),
         );

@@ -35,6 +35,7 @@ use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Presidio\Client;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
@@ -62,6 +63,7 @@ class Controller extends Base
         private Client $presidioClient,
         private DifferentiationProfileMapper $differentiationProfileMapper,
         private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
+        private FolderMapper $folderMapper,
         private MapperProxy $assessmentMapperProxy,
         private CacheInterface $aiCache,
     ) {
@@ -442,6 +444,8 @@ class Controller extends Base
                     ->findByColumn('is_enabled', 1),
             );
 
+            $course = $this->folderMapper->findById($assessment->getContext()->getFolder()->getParent()->getId());
+
             $agent = new LearningActivityCustomisationGeneration(
                 $this->clientFactory->buildForFeature(Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION),
                 $diffConfig,
@@ -454,6 +458,7 @@ class Controller extends Base
                 $this->getUser(),
                 $assessment,
                 $differentiationProfile,
+                $course,
                 $aiSessionId,
             );
 

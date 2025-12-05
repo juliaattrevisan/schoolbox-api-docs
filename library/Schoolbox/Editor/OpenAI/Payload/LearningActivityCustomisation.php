@@ -2,10 +2,9 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
-use Schoolbox\DifferentiationProfile\Model as DifferentiationProfileModel;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class LearningActivityCustomisation
@@ -114,6 +113,17 @@ class LearningActivityCustomisation
         'strict' => true,
     ];
 
+    /**
+     * @param string      $openAiEndpoint
+     * @param string      $openAiModel
+     * @param string      $openAiDeploymentId
+     * @param string      $systemPrompt
+     * @param IAssessable $assessable
+     * @param User        $student
+     * @param Folder      $course
+     * @param string      $attachment
+     * @param string      $differentiationProfile
+     */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
@@ -121,6 +131,7 @@ class LearningActivityCustomisation
         private string $systemPrompt,
         private IAssessable $assessable,
         private User $student,
+        private Folder $course,
         private string $attachment,
         private string $differentiationProfile,
     ) {
@@ -147,15 +158,13 @@ class LearningActivityCustomisation
             ]
         );
 
-        $course = Mapper::getInstance()->findById($this->assessable->getContext()->getFolder()->getParent()->getId());
-
         $userPrompt = strip_tags(strtr(
             self::PROMPT_USER_PERSONA,
             [
                 '[STUDENT_PROFILE_JSON]' => $this->differentiationProfile,
                 '[YEAR_LEVEL]' => implode(',', $this->assessable->getBaseContext()->getFolder()->getYearLevels()?->getPropertyValues('name') ?? []),
                 '[CLASS_NAME]' => $this->assessable->getContext()->getFolder()->getName(),
-                '[COURSE_NAME]' => $course->getName(),
+                '[COURSE_NAME]' => $this->course->getName(),
                 '[UNIT_NAME]' => $this->assessable->getContext()->getTitle(),
                 '[CURRICULUM_CONTENT]' => implode(',', $this->assessable->getCurriculumNodes()->getPropertyValues('description') ?? []),
                 '[ACTIVITY_NAME]' => $this->assessable->getTitle(),

@@ -11,6 +11,7 @@ use Schoolbox\DifferentiationProfile\Translator\ProfileToArray;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
@@ -36,6 +37,7 @@ class LearningActivityCustomisationGeneration
      * @param User                        $user                        The user requesting the customisation.
      * @param IAssessable                 $assessable                  The assessable learning activity.
      * @param DifferentiationProfileModel $differentiationProfileModel The differentiation profile
+     * @param Folder                      $course
      * @param string|null                 $aiSessionId
      * @return array
      * @throws ClientExceptionInterface
@@ -44,6 +46,7 @@ class LearningActivityCustomisationGeneration
         User $user,
         IAssessable $assessable,
         DifferentiationProfileModel $differentiationProfileModel,
+        Folder $course,
         ?string $aiSessionId = null,
     ): array {
         $attachments = $this->generateFilePrompts($assessable);
@@ -55,6 +58,7 @@ class LearningActivityCustomisationGeneration
             trim($this->config[Config::SECTION_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
             $assessable,
             $differentiationProfileModel->getStudent(),
+            $course,
             $attachments,
             json_encode(call_user_func($this->profileToArray, $differentiationProfileModel)),
         );
