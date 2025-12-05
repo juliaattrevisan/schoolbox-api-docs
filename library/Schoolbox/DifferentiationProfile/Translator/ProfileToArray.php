@@ -11,8 +11,6 @@ use Schoolbox\User;
 
 class ProfileToArray
 {
-    use GetRouteIfAuthorized;
-
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
