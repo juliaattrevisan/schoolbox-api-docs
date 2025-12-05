@@ -62,6 +62,14 @@ export type Adjustment = {
 };
 
 /**
+ * The expected AI response type when generating suggested customisations
+ */
+export type CustomisedSuggestionResponse = {
+    suggested_considerations: string;
+    suggested_learning_activity_update: string;
+};
+
+/**
  * The expected payload for each participant in the activity
  */
 export type Participant = {
@@ -73,17 +81,10 @@ export type Participant = {
     user: User;
     customisedPlan: CustomisedPlan | null;
     hasInteraction: boolean;
+    cachedSuggestedCustomisation: CustomisedSuggestionResponse | null;
     _links: {
         exclude: string;
         include: string;
         differentiationProfile: string | null;
     };
-};
-
-/**
- * The expected AI response type when generating suggested customisations
- */
-export type AIResponse = {
-    suggested_considerations: string;
-    suggested_learning_activity_update: string;
 };

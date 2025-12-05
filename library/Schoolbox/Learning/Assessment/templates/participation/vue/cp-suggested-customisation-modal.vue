@@ -8,7 +8,7 @@
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CpGenAi from "./cp-gen-ai.vue";
 import CpSelectActivity from "./cp-select-activity.vue";
-import type { AIResponse, Routes } from "../js/types/customParticipationTypes";
+import type { CustomisedSuggestionResponse, Routes } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     routes: Routes;
@@ -19,7 +19,7 @@ const studentId = defineModel<number | null>("student-id", { default: null });
 
 const isOpen = window.Vue.ref(false);
 const newLoad = window.Vue.ref(true); // to indicate whether to load new AI content, as we may be returning from another status without changing student
-const aiResponse = window.Vue.ref<AIResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
+const aiResponse = window.Vue.ref<CustomisedSuggestionResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
 const status = window.Vue.ref<"view" | "selectType">("view"); // to track the current status of the modal
 
 /**

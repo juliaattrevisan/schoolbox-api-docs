@@ -10,7 +10,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import type { AIResponse } from "../js/types/customParticipationTypes";
+import type { CustomisedSuggestionResponse } from "../js/types/customParticipationTypes";
 
 const props = defineProps<{
     route: string;
@@ -24,7 +24,7 @@ const emit = defineEmits<{
     (event: "customiseActivity"): void;
 }>();
 
-const aiResponse = defineModel<AIResponse | null>("ai-response", { default: null });
+const aiResponse = defineModel<CustomisedSuggestionResponse | null>("ai-response", { default: null });
 
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
@@ -43,7 +43,10 @@ async function load(): Promise<void> {
         loadError.value = null;
         aiResponse.value = null;
         controller = new AbortController();
-        const response = await apiRequest<AIResponse, { assessmentId: number; studentId: number | null }>({
+        const response = await apiRequest<
+            CustomisedSuggestionResponse,
+            { assessmentId: number; studentId: number | null }
+        >({
             url: props.route,
             method: "POST",
             signal: controller.signal,
