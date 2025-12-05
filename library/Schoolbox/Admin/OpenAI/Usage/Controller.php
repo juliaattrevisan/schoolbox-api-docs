@@ -263,7 +263,8 @@ class Controller extends Base
         ]);
 
         $userTranslator = new User\Translator\Author\ModelToArray();
-        $logTranslator = new Log\Translator\ModelToArray($userTranslator);
+        $strategyFactory = new Log\Translator\Format\StrategyFactory();
+        $logTranslator = new Log\Translator\ModelToArray($userTranslator, $strategyFactory);
 
         $logEntriesArray = $logEntries->map($logTranslator);
 

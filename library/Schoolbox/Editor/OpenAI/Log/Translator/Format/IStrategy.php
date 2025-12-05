@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @author    Zac McWilliam <zac.mcwilliam@schoolbox.education>
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Editor\OpenAI\Log\Translator\Format;
+
+use Schoolbox\Editor\OpenAI\Log\LogFormat;
+use Schoolbox\Editor\OpenAI\Log\Model;
+
+/**
+ * Interface for log format translation strategies
+ * Each enum value from LogFormat should have an implementation of this interface
+ */
+interface IStrategy
+{
+    /**
+     * Returns this implementation's LogFormat
+     * @return LogFormat
+     */
+    public static function getLogFormat(): LogFormat;
+
+    /**
+     * Translate a saved log's inputText and outputText back into structured data for display
+     *
+     * @param Model $log
+     * @return array an array ready to be used in an API response
+     */
+    public function translate(Model $log): array;
+}
