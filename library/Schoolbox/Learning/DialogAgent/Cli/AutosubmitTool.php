@@ -30,6 +30,12 @@ class AutosubmitTool extends CliTool\App
 
 
     /**
+     * For responses that have exceeded their allowed duration
+     */
+    private const string OPT_LONG_DURATION = 'duration';
+
+
+    /**
      * A prepared statement that we'll reuse throughout this tool
      */
     private const string QUERY_UPDATE = "
@@ -58,6 +64,8 @@ class AutosubmitTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
+Activity Expiry
+---------------
 Dialog Agents (Discussion Activities) allow students to interact with an AI to discuss topics. Students can start a
 discussion but neglect to officially submit their response to the activity. This tool will set the submitted_at value
 to the end datetime of the activity on behalf of the student when the activity reaches its due/close date (these dates
@@ -65,6 +73,16 @@ are synonymous specifically in Dialog Agents). The student will be presumed to b
 don't have a "system user" to do that.
  
 Usage:    autosubmit.php --expired --perform [-vvv]
+
+
+Response Duration
+-----------------
+A secondary usage is when students' responses took longer than the time that was allowed per response. That can occur 
+when students start their response, but then shut their computers and walk away until the allotted time has elapsed. 
+That could be by choice (non-participation) or by circumstance (eg. the internet turned off). Such responses, if they
+remained in an unsubmitted state, will be arbitrarily submitted on behalf of the student.
+
+Usage:    autosubmit.php --duration --perform [-vvv]
 
 
 HELP;
