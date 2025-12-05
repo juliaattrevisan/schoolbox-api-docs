@@ -234,13 +234,21 @@ class Model extends AbstractAssessment
      */
     public function getAuthoritativeFeedback(Participant $participant, $publishedOnly): ?IFeedback
     {
-        // TODO: Implement getAuthoritativeFeedback() method.
-        //  foreach ($participant responses) {
-        //      if $response->getAuthoritative() {
-        //          return true;
-        //      }
-        //  }
+        $this->assertSameAssessment($participant);
 
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            /* Returns the feedback directly attributed to an authoritative response
+             */
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
+            $response = $feedback->getResponse();
+
+            if ($response->getAuthoritative()) {
+                return $feedback;
+            }
+        }
+
+        /* No authoritative feedback exists yet
+         */
         return null;
     }
 

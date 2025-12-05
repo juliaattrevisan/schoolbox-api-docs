@@ -242,6 +242,10 @@ class Module extends BaseModule
             $this->buildRuleCanAction(Status::ACTION_RESET),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
+
+        /* Exports everyone's Response Status and Feedback Contents (if any exist) into a csv format.
+         */
+        $this->register('GET', "{$assRoute}/export", 'getExport', $canWrite, $preloadAssessment);
     }
 
 
@@ -508,6 +512,7 @@ class Module extends BaseModule
             $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper::class),
         );
     }
 

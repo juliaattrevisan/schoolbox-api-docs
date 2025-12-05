@@ -100,7 +100,9 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DataModel\Translator as AssessmentDataModelTranslator;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy as DialogAgentFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper as DialogAgentResponseMapper;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper as DialogAgentFeedbackMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkSubmissionMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as AssessmentFeedbackDataSource;
@@ -108,6 +110,7 @@ use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as FeedbackSubSourc
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Lti as FeedbackSubSourceLti;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Quiz as FeedbackSubSourceQuiz;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\Task as FeedbackSubSourceTask;
+use Schoolbox\Learning\Assessment\Feedback\SubSource\DialogAgent as FeedbackSubSourceDialogAgent;
 use Schoolbox\Learning\Assessment\Lti\Feedback\MapperProxy as LtiFeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\Lti\Response\MapperProxy as LtiResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Overwriter;
@@ -1651,6 +1654,14 @@ abstract class Kernel
             )
         );
 
+        $di->set(
+            'dialogAgentFeedbackDataSource',
+            $di->lazyNew(
+                DialogAgentFeedbackMapperProxy::class,
+                ['mapper' => $mapperFactory->getLazy(DialogAgentFeedbackMapper::class)]
+            )
+        );
+
         // Register response data source
         $di->set(
             'responseDataSource',
@@ -1700,11 +1711,15 @@ abstract class Kernel
                     /** @var LtiFeedbackMapperProxy $ltiFeedbackDataSource */
                     $ltiFeedbackDataSource = $di->get('ltiFeedbackDataSource');
 
+                    /** @var DialogAgentFeedbackMapperProxy $dialogAgentFeedbackDataSource */
+                    $dialogAgentFeedbackDataSource = $di->get('dialogAgentFeedbackDataSource');
+
                     return (new AssessmentFeedbackDataSource())
                         ->addSubSource(new FeedbackSubSourceDueWork($returnDataSource))
                         ->addSubSource(new FeedbackSubSourceTask($ratificationDataSource))
                         ->addSubSource(new FeedbackSubSourceQuiz($reviewDataSource))
-                        ->addSubSource(new FeedbackSubSourceLti($ltiFeedbackDataSource));
+                        ->addSubSource(new FeedbackSubSourceLti($ltiFeedbackDataSource))
+                        ->addSubSource(new FeedbackSubSourceDialogAgent($dialogAgentFeedbackDataSource));
                 }
             )
         );

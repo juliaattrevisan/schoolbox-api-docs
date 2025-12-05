@@ -87,8 +87,8 @@ CREATE TABLE `dialog_agent` (
 -- Something the teacher writes for a particular field
 CREATE TABLE `dialog_agent_scenario_field_context` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `scenario_field_id` INT NOT NULL,
     `dialog_agent_id` INT NOT NULL,
+    `scenario_field_id` INT NOT NULL,
     `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
@@ -195,15 +195,26 @@ CREATE TABLE `dialog_agent_response` (
 );
 
 -- AI-generated feedback for the responses made by students
+-- Note that the swamp REQUIRES you know the direct relationship betweena row in this table and the subobject
+-- to which it belongs (ie. each row knows its dialog_agent_id without having to dig through the relationships)
+-- Just Another Swamp Secret
 CREATE TABLE `dialog_agent_feedback` (
     `id` INT NOT NULL AUTO_INCREMENT,
+    `dialog_agent_id` INT NOT NULL,
     `response_id` INT NOT NULL,
     `criteria_id` INT NOT NULL,
+    `learner_id` INT UNSIGNED NOT NULL,
     `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
+    INDEX `fk_daf_dialog_agent_idx` (`dialog_agent_id` ASC),
+    CONSTRAINT `fk_daf_dialog_agent`
+        FOREIGN KEY (`dialog_agent_id`)
+            REFERENCES `dialog_agent` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
     INDEX `fk_daf_response_idx` (`response_id` ASC),
     CONSTRAINT `fk_daf_response`
         FOREIGN KEY (`response_id`)

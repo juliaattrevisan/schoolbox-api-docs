@@ -52,13 +52,17 @@
     <dialog-agent-status
         :criteria="{{ criteria|json_encode }}"
         :assessments="{{ assessments|json_encode }}"
+        export-route="{{ routeLookupIfAuthorized('learningDialogAgent.getExport', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) }}"
         {% if assessment.isSpecification %}is-specification{% endif %}
     >
         <template #meta>
             <ul class="meta">
                 {% include '@learning/fragments/meta/dueDate.twig' %}
                 {% include '@learning/fragments/meta/workType.twig' %}
-                {% if not assessment.isSpecification %}
+                {% if assessment.isImplementation %}
                     {% if readonly ?? false %}
                         <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
                     {% endif %}

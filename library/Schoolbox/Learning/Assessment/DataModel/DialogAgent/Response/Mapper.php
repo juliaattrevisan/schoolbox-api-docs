@@ -30,7 +30,6 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('dialog_agent_response');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('dialog_agent_id', self::TYPE_INTEGER, null, 'dialogAgent');
         $this->uses('learner_id', self::TYPE_INTEGER, null, 'learner');
         $this->uses('authoritative', self::TYPE_BOOLEAN, null, 'authoritative');
         $this->uses('session_id', self::TYPE_STRING, null, 'sessionId');

@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 /**
  * @method Model createModel($idValue = null)
  * @method GenericCollection|Model[] findAll($options = [])
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
