@@ -96,7 +96,11 @@ HELP;
         $this->getLogger()->info('');
 
         if ($this->getOpt(self::OPT_LONG_EXPIRED)) {
-            $this->autosubmitConcludedActivities();
+            $this->autosubmitExpirededActivities();
+        }
+
+        if ($this->getOpt(self::OPT_LONG_DURATION)) {
+            $this->autosubmitDurationExceeded();
         }
 
         $this->getLogger()->info('');
@@ -113,7 +117,7 @@ HELP;
      *
      * @return void
      */
-    private function autosubmitConcludedActivities(): void
+    private function autosubmitExpirededActivities(): void
     {
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT 
