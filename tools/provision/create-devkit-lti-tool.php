@@ -18,13 +18,31 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new Kernel(
     new class extends App {
+        private const OPT_SHORT_HELP = 'h';
+        private const OPT_LONG_HELP = 'help';
         private const OPT_LONG_PUBLIC_KEY = 'key:';
         private const OPT_LONG_HOST = 'host:';
         private const OPT_LONG_PORT = 'port:';
 
+        /**
+         * @inheritdoc
+         */
+        public function getShortOpts(): array
+        {
+            return [self::OPT_SHORT_HELP];
+        }
+
+        /**
+         * @inheritdoc
+         */
         public function getLongOpts(): array
         {
-            return [self::OPT_LONG_PUBLIC_KEY, self::OPT_LONG_PORT, self::OPT_LONG_HOST];
+            return [
+                self::OPT_LONG_HELP,
+                self::OPT_LONG_PUBLIC_KEY,
+                self::OPT_LONG_HOST,
+                self::OPT_LONG_PORT,
+            ];
         }
 
         public function run(): void
@@ -42,6 +60,7 @@ $kernel = new Kernel(
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
 
+            $this->getLogger()->info('Creating LTI tool configuration');
             $deploymentId  = Uuid::uuid4()->toString();
             $baseUrl       = new Uri($host)->withPort($port);
             $oidcUrl       = $baseUrl->withPath(rtrim($baseUrl->getPath(), '/') . '/lti1p3/oidc/initiation');
@@ -70,10 +89,27 @@ $kernel = new Kernel(
                 ->setAvailableForAssessment(true);
             $ltiToolMapper->save($ltiTool);
 
-            echo "Inserted LTI tool with deployment ID {$deploymentId}\n";
+            // Configure Schoolbox to allow LTI tool use
+            $this->getLogger()->info('Enabling LTI assessments and LTI debug mode');
+            $this->getDatabaseInternal()->execute("
+                UPDATE config
+                SET value = '1'
+                WHERE name IN ('lti_assessments_enable', 'lti_debug_mode')
+            ");
+
+            $this->getLogger()->info('Enabling 3rd party assessment homepage component');
+            $this->getDatabaseInternal()->execute("
+                UPDATE component_definition
+                SET visible = 'true'
+                WHERE class = 'Schoolbox\\\\Learning\\\\Assessment\\\\Lti\\\\Component\\\\Homepage\\\\Controller'
+            ");
+
+            printf("%s\n", $deploymentId);
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
     },
     [
+        CliKernelAbstract::OPTION_LEVEL  => Monolog\Level::Info->value,
         CliKernelAbstract::OPTION_ERRORS => E_ALL,
     ]
 );
