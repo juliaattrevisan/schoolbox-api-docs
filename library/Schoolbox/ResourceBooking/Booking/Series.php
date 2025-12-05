@@ -211,7 +211,7 @@ class Series
      * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
      *                                                       notes key in the value contains the notes for the related
      *                                                       booking.
-     * @param string|null                      $efficacy     The efficiacy of this update:
+     * @param string|null                      $efficacy     The efficacy of this update:
      *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
      *                                                       entire series, otherwise update only this item.
      *                                                       (Related bookings are always updated.)
@@ -249,7 +249,7 @@ class Series
      * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
      *                                                       notes key in the value contains the notes for the related
      *                                                       booking.
-     * @param string|null                      $efficacy     The efficiacy of this update:
+     * @param string|null                      $efficacy     The efficacy of this update:
      *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to delete the
      *                                                       entire series, otherwise update only this item.
      *                                                       (Related bookings are always updated.)
@@ -292,7 +292,7 @@ class Series
      * @param array<int, array{notes: string}> $relatedItems A list of related items: the key is the ID of the item, the
      *                                                       notes key in the value contains the notes for the related
      *                                                       booking.
-     * @param string|null                      $efficacy     The efficiacy of this update:
+     * @param string|null                      $efficacy     The efficacy of this update:
      *                                                       `EventRecurrenceMapper::EFFICACY_SERIES` to update the
      *                                                       entire series, otherwise update only this item.
      *                                                       (Related bookings are always updated.)

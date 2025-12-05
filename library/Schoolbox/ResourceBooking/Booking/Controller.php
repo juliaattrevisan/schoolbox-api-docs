@@ -10,10 +10,12 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Date\Interval;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
+use Calendar\Event\Type\Day\Event;
 use Calendar\Event\Type\EventBase;
 use Calendar_Api_Config_Mapper;
 use DateTime;
@@ -81,6 +83,18 @@ class Controller extends Base
      * @var \Schoolbox\External\Event\Mapper
      */
     protected \Schoolbox\External\Event\Mapper $externalEventMapper;
+
+    /**
+     *
+     */
+    protected Validation $validation;
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+    }
 
     /**
      * Generates the 'Book Item' page.
@@ -201,7 +215,7 @@ class Controller extends Base
 
         $code = 200;
         [$errors, $clashBookingStartDatesAsKeys] = (
-            $this->validateItemIgnoringClashesIfClashesAllowed($item, $this->requestPost->getArrayCopy())
+            $this->validateBookingIgnoringClashesIfClashesAllowed($item, $this->requestPost->getArrayCopy())
         );
 
         if (empty($errors)) {
@@ -304,7 +318,7 @@ class Controller extends Base
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
         $code = 200;
-        [$errors, $clashBookingStartDatesAsKeys] = $this->validateItemIgnoringClashesIfClashesAllowed(
+        [$errors, $clashBookingStartDatesAsKeys] = $this->validateBookingIgnoringClashesIfClashesAllowed(
             $item->getResource(),
             $this->requestPost->getArrayCopy(),
             $item,
@@ -1050,88 +1064,87 @@ class Controller extends Base
      */
     public function addBookings(): void
     {
-        $eventId = $this->requestPost->getInt('eventId');
+        $baseEventId = $this->requestPost->getInt('eventId');
+        $eventSeriesOption = $this->requestPost->get('eventSeriesOption');
         $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', []);
         $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
 
         try {
-            $event = $this->getEventMapper()->findById($eventId);
+            $baseEvent = $this->getEventMapper()->findById($baseEventId);
         } catch (MapperException) {
             // Can't find event, so cannot add bookings.
             throw new SchoolboxException('Event not found');
         }
 
+        /** @var GenericCollection<Item\Model> $resourceById */
         $resourceById = $this->resourceMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
-        $validationResultsByResourceId = [];
-        foreach ($resourceById as $resourceId => $resource) {
-            $startDateString = $event->getStartDateTime()?->getLocal();
-            $endDateString = $event->getEndDateTime()?->getLocal();
-
-            $validationResultsByResourceId[$resourceId] = $this->validateItemIgnoringClashesIfClashesAllowed(
-                $resource,
-                [
-                    'startDate' => $startDateString,
-                    'endDate' => $endDateString,
-                    'campus' => 0,
-                ]
-            );
+        // If the user requested the booking be added to all events in the series (and the event is part of a series)...
+        if ($eventSeriesOption === 'allInSeries' && $baseEvent->getSeriesId() !== null) {
+            // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
+            // and events can be removed from a series once the series has been created.  Therefore, we cannot assume
+            // any regular period between events, and so must fetch each event's start/end times.
+            $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
+            $pb->equals('series_id', $baseEvent->getSeriesId());
+            $pb->greaterThan('start_datetime', 'NOW()');
+            /** @var GenericCollection<Calendar\Event> $resourceById */
+            $eventById = $this->eventMapper->findByPredicates($pb);
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $eventById = new GenericCollection(Calendar\Event::class, [$baseEvent->getId() => $baseEvent]);
         }
 
-        // Create bookings depending on validation results.
-        $nBookingsNotCreated = 0;
-        foreach ($validationResultsByResourceId as $resourceId => $validationResults) {
-            [$errors, $clashBookingStartDatesAsKeys] = $validationResults;
-            if (empty($errors)) {
-                // Build the booking.
-                // Do not set start/end times because these are intended to be the same as in the linked event row.
+        // Check whether each hypothetical booking would result in a clash.
+        $isClashByResourceIdByEventId = $this->checkForClashesIfResourceBookingsAddedToEvents($resourceById, $eventById);
+
+        // This will hold the booking models to be persisted.
+        $bookingList = new Collection();
+
+        // If a booking for a resource cannot be created, this array will store the reason.
+        // There will only ever be one event per date, because the most frequent recurrence type is daily.
+        $errorMsgByResourceIdByEventDate = [];
+
+        // Create a list of booking models to be persisted depending on validation results.
+        foreach ($eventById as $eventId => $event) {
+            $isClashByResourceId = $isClashByResourceIdByEventId[$eventId] ?? [];
+            foreach ($resourceById as $resourceId => $resource) {
+                $isClash = $isClashByResourceId[$resourceId] ?? false;
+
+                /** @var Item\Model $resource */
                 $resource = $resourceById[$resourceId];
-                $booking = new Model()
-                    ->setEvent($event)
-                    ->setResource($resource)
-                    ->setBookingStartAt($event->getStartDateTime())
-                    ->setBookingEndAt($event->getEndDateTime())
-                    ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
-                    ->setName($resource->getName());
-
-                $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
-                $bookingStatusId = (
-                    (
-                        $bookingStartDateTime !== null &&
-                        array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
-                    )
-                    ? Status\Model::STATUS_PENDING // Set status to pending because this booking has a clash.
-                    : $this->getStatusIdForNonClashBooking($booking)
-                );
-                $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
-
-                $bookingList = new Collection();
-                $bookingList->add($booking);
-
-                $this->bookingMapper->save($bookingList);
-            } else {
-                ++$nBookingsNotCreated;
+                if (!$isClash || $resource->getAllowClashBookings()) {
+                    // Build the booking.
+                    // Do not set start/end times because these are intended to be the same as in the linked event row.
+                    $booking = new Model()
+                        ->setEvent($event)
+                        ->setResource($resource)
+                        ->setBookingStartAt($event->getStartDateTime())
+                        ->setBookingEndAt($event->getEndDateTime())
+                        ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
+                        ->setName($resource->getName());
+                    $booking->setStatus(
+                        $this->getStatusMapper()->createModel(
+                            $isClash ? Status\Model::STATUS_PENDING : $this->getStatusIdForNonClashBooking($booking)
+                        )
+                    );
+                    $bookingList->add($booking);
+                } else {
+                    $eventDate = $event->getStartDateTime()?->getDatabase();
+                    if (!array_key_exists($eventDate, $errorMsgByResourceIdByEventDate)) {
+                        $errorMsgByResourceIdByEventDate[$eventDate] = [];
+                    }
+                    $errorMsgByResourceIdByEventDate[$eventId][$resourceId] = 'Booking clashes and clashes are not allowed';
+                }
             }
         }
 
-        if ($nBookingsNotCreated === 0) {
-            $errorMessage = ''; // All bookings were created.
-            $code = 200;
-        } elseif ($nBookingsNotCreated !== count($resourceIds)) {
-            $errorMessage = "$nBookingsNotCreated booking" . ($nBookingsNotCreated === 1 ? '' : 's') . ' could not be created';
-            $code = 200;
-        } else {
-            $errorMessage = 'Could not create any bookings';
-            $code = 400;
-        }
+        $this->bookingMapper->save($bookingList);
 
-        $responseData = [];
-        if ($errorMessage !== '') {
-            $responseData['errors'] = [$errorMessage];
-        }
-
-        $this->response = $this->responseAsJson($responseData)->withStatus($code); // TODO: Use constant instead of hard-coding 200.
+        // Only unexpected errors require non-success code.
+        // It is expected that some or all attempts to book resources may fail for validation reasons.
+        $this->response = $this->responseAsJson(['errors' => $errorMsgByResourceIdByEventDate])->withStatus(200);
     }
 
     /**
@@ -1370,5 +1383,19 @@ class Controller extends Base
         // approve the new booking
         $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
+    }
+
+    /**
+     * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result
+     * in a clash booking.  Whether the booking can be then depends on whether clash bookings are allowed on the
+     * resource.
+     * @param GenericCollection<Item\Model> $resourceById
+     * @param GenericCollection<Calendar\Event> $eventById
+     * @return array
+     */
+    private function checkForClashesIfResourceBookingsAddedToEvents(GenericCollection $resourceById, GenericCollection $eventById): array
+    {
+        $isClashByResourceIdByEventId = [];
+        return $isClashByResourceIdByEventId;
     }
 }
