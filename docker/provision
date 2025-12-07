@@ -76,8 +76,8 @@ case "${LTI_DEVKIT_ENABLE}" in
         ${PUBLIC_KEY}\"
         SCHOOLBOX_REGISTRATION_DEPLOYMENT_ID=\"${DEPLOYMENT_ID}\"" | sed -e 's/^[ \t]*//' > ./docker/devkit-lti1p3-phpfpm/.env
 
-        # restart now
-        "$(dirname "$0")/compose" restart devkit-lti1p3-phpfpm
+        # restart now, with the new .env file
+        "$(dirname "$0")/compose" up -d devkit-lti1p3-phpfpm
         ;;
 
 esac
