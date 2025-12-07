@@ -13,22 +13,28 @@ use Crell\ApiProblem\ApiProblem;
 use Html2Text\Html2Text;
 use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Admin\DifferentiationProfiles\Model;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as DifferentiationProfileAdminMapper;
+use Schoolbox\DifferentiationProfile\Translator\ProfileToArray;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\CkEditorTextChat;
 use Schoolbox\OpenAi\Agent\DifferentiationProfileGeneration;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
+use Schoolbox\OpenAi\Agent\LearningActivityCustomisationGeneration;
 use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
-use Smalot\PdfParser\Parser;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -51,6 +57,10 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
+        private DifferentiationProfileMapper $differentiationProfileMapper,
+        private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
+        private MapperProxy $assessmentMapperProxy,
+        private CacheInterface $aiCache,
     ) {
     }
 
@@ -287,20 +297,28 @@ class Controller extends Base
 
             return;
         }
-
-        $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
-
-        $agent = new DifferentiationProfileGeneration(
-            $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
-            $diffConfig,
-            $this->filesystemProxy,
-            $this->parserFactory,
-        );
-
         try {
+            $records = $this->pastoralMapper->findByContributionDifferentiationProfile($studentId);
+
+            $agent = new DifferentiationProfileGeneration(
+                $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
+                $diffConfig,
+                $this->filesystemProxy,
+                $this->parserFactory,
+            );
+
+            $enabledFields = $this->differentiationProfileAdminMapper
+                ->findByColumnList(
+                    [
+                        'module' => DifferentiationProfileAdminMapper::MODULE_DETAILS,
+                        'is_enabled' => 1,
+                    ],
+                );
+
             [$response, $status] = $agent->request(
                 $this->getUser(),
                 $records,
+                $enabledFields,
                 $aiSessionId,
             );
 
@@ -315,6 +333,144 @@ class Controller extends Base
 
             $this->response = $this->responseAsJson($problem)
                 ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+    public function postLearningActivityCustomisation(): void
+    {
+        $this->setAllowBackToTheFuture(false);
+
+        $aiConfig = new Config();
+        $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION));
+
+        if ($aiConfig->isEnabled($diffConfig) === false) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem("AI Learning Activity Customisation is not enabled."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+
+        $studentId = $this->requestPost->getInt('studentId');
+        if (!$studentId) {
+            $returnCode = 400;
+
+            $problem = (new ApiProblem("Student Id is required."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+
+        $assessmentId = $this->requestPost->getInt('assessmentId');
+        if (!$assessmentId) {
+            $returnCode = 400;
+
+            $problem = (new ApiProblem("Assessment Id is required."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
+
+            return;
+        }
+
+        $cacheKey = sprintf(
+            Helper::DIFFERENTIATION_PROFILE_CACHE_KEY,
+            $assessmentId,
+            $studentId
+        );
+
+        $cache = $this->aiCache->get($cacheKey);
+
+        /* Allow bypassing the cache if regenerating
+         */
+        $bypassCache = $this->requestPost->getBool('regenerate', false);
+
+        /* Early return if we have a cached response
+         */
+        if (null !== $cache && !$bypassCache) {
+            $this->response = $this->responseAsJson($cache)
+                                   ->withStatus(200);
+
+            return;
+        }
+
+        $aiSessionId = (string)Uuid::uuid4();
+
+        try {
+            $assessment = $this->assessmentMapperProxy->findById($assessmentId);
+            $differentiationProfile = $this->differentiationProfileMapper->findOneByColumn(
+                'student_id',
+                $studentId,
+                [
+                    'order' => 'created_at DESC',
+                ]
+            );
+
+            /* Fully hydrate the differentiation profile with the student data
+             */
+            $differentiationProfile->setStudent(
+                $this->differentiationProfileMapper
+                    ->getJoinMapper('student')
+                    ->findById($studentId)
+            );
+
+            $translator = new ProfileToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->differentiationProfileAdminMapper
+                    ->findByColumn('is_enabled', 1),
+            );
+
+            $agent = new LearningActivityCustomisationGeneration(
+                $this->clientFactory->buildForFeature(Helper::FEATURE_LEARNING_ACTIVITY_CUSTOMISATION),
+                $diffConfig,
+                $this->filesystemProxy,
+                $this->parserFactory,
+                $translator,
+            );
+
+            [$response, $status] = $agent->request(
+                $this->getUser(),
+                $assessment,
+                $differentiationProfile,
+                $aiSessionId,
+            );
+
+            if (200 === $status) {
+                /* Cache successful responses
+                 */
+                $this->aiCache->set(
+                    $cacheKey,
+                    $response,
+                    Helper::DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL
+                );
+            }
+
+            $this->response = $this->responseAsJson($response)->withStatus($status);
+            return;
+        } catch (\DomainException $e) {
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($returnCode);
 
             return;
         }

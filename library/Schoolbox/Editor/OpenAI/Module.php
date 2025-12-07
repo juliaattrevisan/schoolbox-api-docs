@@ -12,8 +12,10 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as DifferentiationAdminMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -68,6 +70,12 @@ class Module extends BaseModule
             $hasDifferentiationProfileService,
             new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIFFERENTIATION, $this->getConfig()),
         ));
+        /* Learning Activity Customisation generation
+         */
+        $this->register('POST', '/learning-activity-customisation', 'postLearningActivityCustomisation', new Rule\All(
+            $hasDifferentiationProfileService,
+            new IsAIFeatureEnabled(ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION, $this->getConfig()),
+        ));
     }
 
 
@@ -79,6 +87,10 @@ class Module extends BaseModule
             $this->injector->get('filesystem.storageProxy'),
             new ParserFactory(),
             $this->injector->get('ai.clientFactory'),
+            $this->getMapperFactory()->get(DifferentiationProfileMapper::class),
+            $this->getMapperFactory()->get(DifferentiationAdminMapper::class),
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('ai.response.cache')
         );
     }
 }

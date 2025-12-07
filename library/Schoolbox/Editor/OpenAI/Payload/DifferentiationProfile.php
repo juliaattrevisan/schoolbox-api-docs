@@ -2,6 +2,8 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Admin\DifferentiationProfiles\Model;
+use Schoolbox\Collection;
 use Schoolbox\Editor\OpenAI\Helper;
 
 class DifferentiationProfile
@@ -9,9 +11,9 @@ class DifferentiationProfile
     /**
      * These three params control wildness and output length
      */
-    private const float TEMPERATURE = 0.7;
-    private const float TOP_P = 0.9;
-    private const int MAX_OUTPUT_TOKENS = 75000;
+    private const float TEMPERATURE       = 0.7;
+    private const float TOP_P             = 0.9;
+    private const int   MAX_OUTPUT_TOKENS = 75000;
 
     /**
      * System prompt for the new student profile extraction tool.
@@ -50,6 +52,8 @@ class DifferentiationProfile
 
     /**
      * User prompt for the new student profile extraction tool.
+     * [DIFFERENTIATION_PROFILE_FIELDS] - replaced with the dynamically generated list of enabled fields and their descriptions
+     * [ILP_DOCUMENT_CONTENT] - replaced with the content of the student pastoral record documents
      */
     private const string PROMPT_USER_PERSONA = "
         I will provide you with the content of a student learning plan and/or other supporting documentation. Your goal is to populate a JSON object according to the following target fields.
@@ -59,21 +63,7 @@ class DifferentiationProfile
 
         Here are the target fields, including their current terminology and descriptions:
 
-        - Field: overview
-          - Terminology: \"Overview\"
-          - Description: \"concise Overview of key learner attributes, including diagnosis\"
-        - Field: interests_strengths
-          - Terminology: \"Interests/strengths\"
-          - Description: \"List of students strengths and interests\"
-        - Field: needs_challenges
-          - Terminology: \"Learning Needs\"
-          - Description: \"List of Needs/Challenges that the student faces.\"
-        - Field: strategies_adjustments
-          - Terminology: \"Specific Strategies\"
-          - Description: \"Specific Strategies to consider when differentiating for the student\"
-        - Field: goals
-          - Terminology: \"Learning Goals\"
-          - Description: \"Students individual learning goals.\"
+        [DIFFERENTIATION_PROFILE_FIELDS]
 
         Please extract the information and return a single JSON object in the following format. Ensure the output is valid JSON.
 
@@ -89,39 +79,12 @@ class DifferentiationProfile
     ";
 
     private const array RESPONSE_FORMAT = [
-        'type' => 'json_schema',
-        'name' => 'fields_format',
+        'type'   => 'json_schema',
+        'name'   => 'fields_format',
         'schema' => [
-            'type' => 'object',
-            'properties' => [
-                'overview' => [
-                    'type' => 'string',
-                    'description' => 'USE HTML. concise Overview of key learner attributes, including diagnosis'
-                ],
-                'interests_strengths' => [
-                    'type' => 'string',
-                    'description' => 'USE HTML. List of students strengths and interests'
-                ],
-                'needs_challenges' => [
-                    'type' => 'string',
-                    'description' => 'USE HTML. List of Needs/Challenges that the student faces.'
-                ],
-                'strategies_adjustments' => [
-                    'type' => 'string',
-                    'description' => 'USE HTML. Specific Strategies to consider when differentiating for the student'
-                ],
-                'goals' => [
-                    'type' => 'string',
-                    'description' => 'USE HTML. Students individual learning goals.'
-                ]
-            ],
-            'required' => [
-                'overview',
-                'interests_strengths',
-                'needs_challenges',
-                'strategies_adjustments',
-                'goals'
-            ],
+            'type'                 => 'object',
+            'properties'           => [],
+            'required'             => [],
             'additionalProperties' => false,
         ],
         'strict' => true
@@ -136,12 +99,12 @@ class DifferentiationProfile
         private string $openAiDeploymentId,
         private string $systemPrompt,
         private string $documentContent,
+        private Collection $enabledFields,
     ) {
     }
+
     public function generate(): array
     {
-        $responseFormat = self::RESPONSE_FORMAT;
-
         /* OpenAI uses the model name from our ui.
          * Azure uses the Deployment ID instead.
          */
@@ -149,6 +112,8 @@ class DifferentiationProfile
         if (Helper::ENDPOINT_TYPE_AZURE === $this->openAiEndpoint) {
             $model = $this->openAiDeploymentId;
         }
+
+        $responseFormat = $this->getResponseFormat();
 
         /* Replacing the token with the config setting defined prompt
          */
@@ -159,33 +124,77 @@ class DifferentiationProfile
             ]
         );
 
-        $userPrompt = strtr(
-            self::PROMPT_USER_PERSONA,
-            [
-                '[ILP_DOCUMENT_CONTENT]' => $this->documentContent,
-            ]
-        );
+        $userPrompt = $this->generateUserPrompt();
 
         $payload = [
-            'model' => $model,
-            'temperature' => self::TEMPERATURE,
-            'top_p' => self::TOP_P,
+            'model'             => $model,
+            'temperature'       => self::TEMPERATURE,
+            'top_p'             => self::TOP_P,
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,
-            'input' => [
+            'input'             => [
                 [
-                    'role' => 'system',
+                    'role'    => 'system',
                     'content' => $systemPrompt,
                 ],
                 [
-                    'role' => 'user',
+                    'role'    => 'user',
                     'content' => $userPrompt,
                 ],
             ],
-            'stream' => false,
-            'text' => [
+            'stream'            => false,
+            'text'              => [
                 'format' => $responseFormat
             ],
         ];
         return $payload;
+    }
+
+    /**
+     * Generate the user prompt with dynamic fields
+     * @return string
+     */
+    private function generateUserPrompt(): string
+    {
+        /* Build the fields prompt dynamically
+         */
+        $fieldsPrompt = $this->enabledFields->reduce(function (string $carry, Model $field) {
+            $carry .= "- Field: " . $field->getName() . "\n"
+                . "  - Terminology: \"" . $field->getTerminology() . "\"\n"
+                . "  - Description: \"" . $field->getDescription() . "\"\n";
+            return $carry;
+        }, '');
+
+        return strtr(
+            self::PROMPT_USER_PERSONA,
+            [
+                '[ILP_DOCUMENT_CONTENT]' => $this->documentContent,
+                '[DIFFERENTIATION_PROFILE_FIELDS]' => $fieldsPrompt,
+            ]
+        );
+    }
+
+    /**
+     * Generate the response and dynamically adding the enabled fields and properties
+     * @return array
+     */
+    private function getResponseFormat(): array
+    {
+        $responseFormat = self::RESPONSE_FORMAT;
+
+        /* Dynamically build the response format based on enabled fields
+         */
+        $enabledFields = $this->enabledFields->reduce(function (array $carry, Model $field) {
+            $key = $field->getName();
+            $carry['required'][] = $key;
+            $carry['properties'][$key] = [
+                'type'        => 'string',
+                'description' => 'USE HTML. ' . $field->getDescription(),
+            ];
+            return $carry;
+        }, []);
+        $responseFormat['schema']['required'] = $enabledFields['required'];
+        $responseFormat['schema']['properties'] = $enabledFields['properties'];
+
+        return $responseFormat;
     }
 }

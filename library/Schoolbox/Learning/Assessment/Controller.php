@@ -1207,6 +1207,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Load customisation to the participant
          */
         $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
+
+
+        /* Cache interface for AI generated content (ie suggested customisation)
+         * Injecting here rather than in the module to avoid inheritance complications
+         */
+        $aiCache = $this->getDi()->get('ai.response.cache');
+
         $planTranslator = new ParticipationPlans(
             $this->getRouteGenerator(),
             $this->getAuthorizer(),
@@ -1218,6 +1225,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getUser(),
             $planTranslator,
             $customisedAssessments,
+            $aiCache,
         );
 
         $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
