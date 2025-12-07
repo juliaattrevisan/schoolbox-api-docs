@@ -34,6 +34,10 @@ export default class Common {
 
     static readonly DATA_TEST_APPLY_FILTERS = "panel-apply-filters-button";
 
+    static readonly DATA_TEST_FILTER_DROPDOWN = `sbx-pop-out-filter-component-{filterOption}-button`;
+
+    static readonly DATA_TEST_FILTER_DROPDOWN_OPTION = `selectionCheckbox-{filterOption}-{optionValue}`;
+
     // TODO: Replace following with data-test selectors where possible
 
     /**
@@ -489,6 +493,19 @@ export default class Common {
     // filters - set filters to default
     async resetFiltersToDefault(): Promise<void> {
         await this.page.locator(Common.SELECTOR_RESET_DEFAULTS).click();
+        await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
+    }
+
+    // select a filter option in the filter dropdown
+    async selectFilterOption(filterOption: string, optionValue: string): Promise<void> {
+        const filterDropdown = Common.DATA_TEST_FILTER_DROPDOWN.replace("{filterOption}", filterOption);
+        const filterOptionSelector = Common.DATA_TEST_FILTER_DROPDOWN_OPTION.replace(
+            "{filterOption}",
+            filterOption,
+        ).replace("{optionValue}", optionValue);
+        await this.page.getByTestId(filterDropdown).click();
+        await this.page.getByTestId(filterOptionSelector).click();
+        await this.page.getByTestId(filterDropdown).click();
         await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
     }
 }

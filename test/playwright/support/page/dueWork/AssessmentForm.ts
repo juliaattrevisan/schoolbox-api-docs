@@ -11,6 +11,8 @@ export default class AssessmentForm {
 
     static readonly URL = "/learning/folders/{class_id}/assessments/new?type=dueWork";
 
+    static readonly URL_MODIFY = "/learning/assessments/{assessment_id}/modify";
+
     // Constants for data-test selectors
     static readonly SELECTOR_FORM = "assessment-form";
 
@@ -144,6 +146,14 @@ export default class AssessmentForm {
     }
 
     /**
+     * Navigates to the activity modify form for an assessment ID
+     * @param assessmentId - The assessment ID to navigate to
+     */
+    async gotoAssessmentModifyPage(assessmentId: string): Promise<void> {
+        await this.page.goto(AssessmentForm.URL_MODIFY.replace("{assessment_id}", assessmentId));
+    }
+
+    /**
      * Submits this form to create a duework - by default it skips the participation prompt by clicking Later
      * if you want to navifate to the participation plan page, set toParticipation to true eg: create(true, true);
      * Verifies that the homepage is visible after submission
@@ -253,11 +263,25 @@ export default class AssessmentForm {
 
     /**
      * Sets visibility
-     * @param visibility - The visibility to set
+     * @param visibility - The visibility to set: VISIBILITY_STAFF_ONLY, VISIBILITY_STAFF_AND_STUDENT, VISIBILITY_ALL
      */
-    async setVisibility(visibility: number): Promise<void> {
-        const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
-        await visibilitySelectEl.selectOption({ value: visibility.toString() });
+    async setVisibility(visibility: string): Promise<void> {
+        await this.page.locator(`select[name="visibility"]`).selectOption({ value: visibility });
+    }
+
+    /**
+     * For each assessment ID, navigates to its modify page and verifies that the expected visibility option is selected.
+     * @param assessmentIds - Array of assessment IDs to check.
+     * @param visibility -  Array of expected visibility option labels, corresponding to each assessment ID.
+     */
+    async assessmentModifyCheckVisibilityOptionsSelected(assessmentIds: number[], visibility: string[]): Promise<void> {
+        for (let i = 0; i < assessmentIds.length; i += 1) {
+            const assessmentId = assessmentIds[i];
+            await this.gotoAssessmentModifyPage(assessmentId.toString());
+            const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
+            const selectedValue = await visibilitySelectEl.locator('option[selected="selected"]').innerText();
+            expect(selectedValue).toBe(visibility[i]);
+        }
     }
 
     /**
