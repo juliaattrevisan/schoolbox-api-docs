@@ -84,7 +84,7 @@ async function createLessonPlanTemplate(
     );
 
     tester.isGoingTo("Navigate to the homepage");
-    await page.goto("https://vagrant.dev.schoolbox.cloud/resources/");
+    await page.goto("/resources/");
     await expect(page.locator(`li[title="${folderName}"]`)).toBeVisible();
     const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
     expect(folderId).not.toBe(null);
