@@ -51,7 +51,7 @@ NAME
     create-devkit-lti-tool.php - create a LTI tool configuration for use with the LTI Devkit
 
 SYNOPSIS
-    create-devkit-lti-tool.php [--host HOST] [--port PORT] [--key KEY]
+    create-devkit-lti-tool.php [--host HOST] [--key KEY]
 
 DESCRIPTION
     This script is used to create an LTI tool configuration for use with the LTI Devkit. Once finished, outputs the
