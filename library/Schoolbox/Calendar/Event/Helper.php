@@ -19,7 +19,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\Campus;
 use Schoolbox\Mapper\Exception;
 
-readonly class Helper
+class Helper
 {
     /**
      * Helper constructor.
