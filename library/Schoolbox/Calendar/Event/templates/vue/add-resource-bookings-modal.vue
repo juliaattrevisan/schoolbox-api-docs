@@ -4,6 +4,11 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Booking, Resource } from "./resourceBookingTypes";
 
+// TODO: Define these in an eventTypes.ts file (maybe Calendar/Event/templates/vue/eventTypes.ts?)
+//       (see repeated definitions in view-event-modal.vue)
+const EFFICACY_SELF = "self";
+const EFFICACY_SERIES = "series";
+
 interface Props {
     resourceBookings: Booking[];
     eventId: number;
@@ -22,7 +27,10 @@ interface AddBookingsResponse {
 const isModalOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
 const resources = window.Vue.ref<Resource[]>([]);
-const isFormSubmittable = window.Vue.computed(() => !isProcessing.value && resources.value.length > 0);
+const efficacy = window.Vue.ref<string>("");
+const isFormSubmittable = window.Vue.computed(() => {
+    return !isProcessing.value && resources.value.length > 0 && (!props.eventSeriesId || efficacy.value !== "");
+});
 const createBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("createBookingForm");
 
 /**
@@ -58,6 +66,7 @@ function getResourceSearchEndpoint(): string {
 function open(): void {
     isModalOpen.value = true;
     resources.value = [];
+    efficacy.value = "";
 }
 
 // Expose functions for parent components
@@ -137,15 +146,22 @@ async function createNewBooking(): Promise<void> {
                 <h3>This event is part of a series</h3>
                 <p>Would you like to effect only this event, or all in the series?</p>
                 <div class="radiolist l-grid l-gap-l l-grid--2-col">
-                    <input id="radioOnlyThisEvent" type="radio" name="eventSeriesOption" value="onlyThisEvent" />
-                    <label for="radioOnlyThisEvent">Only this event</label>
                     <input
-                        id="radioAllEventsInSeries"
+                        id="radioEfficacySelf"
+                        v-model="efficacy"
                         type="radio"
-                        name="eventSeriesOption"
-                        value="allEventsInSeries"
+                        name="efficacy"
+                        :value="EFFICACY_SELF"
                     />
-                    <label for="radioAllEventsInSeries">All events in series</label>
+                    <label for="radioEfficacySelf">Only this event</label>
+                    <input
+                        id="radioEfficacySeries"
+                        v-model="efficacy"
+                        type="radio"
+                        name="efficacy"
+                        :value="EFFICACY_SERIES"
+                    />
+                    <label for="radioEfficacySeries">All events in series</label>
                 </div>
                 <hr />
             </template>

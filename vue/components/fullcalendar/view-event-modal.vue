@@ -18,6 +18,8 @@ import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
 
+// TODO: Define these in an eventTypes.ts file (maybe Calendar/Event/templates/vue/eventTypes.ts?)
+//       (see repeated definitions in add-resource-booking-modal.vue)
 const EFFICACY_SELF = "self";
 const EFFICACY_SERIES = "series";
 
