@@ -17,7 +17,8 @@
 .sbx-body [type="submit"],
 .sbx-body a.submit,
 .sbx-body button.submit,
-.sbx-body .flex-list.buttons a.submit {
+.sbx-body .flex-list.buttons a.submit,
+.sbx-body .flex-list.buttons button.submit {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -33,8 +34,19 @@
         background: var(--sbx-color-accent);
         color: var(--sbx-color-foreground-primary);
     }
-    &:disabled {
+    &:disabled,
+    &.disabled {
         @include sbx-form.form-input-disabled;
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        background-color: var(--sbx-color-foreground-secondary) !important;
+        color: var(--sbx-color-accent) !important;
+        pointer-events: none;
+        &:hover,
+        &:active {
+            background-color: var(--sbx-color-foreground-secondary) !important;
+            color: var(--sbx-color-accent) !important;
+            filter: none !important;
+        }
     }
 }
 
@@ -43,7 +55,9 @@
  */
 .sbx-body .button,
 .sbx-body .flex-list.buttons a,
+.sbx-body .flex-list.buttons button,
 .sbx-body .sub-nav li a,
+.sbx-body nav li.active a,
 .sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
@@ -60,8 +74,19 @@
     &:focus {
         @include sbx-form.form-input-focus;
     }
-    &:disabled {
+    &:disabled,
+    &.disabled {
         @include sbx-form.form-input-disabled;
+        border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
+        background-color: var(--sbx-color-foreground-secondary) !important;
+        color: var(--sbx-color-accent) !important;
+        pointer-events: none;
+        &:hover,
+        &:active {
+            background-color: var(--sbx-color-foreground-secondary) !important;
+            color: var(--sbx-color-accent) !important;
+            filter: none !important;
+        }
     }
 }
 
@@ -96,7 +121,7 @@
  * An existing flex list of buttons, just add some gap
  */
 .flex-list.buttons {
-    gap: var(--sbx-size-xs);
+    gap: var(--sbx-size-s);
 }
 
 /**
@@ -116,7 +141,7 @@
 /**
  * Icon only buttons
  * These need to be treated differently to standard buttons
- * as they have no text content and so don't need a border to define their shape
+ * as they have no text content and so need a border to define their shape
  */
 .sbx-body button.button[class*="icon-"] {
     border: none;
@@ -133,4 +158,38 @@
     background-color: var(--sbx-color-accent);
     border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
     height: auto;
+}
+
+/**
+ * List items inside flex-list should have margin for spacing (in pantry)
+ */
+.sbx-body .flex-list li {
+    margin: 5px;
+}
+
+/**
+ * Chips component buttons
+ * These need to hide the checkbox input to match design
+ */
+.sbx-body .c-chips li > input[type="checkbox"] {
+    display: none;
+}
+
+/**
+ * Small action buttons with icons
+ * These need a border radius on hover to match design
+ */
+.actions-small-5 > nav a[class*="icon-"]:hover,
+.actions-small-5 > nav a[class^="icon-"]:hover,
+.island .row.actions-small-5 > nav a[class*="icon-"]:hover,
+.island .row.actions-small-5 > nav a[class^="icon-"]:hover {
+    border-radius: var(--sbx-border-radius-normal) !important;
+}
+
+/**
+ * Dropdown list buttons
+ * These need to have a transparent background because action buttons inside dropdowns should have same style as other buttons
+ */
+.sbx-body ul.f-dropdown li button {
+    background-color: transparent;
 }
