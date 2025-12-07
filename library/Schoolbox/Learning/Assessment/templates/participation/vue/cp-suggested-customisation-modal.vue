@@ -27,16 +27,18 @@ const status = window.Vue.ref<"view" | "confirm" | "selectType">("view"); // to 
  * To display the view/generate customisation modal when a participant is selected
  */
 window.Vue.watch(participant, (newParticipant) => {
+    // open the modal when a new participant is set
     if (newParticipant) {
         isOpen.value = true;
     }
+    // set the cached AI response if it exists to avoid regenerating
     if (newParticipant && newParticipant.cachedSuggestedCustomisation) {
         aiResponse.value = newParticipant.cachedSuggestedCustomisation;
     }
 });
 
 /**
- * When the modal is closed trigger to clear the participant
+ * When the modal is closed trigger to clear the participant and reset status
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (!newIsOpen) {
@@ -46,7 +48,7 @@ window.Vue.watch(isOpen, (newIsOpen) => {
 });
 
 /**
- * When a new AI response is generated, store it against the participant\
+ * When a new AI response is generated, store it against the participant
  * so it can be reused if the modal is reopened for the same participant
  * @param newResponse The new AI response generated
  */
@@ -59,7 +61,6 @@ function onNewResponse(newResponse: CustomisedSuggestionResponse): void {
  */
 function onCancel(): void {
     isOpen.value = false;
-    participant.value = null;
 }
 
 /**
