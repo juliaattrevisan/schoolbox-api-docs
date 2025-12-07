@@ -46,12 +46,13 @@
             <a class='button' href="{{ manageAllRoute }}?{{ RETURN_URL.name }}={{ returnUrl }}">Manage All</a>
             {% endif %}
 
-            <button data-action="save"
+            <button class="button"
+                    data-action="save"
                     data-form-method="put"
                     data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
                     data-processing-text="Saving..."
                     class="hide">Save</button>
-            <button data-action="modify" data-processing-text="Modifying">Modify</button>
+            <button class="button" data-action="modify" data-processing-text="Modifying">Modify</button>
         </section>
     </div>
 {% else %}
