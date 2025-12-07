@@ -16,7 +16,6 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress\Date\Recurrence;
 use Calendar\Event\Type\EventBase;
-use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Calendar_Api_Config_Mapper;
 use DateTime;
 use External_Timetable;
