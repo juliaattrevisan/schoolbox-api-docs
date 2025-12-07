@@ -1065,7 +1065,7 @@ class Controller extends Base
     public function addBookings(): void
     {
         $baseEventId = $this->requestPost->getInt('eventId');
-        $eventSeriesOption = $this->requestPost->get('eventSeriesOption');
+        $efficacy = $this->requestPost->get('efficacy');
         $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', []);
         $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
@@ -1081,7 +1081,7 @@ class Controller extends Base
         $resourceById = $this->resourceMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
-        if ($eventSeriesOption === 'allInSeries' && $baseEvent->getSeriesId() !== null) {
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $baseEvent->getSeriesId() !== null) {
             // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
             // and events can be removed from a series once the series has been created.  Therefore, we cannot assume
             // any regular period between events, and so must fetch each event's start/end times.
