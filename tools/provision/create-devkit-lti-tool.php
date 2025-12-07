@@ -43,6 +43,9 @@ $kernel = new Kernel(
             ];
         }
 
+        /**
+         * @inheritdoc
+         */
         public function run(): void
         {
             if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
