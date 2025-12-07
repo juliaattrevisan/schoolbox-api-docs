@@ -142,7 +142,7 @@ HELP;
             }
 
             $updated += 1;
-            $currentFilters[AssessmentType::TYPE_DIALOG_AGENT] = 1;
+            $currentFilters[AssessmentType::TYPE_DIALOG_AGENT] = '1';
             $updateStatement->execute([
                 'value' => json_encode($currentFilters),
                 'id'    => $configInstance['id'],
