@@ -8,6 +8,7 @@ import { sbProps } from "@js/util/sbx/pageUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
+import { hasCustomisation } from "../js/util/participantUtils";
 
 const props = defineProps<{
     participant: Participant;
@@ -172,13 +173,7 @@ function onOpenIncludeInExistingModal(): void {
                     ></sbx-pop-out>
                 </nav>
                 <ul :id="`participant-${props.participant.user.id}`" data-dropdown-content="" class="f-dropdown">
-                    <template
-                        v-if="
-                            props.participant.excludedAt !== null ||
-                            props.participant.plan.name !== null ||
-                            props.participant.customisedPlan !== null
-                        "
-                    >
+                    <template v-if="hasCustomisation(props.participant)">
                         <li class="separator">Manage</li>
                         <li>
                             <button class="icon-close" @click.prevent="onActionSelected('removeCustomisation')">

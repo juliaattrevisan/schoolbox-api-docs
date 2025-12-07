@@ -11,6 +11,7 @@ import CpGenAi from "./cp-gen-ai.vue";
 import CpSelectActivity from "./cp-select-activity.vue";
 import CpConfirmModify from "./cp-confirm-modify.vue";
 import type { CustomisedSuggestionResponse, Participant, Routes } from "../js/types/customParticipationTypes";
+import { hasCustomisation } from "../js/util/participantUtils";
 
 const props = defineProps<{
     routes: Routes;
@@ -22,6 +23,8 @@ const participant = defineModel<Participant | null>("participant", { default: nu
 const isOpen = window.Vue.ref(false);
 const aiResponse = window.Vue.ref<CustomisedSuggestionResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
 const status = window.Vue.ref<"view" | "confirm" | "selectType">("view"); // to track the current status of the modal
+const confirmStatusText = window.Vue.ref("");
+const confirmProceedText = window.Vue.ref("");
 
 /**
  * To display the view/generate customisation modal when a participant is selected
@@ -67,11 +70,28 @@ function onCancel(): void {
  * To move to the next step of customising the activity
  */
 function onCustomiseActivity(): void {
+    // has a customisation already but no submission
+    if (hasCustomisation(participant.value!) && !participant.value?.hasInteraction) {
+        status.value = "confirm";
+        confirmStatusText.value = "A submission already exists for this student.";
+        confirmProceedText.value = `Proceeding will exclude them from this ${locale.activity.singular()} and create a new customisation. Proceed?`;
+        return;
+    }
+    // has both customisation and submission/feedback
+    if (hasCustomisation(participant.value!) && participant.value?.hasInteraction) {
+        status.value = "confirm";
+        confirmStatusText.value = "A customisation with a submission and/or feedback already exists for this student.";
+        confirmProceedText.value = `Proceeding will exclude them from this ${locale.activity.singular()} and remove access to these submissions and/or feedback. Proceed?`;
+        return;
+    }
+    // has submission/feedback on the existing activity
     if (participant.value?.hasInteraction) {
         status.value = "confirm";
-    } else {
-        status.value = "selectType";
+        confirmStatusText.value = "A submission and/or feedback already exists for this student.";
+        confirmProceedText.value = `Proceeding will exclude them from this ${locale.activity.singular()} and remove access to their submission and/or feedback. Proceed?`;
+        return;
     }
+    status.value = "selectType";
 }
 
 /**
@@ -109,7 +129,10 @@ function onConfirm(): void {
             @confirm="onConfirm"
         >
             <template #status-text>
-                The student has submissions and/or feedback for this {{ locale.assessment.singular() }}.
+                {{ confirmStatusText }}
+            </template>
+            <template #proceed-text>
+                {{ confirmProceedText }}
             </template>
         </cp-confirm-modify>
         <cp-select-activity

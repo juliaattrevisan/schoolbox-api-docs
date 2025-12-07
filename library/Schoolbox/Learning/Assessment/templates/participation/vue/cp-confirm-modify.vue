@@ -64,7 +64,7 @@ function onConfirm(): void {
                 </div>
             </div>
             <p>
-                <slot name="confirm-text">
+                <slot name="proceed-text">
                     Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions
                     and/or feedback. Proceed?
                 </slot>
