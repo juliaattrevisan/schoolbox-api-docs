@@ -92,7 +92,7 @@ function onCustomiseActivity(): void {
     // has a customisation already but no submission
     if (hasCustomisation(participant.value!) && !participant.value?.hasInteraction) {
         status.value = "confirm";
-        confirmStatusText.value = "A submission already exists for this student.";
+        confirmStatusText.value = "A customisation already exists for this student.";
         confirmProceedText.value = `Proceeding will exclude them from this ${locale.activity.singular()} and create a new customisation. Proceed?`;
         return;
     }

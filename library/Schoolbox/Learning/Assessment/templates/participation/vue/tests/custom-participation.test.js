@@ -14,6 +14,18 @@ jest.mock("@js/terminology/rosettaStone", () => ({
             if (!plural && capitalised) return "Activity";
             return "activity";
         }),
+        singular: jest.fn(() => "activity"),
+    },
+    assessment: {
+        singular: jest.fn(() => "assessment"),
+    },
+    differentiationProfile: {
+        translate: jest.fn((plural, capitalised) => {
+            if (plural && capitalised) return "Differentiation Profiles";
+            if (plural && !capitalised) return "differentiation profiles";
+            if (!plural && capitalised) return "Differentiation Profile";
+            return "differentiation profile";
+        }),
     },
 }));
 
