@@ -18,7 +18,11 @@
 .sbx-body a.submit,
 .sbx-body button.submit,
 .sbx-body .flex-list.buttons a.submit,
-.sbx-body .flex-list.buttons button.submit {
+.sbx-body .flex-list.buttons button.submit,
+.sbx-body .introjs-nextbutton.introjs-fullbutton,
+.sbx-body .introjs-skipbutton,
+.sbx-body .introjs-prevbutton,
+.sbx-body .introjs-button {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
