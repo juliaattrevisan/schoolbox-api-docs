@@ -30,14 +30,17 @@ use Schoolbox\External\Event\Mapper as ExternalEventMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
+use Schoolbox\ResourceBooking\Item\Mapper as BookingItemMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
-use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
 use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
+
+
 
 /**
  * Class Module
@@ -110,6 +113,8 @@ class Module extends BaseModule
         $this->register('GET', '/create', 'getCreate', $createPerms);
         $this->register('POST', '/create', 'postCreate', $createPerms);
         $this->register('POST', '/{eventId:\d+}/delete', 'postDelete', $modifyPerms, $preloadEvent);
+        $this->register('POST', '/{eventId:\d+}/modify', 'postModify', $modifyPerms, $preloadEvent);
+        $this->register('POST', '/addBookingsToEvent', 'addBookingsToEvent', $modifyPerms);
     }
 
     /**
@@ -126,7 +131,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(Attendance\Mapper::class),
-            $this->getMapperFactory()->get(ResourceBookingMapper::class),
             $this->getMapperFactory()->get(Access::class), // Not a mapper, but has getInstance, so does work.
             new Validator(new \Alaress_Date_Locale_Config()),
             new EditorTemplateHelper(
@@ -134,8 +138,9 @@ class Module extends BaseModule
                 EditorTemplatesCategoryModel::CALENDAR_EVENTS,
                 $this->injector->get('user')
             ),
+            $this->getMapperFactory()->get(BookingItemMapper::class),
+            $this->getMapperFactory()->get(BookingStatusMapper::class),
             $this->getMapperFactory()->get(ResourceBookingMapper::class),
-            $this->getMapperFactory()->get(ResourceBookingStatusMapper::class),
             $this->getMapperFactory()->get(TermMapper::class),
             $this->getMapperFactory()->get(ExternalEventMapper::class),
             $this->injector->get('externalTimetable'),
