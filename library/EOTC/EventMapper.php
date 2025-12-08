@@ -419,7 +419,7 @@ class EventMapper extends CalendarEventMapper
      */
     protected function postSave(object $event, ?object $previous = null)
     {
-        /* noop EOTC doesn't have to do anything special on delete
+        /* noop EOTC doesn't have to do anything special on save
          */
     }
 
