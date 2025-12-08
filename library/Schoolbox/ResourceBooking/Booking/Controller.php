@@ -1090,7 +1090,7 @@ class Controller extends Base
             $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
             $pb->equals('series_id', $baseEvent->getSeriesId());
             $pb->greaterThan('start_datetime', 'NOW()');
-            /** @var GenericCollection<Calendar\Event> $resourceById */
+            /** @var GenericCollection<Calendar\Event> $eventById */
             $eventById = $this->eventMapper->findByPredicates($pb);
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
