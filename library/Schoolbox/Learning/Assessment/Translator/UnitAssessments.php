@@ -280,18 +280,8 @@ class UnitAssessments
         /** If this is a DialogAgent, it has totally unique logic for its progress tick compared to everything else */
         if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
             $response = $participant->getAuthoritativeResponse(true);
-            $status = (new Lookup\Status())->calculate($response);
 
-            // TODO: Ideally these strings for progress tick states (including the normal ones) would in an enum somewhere
-            if ($status['status'] === Lookup\Status::STATUS_INCOMPLETE) {
-                $progress = 'incomplete';
-            } elseif ($status['status'] === Lookup\Status::STATUS_REQUIRES_ASSISTANCE) {
-                $progress = 'requires-assistance';
-            } elseif ($status['status'] === Lookup\Status::STATUS_SUBMITTED) {
-                $progress = 'submitted';
-            } else {
-                $progress = 'in-progress';
-            }
+//            $progress = $response->getCurrentStatus();
 
             return [
                 'postRouteUrl'  => null, // dialog agent ticks aren't ever actionable

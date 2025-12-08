@@ -459,9 +459,9 @@ class Module extends BaseModule
     {
         return new Rule\LazyCallback(
             fn() => new Rule\Callback(function (array $params) use ($action): void {
-                $status = (new DialogAgent\Response\Lookup\NextRoutes())->calculate($params['response'] ?? null);
+                $nextRoutes = (new DialogAgent\Response\Lookup\NextRoutes())->calculate($params['response'] ?? null);
 
-                if (!$status['actions'][$action]) {
+                if (!$nextRoutes[$action]) {
                     throw new Forbidden(\sprintf(
                         'Action "%s" is not allowed',
                         $action,

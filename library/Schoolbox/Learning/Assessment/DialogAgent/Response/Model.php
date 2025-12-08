@@ -21,16 +21,6 @@ class Model extends AbstractResponse
     use UpdatedBy;
     use DeletedBy;
 
-    /**
-     * Consts correlating to the status enum used by frontend world
-     * Not to be confused with the progress tick classes, despite them currently being the same strings
-     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
-     */
-    public const string STATUS_INCOMPLETE = 'incomplete';
-    public const string STATUS_IN_PROGRESS = 'in-progress';
-    public const string STATUS_REQUIRES_ASSISTANCE = 'requires-assistance';
-    public const string STATUS_SUBMITTED = 'submitted';
-
 
     /**
      * @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
@@ -78,7 +68,7 @@ class Model extends AbstractResponse
         /* Submitted: disregard all other statuses
          */
         if (null !== $this->getSubmittedAt()) {
-            return self::STATUS_SUBMITTED;
+            return StatusEnum::SUBMITTED->value;
         }
 
         // TODO: deal with duration eventually. still allow SOBO from staff
@@ -89,18 +79,18 @@ class Model extends AbstractResponse
          * If assistance was requested and the response is still in progress, send a special status
          */
         if (null !== $this->getAssistanceRequestedAt()) {
-            return self::STATUS_REQUIRES_ASSISTANCE;
+            return StatusEnum::REQUIRES_ASSISTANCE->value;
         }
 
         /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
          */
         if (null === $this->getSessionId()) {
-            return self::STATUS_INCOMPLETE;
+            return StatusEnum::INCOMPLETE->value;
         }
 
         /* Otherwise we're just doing the stuff
          */
-        return self::STATUS_IN_PROGRESS;
+        return StatusEnum::IN_PROGRESS->value;
     }
 
 
@@ -111,7 +101,7 @@ class Model extends AbstractResponse
      */
     public function getCurrentStatusHR(): string
     {
-        return StatusEnum::from($this->getCurrentStatus())->value;
+        return StatusEnum::tryFrom($this->getCurrentStatus())->translate();
     }
 
 

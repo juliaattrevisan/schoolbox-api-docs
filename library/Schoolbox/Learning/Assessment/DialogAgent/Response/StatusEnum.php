@@ -11,8 +11,39 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
  */
 enum StatusEnum: string
 {
-    case STATUS_INCOMPLETE = 'Incomplete';
-    case STATUS_IN_PROGRESS = 'In Progress';
-    case STATUS_REQUIRES_ASSISTANCE = 'Requires Assistance';
-    case STATUS_SUBMITTED = 'Submitted';
+    /**
+     * Consts correlating to the status enum used by frontend world
+     * Not to be confused with the progress tick classes, despite them currently being the same strings
+     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
+     */
+    case INCOMPLETE = 'incomplete';
+    case IN_PROGRESS = 'in-progress';
+    case REQUIRES_ASSISTANCE = 'requires-assistance';
+    case SUBMITTED = 'submitted';
+
+
+    case INCOMPLETE_HR = 'Incomplete';
+    case IN_PROGRESS_HR = 'In Progress';
+    case REQUIRES_ASSISTANCE_HR = 'Requires Assistance';
+    case SUBMITTED_HR = 'Submitted';
+
+
+    /**
+     * Convert a programmatically-meaningful state into its human-readable equivalent and vice versa
+     *
+     * @return string
+     */
+    public function translate(): string
+    {
+        return match ($this) {
+            StatusEnum::INCOMPLETE => StatusEnum::INCOMPLETE_HR->value,
+            StatusEnum::IN_PROGRESS => StatusEnum::IN_PROGRESS_HR->value,
+            StatusEnum::REQUIRES_ASSISTANCE => StatusEnum::REQUIRES_ASSISTANCE_HR->value,
+            StatusEnum::SUBMITTED => StatusEnum::SUBMITTED_HR->value,
+            StatusEnum::INCOMPLETE_HR => StatusEnum::INCOMPLETE->value,
+            StatusEnum::IN_PROGRESS_HR => StatusEnum::IN_PROGRESS->value,
+            StatusEnum::REQUIRES_ASSISTANCE_HR => StatusEnum::REQUIRES_ASSISTANCE->value,
+            StatusEnum::SUBMITTED_HR => StatusEnum::SUBMITTED->value,
+        };
+    }
 }
