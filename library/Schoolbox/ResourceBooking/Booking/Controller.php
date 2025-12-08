@@ -1058,8 +1058,7 @@ class Controller extends Base
      * This function is called when the form on the 'Add Resource Bookings' modal is submitted.
      * The 'Add Resource Bookings' modal appears on the 'Event Details' page when the 'Add booking(s)' button is clicked.
      *
-     * @throws Deleted
-     * @throws MapperException
+     * @throws Deleted|MapperException
      */
     public function addBookings(): void
     {
@@ -1143,8 +1142,15 @@ class Controller extends Base
             }
         }
 
-        // TODO: Catch exception here and return failure code.
-        $this->bookingMapper->save($bookingList);
+        $httpStatusCode = 200;
+
+        try {
+            $this->bookingMapper->save($bookingList);
+        } catch (MapperException) {
+            $httpStatusCode = 400; // Server error.
+            $nBookingsCreatedWithClash = 0;
+            $nBookingsCreatedWithoutClash = 0;
+        }
 
         // Only unexpected errors require non-success code.
         // It is expected that some or all attempts to book resources may fail for validation reasons.
@@ -1155,7 +1161,7 @@ class Controller extends Base
                 'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
                 'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
             ]
-        )->withStatus(200);
+        )->withStatus($httpStatusCode);
     }
 
     /**
