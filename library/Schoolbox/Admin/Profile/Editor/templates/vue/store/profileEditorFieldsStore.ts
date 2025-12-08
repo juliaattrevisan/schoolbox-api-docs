@@ -434,6 +434,18 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         return `pe-${roleType}-fields-${fieldType}-item-${field.field}`;
     }
 
+    /**
+     *
+     * @param field
+     * @returns
+     */
+    function showField(field: ProfileEditorAvailableField | ProfileEditorActiveField): boolean {
+        if (peStore.configSettings?.differentiationEnabled === false && field.field === "differentiationProfile") {
+            return false;
+        }
+        return true;
+    }
+
     return {
         getFieldName,
         actionQueue,
@@ -446,5 +458,6 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         isFieldSettingsUnsaved,
         updateFieldSettingOption,
         getFieldIdentifier,
+        showField,
     };
 });
