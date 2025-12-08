@@ -473,7 +473,9 @@ class Factory
             'barcode' => $viewee->getExternalId(),
             /* Emergency Contacts
              */
-            'emergencyContacts' => $emergencyContacts
+            'emergencyContacts' => $emergencyContacts,
+
+            'differentiationProfile' => 'blah',
         ];
 
         return array_merge($externalUser, $referenceFields);
