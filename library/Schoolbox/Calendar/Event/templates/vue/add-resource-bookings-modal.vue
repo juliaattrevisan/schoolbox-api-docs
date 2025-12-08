@@ -179,7 +179,7 @@ async function createNewBooking(): Promise<void> {
             <template v-if="eventSeriesId">
                 <hr />
                 <h3>This event is part of a series</h3>
-                <p>Would you like to effect only this event, or all in the series?</p>
+                <p>Would you like to affect only this event, or all in the series?</p>
                 <div class="radiolist l-grid l-gap-l l-grid--2-col">
                     <input
                         id="radioEfficacySelf"
