@@ -1038,8 +1038,8 @@ class Controller extends Base
             return []; // No bookings to move if we don't have old times
         }
         // get the time diff in minutes
-        $startDiff = $oldStartDateTime?->diffInMinutes($event->getStartDateTime(), false);
-        $endDiff = $oldEndDateTime?->diffInMinutes($event->getEndDateTime(), false);
+        $startDiff = $oldStartDateTime->diffInMinutes($event->getStartDateTime(), false);
+        $endDiff = $oldEndDateTime->diffInMinutes($event->getEndDateTime(), false);
 
         // get all bookings for this event
         $bookings = $this->bookingMapper->getForAllEventIds([$event->getId()]);
@@ -1081,8 +1081,7 @@ class Controller extends Base
                 // set status to pending if there are clashes (even if the resource can NOT have clashes...)
                 $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
             } else {
-                // if booking is managed, then set back to pending, for more approved...
-                // If item is moderated, already approved and time changed, set item to need approval again.
+                // If booking is managed or moderated, and was previously approved, set status back to pending so it can be re-approved by a moderator if the time has changed.
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId = $booking->getStatus()->getId();
                 if (
