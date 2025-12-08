@@ -12,13 +12,13 @@ class Proxy
 {
     /* Max number of results allowed
      */
-    private const MAX_RESULTS = 10000;
+    private const int MAX_RESULTS = 10000;
 
     /* HMAC algorithm for hashing the request
      */
-    public const PAPERLY_PROXY_HMAC_ALGO = 'sha256';
+    public const string PAPERLY_PROXY_HMAC_ALGO = 'sha256';
 
-    public const IMAGE_WILDCARD = 'image/';
+    public const string IMAGE_WILDCARD = 'image/';
 
     /* Compatible SQL Operators
      */
@@ -41,6 +41,14 @@ class Proxy
     public function executeQuery(string $sql, ?array $params = []): IQuery|Base
     {
         /* Appending SCOPE_IDENTITY() to retrieve the last inserted ID
+         * We are purposely inserting the SELECT statement in the same
+         * execution to be able to return the last inserted ID immediately after
+         * the insert operation.
+         * This also introduces te semi-colon, but we are ok cause we've already identified
+         * the SQL operator earlier.
+         *
+         * Note: This is specific to MS SQL Server databases, unlikely, but if this is ever used with
+         * other database types, this part will need to be adjusted accordingly.
          */
         if (self::SQL_INSERT === $this->getSqlOperator($sql)) {
             $sql .= '; SELECT SCOPE_IDENTITY() AS InsertedID;';
@@ -79,6 +87,14 @@ class Proxy
          */
         $regex = "/[^a-zA-Z]*(?<sqlOperator>\w+)/";
         preg_match($regex, $sql, $matches);
+
+        /* Validating if we were able to extract the SQL operator
+         */
+        if (!isset($matches['sqlOperator'])) {
+            throw new OutOfBoundsException(
+                'Invalid SQL statement. Please use a valid SQL operator.'
+            );
+        }
 
         return strtoupper(
             trim($matches['sqlOperator'])
