@@ -1068,7 +1068,7 @@ class Controller extends Base
     {
         $baseEventId = $this->requestPost->getInt('eventId');
         $efficacy = $this->requestPost->get('efficacy');
-        $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', []);
+        $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', '');
         $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
 
