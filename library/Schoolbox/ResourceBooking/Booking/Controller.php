@@ -1017,7 +1017,7 @@ class Controller extends Base
                     'callbackUrl' => $callbackUrl,
                     'errors'      => $errors,
                 ],
-            )->withStatus(empty($errors) ? self::HTTP_STATUS_CODE_OK: self::HTTP_STATUS_CODE_BAD_REQUEST);
+            )->withStatus(empty($errors) ? self::HTTP_STATUS_CODE_OK : self::HTTP_STATUS_CODE_BAD_REQUEST);
         } else {
             // Is there a previous location to redirect to? if so use that.
             $this->response = $this->redirectAfterPost(
