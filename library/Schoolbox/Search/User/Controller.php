@@ -47,6 +47,8 @@ use Timetable_ColourMapper;
 use Twig\Environment;
 use Twig\Error\Error;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\DifferentiationProfile\AdjustmentCategories\Model as AdjustmentCategoriesModel;
+use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevelsModel;
 
 /**
  * The controller for the mock version of the search API.
@@ -77,6 +79,8 @@ class Controller extends BaseController
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
      * @param Calendar_Api_Factory                         $calendarApiFactory
+     * @param \Schoolbox\DifferentiationProfile\Mapper   $differentiationProfileMapper
+     * @param \Schoolbox\Admin\DifferentiationProfiles\Mapper $differentiationProfileConfigMapper
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -97,6 +101,8 @@ class Controller extends BaseController
         private Calendar_Api_Factory $calendarApiFactory,
         private RosettaStone $rosettaStone,
         private EditorTemplateHelper $editorTemplateHelper,
+        private \Schoolbox\DifferentiationProfile\Mapper $differentiationProfileMapper,
+        private \Schoolbox\Admin\DifferentiationProfiles\Mapper $differentiationProfileConfigMapper,
     ) {
     }
 
@@ -204,6 +210,64 @@ class Controller extends BaseController
                     }
 
                     return [];
+                },
+                /* Inject differentiation profile data so it executes in proper place deeper in the Factory
+                 * ...but only if differentiationProfile was a renderable field, as per admin
+                 */
+                'differentiationProfile' => function () use ($viewee) {
+                    try {
+                        $profile = $this->differentiationProfileMapper->findOneByColumn(
+                            'student_id',
+                            $viewee->getId(),
+                            [
+                                'order' => ['updated_at' => \Schoolbox\DifferentiationProfile\Mapper::SORT_ORDER_DESC],
+                            ]
+                        );
+                    } catch (MapperException\NotFound $e) {
+                        return null;
+                    }
+
+                    $configs = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1)->indexBy('name');
+                    $configKey = \Schoolbox\DifferentiationProfile\Mapper::CONFIG_METHOD_MAPPING;
+
+                    $data = $configs->reduce(function ($carry, $config) use ($profile, $configKey) {
+                        /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
+                        if (array_key_exists($config->getName(), $configKey)) {
+                            $method  = $configKey[$config->getName()];
+                            $value   = call_user_func([$profile, $method]);
+
+                            if ($config->getModule() === \Schoolbox\Admin\DifferentiationProfiles\Mapper::MODULE_ADJUSTMENTS && $value instanceof \Schoolbox\Collection) {
+                                $value = ($value->count() > 0 ) ?
+                                    $value->map(fn(AdjustmentCategoriesModel|AdjustmentLevelsModel $adjustment) => [
+                                        'name' => $adjustment->getName(),
+                                    ])->getAll() : null;
+                            }
+
+                            $carry[] = [
+                                'terminology' => $config->getTerminology() ?? $config->getTitle(),
+                                'value'       => $value
+                            ];
+                        }
+                        return $carry;
+                    }, []);
+
+                    /* Group differentiation data into adjustmentData (array values) and textData (string values)
+                     */
+                    $adjustmentData = [];
+                    $textData = [];
+
+                    foreach ($data as $item) {
+                        if (is_array($item['value'])) {
+                            $adjustmentData[] = $item;
+                        } elseif (null !== $item['value']) {
+                            $textData[] = $item;
+                        }
+                    }
+
+                    return [
+                        'adjustmentData' => $adjustmentData,
+                        'textData' => $textData,
+                    ];
                 }
             ]);
 
