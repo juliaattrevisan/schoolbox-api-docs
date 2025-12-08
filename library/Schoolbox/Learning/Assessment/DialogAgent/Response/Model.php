@@ -68,7 +68,7 @@ class Model extends AbstractResponse
         /* Submitted: disregard all other statuses
          */
         if (null !== $this->getSubmittedAt()) {
-            return StatusEnum::SUBMITTED->value;
+            return Status::SUBMITTED->value;
         }
 
         // TODO: deal with duration eventually. still allow SOBO from staff
@@ -79,18 +79,18 @@ class Model extends AbstractResponse
          * If assistance was requested and the response is still in progress, send a special status
          */
         if (null !== $this->getAssistanceRequestedAt()) {
-            return StatusEnum::REQUIRES_ASSISTANCE->value;
+            return Status::REQUIRES_ASSISTANCE->value;
         }
 
         /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
          */
         if (null === $this->getSessionId()) {
-            return StatusEnum::INCOMPLETE->value;
+            return Status::INCOMPLETE->value;
         }
 
         /* Otherwise we're just doing the stuff
          */
-        return StatusEnum::IN_PROGRESS->value;
+        return Status::IN_PROGRESS->value;
     }
 
 
@@ -101,7 +101,7 @@ class Model extends AbstractResponse
      */
     public function getCurrentStatusHR(): string
     {
-        return StatusEnum::tryFrom($this->getCurrentStatus())->translate();
+        return Status::tryFrom($this->getCurrentStatus())->translate();
     }
 
 

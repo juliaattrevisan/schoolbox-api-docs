@@ -13,12 +13,11 @@ use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\StatusEnum;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 use Schoolbox\User;
 
 /**
@@ -285,7 +284,7 @@ class UnitAssessments
             /* If a response exists; interrogate it for its current status; otherwise assume it's Incmoplete
              */
             /** @var \Schoolbox\Learning\Assessment\Dialogagent\Response\Model $response */
-            $progress = $response?->getCurrentStatus() ?? StatusEnum::INCOMPLETE->value;
+            $progress = $response?->getCurrentStatus() ?? Status::INCOMPLETE->value;
 
             return [
                 'postRouteUrl'  => null, // dialog agent ticks aren't ever actionable

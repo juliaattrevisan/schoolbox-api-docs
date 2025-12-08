@@ -30,13 +30,11 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentData
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\StatusEnum;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi;
@@ -623,10 +621,10 @@ class Controller extends Base
          * you'd want to generate an empty csv: most of the time you'd have at least one of them selected.
          */
         $requestedStatuses = $this->requestQuery->get('status') ?? [
-            StatusEnum::INCOMPLETE->value,
-            StatusEnum::IN_PROGRESS->value,
-            StatusEnum::REQUIRES_ASSISTANCE->value,
-            StatusEnum::SUBMITTED->value,
+            Status::INCOMPLETE->value,
+            Status::IN_PROGRESS->value,
+            Status::REQUIRES_ASSISTANCE->value,
+            Status::SUBMITTED->value,
         ];
 
         /* Filter output to whatever was chosen in the frontend.

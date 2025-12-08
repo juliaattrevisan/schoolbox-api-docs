@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
  * not great for our app as it reduces polymorphism and replacement, but I suppose this area isn't supposed to be
  * easily replaceable.
  */
-enum StatusEnum: string
+enum Status: string
 {
     /**
      * Consts correlating to the status enum used by frontend world
@@ -39,14 +39,14 @@ enum StatusEnum: string
         // see https://www.php.net/manual/en/language.enumerations.methods.php
         // phpcs:ignore
         return match ($this) {
-            StatusEnum::INCOMPLETE => StatusEnum::INCOMPLETE_HR->value,
-            StatusEnum::IN_PROGRESS => StatusEnum::IN_PROGRESS_HR->value,
-            StatusEnum::REQUIRES_ASSISTANCE => StatusEnum::REQUIRES_ASSISTANCE_HR->value,
-            StatusEnum::SUBMITTED => StatusEnum::SUBMITTED_HR->value,
-            StatusEnum::INCOMPLETE_HR => StatusEnum::INCOMPLETE->value,
-            StatusEnum::IN_PROGRESS_HR => StatusEnum::IN_PROGRESS->value,
-            StatusEnum::REQUIRES_ASSISTANCE_HR => StatusEnum::REQUIRES_ASSISTANCE->value,
-            StatusEnum::SUBMITTED_HR => StatusEnum::SUBMITTED->value,
+            Status::INCOMPLETE => Status::INCOMPLETE_HR->value,
+            Status::IN_PROGRESS => Status::IN_PROGRESS_HR->value,
+            Status::REQUIRES_ASSISTANCE => Status::REQUIRES_ASSISTANCE_HR->value,
+            Status::SUBMITTED => Status::SUBMITTED_HR->value,
+            Status::INCOMPLETE_HR => Status::INCOMPLETE->value,
+            Status::IN_PROGRESS_HR => Status::IN_PROGRESS->value,
+            Status::REQUIRES_ASSISTANCE_HR => Status::REQUIRES_ASSISTANCE->value,
+            Status::SUBMITTED_HR => Status::SUBMITTED->value,
         };
     }
 }
