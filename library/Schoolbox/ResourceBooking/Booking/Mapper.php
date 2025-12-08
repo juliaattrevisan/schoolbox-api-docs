@@ -687,10 +687,7 @@ class Mapper extends BaseMapper
         $statement->execute(['statusId' => Status\Model::STATUS_APPROVED]);
 
         $periodsByResourceId = [];
-
-        $rows = [];
         foreach ($statement as $row) {
-            $rows[] = $row;
             $periodsByResourceId[$row['resource_id']][] = [
                 'startDatetime' => new Alaress_Date_Format($row['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT),
                 'endDatetime' => new Alaress_Date_Format($row['end_datetime'], Alaress_Date_Format::DATABASE_FORMAT),
