@@ -42,7 +42,7 @@ class ModelToArray
         return [
             'id' => $log->getSessionId(),
             'feature' => $log->getFeature(),
-            'logFormat' => $log->getLogFormat()?->value,
+            'logFormat' => $log->getLogFormat(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $this->userTranslator->__invoke($log->getUser()),
             'returnCode' => $log->getReturnCode(),

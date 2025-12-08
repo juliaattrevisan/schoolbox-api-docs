@@ -46,7 +46,7 @@ class Mapper extends BaseMapper
         $this->uses('model', self::TYPE_STRING);
         $this->uses('endpoint', self::TYPE_STRING);
         $this->uses('feature', self::TYPE_STRING);
-        $this->uses('log_format', self::TYPE_STRING, self::COLUMN_ENUM, null, [...LogFormat::cases(), null]);
+        $this->uses('log_format', self::TYPE_STRING, self::COLUMN_ENUM, null, [...array_column(LogFormat::cases(), 'value'), null]);
         $this->uses('response', self::TYPE_STRING);
         $this->uses('return_code', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);

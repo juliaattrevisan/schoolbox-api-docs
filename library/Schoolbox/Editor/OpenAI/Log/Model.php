@@ -263,15 +263,15 @@ class Model
     }
 
     /**
-     * @return LogFormat|null
+     * @return string|null
      */
-    public function getLogFormat(): ?LogFormat
+    public function getLogFormat(): ?string
     {
         if (null === $this->logFormat) {
             return null;
         }
 
-        return LogFormat::tryFrom($this->logFormat);
+        return $this->logFormat;
     }
 
     /**

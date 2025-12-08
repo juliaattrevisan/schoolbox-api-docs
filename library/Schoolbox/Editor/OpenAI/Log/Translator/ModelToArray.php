@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Log\Translator;
 
+use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\User;
 use Schoolbox\Editor\OpenAI\Log\Model;
 use Schoolbox\Editor\OpenAI\Log\Translator\Format\StrategyFactory;
@@ -37,7 +38,7 @@ class ModelToArray
     public function __invoke(Model $log): array
     {
         $logData = null;
-        $logFormat = $log->getLogFormat();
+        $logFormat = $log->getLogFormat() ? LogFormat::tryFrom($log->getLogFormat()) : null;
         if (null !== $logFormat) {
             $strategy = $this->strategyFactory->makeStrategy($logFormat);
             $logData = $strategy->translate($log);
