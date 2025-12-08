@@ -212,8 +212,8 @@ class Controller extends BaseController
                     return [];
                 },
                 /* Inject differentiation profile data so it executes in proper place deeper in the Factory
-                 * ...but only if differentiationProfile was a renderable field, as per admin
-                 * ...and only if the differentiation profile feature is enabled
+                 * ...but only if the differentiation profile feature is enabled...
+                 * ...and only if differentiationProfile was a renderable field, as per admin
                  */
                 'differentiationProfile' => function () use ($viewee) {
                     /* Return null if differentiation profile is disabled
@@ -222,6 +222,8 @@ class Controller extends BaseController
                         return null;
                     }
 
+                    /* Return null if no differentiation profile exists for this student
+                     */
                     try {
                         $profile = $this->differentiationProfileMapper->findOneByColumn(
                             'student_id',
@@ -259,6 +261,7 @@ class Controller extends BaseController
                     }, []);
 
                     /* Group differentiation data into adjustmentData (array values) and textData (string values)
+                     * so we can vary their display in the frontend
                      */
                     $adjustmentData = [];
                     $textData = [];
