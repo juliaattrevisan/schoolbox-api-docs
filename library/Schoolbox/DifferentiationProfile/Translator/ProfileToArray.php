@@ -2,20 +2,13 @@
 
 namespace Schoolbox\DifferentiationProfile\Translator;
 
-use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\GetRouteIfAuthorized;
-use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Model;
 use Schoolbox\User;
 
 class ProfileToArray
 {
-    use GetRouteIfAuthorized;
-
     public function __construct(
-        protected Generator $routeGenerator,
-        protected Authorizer $authorizer,
         protected User $currentUser,
         private Collection $profileConfig,
     ) {

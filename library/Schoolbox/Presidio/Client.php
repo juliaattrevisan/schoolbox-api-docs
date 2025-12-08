@@ -57,7 +57,7 @@ class Client
      * @return array An array payload which may be passed to `$this->anonymise()`.
      * @throws ClientExceptionInterface if the request goes wrong
      */
-    public function analyse(string $text): array
+    public function analyse(string $text, array $options = []): array
     {
         $analysisUrl      = new Uri($this->analysisUrl);
         $analysisUrl      = $analysisUrl->withPath(rtrim($analysisUrl->getPath(), '/') . self::ANALYSIS_ENDPOINT);
@@ -71,6 +71,7 @@ class Client
                     'text'                    => $text,
                     'language'                => 'en',
                     'return_decision_process' => true,
+                    ...$options,
                 ],
                 RequestOptions::HEADERS => [
                     'Accept' => 'application/json'
@@ -177,14 +178,14 @@ class Client
      *                                                Defaults to a sha-1 hash.
      * @return array{anonymisedText: string, pairs: array<string, string>}
      */
-    public function anonymiseWithTokens(string $text, ?callable $hashFunction = null): array
+    public function anonymiseWithTokens(string $text, array $options = [], ?callable $hashFunction = null): array
     {
         if (!isset($hashFunction)) {
             $hashFunction = fn ($value) => hash('sha1', $value);
         }
         // It is possible to do this without the anonymiser:
         // that gives more control over how the anonymised text is generated.
-        $analysisItems = $this->analyse($text);
+        $analysisItems = $this->analyse($text, $options);
         usort($analysisItems, $this->sortItems(...));
 
         // Go thru each analysis item, and:

@@ -15,6 +15,8 @@ use Schoolbox\DifferentiationProfile\FileParser\ParserFactory;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\Pastoral\Model;
+use Schoolbox\Presidio\Client;
+use Schoolbox\Presidio\Anonymiser;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
@@ -31,6 +33,7 @@ class DifferentiationProfileGeneration
         private array $config,
         private FilesystemProxy $filesystemProxy,
         private ParserFactory $parserFactory,
+        private Client $presidioClient,
     ) {
     }
 
@@ -38,10 +41,37 @@ class DifferentiationProfileGeneration
         User $user,
         Collection $pastoralRecords,
         Collection $enabledFields,
+        User $student,
         ?string $aiSessionId = null,
     ): array {
 
         $attachments = $this->generateFilePrompts($pastoralRecords);
+
+        /* Deny list to force the anonymisation of the student's name
+         * we will enforce anonymise student's full name, first name and preferred name
+         */
+        $personDenyList = [
+            $student->getFullName(),
+            (string)$student->getFirstName(),
+            (string)$student->getPreferredName(),
+        ];
+
+        $customPersonRecognizer = [
+            "name" => "CustomPersonDenyList",
+            "supported_language" => "en",
+            "supported_entity" => "PERSON",
+            "deny_list" => array_filter($personDenyList),
+        ];
+
+        $attachments = $this->presidioClient->anonymiseWithTokens(
+            $attachments,
+            [
+                'entities' => ['PERSON'],
+                'ad_hoc_recognizers' => [
+                    $customPersonRecognizer,
+                ]
+            ]
+        )['anonymisedText'] ?? '';
 
         $payloadGenerator = new \Schoolbox\Editor\OpenAI\Payload\DifferentiationProfile(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
@@ -104,6 +134,8 @@ class DifferentiationProfileGeneration
                     ''
                 )
         );
-        return implode("\n", $processed->getAll());
+        /* Removing excessive whitespace but preserves the line breaks
+         */
+        return preg_replace("/[ \t]+/", " ", implode("\n", $processed->getAll()));
     }
 }
