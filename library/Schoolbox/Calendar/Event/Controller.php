@@ -1031,7 +1031,7 @@ class Controller extends Base
      * @return array
      * @throws MapperException
      */
-    private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user)
+    private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user): array
     {
         // can't work out the diff if there is no past...
         if (!$oldStartDateTime || !$oldEndDateTime) {
