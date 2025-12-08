@@ -349,7 +349,7 @@ class Mapper extends BaseMapper
      * @param int        $limit
      * @param string     $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
      * @param string     $sort_dir Sort direction, defaults to 'ASC'
-     * @param array<int> $excludeResourceIds Ids of resources to exclude from search results
+     * @param array<int> $excludeResourceIds - Ids of resources to exclude from search results
      * @return Collection
      */
     public function search(
@@ -399,7 +399,7 @@ class Mapper extends BaseMapper
      * @param string      $keyword
      * @param User        $user
      * @param string|null $category
-     * @param array<int> $excludeResourceIds Ids of resources to exclude from search results
+     * @param array<int> $excludeResourceIds - Ids of resources to exclude from search results
      * @return Builder
      */
     private function buildSearchPredicate(
