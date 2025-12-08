@@ -44,7 +44,7 @@ class ModelToArray
             'feature' => $log->getFeature(),
             'logFormat' => $log->getLogFormat(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            'createdBy' => $this->userTranslator->__invoke($log->getUser()),
+            'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,
             'returnCode' => $log->getReturnCode(),
             '_routes' => $routes,
         ];
