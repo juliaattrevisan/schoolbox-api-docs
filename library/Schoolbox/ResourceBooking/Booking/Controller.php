@@ -193,7 +193,7 @@ class Controller extends Base
                                         Recurrence::RECURRENCE_WEEKLY => 'Weekly',
                                         Recurrence::RECURRENCE_FORTNIGHTLY => 'Fortnightly',
                                         Recurrence::RECURRENCE_MONTHLY => 'Monthly',
-                                        Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based'
+                                        Recurrence::RECURRENCE_TIMETABLE => 'Timetable Based',
                                         ],
                 'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
                 'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
@@ -807,7 +807,7 @@ class Controller extends Base
                 ],
                 'recurrence'        => $recurrence,
                 'efficacySelf'      => EventRecurrenceMapper::EFFICACY_SELF,
-                'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES
+                'efficacySeries'    => EventRecurrenceMapper::EFFICACY_SERIES,
             ],
         );
     }
@@ -1385,29 +1385,43 @@ class Controller extends Base
     }
 
     /**
-     * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result
-     * in a clash booking.  Whether the booking can be then depends on whether clash bookings are allowed on the
-     * resource.
-     * @param GenericCollection<Item\Model> $resourceById
-     * @param GenericCollection<Calendar\Event> $eventById
+     * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
+     * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
+     * allowed on the resource.)
+     * @param GenericCollection<int, Item\Model> $resourceById - Resources indexed by resourceId.
+     * @param GenericCollection<int, Calendar\Event> $eventById - Events indexed by eventId.
      * @return array
      */
     private function checkForClashesIfResourceBookingsAddedToEvents(GenericCollection $resourceById, GenericCollection $eventById): array
     {
         $isClashByResourceIdByEventId = [];
 
-//        $periodsOfApprovedBookingsByResourceId = (
-//            $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId($resourceById->keys()
-//        );
-//
-//        // For each event in the series, check for clash bookings if each resource is booked at a time matching the event time.
-//        foreach ($eventById as $eventId => $event) {
-//            // For each resource, check for existing approved bookings of that resource that overlap the event period.
-//            foreach ($resourceById as $resourceId => $resource) {
-//            foreach ($periodsOfApprovedBookings as $periodOfApprovedBooking) {
-//                if
-//            }
-//        }
+        $periodsOfApprovedBookingsByResourceId = (
+            $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId($resourceById->keys(), true)
+        );
+
+        // For each event in the series, check for clash bookings if each resource is booked at a time matching the event time.
+        /** @var Calendar\Event $event */
+        foreach ($eventById as $eventId => $event) {
+            // For each resource, check for existing approved bookings of that resource that overlap the event period.
+            foreach ($resourceById as $resourceId => $resource) {
+                $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$resourceId] ?? [];
+                foreach ($periodsOfApprovedBookings as $period) {
+                    if ($period['startDatetime']->gt($event->getEndDatetime())) {
+                        // The $periods are sorted by start datetime ascending, so we can be sure that no other periods will clash with event.
+                        break;
+                    }
+
+                    if (
+                        $period['startDatetime']->lt($event->getEndDatetime()) &&
+                        $period['endDatetime']->gt($event->getStartDatetime())
+                    ) {
+                        // If $resource was booked for $event, that booking would clash with an approved booking for $period.
+                        $isClashByResourceIdByEventId[$eventId][$resourceId] = true;
+                    }
+                }
+            }
+        }
 
         return $isClashByResourceIdByEventId;
     }
