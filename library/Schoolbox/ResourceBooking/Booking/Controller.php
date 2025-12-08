@@ -1057,7 +1057,7 @@ class Controller extends Base
      *
      * @throws Deleted|MapperException
      */
-    public function addBookings(): void
+    public function addBookingsToEvent(): void
     {
         $baseEventId = $this->requestPost->getInt('eventId');
         $efficacy = $this->requestPost->get('efficacy');
@@ -1151,7 +1151,7 @@ class Controller extends Base
         // Only unexpected errors require non-success code.
         // It is expected that some or all attempts to book resources may fail for validation reasons.
         $this->response = $this->responseAsJson(
-            // This data structure must match type 'AddBookingsResponse' defined in add-resource-bookings-modal.vue.
+            // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
                 'nBookingsAttempted' => $nBookingsAttempted,
                 'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,

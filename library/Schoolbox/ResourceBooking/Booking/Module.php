@@ -43,7 +43,7 @@ class Module extends BaseModule
         $this->addPostRoute('update:post', $basePath, '/{id}/update')
              ->attributes(['action' => 'update']);
         $this->addRoute('bookingCalendar', $basePath, '/itemCalendar/{id}');
-        $this->addPostRoute('addBookings', $basePath, '/addBookings');
+        $this->addPostRoute('addBookingsToEvent', $basePath, '/addBookingsToEvent');
 
         // Approving or rejecting a single booking
         $this->addRoute('approve', $basePath, '/{id}/approve');
@@ -122,7 +122,7 @@ class Module extends BaseModule
         $manageBookingRule = new Rule\Any($baseManageRule, $isItemModeratorRule);
 
         // Create booking:
-        // This depends on the the item - managed items can only be booked by
+        // This depends on the item - managed items can only be booked by
         // moderators, otherwise they may be booked by any staff member.
         $canBookRule = new Auth\CanBookItem();
         $canBookRule->setMapper($this->getItemMapper());
@@ -139,14 +139,14 @@ class Module extends BaseModule
         // resources.  Because this rule concerns multiple resources, the $canBookRule is unsuitable (the $canBookRule
         // is only suitable if the id of the booking item (the resource) can be read from the path.
         // The permission check for each resource must instead be done in the controller.
-        $addBookingsRule = new Rule\IsLoggedIn(); // TODO: Fix this rule (test with Jack Coles).
+        $addBookingsToEventRule = new Rule\IsLoggedIn(); // TODO: Fix this rule (test with Jack Coles).
 
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, ['book', 'createBooking'], $bookingCreateRule)
             ->addRoutePermission($authorizer, ['approve', 'reject', 'setPending', 'clashApprove'], $manageBookingRule)
             ->addRoutePermission($authorizer, ['cancel', 'edit', 'update:post'], $bookingEditRule)
-            ->addRoutePermission($authorizer, ['addBookings'], $addBookingsRule);
+            ->addRoutePermission($authorizer, ['addBookingsToEvent'], $addBookingsToEventRule);
     }
 
     /**

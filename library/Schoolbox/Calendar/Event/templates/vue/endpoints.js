@@ -33,7 +33,7 @@ export const ENDPOINTS = Object.freeze({
 
     URL_BOOKING_SELECTIZE: "/resource-booking/item/search",
 
-    URL_BOOKINGS_ADD: "/resource-booking/booking/addBookings",
+    URL_BOOKINGS_ADD: "/resource-booking/booking/addBookingsToEvent",
 
     /* Edit bookings on events.
      * TODO: This has not yet been implemented on the back-end.

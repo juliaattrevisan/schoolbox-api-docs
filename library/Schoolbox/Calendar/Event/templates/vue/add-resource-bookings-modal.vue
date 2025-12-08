@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 /**
  * This defines the server response to an ENDPOINTS.URL_BOOKINGS_ADD request.
  */
-type AddBookingsResponse = {
+type AddBookingsToEventResponse = {
     nBookingsAttempted: number;
     nBookingsCreatedWithClash: number;
     nBookingsCreatedWithoutClash: number;
@@ -77,7 +77,7 @@ defineExpose({
  * @param toast The toast to update
  * @param responseData The server's response to an 'addBookings' request.
  */
-function updateToastAndRefreshPage(toast: Toast, responseData: AddBookingsResponse): void {
+function updateToastAndRefreshPage(toast: Toast, responseData: AddBookingsToEventResponse): void {
     const nBookingsCreated = responseData.nBookingsCreatedWithoutClash + responseData.nBookingsCreatedWithClash;
     const nBookingsNotCreated = responseData.nBookingsAttempted - nBookingsCreated;
 
@@ -136,7 +136,7 @@ async function createNewBooking(): Promise<void> {
                 Accept: "application/json",
             },
         });
-        const responseData = (await response.json()) as AddBookingsResponse;
+        const responseData = (await response.json()) as AddBookingsToEventResponse;
         if (response.ok) {
             updateToastAndRefreshPage(toast, responseData);
         } else {
