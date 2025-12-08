@@ -35,6 +35,9 @@ enum StatusEnum: string
      */
     public function translate(): string
     {
+        // This is a valid use of $this:
+        // see https://www.php.net/manual/en/language.enumerations.methods.php
+        // phpcs:ignore
         return match ($this) {
             StatusEnum::INCOMPLETE => StatusEnum::INCOMPLETE_HR->value,
             StatusEnum::IN_PROGRESS => StatusEnum::IN_PROGRESS_HR->value,
