@@ -1119,8 +1119,8 @@ class Controller extends Base
                     $booking = new Model()
                         ->setEvent($event)
                         ->setResource($resource)
-                        ->setBookingStartAt($event->getStartDateTime())
-                        ->setBookingEndAt($event->getEndDateTime())
+                        ->setBookingStartAt(null) // Set as null to default to the event's start time.
+                        ->setBookingEndAt(null) // Set as null to default to the event's end time.
                         ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
                         ->setName($resource->getName());
                     $booking->setStatus(
