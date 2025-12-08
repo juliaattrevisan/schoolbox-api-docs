@@ -657,7 +657,10 @@ class Mapper extends BaseMapper
 
     /**
      * @param array $resourceIds
-     * @param bool  $sortByStartTimeAsc Set to true to have the array sorted by start time asc.
+     * @param bool  $sortByStartDatetimeAsc Set to true to have the array sorted by start time asc.
+     *              This has been made a parameter so that if sorting is important in the calling
+     *              code, that can be made clear to the reader by use of a named parameter.
+     *              Eg. getPeriodsOfFutureApprovedBookingsByResourceId($resourceIds, sortByStartDatetimeAsc: true)
      * @return array
      */
     public function getPeriodsOfFutureApprovedBookingsByResourceId(array $resourceIds, bool $sortByStartDatetimeAsc = false): array

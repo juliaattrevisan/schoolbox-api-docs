@@ -1398,7 +1398,7 @@ class Controller extends Base
         $isClashByResourceIdByEventId = [];
 
         $periodsOfApprovedBookingsByResourceId = (
-            $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId($resourceById->keys(), true)
+            $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId($resourceById->keys(), sortByStartDatetimeAsc: true)
         );
 
         // For each event in the series, check for clash bookings if each resource is booked at a time matching the event time.
