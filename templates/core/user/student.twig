@@ -166,8 +166,32 @@
                                                             {# A string that displays on its own in a flag#}
                                                             {{ selectedField.value|nl2br }}
                                                         {% elseif selectedField.field in ['differentiationProfile'] %}
-                                                            {# A string that displays on its own in a flag#}
-                                                            {{ selectedField.value|nl2br }}
+                                                            {# Display differentiation profile data grouped by adjustments and text #}
+                                                            <div class="l-flex-col l-gap-s f-no-margins">
+                                                                <h3>{{ locale.differentiationProfile.proper }}</h3>
+                                                                {# Display adjustment data (array values) #}
+                                                                {% for item in selectedField.value.adjustmentData %}
+                                                                <div class="l-flex-col l-gap-xs f-no-margins">
+                                                                    <h5><strong>{{ item.terminology }}</strong></h5>
+                                                                    <article>
+                                                                        <ul>
+                                                                            {% for value in item.value %}
+                                                                                <li>{{ value.name }}</li>
+                                                                            {% endfor %}
+                                                                        </ul>
+                                                                    </article>
+                                                                </div>
+                                                                {% endfor %}
+                                                                {# Display text data (string values with HTML) #}
+                                                                {% for item in selectedField.value.textData %}
+                                                                <div class="l-flex-col l-gap-xs f-no-margins">
+                                                                    <h5><strong>{{ item.terminology }}</strong></h5>
+                                                                    <article>
+                                                                        {{ item.value|raw }}
+                                                                    </article>
+                                                                </div>
+                                                                {% endfor %}
+                                                            </div>
                                                         {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                             {% block parentsSeparated %}
                                                                 {# A special flag that has a hardcoded text string #}
