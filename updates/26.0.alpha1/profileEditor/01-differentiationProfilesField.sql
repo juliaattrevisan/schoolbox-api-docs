@@ -12,7 +12,8 @@ INSERT INTO
         css,
         options,
         options_default,
-        is_external
+        is_external,
+        term
     )
 VALUES (
         'student',
@@ -30,7 +31,8 @@ VALUES (
         'highlight',
         '{"clickToReveal": 1}',
         '{"clickToReveal": 1}',
-        0
+        0,
+        'differentiationProfile'
     );
 
 -- Update the sequence of the new differentiationProfile field to be right after the portrait field
