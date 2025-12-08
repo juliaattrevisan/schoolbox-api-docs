@@ -65,6 +65,7 @@ class CkEditorTextChat
             $user,
             Helper::FEATURE_CHAT,
             $aiSessionId,
+            null, // TODO: should be able to use the AgentChat log format
         );
 
         /* Immediately pass on all streamed messages without any changes as CKEditor expects the raw response format */

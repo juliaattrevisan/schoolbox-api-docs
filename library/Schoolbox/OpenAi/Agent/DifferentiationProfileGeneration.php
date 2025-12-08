@@ -84,7 +84,14 @@ class DifferentiationProfileGeneration
 
         $payload = $payloadGenerator->generate();
 
-        $log = $this->client->createLog($payload, null, $user, Helper::FEATURE_DIFFERENTIATION, $aiSessionId);
+        $log = $this->client->createLog(
+            $payload,
+            null,
+            $user,
+            Helper::FEATURE_DIFFERENTIATION,
+            $aiSessionId,
+            null, // These requests can't be restored in the AI Usage Log yet
+        );
         $response = $this->client->createResponse($payload, $log);
 
         $data = json_decode($response->getBody()->getContents(), true);

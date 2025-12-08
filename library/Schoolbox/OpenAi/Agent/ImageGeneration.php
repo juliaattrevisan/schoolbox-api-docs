@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\ImageGeneration as PayloadGenerator;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
@@ -62,7 +63,14 @@ class ImageGeneration
     ): iterable {
         $payload = $this->buildPayload($prompt, $size, $style, $imageUrl, $previousResponseId);
         // TODO: Should $prompt (what ends up being logged as inputText) contain the other parameters such as the style you selected too? or are we okay with loosing that info
-        $log     = $this->client->createLog($payload, $prompt, $user, Helper::FEATURE_IMAGE, $sessionId);
+        $log = $this->client->createLog(
+            $payload,
+            $prompt,
+            $user,
+            Helper::FEATURE_IMAGE,
+            $sessionId,
+            Log\Translator\Format\AgentChat::getLogFormat(),
+        );
         return $this->client->createResponseStream(
             $payload,
             $log,

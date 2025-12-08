@@ -22,6 +22,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Editor\OpenAI\Log;
+use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
@@ -170,10 +171,12 @@ class Client implements IClient
         ?User $user = null,
         ?string $feature = null,
         ?string $aiSessionId = null,
+        ?LogFormat $logFormat = null,
     ): Log\Model {
         /** @noinspection PhpUnhandledExceptionInspection - this will never throw */
         $log = $this->logMapper->createModel()
-            ->setPrompt(json_encode($payload));
+            ->setPrompt(json_encode($payload))
+            ->setLogFormat($logFormat);
         if (isset($inputText)) {
             $log = $log->setInputText($inputText);
         }

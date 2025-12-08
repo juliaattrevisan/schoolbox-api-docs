@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Agent;
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
@@ -61,7 +62,8 @@ class DialogAgentChat
             $userPrompt,
             $user,
             Helper::FEATURE_DIALOGAGENT,
-            $sessionId
+            $sessionId,
+            Log\Translator\Format\AgentChat::getLogFormat(),
         );
 
         /** Immediately save the log so the dialog agent response can be associated without failing a foreign key constraint */
