@@ -230,18 +230,27 @@ class Transactor
              */
             $dialogAgent = $this->dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
 
-            $fieldContexts = $this->fieldContextMapper->createCollection();
-
-            foreach ($scenario->getFields() as $field) {
-                $fieldContexts->add($this->fieldContextMapper->createModel()
-                    ->setField($field)
-                    ->setDialogAgent($dialogAgent));
-            }
-
-            /* I'll save them. I'll save them all.
-             *    --Jardani Jovonovich
+            /* See if fields already exist for this dialog agent; if so, reuse them (leave them unchanged) because you
+             * are updating an existing dialog agent's settings.
+             *
+             * Otherwise you're creating a new dialog agent and you need new field contexts to spawn.
              */
-            $this->fieldContextMapper->save($fieldContexts);
+            $existingFieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->count();
+
+            if (!$existingFieldContexts) {
+                $fieldContexts = $this->fieldContextMapper->createCollection();
+
+                foreach ($scenario->getFields() as $field) {
+                    $fieldContexts->add($this->fieldContextMapper->createModel()
+                        ->setField($field)
+                        ->setDialogAgent($dialogAgent));
+                }
+
+                /* I'll save them. I'll save them all.
+                 *    --Jardani Jovonovich
+                 */
+                $this->fieldContextMapper->save($fieldContexts);
+            }
         }
 
         /* The conclusion of how $returnUrl was derived
