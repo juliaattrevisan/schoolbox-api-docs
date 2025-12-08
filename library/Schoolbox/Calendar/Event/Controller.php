@@ -831,7 +831,7 @@ class Controller extends Base
                     ),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees(),
-                    'bookingErrors' => $bookingErrors ?? [],
+                    'bookingErrors' => $bookingErrors,
                 ]
             );
         } else {
