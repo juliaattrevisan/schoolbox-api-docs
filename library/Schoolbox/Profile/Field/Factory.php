@@ -442,6 +442,64 @@ class Factory
             }
         }
 
+        /* Mock differentiation profile data
+         * TODO: Replace with actual data from database/SIS
+         */
+        $mockDifferentiationData = [
+            [
+                'terminology' => 'Adjustment Category',
+                'value' => [
+                    ['name' => 'Cognitive'],
+                    ['name' => 'Social / Emotional'],
+                ],
+            ],
+            [
+                'terminology' => 'Adjustment Level',
+                'value' => [
+                    ['name' => 'Support'],
+                    ['name' => 'Extensive'],
+                ],
+            ],
+            [
+                'terminology' => 'Overview',
+                'value' => '<p>Hardworking, motivated, and creative student with strong group work skills but experiences difficulty with reading fluency, comprehension, writing, and independent work. Requires support to improve organization, time management, and emotional regulation to enhance participation and confidence across academic and specialist subjects.</p>',
+            ],
+            [
+                'terminology' => 'Interests / Strengths',
+                'value' => '<ul><li>Strengths: Group work, hardworking, creative, motivated</li><li>Interests: Swimming, board games</li></ul>',
+            ],
+            [
+                'terminology' => 'Learning Needs',
+                'value' => '<ul><li>Difficulty with reading fluency and comprehension</li><li>Challenges in writing and independent work</li><li>Needs to improve emotional regulation and social skills</li><li>Requires development in organizational skills and task completion</li></ul>',
+            ],
+            [
+                'terminology' => 'Specific Strategies',
+                'value' => '<ul><li>Provide daily guided reading practice with phonics and sight word games</li><li>Use concrete materials and manipulatives for hands-on math learning</li><li>Incorporate visual aids, charts, and colour-coded worksheets across subjects</li><li>Implement small group and peer collaboration for literacy and numeracy tasks</li><li>Use educational apps and technology for interactive learning</li><li>Break tasks into smaller steps and provide extra time for complex assignments</li><li>Offer one-on-one support during challenging tasks and review foundational concepts regularly</li><li>Use visual schedules, checklists, and structured routines to support organization and independence</li><li>Provide preferential seating and quiet areas to reduce distractions</li><li>Conduct regular social-emotional check-ins and role-playing activities for conflict resolution</li><li>Encourage positive reinforcement and celebrate progress to boost motivation and confidence</li><li>Engage parents in at-home reading, math practice, and related activities for specialist subjects</li></ul>',
+            ],
+            [
+                'terminology' => 'Goals',
+                'value' => '<ol><li><strong>Literacy (Reading and Writing):</strong> Improve reading fluency and comprehension; develop writing skills</li><li><strong>Numeracy (Mathematics):</strong> Develop number sense focusing on addition and subtraction; practice multiplication tables for fluency</li><li><strong>Social and Emotional Development:</strong> Improve emotional regulation and social skills</li><li><strong>Organization and Independence:</strong> Increase organizational skills and task completion; foster independent learning and problem-solving</li><li><strong>Specialist Subjects (Art, Spanish, Sports):</strong> Improve vocabulary retention and understanding; enhance confidence and participation; develop practical and theoretical skills; encourage independent application of knowledge</li></ol>',
+            ],
+        ];
+
+        /* Group differentiation data into adjustmentData (array values) and textData (string values)
+         */
+        $adjustmentData = [];
+        $textData = [];
+
+        foreach ($mockDifferentiationData as $item) {
+            if (is_array($item['value'])) {
+                $adjustmentData[] = $item;
+            } else {
+                $textData[] = $item;
+            }
+        }
+
+        $differentiationProfile = [
+            'adjustmentData' => $adjustmentData,
+            'textData' => $textData,
+        ];
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -475,7 +533,7 @@ class Factory
              */
             'emergencyContacts' => $emergencyContacts,
 
-            'differentiationProfile' => 'blah',
+            'differentiationProfile' => $differentiationProfile,
         ];
 
         return array_merge($externalUser, $referenceFields);
