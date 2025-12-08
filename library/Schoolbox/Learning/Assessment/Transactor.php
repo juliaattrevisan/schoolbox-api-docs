@@ -235,7 +235,7 @@ class Transactor
              *
              * Otherwise you're creating a new dialog agent and you need new field contexts to spawn.
              */
-            $existingFieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->count();
+            $existingFieldContexts = $this->fieldContextMapper->countByColumn('dialog_agent_id', $dialogAgent->getId());
 
             if (!$existingFieldContexts) {
                 $fieldContexts = $this->fieldContextMapper->createCollection();
