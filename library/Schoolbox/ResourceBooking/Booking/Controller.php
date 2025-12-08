@@ -1434,6 +1434,10 @@ class Controller extends Base
                         $period['startDatetime']->lt($event->getEndDatetime()) &&
                         $period['endDatetime']->gt($event->getStartDatetime())
                     ) {
+                        if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
+                            $isClashByResourceIdByEventId[$eventId] = [];
+                        }
+
                         // If $resource was booked for $event, that booking would clash with an approved booking for $period.
                         $isClashByResourceIdByEventId[$eventId][$resourceId] = true;
                     }
