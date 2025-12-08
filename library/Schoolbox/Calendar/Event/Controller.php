@@ -1033,6 +1033,10 @@ class Controller extends Base
      */
     private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user)
     {
+        // can't work out the diff if there is no past...
+        if (!$oldStartDateTime || !$oldEndDateTime) {
+            return []; // No bookings to move if we don't have old times
+        }
         // get the time diff in minutes
         $startDiff = $oldStartDateTime?->diffInMinutes($event->getStartDateTime(), false);
         $endDiff = $oldEndDateTime?->diffInMinutes($event->getEndDateTime(), false);
