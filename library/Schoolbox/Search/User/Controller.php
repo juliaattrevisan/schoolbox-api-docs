@@ -213,8 +213,15 @@ class Controller extends BaseController
                 },
                 /* Inject differentiation profile data so it executes in proper place deeper in the Factory
                  * ...but only if differentiationProfile was a renderable field, as per admin
+                 * ...and only if the differentiation profile feature is enabled
                  */
                 'differentiationProfile' => function () use ($viewee) {
+                    /* Return null if differentiation profile is disabled
+                     */
+                    if (!$this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED)) {
+                        return null;
+                    }
+
                     try {
                         $profile = $this->differentiationProfileMapper->findOneByColumn(
                             'student_id',
