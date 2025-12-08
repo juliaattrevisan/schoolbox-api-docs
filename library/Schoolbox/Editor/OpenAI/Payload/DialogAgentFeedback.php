@@ -173,7 +173,7 @@ class DialogAgentFeedback
         $responseFormat = self::RESPONSE_FORMAT;
 
         foreach ($scenario->getCriteria() as $criterion) {
-            $fieldKey = $criterion->getId();
+            $fieldKey = \sprintf("criteria_%d", $criterion->getId());
 
             $responseFormat['schema']['properties'][$fieldKey] = [
                 'type' => 'string',

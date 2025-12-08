@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent;
 
 use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
@@ -17,6 +18,7 @@ use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentFeedback as PayloadGenerator;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\Collection;
 use Schoolbox\User;
 
 /**
@@ -47,15 +49,16 @@ class DialogAgentFeedback
      * @param string   $sessionId The session ID against which this request should be logged.
      * @param Scenario $scenario
      * @param Response $response
-     * @return string
+     * @return Collection<int,string|null> Map of criteria ID to feedback body
      * @throws ClientExceptionInterface
+     * @throws SchoolboxException
      */
     public function request(
         ?User $user,
         string $sessionId,
         Scenario $scenario,
         Response $response
-    ): string {
+    ): Collection {
         $payload = new PayloadGenerator(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
@@ -66,15 +69,69 @@ class DialogAgentFeedback
 
         $log = $this->client->createLog(
             $payload,
-            $response->getId(), // for debugging purposes, this links the log back to the response ID
+            (string)$response->getId(), // for debugging purposes, this links the log back to the response ID
             $user,
             Helper::FEATURE_DIALOGAGENT,
             $sessionId,
             null, // These requests can't be restored in the AI Usage Log yet
         );
 
-        $response = $this->client->createResponse($payload, $log);
+        $feedbackResponse = $this->client->createResponse($payload, $log);
 
-        return $response->getBody()->getContents();
+        return $this->parseResponse($scenario, $feedbackResponse->getBody()->getContents());
+    }
+
+
+    /**
+     * Handle the response from the AI for a request
+     * @param Scenario $scenario
+     * @param string $feedbackResponseData
+     * @return Collection<int,string|null> Map of criteria ID to feedback body
+     * @throws SchoolboxException
+     */
+    private function parseResponse(Scenario $scenario, string $feedbackResponseData): Collection
+    {
+        // This response used to need special handling of its return, because it
+        // was not guaranteed to be valid JSON.
+        // That no longer seems to be required, but the original comment was:
+        // Send it and decode the result (if any: sometimes it returns null)
+        // and dodge around all its weird encoding business with a double-decode,
+        // and ditching all its training markdown (lol) that it loves to use
+        //
+        // https://community.openai.com/t/json-returning-with-json/584818/6
+        $data = json_decode($feedbackResponseData, true);
+
+        /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
+        $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
+        if (!isset($relevantData)) {
+            throw new SchoolboxException($data['output'] ?? 'Invalid response');
+        }
+
+        try {
+            /* if this didn't decode correctly, then some weird response came from the AI:
+             * send that on... so we can figure out what happened
+             */
+            $feedbackData = json_decode(
+                $relevantData,
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            );
+        } catch (\JsonException $e) {
+            throw new SchoolboxException('Invalid response', 0, $e);
+        }
+
+        /* Retrieve the output for each of the criteria that was requested */
+        $feedback = new Collection();
+
+        foreach ($scenario->getCriteria() as $criterion) {
+            $fieldKey = \sprintf("criteria_%d", $criterion->getId());
+
+            // maybe the AI didn't return stuff for this criterion... ignore if so
+            $body = $feedbackData[$fieldKey] ?? null;
+            $feedback->setOffset($criterion->getTitle(), $body);
+        }
+
+        return $feedback;
     }
 }

@@ -730,8 +730,60 @@ class Controller extends Base
             ->withHeader('Pragma', ' ')
             ->withHeader('Cache-Control', ' ')
             ->withHeader('Content-Type', 'text/csv')
-            ->withHeader('Content-Length', strlen($contents))
+            ->withHeader('Content-Length', (string)\strlen($contents))
             ->withHeader('Content-Disposition', "attachment; filename=\"{$filename}\"")
         ;
+    }
+
+
+    /**
+     * Generate feedback for a particular dialog agent response
+     *
+     * @param DialogAgent $assessment
+     * @param User $student
+     * @param Response $response
+     * @return void
+     * @throws ClientExceptionInterface
+     */
+    public function getGenerateFeedback(DialogAgent $assessment, User $student, Response $response): void
+    {
+        // TODO: This should be a POST and actually persist the feedback. The frontend never needs this return data
+        // TODO: Move this where it's most relevant
+
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+
+        $agent = new OpenAI\Agent\DialogAgentFeedback(
+            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $agentConfig,
+            $this->aiLogMapper,
+        );
+
+        /* Each feedback generation gets its own session ID */
+        $aiSessionId = Uuid::uuid4()->toString();
+
+        try {
+            $feedbackData = $agent->request(
+                $this->getUser(), /* user is optional, as this could be system-triggered */
+                $aiSessionId,
+                $scenario,
+                $response,
+            );
+        } catch (SchoolboxException $e) {
+            $problem = new ApiProblem($e->getMessage())
+                ->setStatus($e->getCode())
+                ->asArray();
+
+            $this->response = $this
+                ->responseAsJson($problem)
+                ->withStatus($e->getCode());
+            return;
+        }
+
+        // TODO: persist it
+
+        $this->response = $this->responseAsJson($feedbackData);
     }
 }
