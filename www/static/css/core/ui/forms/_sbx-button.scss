@@ -125,7 +125,7 @@
  * An existing flex list of buttons, just add some gap
  */
 .flex-list.buttons {
-    gap: var(--sbx-size-s);
+    gap: var(--sbx-size-xs);
 }
 
 /**
@@ -147,7 +147,9 @@
  * These need to be treated differently to standard buttons
  * as they have no text content and so need a border to define their shape
  */
-.sbx-body button.button[class*="icon-"] {
+.sbx-body button.button[class*="icon-"],
+.sbx-body .dz-remove,
+.sbx-body .ab-upload .dz-remove {
     border: none;
 }
 
