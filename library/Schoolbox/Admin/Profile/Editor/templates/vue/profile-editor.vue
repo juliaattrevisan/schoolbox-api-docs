@@ -9,10 +9,11 @@ import PeTabs from "./pe-tabs.vue";
 import PeRoleType from "./pe-role-type.vue";
 import PeNameFormat from "./pe-name-format.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileEditorPayload } from "./types/profileEditorTypes";
+import type { ProfileEditorPayload, ProfileEditorConfig } from "./types/profileEditorTypes";
 
 interface Props {
     payload: ProfileEditorPayload;
+    config: ProfileEditorConfig;
 }
 
 const props = defineProps<Props>();

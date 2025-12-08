@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Config\ConfigMapper;
 
 class Controller extends Base
 {
@@ -64,6 +65,9 @@ class Controller extends Base
             /* Profile Fields
              */
             'payload' => $payload,
+            'configSettings' => [
+                'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+            ],
         ], 'Profile Editor - ' . ucwords($roleType));
     }
 
