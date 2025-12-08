@@ -330,7 +330,7 @@ class Controller extends Base
 
         // ai Config
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
+        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
 
         /**
          * For dialog agent response chats, the sessionID guid is directly tied to the response,
@@ -408,7 +408,7 @@ class Controller extends Base
 
         // ai Config
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_TEXT_CHAT));
+        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
 
         /**
          * For dialog agent sandbox chats, the sessionID guid is provided by the frontend,
