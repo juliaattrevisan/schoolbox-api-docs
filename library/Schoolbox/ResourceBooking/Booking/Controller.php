@@ -1125,7 +1125,6 @@ class Controller extends Base
                         ->setResource($resource)
                         ->setBookingStartAt(null) // Set as null to default to the event's start time.
                         ->setBookingEndAt(null) // Set as null to default to the event's end time.
-                        ->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED))
                         ->setName($resource->getName())
                         ->setNotes('');
                     $booking->setStatus(
