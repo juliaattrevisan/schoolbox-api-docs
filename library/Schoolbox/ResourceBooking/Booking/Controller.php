@@ -88,16 +88,9 @@ class Controller extends Base
     protected \Schoolbox\External\Event\Mapper $externalEventMapper;
 
     /**
-     *
+     * @var Validation
      */
     protected Validation $validation;
-
-    /**
-     *
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * Generates the 'Book Item' page.
