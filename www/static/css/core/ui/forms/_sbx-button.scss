@@ -61,7 +61,6 @@
 .sbx-body .flex-list.buttons a,
 .sbx-body .flex-list.buttons button,
 .sbx-body .sub-nav li a,
-.sbx-body nav li.active a,
 .sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
@@ -178,9 +177,7 @@
  * These need a border radius on hover to match design
  */
 .sbx-body nav a[class*="icon-"]:hover,
-.sbx-body nav a[class^="icon-"]:hover,
-.island .row.actions-small-5 > nav a[class*="icon-"]:hover,
-.island .row.actions-small-5 > nav a[class^="icon-"]:hover {
+.sbx-body nav a[class^="icon-"]:hover {
     border-radius: var(--sbx-border-radius-normal) !important;
 }
 
