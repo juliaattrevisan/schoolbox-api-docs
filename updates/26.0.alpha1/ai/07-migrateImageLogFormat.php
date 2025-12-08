@@ -184,8 +184,6 @@ HELP;
             ]);
 
             $this->getLogger()->info(sprintf('Updated AI log with ID %s', $log->getId()));
-            $this->getLogger()->debug(sprintf(' * Input Text: %s', $log->getInputText()));
-            $this->getLogger()->debug(sprintf(' * Output Text: %s', $log->getOutputText()));
         }
     }
 
