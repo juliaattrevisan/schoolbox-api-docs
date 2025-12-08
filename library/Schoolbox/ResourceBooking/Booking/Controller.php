@@ -39,6 +39,9 @@ use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 
 class Controller extends Base
 {
+    private const int HTTP_STATUS_CODE_OK = 200;
+    private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
+
     /**
      * @var \Schoolbox\ResourceBooking\Booking\Mapper
      */
@@ -1142,12 +1145,13 @@ class Controller extends Base
             }
         }
 
-        $httpStatusCode = 200;
+        $httpStatusCode = self::HTTP_STATUS_CODE_OK;
 
         try {
+            // Since all saves are attempted in one call below, either all will succeed or all will fail.
             $this->bookingMapper->save($bookingList);
         } catch (MapperException) {
-            $httpStatusCode = 400; // Server error.
+            $httpStatusCode = self::HTTP_STATUS_CODE_SERVER_ERROR;
             $nBookingsCreatedWithClash = 0;
             $nBookingsCreatedWithoutClash = 0;
         }
