@@ -179,8 +179,8 @@
  * Small action buttons with icons
  * These need a border radius on hover to match design
  */
-.actions-small-5 > nav a[class*="icon-"]:hover,
-.actions-small-5 > nav a[class^="icon-"]:hover,
+.sbx-body nav a[class*="icon-"]:hover,
+.sbx-body nav a[class^="icon-"]:hover,
 .island .row.actions-small-5 > nav a[class*="icon-"]:hover,
 .island .row.actions-small-5 > nav a[class^="icon-"]:hover {
     border-radius: var(--sbx-border-radius-normal) !important;
