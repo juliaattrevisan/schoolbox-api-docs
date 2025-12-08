@@ -20,7 +20,12 @@ const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
 
 window.Vue.onMounted(() => {
-    peStore.init(props.payload.data.roleTypes, props.payload.data.fieldSettings, props.payload.data.tabSettings);
+    peStore.init(
+        props.payload.data.roleTypes,
+        props.payload.data.fieldSettings,
+        props.payload.data.tabSettings,
+        props.config,
+    );
 });
 </script>
 
