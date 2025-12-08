@@ -31,12 +31,11 @@ body {
 
     font-family: var(--ff-primary) !important;
 
-    // to prevent barcode font override
-    & *:not(.barcode-39) {
+    // to prevent barcode/vjs/view file modal icons override
+    & *:not(.barcode-39, button.vjs-control, [class*=" lg-"]) {
         font-family: var(--ff-primary) !important;
     }
 }
-
 /* ==========================================================================
    2. Header & Global Navigation
    ========================================================================== */

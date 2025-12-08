@@ -295,7 +295,12 @@ export default {
                 >
                     Award with Evidence
                 </a>
-                <button :disabled="isSubmitButtonDisabled" @click.prevent="onSubmit" data-test="badge-award-confirm">
+                <button
+                    class="button"
+                    :disabled="isSubmitButtonDisabled"
+                    @click.prevent="onSubmit"
+                    data-test="badge-award-confirm"
+                >
                     <slot name="confirmButton">Award</slot>
                 </button>
             </section>

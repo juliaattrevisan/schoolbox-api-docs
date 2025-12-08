@@ -18,7 +18,11 @@
 .sbx-body a.submit,
 .sbx-body button.submit,
 .sbx-body .flex-list.buttons a.submit,
-.sbx-body .flex-list.buttons button.submit {
+.sbx-body .flex-list.buttons button.submit,
+.sbx-body .introjs-nextbutton.introjs-fullbutton,
+.sbx-body .introjs-skipbutton,
+.sbx-body .introjs-prevbutton,
+.sbx-body .introjs-button {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-border-radius-normal);
@@ -57,7 +61,6 @@
 .sbx-body .flex-list.buttons a,
 .sbx-body .flex-list.buttons button,
 .sbx-body .sub-nav li a,
-.sbx-body nav li.active a,
 .sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
@@ -112,7 +115,6 @@
  * A horizontal list of buttons, adding some gap between them
  */
 .sbx-body .sub-nav {
-    display: flex;
     flex-wrap: wrap;
     gap: var(--sbx-size-xs);
 }
@@ -121,7 +123,7 @@
  * An existing flex list of buttons, just add some gap
  */
 .flex-list.buttons {
-    gap: var(--sbx-size-s);
+    gap: var(--sbx-size-xs);
 }
 
 /**
@@ -129,8 +131,8 @@
  */
 .sbx-body .component-action section {
     background: var(--sbx-color-foreground-primary);
-    gap: var(--sbx-size-xs);
-    padding: var(--sbx-size-xs);
+    gap: var(--sbx-size-s);
+    padding: var(--sbx-size-s);
     button,
     .button {
         font-weight: normal; // for better readability and consistency with other buttons
@@ -143,7 +145,9 @@
  * These need to be treated differently to standard buttons
  * as they have no text content and so need a border to define their shape
  */
-.sbx-body button.button[class*="icon-"] {
+.sbx-body button.button[class*="icon-"],
+.sbx-body .dz-remove,
+.sbx-body .ab-upload .dz-remove {
     border: none;
 }
 
@@ -161,13 +165,6 @@
 }
 
 /**
- * List items inside flex-list should have margin for spacing (in pantry)
- */
-.sbx-body .flex-list li {
-    margin: 5px;
-}
-
-/**
  * Chips component buttons
  * These need to hide the checkbox input to match design
  */
@@ -179,10 +176,8 @@
  * Small action buttons with icons
  * These need a border radius on hover to match design
  */
-.actions-small-5 > nav a[class*="icon-"]:hover,
-.actions-small-5 > nav a[class^="icon-"]:hover,
-.island .row.actions-small-5 > nav a[class*="icon-"]:hover,
-.island .row.actions-small-5 > nav a[class^="icon-"]:hover {
+.sbx-body nav a[class*="icon-"]:hover,
+.sbx-body nav a[class^="icon-"]:hover {
     border-radius: var(--sbx-border-radius-normal) !important;
 }
 
