@@ -1063,8 +1063,11 @@ class Controller extends Base
         foreach ($bookings[$event->getId()] as $booking) {
             /** @var ResourceBookingModel $booking */
 
-            $newStart = $booking->getBookingStartAt()?->addMinutes($startDiff);
-            $newEnd = $booking->getBookingEndAt()?->addMinutes($endDiff);
+            // booking dates may be null, so fall back to event dates
+            $bookingStart = $booking->getBookingStartAt() ?? $event->getStartDateTime();
+            $bookingEnd = $booking->getBookingEndAt() ?? $event->getEndDateTime();
+            $newStart = $bookingStart?->addMinutes($startDiff);
+            $newEnd = $bookingEnd?->addMinutes($endDiff);
 
             $clashErrors = $validation->validateForClashes(
                 $booking->getResource(),
