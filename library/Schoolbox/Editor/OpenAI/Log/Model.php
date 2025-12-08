@@ -267,10 +267,6 @@ class Model
      */
     public function getLogFormat(): ?string
     {
-        if (null === $this->logFormat) {
-            return null;
-        }
-
         return $this->logFormat;
     }
 
@@ -280,7 +276,9 @@ class Model
      */
     public function setLogFormat(string|LogFormat|null $logFormat): self
     {
-        $this->logFormat = $logFormat instanceof LogFormat ? $logFormat->value : $logFormat;
+        $this->logFormat = $logFormat instanceof LogFormat
+            ? $logFormat->value
+            : $logFormat;
 
         return $this;
     }
