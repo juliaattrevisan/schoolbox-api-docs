@@ -53,8 +53,9 @@ async function createLessonPlanTemplate(
     tester.isGoingTo("Type a template name,add a field name and body and save it");
     await templates.typeName(templateName);
     await templates.typeFieldTile(1, "Automation Field 1");
+    await templates.typeDescription(1, "Automation Description 1");
     await templates.fillBody(1, "Automation Body 1");
-    tester.isGoingTo("Add a new field, type a filed title and body and save it");
+    tester.isGoingTo("Add a new field, type a field title and body and save it");
     await templates.clickAddNewFieldButton();
     await templates.typeFieldTile(2, "Automation Field 2 not visible to students");
     await templates.fillBody(2, "Automation Body 2 not visible to students");
@@ -83,7 +84,7 @@ async function createLessonPlanTemplate(
     );
 
     tester.isGoingTo("Navigate to the homepage");
-    await page.goto("https://vagrant.dev.schoolbox.cloud/resources/");
+    await page.goto("/resources/");
     await expect(page.locator(`li[title="${folderName}"]`)).toBeVisible();
     const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
     expect(folderId).not.toBe(null);
@@ -111,6 +112,12 @@ async function createLessonPlanTemplate(
 test.describe("Lesson Plan Activity", () => {
     // Run tests serially, as tests rely on prior tests to have been run
     test.describe.configure({ mode: "serial" });
+    const templateName = "Automation Template to create a lesson plan";
+    const lessonPlanName = "Lesson Plan Automation Test 1";
+    const folderName = "Test Class Homepage Lesson Plan";
+    const lessonPlanField1Text = "Automation Field 1";
+    const lessonPlanField2Text = "Automation Field 2";
+    const unitPersuasionAndMediaId = 17; // Persuasion and the Media unit id
     /**
      * Preparations
      *
@@ -134,9 +141,6 @@ test.describe("Lesson Plan Activity", () => {
         const createLessonPlan = new CreateLessonPlan(tester, page);
         const courseId = 6; // Year 9 English course id
         const unitId = 15; // Romeo and Juliet unit id
-        const templateName = "Automation Template to create a lesson plan";
-        const lessonPlanName = "Lesson Plan Automation Test 1";
-        const folderName = "Test Class Homepage Lesson Plan";
 
         const teacher = "Jack Coles";
         const student = "Eden Reed";
@@ -174,8 +178,6 @@ test.describe("Lesson Plan Activity", () => {
     test("Lesson Plan Fields Visibility", async ({ tester, page, db }) => {
         const courseList = new CourseList(page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
-        const lessonPlanName = "Lesson Plan Automation Test 1";
-        const folderName = "Test Class Homepage Lesson Plan";
 
         const teacher = "Mr Jack Coles";
         const student = "Ms Eden Reed";
@@ -226,7 +228,7 @@ test.describe("Lesson Plan Activity", () => {
             "check if student can view the visible field and cannot view the not visible fields to students",
         );
         await page.waitForTimeout(3000);
-        await expect(page.locator("#lessonPlan-student")).toContainText("Automation Field 1");
+        await expect(page.locator("#lessonPlan-student")).toContainText(lessonPlanField1Text);
         await expect(page.locator("#lessonPlan-student")).not.toContainText(
             "Automation Field 2 not visible to students",
         );
@@ -238,6 +240,36 @@ test.describe("Lesson Plan Activity", () => {
         tester.isGoingTo("check if teacher can view all the lesson plan fields");
         await expect(page.locator("#lessonPlan-staff")).toContainText("Automation Field 1");
         await expect(page.locator("#lessonPlan-staff")).toContainText("Automation Field 2 not visible to students");
+    });
+
+    /**
+     * check whether the lesson plan tooltip description is presented or not
+     */
+    test("Lesson Plan Field Description Tooltip: check whether the tooltip is presented or not", async ({
+        tester,
+        page,
+        db,
+    }) => {
+        const unitPlanner = new UnitPlanner(tester, page);
+        const templateList = new TemplateList(tester, page);
+        const lessonPlanTemplateId = (await db.grabFromDatabase("lesson_plan_template", "id", {
+            deleted_at: null,
+            title: templateName,
+        })) as number;
+
+        tester.isGoingTo(
+            "navigate to Year 9 English unit planner page to create a lesson plan under Persuasion and the Media unit",
+        );
+        await unitPlanner.goto(6);
+        await unitPlanner.clickCreateActivityButton(unitPersuasionAndMediaId);
+        await unitPlanner.clickCreateActivityOption("lesson-plan", unitPersuasionAndMediaId);
+        await page.waitForLoadState("domcontentloaded");
+        await templateList.clickTemplateLink(lessonPlanTemplateId);
+        await tester.common.clickSubmitButton();
+
+        tester.isGoingTo("check whether the lesson plan field description tooltip is presented or not");
+        await expect(page.getByTestId(`lp-description-field-hint-${lessonPlanField1Text}`)).toBeVisible();
+        await expect(page.getByTestId(`lp-description-field-hint-${lessonPlanField2Text}`)).not.toBeVisible();
     });
 
     /**
