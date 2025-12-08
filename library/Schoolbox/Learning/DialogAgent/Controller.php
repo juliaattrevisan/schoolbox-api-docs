@@ -22,8 +22,9 @@ use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMap
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper as CriteriaMapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Log\LogFormat as AiLogFormat;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
-use Schoolbox\Editor\OpenAI\Log\ModelToArray as AILogModelToArray;
+use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -271,9 +272,12 @@ class Controller extends Base
                 'order' => [ 'created_at' => 'ASC' ]
             ]);
 
-            /* Assume they have the right log type since sessionId came from the response */
+            /** The strategy should always be AgentChat for each log */
+            $logStrategyFactory = new AILogTranslator\Format\StrategyFactory();
             foreach ($logEntries as $log) {
-                $feed->add(AILogModelToArray::translateLogData($log));
+                $logFormat = AILogFormat::from($log->getLogFormat());
+                $strategy = $logStrategyFactory->makeStrategy($logFormat);
+                $feed->add($strategy->translate($log));
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
