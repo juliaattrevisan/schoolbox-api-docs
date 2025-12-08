@@ -12,8 +12,7 @@ INSERT INTO
         css,
         options,
         options_default,
-        is_external,
-        term
+        is_external
     )
 VALUES (
         'student',
@@ -26,13 +25,12 @@ VALUES (
                 roletype = 'student'
         ),
         1, -- enabled by default
-        NULL,
+        'differentiationProfile',
         'icon-learning-support',
         'highlight',
         '{"clickToReveal": 1}',
         '{"clickToReveal": 1}',
-        0,
-        'differentiationProfile'
+        0
     );
 
 -- Update the sequence of the new differentiationProfile field to be right after the portrait field
