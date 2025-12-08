@@ -129,7 +129,7 @@ class DialogAgentFeedback
 
             // maybe the AI didn't return stuff for this criterion... ignore if so
             $body = $feedbackData[$fieldKey] ?? null;
-            $feedback->setOffset($criterion->getTitle(), $body);
+            $feedback->setOffset($criterion->getId(), $body);
         }
 
         return $feedback;
