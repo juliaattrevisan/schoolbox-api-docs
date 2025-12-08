@@ -26,7 +26,7 @@ VALUES (
         ),
         1, -- enabled by default
         NULL,
-        'icons-learning-support',
+        'icon-learning-support',
         'highlight',
         '{"clickToReveal": 1}',
         '{"clickToReveal": 1}',
