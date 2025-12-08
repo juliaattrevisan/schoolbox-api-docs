@@ -421,9 +421,9 @@ class EventMapper extends CalendarEventMapper
     /**
      * Post-soft-delete hook method
      *
-     * @param object $event
+     * @param \Schoolbox\Calendar\Event $event
      */
-    protected function postDelete(object $event): void
+    protected function postDelete(\Schoolbox\Calendar\Event $event): void
     {
         /* noop EOTC doesn't have to do anything special on delete
          */

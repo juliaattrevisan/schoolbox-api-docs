@@ -405,10 +405,10 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     /**
      * Post-soft-delete hook method
      *
-     * @param object $event
+     * @param Event $event
      * @throws MapperException
      */
-    protected function postDelete(object $event): void
+    protected function postDelete(Event $event): void
     {
         /** @var Event $event */
 
