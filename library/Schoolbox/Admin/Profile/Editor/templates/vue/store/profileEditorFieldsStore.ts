@@ -435,12 +435,12 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     }
 
     /**
-     * Determine whether a field should be shown based on config settings
+     * Determine whether a field should be shown based on config
      * @param field - The field to check
      * @returns true if the field should be shown, false otherwise
      */
     function showField(field: ProfileEditorAvailableField | ProfileEditorActiveField): boolean {
-        if (peStore.configSettings?.differentiationEnabled === false && field.field === "differentiationProfile") {
+        if (peStore.config?.differentiationEnabled === false && field.field === "differentiationProfile") {
             return false;
         }
         return true;

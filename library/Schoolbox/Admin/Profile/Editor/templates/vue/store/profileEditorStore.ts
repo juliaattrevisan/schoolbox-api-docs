@@ -10,7 +10,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const fieldSettings = window.Vue.ref<ProfileEditorPayload["data"]["fieldSettings"]>({});
     const tabSettings = window.Vue.ref<ProfileEditorPayload["data"]["tabSettings"]>({});
     const selectedRoleType = window.Vue.ref<ProfileEditorRoleType | null>(null);
-    const configSettings = window.Vue.ref<ProfileEditorConfig | null>(null);
+    const config = window.Vue.ref<ProfileEditorConfig | null>(null);
 
     const savedSelectedRoleType = window.Vue.computed<typeof selectedRoleType.value>(() => {
         const currentRoleType = selectedRoleType.value;
@@ -24,19 +24,19 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
      * @param $roleTypes - The current role types
      * @param $fieldSettings - The current field settings spec
      * @param $tabSettings - The current tab settings spec
-     * @param $configSettings - The current config settings spec
+     * @param $config - The current config settings spec
      */
     function init(
         $roleTypes: ProfileEditorPayload["data"]["roleTypes"],
         $fieldSettings: ProfileEditorPayload["data"]["fieldSettings"],
         $tabSettings: ProfileEditorPayload["data"]["tabSettings"],
-        $configSettings: ProfileEditorConfig | null,
+        $config: ProfileEditorConfig | null,
     ): void {
         roleTypes.value = $roleTypes;
         savedRoleTypes.value = cloneDeep($roleTypes);
         fieldSettings.value = $fieldSettings;
         tabSettings.value = $tabSettings;
-        configSettings.value = $configSettings;
+        config.value = $config;
     }
 
     /**
@@ -86,6 +86,6 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         savedSelectedRoleType,
         setSelectedRoleType,
         saveNameFormat,
-        configSettings,
+        config,
     };
 });
