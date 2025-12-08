@@ -1103,13 +1103,12 @@ class Controller extends Base
         $nBookingsCreatedWithClash = 0;
 
         // Create a list of booking models to be persisted depending on validation results.
+        /** @var Calendar\Event $event */
         foreach ($eventById as $eventId => $event) {
             $isClashByResourceId = $isClashByResourceIdByEventId[$eventId] ?? [];
+            /** @var Item\Model $resource */
             foreach ($resourceById as $resourceId => $resource) {
                 $isClash = $isClashByResourceId[$resourceId] ?? false;
-
-                /** @var Item\Model $resource */
-                $resource = $resourceById[$resourceId];
                 if (!$isClash || $resource->getAllowClashBookings()) {
                     // Build the booking.
                     // Do not set start/end times because these are intended to be the same as in the linked event row.
