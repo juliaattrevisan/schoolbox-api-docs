@@ -1135,7 +1135,7 @@ class Controller extends Base
                     if (!array_key_exists($eventDate, $errorMsgByResourceIdByEventDate)) {
                         $errorMsgByResourceIdByEventDate[$eventDate] = [];
                     }
-                    $errorMsgByResourceIdByEventDate[$eventId][$resourceId] = 'Booking clashes and clashes are not allowed';
+                    $errorMsgByResourceIdByEventDate[$eventDate][$resourceId] = 'Booking clashes and clashes are not allowed';
                 }
             }
         }
