@@ -40,6 +40,7 @@ use Calendar_Api_EventType_ResourceBooking_Booking_ForItem;
 class Controller extends Base
 {
     private const int HTTP_STATUS_CODE_OK = 200;
+    private const int HTTP_STATUS_CODE_BAD_REQUEST = 400;
     private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
 
     /**
@@ -215,7 +216,7 @@ class Controller extends Base
     {
         $bookingList = null;
 
-        $code = 200;
+        $code = self::HTTP_STATUS_CODE_OK;
         [$errors, $clashBookingStartDatesAsKeys] = (
             $this->validateBookingIgnoringClashesIfClashesAllowed($item, $this->requestPost->getArrayCopy())
         );
@@ -275,7 +276,7 @@ class Controller extends Base
             }
             $this->bookingMapper->save($bookingList);
         } else {
-            $code = 400;
+            $code = self::HTTP_STATUS_CODE_BAD_REQUEST;
         }
 
         /* Append the booking's id to the url, for the calling module to
@@ -319,7 +320,7 @@ class Controller extends Base
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
-        $code = 200;
+        $code = self::HTTP_STATUS_CODE_OK;
         [$errors, $clashBookingStartDatesAsKeys] = $this->validateBookingIgnoringClashesIfClashesAllowed(
             $item->getResource(),
             $this->requestPost->getArrayCopy(),
@@ -410,7 +411,7 @@ class Controller extends Base
             );
             $this->bookingMapper->delete($deletedSeries);
         } else {
-            $code = 400;
+            $code = self::HTTP_STATUS_CODE_BAD_REQUEST;
         }
 
         /* Append the booking's id to the url, for the calling module to
@@ -1016,7 +1017,7 @@ class Controller extends Base
                     'callbackUrl' => $callbackUrl,
                     'errors'      => $errors,
                 ],
-            )->withStatus(empty($errors) ? 200 : 400);
+            )->withStatus(empty($errors) ? self::HTTP_STATUS_CODE_OK: self::HTTP_STATUS_CODE_BAD_REQUEST);
         } else {
             // Is there a previous location to redirect to? if so use that.
             $this->response = $this->redirectAfterPost(
