@@ -22,6 +22,8 @@ use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMap
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as FieldContextModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper as CriteriaMapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\Editor\OpenAI\Log\ModelToArray as AILogModelToArray;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -53,6 +55,7 @@ class Controller extends Base
      * @param BreadcrumbFactory $bakery
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param OpenAI\ClientFactory $aiClientFactory
+     * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
@@ -63,6 +66,7 @@ class Controller extends Base
         private BreadcrumbFactory $bakery,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private OpenAI\ClientFactory $aiClientFactory,
+        private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
@@ -99,9 +103,7 @@ class Controller extends Base
          */
         $dialogAgent = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
-        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId())->indexByCallback(static function (FieldContextModel $instance) {
-            return $instance->getField()->getId();
-        });
+        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId());
 
         $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
@@ -230,14 +232,81 @@ class Controller extends Base
     /**
      * View a response's chat log in a readonly mode
      *
-     * @param IAssessable $assessment
+     * @param DialogAgent $assessment
      * @param User $student
+     * @param Response $response
      * @return void
      */
-    public function getViewResponse(IAssessable $assessment, User $student): void
+    public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
     {
-        echo "View a response";
-        // todo implement a readonly viewing mode
+        $participant = $assessment->getParticipant($student);
+
+        /* Prepare a redirection url if one was provided
+         * This will be used after any actions are made (i.e. resetting the chat/submitting the response/etc)
+         * If not provided, no redirection will occur and the page will just reload
+         */
+        $returnUrl = null;
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        }
+
+        /**
+         * Build up the existing feed from the logs.
+         * Also add extra messages such as the opening message as if they were real messages if available
+         */
+        $feed = new \Schoolbox\Collection();
+
+        $feed->add([
+            'type' => 'response',
+            'data' => [
+                'status' => 'success',
+                'responseId' => null,
+                'image' => null,
+                'message' => $assessment->getOpeningMessage()
+            ],
+        ]);
+
+        if ($response->getSessionId()) {
+            $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
+                'order' => [ 'created_at' => 'ASC' ]
+            ]);
+
+            /* Assume they have the right log type since sessionId came from the response */
+            foreach ($logEntries as $log) {
+                $feed->add(AILogModelToArray::translateLogData($log));
+            }
+
+            // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
+        }
+
+        $userTranslator = new User\Translator\Author\ModelToArray();
+        $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
+        $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
+
+        $data = [
+            'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                $assessment->getTitle(),
+                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+            ])->add(['Response']),
+            'assessment' => $assessment,
+            'feed' => $feed,
+            'student' => $userTranslator->__invoke($student),
+            'response' => $response,
+            'responseData' => $responseTranslator->__invoke($response),
+            'interactionLocked' => false, // TODO
+            'returnUrl' => $returnUrl,
+        ];
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dialogAgent/response/view.twig',
+            $data,
+            \sprintf(
+                'Response for %s in %s',
+                $student->getFullName(),
+                $assessment->getTitle(),
+            )
+        );
     }
 
 

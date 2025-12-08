@@ -51,6 +51,18 @@ class ValidConfiguration
             return false;
         }
 
+        /* Opening Message must have been supplied
+         */
+        if ('' === trim((string)$assessment->getOpeningMessage())) {
+            return false;
+        }
+
+        /* Rules must have been supplied
+         */
+        if ('' === trim((string)$assessment->getRules())) {
+            return false;
+        }
+
         /* Find all the contexts that an instructor was supposed to provide for each field in the scenario
          * These are used by the AI to evaluate learners' inputs
          */

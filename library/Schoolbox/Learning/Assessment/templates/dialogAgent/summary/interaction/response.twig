@@ -9,7 +9,7 @@
     student: participant.user
 }) %}
 
-{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgentResponse.getParticularResponse', {
+{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgent.getParticularResponse', {
     assessmentId: currentInteraction.assessable.id,
     studentId:    participant.user.id,
     responseId:   currentInteraction.id,
@@ -18,22 +18,21 @@
     student:      participant.user
 }) %}
 
-{% if currentInteraction.isSubmitted %}
+{% if createSubmissionRoute and currentInteraction.authoritative %}
+    {# You only have access to the create route if this is the current auth response and it's a draft #}
+    {% set url = createSubmissionRoute %}
+    {% set tooltip = 'Resume ' ~ locale.dialogAgent %}
+{% elseif viewSubmissionRoute %}
     {# If it's published, provide a link for teachers to view the submission in the inline grader #}
     {% set url = viewSubmissionRoute %}
-    {% set tooltip = 'View response' %}
+    {% set tooltip = 'View ' ~ locale.dialogAgent %}
 {% else %}
-    {# If this is a draft submission, provide a link to resume #}
-    {% set url = createSubmissionRoute %}
-    {% set tooltip = 'Resume submission' %}
-{% endif %}
-
-{% if not url %}
     {# Just link to participant's profile #}
     {% set url = '/search/user/' ~ participant.user.id %}
     {% set tooltip = 'View Profile' %}
 {% endif %}
 
+{# TODO: implement deleting a particular response #}
 {% set deleteRoute = routeLookupIfAuthorized('learningDialogAgentResponse.deleteParticularResponse', {
     assessment: currentInteraction.assessable,
     assessmentId: currentInteraction.assessable.id,

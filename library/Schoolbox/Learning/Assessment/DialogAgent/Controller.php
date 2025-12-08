@@ -17,7 +17,7 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
-use Schoolbox\Editor\OpenAI\Log\ModelToArray;
+use Schoolbox\Editor\OpenAI\Log\ModelToArray as AILogModelToArray;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
@@ -394,8 +394,9 @@ class Controller extends Assessment\Controller
 
         // Is the page being displayed in readonly mode?
         /* TODO Are students allowed to visit this after the activity is closed?
+         * I don't think you should be able to get here if it's locked. go to the view page instead...
          */
-        $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
+        // $isInteractionLocked = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment);
 
         /* Prepare a redirection url
          */
@@ -432,19 +433,15 @@ class Controller extends Assessment\Controller
          * Also add extra messages such as the opening message as if they were real messages if available
          */
         $feed = new \Schoolbox\Collection();
-
-        if (trim((string)$assessment->getOpeningMessage()) !== '') {
-            // TODO: opening message is actually a required field, handle that properly (maybe it should influence the ability to get here, like prompt also should?)
-            $feed->add([
-                'type' => 'response',
-                'data' => [
-                    'status' => 'success',
-                    'responseId' => null,
-                    'image' => null,
-                    'message' => (string)$assessment->getOpeningMessage()
-                ],
-            ]);
-        }
+        $feed->add([
+            'type' => 'response',
+            'data' => [
+                'status' => 'success',
+                'responseId' => null,
+                'image' => null,
+                'message' => $assessment->getOpeningMessage()
+            ],
+        ]);
 
         if ($response->getSessionId()) {
             $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
@@ -453,11 +450,10 @@ class Controller extends Assessment\Controller
 
             /* Assume they have the right log type since sessionId came from the response */
             foreach ($logEntries as $log) {
-                $feed->add(ModelToArray::translateLogData($log));
+                $feed->add(AILogModelToArray::translateLogData($log));
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
-            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
         }
 
         $userTranslator = new User\Translator\Author\ModelToArray();
@@ -471,13 +467,13 @@ class Controller extends Assessment\Controller
             'assessment' => $assessment,
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
-            'response' => $responseTranslator->__invoke($response),
-            'readonly' => $isInteractionLocked,
+            'response' => $response,
+            'responseData' => $responseTranslator->__invoke($response),
             'returnUrl' => $returnUrl,
         ];
 
         $this->response = $this->responseFromTemplate(
-            '@learningAssessment/dialogAgent/response/create.twig',
+            '@learningAssessment/dialogAgent/response/chat.twig',
             $data
         );
     }

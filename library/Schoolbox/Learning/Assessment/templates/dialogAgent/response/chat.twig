@@ -7,33 +7,34 @@
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
- # @param array $student                  Array of author info about the student creating the response
- # @param array $response                 Array about the response that we are creating/resuming
- # @param bool $readonly                  There's a readonly conditional that prevents you from creating/updating data.
+ # @param array $student                  Array of author info about the student who owns the response
+ # @param DialogAgent\Response $response  The response that we are creating/resuming
+ # @param array $responseData             Array translation of the response to pass to Vue
+ # @param bool $interactionLocked         Is the assessment due in an archived term?
  # @param string $returnUrl               A redirect destination
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<div class="row">
+<div class="actions-small-1 row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
     </div>
 </div>
 
-{# Apparently we _really_ want this to be a centered snowflake #}
-<div class="row l-flex l-flex--center">
-    <div class="small-12 island" style="max-width: 64em"> {# $medium-breakpoint: 64em #}
-        <section class="content">
-            <div id="dialog-agent-chat-container" data-test="dialog-agent-chat-container">
-                <dialog-agent-chat
+<div class="row">
+    <div class="small-12 island">
+        {# Apparently we _really_ want this to be a centered snowflake #}
+        <section class="content c-max-width--medium l-mar--auto-horiz">
+            <div id="dialog-agent-response-container" data-test="dialog-agent-response-container">
+                <dialog-agent-response-chat
                     :feed="{{ feed |json_encode }}"
-                    :response="{{ response |json_encode }}"
+                    :response="{{ responseData |json_encode }}"
                     :student="{{ student |json_encode }}"
                     return-url="{{ returnUrl }}"
                 />
             </div>
-            <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentChat.js?v={{ config.site_version }}"></script>
+            <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentResponse.js?v={{ config.site_version }}"></script>
         </section>
     </div>
 </div>

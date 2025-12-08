@@ -18,7 +18,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    (e: "updateParticipant", data: ApiDialogAgentActionResponse): void;
+    (e: "updateResponse", data: ApiDialogAgentActionResponse): void;
 }>();
 
 /**
@@ -81,8 +81,10 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
             />
             <ul :id="`response-options-${participant.user.id}`" class="f-dropdown" data-dropdown-content>
                 <das-actions
-                    :participant="participant"
-                    @update-participant="(data) => emit('updateParticipant', data)"
+                    :user="participant.user"
+                    :response="participant.response"
+                    :summary-route="participant._routes.summary"
+                    @update-response="(data) => emit('updateResponse', data)"
                 />
             </ul>
         </td>

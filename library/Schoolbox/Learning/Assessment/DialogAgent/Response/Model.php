@@ -178,4 +178,17 @@ class Model extends AbstractResponse
         $this->assistanceRequestedAt = $assistanceRequestedAt;
         return $this;
     }
+
+    /**
+     * Calculate how long this response took to complete; returns number of seconds elapsed
+     *
+     * @return int
+     */
+    public function getTimeTaken(): int
+    {
+        $startedAt = $this->getStartedAt() ?? $this->getCreatedAt();
+        $endedAt = $this->getSubmittedAt() ?? \Alaress_Date_Format::now();
+
+        return $endedAt->diffInSeconds($startedAt);
+    }
 }

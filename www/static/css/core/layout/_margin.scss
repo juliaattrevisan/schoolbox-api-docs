@@ -37,6 +37,14 @@
             }
         }
     }
+    &--auto-horiz {
+        margin-inline-start: auto;
+        margin-inline-end: auto;
+    }
+    &--auto-vert {
+        margin-block-start: auto;
+        margin-block-end: auto;
+    }
     &--0 {
         margin: 0;
     }

@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { useMousePressed } from "@vueuse/core";
+import locale from "@js/terminology/rosettaStone";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
@@ -23,48 +23,9 @@ const acStore = useAgentChatStore();
 
 const currentResponse = window.Vue.ref<DialogAgentResponse>(props.response);
 
-/** If the current user isn't the student, they're the instructor I guess */
-const isInstructor = window.Vue.computed(() => {
-    return props.student.id !== window.schoolboxUser.id;
-});
-
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
-
-    // TODO: all temporary, needs to inject into the right timeline position when it actually exists etc
-    if (isInstructor.value) {
-        acStore.feed.push({
-            // TODO: this would only ever come from props.feed
-            type: AgentChatMessageType.ALERT,
-            side: AgentChatMessageType.RESPONSE,
-            severity: "warning",
-            entryKey: acStore.getNextEntryKey(),
-            message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
-        });
-
-        const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
-        acStore.feed.push({
-            // TODO: a teacher can't spawn this, but they can 'resolve' it so we would need to track it somehow
-            // hence need to be able to insert it based on the createdAt time of each log entry (not currently tracked on the frontend)
-            // and then not include it when it's eventually resolved
-            type: AgentChatMessageType.ALERT,
-            side: AgentChatMessageType.REQUEST,
-            severity: "warning-tint",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-        });
-
-        // This won't actually exist I think. The "requested assistance" message just gets purged
-        // const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-        // acStore.feed.push({
-        //     type: "alert",
-        //     side: "request",
-        //     severity: "highlight",
-        //     entryKey: acStore.getNextEntryKey(),
-        //     message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
-        // });
-    }
 });
 
 const isHelpRequestChanging = window.Vue.ref(false);
@@ -222,7 +183,7 @@ window.Vue.onUnmounted(() => {
 <template>
     <div class="actions-small-1 l-mar-s--bottom no-print">
         <button
-            v-if="!isInstructor && currentResponse._routes.assistanceRequest"
+            v-if="currentResponse._routes.assistanceRequest"
             class="button"
             type="button"
             :disabled="isHelpRequestChanging"
@@ -231,15 +192,7 @@ window.Vue.onUnmounted(() => {
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button
-                class="button submit icon-approve"
-                type="submit"
-                :disabled="isSubmitting || undefined"
-                @click="isSubmitModalOpen = true"
-            >
-                {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
-                <!-- TODO: `Submit on behalf of ${props.student.fullName}` in SA-21415 -->
-            </button>
+            <button class="button submit icon-approve" type="submit" @click="isSubmitModalOpen = true">Submit</button>
         </nav>
     </div>
 
@@ -254,7 +207,7 @@ window.Vue.onUnmounted(() => {
     >
         <template #header>
             <div
-                v-if="!isInstructor && currentResponse.assistanceRequestedAt !== null"
+                v-if="currentResponse.assistanceRequestedAt !== null"
                 class="alert-box highlight l-pad-xs l-pad-m--left"
             >
                 <div class="l-flex l-flex--justify-space l-flex--align-center">
@@ -293,23 +246,33 @@ window.Vue.onUnmounted(() => {
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 
     <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
-        <h2>Confirm Submission</h2>
-        <p>
-            Are you sure you want to finalise this response? Once submitted, you will not be able to make further
-            changes.
-        </p>
-        <div v-if="submitError" class="alert-box alert">
-            <span>{{ submitError }}</span>
-            <a href="#" class="close" @click.prevent="submitError = null">×</a>
-        </div>
-        <ul class="flex-list buttons">
-            <li>
-                <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
-                    {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
-                </button>
-            </li>
-            <li><button class="button" @click="isSubmitModalOpen = false">Cancel</button></li>
-        </ul>
+        <template v-if="props.response._routes.submit">
+            <h2>Confirm Submission</h2>
+            <p>
+                Are you sure you want to finalise this {{ locale.dialogAgent.singular() }}? Once submitted, you will not
+                be able to make further changes.
+            </p>
+            <div v-if="submitError" class="alert-box alert">
+                <span>{{ submitError }}</span>
+                <a href="#" class="close" @click.prevent="submitError = null">×</a>
+            </div>
+            <ul class="flex-list buttons">
+                <li>
+                    <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
+                        {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
+                    </button>
+                </li>
+                <li><button class="button" @click="isSubmitModalOpen = false">Cancel</button></li>
+            </ul>
+        </template>
+        <template v-else>
+            <h2>Nothing To Submit</h2>
+            <p>
+                You haven't made any responses for this {{ locale.dialogAgent.singular() }} yet. Please complete the
+                {{ locale.activity.singular() }} and try again.
+            </p>
+            <button class="button full-width" @click="isSubmitModalOpen = false">Close</button>
+        </template>
     </basic-modal>
 </template>
 
