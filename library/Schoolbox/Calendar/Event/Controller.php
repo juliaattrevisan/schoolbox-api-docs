@@ -1085,8 +1085,8 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId = $booking->getStatus()->getId();
                 if (
-                    $booking->getResource()->isUserModerator($this->getUser())
-                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                    $booking->getResource()->isUserModerator($user)
+                    && (int)$event->getAuthor()->getId() === (int)$user->getId()
                 ) {
                     /* If you're a Moderator and can moderate this request,
                      * and you created the booking in the first place,
