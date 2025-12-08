@@ -12,6 +12,14 @@ namespace External\Canvas\Sync\Bridge\Tasfg;
 class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
 {
     /**
+     * @inheritDoc
+     */
+    public function syncCanvasMarks(): bool
+    {
+        return false;
+    }
+
+    /**
      * Attempt to parse a Subject Code from a sisSourceId and year.
      * +----------------+-----------+-------------+
      * | sis_source_id  | term_name | term_sis_id |
