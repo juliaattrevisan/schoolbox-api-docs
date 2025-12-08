@@ -11,17 +11,13 @@ import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullC
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
  */
+import { EFFICACY_SELF, EFFICACY_SERIES } from "@schoolboxCalendarEvent/eventTypes";
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
-
-// TODO: Define these in an eventTypes.ts file (maybe Calendar/Event/templates/vue/eventTypes.ts?)
-//       (see repeated definitions in add-resource-booking-modal.vue)
-const EFFICACY_SELF = "self";
-const EFFICACY_SERIES = "series";
 
 const EVENT_MODIFIED = "eventModified";
 const EVENT_DELETED = "eventDeleted";

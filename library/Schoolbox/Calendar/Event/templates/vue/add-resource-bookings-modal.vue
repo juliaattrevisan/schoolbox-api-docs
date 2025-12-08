@@ -4,11 +4,7 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { Booking, Resource } from "./resourceBookingTypes";
-
-// TODO: Define these in an eventTypes.ts file (maybe Calendar/Event/templates/vue/eventTypes.ts?)
-//       (see repeated definitions in view-event-modal.vue)
-const EFFICACY_SELF = "self";
-const EFFICACY_SERIES = "series";
+import { EFFICACY_SELF, EFFICACY_SERIES } from "./eventTypes";
 
 interface Props {
     resourceBookings: Booking[];
