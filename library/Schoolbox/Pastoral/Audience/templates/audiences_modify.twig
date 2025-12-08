@@ -90,8 +90,8 @@
                                         <li>
                                             <input id="applyDefaultExpiry" name="applyDefaultExpiry" type="checkbox" value="1">
                                             <label for="applyDefaultExpiry" data-test="audiences-modify-apply-default-expiry">Apply to existing records
-                                            <p class="meta">This will overwrite and apply the Default Expiry to all existing records of this type.</p>
-                                        </label>
+                                                <p class="meta">This will overwrite and apply the Default Expiry to all existing records of this type.</p>
+                                            </label>
                                         </li>
                                     </ul>
                                 </div>
@@ -100,24 +100,22 @@
                     </fieldset>
                     {% if config.differentiation_profiles_enabled ?? false %}
                         <fieldset class="content">
-                            <div class="small-12 columns">
-                                <label for="contributeDifferentiationProfile">Contributes to Differentiation Profile</label>
-                                <p class="meta">
-                                    When checked, records of this type will be linked to students Differentiation Profiles.
-                                </p>
-                                <div class="row">
-                                    <div class="small-12 columns">
+                            <div class="small-12 columns checklist">
+                                 <ul class="option-list">
+                                    <li>
                                         {% set currentContribute = (subtype ? subtype.contributeDifferentiationProfile : type.contributeDifferentiationProfile) %}
                                         <input
-                                                id="contributeDifferentiationProfile"
-                                                name="contributeDifferentiationProfile"
-                                                type="checkbox"
-                                                value="1"
-                                                {% if currentContribute %}checked="checked"{% endif %}
+                                            id="contributeDifferentiationProfile"
+                                            name="contributeDifferentiationProfile"
+                                            type="checkbox"
+                                            value="1"
+                                            {% if currentContribute %}checked="checked"{% endif %}
                                         >
-                                        <label for="contributeDifferentiationProfile" class="checkbox-label" data-test="audiences-modify-contribute-differentiation-profile"></label>
-                                    </div>
-                                </div>
+                                        <label for="contributeDifferentiationProfile" data-test="audiences-modify-apply-default-expiry" data-test="audiences-modify-contribute-differentiation-profile">Contributes to Differentiation Profile
+                                            <p class="meta">When checked, records of this type will be linked to students Differentiation Profiles.</p>
+                                        </label>
+                                    </li>
+                                </ul>
                             </div>
                         </fieldset>
                     {% endif %}
