@@ -281,9 +281,9 @@ class UnitAssessments
         if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
             $response = $participant->getAuthoritativeResponse(true);
 
-            /* If a response exists; interrogate it for its current status; otherwise assume it's Incmoplete
+            /* If a response exists; interrogate it for its current status; otherwise assume it's Incomplete
              */
-            /** @var \Schoolbox\Learning\Assessment\Dialogagent\Response\Model $response */
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
             $progress = $response?->getCurrentStatus() ?? Status::INCOMPLETE->value;
 
             return [
