@@ -2,6 +2,7 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { Booking, Resource } from "./resourceBookingTypes";
 
 // TODO: Define these in an eventTypes.ts file (maybe Calendar/Event/templates/vue/eventTypes.ts?)
@@ -20,9 +21,11 @@ const props = defineProps<Props>();
 /**
  * This defines the server response to an ENDPOINTS.URL_BOOKINGS_ADD request.
  */
-interface AddBookingsResponse {
-    errors?: string[];
-}
+type AddBookingsResponse = {
+    nBookingsAttempted: number;
+    nBookingsCreatedWithClash: number;
+    nBookingsCreatedWithoutClash: number;
+};
 
 const isModalOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
@@ -75,6 +78,50 @@ defineExpose({
 });
 
 /**
+ * @param toast The toast to update
+ * @param responseData The server's response to an 'addBookings' request.
+ */
+function updateToastAndRefreshPage(toast: Toast, responseData: AddBookingsResponse): void {
+    const nBookingsCreated = responseData.nBookingsCreatedWithoutClash + responseData.nBookingsCreatedWithClash;
+    const nBookingsNotCreated = responseData.nBookingsAttempted - nBookingsCreated;
+
+    let msg;
+    let isSuccess;
+
+    switch (nBookingsCreated) {
+        case responseData.nBookingsAttempted:
+            isSuccess = true;
+            msg =
+                responseData.nBookingsCreatedWithClash === 0
+                    ? "Created all bookings and found no clashes"
+                    : `Created all bookings (${responseData.nBookingsCreatedWithClash} as pending because of clash${
+                          responseData.nBookingsCreatedWithClash > 1 ? "es" : ""
+                      })`;
+            break;
+        case 0:
+            isSuccess = false;
+            msg = `Could not create any bookings because of clashes`;
+            break;
+        default:
+            isSuccess = true;
+            msg = `Created some bookings (${nBookingsNotCreated} not created because of clash${
+                nBookingsNotCreated > 1 ? "es" : ""
+            })`;
+    }
+
+    toast.timeout({
+        text: msg,
+        isSuccess,
+        duration: 2000,
+        fadeDuration: 1000,
+        timeoutCallback: () => {
+            // Reload the page after the timeout expires.
+            window.location.reload();
+        },
+    });
+}
+
+/**
  * Post the booking creation form.
  */
 async function createNewBooking(): Promise<void> {
@@ -95,17 +142,7 @@ async function createNewBooking(): Promise<void> {
         });
         const responseData = (await response.json()) as AddBookingsResponse;
         if (response.ok) {
-            isModalOpen.value = false;
-            if (responseData.errors && responseData.errors.length > 0) {
-                toast.timeout({
-                    text: `Booking(s) created with some issues: ${responseData.errors.join(", ")}`,
-                    isSuccess: false,
-                });
-            } else {
-                toast.timeout({ text: "Booking(s) created", isSuccess: true });
-            }
-            // The new booking was successfully added, so reload the page to make it appear.
-            window.location.reload();
+            updateToastAndRefreshPage(toast, responseData);
         } else {
             toast.timeout({ text: "Unable to create booking(s).", isSuccess: false });
         }

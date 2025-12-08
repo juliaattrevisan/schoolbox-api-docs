@@ -1101,9 +1101,10 @@ class Controller extends Base
         // This will hold the booking models to be persisted.
         $bookingList = new Collection();
 
-        // If a booking for a resource cannot be created, this array will store the reason.
-        // There will only ever be one event per date, because the most frequent recurrence type is daily.
-        $errorMsgByResourceIdByEventDate = [];
+        // Counts for results data structure.
+        $nBookingsAttempted = 0;
+        $nBookingsCreatedWithoutClash = 0;
+        $nBookingsCreatedWithClash = 0;
 
         // Create a list of booking models to be persisted depending on validation results.
         foreach ($eventById as $eventId => $event) {
@@ -1130,21 +1131,31 @@ class Controller extends Base
                         )
                     );
                     $bookingList->add($booking);
-                } else {
-                    $eventDate = $event->getStartDateTime()?->getDatabase();
-                    if (!array_key_exists($eventDate, $errorMsgByResourceIdByEventDate)) {
-                        $errorMsgByResourceIdByEventDate[$eventDate] = [];
+
+                    if ($isClash) {
+                        ++$nBookingsCreatedWithClash;
+                    } else {
+                        ++$nBookingsCreatedWithoutClash;
                     }
-                    $errorMsgByResourceIdByEventDate[$eventDate][$resourceId] = 'Booking clashes and clashes are not allowed';
                 }
+
+                ++$nBookingsAttempted;
             }
         }
 
+        // TODO: Catch exception here and return failure code.
         $this->bookingMapper->save($bookingList);
 
         // Only unexpected errors require non-success code.
         // It is expected that some or all attempts to book resources may fail for validation reasons.
-        $this->response = $this->responseAsJson(['errors' => $errorMsgByResourceIdByEventDate])->withStatus(200);
+        $this->response = $this->responseAsJson(
+            // This data structure must match type 'AddBookingsResponse' defined in add-resource-bookings-modal.vue.
+            [
+                'nBookingsAttempted' => $nBookingsAttempted,
+                'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
+                'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
+            ]
+        )->withStatus(200);
     }
 
     /**
