@@ -20,6 +20,12 @@ class Proxy
 
     public const IMAGE_WILDCARD = 'image/';
 
+    /* Compatible SQL Operators
+     */
+    private const string SQL_INSERT = 'INSERT';
+    private const string SQL_SELECT = 'SELECT';
+    private const string SQL_UPDATE = 'UPDATE';
+
     public function __construct(
         private IConnector $externalDb,
     ) {
@@ -34,6 +40,12 @@ class Proxy
      */
     public function executeQuery(string $sql, ?array $params = []): IQuery|Base
     {
+        /* Appending SCOPE_IDENTITY() to retrieve the last inserted ID
+         */
+        if (self::SQL_INSERT === $this->getSqlOperator($sql)) {
+            $sql .= '; SELECT SCOPE_IDENTITY() AS InsertedID;';
+        }
+
         $statement = $this->externalDb->prepareQuery($sql, $params);
         $stmt = $statement->execute();
 
@@ -47,13 +59,13 @@ class Proxy
     }
 
     /**
-     * Determine whether results will need to be fetched after execution
+     * Get the SQL operator from the query
      *
      * @param string $sql
-     * @return bool
+     * @return string
      * @throws OutOfBoundsException
      */
-    public function shouldReturnResults(string $sql): bool
+    private function getSqlOperator(string $sql): string
     {
         //Reject requests that contains semicolons as we only accept one query at a time
         if (str_contains($sql, ';')) {
@@ -68,15 +80,25 @@ class Proxy
         $regex = "/[^a-zA-Z]*(?<sqlOperator>\w+)/";
         preg_match($regex, $sql, $matches);
 
+        return strtoupper(
+            trim($matches['sqlOperator'])
+        );
+    }
+
+    /**
+     * Determine whether results will need to be fetched after execution
+     *
+     * @param string $sql
+     * @return bool
+     * @throws OutOfBoundsException
+     */
+    public function shouldReturnResults(string $sql): bool
+    {
         /* Trying to discern the type of sql query the user wants to execute
          */
-        return match (
-            strtoupper(
-                trim($matches['sqlOperator'])
-            )
-        ) {
-            'SELECT' => true,
-            'UPDATE', 'INSERT' => false,
+        return match ($this->getSqlOperator($sql)) {
+            self::SQL_SELECT, self::SQL_INSERT => true,
+            self::SQL_UPDATE => false,
             default => throw new OutOfBoundsException(
                 'Invalid SQL statement. Please use a valid SQL operator.'
             ),
