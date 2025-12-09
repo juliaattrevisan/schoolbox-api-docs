@@ -1154,6 +1154,9 @@ class Controller extends Base
      * Return the status to be set for a new booking that does not clash with any existing booking.
      * Note bookings that clash with existing bookings should be given status 'pending'.
      *
+     * TODO: Modify this function so that no database operations are required.
+     *       This should be done because this function is called from within a loop.
+     *
      * @param BookingModel $booking
      * @return int
      */
