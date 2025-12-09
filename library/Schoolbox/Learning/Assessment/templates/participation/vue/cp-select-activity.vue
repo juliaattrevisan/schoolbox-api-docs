@@ -85,9 +85,4 @@ function onConfirm(): void {
     </form>
 </template>
 
-<style scoped>
-.inline-icon {
-    display: inline-block;
-    margin-right: var(--sbx-size-xs, 0.25rem);
-}
-</style>
+<style scoped></style>
