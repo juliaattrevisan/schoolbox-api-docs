@@ -1109,8 +1109,7 @@ class Controller extends Base
     private function checkForClashesIfResourceBookingsAddedToEvents(
         GenericCollection $resourceById,
         GenericCollection $eventById
-    ): array
-    {
+    ): array {
         $isClashByResourceIdByEventId = [];
 
         $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
