@@ -856,8 +856,8 @@ class Controller extends Base
         // Do not modify anything except the event's start/end/allDay
         $start  = new Alaress_Date_Format($this->requestPost->get('start'), \DateTime::ATOM);
         $end    = new Alaress_Date_Format($this->requestPost->get('end'), \DateTime::ATOM);
-        $oldStart = $event->getStartDateTime();
-        $oldEnd = $event->getEndDateTime();
+        $oldStart = clone $event->getStartDateTime();
+        $oldEnd = clone $event->getEndDateTime();
         $allDay = $this->requestPost->getBool('allDay');
         if ($allDay) {
             $event->setStartDate($start->getDatabase());
