@@ -49,6 +49,7 @@ function onViewMoreClick(): void {
 <template>
     <div class="show-more-container" :data-visible="showViewMoreGradient">
         <button
+            class="button"
             :data-test="`mdp-grid-view-more-button-${props.profile.student.id}-${props.headerKey}`"
             :data-visible="showViewMoreInner"
             :tabindex="showViewMoreInner ? 0 : -1"

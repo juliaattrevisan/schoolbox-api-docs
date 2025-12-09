@@ -4,9 +4,11 @@
  */
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import { sbProps } from "@js/util/sbx/pageUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
+import { hasCustomisation } from "../js/util/participantUtils";
 
 const props = defineProps<{
     participant: Participant;
@@ -22,6 +24,7 @@ const selectedList = defineModel<Participant[]>("selectedList", { default: [] })
 
 const emit = defineEmits<{
     (event: "viewDifferentiationProfile", participant: Participant): void;
+    (event: "viewSuggestedCustomisation", participant: Participant): void;
     (event: "actionSelected", participants: Participant[], action: string, isSingle: boolean): void;
     (event: "openIncludeInExistingModal", isSingle: boolean, participant: Participant | null): void;
 }>();
@@ -52,8 +55,15 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 /**
  * To open the differentiation profile view
  */
-function onDPSelected(): void {
+function onViewDP(): void {
     emit("viewDifferentiationProfile", props.participant);
+}
+
+/**
+ * To generate or view the AI suggested customisation
+ */
+function onViewSuggestedCustomisation(): void {
+    emit("viewSuggestedCustomisation", props.participant);
 }
 
 /**
@@ -121,12 +131,21 @@ function onOpenIncludeInExistingModal(): void {
         <td v-if="props.differentiationEnabled">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="sbx-link-button"
+                class="button f-no-margins"
                 type="button"
-                :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
-                @click.prevent="onDPSelected"
+                @click.prevent="onViewDP"
             >
                 View {{ locale.differentiationProfile.translate(false, true) }}
+            </button>
+        </td>
+        <td v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled">
+            <button
+                v-if="props.participant._links.differentiationProfile"
+                class="button icon-ai f-no-margins"
+                type="button"
+                @click.prevent="onViewSuggestedCustomisation"
+            >
+                {{ props.participant.cachedSuggestedCustomisation ? "View" : "Generate" }} Suggested Customisation
             </button>
         </td>
         <td>
@@ -154,13 +173,7 @@ function onOpenIncludeInExistingModal(): void {
                     ></sbx-pop-out>
                 </nav>
                 <ul :id="`participant-${props.participant.user.id}`" data-dropdown-content="" class="f-dropdown">
-                    <template
-                        v-if="
-                            props.participant.excludedAt !== null ||
-                            props.participant.plan.name !== null ||
-                            props.participant.customisedPlan !== null
-                        "
-                    >
+                    <template v-if="hasCustomisation(props.participant)">
                         <li class="separator">Manage</li>
                         <li>
                             <button class="icon-close" @click.prevent="onActionSelected('removeCustomisation')">
@@ -206,7 +219,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                Copy Activity
+                                Copy {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
@@ -218,7 +231,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                New Activity
+                                New {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                     </template>

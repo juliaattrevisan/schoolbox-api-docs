@@ -38,6 +38,12 @@
     float: right;
 }
 
+/** for when an icon sits inline with text **/
+.inline-icon {
+    display: inline-block;
+    margin-right: var(--sbx-size-xs, 0.25rem);
+}
+
 // Icon sizes
 .size-8:before {
     font-size: 0.5rem;

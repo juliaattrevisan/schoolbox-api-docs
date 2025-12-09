@@ -315,26 +315,6 @@ article:has(img) p > img {
     }
 }
 
-.discussion .reply, //discussion thread styles
-.discussion .child,
-.threaded .reply,
-.threaded .child {
-    border-left: 0;
-    border-top: none;
-
-    & .card {
-        & img {
-            margin-inline-end: 0;
-            width: 2.5rem;
-        }
-
-        & p {
-            grid-row: span 2;
-            margin-bottom: 0;
-        }
-    }
-}
-
 .activity-feed {
     & .grade {
         border-radius: var(--sbx-border-radius-normal);
@@ -825,20 +805,6 @@ input[type="radio"] + .block {
         overflow: hidden;
     }
 }
-.v-card-list {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
-
-    &::before,
-    &::after {
-        content: none !important;
-    }
-
-    & > div {
-        margin: 0 !important;
-    }
-}
 
 .c-search-page__filters {
     border: var(--border);
@@ -1144,13 +1110,6 @@ input[type="radio"] + .block {
 }
 
 .island > .no-pad {
-    & > .profile {
-        background-color: #fff;
-        border: var(--border);
-        border-radius: var(--sbx-border-radius-normal);
-        box-shadow: var(--sbx-shadow-m);
-    }
-
     & .full-width {
         padding-inline-end: 0;
     }
@@ -1393,5 +1352,6 @@ section {
 //added to fix some styling issue
 .f-dropdown li :is(a, button),
 .f-dropdown li :is(a, button)::before {
+    background: var(--sbx-color-foreground-primary);
     color: var(--sbx-color-accent);
 }

@@ -74,7 +74,7 @@ function onConfirmSelected(): void {
             <div v-else-if="genAiStore.isProcessing">
                 <template v-for="field in headerStore.enabledTextFields" :key="field.id">
                     <loading-cards :rows="1" :show-image="false">
-                        <h3>&nbsp;</h3>
+                        <span class="title-placeholder"></span>
                         <p></p>
                         <p></p>
                     </loading-cards>

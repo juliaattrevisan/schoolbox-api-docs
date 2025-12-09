@@ -109,7 +109,8 @@
             height: var(--image-size-l);
             width: var(--image-size-l);
         }
-        h3 {
+        h3,
+        span.title-placeholder {
             height: 1rem;
             width: 30%;
         }

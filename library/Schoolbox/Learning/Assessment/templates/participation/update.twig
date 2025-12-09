@@ -29,7 +29,8 @@
         includeInExistingCustomisation: routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
             assessmentId: assessment.id,
             assessment: assessment,
-        })
+        }),
+        genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
     } | json_encode }}"
     :assessment-id="{{ assessment.id }}"
     :customisations="{{ (customisations ?? []) | json_encode }}"

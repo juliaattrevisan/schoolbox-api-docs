@@ -4,6 +4,7 @@
  */
 
 import locale from "@js/terminology/rosettaStone";
+import { sbProps } from "@js/util/sbx/pageUtils";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import type { User } from "@schoolboxLibrary/types/User";
@@ -12,6 +13,7 @@ import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
+import CpSuggestedCustomisationModal from "./cp-suggested-customisation-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
@@ -76,12 +78,26 @@ const studentWithDPRoute = window.Vue.ref<string>("");
  * Display the differentiation profile for a participant
  * @param participant - The participant whose differentiation profile is to be viewed
  */
-function onDPSelected(participant: Participant): void {
+function onViewDP(participant: Participant): void {
     studentWithDPRoute.value = participant._links.differentiationProfile ?? "";
     studentWithDP.value = participant.user;
 }
 
 // #endregion Differentiation Profiles
+
+// #region AI Suggested Customisation
+
+const currentParticipant = window.Vue.ref<Participant | null>(null);
+
+/**
+ * To view the AI suggested customisation for a participant
+ * @param participant - The participant whose AI suggested customisation is to be viewed or generated
+ */
+function onViewSuggestedCustomisation(participant: Participant): void {
+    currentParticipant.value = participant;
+}
+
+// #endregion AI Suggested Customisation
 </script>
 
 <template>
@@ -107,6 +123,14 @@ function onDPSelected(participant: Participant): void {
                         <th v-if="props.differentiationEnabled">
                             {{ locale.differentiationProfile.translate(false, true) }}
                         </th>
+                        <th
+                            v-if="
+                                props.differentiationEnabled &&
+                                sbProps.aiFeatures.learningactivitycustomisation?.enabled
+                            "
+                        >
+                            Suggested Customisation
+                        </th>
                         <th>Customisation</th>
                         <td></td>
                     </tr>
@@ -123,7 +147,8 @@ function onDPSelected(participant: Participant): void {
                         :assessment-id="props.assessmentId"
                         :customisations="props.customisations"
                         :differentiation-enabled="props.differentiationEnabled"
-                        @view-differentiation-profile="onDPSelected"
+                        @view-differentiation-profile="onViewDP"
+                        @view-suggested-customisation="onViewSuggestedCustomisation"
                         @action-selected="onActionSelected"
                         @open-include-in-existing-modal="openIncludeInExistingModal"
                     />
@@ -154,5 +179,11 @@ function onDPSelected(participant: Participant): void {
         v-model:is-open="isConfirmModifyOpen"
         :participants-with-interactions="participantsWithInteractions"
         @confirm="onConfirmActionSelected"
+    />
+    <cp-suggested-customisation-modal
+        v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
+        v-model:participant="currentParticipant"
+        :routes="props.routes"
+        :assessment-id="props.assessmentId"
     />
 </template>

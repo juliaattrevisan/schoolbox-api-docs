@@ -5,6 +5,30 @@ import { allParticipants } from "./allParticipantsData";
 
 beforeEach(() => {});
 
+// Mock the locale
+jest.mock("@js/terminology/rosettaStone", () => ({
+    activity: {
+        translate: jest.fn((plural, capitalised) => {
+            if (plural && capitalised) return "Activities";
+            if (plural && !capitalised) return "activities";
+            if (!plural && capitalised) return "Activity";
+            return "activity";
+        }),
+        singular: jest.fn(() => "activity"),
+    },
+    assessment: {
+        singular: jest.fn(() => "assessment"),
+    },
+    differentiationProfile: {
+        translate: jest.fn((plural, capitalised) => {
+            if (plural && capitalised) return "Differentiation Profiles";
+            if (plural && !capitalised) return "differentiation profiles";
+            if (!plural && capitalised) return "Differentiation Profile";
+            return "differentiation profile";
+        }),
+    },
+}));
+
 const defaultProps = {
     allParticipants,
     pastoralEnabled: false,
