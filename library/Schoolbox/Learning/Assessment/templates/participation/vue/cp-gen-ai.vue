@@ -28,10 +28,10 @@ const aiResponse = defineModel<CustomisedSuggestionResponse | null>("ai-response
 
 const isProcessing = window.Vue.ref(false);
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
-let controller: AbortController; // to allow aborting the previous search if a new one is started
+let controller: AbortController | null = null; // to allow aborting the previous search if a new one is started
 
 /**
- * Load the DP
+ * Load the AI customised suggestion for the participant
  */
 async function load(): Promise<void> {
     if (props.route === "") {
@@ -74,7 +74,7 @@ async function load(): Promise<void> {
  */
 function onCancel(): void {
     emit("cancel");
-    if (isProcessing.value) {
+    if (isProcessing.value && controller) {
         controller.abort();
     }
 }

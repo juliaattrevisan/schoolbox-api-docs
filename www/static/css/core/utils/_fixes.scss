@@ -71,9 +71,3 @@
         display: block !important;
     }
 }
-
-// _icons.scss adds a color: $body-foreground; to all icons, which is not always desired,
-// typically the colour should be inherited from the parent element the colour should be inherited from the parent element
-.f-no-icon-color {
-    color: inherit !important;
-}
