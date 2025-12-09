@@ -208,6 +208,7 @@ class Mapper extends BaseMapper
                 {$this->getTable()}.id AS id,
                 session_id,
                 feature,
+                prompt,
                 log_format,
                 return_code,
                 {$this->getTable()}.created_at,
