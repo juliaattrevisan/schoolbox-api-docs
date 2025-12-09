@@ -479,67 +479,65 @@ switch ($_POST['module']) {
         }
         break;
     case 'cluster_info':
-        $cacheDir = $config->get('stream_dir');
-        $cacheFile = $cacheDir . '/cluster_info_cache_' . md5(INSTANCE_ID) . '.json';
-        $cacheExpiry = 86400; // 1 day cache
-
-        // Check if cache exists and is still valid
-        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheExpiry) {
-            $cachedData = json_decode(file_get_contents($cacheFile), true);
-            $output['cluster_info_status'] = $cachedData['cluster_name'];
-            $output['cluster_info_light'] = $cachedData['light'];
-        } else {
-            // Cache miss or expired - fetch from API
-            $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
-            $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null');
-            $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
-            // Sanitize and validate API key
-            $irApiKey = trim($irApiKey);
-            if (!preg_match('/^[A-Za-z0-9\-_.]+$/', $irApiKey)) {
-                throw new \RuntimeException('Invalid API key format');
-            }
-            // Sanitize and validate URL
-            $irUrl = trim($irUrl);
-            if (!filter_var($irUrl, FILTER_VALIDATE_URL)) {
-                throw new \RuntimeException('Invalid URL format');
-            }
-
-            $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
-
-            try {
-                $response = $client->post($endpoint, [
-                    'headers' => [
-                        'Authorization' => "Bearer {$irApiKey}",
-                        'Content-Type'  => 'application/json',
-                    ],
-                    'json' => [
-                        'instance_id' => INSTANCE_ID,
-                    ],
-                ]);
-
-                if ($response->getStatusCode() == 200) {
-                    $json = json_decode($response->getBody()->getContents());
-                    if ($json !== null && json_last_error() === JSON_ERROR_NONE && isset($json->cluster_name)) {
-                        $clusterName = $json->cluster_name;
-                        $output['cluster_info_status'] = $clusterName;
-                        $output['cluster_info_light'] = 'success';
-                        // Cache the successful result
-                        $cacheData = [
-                            'cluster_name' => $clusterName,
-                            'light' => 'success'
-                        ];
-                        file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
-                    } else {
-                        $output['cluster_info_status'] = 'Unknown';
-                        $output['cluster_info_light'] = 'warning';
-                        // Don't cache error responses
-                    }
+        $cache = new \Alaress\Redis\Cache(
+            function () {
+                $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
+                $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null');
+                $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
+                // Sanitize and validate API key
+                $irApiKey = trim($irApiKey);
+                if (!preg_match('/^[A-Za-z0-9\-_.]+$/', $irApiKey)) {
+                    throw new \RuntimeException('Invalid API key format');
                 }
-            } catch (Exception $e) {
-                $output['cluster_info_status'] = 'Unknown';
-                $output['cluster_info_light'] = 'warning';
-                // Don't cache error responses
-            }
+                // Sanitize and validate URL
+                $irUrl = trim($irUrl);
+                if (!filter_var($irUrl, FILTER_VALIDATE_URL)) {
+                    throw new \RuntimeException('Invalid URL format');
+                }
+
+                $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
+
+                try {
+                    $response = $client->post($endpoint, [
+                        'headers' => [
+                            'Authorization' => "Bearer {$irApiKey}",
+                            'Content-Type'  => 'application/json',
+                        ],
+                        'json' => [
+                            'instance_id' => INSTANCE_ID,
+                        ],
+                    ]);
+
+                    if ($response->getStatusCode() == 200) {
+                        $json = json_decode($response->getBody()->getContents());
+                        if ($json !== null && json_last_error() === JSON_ERROR_NONE && isset($json->cluster_name)) {
+                            return [
+                                'cluster_name' => $json->cluster_name,
+                                'light' => 'success'
+                            ];
+                        }
+                    }
+                } catch (Exception $e) {
+                    // Log error but return default values
+                }
+
+                return [
+                    'cluster_name' => 'Unknown',
+                    'light' => 'warning'
+                ];
+            },
+            $kernel->get('redis.cache'),
+            'cluster_info.' . INSTANCE_ID,
+            86400 // 1 day cache
+        );
+
+        try {
+            $cacheData = $cache->get('data');
+            $output['cluster_info_status'] = $cacheData['cluster_name'];
+            $output['cluster_info_light'] = $cacheData['light'];
+        } catch (Exception $e) {
+            $output['cluster_info_status'] = 'Unknown';
+            $output['cluster_info_light'] = 'warning';
         }
         break;
     default:
