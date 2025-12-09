@@ -17,6 +17,7 @@ use Schoolbox\Mapper as BaseMapper;
  * Class Mapper
  * @package Schoolbox\LTI\Provider
  * @method Model findById($identifierValue)
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
