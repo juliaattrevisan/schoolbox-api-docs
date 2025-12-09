@@ -1004,6 +1004,16 @@ class Controller extends Base
         /** @var GenericCollection<BookingItemModel> $resourceById */
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
+        // Check whether the user has permission to book the selected resources.
+        $route = 'resourceBooking.createBooking';
+        foreach ($resourceById as $resourceId => $resource) {
+            if (!$this->authorizer->isPathAuthorizedForUser($route, [$resourceId], $this->user)) {
+                throw new SchoolboxException(
+                    "You do not have permission to create bookings for resource '{$resource->getName()}'."
+                );
+            }
+        }
+
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
             // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
