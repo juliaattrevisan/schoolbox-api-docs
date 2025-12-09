@@ -49,24 +49,32 @@ function onConfirm(): void {
             <h2>Select Customisation</h2>
         </div>
         <div>
-            <ul class="option-list">
-                <li>
-                    <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
-                    <label for="cp-modify" class="icon-modify f-no-icon-color">Modify</label>
-                </li>
-                <li>
-                    <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
-                    <label for="cp-copy" class="icon-copy f-no-icon-color"
-                        >Copy {{ locale.activity.translate(false, true) }}</label
-                    >
-                </li>
-                <li>
-                    <input id="cp-new" v-model="typePicked" type="radio" value="new" />
-                    <label for="cp-new" class="icon-submissions f-no-icon-color"
-                        >New {{ locale.activity.translate(false, true) }}</label
-                    >
-                </li>
-            </ul>
+            <fieldset class="checklist f-no-margins">
+                <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
+                <ul class="option-list">
+                    <li>
+                        <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
+                        <label for="cp-modify">
+                            <span class="inline-icon"><sbx-icon name="modify" size="0.75rem" /></span>
+                            <span>Modify</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
+                        <label for="cp-copy">
+                            <span class="inline-icon"><sbx-icon name="copy" size="0.75rem" /></span>
+                            <span>Copy {{ locale.activity.translate(false, true) }}</span>
+                        </label>
+                    </li>
+                    <li>
+                        <input id="cp-new" v-model="typePicked" type="radio" value="new" />
+                        <label for="cp-new">
+                            <span class="inline-icon"><sbx-icon name="submissions" size="0.75rem" /></span>
+                            <span>New {{ locale.activity.translate(false, true) }}</span>
+                        </label>
+                    </li>
+                </ul>
+            </fieldset>
         </div>
         <div class="l-flex l-gap-xs f-no-margins">
             <button class="button l-flex__item--1" data-test="" @click.prevent="onBack">Back</button>
@@ -77,4 +85,9 @@ function onConfirm(): void {
     </form>
 </template>
 
-<style scoped></style>
+<style scoped>
+.inline-icon {
+    display: inline-block;
+    margin-right: var(--sbx-size-xs, 0.25rem);
+}
+</style>
