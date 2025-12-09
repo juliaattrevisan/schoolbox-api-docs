@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\User;
-use Schoolbox\Error;
 
 class IsAssessmentOpen extends AbstractParticipationRule
 {
@@ -25,7 +24,11 @@ class IsAssessmentOpen extends AbstractParticipationRule
         $student = $this->findStudent($params);
 
         if (!$assessment->isOpen($student)) {
-            throw new Unauthorized(Error\Mapper::ERROR_ASSESSMENT_CLOSED);
+            throw new Unauthorized(sprintf(
+                'Assessment "%s" is no longer open for user %s',
+                $assessment->getTitle(),
+                $student->getId()
+            ));
         }
     }
 }
