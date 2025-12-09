@@ -997,8 +997,10 @@ class Controller extends Base
     public function addBookings(Event $event): void
     {
         $efficacy = $this->requestPost->get('efficacy');
-        $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', '');
-        $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
+        $resourceBookingIdsCommaSeparated = trim($this->requestPost->get('resourceIds', ''));
+        $resourceIdStrings = (
+            $resourceBookingIdsCommaSeparated === '' ? [] : explode(',', $resourceBookingIdsCommaSeparated)
+        );
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
 
         /** @var GenericCollection<BookingItemModel> $resourceById */
