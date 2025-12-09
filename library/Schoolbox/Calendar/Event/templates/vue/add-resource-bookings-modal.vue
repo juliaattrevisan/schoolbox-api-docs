@@ -15,7 +15,7 @@ interface Props {
 const props = defineProps<Props>();
 
 /**
- * This defines the server response to an ENDPOINTS.URL_BOOKINGS_ADD request.
+ * This defines the server response to an ENDPOINTS.addBookings request.
  */
 type AddBookingsToEventResponse = {
     nBookingsAttempted: number;
@@ -39,13 +39,6 @@ const createBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("createBo
 const compileResourceIds = window.Vue.computed(() =>
     resources.value.map((resource: Resource) => resource.id).join(","),
 );
-
-/**
- * @returns a URL.
- */
-function getAddBookingsEndpoint(): string {
-    return new URL(ENDPOINTS.URL_BOOKINGS_ADD, window.location.href).toString();
-}
 
 /**
  * Get the endpoint for the booking resource search.
@@ -159,7 +152,7 @@ async function createNewBooking(): Promise<void> {
         <form
             ref="createBookingForm"
             method="post"
-            :action="getAddBookingsEndpoint()"
+            :action="ENDPOINTS.addBookingsPath(eventId)"
             class="top"
             @submit.prevent="createNewBooking()"
         >

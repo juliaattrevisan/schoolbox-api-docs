@@ -994,38 +994,30 @@ class Controller extends Base
      *
      * @throws MapperException
      */
-    public function addBookingsToEvent(): void
+    public function addBookings(Event $event): void
     {
-        $baseEventId = $this->requestPost->getInt('eventId');
         $efficacy = $this->requestPost->get('efficacy');
         $resourceBookingIdsCommaSeparated = $this->requestPost->get('resourceIds', '');
         $resourceIdStrings = explode(',', $resourceBookingIdsCommaSeparated);
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
 
-        try {
-            $baseEvent = $this->eventMapper->findById($baseEventId);
-        } catch (MapperException) {
-            // Can't find event, so cannot add bookings.
-            throw new SchoolboxException('Event not found');
-        }
-
         /** @var GenericCollection<BookingItemModel> $resourceById */
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
-        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $baseEvent->getSeriesId() !== null) {
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
             // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
             // and events can be removed from a series once the series has been created.  Therefore, we cannot assume
             // any regular period between events, and so must fetch each event's start/end times.
             $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
-            $pb->equals('series_id', $baseEvent->getSeriesId());
+            $pb->equals('series_id', $event->getSeriesId());
             $pb->greaterThan('start_datetime', 'NOW()');
             /** @var GenericCollection<Event> $eventById */
             $eventById = $this->eventMapper->findByPredicates($pb);
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
-            $eventById = new GenericCollection(Event::class, [$baseEvent->getId() => $baseEvent]);
+            $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
         }
 
         // Check whether each hypothetical booking would result in a clash.
@@ -1040,8 +1032,8 @@ class Controller extends Base
         $nBookingsCreatedWithClash = 0;
 
         // Create a list of booking models to be persisted depending on validation results.
-        /** @var Event $event */
-        foreach ($eventById as $eventId => $event) {
+        /** @var Event $loopEvent */
+        foreach ($eventById as $eventId => $loopEvent) {
             $isClashByResourceId = $isClashByResourceIdByEventId[$eventId] ?? [];
             /** @var BookingItemModel $resource */
             foreach ($resourceById as $resourceId => $resource) {
@@ -1050,7 +1042,7 @@ class Controller extends Base
                     // Build the booking.
                     // Do not set start/end times because these are intended to be the same as in the linked event row.
                     $booking = new BookingModel()
-                        ->setEvent($event)
+                        ->setEvent($loopEvent)
                         ->setResource($resource)
                         ->setBookingStartAt(null) // Set as null to default to the event's start time.
                         ->setBookingEndAt(null) // Set as null to default to the event's end time.

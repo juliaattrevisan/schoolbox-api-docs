@@ -112,7 +112,7 @@ class Module extends BaseModule
         $this->register('POST', '/create', 'postCreate', $createPerms);
         $this->register('POST', '/{eventId:\d+}/delete', 'postDelete', $modifyPerms, $preloadEvent);
         $this->register('POST', '/{eventId:\d+}/modify', 'postModify', $modifyPerms, $preloadEvent);
-        $this->register('POST', '/addBookingsToEvent', 'addBookingsToEvent', $modifyPerms);
+        $this->register('POST', '/{eventId:\d+}/addBookings', 'addBookings', $modifyPerms, $preloadEvent);
     }
 
     /**
