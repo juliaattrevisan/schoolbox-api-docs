@@ -678,7 +678,8 @@ export default {
                             class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
                         >
                             <div>
-                                {{ booking.name !== "" ? booking.name : booking.resource.name }}
+                                <!-- Intentionally display the resource name here, not the booking name -->
+                                {{ booking.resource.name }}
                             </div>
                             <div class="text-right">
                                 <span
