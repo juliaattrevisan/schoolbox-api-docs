@@ -229,6 +229,7 @@ class DialogAgentFeedback
 
                 /** otherwise if it's the assistant, then we only care about the final message */
                 if ($message['type'] === 'response') {
+                    $entry['role'] = 'assistant';
                     $entry['content'] = $message['data']['message'] ?? 'No response';
                 }
 
@@ -237,6 +238,6 @@ class DialogAgentFeedback
         }
 
         /** Just dump it into one large JSON string for now, apparently that's what we want */
-        return json_encode($feedEntries);
+        return json_encode($feedEntries, JSON_THROW_ON_ERROR);
     }
 }
