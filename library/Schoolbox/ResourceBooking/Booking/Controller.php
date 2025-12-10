@@ -18,6 +18,7 @@ use Calendar\Event\Type\EventBase;
 use Calendar_Api_Config_Mapper;
 use DateTime;
 use External_Timetable;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -1233,7 +1234,7 @@ class Controller extends Base
      * @param Model $item // item as we do route perm checks on $item so we can leverage that for the new booking
      *                    (both old booking and item (new booking) should be both the same resource, so if you have access to one, you have access to the other)
      * @return void
-     * @throws Exception
+     * @throws SchoolboxException
      * @api GET /resource-booking/booking/{old}/{new}/clashApprove
      * @since 26.0
      */
@@ -1247,29 +1248,29 @@ class Controller extends Base
         //     * if both are resource bookings, only care if one is pending
         //     * if both are resource bookings, skip if both pending or same booking id
         if ($oldBooking->getId() === $item->getId()) {
-            throw new Exception("Cannot approve clash: bookings have the same ID.");
+            throw new SchoolboxException("Cannot approve clash: bookings have the same ID.");
         }
         if ($oldBooking->getResource()->getId() !== $item->getResource()->getId()) {
-            throw new Exception("Cannot approve clash: bookings are for different resources.");
+            throw new SchoolboxException("Cannot approve clash: bookings are for different resources.");
         }
         if ($oldBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED) {
-            throw new Exception("Cannot approve clash: the old booking is rejected.");
+            throw new SchoolboxException("Cannot approve clash: the old booking is rejected.");
         }
         if ($item->getStatus()->getId() === Status\Model::STATUS_REJECTED) {
-            throw new Exception("Cannot approve clash: the new booking is rejected.");
+            throw new SchoolboxException("Cannot approve clash: the new booking is rejected.");
         }
         if (
             $oldBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
             && $item->getStatus()->getId() === Status\Model::STATUS_APPROVED
         ) {
-            throw new Exception("Cannot approve clash: both bookings are already approved.");
+            throw new SchoolboxException("Cannot approve clash: both bookings are already approved.");
         }
         // Ensure old booking is approved and new booking is pending
         if (
             $oldBooking->getStatus()->getId() !== Status\Model::STATUS_APPROVED
             || $item->getStatus()->getId() !== Status\Model::STATUS_PENDING
         ) {
-            throw new Exception("Unable to approve clash booking, only allowed when old booking is approved and new booking is pending.");
+            throw new SchoolboxException("Unable to approve clash booking, only allowed when old booking is approved and new booking is pending.");
         }
 
         // reject the old booking, so we can approve the new one.
@@ -1284,5 +1285,50 @@ class Controller extends Base
         // approve the new booking
         $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
+    }
+
+    /**
+     * Validate the booking of a single resource $item, possibly as a recurrence.
+     * @param Item\Model $item
+     * @param array $bookingDetailsForItem - See docblock on for Validation->validateBookingFromPostData() for details.
+     * @param null|Model $existingBooking
+     * @return array
+     * @throws MapperException
+     * @throws Deleted
+     */
+    private function validateBookingIgnoringClashesIfClashesAllowed(
+        Item\Model $item,
+        array $bookingDetailsForItem,
+        ?Model $existingBooking = null
+    ): array {
+        // Validate this item.
+        $validation = new Validation(
+            $this->getUser(),
+            $this->getBookingMapper(),
+            $this->getStatusMapper(),
+            $this->getTermMapper(),
+            $this->getExternalTimetableHandler(),
+            $this->getCampusMapper(),
+            $this->getConfigLoader(),
+            $this->getExternalEventMapper()
+        );
+        $errors = $validation->validateBookingFromPostData($item, $bookingDetailsForItem, $existingBooking);
+
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
+        $clashBookingStartDatesAsKeys = [];
+        if (
+            count($errors) > 0 && $item->getAllowClashBookings() &&
+            $validation->validationErrorsAreAllClashes($errors)
+        ) {
+            // Remember the start dates of clash bookings.
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
+                $clashBookingStartDatesAsKeys[$startDate] = null;
+            }
+            // Ignore errors since all were clashes and clashes are allowed.
+            $errors = [];
+        }
+
+        return [$errors, $clashBookingStartDatesAsKeys];
     }
 }
