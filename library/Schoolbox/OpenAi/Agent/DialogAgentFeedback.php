@@ -22,7 +22,7 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 
 /**
- * Summative review agent for reviewing a chat interaction from DialogAgentChat and
+ * Summative review agent for reviewing a chat interaction from DialogAgentChat
  * and generating feedback that the teacher can access
  */
 class DialogAgentFeedback
