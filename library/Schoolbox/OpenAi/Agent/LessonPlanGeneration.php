@@ -97,7 +97,14 @@ class LessonPlanGeneration
         );
 
         // No meaningful input text, so don't send it to the AI.
-        $log      = $this->client->createLog($payload, null, $user, Helper::FEATURE_LESSONPLAN, $aiSessionId);
+        $log = $this->client->createLog(
+            $payload,
+            null,
+            $user,
+            Helper::FEATURE_LESSONPLAN,
+            $aiSessionId,
+            null, // These requests can't be restored in the AI Usage Log yet
+        );
         $response = $this->client->createResponse($payload, $log);
 
         // This response used to need special handling of its return, because it

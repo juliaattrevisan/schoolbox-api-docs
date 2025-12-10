@@ -8,8 +8,15 @@ import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
-import { AiFeature } from "./payload";
-import type { AiSession, AiUsageLogApiRequest, AiUsageLogApiResponse, AiSessionLogApiResponse } from "./payload";
+import { AiLogFormat } from "./payload";
+import type {
+    AiSessionId,
+    AiFeature,
+    AiSession,
+    AiUsageLogApiRequest,
+    AiUsageLogApiResponse,
+    AiSessionLogApiResponse,
+} from "./payload";
 import AulAgentChat from "./aul-agent-chat.vue";
 
 interface Props {
@@ -36,30 +43,37 @@ const usageSessions = window.Vue.ref<AiSession[]>([]);
 const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
-const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
+const selectedSessionId = window.Vue.ref<AiSessionId | null>(null);
 const selectedSessionLog = window.Vue.ref<AiSessionLogApiResponse | null>(null);
 
-type AiSelectedSessionInfo = {
-    [K in AiFeature]: {
-        feature: K;
-        session: AiSession<K>;
-        log: AiSessionLogApiResponse<K>;
+type AiSelectedSessionInfo<TFeature extends AiFeature = AiFeature> = {
+    [KLogFormat in AiLogFormat]: {
+        logFormat: KLogFormat;
+        session: AiSession<KLogFormat, TFeature>;
+        log: AiSessionLogApiResponse<KLogFormat, TFeature>;
     };
-}[AiFeature];
+}[AiLogFormat];
 
-const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | null>(() => {
+type AiSelectedSessionInfoLoading = Pick<AiSelectedSessionInfo, "session">;
+
+const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelectedSessionInfoLoading | null>(() => {
     if (selectedSessionId.value === null) {
         return null;
     }
 
     const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
-    const logInfo = selectedSessionLog.value;
-
-    if (sessionInfo === undefined || logInfo === null) {
+    if (sessionInfo === undefined) {
+        console.warn(`Session ID ${selectedSessionId.value} not found`); // shouldn't get here
         return null;
     }
 
-    const info = { feature: sessionInfo.feature, session: sessionInfo, log: logInfo };
+    const logInfo = selectedSessionLog.value;
+    if (logInfo === null) {
+        // still loading
+        return { session: sessionInfo };
+    }
+
+    const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: logInfo };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
@@ -254,7 +268,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     </thead>
 
                     <tbody>
-                        <tr v-for="session in usageSessions" :key="session.id">
+                        <tr v-for="session in usageSessions" :key="session.id ?? undefined">
                             <td>
                                 {{ formatSessionDate(session) }}
                             </td>
@@ -272,7 +286,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             </td>
                             <td>{{ 200 !== session.returnCode ? "Error" : "" }}</td>
                             <td class="actions-small-1">
-                                <nav v-if="session.sessionId && session._routes.getLog">
+                                <nav v-if="session.id !== null && session.logFormat !== null && session._routes.getLog">
                                     <a
                                         class="icon-eye"
                                         :disabled="session.id.toString() === selectedSessionId?.toString() || undefined"
@@ -295,42 +309,41 @@ async function openSessionDetails(session: AiSession): Promise<void> {
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
-            <section v-else-if="selectedSessionId !== null || sessionLoadError !== null">
-                <div v-if="selectedSessionInfo === null" class="loader"></div>
-                <template v-else>
-                    <div class="card small-12">
-                        <span>
-                            <user-photo :user-id="selectedSessionInfo.session.createdBy.id || 0" render="small" />
-                            <h3>
-                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
-                            </h3>
-                        </span>
-                        <p class="meta">
-                            Created by
-                            <component
-                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
-                            >
-                                {{ selectedSessionInfo.session.createdBy.fullName }}
-                            </component>
-                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+            <section v-else-if="selectedSessionInfo !== null">
+                <div class="card small-12">
+                    <span>
+                        <user-photo :user-id="selectedSessionInfo.session.createdBy.id || 0" render="small" />
+                        <h3>
+                            {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
+                        </h3>
+                    </span>
+                    <p class="meta">
+                        Created by
+                        <component
+                            :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                            :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                        >
+                            {{ selectedSessionInfo.session.createdBy.fullName }}
+                        </component>
+                        <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
+
+                <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
+                <div v-else class="l-mar-m">
+                    <aul-agent-chat
+                        v-if="selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT"
+                        :session-log="selectedSessionInfo.log"
+                    />
+                    <div v-else class="empty-state">
+                        <i class="icon-view-hollow"></i>
+                        <p>
+                            The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
+                            previews for this session.
                         </p>
                     </div>
-                    <div class="clearfix"></div>
-                    <div class="l-mar-m">
-                        <aul-agent-chat
-                            v-if="selectedSessionInfo.feature === AiFeature.IMAGE"
-                            :session-log="selectedSessionInfo.log"
-                        />
-                        <div v-else class="empty-state">
-                            <i class="icon-view-hollow"></i>
-                            <p>
-                                The {{ props.features[selectedSessionInfo.feature].title }} feature does not support
-                                previews
-                            </p>
-                        </div>
-                    </div>
-                </template>
+                </div>
             </section>
         </div>
     </div>

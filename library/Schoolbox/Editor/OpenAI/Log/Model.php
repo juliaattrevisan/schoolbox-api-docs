@@ -27,6 +27,7 @@ class Model
     private ?string $model = null;
     private ?string $endpoint = null;
     private ?string $feature = null;
+    private ?string $logFormat = null;
     private ?string $response = null;
     private ?int $returnCode = null;
     private ?string $errorMessage = null;
@@ -258,6 +259,27 @@ class Model
     public function setFeature(?string $feature): self
     {
         $this->feature = $feature;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLogFormat(): ?string
+    {
+        return $this->logFormat;
+    }
+
+    /**
+     * @param string|LogFormat|null $logFormat
+     * @return $this
+     */
+    public function setLogFormat(string|LogFormat|null $logFormat): self
+    {
+        $this->logFormat = $logFormat instanceof LogFormat
+            ? $logFormat->value
+            : $logFormat;
+
         return $this;
     }
 

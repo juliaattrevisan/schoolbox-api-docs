@@ -3,7 +3,7 @@ import type { GalleryItem } from "lightgallery/lg-utils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import type { AiSessionId } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { AgentChatMessageType } from "../agentChatTypes";
 import type {
     AgentChatFeedMessage,
@@ -22,7 +22,7 @@ export type AgentChatRequestConfig = {
     /** The route to send messages to */
     messageRoute: string;
     /** The AI session ID to include in the request, if required */
-    aiSessionId: AiSession["id"] | null;
+    aiSessionId: AiSessionId | null;
     /** Whether an image is required in responses */
     requireImage: boolean;
 };

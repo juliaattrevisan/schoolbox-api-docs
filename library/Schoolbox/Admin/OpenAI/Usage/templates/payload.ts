@@ -6,7 +6,11 @@ import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
-type AiSessionId = string;
+/**
+ * A unique guid for an AI session, used to group related requests such as a chat conversation together
+ * Some endpoints have one session ID per request (such as lesson plans) as they don't connect with each other
+ */
+export type AiSessionId = string;
 
 export enum AiFeature {
     CHAT = "chat",
@@ -17,30 +21,36 @@ export enum AiFeature {
     LEARNING_ACTIVITY_CUSTOMISATION = "learningactivitycustomisation",
 }
 
-type AiLogFeatureDataMap = {
-    [AiFeature.CHAT]: null;
-    [AiFeature.LESSON_PLAN]: null;
-    [AiFeature.IMAGE]: AiLogAgentChatData;
-    [AiFeature.DIALOG_AGENT]: null; // TODO define when implemented
-    [AiFeature.DIFFERENTIATION]: null;
-    [AiFeature.LEARNING_ACTIVITY_CUSTOMISATION]: null;
+/**
+ * Each log format represents a different way that log data should be represented
+ * @see /library/Schoolbox/Editor/OpenAI/Log/LogFormat.php
+ */
+export enum AiLogFormat {
+    AGENT_CHAT = "agent_chat",
+}
+
+type AiLogFormatDataMap = {
+    [AiLogFormat.AGENT_CHAT]: AiLogAgentChatData;
 };
 
+/** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/Session/ModelToArray.php */
 export type AiSessionLog = {
-    [K in AiFeature]: {
-        id: number;
-        sessionId: AiSessionId;
-        createdAt: string;
-        createdBy: UserAuthor;
-        feature: K;
-        data: AiLogFeatureDataMap[K];
-    };
-}[AiFeature];
-
-export type AiSession<TFeature extends AiFeature = AiFeature> = {
-    id: AiSessionId;
-    feature: TFeature;
+    id: number;
     sessionId: AiSessionId;
+    createdAt: string;
+    createdBy: UserAuthor;
+    feature: AiFeature;
+} & (
+    | { [K in AiLogFormat]: { logFormat: K; data: AiLogFormatDataMap[K] } }[AiLogFormat]
+    | { logFormat: null; data: null }
+);
+
+/** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/ModelToArray.php */
+export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature extends AiFeature = AiFeature> = {
+    /** The session ID can be null for legacy records which never had a session ID before we added those */
+    id: AiSessionId | null;
+    feature: TFeature;
+    logFormat: TLogFormat | null;
     createdAt: string;
     createdBy: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
@@ -64,4 +74,7 @@ export type AiUsageLogApiResponse = {
     metadata: PaginationMeta;
 };
 
-export type AiSessionLogApiResponse<TFeature extends AiFeature = AiFeature> = (AiSessionLog & { feature: TFeature })[];
+export type AiSessionLogApiResponse<
+    TLogFormat extends AiLogFormat = AiLogFormat,
+    TFeature extends AiFeature = AiFeature,
+> = (AiSessionLog & { logFormat: TLogFormat; feature: TFeature })[];
