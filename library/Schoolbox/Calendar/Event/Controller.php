@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use DateTimeInterface;
+use External_Timetable;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
@@ -28,13 +29,22 @@ use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
+use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\External\Event\Mapper as ExternalEventMapper;
+use Schoolbox\ResourceBooking\Booking\Validation;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\User\Translator\ModelToArray as UserTranslator;
@@ -50,110 +60,43 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
-     * @var Error\Mapper
-     */
-    private $errorMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-
-    /**
-     * @var Folder\Mapper
-     */
-    private $folderMapper;
-
-
-    /**
-     * @var EventMapper
-     */
-    private $eventMapper;
-
-
-    /**
-     * @var EventTypeMapper
-     */
-    private $eventTypeMapper;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
-     * @var Attendance\Mapper
-     */
-    private $attendanceMapper;
-
-
-    /**
-     * @var FolderAccess
-     */
-    private FolderAccess $folderAccess;
-
-
-    /**
-     * @var Validator
-     */
-    private Validator $validator;
-
-
-    /**
-     * Helper for editor templates.
-     */
-    private EditorTemplateHelper $editorTemplateHelper;
-
-
-    /**
      * Controller constructor.
      *
-     * @param Error\Mapper      $errorMapper
-     * @param RoleMapper        $roleMapper
-     * @param Folder\Mapper     $folderMapper
-     * @param EventMapper       $eventMapper
-     * @param EventTypeMapper   $eventTypeMapper
-     * @param CampusMapper      $campusMapper
-     * @param UserMapper        $userMapper
+     * @param Mapper $errorMapper
+     * @param RoleMapper $roleMapper
+     * @param Folder\Mapper $folderMapper
+     * @param EventMapper $eventMapper
+     * @param EventTypeMapper $eventTypeMapper
+     * @param CampusMapper $campusMapper
+     * @param UserMapper $userMapper
      * @param Attendance\Mapper $attendanceMapper
-     * @param FolderAccess      $folderAccess
-     * @param Validator         $validator
-     * @param EditorTemplateHelper    $editorTemplateHelper
+     * @param FolderAccess $folderAccess
+     * @param Validator $validator
+     * @param EditorTemplateHelper $editorTemplateHelper
+     * @param ResourceBookingMapper $bookingMapper
+     * @param ResourceBookingStatusMapper $bookingStatusMapper
+     * @param TermMapper $termMapper
+     * @param ExternalEventMapper $externalEventMapper
+     * @param External_Timetable $externalTimetable
      */
     public function __construct(
-        Error\Mapper $errorMapper,
-        RoleMapper $roleMapper,
-        Folder\Mapper $folderMapper,
-        EventMapper $eventMapper,
-        EventTypeMapper $eventTypeMapper,
-        CampusMapper $campusMapper,
-        UserMapper $userMapper,
-        Attendance\Mapper $attendanceMapper,
-        FolderAccess $folderAccess,
-        Validator $validator,
-        EditorTemplateHelper $editorTemplateHelper,
+        private Error\Mapper $errorMapper,
+        private RoleMapper $roleMapper,
+        private Folder\Mapper $folderMapper,
+        private EventMapper $eventMapper,
+        private EventTypeMapper $eventTypeMapper,
+        private CampusMapper $campusMapper,
+        private UserMapper $userMapper,
+        private Attendance\Mapper $attendanceMapper,
+        private FolderAccess $folderAccess,
+        private Validator $validator,
+        private EditorTemplateHelper $editorTemplateHelper, //Helper for editor templates
+        private ResourceBookingMapper $bookingMapper,
+        private ResourceBookingStatusMapper $bookingStatusMapper,
+        private TermMapper $termMapper,
+        private ExternalEventMapper $externalEventMapper,
+        private External_Timetable $externalTimetable,
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->roleMapper = $roleMapper;
-        $this->folderMapper = $folderMapper;
-        $this->eventMapper = $eventMapper;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->campusMapper = $campusMapper;
-        $this->userMapper = $userMapper;
-        $this->attendanceMapper = $attendanceMapper;
-        $this->folderAccess = $folderAccess;
-        $this->validator = $validator;
-        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -617,6 +560,15 @@ class Controller extends Base
         // require no further validation.
         $validRequestPost = $this->validator->validateForPostModify($event, $this->requestPost);
 
+        // cache old start and end for resource booking move
+        $existingEvent = false;
+        $oldStart = $oldEnd = null;
+        if ($event->getId()) {
+            $oldStart = clone $event->getStartDateTime();
+            $oldEnd = clone $event->getEndDateTime();
+            $existingEvent = true;
+        }
+
         /* Check owner still exists
          * If not - pass ownership to the author
          * Event owner is deliberately not modifiable by API requests.
@@ -831,6 +783,12 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
+        $bookingErrors = [];
+        if ($existingEvent) {
+            // Move any resource bookings attached to this event
+            $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+        }
+
         if ($this->isJsonRequest()) {
             $this->eventMapper->populateGuests($event); // Reload guests to ensure the response matches the database representation.
 
@@ -873,6 +831,7 @@ class Controller extends Base
                     ),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees(),
+                    'bookingErrors' => $bookingErrors,
                 ]
             );
         } else {
@@ -897,6 +856,8 @@ class Controller extends Base
         // Do not modify anything except the event's start/end/allDay
         $start  = new Alaress_Date_Format($this->requestPost->get('start'), \DateTime::ATOM);
         $end    = new Alaress_Date_Format($this->requestPost->get('end'), \DateTime::ATOM);
+        $oldStart = clone $event->getStartDateTime();
+        $oldEnd = clone $event->getEndDateTime();
         $allDay = $this->requestPost->getBool('allDay');
         if ($allDay) {
             $event->setStartDate($start->getDatabase());
@@ -930,6 +891,17 @@ class Controller extends Base
             $event->getAccess(),
             $eventRelations
         );
+
+        // Move any resource bookings attached to this event
+        $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+
+        // If there were booking errors, return them
+        if (count($bookingErrors)) {
+            $this->response = $this->responseAsJson(
+                ['errors' => $bookingErrors],
+            )->withStatus(200);
+            return;
+        }
 
         // Return empty '200 OK' regardless of whether JSON was requested.
         $this->response = $this->responseEmpty()->withStatus(200);
@@ -1046,5 +1018,97 @@ class Controller extends Base
             $userArrays[] = $translator->convertLinkedUser($user);
         }
         return $userArrays;
+    }
+
+
+    /**
+     * Update all resource bookings (start / end times) attached to this event
+     *
+     * @param Event $event
+     * @param ?Alaress_Date_Format $oldStartDateTime
+     * @param ?Alaress_Date_Format $oldEndDateTime
+     * @param User $user
+     * @return array
+     * @throws MapperException
+     */
+    private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user): array
+    {
+        // can't work out the diff if there is no past...
+        if (!$oldStartDateTime || !$oldEndDateTime) {
+            return []; // No bookings to move if we don't have old times
+        }
+        // get the time diff in minutes
+        $startDiff = $oldStartDateTime->diffInMinutes($event->getStartDateTime(), false);
+        $endDiff = $oldEndDateTime->diffInMinutes($event->getEndDateTime(), false);
+
+        // get all bookings for this event
+        $bookings = $this->bookingMapper->getForAllEventIds([$event->getId()]);
+
+        // clashes?
+        $validation = new Validation(
+            $user,
+            $this->bookingMapper,
+            $this->bookingStatusMapper,
+            $this->termMapper,
+            $this->externalTimetable,
+            $this->campusMapper,
+            $this->getConfigLoader(),
+            $this->externalEventMapper,
+        );
+
+        // collect errors
+        $errors = [];
+
+        // update each booking, and check for clashes
+        foreach ($bookings[$event->getId()] as $booking) {
+            /** @var ResourceBookingModel $booking */
+
+            // booking dates may be null, so fall back to event dates
+            $bookingStart = $booking->getBookingStartAt() ?? $event->getStartDateTime();
+            $bookingEnd = $booking->getBookingEndAt() ?? $event->getEndDateTime();
+            $newStart = $bookingStart?->addMinutes($startDiff);
+            $newEnd = $bookingEnd?->addMinutes($endDiff);
+
+            $clashErrors = $validation->validateForClashes(
+                $booking->getResource(),
+                $newStart->getDateTimeObject(), // We need a different kind of date object.
+                $newEnd->getDateTimeObject(), // We need a different kind of date object.
+                $booking
+            );
+
+            if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
+                $errors[] = $clashErrors;
+                // set status to pending if there are clashes (even if the resource can NOT have clashes...)
+                $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+            } else {
+                // If booking is managed or moderated, and was previously approved, set status back to pending so it can be re-approved by a moderator if the time has changed.
+                $moderationId = $booking->getResource()->getModerationType()->getId();
+                $statusId = $booking->getStatus()->getId();
+                if (
+                    $booking->getResource()->isUserModerator($user)
+                    && (int)$event->getAuthor()->getId() === (int)$user->getId()
+                ) {
+                    /* If you're a Moderator and can moderate this request,
+                     * and you created the booking in the first place,
+                     * set it to Approved - otherwise you'll end up approving your own request anyway
+                     */
+                    $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_APPROVED));
+                } elseif (
+                    ($moderationId === ResourceBookingModerationTypeModel::TYPE_MODERATED || $moderationId === ResourceBookingModerationTypeModel::TYPE_MANAGED) &&
+                    $statusId === \Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_APPROVED
+                ) {
+                    $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+                }
+                // if not moderated or managed, keep approved status
+            }
+
+            $booking->setBookingStartAt($newStart);
+            $booking->setBookingEndAt($newEnd);
+        }
+
+        // save the lot
+        $this->bookingMapper->save($bookings[$event->getId()]);
+
+        return $errors;
     }
 }

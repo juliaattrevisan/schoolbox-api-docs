@@ -20,7 +20,6 @@ use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter
 {
-
     /**
      * The event type for bookings.
      *
@@ -49,8 +48,11 @@ class EventConverter
         $event->setAuthorName($eventItem->getAuthor()->formatName());
         $event->setAuthorId($eventItem->getAuthor()->getId());
         $event->setEventId($eventItem->getId());
-        $event->setStartTime($eventItem->getStartDateTime());
-        $event->setEndTime($eventItem->getEndDateTime());
+
+        // use the booking times (if they exist) otherwise fall back to the event times
+        $event->setStartTime($booking->getBookingStartAt() ?? $eventItem->getStartDateTime());
+        $event->setEndTime($booking->getBookingEndAt() ?? $eventItem->getEndDateTime());
+
         $event->setPublishDate($eventItem->getPublishDateTime());
 
         $event->setTitle($booking->getName());
