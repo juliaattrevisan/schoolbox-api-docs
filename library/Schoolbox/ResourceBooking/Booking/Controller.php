@@ -1262,4 +1262,64 @@ class Controller extends Base
         $this->externalEventMapper = $externalEventMapper;
         return $this;
     }
+
+    /**
+     * Handle approval of a booking that clashes with an existing booking.
+     * rejects the old booking (approved) and approve the new booking. (pending)
+     * @param Model $oldBooking
+     * @param Model $item // item as we do route perm checks on $item so we can leverage that for the new booking
+     *                    (both old booking and item (new booking) should be both the same resource, so if you have access to one, you have access to the other)
+     * @return void
+     * @throws Exception
+     * @api GET /resource-booking/booking/{old}/{new}/clashApprove
+     * @since 26.0
+     */
+    public function clashApprove(Model $oldBooking, Model $item)
+    {
+        // ensure these are a valid clash situation
+        //     * Determine if this event clashes with another event
+        //     * if it's the same event, return false
+        //     * if different resources, return false
+        //     * if either is a rejected booking, return false
+        //     * if both are resource bookings, only care if one is pending
+        //     * if both are resource bookings, skip if both pending or same booking id
+        if ($oldBooking->getId() === $item->getId()) {
+            throw new Exception("Cannot approve clash: bookings have the same ID.");
+        }
+        if ($oldBooking->getResource()->getId() !== $item->getResource()->getId()) {
+            throw new Exception("Cannot approve clash: bookings are for different resources.");
+        }
+        if ($oldBooking->getStatus()->getId() === Status\Model::STATUS_REJECTED) {
+            throw new Exception("Cannot approve clash: the old booking is rejected.");
+        }
+        if ($item->getStatus()->getId() === Status\Model::STATUS_REJECTED) {
+            throw new Exception("Cannot approve clash: the new booking is rejected.");
+        }
+        if (
+            $oldBooking->getStatus()->getId() === Status\Model::STATUS_APPROVED
+            && $item->getStatus()->getId() === Status\Model::STATUS_APPROVED
+        ) {
+            throw new Exception("Cannot approve clash: both bookings are already approved.");
+        }
+        // Ensure old booking is approved and new booking is pending
+        if (
+            $oldBooking->getStatus()->getId() !== Status\Model::STATUS_APPROVED
+            || $item->getStatus()->getId() !== Status\Model::STATUS_PENDING
+        ) {
+            throw new Exception("Unable to approve clash booking, only allowed when old booking is approved and new booking is pending.");
+        }
+
+        // reject the old booking, so we can approve the new one.
+        $errorsOld = $this->changeStatus($oldBooking, Status\Model::STATUS_REJECTED);
+
+        // if errors then exit here
+        if (!empty($errorsOld)) {
+            $this->setUpdateStatusResponse($oldBooking, $this->getStatusChangeCallbackUrl(), $errorsOld);
+            return;
+        }
+
+        // approve the new booking
+        $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
+        $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
+    }
 }
