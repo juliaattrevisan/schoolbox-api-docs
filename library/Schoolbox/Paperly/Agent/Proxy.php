@@ -40,20 +40,6 @@ class Proxy
      */
     public function executeQuery(string $sql, ?array $params = []): IQuery|Base
     {
-        /* Appending SCOPE_IDENTITY() to retrieve the last inserted ID
-         * We are purposely inserting the SELECT statement in the same
-         * execution to be able to return the last inserted ID immediately after
-         * the insert operation.
-         * This also introduces te semi-colon, but we are ok cause we've already identified
-         * the SQL operator earlier.
-         *
-         * Note: This is specific to MS SQL Server databases, unlikely, but if this is ever used with
-         * other database types, this part will need to be adjusted accordingly.
-         */
-        if (self::SQL_INSERT === $this->getSqlOperator($sql)) {
-            $sql .= '; SELECT SCOPE_IDENTITY() AS InsertedID;';
-        }
-
         $statement = $this->externalDb->prepareQuery($sql, $params);
         $stmt = $statement->execute();
 
@@ -130,21 +116,34 @@ class Proxy
      */
     public function retrieveResults(IQuery|Base $stmt): array
     {
-        $results = [];
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        /* If it's an insert query, return the last inserted ID
+         * This will only return the last ID if there are multiple rows inserted
+         *
+         * Note that it is possible that if there are anything inserted before this was executed it
+         * (ie Stored Procedures with inserts or someone inserted something in between) it
+         * might not return the correct last inserted ID. However, this is a limitation of PDO itself.
+         */
+        if (self::SQL_INSERT === $this->getSqlOperator($stmt->getSql())) {
+            $results = [
+                'lastInsertedID' => (int)$this->externalDb->lastInsertId()
+            ];
+        } else {
+            $results = [];
+            $data    = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        if (count($data) > self::MAX_RESULTS) {
-            throw new AlaressDatabaseException(
-                sprintf(
-                    "Maximum number of results exceeded. Please limit the number of results in query to be below %d.",
-                    self::MAX_RESULTS
-                )
-            );
-        }
+            if (count($data) > self::MAX_RESULTS) {
+                throw new AlaressDatabaseException(
+                    sprintf(
+                        "Maximum number of results exceeded. Please limit the number of results in query to be below %d.",
+                        self::MAX_RESULTS
+                    )
+                );
+            }
 
-        foreach ($data as $row) {
-            $row = array_map(fn($item) => $this->convertImageToBase64($item), $row);
-            $results[] = $row;
+            foreach ($data as $row) {
+                $row       = array_map(fn($item) => $this->convertImageToBase64($item), $row);
+                $results[] = $row;
+            }
         }
         return $results;
     }
