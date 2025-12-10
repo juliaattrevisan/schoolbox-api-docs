@@ -669,11 +669,6 @@ class Mapper extends BaseMapper
             return [];
         }
 
-        $pb = $this->getPredicateBuilder()
-            ->equals('rb.resource_booking_status_id', Status\Model::STATUS_APPROVED)
-            ->isNull('rb.deleted_at')
-            ->in('rb.resource_id', $resourceIds);
-
         // Get the periods of all approved bookings of the given resources that end in the future.
         $query = "
             SELECT
@@ -682,7 +677,9 @@ class Mapper extends BaseMapper
             COALESCE(rb.end_datetime, e.end_datetime) AS end_datetime
             FROM resource_booking rb
             JOIN event e ON e.id = rb.event_id AND e.deleted_at IS NULL
-            WHERE {$pb->getWhereIntersect()}
+            WHERE rb.resource_booking_status_id = :statusId
+            AND rb.deleted_at IS NULL
+            AND rb.resource_id IN (" . implode(',', array_map('intval', $resourceIds)) . ")
             AND COALESCE(rb.end_datetime, e.end_datetime) > NOW()
             " . ($sortByStartDatetimeAsc ? 'ORDER BY COALESCE(rb.start_datetime, e.start_datetime) ASC' : '') . '
         ';
