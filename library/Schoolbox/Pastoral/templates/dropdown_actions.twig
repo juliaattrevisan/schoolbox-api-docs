@@ -3,6 +3,7 @@
     {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
     {% set routeGetAudiences = routeLookupIfAuthorized('pastoralAudience.getAudiences') %}
     {% set routeBulkImport = routeLookupIfAuthorized('pastoralBulkImport.getList') %}
+    {% set routeDPManage = routeLookupIfAuthorized('differentiationProfiles.manageDifferentiationProfiles') %}
 
     <sbx-pop-out content-id="header-options"></sbx-pop-out>
 </nav>
@@ -18,5 +19,8 @@
     {% endif %}
     {% if routeGetAudiences %}
         <li><a href="{{ routeGetAudiences }}" class="icon-settings" title="Manage Flag, Audience and Template Defaults">Manage {{ locale.pastoral.proper }} Record Settings</a></li>
+    {% endif %}
+    {% if routeDPManage %}
+        <li><a href="{{ routeDPManage }}" class="icon-advanced-list" title="Manage {{ locale.differentiationProfile.proper }}">Manage {{ locale.differentiationProfile.plural }}</a></li>
     {% endif %}
 </ul>
