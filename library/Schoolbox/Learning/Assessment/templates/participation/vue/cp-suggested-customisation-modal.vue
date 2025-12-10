@@ -47,6 +47,7 @@ window.Vue.watch(participant, (newParticipant) => {
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (!newIsOpen) {
         participant.value = null;
+        aiResponse.value = null;
         status.value = "view";
         previousStatus.value = "view";
     }

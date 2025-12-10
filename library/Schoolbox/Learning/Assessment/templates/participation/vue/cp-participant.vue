@@ -133,6 +133,7 @@ function onOpenIncludeInExistingModal(): void {
                 v-if="props.participant._links.differentiationProfile"
                 class="button f-no-margins"
                 type="button"
+                :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
                 @click.prevent="onViewDP"
             >
                 View {{ locale.differentiationProfile.translate(false, true) }}
@@ -192,7 +193,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                Modify
+                                Modify Existing {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
@@ -219,7 +220,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                Copy {{ locale.activity.translate(false, true) }}
+                                Create Copy of {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
@@ -231,7 +232,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                New {{ locale.activity.translate(false, true) }}
+                                Create New {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                     </template>

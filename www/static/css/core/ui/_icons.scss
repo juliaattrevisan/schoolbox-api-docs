@@ -51,10 +51,9 @@ $font-family-icon: var(--sbx-icon-font-family);
     float: right;
 }
 
-/** for when an icon sits inline with text **/
-.inline-icon {
-    display: inline-block;
-    margin-right: var(--sbx-size-xs, 0.25rem);
+/* for the icon to just use the parent color */
+.f-no-icon-color {
+    color: inherit !important;
 }
 
 // Icon sizes

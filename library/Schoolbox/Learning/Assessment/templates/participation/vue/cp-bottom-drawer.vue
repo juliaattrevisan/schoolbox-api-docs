@@ -82,7 +82,7 @@ function clearSelection(): void {
                         )
                     "
                 >
-                    Modify
+                    Modify Existing {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
                     class="icon-staff-students button l-flex__item--1-auto"
@@ -108,7 +108,7 @@ function clearSelection(): void {
                         )
                     "
                 >
-                    Copy {{ locale.activity.translate(false, true) }}
+                    Create Copy of {{ locale.activity.translate(false, true) }}
                 </button>
                 <button
                     class="icon-submissions button l-flex__item--1-auto"
@@ -119,7 +119,7 @@ function clearSelection(): void {
                         )
                     "
                 >
-                    New {{ locale.activity.translate(false, true) }}
+                    Create New {{ locale.activity.translate(false, true) }}
                 </button>
             </template>
         </div>

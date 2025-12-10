@@ -49,28 +49,31 @@ function onConfirm(): void {
             <h2>Select Customisation</h2>
         </div>
         <div>
-            <fieldset class="checklist f-no-margins">
+            <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
                 <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
                 <ul class="option-list">
                     <li>
                         <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
                         <label for="cp-modify">
-                            <span class="inline-icon"><sbx-icon name="modify" size="0.75rem" /></span>
-                            <span>Modify</span>
+                            <span class="icon-modify f-no-icon-color">
+                                Modify Existing {{ locale.activity.translate(false, true) }}
+                            </span>
                         </label>
                     </li>
                     <li>
                         <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
                         <label for="cp-copy">
-                            <span class="inline-icon"><sbx-icon name="copy" size="0.75rem" /></span>
-                            <span>Copy {{ locale.activity.translate(false, true) }}</span>
+                            <span class="icon-copy f-no-icon-color">
+                                Create Copy of {{ locale.activity.translate(false, true) }}
+                            </span>
                         </label>
                     </li>
                     <li>
                         <input id="cp-new" v-model="typePicked" type="radio" value="new" />
                         <label for="cp-new">
-                            <span class="inline-icon"><sbx-icon name="submissions" size="0.75rem" /></span>
-                            <span>New {{ locale.activity.translate(false, true) }}</span>
+                            <span class="icon-submissions f-no-icon-color">
+                                Create New {{ locale.activity.translate(false, true) }}
+                            </span>
                         </label>
                     </li>
                 </ul>
