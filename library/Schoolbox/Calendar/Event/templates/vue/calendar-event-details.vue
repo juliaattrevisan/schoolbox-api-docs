@@ -721,6 +721,8 @@ export default {
         <add-resource-bookings-modal
             v-if="event.resourceBookings"
             ref="addResourceBookingsModal"
+            :event-id="this.event.id"
+            :event-series-id="this.event.seriesId"
             :resource-bookings="this.event.resourceBookings"
         />
     </div>

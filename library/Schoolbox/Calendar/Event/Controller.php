@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -18,6 +19,7 @@ use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Attendance\Payload;
 use Schoolbox\Calendar\EventLevelCollection;
@@ -31,12 +33,18 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\ResourceBooking\Item\Mapper as BookingItemMapper;
+use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
+use Schoolbox\ResourceBooking\Item\ModerationType\Model as BookingModerationTypeModel;
+use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
@@ -60,25 +68,30 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 class Controller extends Base
 {
+    private const int HTTP_STATUS_CODE_OK = 200;
+    private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
+
+
     /**
      * Controller constructor.
      *
-     * @param Mapper $errorMapper
-     * @param RoleMapper $roleMapper
-     * @param Folder\Mapper $folderMapper
-     * @param EventMapper $eventMapper
-     * @param EventTypeMapper $eventTypeMapper
-     * @param CampusMapper $campusMapper
-     * @param UserMapper $userMapper
-     * @param Attendance\Mapper $attendanceMapper
-     * @param FolderAccess $folderAccess
-     * @param Validator $validator
-     * @param EditorTemplateHelper $editorTemplateHelper
-     * @param ResourceBookingMapper $bookingMapper
+     * @param Mapper                      $errorMapper
+     * @param RoleMapper                  $roleMapper
+     * @param Folder\Mapper               $folderMapper
+     * @param EventMapper                 $eventMapper
+     * @param EventTypeMapper             $eventTypeMapper
+     * @param CampusMapper                $campusMapper
+     * @param UserMapper                  $userMapper
+     * @param Attendance\Mapper           $attendanceMapper
+     * @param FolderAccess                $folderAccess
+     * @param Validator                   $validator
+     * @param EditorTemplateHelper        $editorTemplateHelper
+     * @param BookingItemMapper           $bookingItemMapper
      * @param ResourceBookingStatusMapper $bookingStatusMapper
-     * @param TermMapper $termMapper
-     * @param ExternalEventMapper $externalEventMapper
-     * @param External_Timetable $externalTimetable
+     * @param ResourceBookingMapper       $bookingMapper
+     * @param TermMapper                  $termMapper
+     * @param ExternalEventMapper         $externalEventMapper
+     * @param External_Timetable          $externalTimetable
      */
     public function __construct(
         private Error\Mapper $errorMapper,
@@ -92,23 +105,13 @@ class Controller extends Base
         private FolderAccess $folderAccess,
         private Validator $validator,
         private EditorTemplateHelper $editorTemplateHelper, //Helper for editor templates
+        private BookingItemMapper $bookingItemMapper,
+        private BookingStatusMapper $bookingStatusMapper,
         private ResourceBookingMapper $bookingMapper,
-        private ResourceBookingStatusMapper $bookingStatusMapper,
         private TermMapper $termMapper,
         private ExternalEventMapper $externalEventMapper,
         private External_Timetable $externalTimetable,
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->roleMapper = $roleMapper;
-        $this->folderMapper = $folderMapper;
-        $this->eventMapper = $eventMapper;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->campusMapper = $campusMapper;
-        $this->userMapper = $userMapper;
-        $this->attendanceMapper = $attendanceMapper;
-        $this->folderAccess = $folderAccess;
-        $this->validator = $validator;
-        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -116,7 +119,7 @@ class Controller extends Base
      * View an event's detail screen
      *
      * @param Event $event
-     * @throws Exception
+     * @throws MapperException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface|\Twig\Error\Error
      */
@@ -129,7 +132,7 @@ class Controller extends Base
                 'event_id' => $event->getId(),
                 'user_id'  => $this->getUser()->getId()
             ])->getStatus();
-        } catch (Exception) {
+        } catch (MapperException) {
             $attendanceStatus = null;
         }
 
@@ -141,6 +144,7 @@ class Controller extends Base
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
+            'resourceBookings' => $this->bookingMapper->findByColumn('event_id', $event->getId()),
             'user' => $this->getUser(),
 
             /* Modify perms are calculated in the attendance list fragment
@@ -178,7 +182,7 @@ class Controller extends Base
      * and staff can do it to others as well, via $selectedUser
      *
      * @throws DefinitionException
-     * @throws Exception
+     * @throws MapperException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -285,7 +289,7 @@ class Controller extends Base
      *
      * @param Event $event
      * @throws DefinitionException
-     * @throws Exception
+     * @throws MapperException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -391,7 +395,7 @@ class Controller extends Base
         if ($userId) {
             try {
                 $selectedUser = $this->userMapper->findById($userId);
-            } catch (Exception $e) {
+            } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_USER_NOT_FOUND);
             }
         }
@@ -406,7 +410,7 @@ class Controller extends Base
      *
      * @param Event $event
      * @return Collection|Folder\Model[]
-     * @throws Exception
+     * @throws MapperException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -439,7 +443,7 @@ class Controller extends Base
      * @param Event $event
      * @return array
      * @throws DefinitionException
-     * @throws Exception
+     * @throws MapperException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -528,7 +532,7 @@ class Controller extends Base
     /**
      * Create an event for person specified by userId
      * (remember, you can create events for other people)
-     * @throws Exception
+     * @throws MapperException
      */
     public function postCreate(): void
     {
@@ -564,7 +568,7 @@ class Controller extends Base
      * There's some validation checks to ensure that you can write to the $_POST args specified
      *
      * @param Event $event
-     * @throws Exception
+     * @throws MapperException
      * @throws InvalidArgumentException
      * @throws LogicException
      * @throws UnexpectedValueException
@@ -594,7 +598,7 @@ class Controller extends Base
          */
         try {
             $owner = $this->userMapper->findById($event->getOwner()->getId());
-        } catch (Exception $e) {
+        } catch (MapperException $e) {
             $owner = $this->getUser();
         }
 
@@ -605,7 +609,7 @@ class Controller extends Base
          */
         try {
             $author = $this->userMapper->findById($authorId);
-        } catch (Exception) {
+        } catch (MapperException) {
             $author = $this->getUser();
         }
 
@@ -982,6 +986,208 @@ class Controller extends Base
             }
         }
     }
+
+
+    /**
+     * This function is called when the form on the 'Add Resource Bookings' modal is submitted.
+     * The 'Add Resource Bookings' modal appears on the 'Event Details' page when the 'Add booking(s)' button is clicked.
+     *
+     * @throws MapperException
+     */
+    public function addBookings(Event $event): void
+    {
+        $efficacy = $this->requestPost->get('efficacy');
+        $resourceBookingIdsCommaSeparated = trim($this->requestPost->get('resourceIds', ''));
+        $resourceIdStrings = (
+            $resourceBookingIdsCommaSeparated === '' ? [] : explode(',', $resourceBookingIdsCommaSeparated)
+        );
+        $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
+
+        /** @var GenericCollection<BookingItemModel> $resourceById */
+        $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
+
+        // Check whether the user has permission to book the selected resources.
+        $route = 'resourceBooking.createBooking';
+        foreach ($resourceById as $resourceId => $resource) {
+            if (!$this->authorizer->isPathAuthorizedForUser($route, [$resourceId], $this->user)) {
+                throw new SchoolboxException(
+                    "You do not have permission to create bookings for resource '{$resource->getName()}'."
+                );
+            }
+        }
+
+        // If the user requested the booking be added to all events in the series (and the event is part of a series)...
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
+            // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
+            // and events can be removed from a series once the series has been created.  Therefore, we cannot assume
+            // any regular period between events, and so must fetch each event's start/end times.
+            $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
+            $pb->equals('series_id', $event->getSeriesId());
+            $pb->greaterThan('start_datetime', Alaress_Date_Format::now()->getDatabase());
+            /** @var GenericCollection<Event> $eventById */
+            $eventById = $this->eventMapper->findByPredicates($pb);
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
+        }
+
+        // Check whether each hypothetical booking would result in a clash.
+        $isClashByResourceIdByEventId = $this->checkForClashesIfResourceBookingsAddedToEvents($resourceById, $eventById);
+
+        // This will hold the booking models to be persisted.
+        $bookingList = new Collection();
+
+        // Counts for results data structure.
+        $nBookingsAttempted = 0;
+        $nBookingsCreatedWithoutClash = 0;
+        $nBookingsCreatedWithClash = 0;
+
+        // Create a list of booking models to be persisted depending on validation results.
+        /** @var Event $loopEvent */
+        foreach ($eventById as $eventId => $loopEvent) {
+            $isClashByResourceId = $isClashByResourceIdByEventId[$eventId] ?? [];
+            /** @var BookingItemModel $resource */
+            foreach ($resourceById as $resourceId => $resource) {
+                $isClash = $isClashByResourceId[$resourceId] ?? false;
+                if (!$isClash || $resource->getAllowClashBookings()) {
+                    // Build the booking.
+                    // Do not set start/end times because these are intended to be the same as in the linked event row.
+                    $booking = new BookingModel()
+                        ->setEvent($loopEvent)
+                        ->setResource($resource)
+                        ->setBookingStartAt(null) // Set as null to default to the event's start time.
+                        ->setBookingEndAt(null) // Set as null to default to the event's end time.
+                        ->setName($resource->getName())
+                        ->setNotes('');
+                    $booking->setStatus(
+                        $this->bookingStatusMapper->createModel(
+                            $isClash ? BookingStatusModel::STATUS_PENDING : $this->getStatusIdForNonClashBooking($booking)
+                        )
+                    );
+                    $bookingList->add($booking);
+
+                    if ($isClash) {
+                        ++$nBookingsCreatedWithClash;
+                    } else {
+                        ++$nBookingsCreatedWithoutClash;
+                    }
+                }
+
+                ++$nBookingsAttempted;
+            }
+        }
+
+        $httpStatusCode = self::HTTP_STATUS_CODE_OK;
+
+        try {
+            // Since all saves are attempted in one call below, either all will succeed or all will fail.
+            $this->bookingMapper->save($bookingList);
+        } catch (MapperException) {
+            $httpStatusCode = self::HTTP_STATUS_CODE_SERVER_ERROR;
+            $nBookingsCreatedWithClash = 0;
+            $nBookingsCreatedWithoutClash = 0;
+        }
+
+        // Only unexpected errors require non-success code.
+        // It is expected that some or all attempts to book resources may fail for validation reasons.
+        $this->response = $this->responseAsJson(
+        // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
+            [
+                'nBookingsAttempted' => $nBookingsAttempted,
+                'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
+                'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
+            ]
+        )->withStatus($httpStatusCode);
+    }
+
+
+    /**
+     * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
+     * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
+     * allowed on the resource.)
+     * TODO: Move this function into a helper class.
+     * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
+     * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
+     * @return array
+     */
+    private function checkForClashesIfResourceBookingsAddedToEvents(
+        GenericCollection $resourceById,
+        GenericCollection $eventById
+    ): array {
+        $isClashByResourceIdByEventId = [];
+
+        $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
+            $resourceById->keys(),
+            sortByStartDatetimeAsc: true
+        );
+
+        // For each event in the series, check for clash bookings if each resource is booked at a time matching the event time.
+        /** @var Event $event */
+        foreach ($eventById as $eventId => $event) {
+            // For each resource, check for existing approved bookings of that resource that overlap the event period.
+            foreach ($resourceById as $resourceId => $resource) {
+                $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$resourceId] ?? [];
+                foreach ($periodsOfApprovedBookings as $period) {
+                    if ($period['startDatetime']->gt($event->getEndDatetime())) {
+                        // The $periods are sorted by start datetime ascending, so we can be sure that no other periods will clash with event.
+                        break;
+                    }
+
+                    if (
+                        $period['startDatetime']->lt($event->getEndDatetime()) &&
+                        $period['endDatetime']->gt($event->getStartDatetime())
+                    ) {
+                        if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
+                            $isClashByResourceIdByEventId[$eventId] = [];
+                        }
+
+                        // If $resource was booked for $event, that booking would clash with an approved booking for $period.
+                        $isClashByResourceIdByEventId[$eventId][$resourceId] = true;
+                    }
+                }
+            }
+        }
+
+        return $isClashByResourceIdByEventId;
+    }
+
+
+    /**
+     * Return the status to be set for a new booking that does not clash with any existing booking.
+     * Note bookings that clash with existing bookings should be given status 'pending'.
+     *
+     * TODO: Modify this function so that no database operations are required.
+     *       This should be done because this function is called from within a loop.
+     *
+     * @param BookingModel $booking
+     * @return int
+     */
+    private function getStatusIdForNonClashBooking(BookingModel $booking): int
+    {
+        $resource = $booking->getResource();
+        $event = $booking->getEvent();
+
+        // What about the resource? If it's an open resource, confirm the
+        // booking immediately.
+        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
+            return BookingStatusModel::STATUS_APPROVED;
+        }
+
+        if (
+            $resource->isUserModerator($this->getUser())
+            && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+        ) {
+            /* If you're a Moderator and can moderate this request,
+             * and you created the booking in the first place,
+             * set it to Approved - otherwise you'll end up approving your own request anyway
+             */
+            return BookingStatusModel::STATUS_APPROVED;
+        }
+
+        return BookingStatusModel::STATUS_PENDING;
+    }
+
 
     /**
      * @param Collection $roles (each element is a \Schoolbox\Role)

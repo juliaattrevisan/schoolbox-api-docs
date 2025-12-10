@@ -134,7 +134,17 @@ class Validation
      * Attempts to validate the creation or update of a booking from post data.
      *
      * @param Item\Model   $resource
-     * @param Values|array       $postData
+     * @param Values|array $postData Example:
+     *        [
+     *            // These values are those submitted by the form in Calendar/Event/templates/create.twig.
+     *            'override_validation' => '1' or blank or unset
+     *            'startDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
+     *            'endDate' => datetime in local format (e.g. '02/12/2025 12:00pm')
+     *            'campus' => 0 or campusId
+     *            'repeat_until' => date in local format (e.g. 02/12/2025)
+     *            'related_item' => array of ['resource_id' => int, 'notes' => string]
+     *            'repeat' => (E.g. 'daily', 'weekly', etc.  See the create.twig form)
+     *        ]
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
      *                                      Leave it out of conflict checks.
      * @return array<string, array<string, array<string>>> Example:
@@ -164,7 +174,7 @@ class Validation
         Item\Model $resource,
         Values|array $postData,
         ?Booking $existingBooking = null
-    ) {
+    ): array {
         // Check:
         // Beginning and end of booking are valid datetime
         // (These checks can't be overridden.)

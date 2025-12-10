@@ -33,10 +33,11 @@ export const ENDPOINTS = Object.freeze({
 
     URL_BOOKING_SELECTIZE: "/resource-booking/item/search",
 
-    /* Add/edit bookings on events
-     * TODO: These have not yet been implemented on the back-end.
+    URL_BOOKINGS_ADD: "/calendar/event/{eventId}/addBookings",
+
+    /* Edit bookings on events.
+     * TODO: This has not yet been implemented on the back-end.
      */
-    URL_BOOKINGS_ADD: "/resource-booking/booking/addMultiple",
     URL_BOOKING_EDIT: "/resource-booking/booking/edit",
 
     /**
@@ -133,6 +134,16 @@ export const ENDPOINTS = Object.freeze({
      */
     rsvpAcceptPath: function (eventId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, eventId, btoa(window.location.pathname));
+    },
+
+    /**
+     * Add bookings
+     *
+     * @param eventId
+     * @return string
+     */
+    addBookingsPath: function (eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, btoa(window.location.pathname));
     },
 
     /**

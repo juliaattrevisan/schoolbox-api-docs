@@ -14,7 +14,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Calendar;
@@ -121,7 +120,7 @@ class Module extends BaseModule
         $manageBookingRule = new Rule\Any($baseManageRule, $isItemModeratorRule);
 
         // Create booking:
-        // This depends on the the item - managed items can only be booked by
+        // This depends on the item - managed items can only be booked by
         // moderators, otherwise they may be booked by any staff member.
         $canBookRule = new Auth\CanBookItem();
         $canBookRule->setMapper($this->getItemMapper());

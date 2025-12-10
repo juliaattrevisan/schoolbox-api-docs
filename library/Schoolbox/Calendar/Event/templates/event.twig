@@ -1,6 +1,7 @@
 <div id="event-details">
     {% set eventData = {
         "id"      : event.id,
+        "seriesId": event.seriesId,
         "title"   : event.title,
         "location": event.location | purify,
         "author"  : {

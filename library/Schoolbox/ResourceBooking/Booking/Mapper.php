@@ -8,6 +8,7 @@
 
 namespace Schoolbox\ResourceBooking\Booking;
 
+use Alaress_Date_Format;
 use Schoolbox\Calendar\Event;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -652,5 +653,50 @@ class Mapper extends BaseMapper
             ;
         });
         return $list;
+    }
+
+    /**
+     * @param array $resourceIds
+     * @param bool  $sortByStartDatetimeAsc Set to true to have the array sorted by start time asc.
+     *              This has been made a parameter so that if sorting is important in the calling
+     *              code, that can be made clear to the reader by use of a named parameter.
+     *              Eg. getPeriodsOfFutureApprovedBookingsByResourceId($resourceIds, sortByStartDatetimeAsc: true)
+     * @return array
+     */
+    public function getPeriodsOfFutureApprovedBookingsByResourceId(array $resourceIds, bool $sortByStartDatetimeAsc = false): array
+    {
+        if (count($resourceIds) === 0) {
+            return [];
+        }
+
+        $pb = $this->getPredicateBuilder()
+            ->equals('rb.resource_booking_status_id', Status\Model::STATUS_APPROVED)
+            ->isNull('rb.deleted_at')
+            ->in('rb.resource_id', $resourceIds);
+
+        // Get the periods of all approved bookings of the given resources that end in the future.
+        $query = "
+            SELECT
+            rb.resource_id,
+            COALESCE(rb.start_datetime, e.start_datetime) AS start_datetime,
+            COALESCE(rb.end_datetime, e.end_datetime) AS end_datetime
+            FROM resource_booking rb
+            JOIN event e ON e.id = rb.event_id AND e.deleted_at IS NULL
+            WHERE {$pb->getWhereIntersect()}
+            AND COALESCE(rb.end_datetime, e.end_datetime) > NOW()
+            " . ($sortByStartDatetimeAsc ? 'ORDER BY COALESCE(rb.start_datetime, e.start_datetime) ASC' : '') . '
+        ';
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(['statusId' => Status\Model::STATUS_APPROVED]);
+
+        $periodsByResourceId = [];
+        foreach ($statement as $row) {
+            $periodsByResourceId[$row['resource_id']][] = [
+                'startDatetime' => new Alaress_Date_Format($row['start_datetime'], Alaress_Date_Format::DATABASE_FORMAT),
+                'endDatetime' => new Alaress_Date_Format($row['end_datetime'], Alaress_Date_Format::DATABASE_FORMAT),
+            ];
+        }
+
+        return $periodsByResourceId;
     }
 }
