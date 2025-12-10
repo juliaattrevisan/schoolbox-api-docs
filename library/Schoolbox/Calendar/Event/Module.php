@@ -30,7 +30,6 @@ use Schoolbox\External\Event\Mapper as ExternalEventMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
