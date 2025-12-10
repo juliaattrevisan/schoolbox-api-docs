@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { getRelativeTime } from "@js/util/dateUtils";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import UserLink from "@schoolboxVue/components/user/user-link.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import { STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
+import { DialogAgentResponseStatus, STATUS_LABELS, STATUS_TICKS } from "@schoolboxAssessment/Types/dialogAgent";
 import { getResponseStatus } from "./dialogAgentStatusTypes";
 import type {
     ApiDialogAgentActionResponse,
@@ -19,6 +20,7 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<{
     (e: "updateResponse", data: ApiDialogAgentActionResponse): void;
+    (e: "feedback", data: Record<string, string>): void; // TEMPORARY
 }>();
 
 /**
@@ -38,6 +40,35 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
     }
 
     return STATUS_LABELS[getResponseStatus(participant.response)];
+}
+
+/**
+ * TEMPORARY:
+ * Generate feedback for the participant using AI and ram it in
+ */
+async function generateFeedback(): Promise<void> {
+    /** intentional jank, the temporary route is the same as view but with "feedback" */
+    const viewRoute = props.participant.response?._routes.view;
+    if (!viewRoute) {
+        console.warn("Unable to generate feedback: no view route found"); // shouldn't get here
+        return;
+    }
+
+    const feedbackRoute = viewRoute.replace("/view/", "/feedback/");
+
+    const toast = window.sbProps.toastActivate("Generating feedback...");
+    const response = await apiRequest<Record<string, string>>({
+        method: "GET",
+        url: feedbackRoute,
+    });
+
+    if (!response.success) {
+        toast.timeout({ text: "Failed to generate feedback", isSuccess: false });
+        return;
+    }
+
+    toast.timeout({ text: "Feedback generated", isSuccess: true });
+    emit("feedback", response.data);
 }
 </script>
 
@@ -86,6 +117,10 @@ function getProgressTickTitle(participant: DialogAgentParticipant): string {
                     :summary-route="participant._routes.summary"
                     @update-response="(data) => emit('updateResponse', data)"
                 />
+                <!-- TEMPORARY: TO DEMO FEEDBACK -->
+                <li v-if="participant.response?.status === DialogAgentResponseStatus.SUBMITTED">
+                    <button class="icon-ai" @click="generateFeedback">Generate Feedback</button>
+                </li>
             </ul>
         </td>
         <td v-for="field in props.criteria" :key="field.id" class="u-sticky-left--row">
