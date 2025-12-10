@@ -246,7 +246,7 @@ class Controller extends BaseController
                             $value   = call_user_func([$profile, $method]);
 
                             if ($config->getModule() === \Schoolbox\Admin\DifferentiationProfiles\Mapper::MODULE_ADJUSTMENTS && $value instanceof \Schoolbox\Collection) {
-                                $value = ($value->count() > 0 ) ?
+                                $value = ($value->count() > 0) ?
                                     $value->map(fn(AdjustmentCategoriesModel|AdjustmentLevelsModel $adjustment) => [
                                         'name' => $adjustment->getName(),
                                     ])->getAll() : null;
@@ -270,6 +270,7 @@ class Controller extends BaseController
                         if (is_array($item['value'])) {
                             $adjustmentData[] = $item;
                         } elseif (null !== $item['value']) {
+                            $item['value'] = \Scrub::html($item['value']);
                             $textData[] = $item;
                         }
                     }
