@@ -47,11 +47,16 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        $staffWithFeatureEnabled = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+        );
+
         /* Only staff with the differentiation profile service permission can view the form
          */
         $getPerms = new Rule\All(
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+            $staffWithFeatureEnabled,
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
                 UserAccess::ACCESS_WRITE
@@ -80,8 +85,7 @@ class Module extends BaseModule
         /* Only staff can view differentiation profiles when the feature is enabled
          */
         $getProfilePerms = new Rule\All(
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+            $staffWithFeatureEnabled,
             new Rule\Callback(function (array $params): void {
                 try {
                     $this->getMapperFactory()->get(DifferentiationProfileMapper::class)
