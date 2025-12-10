@@ -122,7 +122,7 @@ class Controller extends Base
      */
     public function getEvent(Event $event): void
     {
-        $helper = new Helper($this->roleMapper, $this->folderMapper, $this->resourceBookingMapper);
+        $helper = new Helper($this->roleMapper, $this->folderMapper, $this->bookingMapper);
 
         try {
             $attendanceStatus = $this->attendanceMapper->findOneByColumnList([
