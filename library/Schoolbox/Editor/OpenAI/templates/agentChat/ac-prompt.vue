@@ -53,9 +53,37 @@ async function getImageUrl(file: File): Promise<string | null> {
 }
 
 /**
+ * The form is disabled if:
+ * - the entire component is disabled
+ * - an invalid image was uploaded (the user must remove it first)
+ */
+const isFormDisabled = window.Vue.computed(() => {
+    if (props.disabled) {
+        return true;
+    }
+
+    if ((currentFile.value?.error ?? false) !== false) {
+        return true;
+    }
+
+    return false;
+});
+
+/**
+ * The submit button is disabled if:
+ * - the form is disabled
+ * - there is an active generation in progress
+ */
+const isSubmitDisabled = window.Vue.computed(() => isFormDisabled.value || acStore.activeGeneration !== null);
+
+/**
  * Send the current prompt to the AI
  */
 async function sendRequest(): Promise<void> {
+    if (isSubmitDisabled.value) {
+        return; // form is disabled, can't send
+    }
+
     if (promptEl.value) {
         promptEl.value.value = promptEl.value.value.trim();
         if (!promptEl.value.reportValidity()) {
@@ -113,23 +141,6 @@ acPromptEventBus.on(({ retryRequest }) => {
         );
     }
 });
-
-/**
- * The form is disabled if:
- * - the entire component is disabled
- * - an invalid image was uploaded (the user must remove it first)
- */
-const isFormDisabled = window.Vue.computed(() => {
-    if (props.disabled) {
-        return true;
-    }
-
-    if ((currentFile.value?.error ?? false) !== false) {
-        return true;
-    }
-
-    return false;
-});
 </script>
 
 <template>
@@ -184,7 +195,7 @@ const isFormDisabled = window.Vue.computed(() => {
                 class="icon-send"
                 href="#"
                 title="Generate Image"
-                :disabled="isFormDisabled || undefined"
+                :disabled="isSubmitDisabled || undefined"
                 @click.prevent="sendRequest"
             ></a>
         </nav>
