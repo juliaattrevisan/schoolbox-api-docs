@@ -453,6 +453,57 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Returns a collection of resource booking objects, each with their resource and status objects hydrated.
+     *
+     * @param  int $eventId
+     * @return GenericCollection<Model>
+     */
+    public function findByEventId(int $eventId): GenericCollection
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('b')},
+                {$this->getJoinColumnString('resource', 'r')},
+                {$this->getJoinColumnString('status', 's')}
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
+            INNER JOIN {$this->getJoinSql('status', 'b', 's')}
+            WHERE b.event_id=:eventId
+            AND b.deleted_at IS NULL
+            AND r.deleted_at IS NULL
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('eventId', $eventId);
+        $statement->execute();
+
+        $collection = new GenericCollection(Model::class);
+        foreach ($statement as $row) {
+            try {
+                $bookingModel = $this->hydrate($row, 'b', function ($mapper, $model, $row) {
+                    /** @var self $mapper */
+                    /** @var Model $model */
+                    /** @var Item\Model $resource */
+                    $resource = $mapper->hydrateJoin($row, 'resource', 'r');
+                    $model->setResource($resource);
+                    /** @var Status\Model $status */
+                    $status = $mapper->hydrateJoin($row, 'status', 's');
+                    $model->setStatus($status);
+                    return $model;
+                });
+            } catch (BaseMapper\Exception $e) {
+                continue; // Skip the problem booking and move on to the next one.
+            }
+
+            if ($bookingModel !== null) {
+                $collection->add($bookingModel);
+            }
+        }
+
+        return $collection;
+    }
+
+
+    /**
      * Return an array of collections of ResourceBookingModels, indexed by eventId.
      *
      * @param  array<int> $eventIds

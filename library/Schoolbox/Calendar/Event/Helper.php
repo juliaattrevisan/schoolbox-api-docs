@@ -11,6 +11,8 @@ namespace Schoolbox\Calendar\Event;
 
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Relation\Role;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\RoleMapper;
@@ -20,25 +22,17 @@ use Schoolbox\Mapper\Exception;
 class Helper
 {
     /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
-    /**
      * Helper constructor.
      *
-     * @param RoleMapper   $roleMapper
+     * @param RoleMapper $roleMapper
      * @param FolderMapper $folderMapper
+     * @param ResourceBookingMapper $resourceBookingMapper
      */
-    public function __construct(RoleMapper $roleMapper, FolderMapper $folderMapper)
-    {
-        $this->roleMapper   = $roleMapper;
-        $this->folderMapper = $folderMapper;
+    public function __construct(
+        private RoleMapper $roleMapper,
+        private FolderMapper $folderMapper,
+        private ResourceBookingMapper $resourceBookingMapper
+    ) {
     }
 
     /**
@@ -74,7 +68,7 @@ class Helper
         foreach ($event->getRoleCollection()->getAll() as $role) {
             try {
                 $result[] = $this->roleMapper->findById($role->getRoleId());
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // noop
             }
         }
@@ -116,6 +110,23 @@ class Helper
                 'name' => $folder->getNameWithCodes(),
                 'id'   => $folder->getId(),
             ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Event $event
+     * @return array
+     */
+    public function getResourceBookingsCollection(Event $event): array
+    {
+        $result = [];
+
+        $resourceBookings = $this->resourceBookingMapper->findByEventId($event->getId());
+        /** @var ResourceBookingModel $resourceBooking */
+        foreach ($resourceBookings as $resourceBooking) {
+            $result[] = $resourceBooking->jsonSerialize();
         }
 
         return $result;

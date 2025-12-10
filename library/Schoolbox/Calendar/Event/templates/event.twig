@@ -30,6 +30,11 @@
         "level"      : level,
     } %}
 
+    {# Resource booking data will only be available if the resource booking module is enabled. #}
+    {% if resourceBookingsCollection is defined %}
+        {% set eventData = eventData | merge({"resourceBookings": resourceBookingsCollection}) %}
+    {% endif %}
+
     <calendar-event-details :event="{{ eventData | json_encode }}"></calendar-event-details>
 </div>
 

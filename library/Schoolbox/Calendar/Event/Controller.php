@@ -28,6 +28,7 @@ use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -97,6 +98,17 @@ class Controller extends Base
         private ExternalEventMapper $externalEventMapper,
         private External_Timetable $externalTimetable,
     ) {
+        $this->errorMapper = $errorMapper;
+        $this->roleMapper = $roleMapper;
+        $this->folderMapper = $folderMapper;
+        $this->eventMapper = $eventMapper;
+        $this->eventTypeMapper = $eventTypeMapper;
+        $this->campusMapper = $campusMapper;
+        $this->userMapper = $userMapper;
+        $this->attendanceMapper = $attendanceMapper;
+        $this->folderAccess = $folderAccess;
+        $this->validator = $validator;
+        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -106,24 +118,24 @@ class Controller extends Base
      * @param Event $event
      * @throws Exception
      * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @throws NotFoundExceptionInterface|\Twig\Error\Error
      */
     public function getEvent(Event $event): void
     {
-        $helper = new Helper($this->roleMapper, $this->folderMapper);
+        $helper = new Helper($this->roleMapper, $this->folderMapper, $this->bookingMapper);
 
         try {
             $attendanceStatus = $this->attendanceMapper->findOneByColumnList([
                 'event_id' => $event->getId(),
                 'user_id'  => $this->getUser()->getId()
             ])->getStatus();
-        } catch (Exception $e) {
+        } catch (Exception) {
             $attendanceStatus = null;
         }
 
-        $payload = (new Payload($this->di, $this->attendanceMapper))->generate($event, $this->getUser());
+        $payload = new Payload($this->di, $this->attendanceMapper)->generate($event, $this->getUser());
 
-        $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', [
+        $data = [
             'event' => $event,
             'level' => $helper->getEventLevel($event),
             'campusCollection' => $helper->getCampusCollection($event),
@@ -148,7 +160,14 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
-        ], $event->getTitle());
+        ];
+
+        // Only include resource booking data if the resource booking module is enabled.
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
+            $data['resourceBookingsCollection'] = $helper->getResourceBookingsCollection($event);
+        }
+
+        $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', $data, $event->getTitle());
     }
 
 

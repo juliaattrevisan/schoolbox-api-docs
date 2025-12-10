@@ -5,6 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
+import AddResourceBookingsModal from "./add-resource-bookings-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -26,6 +27,7 @@ export default {
         AudiencesModal,
         MediaArticle,
         SearchSelect,
+        AddResourceBookingsModal,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -449,6 +451,10 @@ export default {
         showAudiencesModal() {
             this.$refs.audiencesModal.open();
         },
+
+        showAddResourceBookingsModal() {
+            this.$refs.addResourceBookingsModal.open();
+        },
     },
 };
 </script>
@@ -648,6 +654,61 @@ export default {
             </template>
         </div>
 
+        <div v-if="event.resourceBookings" class="small-12 medium-8 island">
+            <section class="detail content">
+                <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
+                    <h2>Resource Bookings</h2>
+                    <nav class="l-flex-row l-flex--align-center f-no-margins">
+                        <a
+                            class="icon-add f-no-margins"
+                            href="#"
+                            @click.prevent="showAddResourceBookingsModal()"
+                            aria-label="Add resource bookings"
+                            title="Add resource bookings"
+                        >
+                        </a>
+                    </nav>
+                </div>
+                <div class="meta"></div>
+                <div class="content-section">
+                    <div v-if="event.resourceBookings.length > 0">
+                        <div
+                            v-for="booking in event.resourceBookings"
+                            :key="booking.id"
+                            class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
+                        >
+                            <div>
+                                {{ booking.name !== "" ? booking.name : booking.resource.name }}
+                            </div>
+                            <div class="text-right">
+                                <span
+                                    class="label"
+                                    :class="{
+                                        pending: booking.status.isPending,
+                                        approved: booking.status.isApproved,
+                                        rejected: booking.status.isRejected,
+                                    }"
+                                    >{{ booking.status.name }}</span
+                                >
+                                <a
+                                    href="#"
+                                    class="icon-modify"
+                                    title="Modify Booking"
+                                    aria-label="Modify Booking"
+                                    onclick="alert('TODO: Implement edit booking modal (SA-21381)')"
+                                ></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="empty-state">
+                        <i class="icon-resource-booking"></i>
+                        <p>No resources are booked for this event.</p>
+                        <a href="#" @click.prevent="showAddResourceBookingsModal()">Book resources for this event</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
         <div data-toast class="toast"></div>
 
         <audiences-modal
@@ -656,6 +717,11 @@ export default {
             :role-audiences="this.event.audiences.roles"
             :group-audiences="this.event.audiences.folders"
             :is-group="this.isGroupEvent"
+        />
+        <add-resource-bookings-modal
+            v-if="event.resourceBookings"
+            ref="addResourceBookingsModal"
+            :resource-bookings="this.event.resourceBookings"
         />
     </div>
 </template>

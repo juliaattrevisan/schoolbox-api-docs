@@ -195,7 +195,6 @@ class Mapper extends BaseMapper
         $bookingMapper->delete($bookings);
     }
 
-
     /**
      * Always join onto category, image and its mime type
      *
@@ -211,7 +210,6 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('image.allowedFileExtension', 'im')}
         ";
     }
-
 
     /**
      * Always join onto category, image and its mime type
@@ -230,7 +228,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'im', true)}
         ";
     }
-
 
     /**
      * @param PDOStatement $statement
@@ -268,7 +265,6 @@ class Mapper extends BaseMapper
 
         return $c;
     }
-
 
     /**
      * Overrides hydrate() to populate the list of moderators, and the image.
@@ -346,19 +342,28 @@ class Mapper extends BaseMapper
     /**
      * Searches for a resource that matches a search term.
      *
-     * @param string  $keyword
-     * @param User    $user
-     * @param ?string $category
-     * @param int     $offset
-     * @param int     $limit
-     * @param string  $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
-     * @param string  $sort_dir Sort direction, defaults to 'ASC'
+     * @param string     $keyword
+     * @param User       $user
+     * @param ?string    $category
+     * @param int        $offset
+     * @param int        $limit
+     * @param string     $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
+     * @param string     $sort_dir Sort direction, defaults to 'ASC'
+     * @param array<int> $excludeResourceIds - Ids of resources to exclude from search results
      * @return Collection
      */
-    public function search($keyword, $user, $category = null, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC'): Collection
-    {
+    public function search(
+        string $keyword,
+        User $user,
+        ?string $category = null,
+        int $offset = 0,
+        int $limit = 20,
+        string $sort_by = 'name',
+        string $sort_dir = 'ASC',
+        array $excludeResourceIds = [],
+    ): Collection {
         return $this->findByPredicates(
-            $this->buildSearchPredicate($keyword, $user, $category),
+            $this->buildSearchPredicate($keyword, $user, $category, $excludeResourceIds),
             [
                 'order' => [$sort_by => $sort_dir],
                 'limit' => intval($limit),
@@ -367,20 +372,24 @@ class Mapper extends BaseMapper
         );
     }
 
-
     /**
      * Gets count for a resource that matches a search term.
      *
-     * @param string  $keyword
-     * @param User    $user
-     * @param ?string $category
+     * @param string     $keyword
+     * @param User       $user
+     * @param ?string    $category
+     * @param array<int> $excludeResourceIds - Ids of resources to exclude from search results
      * @return int
      * @throws \PDOException
      */
-    public function searchCount($keyword, $user, $category = null): int
-    {
+    public function searchCount(
+        string $keyword,
+        User $user,
+        ?string $category = null,
+        array $excludeResourceIds = []
+    ): int {
         return $this->countByPredicates(
-            $this->buildSearchPredicate($keyword, $user, $category)
+            $this->buildSearchPredicate($keyword, $user, $category, $excludeResourceIds)
         );
     }
 
@@ -390,10 +399,15 @@ class Mapper extends BaseMapper
      * @param string      $keyword
      * @param User        $user
      * @param string|null $category
+     * @param array<int> $excludeResourceIds - Ids of resources to exclude from search results
      * @return Builder
      */
-    private function buildSearchPredicate(string $keyword, User $user, ?string $category = null): Builder
-    {
+    private function buildSearchPredicate(
+        string $keyword,
+        User $user,
+        ?string $category = null,
+        array $excludeResourceIds = []
+    ): Builder {
         $pb = $this->getPredicateBuilder();
 
         $hasAdminPermission =
@@ -426,6 +440,10 @@ class Mapper extends BaseMapper
             $pb->equals('c.id', $category);
         }
 
+        if (count($excludeResourceIds) > 0) {
+            $pb->notIn('id', $excludeResourceIds);
+        }
+
         return $pb;
     }
 
@@ -445,7 +463,6 @@ class Mapper extends BaseMapper
         );
         return count($list) >= 1;
     }
-
 
     /**
      * Finds items for which $moderatorId is a moderator.
@@ -476,7 +493,6 @@ class Mapper extends BaseMapper
         // progress through each join that was passed.
         return $this->hydrateList($statement, 'r');
     }
-
 
     /**
      * Loads this resource's moderators into its moderator list.

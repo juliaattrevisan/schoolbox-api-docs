@@ -41,7 +41,7 @@
                 ajax: {
                     url:      {{ routeLookup('resourceItem.search', {id: item.id, format:'.json'}) | json_encode|raw}},
                     type:     'GET',
-                    data:     {thisId: {{ item.id|json_encode|raw }}},
+                    data:     {excludeResourceIds: {{ item.id|json_encode|raw }}},
                     dataType: 'json'
                 },
                 multiple: true,

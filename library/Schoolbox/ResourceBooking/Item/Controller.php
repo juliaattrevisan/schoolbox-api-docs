@@ -60,7 +60,6 @@ class Controller extends Base
      */
     public function browse(): void
     {
-
         // Get the list of items
         $query    = [];
         $catId    = $this->requestQuery->get('category');
@@ -118,18 +117,30 @@ class Controller extends Base
      */
     public function search(): void
     {
-        $excludedId = $this->requestQuery->get('thisId');
-        $search     = trim($this->requestQuery->get('query'));
-        $data       = $this->mapper->search($search, $this->getUser())
-                           ->filter(function (Model $item) use ($excludedId) {
-                               return $item->getId() != $excludedId;
-                           })
-                           ->map(function (Model $item) {
-                               return [
-                                   'id'   => $item->getId(),
-                                   'name' => $item->getName(),
-                               ];
-                           });
+        $search = trim($this->requestQuery->get('query'));
+        $excludeResourceIdsString = trim($this->requestQuery->get('excludeResourceIds', ''));
+
+        if ($excludeResourceIdsString !== '') {
+            // Extract integers from comma-separated values in string to protect against SQL injection attacks.
+            $excludeResourceIds = explode(',', $excludeResourceIdsString);
+            $excludeResourceIds = array_map(
+                'intval',
+                array_filter($excludeResourceIds, static fn ($id) => (int)$id > 0)
+            );
+        } else {
+            $excludeResourceIds = [];
+        }
+
+        $data = $this->mapper->search(
+            keyword: $search,
+            user: $this->getUser(),
+            excludeResourceIds: $excludeResourceIds
+        )->map(function (Model $item) {
+            return [
+                'id'   => $item->getId(),
+                'name' => $item->getName(),
+            ];
+        });
         $data->reindex();
         $this->response = $this->responseAsJson($data);
     }

@@ -341,11 +341,13 @@ class Model implements ISoftDeletable, JsonSerializable
     {
         return array(
             'id'       => $this->getId(),
-            'resource' => $this->getResource(),
-            'event'    => array(
+            'name'     => $this->getName(),
+            'resource' => $this->getResource()->jsonSerialize(),
+            'event'    => [
                 'start' => $this->getEvent()->getStartDateTime()?->toIso8601String(),
                 'end'   => $this->getEvent()->getEndDateTime()?->toIso8601String(),
-            ),
+            ],
+            'status' => $this->getStatus()->jsonSerialize()
         );
     }
 }
