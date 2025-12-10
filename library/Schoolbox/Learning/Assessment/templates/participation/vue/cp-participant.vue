@@ -192,7 +192,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                Modify
+                                Modify Existing {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
@@ -219,7 +219,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                Copy {{ locale.activity.translate(false, true) }}
+                                Create Copy of {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                         <li>
@@ -231,7 +231,7 @@ function onOpenIncludeInExistingModal(): void {
                                     )
                                 "
                             >
-                                New {{ locale.activity.translate(false, true) }}
+                                Create New {{ locale.activity.translate(false, true) }}
                             </button>
                         </li>
                     </template>
