@@ -4,7 +4,7 @@
 * Note that some of these colours can be configured via the Skin Config settings.
 */
 :root {
-    --sbx-color-body-background: #e5eff7; // derived as a light shade of --sbx-color-accent
+    --sbx-color-body-background: var(--body-background); // derived as a light shade of --sbx-color-accent
     --sbx-color-foreground-primary: #fff;
     --sbx-color-foreground-secondary: #f4f2f2;
     --sbx-color-text-primary: #000;
@@ -13,6 +13,6 @@
     --sbx-color-success: #3e843e;
     --sbx-color-warning: #ff7d00;
     --sbx-color-highlight: #ffd100;
-    --sbx-color-accent: #0066b0; // skin configurable
-    --sbx-color-accent-text: #fff; // derived to contrast with --sbx-color-accent
+    --sbx-color-accent: var(--form-border-color); // skin configurable
+    --sbx-color-accent-text: var(--content-ui-submit-foreground); // derived to contrast with --sbx-color-accent
 }
