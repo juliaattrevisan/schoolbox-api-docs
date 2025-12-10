@@ -12,7 +12,8 @@
     .island .matching-pairs p,
     .matching-pairs .island p,
     .island .resource-browser .meta-panel,
-    .resource-browser .island .meta-panel {
-        border-radius: var(--sbx-config-field-roundess);
+    .resource-browser .island .meta-panel,
+    textarea {
+        border-radius: var(--sbx-border-radius-normal);
     }
 }
