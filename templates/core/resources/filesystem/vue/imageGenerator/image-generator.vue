@@ -49,6 +49,7 @@ const uploadError = window.Vue.ref<string | null>(null);
         <ac-feed
             v-if="acStore.feed.length > 0"
             :feed="acStore.fullFeed"
+            :allow-retry="!!props.generateRoute"
             class="l-mar-m--bottom"
             max-height="35vh"
             allow-selection

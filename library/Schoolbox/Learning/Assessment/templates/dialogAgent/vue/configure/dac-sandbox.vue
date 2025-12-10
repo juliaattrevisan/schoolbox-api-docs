@@ -57,6 +57,7 @@ defineExpose({ resetFeed });
             min-height="20rem"
             max-height="70vh"
             :feed="acStore.fullFeed"
+            :allow-retry="!!props.postMessage"
             error-prefix="There was a problem retrieving the response."
         />
 
