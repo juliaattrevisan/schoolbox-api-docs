@@ -209,12 +209,12 @@ class Mapper extends BaseMapper
                 session_id,
                 feature,
                 log_format,
-                prompt,
+                '' AS prompt, -- Prompt is required in the Model, but we specifically want it excluded to reduce the potentially large amount of unnecessary memory use
                 return_code,
                 {$this->getTable()}.created_at,
                 {$this->getJoinColumnString('user', 'u')}
             FROM {$this->table}
-            INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u', true)}
             {$where}
             GROUP BY session_id
             ORDER BY created_at DESC

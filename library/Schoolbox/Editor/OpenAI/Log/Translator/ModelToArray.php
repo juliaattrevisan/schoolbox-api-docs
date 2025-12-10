@@ -49,7 +49,7 @@ class ModelToArray
             'sessionId' => $log->getSessionId(),
             'feature' => $log->getFeature(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            'createdBy' => $this->userTranslator->__invoke($log->getUser()),
+            'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,
             'logFormat' => $logFormat?->value,
             'data' => $logData,
         ];

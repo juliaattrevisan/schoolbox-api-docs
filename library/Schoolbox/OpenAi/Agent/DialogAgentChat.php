@@ -38,7 +38,7 @@ class DialogAgentChat
     }
 
     /**
-     * Streams an image generation payload.
+     * Streams a dialog agent chat.
      *
      * @param User        $user               The user making the request.
      * @param string      $agentPrompt        The specific system prompt for this dialog agent activity

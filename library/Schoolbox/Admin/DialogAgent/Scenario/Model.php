@@ -219,7 +219,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Schoolbox\GenericCollection|null
+     * @return \Schoolbox\GenericCollection<Criteria\Model>|null
      */
     public function getCriteria(): ?\Schoolbox\GenericCollection
     {
@@ -228,7 +228,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param \Schoolbox\GenericCollection|null $criteria
+     * @param \Schoolbox\GenericCollection<Criteria\Model>|null $criteria
      * @return $this
      */
     public function setCriteria(?\Schoolbox\GenericCollection $criteria): self

@@ -276,8 +276,10 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                 {{ props.features[session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
                             </td>
                             <td>
+                                <span v-if="!session.createdBy">System</span>
                                 <component
                                     :is="session.createdBy._links.profile ? 'a' : 'span'"
+                                    v-else
                                     :href="session.createdBy._links.profile ?? undefined"
                                     :title="session.createdBy._links.profile ? 'View Profile' : undefined"
                                 >
@@ -312,19 +314,26 @@ async function openSessionDetails(session: AiSession): Promise<void> {
             <section v-else-if="selectedSessionInfo !== null">
                 <div class="card small-12">
                     <span>
-                        <user-photo :user-id="selectedSessionInfo.session.createdBy.id || 0" render="small" />
+                        <user-photo
+                            v-if="selectedSessionInfo.session.createdBy"
+                            :user-id="selectedSessionInfo.session.createdBy.id || 0"
+                            render="small"
+                        />
                         <h3>
                             {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
                         </h3>
                     </span>
                     <p class="meta">
-                        Created by
-                        <component
-                            :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
-                            :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
-                        >
-                            {{ selectedSessionInfo.session.createdBy.fullName }}
-                        </component>
+                        <span v-if="!selectedSessionInfo.session.createdBy"> Created </span>
+                        <template v-else>
+                            Created by
+                            <component
+                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                            >
+                                {{ selectedSessionInfo.session.createdBy.fullName }}
+                            </component>
+                        </template>
                         <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
                     </p>
                 </div>

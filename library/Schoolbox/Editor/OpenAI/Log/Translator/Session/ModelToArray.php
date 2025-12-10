@@ -39,12 +39,17 @@ class ModelToArray
     {
         $routes = $this->linkTranslator->__invoke($log);
 
+        /**
+         * Note: $log only represents session-specific stuff, values representing an individual log
+         * such as $log->getPrompt() or $log->getOutputText() are intentially omitted to reduce memory overhead
+         */
+
         return [
             'id' => $log->getSessionId(),
             'feature' => $log->getFeature(),
             'logFormat' => $log->getLogFormat(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            'createdBy' => $this->userTranslator->__invoke($log->getUser()),
+            'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,
             'returnCode' => $log->getReturnCode(),
             '_routes' => $routes,
         ];

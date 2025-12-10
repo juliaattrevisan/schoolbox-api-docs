@@ -248,6 +248,13 @@ class Module extends BaseModule
         /* Exports everyone's Response Status and Feedback Contents (if any exist) into a csv format.
          */
         $this->register('GET', "{$assRoute}/export", 'getExport', $canWrite, $preloadAssessment);
+
+        /* Generate feedback for a particular dialog agent response
+         */
+        $this->register('GET', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'getGenerateFeedback', new Rule\All(
+            $canWrite,
+            $this->buildIsConfiguredAuthRule()
+        ), $preloadParticipantAndResponse);
     }
 
 

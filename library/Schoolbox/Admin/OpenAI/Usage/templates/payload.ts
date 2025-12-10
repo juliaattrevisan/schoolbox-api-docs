@@ -38,7 +38,7 @@ export type AiSessionLog = {
     id: number;
     sessionId: AiSessionId;
     createdAt: string;
-    createdBy: UserAuthor;
+    createdBy?: UserAuthor;
     feature: AiFeature;
 } & (
     | { [K in AiLogFormat]: { logFormat: K; data: AiLogFormatDataMap[K] } }[AiLogFormat]
@@ -52,7 +52,7 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     feature: TFeature;
     logFormat: TLogFormat | null;
     createdAt: string;
-    createdBy: UserAuthor;
+    createdBy?: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
     _routes: {
         getLog?: string | null;

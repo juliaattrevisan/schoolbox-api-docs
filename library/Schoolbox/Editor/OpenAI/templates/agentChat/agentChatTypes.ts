@@ -28,7 +28,7 @@ export type AgentChatImage = {
 export type AgentChatRequest = {
     type: AgentChatMessageType.REQUEST;
     entryKey: number;
-    user: Pick<UserAuthor, "id" | "fullName" | "_links">;
+    user?: Pick<UserAuthor, "id" | "fullName" | "_links"> | null;
     payload: AgentChatApiPayload;
     file: FileDropFile | null;
 };
