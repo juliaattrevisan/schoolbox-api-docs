@@ -96,7 +96,8 @@ async function sendRequest(): Promise<void> {
     }
 
     const userPrompt = prompt.value.trim();
-    const imageUrl = currentFile.value ? await getImageUrl(currentFile.value.file) : null;
+    const currentFileValue = currentFile.value;
+    const imageUrl = currentFileValue !== null ? await getImageUrl(currentFileValue.file) : null;
 
     /* clear the prompt but not the other settings. request can be retried if it fails from ac-feed-response */
     prompt.value = "";
@@ -118,7 +119,7 @@ async function sendRequest(): Promise<void> {
             previousResponseId: acStore.getPreviousResponseId(),
             aiSessionId: props.requestConfig.aiSessionId,
         },
-        currentFile.value,
+        currentFileValue,
     );
 }
 
