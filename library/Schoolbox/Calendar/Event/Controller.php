@@ -1106,6 +1106,7 @@ class Controller extends Base
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
      * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
      * allowed on the resource.)
+     * TODO: Move this function into a helper class.
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
      * @return array
