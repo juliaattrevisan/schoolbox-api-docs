@@ -104,7 +104,7 @@ class DialogAgentFeedback
         /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
         $relevantData = $data['output'][0]['content'][0]['text'] ?? null;
         if (!isset($relevantData)) {
-            throw new SchoolboxException($data['output'] ?? 'Invalid response');
+            throw new SchoolboxException('Invalid response');
         }
 
         try {
