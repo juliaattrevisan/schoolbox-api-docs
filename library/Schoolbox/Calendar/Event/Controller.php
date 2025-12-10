@@ -1023,7 +1023,7 @@ class Controller extends Base
             // any regular period between events, and so must fetch each event's start/end times.
             $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
             $pb->equals('series_id', $event->getSeriesId());
-            $pb->greaterThan('start_datetime', 'NOW()');
+            $pb->greaterThan('start_datetime', Alaress_Date_Format::now()->getDatabase());
             /** @var GenericCollection<Event> $eventById */
             $eventById = $this->eventMapper->findByPredicates($pb);
         } else {
