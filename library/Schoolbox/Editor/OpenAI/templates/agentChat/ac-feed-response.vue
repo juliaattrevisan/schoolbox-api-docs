@@ -11,7 +11,7 @@ interface Props {
     /** A message to display before the actual error message when generation fails */
     errorPrefix?: string;
     /** Whether failed responses can be retried */
-    allowRetry: boolean;
+    allowRetry?: boolean;
     /** Whether the user can select this response */
     allowSelection: boolean;
 }
