@@ -165,6 +165,11 @@
                                                         {% elseif selectedField.field in ['Comment'] %}
                                                             {# A string that displays on its own in a flag#}
                                                             {{ selectedField.value|nl2br }}
+                                                        {% elseif selectedField.field in ['differentiationProfile'] %}
+                                                            {# Display differentiation profile data grouped by adjustments and text #}
+                                                            {% include '@searchUser/field/differentiationProfile.twig' with {
+                                                                differentiationProfile: selectedField.value,
+                                                            } only %}
                                                         {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                             {% block parentsSeparated %}
                                                                 {# A special flag that has a hardcoded text string #}

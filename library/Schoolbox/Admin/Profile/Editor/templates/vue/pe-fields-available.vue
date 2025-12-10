@@ -8,8 +8,10 @@ import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import PeFieldsAvailableItem from "./pe-fields-available-item.vue";
 import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 
 const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 
 const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     // Link the available fields sortable to the selected fields sortable so that we can drag between them
@@ -68,7 +70,8 @@ const availableFieldsToShow = window.Vue.computed(() => {
     }
 
     // Filter the fields by the selected category
-    return allFields.filter((field) => field.category === selectedCategory.value);
+    // And also ensure we only show fields that are not hidden by configuration
+    return allFields.filter((field) => field.category === selectedCategory.value && peFieldsStore.showField(field));
 });
 
 // When the selected role type changes, reset the selected category

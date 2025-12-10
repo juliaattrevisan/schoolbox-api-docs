@@ -129,7 +129,12 @@ const isSaving = window.Vue.computed(() => {
 </script>
 
 <template>
-    <li :data-sortable-item="props.field.field" :class="{ dragging: props.dragging }">
+    <li
+        v-show="peFieldsStore.showField(props.field)"
+        :data-sortable-item="props.field.field"
+        :class="{ dragging: props.dragging }"
+    >
+        <!-- we use v-show so fields not currently active are still passed through in resequencing -->
         <div class="actions-small-2">
             <span v-if="isSaving" class="loader" />
             <div v-else class="grip compact" data-pe-field-drag-handle />

@@ -203,3 +203,11 @@ export type ProfileEditorPayload = {
         tabSettings: Partial<Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingDefinition>>;
     };
 };
+
+/**
+ * Any configuration settings required by the profile editor
+ * that can affect its behaviour
+ */
+export type ProfileEditorConfig = {
+    differentiationEnabled: boolean;
+};

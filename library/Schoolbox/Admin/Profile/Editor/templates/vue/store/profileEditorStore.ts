@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
-import type { ProfileEditorRoleType, ProfileEditorPayload } from "../types/profileEditorTypes";
+import type { ProfileEditorRoleType, ProfileEditorPayload, ProfileEditorConfig } from "../types/profileEditorTypes";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 
 export const useProfileEditorStore = defineStore("profileEditorStore", () => {
@@ -10,6 +10,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const fieldSettings = window.Vue.ref<ProfileEditorPayload["data"]["fieldSettings"]>({});
     const tabSettings = window.Vue.ref<ProfileEditorPayload["data"]["tabSettings"]>({});
     const selectedRoleType = window.Vue.ref<ProfileEditorRoleType | null>(null);
+    const config = window.Vue.ref<ProfileEditorConfig | null>(null);
 
     const savedSelectedRoleType = window.Vue.computed<typeof selectedRoleType.value>(() => {
         const currentRoleType = selectedRoleType.value;
@@ -23,16 +24,19 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
      * @param $roleTypes - The current role types
      * @param $fieldSettings - The current field settings spec
      * @param $tabSettings - The current tab settings spec
+     * @param $config - The current config settings spec
      */
     function init(
         $roleTypes: ProfileEditorPayload["data"]["roleTypes"],
         $fieldSettings: ProfileEditorPayload["data"]["fieldSettings"],
         $tabSettings: ProfileEditorPayload["data"]["tabSettings"],
+        $config: ProfileEditorConfig | null,
     ): void {
         roleTypes.value = $roleTypes;
         savedRoleTypes.value = cloneDeep($roleTypes);
         fieldSettings.value = $fieldSettings;
         tabSettings.value = $tabSettings;
+        config.value = $config;
     }
 
     /**
@@ -82,5 +86,6 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         savedSelectedRoleType,
         setSelectedRoleType,
         saveNameFormat,
+        config,
     };
 });

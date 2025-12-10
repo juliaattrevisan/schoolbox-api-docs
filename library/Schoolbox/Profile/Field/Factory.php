@@ -473,7 +473,11 @@ class Factory
             'barcode' => $viewee->getExternalId(),
             /* Emergency Contacts
              */
-            'emergencyContacts' => $emergencyContacts
+            'emergencyContacts' => $emergencyContacts,
+            /* Differentiation Profile was obtained specially in the controller cos it needs
+             * various controller-specific instances; use the callback to populate it
+             */
+            'differentiationProfile' => null,
         ];
 
         return array_merge($externalUser, $referenceFields);
