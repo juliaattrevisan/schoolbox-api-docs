@@ -181,7 +181,10 @@
                                                         {% endif %}
                                                     </span>
                                                     {% if selectedField.clickToReveal %}
-                                                        <a href="#">View more</a>
+                                                        <a href="#">
+                                                            {% if selectedField.field in ['differentiationProfile'] %} {{ locale.differentiationProfile.proper }} - {% endif %}
+                                                            View more
+                                                        </a>
                                                     {% endif %}
                                                 </div>
                                             </dt>
