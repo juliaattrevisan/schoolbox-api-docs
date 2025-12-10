@@ -5,6 +5,7 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
+use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model as Criteria;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 
@@ -97,6 +98,18 @@ class DialogAgentFeedback
 
 
     /**
+     * Get the key of a particular criteria for the structured output part of the prompt
+     *
+     * @param Criteria $criterion
+     * @return string
+     */
+    public static function getPayloadCriteriaKey(Criteria $criterion): string
+    {
+        return \sprintf("criteria_%d", $criterion->getId());
+    }
+
+
+    /**
      * Generate the payload to send to the AI
      *
      * @param Scenario $scenario
@@ -175,7 +188,7 @@ class DialogAgentFeedback
         foreach ($scenario->getCriteria() as $criterion) {
             $fieldKey = \sprintf("criteria_%d", $criterion->getId());
 
-            $responseFormat['schema']['properties'][$fieldKey] = [
+            $responseFormat['schema']['properties'][self::getPayloadCriteriaKey($criterion)] = [
                 'type' => 'string',
                 'description' => strtr(self::PROMPT_SYSTEM_CRITERIA_CONTEXT, [
                     '[CRITERIA_TITLE]' => $criterion->getTitle(),
