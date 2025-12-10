@@ -133,6 +133,7 @@ function onOpenIncludeInExistingModal(): void {
                 v-if="props.participant._links.differentiationProfile"
                 class="button f-no-margins"
                 type="button"
+                :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
                 @click.prevent="onViewDP"
             >
                 View {{ locale.differentiationProfile.translate(false, true) }}
