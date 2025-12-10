@@ -208,8 +208,8 @@ class Mapper extends BaseMapper
                 {$this->getTable()}.id AS id,
                 session_id,
                 feature,
-                prompt,
                 log_format,
+                '' AS prompt, -- Prompt is required in the Model, but we specifically want it excluded to reduce the potentially large amount of unnecessary memory use
                 return_code,
                 {$this->getTable()}.created_at,
                 {$this->getJoinColumnString('user', 'u')}

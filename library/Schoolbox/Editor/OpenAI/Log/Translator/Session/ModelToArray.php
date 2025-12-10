@@ -39,6 +39,11 @@ class ModelToArray
     {
         $routes = $this->linkTranslator->__invoke($log);
 
+        /**
+         * Note: $log only represents session-specific stuff, values representing an individual log
+         * such as $log->getPrompt() or $log->getOutputText() are intentially omitted to reduce memory overhead
+         */
+
         return [
             'id' => $log->getSessionId(),
             'feature' => $log->getFeature(),
