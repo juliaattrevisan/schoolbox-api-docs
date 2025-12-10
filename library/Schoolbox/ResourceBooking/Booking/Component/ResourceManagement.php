@@ -118,16 +118,16 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
                         'event' => $eventA,
                         'clash' => []
                     ];
-                }
 
-                // now check for clashes with pending bookings
-                foreach ($resourceEvents as $eventB) {
-                    /** @var Event $eventB */
+                    // now check for clashes with pending bookings
+                    foreach ($resourceEvents as $eventB) {
+                        /** @var Event $eventB */
 
-                    // only record clashes if eventB is approved, we don't care about pending vs pending clashes
-                    if ($eventB->isClash($eventA) && $eventB->getBooking()->getStatus()->isApproved()) {
-                        $eventAHash = spl_object_hash($eventA);
-                        $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'][] = $eventB;
+                        // only record clashes if eventB is approved, we don't care about pending vs pending clashes
+                        if ($eventB->isClash($eventA) && $eventB->getBooking()->getStatus()->isApproved()) {
+                            $eventAHash = spl_object_hash($eventA);
+                            $groupedBookings[$resourceID]['bookingEvents'][$eventA->getStartTime()->getDateOnly()]['events'][$eventAHash]['clash'][] = $eventB;
+                        }
                     }
                 }
 
