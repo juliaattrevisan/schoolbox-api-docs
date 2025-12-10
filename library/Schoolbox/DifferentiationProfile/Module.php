@@ -28,6 +28,7 @@ use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelsMapper;
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -46,11 +47,16 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Only logged in users with the differentiation profile service permission can view the form
+        $staffWithFeatureEnabled = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+        );
+
+        /* Only staff with the differentiation profile service permission can view the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+            $staffWithFeatureEnabled,
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
                 UserAccess::ACCESS_WRITE
@@ -76,8 +82,10 @@ class Module extends BaseModule
             $hasCampusPerms
         );
 
+        /* Only staff can view differentiation profiles when the feature is enabled
+         */
         $getProfilePerms = new Rule\All(
-            $getPerms,
+            $staffWithFeatureEnabled,
             new Rule\Callback(function (array $params): void {
                 try {
                     $this->getMapperFactory()->get(DifferentiationProfileMapper::class)
@@ -86,7 +94,6 @@ class Module extends BaseModule
                     throw new Unauthorized('Differentiation profile does not exist.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
                 }
             }),
-            $hasCampusPerms
         );
 
         /* Only superusers can receive data from the form
