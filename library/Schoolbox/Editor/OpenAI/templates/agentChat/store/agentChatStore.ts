@@ -134,6 +134,27 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     /**
+     * Retrieve the latest feed entry with a given type
+     * @param type - The type of message to find
+     * @template TType - To derive the actual return type based on the input type, if any
+     * @returns The latest message with the given type, or null if none found
+     */
+    function getLatestFeedEntry<TType extends AgentChatMessageType | null>(
+        type: TType,
+    ): (TType extends null ? AgentChatFeedMessage : Extract<AgentChatFeedMessage, { type: TType }>) | null {
+        for (let i = feed.value.length - 1; i >= 0; i -= 1) {
+            const message = feed.value[i];
+            if (type === null || message.type === type) {
+                return message as TType extends null
+                    ? AgentChatFeedMessage
+                    : Extract<AgentChatFeedMessage, { type: TType }>;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Request a new image from the AI
      * @param config - The configuration for the request
      * @param payload - The payload to send to the AI
@@ -317,6 +338,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         fullFeed,
         parseFeed,
         resetFeed,
+        getLatestFeedEntry,
         importFeed,
         activeGeneration,
         getNextEntryKey,

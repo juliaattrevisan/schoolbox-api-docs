@@ -67,6 +67,13 @@ async function sendRequest(): Promise<void> {
         return; // some attributes are required and not set yet, can't send the request
     }
 
+    const userPrompt = prompt.value.trim();
+    const imageUrl = currentFile.value ? await getImageUrl(currentFile.value.file) : null;
+
+    /* clear the prompt but not the other settings. request can be retried if it fails from ac-feed-response */
+    prompt.value = "";
+    currentFile.value = null;
+
     /**
      * Trigger the feed to be scrolled down to show the new message
      * This is only done on the user's action, not when the AI responds
@@ -74,37 +81,46 @@ async function sendRequest(): Promise<void> {
      */
     acPromptEventBus.emit({ scrollFeed: true });
 
-    const isSuccess = await acStore.sendRequest(
+    await acStore.sendRequest(
         props.requestConfig,
         {
-            userPrompt: prompt.value.trim(),
+            userPrompt,
             attributes: attributes.value,
-            imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
+            imageUrl,
             previousResponseId: acStore.getPreviousResponseId(),
             aiSessionId: props.requestConfig.aiSessionId,
         },
         currentFile.value,
     );
-
-    if (isSuccess) {
-        /* clear the prompt but not the other settings on success */
-        prompt.value = "";
-        currentFile.value = null;
-    }
 }
+
+acPromptEventBus.on(({ retryRequest }) => {
+    if (retryRequest) {
+        /**
+         * Trigger the feed to be scrolled down to show the new message
+         * This is only done on the user's action, not when the AI responds
+         * as to not interrupt the user if they scrolled back up to read something else
+         */
+        acPromptEventBus.emit({ scrollFeed: true });
+
+        void acStore.sendRequest(
+            props.requestConfig,
+            {
+                ...retryRequest.payload,
+                previousResponseId: acStore.getPreviousResponseId(),
+            },
+            retryRequest.file,
+        );
+    }
+});
 
 /**
  * The form is disabled if:
  * - the entire component is disabled
- * - there is an active generation in progress
  * - an invalid image was uploaded (the user must remove it first)
  */
 const isFormDisabled = window.Vue.computed(() => {
     if (props.disabled) {
-        return true;
-    }
-
-    if (acStore.activeGeneration !== null) {
         return true;
     }
 

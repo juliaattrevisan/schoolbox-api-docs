@@ -11,6 +11,8 @@ interface Props {
     feed: AgentChatFeedMessage[];
     /** A message to display before the actual error message when generation fails */
     errorPrefix?: string;
+    /** Whether failed responses can be retried */
+    allowRetry?: boolean;
     /** Whether the user can select this response */
     allowSelection?: boolean;
     /** The maximum height of the feed container, if any */
@@ -74,6 +76,7 @@ defineExpose({ feedEl });
                         v-else
                         :message="message"
                         :error-prefix="props.errorPrefix"
+                        :allow-retry="props.allowRetry"
                         :allow-selection="props.allowSelection"
                     />
                 </template>

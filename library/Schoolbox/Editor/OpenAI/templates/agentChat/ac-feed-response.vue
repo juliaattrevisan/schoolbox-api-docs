@@ -1,20 +1,24 @@
 <script lang="ts" setup>
+import { useEventBus } from "@vueuse/core";
 import { useAgentChatStore } from "./store/agentChatStore";
+import { AgentChatMessageType } from "./agentChatTypes";
 import type { AgentChatResponse } from "./agentChatTypes";
+import { acPromptEventKey } from "./agentChatSymbols";
 
 interface Props {
-    /**
-     * The message to display
-     */
+    /** The message to display */
     message: AgentChatResponse;
     /** A message to display before the actual error message when generation fails */
     errorPrefix?: string;
+    /** Whether failed responses can be retried */
+    allowRetry: boolean;
     /** Whether the user can select this response */
     allowSelection: boolean;
 }
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
+const acPromptEventBus = useEventBus(acPromptEventKey);
 
 const radioId = window.Vue.computed(() => {
     return `ac-feed-response-${props.message.entryKey}`;
@@ -31,6 +35,25 @@ const imageSrc = window.Vue.computed(() => {
     }
     return null;
 });
+
+/** Whether this is the most recent message of any type */
+const isLatestMessage = window.Vue.computed(() => {
+    const latestResponse = acStore.getLatestFeedEntry(null);
+    return latestResponse && latestResponse.entryKey === props.message.entryKey;
+});
+
+/**
+ * Retry using the latest request prompt
+ */
+function retryResponse(): void {
+    const latestRequest = acStore.getLatestFeedEntry(AgentChatMessageType.REQUEST);
+    if (!latestRequest) {
+        console.warn("Unable to retry response: no previous request found"); // shouldn't get here
+        return;
+    }
+
+    acPromptEventBus.emit({ retryRequest: latestRequest });
+}
 </script>
 
 <template>
@@ -58,10 +81,17 @@ const imageSrc = window.Vue.computed(() => {
             <label :for="radioId"> </label>
         </template>
 
-        <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0 l-pad-s">
-            <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
-            {{ props.message.message }}
-        </p>
+        <template v-if="props.message.status === 'error'">
+            <p class="alert-box alert l-mar--0 l-pad-s">
+                <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
+                {{ props.message.message }}
+            </p>
+            <div v-if="props.allowRetry && isLatestMessage" class="l-mar-xs--left">
+                <button class="button f-no-icon-button" type="button" title="Retry" data-tooltip @click="retryResponse">
+                    <sbx-icon name="refresh" size="m" color="currentColor"></sbx-icon>
+                </button>
+            </div>
+        </template>
 
         <div v-else>
             <div v-if="imageSrc" class="actions-small-1">

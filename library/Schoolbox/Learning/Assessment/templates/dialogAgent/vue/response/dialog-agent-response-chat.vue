@@ -203,6 +203,7 @@ window.Vue.onUnmounted(() => {
         :max-height="maxFeedHeight"
         :feed="acStore.fullFeed"
         error-prefix="There was a problem retrieving the response."
+        :allow-retry="!!props.response._routes.message"
         initially-scrolled
     >
         <template #header>
