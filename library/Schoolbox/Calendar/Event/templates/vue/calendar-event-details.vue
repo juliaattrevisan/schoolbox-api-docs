@@ -658,7 +658,7 @@ export default {
             <section class="detail content">
                 <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
-                    <nav class="l-flex-row l-flex--align-center f-no-margins">
+                    <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
                         <a
                             class="icon-add f-no-margins"
                             href="#"
@@ -703,7 +703,9 @@ export default {
                     <div v-else class="empty-state">
                         <i class="icon-resource-booking"></i>
                         <p>No resources are booked for this event.</p>
-                        <a href="#" @click.prevent="showAddResourceBookingsModal()">Book resources for this event</a>
+                        <a v-if="canModify()" href="#" @click.prevent="showAddResourceBookingsModal()"
+                            >Book resources for this event</a
+                        >
                     </div>
                 </div>
             </section>
