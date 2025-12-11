@@ -34,6 +34,7 @@ use Schoolbox\OpenAi\Agent\LessonPlanGeneration;
 use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\OpenAi\Exception as AiException;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Presidio\Client;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -308,6 +309,36 @@ class Controller extends Base
 
             /** @var User $student */
             $student = $this->differentiationProfileMapper->getJoinMapper('student')->findById($studentId);
+
+            $accessList = $this->getUser()
+                           ->getAccessList()
+                           ->filterBy('service', UserAccess::SERVICE_DIFFERENTIATION_PROFILE);
+
+            $hasAccess = false;
+            $studentCampus = $student->getCampusCollection();
+            foreach ($accessList as $access) {
+                if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE &&
+                    $studentCampus->offsetExists($access->getServiceIdentifier())) {
+                    $hasAccess = true;
+                    break;
+                }
+            }
+
+            /* Ensure user has proper campus permission to generate this student's
+             * differentiation profile
+             */
+            if (!$hasAccess) {
+                $returnCode = 403;
+
+                $problem = (new ApiProblem("Campus permission is required"))
+                    ->setStatus($returnCode)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                                       ->withStatus($returnCode);
+
+                return;
+            }
 
             $agent = new DifferentiationProfileGeneration(
                 $this->clientFactory->buildForFeature(Helper::FEATURE_DIFFERENTIATION),
