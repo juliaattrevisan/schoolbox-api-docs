@@ -693,7 +693,7 @@ class Controller extends Base
                 /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
                 $response = $authoritativeFeedback?->getResponse() ?? $authoritativeResponse;
 
-                $currentStatus = $response?->getCurrentStatus()->value;
+                $currentStatus = $response?->getCurrentStatus()->value ?? Status::INCOMPLETE;
 
                 if (!($requestedStatuses[$currentStatus] ?? false)) {
                     continue;
