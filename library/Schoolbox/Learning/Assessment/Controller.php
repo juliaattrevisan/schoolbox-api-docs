@@ -826,7 +826,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $student = $participant->getUser();
                 $cacheKey = sprintf(
                     OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                    $assessment->getId(),
+                    $assessment->getOriginalAssessmentId(),
                     $student->getId()
                 );
                 return [
@@ -847,6 +847,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         if (null !== $assessment->getOriginalAssessmentId()) {
             $data['customisedFor'] = $assessment->getOriginalAssessmentId();
+            $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
         }
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
