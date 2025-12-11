@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\OpenAi\LogHandler\Composite;
 use Schoolbox\User;
 
 /**
@@ -77,6 +78,8 @@ class DialogAgentChat
             $previousResponseId
         );
 
+        $logListener = new LogOutputText();
+
         // Is there a response model?
         // If so, add a message for the response.
         if ($responseModel) {
@@ -86,6 +89,13 @@ class DialogAgentChat
                 ->setRole(Role::User->value)
                 ->setContent($userPrompt);
             $this->responseMessageMapper->save($responseMessageModel);
+
+            // Also: listen for the completed response from the agent, and add
+            // a message once it's done
+            $logListener = new Composite(
+                $logListener,
+                new DialogAgentChat\SaveMessageLogListener($this->responseMessageMapper, $responseModel),
+            );
         }
 
         $log = $this->client->createLog(
@@ -105,7 +115,7 @@ class DialogAgentChat
             $log,
             null,
             new ResponseListener(requireFinalImage: false),
-            new LogOutputText(),
+            $logListener,
         );
     }
 }

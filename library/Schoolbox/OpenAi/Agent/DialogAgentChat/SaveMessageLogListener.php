@@ -9,19 +9,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent\DialogAgentChat;
 
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as ResponseMessageMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
-use Schoolbox\OpenAi\EventStream\IListener;
+use Schoolbox\OpenAi\LogHandler\IListener;
 use Schoolbox\OpenAi\EventStream\Message;
 
 /**
- * Event stream listener for saving a persistent chat history between the AI
- * model and the student.
+ * Log listener for saving a persistent chat history between the AI model and
+ * the student.
  */
-class SaveMessageEventStreamListener implements IListener
+class SaveMessageLogListener implements IListener
 {
     /**
      * Constructor
@@ -36,23 +38,39 @@ class SaveMessageEventStreamListener implements IListener
     }
 
     /**
-     * Inspect `$message`, and if it's a completed response: save a new message
+     * Inspect `$outputMessage`, and if it's a completed response: save a new message
      * into `$this->response`.
      *
-     * @param Message $message
-     * @return Message `$message` is returned unchanged
+     * @param Message   $outputMessage
+     * @param Message   $rawMessage
+     * @param Log\Model $log
+     * @return Log\Model `$log` is returned unchanged
+     * @throws MapperException if the message couldn't be saved
      */
-    public function modifyMessage(Message $message): Message
+    public function handleMessage(Message $outputMessage, Message $rawMessage, Log\Model $log): Log\Model
     {
-        if ($message->eventType === MessageEventType::COMPLETE->value) {
+        if ($outputMessage->eventType === MessageEventType::COMPLETE->value) {
             $responseMessageModel = $this->responseMessageMapper->createModel()
                 ->setDialogAgentResponse(new ResponseDataModel()->setId($this->responseModel->getId()))
                 ->setRole(Role::Assistant->value)
-                ->setContent($message->getDataAsArray()['message'])
+                ->setContent($outputMessage->getDataAsArray()['message'])
             ;
             // TODO set created at as exact time, not request time
             $this->responseMessageMapper->save($responseMessageModel);
         }
-        return $message;
+        return $log;
+    }
+
+    /**
+     * Does nothing, as this doesn't need to work on non-streaming responses
+     * yet.
+     *
+     * @param array     $responseData
+     * @param Log\Model $log
+     * @return Log\Model `$log` is returned unchanged
+     */
+    public function handleResponse(array $responseData, Log\Model $log): Log\Model
+    {
+        return $log;
     }
 }
