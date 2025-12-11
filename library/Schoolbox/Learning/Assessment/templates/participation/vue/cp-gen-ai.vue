@@ -21,7 +21,7 @@ const props = defineProps<{
 const emit = defineEmits<{
     (event: "newResponse", response: CustomisedSuggestionResponse): void;
     (event: "cancel"): void;
-    (event: "customiseActivity"): void;
+    (event: "confirm"): void;
 }>();
 
 const aiResponse = defineModel<CustomisedSuggestionResponse | null>("ai-response", { default: null });
@@ -83,7 +83,7 @@ function onCancel(): void {
  * To use the suggested AI content
  */
 function onConfirm(): void {
-    emit("customiseActivity");
+    emit("confirm");
 }
 
 /**

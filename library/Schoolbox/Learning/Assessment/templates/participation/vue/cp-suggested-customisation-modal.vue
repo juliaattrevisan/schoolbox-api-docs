@@ -141,7 +141,7 @@ function onConfirm(): void {
                 :participant="participant"
                 @new-response="onNewResponse"
                 @cancel="onCancel"
-                @customise-activity="onCustomiseActivity"
+                @confirm="onCustomiseActivity"
             />
             <cp-confirm-modify
                 v-else-if="status === 'confirm'"
