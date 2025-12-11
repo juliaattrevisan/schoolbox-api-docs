@@ -1297,6 +1297,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'participants' => $participant,
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+                'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
             ]
         );
     }
