@@ -2,6 +2,7 @@ CREATE TABLE dialog_agent_response_message
 (
     id                       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     dialog_agent_response_id INT                         NOT NULL,
+    openai_response_id       VARCHAR(255)                NULL,
     role                     ENUM ('user', 'assistant')  NOT NULL,
     status                   ENUM ('ok', 'error')        NULL,
     content                  TEXT                        NULL,

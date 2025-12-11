@@ -35,6 +35,7 @@ class Mapper extends BaseMapper
             'dialogAgentResponse',
             'dialogAgentResponse',
         );
+        $this->uses('openai_response_id', self::TYPE_STRING);
         $this->uses('role', self::TYPE_STRING, self::COLUMN_ENUM, null, array_map(fn (Role $x) => $x->value, Role::cases()));
         $this->uses(
             'status',

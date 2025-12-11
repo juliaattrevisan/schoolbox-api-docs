@@ -29,6 +29,11 @@ class Model
     private Response\Model $dialogAgentResponse;
 
     /**
+     * The OpenAI response ID, if this message is from OpenAI.
+     */
+    private ?string $openaiResponseId = null;
+
+    /**
      * The role with which this is associated.
      *
      * @var value-of<Role>
@@ -64,6 +69,24 @@ class Model
     public function setDialogAgentResponse(Response\Model $dialogAgentResponse): self
     {
         $this->dialogAgentResponse = $dialogAgentResponse;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOpenaiResponseId(): ?string
+    {
+        return $this->openaiResponseId;
+    }
+
+    /**
+     * @param string|null $openaiResponseId
+     * @return $this
+     */
+    public function setOpenaiResponseId(?string $openaiResponseId): self
+    {
+        $this->openaiResponseId = $openaiResponseId;
         return $this;
     }
 
