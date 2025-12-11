@@ -1344,18 +1344,37 @@ abstract class Controller extends ListController implements IAssessmentControlle
                                   'assessment' => $assessment,
                               ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
 
+        /* Cache interface for AI generated content (ie suggested customisation)
+         * Injecting here rather than in the module to avoid inheritance complications
+         */
+        $aiCache = $this->getDi()->get('ai.response.cache');
 
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => $plan->getParticipants()->keyExists($participant->getUser()->getId()))
-            ->map(function (Participant $participant) {
+            ->map(function (Participant $participant) use ($assessment, $aiCache) {
                 $student = $participant->getUser();
+                $cacheKey = sprintf(
+                    OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
+                    $assessment->getId(),
+                    $student->getId()
+                );
                 return [
                     'id' =>  $student->getId(),
                     'fullName' => $participant->getUser()->getFullName(),
                     'excludedAt' => $participant->getExcludedAt(),
                     'user' => $student,
                     'plan' => $participant->getPlan(),
+                    'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
+                    '_links'     => [
+                        'differentiationProfile' => $this->getRouteIfAuthorized(
+                            'differentiationProfiles.viewDifferentiationProfileData',
+                            [
+                                'student' => $student,
+                                'studentId' => $student->getId()
+                            ],
+                        ),
+                    ]
                 ];
             })->reindex();
 
@@ -1370,6 +1389,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'plan' => $plan,
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
                 'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
+                'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
             ]
         );
     }
