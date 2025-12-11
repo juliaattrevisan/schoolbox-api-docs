@@ -14,6 +14,7 @@ const props = defineProps<{
     participant: Participant;
     routes: Routes;
     assessmentId: number;
+    editorId: string;
 }>();
 
 const isOpen = window.Vue.ref(false);
@@ -63,7 +64,7 @@ function onCancel(): void {
  * Insert the copy of the suggested customisation into the activity description
  */
 function onAddToDescription(): void {
-    const editor = window.sbProps.editors["plan-desc"];
+    const editor = window.sbProps.editors[props.editorId];
     if (editor) {
         const extraSpace = editor.getData() === "" ? "" : "<p></p>"; // add extra line break if the editor is not empty
         editor.setData(`${editor.getData()}${extraSpace}${aiResponse.value?.suggested_learning_activity_update || ""}`);

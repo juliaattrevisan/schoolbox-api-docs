@@ -81,7 +81,7 @@
         parentFolderId: parentFolderId ?? null,
     } %}
 
-    {% set showSuggestedCustomisation = participants|length == 1 %}
+    {% set showSuggestedCustomisation = customisedFor is defined and participants ?? [] is not empty and participants|length == 1 %}
     <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
         <label for="assessment-description">Description</label>
         {# Only show suggested customisation if there is exactly one participant #}
@@ -93,7 +93,8 @@
                 :routes="{{ {
                     genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
                 } | json_encode }}"
-                :assessment-id="{{ assessment.id }}"
+                :assessment-id="{{ customisedFor }}"
+                editor-id="assessment-description"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/viewSuggestedCustomisation.js?v={{ config.site_version }}"></script>

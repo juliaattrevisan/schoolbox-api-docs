@@ -43,7 +43,7 @@
                         >
                     </div>
                     <div class="columns small-12">
-                        {% set showSuggestedCustomisation = participants|length == 1 %}
+                        {% set showSuggestedCustomisation = participants ?? [] is not empty and participants|length == 1 %}
                         <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
                             <label for="plan-desc" class="required">Description</label>
                             {# Only show suggested customisation if there is exactly one participant #}
@@ -56,6 +56,7 @@
                                         genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
                                     } | json_encode }}"
                                     :assessment-id="{{ assessment.id }}"
+                                    editor-id="plan-desc"
                                 />
                             </div>
                             <script src="{{ CDN_PREFIX }}/js/bundle/viewSuggestedCustomisation.js?v={{ config.site_version }}"></script>
