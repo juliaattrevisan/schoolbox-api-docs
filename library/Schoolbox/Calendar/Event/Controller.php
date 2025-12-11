@@ -1092,13 +1092,30 @@ class Controller extends Base
         // Only unexpected errors require non-success code.
         // It is expected that some or all attempts to book resources may fail for validation reasons.
         $this->response = $this->responseAsJson(
-        // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
+            // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
                 'nBookingsAttempted' => $nBookingsAttempted,
                 'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
                 'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
             ]
         )->withStatus($httpStatusCode);
+    }
+
+
+    /**
+     * Process a 'save' request from the 'edit booking' modal that appears on the 'Event Details' page.
+     * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
+     * (Find the 'edit booking' modal by clicking on an 'edit' button on a resource booking.)
+     * @param Event $event
+     * @param $bookingId
+     */
+    public function editBooking(Event $event, $bookingId): void
+    {
+        $this->response = $this->responseAsJson(
+            // This data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
+            [
+            ]
+        )->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 

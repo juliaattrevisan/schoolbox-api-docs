@@ -6,6 +6,11 @@ import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { Booking, Resource } from "./resourceBookingTypes";
 import { EFFICACY_SELF, EFFICACY_SERIES } from "./eventTypes";
 
+// TODO: Lots of items in this file need renaming.
+//  * function 'createNewBooking' should be 'postAddBookingsForm'
+//  * 'booking' should be 'bookings' in lots of places
+//  * 'create' bookings should be 'add' bookings for consistency
+
 interface Props {
     resourceBookings: Booking[];
     eventId: number;

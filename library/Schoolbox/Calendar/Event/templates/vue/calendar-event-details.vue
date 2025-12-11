@@ -6,6 +6,7 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import AddResourceBookingsModal from "./add-resource-bookings-modal.vue";
+import EditResourceBookingModal from "./edit-resource-booking-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -28,6 +29,7 @@ export default {
         MediaArticle,
         SearchSelect,
         AddResourceBookingsModal,
+        EditResourceBookingModal,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -455,6 +457,10 @@ export default {
         showAddResourceBookingsModal() {
             this.$refs.addResourceBookingsModal.open();
         },
+
+        showEditResourceBookingModal(bookingId) {
+            this.$refs.editResourceBookingModal.open(bookingId);
+        },
     },
 };
 </script>
@@ -671,32 +677,41 @@ export default {
                 </div>
                 <div class="meta"></div>
                 <div class="content-section">
-                    <div
-                        v-for="booking in event.resourceBookings"
-                        :key="booking.id"
-                        class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
-                    >
-                        <div>
-                            <!-- Intentionally display the resource name here, not the booking name -->
-                            {{ booking.resource.name }}
-                        </div>
-                        <div class="text-right">
-                            <span
-                                class="label"
-                                :class="{
-                                    pending: booking.status.isPending,
-                                    approved: booking.status.isApproved,
-                                    rejected: booking.status.isRejected,
-                                }"
-                                >{{ booking.status.name }}</span
-                            >
-                            <a
-                                href="#"
-                                class="icon-modify"
-                                title="Modify Booking"
-                                aria-label="Modify Booking"
-                                onclick="alert('TODO: Implement edit booking modal (SA-21381)')"
-                            ></a>
+                    <div v-if="event.resourceBookings.length > 0">
+                        <div
+                            v-for="booking in event.resourceBookings"
+                            :key="booking.id"
+                            class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
+                        >
+                            <div>
+                                <!-- Intentionally display the resource name here, not the booking name -->
+                                {{ booking.resource.name }}
+                            </div>
+                            <div class="text-right">
+                                <span
+                                    class="label"
+                                    :class="{
+                                        pending: booking.status.isPending,
+                                        approved: booking.status.isApproved,
+                                        rejected: booking.status.isRejected,
+                                    }"
+                                    >{{ booking.status.name }}</span
+                                >
+                                <a
+                                    v-if="canModify()"
+                                    href="#"
+                                    class="icon-modify"
+                                    title="Modify Booking"
+                                    aria-label="Modify Booking"
+                                    @onclick.prevent="showEditResourceBookingModal(booking.id)"
+                                ></a>
+                            </div>
+                            <edit-resource-booking-modal
+                                ref="editResourceBookingModal"
+                                :event-id="this.event.id"
+                                :event-series-id="this.event.seriesId"
+                                :resource-booking="booking"
+                            />
                         </div>
                     </div>
                 </div>
