@@ -690,10 +690,10 @@ class Controller extends Base
 
                 /* Check the status of this response and ensure it matches the ones provided in the querystring param
                  */
-                /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
+                /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
                 $response = $authoritativeFeedback?->getResponse() ?? $authoritativeResponse;
 
-                $currentStatus = $response->getCurrentStatus()->value;
+                $currentStatus = $response?->getCurrentStatus()->value;
 
                 if (!($requestedStatuses[$currentStatus] ?? false)) {
                     continue;
