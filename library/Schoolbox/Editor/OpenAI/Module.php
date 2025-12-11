@@ -34,9 +34,13 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF),
         );
 
-        $hasDifferentiationProfileService = new Rule\All(
+        $dpEnabled = new Rule\All(
             $isStaff,
             new Rule\IsConfigOn(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED, $this->getConfig()),
+        );
+
+        $hasDifferentiationProfileService = new Rule\All(
+            $dpEnabled,
             new Rule\HasServicePermission(
                 UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
                 UserAccess::ACCESS_WRITE
@@ -74,7 +78,7 @@ class Module extends BaseModule
         /* Learning Activity Customisation generation
          */
         $this->register('POST', '/learning-activity-customisation', 'postLearningActivityCustomisation', new Rule\All(
-            $hasDifferentiationProfileService,
+            $dpEnabled,
             new IsAIFeatureEnabled(ConfigMapper::NAME_AI_LEARNING_ACTIVITY_CUSTOMISATION, $this->getConfig()),
         ));
     }
