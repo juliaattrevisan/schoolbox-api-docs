@@ -27,6 +27,7 @@ use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\NextRoutes;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\LockedChecker;
@@ -182,7 +183,7 @@ class Module extends BaseModule
          */
         $this->register('GET', "{$assRoute}/{$studentParam}/view/{$responseParam}", 'getParticularResponse', new Rule\All(
             $canViewResponse,
-            $this->buildRuleCanAction(Status::ACTION_VIEW),
+            $this->buildRuleCanAction(NextRoutes::ACTION_VIEW),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
@@ -191,7 +192,7 @@ class Module extends BaseModule
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
             $isAIFeatureEnabled,
             $canInteractWithResponse,
-            $this->buildRuleCanAction(Status::ACTION_MESSAGE),
+            $this->buildRuleCanAction(NextRoutes::ACTION_MESSAGE),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
@@ -199,7 +200,7 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
             $canInteractWithResponse,
-            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_REQUEST),
+            $this->buildRuleCanAction(NextRoutes::ACTION_ASSISTANCE_REQUEST),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
@@ -211,7 +212,7 @@ class Module extends BaseModule
                 $canWrite,
                 $canInteractWithResponse,
             ),
-            $this->buildRuleCanAction(Status::ACTION_ASSISTANCE_RESOLVE),
+            $this->buildRuleCanAction(NextRoutes::ACTION_ASSISTANCE_RESOLVE),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
@@ -224,7 +225,7 @@ class Module extends BaseModule
                 $canSubmit,
             ),
             $isAuthoritativeResponse,
-            $this->buildRuleCanAction(Status::ACTION_SUBMIT),
+            $this->buildRuleCanAction(NextRoutes::ACTION_SUBMIT),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
@@ -232,7 +233,7 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{$responseParam}", 'postReopen', new Rule\All(
             $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_REOPEN),
+            $this->buildRuleCanAction(NextRoutes::ACTION_REOPEN),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 
@@ -241,7 +242,7 @@ class Module extends BaseModule
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/reset/{$responseParam}", 'postReset', new Rule\All(
             $canWrite,
-            $this->buildRuleCanAction(Status::ACTION_RESET),
+            $this->buildRuleCanAction(NextRoutes::ACTION_RESET),
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 

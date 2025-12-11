@@ -13,6 +13,19 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 class NextRoutes
 {
     /**
+     * Consts correlating to available endpoints
+     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
+     */
+    public const string ACTION_VIEW = 'view';
+    public const string ACTION_MESSAGE = 'message';
+    public const string ACTION_SUBMIT = 'submit';
+    public const string ACTION_RESET = 'reset';
+    public const string ACTION_REOPEN = 'reopen';
+    public const string ACTION_ASSISTANCE_REQUEST = 'assistanceRequest';
+    public const string ACTION_ASSISTANCE_RESOLVE = 'assistanceResolve';
+
+
+    /**
      * Decide the next available routes for a particular response; these are used in a Module check to see if
      * you can get to an endpoint whilst $authoritativeResponse is in a particular state.
      *

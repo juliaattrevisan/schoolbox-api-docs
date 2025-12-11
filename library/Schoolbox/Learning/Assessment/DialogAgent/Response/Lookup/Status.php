@@ -15,19 +15,6 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 class Status
 {
     /**
-     * Consts correlating to available endpoints
-     * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
-     */
-    public const string ACTION_VIEW = 'view';
-    public const string ACTION_MESSAGE = 'message';
-    public const string ACTION_SUBMIT = 'submit';
-    public const string ACTION_RESET = 'reset';
-    public const string ACTION_REOPEN = 'reopen';
-    public const string ACTION_ASSISTANCE_REQUEST = 'assistanceRequest';
-    public const string ACTION_ASSISTANCE_RESOLVE = 'assistanceResolve';
-
-
-    /**
      * Consts correlating to the status enum used by frontend world
      * Not to be confused with the progress tick classes, despite them currently being the same strings
      * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
@@ -83,15 +70,6 @@ class Status
         if (null === $authoritativeResponse) {
             return [
                 'status' => self::STATUS_INCOMPLETE,
-                'actions' => [
-                    self::ACTION_VIEW => false,
-                    self::ACTION_MESSAGE => false,
-                    self::ACTION_SUBMIT => false,
-                    self::ACTION_RESET => false,
-                    self::ACTION_REOPEN => false,
-                    self::ACTION_ASSISTANCE_REQUEST => false,
-                    self::ACTION_ASSISTANCE_RESOLVE => false,
-                ],
             ];
         }
 
@@ -100,15 +78,6 @@ class Status
         if (null !== $authoritativeResponse->getSubmittedAt()) {
             return [
                 'status' => self::STATUS_SUBMITTED,
-                'actions' => [
-                    self::ACTION_VIEW => true,
-                    self::ACTION_MESSAGE => false,
-                    self::ACTION_SUBMIT => false,
-                    self::ACTION_RESET => false,
-                    self::ACTION_REOPEN => true,
-                    self::ACTION_ASSISTANCE_REQUEST => false,
-                    self::ACTION_ASSISTANCE_RESOLVE => false,
-                ],
             ];
         }
 
@@ -122,17 +91,6 @@ class Status
         if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
             return [
                 'status' => self::STATUS_REQUIRES_ASSISTANCE,
-                'actions' => [
-                    self::ACTION_VIEW => true,
-                    self::ACTION_MESSAGE => true,
-                    // TODO: A student could request assistance prior to having a session ID,
-                    // which would then turn ON the SUBMIT/RESET options... I doubt we want that...
-                    self::ACTION_SUBMIT => true,
-                    self::ACTION_RESET => true,
-                    self::ACTION_REOPEN => false,
-                    self::ACTION_ASSISTANCE_REQUEST => false,
-                    self::ACTION_ASSISTANCE_RESOLVE => true,
-                ],
             ];
         }
 
@@ -141,15 +99,6 @@ class Status
         if (null === $authoritativeResponse->getSessionId()) {
             return [
                 'status' => self::STATUS_INCOMPLETE,
-                'actions' => [
-                    self::ACTION_VIEW => true,
-                    self::ACTION_MESSAGE => true,
-                    self::ACTION_SUBMIT => false,
-                    self::ACTION_RESET => false,
-                    self::ACTION_REOPEN => false,
-                    self::ACTION_ASSISTANCE_REQUEST => true,
-                    self::ACTION_ASSISTANCE_RESOLVE => false,
-                ],
             ];
         }
 
@@ -157,15 +106,6 @@ class Status
          */
         return [
             'status' => self::STATUS_IN_PROGRESS,
-            'actions' => [
-                self::ACTION_VIEW => true,
-                self::ACTION_MESSAGE => true,
-                self::ACTION_SUBMIT => true,
-                self::ACTION_RESET => true,
-                self::ACTION_REOPEN => false,
-                self::ACTION_ASSISTANCE_REQUEST => true,
-                self::ACTION_ASSISTANCE_RESOLVE => false,
-            ],
         ];
     }
 
