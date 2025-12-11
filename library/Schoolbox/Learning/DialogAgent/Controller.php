@@ -31,6 +31,7 @@ use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as DialogAgentResponseMessageMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
@@ -552,6 +553,8 @@ class Controller extends Base
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $agentConfig,
+            // TODO inject
+            DialogAgentResponseMessageMapper::getInstance(),
         );
 
         try {
@@ -561,6 +564,7 @@ class Controller extends Base
                 $this->requestPost->get('userPrompt'),
                 $aiSessionId,
                 previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
+                responseModel: $response,
             );
 
             /**
@@ -630,6 +634,8 @@ class Controller extends Base
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $agentConfig,
+            // TODO inject
+            DialogAgentResponseMessageMapper::getInstance(),
         );
 
         try {

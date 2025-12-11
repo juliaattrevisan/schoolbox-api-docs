@@ -14,6 +14,7 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for dialog agent response messages.
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
