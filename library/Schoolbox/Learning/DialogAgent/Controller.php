@@ -693,7 +693,7 @@ class Controller extends Base
                 /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
                 $response = $authoritativeFeedback?->getResponse() ?? $authoritativeResponse;
 
-                $currentStatus = $response?->getCurrentStatus()->value ?? Status::INCOMPLETE;
+                $currentStatus = $response?->getCurrentStatus()->value ?? Status::INCOMPLETE->value;
 
                 if (!($requestedStatuses[$currentStatus] ?? false)) {
                     continue;
@@ -719,7 +719,7 @@ class Controller extends Base
                     $participant->getUser()->getExternalId(),
                     $participant->getUser()->getFirstName(),
                     $participant->getUser()->getLastName(),
-                    $response->getCurrentStatusHR(),
+                    $response?->getCurrentStatus()->translate() ?? Status::INCOMPLETE->translate(),
                 ], array_values($feedbackFields)), escape: '');
             }
         }
