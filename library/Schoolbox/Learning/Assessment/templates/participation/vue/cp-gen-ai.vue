@@ -109,7 +109,10 @@ window.Vue.onMounted(() => {
 <template>
     <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
         <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
-            <h2>Suggested Customisation</h2>
+            <h2>
+                Suggested Customisation
+                {{ props.participant?.user.fullName ? ` for ${props.participant.user.fullName}` : "" }}
+            </h2>
             <button v-if="aiResponse" class="button icon-ai" @click.prevent="onRegenerate">Regenerate</button>
         </div>
         <request-error v-if="loadError" :further-info="loadError" />
