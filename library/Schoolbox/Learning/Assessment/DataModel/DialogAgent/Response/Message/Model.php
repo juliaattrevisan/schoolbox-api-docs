@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Learning\Assessment\DataModel\DialogAgent\Response\Message;
+
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
+use Schoolbox\Mapper\Traits\Model\Id;
+
+/**
+ * Model for dialog agent response messages.
+ */
+class Model
+{
+    use Id;
+
+    /**
+     * The response with which this message is associated.
+     *
+     * @var Response\Model
+     */
+    private Response\Model $dialogAgentResponse;
+
+    /**
+     * The role with which this is associated.
+     *
+     * @var value-of<Role>
+     */
+    private string $role;
+
+    /**
+     * The status of the response which generated the message:
+     * at this time, a HTTP response code.
+     *
+     * @var int|null
+     */
+    private ?int $status = null;
+
+    /**
+     * The content of the message.
+     *
+     * @var string|null
+     */
+    private ?string $content = null;
+
+    /**
+     * @return Response\Model
+     */
+    public function getDialogAgentResponse(): Response\Model
+    {
+        return $this->dialogAgentResponse;
+    }
+
+    /**
+     * @param Response\Model $dialogAgentResponse
+     * @return $this
+     */
+    public function setDialogAgentResponse(Response\Model $dialogAgentResponse): self
+    {
+        $this->dialogAgentResponse = $dialogAgentResponse;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param string $role
+     * @return $this
+     */
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param int|null $status
+     * @return $this
+     */
+    public function setStatus(?int $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param string|null $content
+     * @return $this
+     */
+    public function setContent(?string $content): self
+    {
+        $this->content = $content;
+        return $this;
+    }
+}

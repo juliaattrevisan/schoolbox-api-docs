@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Learning\Assessment\DataModel\DialogAgent\Response\Message;
+
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
+use Schoolbox\Mapper as BaseMapper;
+
+/**
+ * Mapper for dialog agent response messages.
+ */
+class Mapper extends BaseMapper
+{
+    /**
+     * @inheritdoc
+     */
+    protected function mapping()
+    {
+        $this->hasTable('dialog_agent_message');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins(
+            'dialog_agent_response_id',
+            Response\Mapper::class,
+            'id',
+            null,
+            null,
+            'dialogAgentResponse',
+            'dialogAgentResponse',
+        );
+        $this->uses('role', self::TYPE_STRING, self::COLUMN_ENUM, array_map(fn (Role $x) => $x->value, Role::cases()));
+        $this->uses('status', self::TYPE_INTEGER);
+        $this->uses('content', self::TYPE_STRING);
+    }
+}
