@@ -317,8 +317,10 @@ class Controller extends Base
             $hasAccess = false;
             $studentCampus = $student->getCampusCollection();
             foreach ($accessList as $access) {
-                if ($access->getAccessLevel() >= UserAccess::ACCESS_WRITE &&
-                    $studentCampus->offsetExists($access->getServiceIdentifier())) {
+                if (
+                    $access->getAccessLevel() >= UserAccess::ACCESS_WRITE &&
+                    $studentCampus->offsetExists($access->getServiceIdentifier())
+                ) {
                     $hasAccess = true;
                     break;
                 }
