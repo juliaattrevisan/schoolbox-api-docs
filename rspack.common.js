@@ -171,6 +171,8 @@ module.exports = {
         quizContent: "./library/Schoolbox/Learning/Learnosity/templates/js/quizContent.ts",
         customParticipation:
             "./library/Schoolbox/Learning/Assessment/templates/participation/vue/customParticipation.ts",
+        viewSuggestedCustomisation:
+            "./library/Schoolbox/Learning/Assessment/templates/participation/vue/viewSuggestedCustomisation.ts",
         dialogAgentConfigure:
             "./library/Schoolbox/Learning/Assessment/templates/dialogAgent/vue/configure/dialogAgentConfigure.ts",
         dialogAgentStatus:

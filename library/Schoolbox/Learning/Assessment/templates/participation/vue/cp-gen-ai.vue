@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display or regenerate AI content for a studentId customisation
+ * To display or regenerate AI content for a student customisation
  * This content is displayed both on a Student Participation page as well
  * as on the modify/new/copy activity pages.
  */
