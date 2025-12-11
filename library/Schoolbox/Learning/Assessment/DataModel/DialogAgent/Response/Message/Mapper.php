@@ -34,8 +34,8 @@ class Mapper extends BaseMapper
             'dialogAgentResponse',
             'dialogAgentResponse',
         );
-        $this->uses('role', self::TYPE_STRING, self::COLUMN_ENUM, array_map(fn (Role $x) => $x->value, Role::cases()));
-        $this->uses('status', self::TYPE_STRING, self::COLUMN_ENUM, array_map(fn (Status $x) => $x->value, Status::cases()));
+        $this->uses('role', self::TYPE_STRING, self::COLUMN_ENUM, null, array_map(fn (Role $x) => $x->value, Role::cases()));
+        $this->uses('status', self::TYPE_STRING, self::COLUMN_ENUM, null, array_map(fn (Status $x) => $x->value, Status::cases()));
         $this->uses('content', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
