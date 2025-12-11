@@ -37,13 +37,15 @@ function onViewSuggestedCustomisation(): void {
 function onNewResponse(newResponse: CustomisedSuggestionResponse): void {
     currentParticipant.value!.cachedSuggestedCustomisation = newResponse;
 }
-
-// props.participant._links.differentiationProfile
 </script>
 
 <template>
     <button
-        v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled"
+        v-if="
+            props.differentiationEnabled &&
+            sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
+            props.participant._links.differentiationProfile
+        "
         class="button icon-ai f-no-margins"
         type="button"
         @click.prevent="onViewSuggestedCustomisation"
