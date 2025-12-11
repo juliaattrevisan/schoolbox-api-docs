@@ -17,8 +17,9 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN rm -rf /var/www/html \
     && chmod 0777 /tmp/
 
-# Install Composer
-COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+# Install an older Composer version (2.2 = current LTS):
+# devkit currently contains a script which is incompatible with 2.8
+COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
 
 # Copy configs
 COPY ./config/*.ini /usr/local/etc/php/conf.d/
