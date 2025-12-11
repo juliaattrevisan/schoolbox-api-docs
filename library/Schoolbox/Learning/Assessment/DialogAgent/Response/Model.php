@@ -94,17 +94,6 @@ class Model extends AbstractResponse
     }
 
 
-    /**
-     * Returns a human-readable equivalent of the current status
-     *
-     * @return string
-     */
-    public function getCurrentStatusHR(): string
-    {
-        return Status::tryFrom($this->getCurrentStatus()->value)->translate();
-    }
-
-
     /* Getters/Setters
      */
 
