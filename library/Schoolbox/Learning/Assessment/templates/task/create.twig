@@ -38,9 +38,25 @@
     {# ----------------------------------------------------------- #}
     {# Description #}
     {# ----------------------------------------------------------- #}
-    <label for="assessment-description">
-        Description
-    </label>
+    {% set showSuggestedCustomisation = customisedFor is defined and participants ?? [] is not empty and participants|length == 1 %}
+    <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
+        <label for="assessment-description">Description</label>
+        {# Only show suggested customisation if there is exactly one participant #}
+        {% if showSuggestedCustomisation %}
+        <div id="view-suggested-customisation-container">
+            <view-suggested-customisation
+                :differentiation-enabled="Boolean({{ differentiationEnabled }})"
+                :participant="{{ (participants[0] ?? []) | json_encode }}"
+                :routes="{{ {
+                    genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
+                } | json_encode }}"
+                :assessment-id="{{ customisedFor }}"
+                editor-id="assessment-description"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/viewSuggestedCustomisation.js?v={{ config.site_version }}"></script>
+        {% endif %}
+    </div>
     <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
 
     {# ----------------------------------------------------------- #}
