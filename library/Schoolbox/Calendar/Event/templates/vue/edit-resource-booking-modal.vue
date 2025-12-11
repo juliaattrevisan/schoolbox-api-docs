@@ -103,15 +103,43 @@ async function postEditBookingForm(): Promise<void> {
             class="top"
             @submit.prevent="postEditBookingForm()"
         >
-            <fieldset>
-                <h2>Edit Resource Booking</h2>
-                <p>Hello, I'm an edit resource form.</p>
-                <input
-                    type="submit"
-                    :disabled="!isFormSubmittable"
-                    value="Submit"
-                    data-test="edit-booking-modal-save-button"
-                />
+            <fieldset class="content">
+                <div class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom">
+                    <div>
+                        <label for="datepicker-datetime">From</label>
+                        <div class="input-group">
+                            <input
+                                id="from-datetime"
+                                type="text"
+                                data-datepicker=""
+                                data-datepicker-time=""
+                                data-datepicker-id="2"
+                            /><a class="adtp-btn icon-calendar" data-adtp-btn="">Select Date</a>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="datepicker-datetime">Until</label>
+                        <div class="input-group">
+                            <input
+                                id="from-datetime"
+                                type="text"
+                                data-datepicker=""
+                                data-datepicker-time=""
+                                data-datepicker-id="2"
+                            /><a class="adtp-btn icon-calendar" data-adtp-btn="">Select Date</a>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <textarea></textarea>
+                </div>
+                <div class="component-action">
+                    <section>
+                        <a class="button">Cancel</a>
+                        <a class="button" :disabled="!isFormSubmittable">Save</a>
+                        <a class="button">Delete</a>
+                    </section>
+                </div>
             </fieldset>
         </form>
     </div>

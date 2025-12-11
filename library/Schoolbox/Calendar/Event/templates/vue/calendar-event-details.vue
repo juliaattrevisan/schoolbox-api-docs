@@ -706,15 +706,16 @@ export default {
                                     @onclick.prevent="showEditResourceBookingModal(booking.id)"
                                 ></a>
                             </div>
-                            <edit-resource-booking-modal
-                                ref="editResourceBookingModal"
-                                :event-id="this.event.id"
-                                :event-series-id="this.event.seriesId"
-                                :resource-booking="booking"
-                            />
                         </div>
                     </div>
                 </div>
+                <edit-resource-booking-modal
+                    v-if="event.resourceBookings.length > 0"
+                    ref="editResourceBookingModal"
+                    :event-id="this.event.id"
+                    :event-series-id="this.event.seriesId"
+                    :resource-booking="event.resourceBookings[0]"
+                />
             </section>
             <div v-else class="empty-state">
                 <i class="icon-resource-booking"></i>
