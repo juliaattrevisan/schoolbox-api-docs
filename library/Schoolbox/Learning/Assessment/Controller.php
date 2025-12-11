@@ -313,11 +313,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['participants'] = $originalAssessment
                 ->getAllParticipants()
                 ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
-                ->map(function (Participant $participant) use ($assessment, $aiCache) {
+                ->map(function (Participant $participant) use ($originalAssessmentId, $aiCache) {
                     $student = $participant->getUser();
                     $cacheKey = sprintf(
                         OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                        $assessment->getId(),
+                        $originalAssessmentId,
                         $student->getId()
                     );
                     return [
