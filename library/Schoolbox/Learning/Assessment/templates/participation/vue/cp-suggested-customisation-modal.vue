@@ -139,6 +139,7 @@ function onConfirm(): void {
                 :route="props.routes.genAI"
                 :assessment-id="props.assessmentId"
                 :participant="participant"
+                :confirm-text="`Customise ${locale.activity.translate(false, true)}`"
                 @new-response="onNewResponse"
                 @cancel="onCancel"
                 @confirm="onCustomiseActivity"

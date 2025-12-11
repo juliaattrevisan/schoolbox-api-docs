@@ -41,6 +41,30 @@ function onViewSuggestedCustomisation(): void {
 function onNewResponse(newResponse: CustomisedSuggestionResponse): void {
     currentParticipant.value!.cachedSuggestedCustomisation = newResponse;
 }
+
+/**
+ * Reset the modal state to initial
+ * for a possible reopening
+ */
+function resetState(): void {
+    isOpen.value = false;
+    currentParticipant.value = null;
+    aiResponse.value = null;
+}
+
+/**
+ * Close the modal, resetting state to cancel any operation
+ */
+function onCancel(): void {
+    resetState();
+}
+
+/**
+ * Insert the copy of the suggested customisation into the activity description
+ */
+function onAddToDescription(): void {
+    resetState();
+}
 </script>
 
 <template>
@@ -62,7 +86,10 @@ function onNewResponse(newResponse: CustomisedSuggestionResponse): void {
             :route="props.routes.genAI"
             :assessment-id="props.assessmentId"
             :participant="currentParticipant"
+            confirm-text="Add to Description"
             @new-response="onNewResponse"
+            @cancel="onCancel"
+            @confirm="onAddToDescription"
         />
     </basic-modal>
 </template>

@@ -16,6 +16,7 @@ const props = defineProps<{
     route: string;
     assessmentId: number;
     participant: Participant | null;
+    confirmText: string;
 }>();
 
 const emit = defineEmits<{
@@ -153,7 +154,7 @@ window.Vue.onMounted(() => {
                 data-test="cp-ai-modal-confirm"
                 @click.prevent="onConfirm"
             >
-                Customise {{ locale.activity.translate(false, true) }}
+                {{ props.confirmText }}
             </button>
         </div>
     </form>
