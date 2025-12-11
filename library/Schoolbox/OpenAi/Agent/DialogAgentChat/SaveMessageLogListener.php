@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Agent\DialogAgentChat;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as ResponseMessageMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Status;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -53,6 +54,7 @@ class SaveMessageLogListener implements IListener
             $responseMessageModel = $this->responseMessageMapper->createModel()
                 ->setDialogAgentResponse(new ResponseDataModel()->setId($this->responseModel->getId()))
                 ->setRole(Role::Assistant->value)
+                ->setStatus(Status::fromMessageEventType(MessageEventType::COMPLETE))
                 ->setContent($outputMessage->getDataAsArray()['message'])
             ;
             // TODO set created at as exact time, not request time
