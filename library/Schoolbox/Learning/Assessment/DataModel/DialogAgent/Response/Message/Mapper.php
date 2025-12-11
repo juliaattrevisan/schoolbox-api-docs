@@ -23,7 +23,8 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('dialog_agent_message');
+        $this->hasTable('dialog_agent_response_message');
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins(
             'dialog_agent_response_id',
@@ -35,7 +36,13 @@ class Mapper extends BaseMapper
             'dialogAgentResponse',
         );
         $this->uses('role', self::TYPE_STRING, self::COLUMN_ENUM, null, array_map(fn (Role $x) => $x->value, Role::cases()));
-        $this->uses('status', self::TYPE_STRING, self::COLUMN_ENUM, null, array_map(fn (Status $x) => $x->value, Status::cases()));
+        $this->uses(
+            'status',
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            array_merge(array_map(fn (Status $x) => $x->value, Status::cases()), [null]),
+        );
         $this->uses('content', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }

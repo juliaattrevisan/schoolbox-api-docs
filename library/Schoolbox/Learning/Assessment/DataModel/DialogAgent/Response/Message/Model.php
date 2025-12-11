@@ -36,12 +36,11 @@ class Model
     private string $role;
 
     /**
-     * The status of the response which generated the message:
-     * at this time, a HTTP response code.
+     * The status of the response which generated the message.
      *
-     * @var int|null
+     * @var string|null
      */
-    private ?int $status = null;
+    private ?string $status = null;
 
     /**
      * The content of the message.
@@ -87,18 +86,18 @@ class Model
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getStatus(): ?int
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
     /**
-     * @param int|null $status
+     * @param string|null $status
      * @return $this
      */
-    public function setStatus(?int $status): self
+    public function setStatus(?string $status): self
     {
         $this->status = $status;
         return $this;
