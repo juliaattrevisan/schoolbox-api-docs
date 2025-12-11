@@ -624,21 +624,21 @@ class Controller extends Base
 
         foreach ($this->requestQuery->get('status') ?? [] as $requestedStatus) {
             try {
-                $requestedStatuses[] = Status::from($requestedStatus)->value;
+                $requestedStatuses[] = Status::from($requestedStatus);
             } catch (\ValueError $e) {
                 // invalid status: skip it
             }
         }
 
         if (!\count($requestedStatuses)) {
-            foreach (Status::cases() as $requestedStatus) {
-                $requestedStatuses[] = $requestedStatus->from($requestedStatus->value)->value;
-            }
+            $requestedStatuses = Status::cases();
         }
 
         /* Filter output to whatever was chosen in the frontend.
          */
-        $requestedStatuses = array_fill_keys($requestedStatuses, true);
+        $requestedStatuses = array_fill_keys(array_map(static function ($a) {
+            return $a->value;
+        }, $requestedStatuses), true);
 
         /* Set up a file pointer
          */
