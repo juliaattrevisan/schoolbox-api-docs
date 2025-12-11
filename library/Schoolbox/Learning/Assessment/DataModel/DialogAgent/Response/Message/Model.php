@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Learning\Assessment\DataModel\DialogAgent\Response\Message;
 
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
@@ -18,6 +19,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 class Model
 {
     use Id;
+    use CreatedAtDate;
 
     /**
      * The response with which this message is associated.
