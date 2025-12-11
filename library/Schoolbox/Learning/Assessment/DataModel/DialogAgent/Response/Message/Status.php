@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Assessment\DataModel\DialogAgent\Response\Message;
+namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message;
 
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
 

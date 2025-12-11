@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Assessment\DataModel\DialogAgent\Response\Message;
+namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message;
 
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;

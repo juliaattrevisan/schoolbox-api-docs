@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Learning\Assessment\DataModel\DialogAgent\Response\Message;
+namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message;
 
 /**
  * Available values for the role associated with a response message.
