@@ -44,6 +44,16 @@
                     </div>
                     <div class="columns small-12">
                         <label for="plan-desc" class="required">Description</label>
+                        <div id="view-suggested-customisation-container" class="f-container">
+                            <view-suggested-customisation
+                                :participant="{{ (participants[0] ?? []) | json_encode }}"
+                                :routes="{{ {
+                                    genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
+                                } | json_encode }}"
+                                :assessment-id="{{ assessment.id }}"
+                            />
+                        </div>
+                        <script src="{{ CDN_PREFIX }}/js/bundle/viewSuggestedCustomisation.js?v={{ config.site_version }}"></script>
                         <textarea name="plan-desc" id="plan-desc">
                             {{ plan is defined ? plan.description : assessment.description }}
                         </textarea>
