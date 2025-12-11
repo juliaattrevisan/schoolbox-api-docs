@@ -19,7 +19,6 @@ const props = defineProps<{
 
 const isOpen = window.Vue.ref(false);
 const aiResponse = window.Vue.ref<CustomisedSuggestionResponse | null>(null); // to store the generated AI response, which is set within the cp-gen-ai component
-
 const currentParticipant = window.Vue.ref<Participant | null>(null);
 
 /**
@@ -61,12 +60,14 @@ function onCancel(): void {
 }
 
 /**
- * Insert the copy of the suggested customisation into the activity description
+ * Insert the copy of the suggested learning activity update into the activity description
+ * We should be pretty confident the description editor exists without thinking about
+ * not showing the button when it does not
  */
 function onAddToDescription(): void {
     const editor = window.sbProps.editors[props.editorId];
     if (editor) {
-        const extraSpace = editor.getData() === "" ? "" : "<p></p>"; // add extra line break if the editor is not empty
+        const extraSpace = editor.getData() === "" ? "" : "<p></p>"; // add extra line break if the editor content is not empty
         editor.setData(`${editor.getData()}${extraSpace}${aiResponse.value?.suggested_learning_activity_update || ""}`);
     }
     resetState();

@@ -81,10 +81,10 @@
         parentFolderId: parentFolderId ?? null,
     } %}
 
+    {# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
     {% set showSuggestedCustomisation = customisedFor is defined and participants ?? [] is not empty and participants|length == 1 %}
     <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
         <label for="assessment-description">Description</label>
-        {# Only show suggested customisation if there is exactly one participant #}
         {% if showSuggestedCustomisation %}
         <div id="view-suggested-customisation-container">
             <view-suggested-customisation
