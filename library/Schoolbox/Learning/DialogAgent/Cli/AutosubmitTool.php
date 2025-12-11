@@ -131,7 +131,7 @@ HELP;
             INNER JOIN dialog_agent da ON da.assessment_id = a.id
             INNER JOIN dialog_agent_response dar ON dar.dialog_agent_id = da.id
             INNER JOIN user u ON dar.learner_id = u.id
-            WHERE (a.close_date < NOW() OR a.due_date < NOW())
+            WHERE a.close_date < NOW()
             AND dar.submitted_at IS NULL
         ");
 
