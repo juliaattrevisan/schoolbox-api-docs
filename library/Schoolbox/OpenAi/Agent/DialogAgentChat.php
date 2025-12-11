@@ -87,6 +87,7 @@ class DialogAgentChat
             $responseMessageModel = $this->responseMessageMapper->createModel()
                 ->setDialogAgentResponse(new ResponseDataModel()->setId($responseModel->getId()))
                 ->setRole(Role::User->value)
+                ->setStatus(null)
                 ->setContent($userPrompt);
             $this->responseMessageMapper->save($responseMessageModel);
 
