@@ -63,6 +63,10 @@ function onCancel(): void {
  * Insert the copy of the suggested customisation into the activity description
  */
 function onAddToDescription(): void {
+    const editor = window.sbProps.editors["plan-desc"];
+    if (editor) {
+        editor.setData(`${editor.getData()}<p></p>${aiResponse.value?.suggested_learning_activity_update || ""}`);
+    }
     resetState();
 }
 </script>
