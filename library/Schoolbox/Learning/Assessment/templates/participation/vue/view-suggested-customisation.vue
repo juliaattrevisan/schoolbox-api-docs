@@ -65,7 +65,8 @@ function onCancel(): void {
 function onAddToDescription(): void {
     const editor = window.sbProps.editors["plan-desc"];
     if (editor) {
-        editor.setData(`${editor.getData()}<p></p>${aiResponse.value?.suggested_learning_activity_update || ""}`);
+        const extraSpace = editor.getData() === "" ? "" : "<p></p>"; // add extra line break if the editor is not empty
+        editor.setData(`${editor.getData()}${extraSpace}${aiResponse.value?.suggested_learning_activity_update || ""}`);
     }
     resetState();
 }
