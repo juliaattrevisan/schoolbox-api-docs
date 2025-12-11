@@ -61,14 +61,14 @@ class Model extends AbstractResponse
     /**
      * Interrogate this instance for the current state that it's in
      *
-     * @return string
+     * @return Status
      */
-    public function getCurrentStatus(): string
+    public function getCurrentStatus(): Status
     {
         /* Submitted: disregard all other statuses
          */
         if (null !== $this->getSubmittedAt()) {
-            return Status::SUBMITTED->value;
+            return Status::SUBMITTED;
         }
 
         // TODO: deal with duration eventually. still allow SOBO from staff
@@ -79,18 +79,18 @@ class Model extends AbstractResponse
          * If assistance was requested and the response is still in progress, send a special status
          */
         if (null !== $this->getAssistanceRequestedAt()) {
-            return Status::REQUIRES_ASSISTANCE->value;
+            return Status::REQUIRES_ASSISTANCE;
         }
 
         /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
          */
         if (null === $this->getSessionId()) {
-            return Status::INCOMPLETE->value;
+            return Status::INCOMPLETE;
         }
 
         /* Otherwise we're just doing the stuff
          */
-        return Status::IN_PROGRESS->value;
+        return Status::IN_PROGRESS;
     }
 
 
@@ -101,7 +101,7 @@ class Model extends AbstractResponse
      */
     public function getCurrentStatusHR(): string
     {
-        return Status::tryFrom($this->getCurrentStatus())->translate();
+        return Status::tryFrom($this->getCurrentStatus()->value)->translate();
     }
 
 

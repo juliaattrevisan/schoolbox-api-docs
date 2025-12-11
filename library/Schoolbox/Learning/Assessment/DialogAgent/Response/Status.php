@@ -22,12 +22,6 @@ enum Status: string
     case SUBMITTED = 'submitted';
 
 
-    case INCOMPLETE_HR = 'Incomplete';
-    case IN_PROGRESS_HR = 'In Progress';
-    case REQUIRES_ASSISTANCE_HR = 'Requires Assistance';
-    case SUBMITTED_HR = 'Submitted';
-
-
     /**
      * Convert a programmatically-meaningful state into its human-readable equivalent and vice versa
      *
@@ -39,14 +33,10 @@ enum Status: string
         // see https://www.php.net/manual/en/language.enumerations.methods.php
         // phpcs:ignore
         return match ($this) {
-            Status::INCOMPLETE => Status::INCOMPLETE_HR->value,
-            Status::IN_PROGRESS => Status::IN_PROGRESS_HR->value,
-            Status::REQUIRES_ASSISTANCE => Status::REQUIRES_ASSISTANCE_HR->value,
-            Status::SUBMITTED => Status::SUBMITTED_HR->value,
-            Status::INCOMPLETE_HR => Status::INCOMPLETE->value,
-            Status::IN_PROGRESS_HR => Status::IN_PROGRESS->value,
-            Status::REQUIRES_ASSISTANCE_HR => Status::REQUIRES_ASSISTANCE->value,
-            Status::SUBMITTED_HR => Status::SUBMITTED->value,
+            Status::INCOMPLETE => 'Incomplete',
+            Status::IN_PROGRESS => 'In Progress',
+            Status::REQUIRES_ASSISTANCE => 'Requires Assistance',
+            Status::SUBMITTED => 'Submitted',
         };
     }
 }

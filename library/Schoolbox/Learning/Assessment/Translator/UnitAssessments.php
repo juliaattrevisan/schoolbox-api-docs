@@ -284,7 +284,7 @@ class UnitAssessments
             /* If a response exists; interrogate it for its current status; otherwise assume it's Incomplete
              */
             /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
-            $progress = $response?->getCurrentStatus() ?? Status::INCOMPLETE->value;
+            $progress = $response?->getCurrentStatus()->value ?? Status::INCOMPLETE->value;
 
             return [
                 'postRouteUrl'  => null, // dialog agent ticks aren't ever actionable

@@ -620,12 +620,21 @@ class Controller extends Base
          * unexpected output when you've turned off all the filters and then exported to csv, but I don't understand why
          * you'd want to generate an empty csv: most of the time you'd have at least one of them selected.
          */
-        $requestedStatuses = $this->requestQuery->get('status') ?? [
-            Status::INCOMPLETE->value,
-            Status::IN_PROGRESS->value,
-            Status::REQUIRES_ASSISTANCE->value,
-            Status::SUBMITTED->value,
-        ];
+        $requestedStatuses = [];
+
+        foreach ($this->requestQuery->get('status') ?? [] as $requestedStatus) {
+            try {
+                $requestedStatuses[] = Status::from($requestedStatus)->value;
+            } catch (\ValueError $e) {
+                // invalid status: skip it
+            }
+        }
+
+        if (!\count($requestedStatuses)) {
+            foreach (Status::cases() as $requestedStatus) {
+                $requestedStatuses[] = $requestedStatus->from($requestedStatus->value)->value;
+            }
+        }
 
         /* Filter output to whatever was chosen in the frontend.
          */
@@ -684,7 +693,7 @@ class Controller extends Base
                 /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model $response */
                 $response = $authoritativeFeedback?->getResponse() ?? $authoritativeResponse;
 
-                $currentStatus = $response->getCurrentStatus();
+                $currentStatus = $response?->getCurrentStatus()->value;
 
                 if (!($requestedStatuses[$currentStatus] ?? false)) {
                     continue;
