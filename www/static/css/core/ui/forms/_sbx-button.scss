@@ -188,3 +188,21 @@
 .sbx-body ul.f-dropdown li button {
     background-color: transparent;
 }
+
+.sbx-body {
+    .flatpickr-current-month {
+        .numInputWrapper {
+            input.numInput {
+                border: 0;
+                outline: none;
+
+                &:focus,
+                &:focus-visible,
+                &:active {
+                    border: 0;
+                    outline: none;
+                }
+            }
+        }
+    }
+}
