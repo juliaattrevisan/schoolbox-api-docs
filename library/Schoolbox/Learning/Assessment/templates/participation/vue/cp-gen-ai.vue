@@ -148,7 +148,7 @@ window.Vue.onMounted(() => {
         </div>
         <div class="l-flex l-gap-xs f-no-margins">
             <button class="button l-flex__item--1" data-test="cp-ai-modal-cancel" @click.prevent="onCancel">
-                Cancel
+                {{ isProcessing ? "Cancel" : "Close" }}
             </button>
             <button
                 v-if="!isProcessing && aiResponse"
