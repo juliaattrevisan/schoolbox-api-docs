@@ -190,9 +190,13 @@
         <div class="small-12 column">
             <ul class="meta">
                 <li>
+                    {% set users = [] %}
+                    {% for participant in participants %}
+                        {% set users = users|merge([participant.user]) %}
+                    {% endfor %}
                     {% include 'sub/userListMetadata.twig'
                         with {
-                        users:    participants,
+                        users:    users,
                         message: 'Customisation for '
                     } only
                     %}

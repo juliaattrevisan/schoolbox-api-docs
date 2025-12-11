@@ -1358,7 +1358,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     $student->getId()
                 );
                 return [
-                    'id'   => $student->getId(),
+                    'id' => $student->getId(),
                     'fullName' => $participant->getUser()->getFullName(),
                     'excludedAt' => $participant->getExcludedAt(),
                     'user' => $student,
