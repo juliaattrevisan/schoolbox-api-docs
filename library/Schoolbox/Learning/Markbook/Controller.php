@@ -476,7 +476,6 @@ class Controller extends Base
             }
             $this->response = $this->responseAsJson($data);
         } catch (\Throwable $e) {
-            new \Alaress_Probe($e->getMessage());
             $this->captureException($e);
             $this->returnJsonError($e);
         }
