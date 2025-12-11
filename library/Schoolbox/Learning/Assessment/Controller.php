@@ -832,6 +832,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 return [
                     'id' => $participant->getUser()->getId(),
                     'fullName' => $participant->getUser()->getFullName(),
+                    'user' => $student,
                     'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
                     '_links'     => [
                         'differentiationProfile' => $this->getRouteIfAuthorized(
