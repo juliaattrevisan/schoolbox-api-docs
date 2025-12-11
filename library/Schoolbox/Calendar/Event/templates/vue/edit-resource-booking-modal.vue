@@ -135,9 +135,9 @@ async function postEditBookingForm(): Promise<void> {
                 </div>
                 <div class="component-action">
                     <section>
-                        <a class="button">Cancel</a>
-                        <a class="button" :disabled="!isFormSubmittable">Save</a>
-                        <a class="button">Delete</a>
+                        <button>Cancel</button>
+                        <button :disabled="!isFormSubmittable">Save</button>
+                        <button>Delete</button>
                     </section>
                 </div>
             </fieldset>
