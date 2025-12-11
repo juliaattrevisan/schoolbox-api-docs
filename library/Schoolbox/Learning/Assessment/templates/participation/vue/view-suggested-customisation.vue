@@ -38,11 +38,7 @@ function onNewResponse(newResponse: CustomisedSuggestionResponse): void {
     currentParticipant.value!.cachedSuggestedCustomisation = newResponse;
 }
 
-// v-if="
-//             props.differentiationEnabled &&
-//             sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
-//             props.participant._links.differentiationProfile
-//         "
+// props.participant._links.differentiationProfile
 </script>
 
 <template>

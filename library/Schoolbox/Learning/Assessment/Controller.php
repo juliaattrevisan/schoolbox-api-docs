@@ -67,6 +67,7 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\OpenAI\Helper as OpenAIHelper;
 
 /**
  * Class Controller
@@ -1274,17 +1275,28 @@ abstract class Controller extends ListController implements IAssessmentControlle
                                    'assessment' => $assessment,
                                ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
 
+        /* Cache interface for AI generated content (ie suggested customisation)
+         * Injecting here rather than in the module to avoid inheritance complications
+         */
+        $aiCache = $this->getDi()->get('ai.response.cache');
+
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) {
+            ->map(function (Participant $participant) use ($assessment, $aiCache) {
                 $student = $participant->getUser();
+                $cacheKey = sprintf(
+                    OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
+                    $assessment->getId(),
+                    $student->getId()
+                );
                 return [
-                    'id' =>  $student->getId(),
+                    'id' =>  $participant->getId(),
                     'fullName' => $participant->getUser()->getFullName(),
                     'excludedAt' => $participant->getExcludedAt(),
                     'user' => $student,
                     'plan' => $participant->getPlan(),
+                    'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
                 ];
             })->reindex();
 
