@@ -26,6 +26,10 @@ const currentParticipant = window.Vue.ref<Participant | null>(null);
  */
 function onViewSuggestedCustomisation(): void {
     currentParticipant.value = props.participant;
+    // set the cached AI response if it exists to avoid regenerating
+    if (currentParticipant && currentParticipant.value.cachedSuggestedCustomisation) {
+        aiResponse.value = currentParticipant.value.cachedSuggestedCustomisation;
+    }
     isOpen.value = true;
 }
 

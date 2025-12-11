@@ -1301,8 +1301,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         'differentiationProfile' => $this->getRouteIfAuthorized(
                             'differentiationProfiles.viewDifferentiationProfileData',
                             [
-                                'student' => $participant,
-                                'studentId' => $participant->getId()
+                                'student' => $student,
+                                'studentId' => $student->getId()
                             ],
                         ),
                     ]
