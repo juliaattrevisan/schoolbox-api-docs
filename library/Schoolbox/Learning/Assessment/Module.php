@@ -37,6 +37,7 @@ use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\Lti\Model as LTI;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -233,9 +234,14 @@ class Module extends BaseModule
                 $assessmentType = AssessmentType::objectToString($param['assessment']);
                 if (
                     $param['assessment'] instanceof LTI ||
-                    $param['assessment'] instanceof Quiz
+                    $param['assessment'] instanceof Quiz ||
+                    $param['assessment'] instanceof DialogAgent
                 ) {
-                    throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                    throw new Unauthorized(sprintf(
+                        '"%s" (%s) cannot be copied via custom participation',
+                        $param['assessment']->getTitle(),
+                        $assessmentType
+                    ));
                 }
             }),
         );
