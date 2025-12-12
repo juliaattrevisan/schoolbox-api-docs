@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
+import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import type { Booking } from "./resourceBookingTypes";
 
 interface Props {
@@ -121,44 +122,14 @@ async function postEditBookingForm(): Promise<void> {
             class="top"
             @submit.prevent="postEditBookingForm()"
         >
-            <fieldset class="content">
-                <div class="l-grid l-gap-l l-grid--2-col dummy-content highlighter l-mar-m--bottom">
-                    <div>
-                        <label for="datepicker-datetime">From</label>
-                        <div class="input-group">
-                            <input
-                                id="from-datetime"
-                                type="text"
-                                data-datepicker=""
-                                data-datepicker-time=""
-                                data-datepicker-id="2"
-                            /><a class="adtp-btn icon-calendar" data-adtp-btn="">Select Date</a>
-                        </div>
-                    </div>
-                    <div>
-                        <label for="datepicker-datetime">Until</label>
-                        <div class="input-group">
-                            <input
-                                id="from-datetime"
-                                type="text"
-                                data-datepicker=""
-                                data-datepicker-time=""
-                                data-datepicker-id="2"
-                            /><a class="adtp-btn icon-calendar" data-adtp-btn="">Select Date</a>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <textarea></textarea>
-                </div>
-                <div class="component-action">
-                    <section>
-                        <button>Cancel</button>
-                        <button :disabled="!isFormSubmittable">Save</button>
-                        <button>Delete</button>
-                    </section>
-                </div>
-            </fieldset>
+            <date-range ref="dateRangeRef" id-prefix="resource-booking-row" :use-time="true" />
+            <div class="component-action">
+                <section>
+                    <button>Cancel</button>
+                    <button :disabled="!isFormSubmittable">Save</button>
+                    <button>Delete</button>
+                </section>
+            </div>
         </form>
     </div>
 </template>

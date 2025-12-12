@@ -9,6 +9,7 @@ import { EMPTY_DATE, INVALID_DATE } from "./datePickerTypes";
 interface Props {
     idPrefix: string; // unique identifier for this date range picker
     dataTestPrefix?: string; // optional prefix for data-test attributes, defaults to idPrefix
+    useTime?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -131,6 +132,7 @@ defineExpose({ clearInvalidDates });
                 :data-datesync-enddate="`#${props.idPrefix}-end-date-input`"
                 :data-datepicker-initial-value="startDate"
                 data-datepicker-hide-timetable="true"
+                :data-datepicker-time="props.useTime || undefined"
             />
         </div>
         <div class="l-flex-col l-flex__item--1">
@@ -145,6 +147,7 @@ defineExpose({ clearInvalidDates });
                 :data-datesync-startdate="`#${props.idPrefix}-start-date-input`"
                 :data-datepicker-initial-value="endDate"
                 data-datepicker-hide-timetable="true"
+                :data-datepicker-time="props.useTime || undefined"
             />
         </div>
     </div>
