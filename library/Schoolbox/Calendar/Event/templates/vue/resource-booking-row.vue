@@ -2,6 +2,7 @@
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
+import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
 import type { Booking } from "./resourceBookingTypes";
 
 interface Props {
@@ -24,6 +25,7 @@ const isFormSubmittable = window.Vue.computed(() => {
     return !isProcessing.value && (!props.eventSeriesId || efficacy.value !== "");
 });
 const createEditBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("editBookingForm");
+const bookingNotes = window.Vue.ref<string>("");
 
 /**
  * @param toast The toast to update
@@ -122,6 +124,10 @@ function toggleEditForm(): void {
             @submit.prevent="postEditBookingForm()"
         >
             <date-range ref="dateRangeRef" id-prefix="resource-booking-row" :use-time="true" />
+            <div>
+                <label for="resource-booking-row-textarea">Notes</label>
+                <text-editor id="resource-booking-row-textarea" v-model:body="bookingNotes" />
+            </div>
             <div class="component-action">
                 <section>
                     <button>Cancel</button>
