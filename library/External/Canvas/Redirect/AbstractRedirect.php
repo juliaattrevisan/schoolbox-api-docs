@@ -28,10 +28,10 @@ class AbstractRedirect
     /**
      * Canvas course id is {folder_code}{parent_folder_code}
      *     options are:
-     * {class code} $folder->getCodeString()
-     * {year} $parentFolder->getCodeString()
+     * {folderCode} $folder->getCodeString()
+     * {parentCode} $parentFolder->getCodeString()
      */
-    protected string $courseIdFormat = '{class code}{year}';
+    protected string $courseIdFormat = '{folderCode}{parentCode}';
 
     /**
      * The column used to find canvas course in courses table
@@ -150,8 +150,8 @@ class AbstractRedirect
         $courseCode = strtr(
             $this->courseIdFormat, // now formattable string
             [
-                '{class code}' => $folder->getCodeString(),
-                '{year}' => $parentFolder->getCodeString()
+                '{folderCode}' => $folder->getCodeString(),
+                '{parentCode}' => $parentFolder->getCodeString()
             ]
         );
 
