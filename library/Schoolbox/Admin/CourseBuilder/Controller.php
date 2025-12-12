@@ -28,11 +28,12 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param ConfigMapper           $configMapper
-     * @param CourseConfigMapper     $courseConfigMapper
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @param RoleMapper             $roleMapper
-     * @param CourseTemplateMapper   $courseTemplateMapper
+     * @param ConfigMapper              $configMapper
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param HomepageTemplateMapper    $homepageTemplateMapper
+     * @param RoleMapper                $roleMapper
+     * @param CourseTemplateMapper      $courseTemplateMapper
+     * @param \Component_InstanceMapper $instanceMapper
      */
     public function __construct(
         private ConfigMapper $configMapper,
