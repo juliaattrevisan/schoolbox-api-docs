@@ -579,6 +579,37 @@ class Subnav
                     ],
                 ],
             ],
+            '/adminv2/differentiation' => [
+                'name'       => 'Differentiation',
+                'visible'    => (
+                    ($userIsSuperuser || $userHasServicePermissionPastoral || $userHasServicePermissionDifferentiationProfile) &&
+                    $this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED)
+                ),
+                'searchable' => false,
+                'children' => [
+                    '/adminv2/filters/differentiation/differentiationProfile' => [
+                        'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_DIFFERENTIATION_PROFILE),
+                        'visible'     =>
+                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
+                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                        'description' => 'Configure the default and available filter options on the differentiation profiles.',
+                    ],
+                    '/adminv2/lists/differentiation/adjustment-categories' => [
+                        'name'        => 'Lists - Adjustment Categories',
+                        'visible'     =>
+                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
+                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                        'description' => 'Adjustment categories.',
+                    ],
+                    '/adminv2/lists/differentiation/adjustment-levels' => [
+                        'name'        => 'Lists - Adjustment Levels',
+                        'visible'     =>
+                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
+                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                        'description' => 'Adjustment levels.',
+                    ],
+                ]
+            ],
             '/adminv2/pastoral' => [
                 'name'       => 'Pastoral Care',
                 'visible'    => (
@@ -597,13 +628,6 @@ class Subnav
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
                         'description' => 'Configure the default and available filter options on the class pastoral report.',
                     ],
-                    '/adminv2/filters/differentiation-profiles/differentiationProfile' => [
-                        'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_DIFFERENTIATION_PROFILE),
-                        'visible'     =>
-                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
-                        'description' => 'Configure the default and available filter options on the differentiation profiles.',
-                    ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
                         'visible'     => $userHasServicePermissionPastoral, // This page is only available to Pastoral Moderators
@@ -613,20 +637,6 @@ class Subnav
                         'name'        => 'Lists - Actions',
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
                         'description' => 'Setup the actions of pastoral records.',
-                    ],
-                    '/adminv2/lists/differentiation/adjustment-categories' => [
-                        'name'        => 'Lists - Adjustment Categories',
-                        'visible'     =>
-                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
-                        'description' => 'Adjustment categories.',
-                    ],
-                    '/adminv2/lists/differentiation/adjustment-levels' => [
-                        'name'        => 'Lists - Adjustment Levels',
-                        'visible'     =>
-                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
-                        'description' => 'Adjustment levels.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
                         'name'        => 'Lists - Record Severity',
