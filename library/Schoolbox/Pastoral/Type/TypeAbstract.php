@@ -51,6 +51,7 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     public const PASTORAL_3_MONTHS = '3 Months';
     public const PASTORAL_6_MONTHS = '6 Months';
     public const PASTORAL_12_MONTHS = '12 Months';
+    public const PASTORAL_14_MONTHS = '14 Months';
     public const PASTORAL_24_MONTHS = '24 Months';
     public const PASTORAL_CALENDAR_YEAR = 'Calendar Year';
     public const PASTORAL_ACADEMIC_PERIOD = 'Academic Period';
@@ -66,6 +67,7 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
         self::PASTORAL_3_MONTHS             => '3 months',
         self::PASTORAL_6_MONTHS             => '6 months',
         self::PASTORAL_12_MONTHS            => '12 months',
+        self::PASTORAL_14_MONTHS            => '14 months',
         self::PASTORAL_24_MONTHS            => '24 months',
         self::PASTORAL_CALENDAR_YEAR        => 'calendar year',
         self::PASTORAL_ACADEMIC_PERIOD      => 'academic period',
