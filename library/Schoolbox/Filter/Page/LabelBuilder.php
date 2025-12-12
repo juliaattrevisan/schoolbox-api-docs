@@ -63,7 +63,7 @@ class LabelBuilder
                 return 'Class Pastoral';
 
             case Model::PAGE_DIFFERENTIATION_PROFILE:
-                return 'Differentiation Profiles';
+                return 'Differentiation';
 
             default:
                 return '';
