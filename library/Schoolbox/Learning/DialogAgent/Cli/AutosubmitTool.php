@@ -196,6 +196,7 @@ HELP;
             AND da.duration > 0
             AND dar.submitted_at IS NULL
             AND dar.started_at IS NOT NULL
+            AND TIMESTAMPDIFF(SECOND, dar.started_at, NOW()) > da.duration
         ");
 
         $statement->execute();
@@ -203,17 +204,8 @@ HELP;
         $updateStatement = null;
 
         $n = 0;
-        $timer = new TimeTaken();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /* Check if it exceeded the duration allotted; if there's still time, just keep going
-             */
-            $startedAt = new \Alaress_Date_Format($row['started_at'], \Alaress_Date_Format::DATABASE_FORMAT);
-
-            if (!$timer->hasExceeded($startedAt, $row['duration'])) {
-                continue;
-            }
-
             $n++;
 
             /* Prepare a reusable query only if it was never set up previously
