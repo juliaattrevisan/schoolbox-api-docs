@@ -9,6 +9,7 @@ import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Participant, Routes } from "../js/types/customParticipationTypes";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
+import { hasCustomisation } from "../js/util/participantUtils";
 
 const props = defineProps<{
     routes: Routes;
@@ -36,7 +37,9 @@ function onBack(): void {
  * To use the suggested AI content and navigate to the appropriate activity page
  */
 async function onConfirm(): Promise<void> {
-    await includeParticipants([props.participant!]);
+    if (props.participant && hasCustomisation(props.participant)) {
+        await includeParticipants([props.participant]);
+    }
     proceedText.value = "Proceeding...";
     const studentId = props.participant?.user.id ?? null;
     if (typePicked.value === "modify") {
