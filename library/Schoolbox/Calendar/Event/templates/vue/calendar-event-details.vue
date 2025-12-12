@@ -14,7 +14,7 @@ import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
-import CevResourceBookingRow from "@schoolboxCalendarEvent/cev-resource-booking-row.vue";
+import ResourceBookingRow from "@schoolboxCalendarEvent/resource-booking-row.vue";
 
 const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
 const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm
@@ -25,7 +25,7 @@ export default {
     name: "event-details",
 
     components: {
-        CevResourceBookingRow,
+        ResourceBookingRow,
         AudiencesModal,
         MediaArticle,
         SearchSelect,
@@ -674,11 +674,11 @@ export default {
                 <div class="meta"></div>
                 <div class="content-section">
                     <div v-if="event.resourceBookings.length > 0">
-                        <cev-resource-booking-row
+                        <resource-booking-row
                             v-for="booking in event.resourceBookings"
                             :key="booking.id"
                             :eventId="event.id"
-                            :eventSeriesId="event.eventSeriesId"
+                            :eventSeriesId="event.seriesId"
                             :booking="booking"
                             :can-modify="canModify()"
                         />
