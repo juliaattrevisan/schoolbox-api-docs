@@ -15,6 +15,7 @@ import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
+import CevResourceBookingRow from "@schoolboxCalendarEvent/cev-resource-booking-row.vue";
 
 const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
 const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm
@@ -25,6 +26,7 @@ export default {
     name: "event-details",
 
     components: {
+        CevResourceBookingRow,
         AudiencesModal,
         MediaArticle,
         SearchSelect,
@@ -457,10 +459,6 @@ export default {
         showAddResourceBookingsModal() {
             this.$refs.addResourceBookingsModal.open();
         },
-
-        showEditResourceBookingModal(bookingId) {
-            this.$refs.editResourceBookingModal.open(bookingId);
-        },
     },
 };
 </script>
@@ -678,35 +676,12 @@ export default {
                 <div class="meta"></div>
                 <div class="content-section">
                     <div v-if="event.resourceBookings.length > 0">
-                        <div
+                        <cev-resource-booking-row
                             v-for="booking in event.resourceBookings"
                             :key="booking.id"
-                            class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
-                        >
-                            <div>
-                                <!-- Intentionally display the resource name here, not the booking name -->
-                                {{ booking.resource.name }}
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="label"
-                                    :class="{
-                                        pending: booking.status.isPending,
-                                        approved: booking.status.isApproved,
-                                        rejected: booking.status.isRejected,
-                                    }"
-                                    >{{ booking.status.name }}</span
-                                >
-                                <a
-                                    v-if="canModify()"
-                                    href="#"
-                                    class="icon-modify"
-                                    title="Modify Booking"
-                                    aria-label="Modify Booking"
-                                    @onclick.prevent="showEditResourceBookingModal(booking.id)"
-                                ></a>
-                            </div>
-                        </div>
+                            :booking="booking"
+                            :can-modify="canModify()"
+                        />
                     </div>
                 </div>
                 <edit-resource-booking-modal
