@@ -1,4 +1,5 @@
 -- Add a feature toggle for Advanced User Interface in Skin Config
+-- The toggle is currently hidden while we continue work on the feature
 SET
     @skin_config_id = (
         SELECT id
