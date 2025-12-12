@@ -123,7 +123,13 @@ function toggleEditForm(): void {
             class="top"
             @submit.prevent="postEditBookingForm()"
         >
-            <date-range ref="dateRangeRef" id-prefix="resource-booking-row" :use-time="true" />
+            <date-range
+                ref="dateRangeRef"
+                id-prefix="resource-booking-row"
+                :use-time="true"
+                :label-start="'From'"
+                :label-end="'Until'"
+            />
             <div>
                 <label for="resource-booking-row-textarea">Notes</label>
                 <text-editor id="resource-booking-row-textarea" v-model:body="bookingNotes" />
