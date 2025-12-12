@@ -9,6 +9,7 @@ import CourseBuilderDeleteModal from "./course-builder-delete-modal.vue";
 interface Props {
     courseTemplates: CourseTemplate[];
     availableTemplates: PageTemplate[];
+    availableUnitTemplates: PageTemplate[]; // only those page templates that have a course builder component assigned
     coursePermissions: Permissions;
     unitPermissions: Permissions;
     courseInherit: boolean;
@@ -27,13 +28,14 @@ const newRowAmount = window.Vue.ref(0);
  */
 function onAddNewRow(): void {
     const firstValidTemplate = props.availableTemplates.filter((template) => !template.deleted)[0];
+    const firstValidUnitTemplate = props.availableUnitTemplates.filter((template) => !template.deleted)[0];
 
     newRowAmount.value += 1;
     store.courseTemplates.push({
         id: -newRowAmount.value, // New rows are set with an ever increasing negative increment to mark them as new for the back end
         name: "",
         courseTemplate: firstValidTemplate,
-        unitTemplate: firstValidTemplate,
+        unitTemplate: firstValidUnitTemplate,
         sequence: store.courseTemplates.length, // default this to the end of the list (may need to actually set the sequence at some point)
     });
 }
@@ -52,6 +54,7 @@ window.Vue.onMounted(() => {
         props.unitPermissions,
         props.courseInherit,
         props.unitInherit,
+        props.availableUnitTemplates,
     );
 });
 </script>
@@ -72,7 +75,10 @@ window.Vue.onMounted(() => {
                         </div>
                     </header>
 
-                    <course-builder-rows :available-templates="props.availableTemplates" />
+                    <course-builder-rows
+                        :available-templates="props.availableTemplates"
+                        :available-unit-templates="props.availableUnitTemplates"
+                    />
 
                     <div class="component-action">
                         <section>

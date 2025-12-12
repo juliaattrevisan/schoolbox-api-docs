@@ -7,6 +7,7 @@ import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 
 interface Props {
     availableTemplates: PageTemplate[];
+    availableUnitTemplates: PageTemplate[];
 }
 
 const props = defineProps<Props>();
@@ -81,6 +82,14 @@ function clearNameValidationError(courseTemplate: CourseTemplate): void {
     courseTemplate.nameHasValidationError = undefined;
 }
 
+/**
+ * Clear the unit template validation error for a course
+ * @param courseTemplate - the course template to clear the validation error for
+ */
+function clearUnitTemplateValidationError(courseTemplate: CourseTemplate): void {
+    courseTemplate.unitTemplateHasValidationError = undefined;
+}
+
 const existingCourseTemplateCount = window.Vue.computed(() => {
     return store.courseTemplates.filter((courseTemplate) => courseTemplate.id >= 0).length;
 });
@@ -142,22 +151,37 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <div class="small-12 medium-3 column">
                             <strong class="hide-for-medium-up">Unit Page Template:</strong>
                             <div class="select-wrapper">
-                                <select v-model="element.unitTemplate" required>
-                                    <template v-for="availableTemplate in props.availableTemplates">
+                                <select
+                                    v-model="element.unitTemplate"
+                                    required
+                                    @change="clearUnitTemplateValidationError(element)"
+                                >
+                                    <option
+                                        v-if="!store.isUnitTemplateValid(element.unitTemplate?.id)"
+                                        disabled
+                                        selected
+                                        :value="element.unitTemplate"
+                                    >
+                                        Please select a template
+                                    </option>
+                                    <template v-for="availableUnitTemplate in props.availableUnitTemplates">
                                         <option
                                             v-if="
-                                                !availableTemplate.deleted ||
-                                                element.unitTemplate?.id === availableTemplate.id
+                                                !availableUnitTemplate.deleted ||
+                                                element.unitTemplate?.id === availableUnitTemplate.id
                                             "
-                                            :key="availableTemplate.id"
-                                            :value="availableTemplate"
-                                            :disabled="availableTemplate.deleted"
+                                            :key="availableUnitTemplate.id"
+                                            :value="availableUnitTemplate"
+                                            :disabled="availableUnitTemplate.deleted"
                                         >
-                                            {{ availableTemplate.name }}
-                                            <template v-if="availableTemplate.deleted">(Deleted)</template>
+                                            {{ availableUnitTemplate.name }}
+                                            <template v-if="availableUnitTemplate.deleted">(Deleted)</template>
                                         </option>
                                     </template>
                                 </select>
+                                <label v-if="element.unitTemplateHasValidationError" class="error">
+                                    This field is required.
+                                </label>
                             </div>
                         </div>
                     </div>

@@ -57,6 +57,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(HomepageTemplateMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getCourseTemplateMapper(),
+            $this->getMapperFactory()->get(\Component_InstanceMapper::class),
         );
     }
 

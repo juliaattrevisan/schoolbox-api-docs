@@ -13,6 +13,7 @@
             <course-builder
                 :course-templates = '{{ courseTemplates |json_encode }}'
                 :available-templates = '{{ availableTemplates |json_encode }}'
+                :available-unit-templates = '{{ availableUnitTemplates |json_encode }}'
                 :course-permissions = '{{ coursePermissions |json_encode }}'
                 :unit-permissions = '{{ unitPermissions |json_encode }}'
                 :course-inherit = '{{ courseInherit |json_encode }}'

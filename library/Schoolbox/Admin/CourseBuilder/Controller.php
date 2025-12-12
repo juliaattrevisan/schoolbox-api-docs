@@ -17,28 +17,31 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\ModelToArray as ModelToArray;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\HomepageTemplate;
-use Schoolbox\RoleMapper;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilder;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\RoleMapper;
 
 class Controller extends Base
 {
     /**
      * Constructor
      *
-     * @param ConfigMapper           $configMapper
-     * @param CourseConfigMapper     $courseConfigMapper
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @param RoleMapper             $roleMapper
-     * @param CourseTemplateMapper   $courseTemplateMapper
+     * @param ConfigMapper              $configMapper
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param HomepageTemplateMapper    $homepageTemplateMapper
+     * @param RoleMapper                $roleMapper
+     * @param CourseTemplateMapper      $courseTemplateMapper
+     * @param \Component_InstanceMapper $instanceMapper
      */
     public function __construct(
         private ConfigMapper $configMapper,
         private CourseConfigMapper $courseConfigMapper,
         private HomepageTemplateMapper $homepageTemplateMapper,
         private RoleMapper $roleMapper,
-        private CourseTemplateMapper $courseTemplateMapper
+        private CourseTemplateMapper $courseTemplateMapper,
+        private \Component_InstanceMapper $instanceMapper,
     ) {
     }
 
@@ -63,18 +66,43 @@ class Controller extends Base
             $unitPermissions[$role->getId()] = $unit->getBy('roleId', $role->getId())?->getPermission() ?? -1;
         }
 
+        $pb = $this->instanceMapper->getPredicateBuilder();
+
+        $pb->all(
+            $this->instanceMapper
+                ->getPredicateBuilder()
+                ->equals('component_instance.module', \Component_Definition::MODULE_HOMEPAGE_TEMPLATE)
+                ->rawWhere("
+                component_instance.component_definition_id = (SELECT cd.id FROM component_definition cd
+                WHERE cd.class = :courseBuilderPath LIMIT 1)
+            ", [':courseBuilderPath' => CourseBuilder::class])
+        );
+
+        $courseBuilder = $this->instanceMapper->findByPredicates($pb);
+
         $templates[] = [
             'id'        => HomepageTemplate::HOMEPAGE_NONE,
             'name'      => HomepageTemplate::NONE_STRING,
             'deleted'   => false,
         ];
-        foreach ($this->homepageTemplateMapper->findAll(['deleted' => true])->sortBy("name", "asc") as $template) {
+
+        foreach (
+            $this->homepageTemplateMapper->findAll(['deleted' => true])->sortBy("name", "asc") as $template
+        ) {
             $templates[] = [
                 'id'        => $template->getId(),
                 'name'      => $template->getName(),
                 'deleted'   => $template->isDeleted(),
             ];
         }
+
+        $courseBuilderTemplateIds = $courseBuilder->getPropertyValues('identifier');
+        $availableUnitTemplates = array_merge(
+            array_filter(
+                $templates,
+                fn(array $template) => in_array($template['id'], $courseBuilderTemplateIds)
+            )
+        );
 
         // Render this thing out
         $this->response = $this->responseFromTemplate(
@@ -86,6 +114,7 @@ class Controller extends Base
                 'coursePermissions' => $coursePermissions,
                 'unitPermissions' => $unitPermissions,
                 'availableTemplates' => $templates,
+                'availableUnitTemplates' => $availableUnitTemplates,
                 'courseTemplates'   => $this->courseTemplateMapper->findAll()->reindex()->map(new ModelToArray()),
                 'courseInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 'unitInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit')
