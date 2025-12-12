@@ -280,6 +280,12 @@ class Controller extends Base
          */
         $yearLevels = $this->yearLevelMapper->findAll();
 
+        // Apply terminology translation to date presets
+        $datePresets = PastoralReport::RELATIVE_DATE_PRESETS;
+        if (isset($datePresets[PastoralReport::ACADEMIC_PERIOD])) {
+            $datePresets[PastoralReport::ACADEMIC_PERIOD] = $this->l10n->translate('term', false, true);
+        }
+
         //This is fudged using the same audience screen from the record. So to get the saved records to display, it is easiest to attach them to $record
         $fakeRecord                         = [];
         $fakeRecord['id']                   = "fakeId";
@@ -311,7 +317,7 @@ class Controller extends Base
                 'actionsSelected'      => $actionsSelected,
                 'foldersSelected'      => $foldersSelected,
                 'report'               => $report,
-                'datePresets'          => PastoralReport::RELATIVE_DATE_PRESETS,
+                'datePresets'          => $datePresets,
                 'selectedRelativeDate' => $report->getRelativeDateString(),
                 'record'               => $fakeRecord,
                 'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
