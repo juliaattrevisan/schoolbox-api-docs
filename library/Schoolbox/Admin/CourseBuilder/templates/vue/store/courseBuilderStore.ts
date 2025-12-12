@@ -118,6 +118,11 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         try {
             // Ensure all course template names are not empty, otherwise set .hasNameValidationError on the courseTemplate
             let allTemplatesHaveNames = true;
+            let allUnitTemplatesValid = true;
+
+            // Get valid unit template IDs
+            const validUnitTemplateIds = availableUnitTemplates.value.map((ut) => ut.id);
+
             courseTemplates.value.forEach((ct, index) => {
                 // resequence before sending to backend...
                 ct.sequence = index;
@@ -126,9 +131,15 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                     ct.nameHasValidationError = true;
                     allTemplatesHaveNames = false;
                 }
+
+                // Check if the unitTemplate.id is defined or not within availableUnitTemplates
+                if (ct.unitTemplate.id === undefined || !validUnitTemplateIds.includes(ct.unitTemplate.id)) {
+                    ct.unitTemplateHasValidationError = true;
+                    allUnitTemplatesValid = false;
+                }
             });
 
-            if (!allTemplatesHaveNames) {
+            if (!allTemplatesHaveNames || !allUnitTemplatesValid) {
                 return;
             }
 

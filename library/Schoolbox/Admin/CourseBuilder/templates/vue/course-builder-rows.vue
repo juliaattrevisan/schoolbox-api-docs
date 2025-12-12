@@ -82,6 +82,14 @@ function clearNameValidationError(courseTemplate: CourseTemplate): void {
     courseTemplate.nameHasValidationError = undefined;
 }
 
+/**
+ * Clear the unit template validation error for a course
+ * @param courseTemplate - the course template to clear the validation error for
+ */
+function clearUnitTemplateValidationError(courseTemplate: CourseTemplate): void {
+    courseTemplate.unitTemplateHasValidationError = undefined;
+}
+
 const existingCourseTemplateCount = window.Vue.computed(() => {
     return store.courseTemplates.filter((courseTemplate) => courseTemplate.id >= 0).length;
 });
@@ -143,7 +151,11 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                         <div class="small-12 medium-3 column">
                             <strong class="hide-for-medium-up">Unit Page Template:</strong>
                             <div class="select-wrapper">
-                                <select v-model="element.unitTemplate" required>
+                                <select
+                                    v-model="element.unitTemplate"
+                                    required
+                                    @change="clearUnitTemplateValidationError(element)"
+                                >
                                     <template v-for="availableUnitTemplate in props.availableUnitTemplates">
                                         <option
                                             v-if="
@@ -159,6 +171,9 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                         </option>
                                     </template>
                                 </select>
+                                <label v-if="element.unitTemplateHasValidationError" class="error">
+                                    This field is required.
+                                </label>
                             </div>
                         </div>
                     </div>
