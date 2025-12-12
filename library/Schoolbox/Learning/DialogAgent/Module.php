@@ -136,6 +136,17 @@ class Module extends BaseModule
             }
         });
 
+        $isFeedbackRequired = new Rule\Callback(function (array $params): void {
+            /** @var DialogAgent\Model $assessment */
+            $assessment = $params['assessment'];
+
+            $participant = $assessment->getParticipant($params['student']);
+
+            if (!$assessment->isFeedbackRequired($participant)) {
+                throw new Unauthorized('Feedback is not required for this participant');
+            }
+        });
+
         /**
          * For a learner to be able to interact with a response, they must meet the canonical "can submit" criteria,
          * and the response must be authoritative.
@@ -253,7 +264,10 @@ class Module extends BaseModule
         /* Generate feedback for a particular dialog agent response
          */
         $this->register('POST', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'postGenerateFeedback', new Rule\All(
-            $canWrite,
+            $canViewResponse,
+            $isAIFeatureEnabled,
+            $isAuthoritativeResponse,
+            $isFeedbackRequired,
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
     }
