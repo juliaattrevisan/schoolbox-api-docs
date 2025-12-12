@@ -517,6 +517,7 @@ class Controller extends BaseController
     {
         return match ($page) {
             'classPastoral' => 'Pastoral',
+            'differentiationProfile' => 'DifferentiationProfile',
             'assessmentCal',
             'classMarkbook',
             'courseMarkbook',

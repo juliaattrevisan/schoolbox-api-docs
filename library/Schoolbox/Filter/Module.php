@@ -91,9 +91,9 @@ class Module extends AlaressModule
         $this->register('POST', '/pastoral/{page:classPastoral}/pushDefaultSelections', 'postPushDefaultSelectionsPastoral', $rulePastoral, $loadFactoryFactory);
 
         // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
-        $this->register('GET', '/differentiation-profiles/{page:differentiationProfile}', 'getPageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
-        $this->register('POST', '/differentiation-profiles/{page:differentiationProfile}', 'postSavePageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
-        $this->register('POST', '/differentiation-profiles/{page:differentiationProfile}/pushDefaultSelections', 'postPushDefaultSelectionsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
+        $this->register('GET', '/differentiation/{page:differentiationProfile}', 'getPageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
+        $this->register('POST', '/differentiation/{page:differentiationProfile}', 'postSavePageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
+        $this->register('POST', '/differentiation/{page:differentiationProfile}/pushDefaultSelections', 'postPushDefaultSelectionsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
         $pagesRegex = '(assessmentCal|classMarkbook|courseMarkbook|dueWorkCal|grades|pending|rubricMarkbook)';
