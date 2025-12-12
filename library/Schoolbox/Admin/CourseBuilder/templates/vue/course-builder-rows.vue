@@ -165,7 +165,12 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                     required
                                     @change="clearUnitTemplateValidationError(element)"
                                 >
-                                    <option v-if="!isUnitTemplateValid(element.unitTemplate?.id)" disabled selected>
+                                    <option
+                                        v-if="!isUnitTemplateValid(element.unitTemplate?.id)"
+                                        disabled
+                                        selected
+                                        :value="element.unitTemplate"
+                                    >
                                         Please select a template
                                     </option>
                                     <template v-for="availableUnitTemplate in props.availableUnitTemplates">
