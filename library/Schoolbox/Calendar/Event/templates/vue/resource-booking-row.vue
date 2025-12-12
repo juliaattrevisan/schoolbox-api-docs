@@ -17,7 +17,7 @@ const props = defineProps<Props>();
  */
 type EditBookingResponse = { success: boolean };
 
-const isModalOpen = window.Vue.ref<boolean>(true);
+const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
 const efficacy = window.Vue.ref<string>("");
 const isFormSubmittable = window.Vue.computed(() => {
@@ -31,7 +31,7 @@ const createEditBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("edit
  */
 function open(bookingId: number): void {
     // TODO: Open the modal matching this id somehow.
-    isModalOpen.value = true;
+    isEditFormOpen.value = true;
     efficacy.value = "";
 }
 
@@ -82,16 +82,23 @@ async function postEditBookingForm(): Promise<void> {
             updateToastAndRefreshPage(toast, responseData);
         } else {
             toast.timeout({ text: "Unable to create booking(s).", isSuccess: false });
-            isModalOpen.value = false; // Close the modal after an error.
+            isEditFormOpen.value = false; // Close the modal after an error.
         }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         toast.timeout({ text: `Unable to create booking(s). ${message}`, isSuccess: false });
         console.warn(error);
-        isModalOpen.value = false; // Close the modal after an error.
+        isEditFormOpen.value = false; // Close the modal after an error.
     } finally {
         isProcessing.value = false;
     }
+}
+
+/**
+ *
+ */
+function toggleEditForm(): void {
+    isEditFormOpen.value = !isEditFormOpen.value;
 }
 </script>
 
@@ -111,10 +118,17 @@ async function postEditBookingForm(): Promise<void> {
                 }"
                 >{{ booking.status.name }}</span
             >
-            <a v-if="canModify" href="#" class="icon-modify" title="Modify Booking" aria-label="Modify Booking"></a>
+            <a
+                v-if="canModify"
+                href="#"
+                class="icon-modify"
+                title="Modify Booking"
+                aria-label="Modify Booking"
+                @click.prevent="toggleEditForm()"
+            ></a>
         </div>
     </div>
-    <div>
+    <div v-if="isEditFormOpen">
         <form
             ref="editBookingForm"
             method="post"
