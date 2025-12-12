@@ -159,6 +159,6 @@ class Admin extends ModuleLoader
 
         /* Learner Profiles
          */
-        $this->loadModule($di, \Schoolbox\Admin\DifferentiationProfiles\Module::class, '/adminv2/pastoral/differentiation-profiles');
+        $this->loadModule($di, \Schoolbox\Admin\DifferentiationProfiles\Module::class, '/adminv2/differentiation/differentiation-profiles');
     }
 }
