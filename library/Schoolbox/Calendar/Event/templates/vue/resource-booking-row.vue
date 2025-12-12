@@ -125,7 +125,7 @@ function toggleEditForm(): void {
             <div class="component-action">
                 <section>
                     <button>Cancel</button>
-                    <button :disabled="!isFormSubmittable">Save</button>
+                    <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
                     <button>Delete</button>
                 </section>
             </div>
