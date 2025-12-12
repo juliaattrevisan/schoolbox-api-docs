@@ -54,8 +54,8 @@
                  # Note that css currently enforces text-transform:lowercase on everything here inside .legend
                  #}
                 {% set submitTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
-                {% set markedTitleSuffix = 'feedback generation' -%}
-                {% set markedPastTense = 'evaluated' %}
+                {% set markedTitleSuffix = 'processing' -%}
+                {% set markedPastTense = 'feedback provided' %}
             {%- else -%}
                 {% set submitTitleSuffix = '' -%}
                 {% set markedTitleSuffix = '' -%}

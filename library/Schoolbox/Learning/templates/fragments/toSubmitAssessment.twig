@@ -47,9 +47,9 @@
      # Note that css currently enforces text-transform:lowercase on everything here inside .legend
      #}
     {%- set submitTitleSuffix    = 'completed this ' ~ locale.dialogAgent -%}
-    {%- set markedTitleSuffix    = 'feedback generation' -%}
+    {%- set markedTitleSuffix    = 'processing' -%}
     {%- set noResultsTitleSuffix = 'completed this ' ~ locale.dialogAgent -%}
-    {% set markedPastTense = 'evaluated' %}
+    {% set markedPastTense = 'feedback provided' %}
 {%- endif -%}
 
 {# Round the percentage values to prevent things like '66.666666%' being displayed. #}
