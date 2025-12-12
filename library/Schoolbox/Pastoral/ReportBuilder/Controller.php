@@ -858,7 +858,7 @@ class Controller extends Base
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
             $afterDate  = $report->getAfterDate();
-        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
+        } elseif ($report->getRelativeDateString() === PastoralReport::ACADEMIC_PERIOD) {
             $currentTerm = $this->termMapper->findForToday();
             $beforeDate  = $currentTerm->getActualFinish();
             $afterDate   = $currentTerm->getStart();

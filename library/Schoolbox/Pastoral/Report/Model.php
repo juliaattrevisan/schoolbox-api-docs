@@ -79,7 +79,7 @@ class Model implements ISoftDeletable
     public const THIS_YEAR        = 'first day of january';
     public const THIS_SCHOOL_YEAR = 'first day of school year';
     public const PAST_FORTNIGHT   = '14 days ago';
-    public const THIS_TERM        = 'this term'; // this is the only one that isn't a strtotime string
+    public const ACADEMIC_PERIOD  = 'academic period'; // this is the only one that isn't a strtotime string
     public const TODAY            = 'today';
     public const PAST_6_MONTHS    = '6 months ago';
     public const PAST_3_MONTHS    = '3 months ago';
@@ -90,7 +90,7 @@ class Model implements ISoftDeletable
     public const RELATIVE_DATE_PRESETS = [
         self::THIS_YEAR        => 'This year',
         self::THIS_SCHOOL_YEAR => 'This school year',
-        self::THIS_TERM        => 'This term',
+        self::ACADEMIC_PERIOD  => 'This term',
         self::PAST_6_MONTHS    => 'Past 6 months',
         self::PAST_3_MONTHS    => 'Past 3 months',
         self::PAST_MONTH       => 'Past month',
