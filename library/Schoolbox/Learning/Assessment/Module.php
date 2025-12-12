@@ -237,7 +237,11 @@ class Module extends BaseModule
                     $param['assessment'] instanceof Quiz ||
                     $param['assessment'] instanceof DialogAgent
                 ) {
-                    throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                    throw new Unauthorized(sprintf(
+                        '"%s" (%s) cannot be copied via custom participation',
+                        $param['assessment']->getTitle(),
+                        $assessmentType
+                    ));
                 }
             }),
         );
