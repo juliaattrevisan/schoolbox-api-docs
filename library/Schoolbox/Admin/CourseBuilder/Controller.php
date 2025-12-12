@@ -98,7 +98,6 @@ class Controller extends Base
 
         $courseBuilderTemplateIds = $courseBuilder->getPropertyValues('identifier');
         $availableUnitTemplates = array_merge(
-            [''], //Empty state dropdown
             array_filter(
                 $templates,
                 fn(array $template) => in_array($template['id'], $courseBuilderTemplateIds)
