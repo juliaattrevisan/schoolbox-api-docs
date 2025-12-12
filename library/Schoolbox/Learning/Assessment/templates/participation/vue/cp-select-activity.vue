@@ -1,11 +1,14 @@
 <script setup lang="ts">
 /**
- *
+ * To select the type of customisation to apply for a participant
+ * when acting on the suggested customisation
  */
 
 import locale from "@js/terminology/rosettaStone";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import type { Participant, Routes } from "../js/types/customParticipationTypes";
+import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 
 const props = defineProps<{
     routes: Routes;
@@ -19,6 +22,8 @@ const emit = defineEmits<{
 
 const typePicked = window.Vue.ref("modify"); // to track the type of customisation picked
 const proceedText = window.Vue.ref("Proceed");
+const loadError = window.Vue.ref<string | null>(null);
+const { includeParticipants } = useIncludeParticipant(loadError);
 
 /**
  * To go back to viewing the suggested customisation
@@ -30,7 +35,8 @@ function onBack(): void {
 /**
  * To use the suggested AI content and navigate to the appropriate activity page
  */
-function onConfirm(): void {
+async function onConfirm(): Promise<void> {
+    await includeParticipants([props.participant!]);
     proceedText.value = "Proceeding...";
     const studentId = props.participant?.user.id ?? null;
     if (typePicked.value === "modify") {
@@ -48,36 +54,37 @@ function onConfirm(): void {
         <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
             <h2>Select Customisation</h2>
         </div>
-        <div>
-            <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
-                <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
-                <ul class="option-list">
-                    <li>
-                        <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
-                        <label for="cp-modify">
-                            <span class="icon-modify f-no-icon-color">
-                                Modify Existing {{ locale.activity.translate(false, true) }}
-                            </span>
-                        </label>
-                    </li>
-                    <li>
-                        <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
-                        <label for="cp-copy">
-                            <span class="icon-copy f-no-icon-color">
-                                Create Copy of {{ locale.activity.translate(false, true) }}
-                            </span>
-                        </label>
-                    </li>
-                    <li>
-                        <input id="cp-new" v-model="typePicked" type="radio" value="new" />
-                        <label for="cp-new">
-                            <span class="icon-submissions f-no-icon-color">
-                                Create New {{ locale.activity.translate(false, true) }}
-                            </span>
-                        </label>
-                    </li>
-                </ul>
-            </fieldset>
+        <fieldset class="checklist u-no-border l-pad--0 f-no-margins">
+            <legend class="t-visually-hidden">Choose the type of customisation to apply:</legend>
+            <ul class="option-list">
+                <li>
+                    <input id="cp-modify" v-model="typePicked" type="radio" value="modify" />
+                    <label for="cp-modify">
+                        <span class="icon-modify f-no-icon-color">
+                            Modify Existing {{ locale.activity.translate(false, true) }}
+                        </span>
+                    </label>
+                </li>
+                <li>
+                    <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
+                    <label for="cp-copy">
+                        <span class="icon-copy f-no-icon-color">
+                            Create Copy of {{ locale.activity.translate(false, true) }}
+                        </span>
+                    </label>
+                </li>
+                <li>
+                    <input id="cp-new" v-model="typePicked" type="radio" value="new" />
+                    <label for="cp-new">
+                        <span class="icon-submissions f-no-icon-color">
+                            Create New {{ locale.activity.translate(false, true) }}
+                        </span>
+                    </label>
+                </li>
+            </ul>
+        </fieldset>
+        <div v-if="loadError">
+            <request-error :further-info="loadError" />
         </div>
         <div class="l-flex l-gap-xs f-no-margins">
             <button class="button l-flex__item--1" data-test="" @click.prevent="onBack">Back</button>
