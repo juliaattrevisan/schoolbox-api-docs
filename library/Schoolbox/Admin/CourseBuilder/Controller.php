@@ -17,10 +17,11 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\ModelToArray as ModelToArray;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Resource\HomepageTemplate;
-use Schoolbox\RoleMapper;
+use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilder;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
+use Schoolbox\RoleMapper;
 
 class Controller extends Base
 {
@@ -64,12 +65,35 @@ class Controller extends Base
             $unitPermissions[$role->getId()] = $unit->getBy('roleId', $role->getId())?->getPermission() ?? -1;
         }
 
+        $pb = $this->instanceMapper->getPredicateBuilder();
+
+        $pb->all(
+            $this->instanceMapper
+                ->getPredicateBuilder()
+                ->equals('component_instance.module', \Component_Definition::MODULE_HOMEPAGE_TEMPLATE)
+                ->rawWhere("
+                component_instance.component_definition_id = (SELECT cd.id FROM component_definition cd
+                WHERE cd.class = :courseBuilderPath LIMIT 1)
+            ", [':courseBuilderPath' => CourseBuilder::class])
+        );
+
+        $courseBuilder = $this->instanceMapper->findByPredicates($pb);
+
+        /* Empty state
+         */
+        $templates[] = '';
+
         $templates[] = [
             'id'        => HomepageTemplate::HOMEPAGE_NONE,
             'name'      => HomepageTemplate::NONE_STRING,
             'deleted'   => false,
         ];
-        foreach ($this->homepageTemplateMapper->findAll(['deleted' => true])->sortBy("name", "asc") as $template) {
+
+        foreach (
+            $this->homepageTemplateMapper->findByColumn(
+                'id',
+                $courseBuilder->getPropertyValues('identifier'),
+                ['deleted' => true])->sortBy("name", "asc") as $template) {
             $templates[] = [
                 'id'        => $template->getId(),
                 'name'      => $template->getName(),
