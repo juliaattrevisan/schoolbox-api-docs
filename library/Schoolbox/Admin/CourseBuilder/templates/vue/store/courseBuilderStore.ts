@@ -51,6 +51,16 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     }
 
     /**
+     * Check if a unit template ID is valid (exists in available unit templates)
+     * @param unitTemplateId - the unit template ID to check
+     * @returns true if the unit template ID exists in availableUnitTemplates
+     */
+    function isUnitTemplateValid(unitTemplateId: number | undefined): boolean {
+        if (unitTemplateId === undefined) return false;
+        return availableUnitTemplates.value.some((ut) => ut.id === unitTemplateId);
+    }
+
+    /**
      * Deletes the currently selected course template
      * @param courseTemplate - the course template to delete
      */
@@ -120,9 +130,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
             let allTemplatesHaveNames = true;
             let allUnitTemplatesValid = true;
 
-            // Get valid unit template IDs
-            const validUnitTemplateIds = availableUnitTemplates.value.map((ut) => ut.id);
-
             courseTemplates.value.forEach((ct, index) => {
                 // resequence before sending to backend...
                 ct.sequence = index;
@@ -132,8 +139,8 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
                     allTemplatesHaveNames = false;
                 }
 
-                // Check if the unitTemplate.id is defined or not within availableUnitTemplates
-                if (ct.unitTemplate.id === undefined || !validUnitTemplateIds.includes(ct.unitTemplate.id)) {
+                // Validate that the unitTemplate.id is within availableUnitTemplates
+                if (!isUnitTemplateValid(ct.unitTemplate?.id)) {
                     ct.unitTemplateHasValidationError = true;
                     allUnitTemplatesValid = false;
                 }
@@ -194,9 +201,11 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         unitPermissions,
         courseInherit,
         unitInherit,
+        availableUnitTemplates,
         courseTemplateToDelete,
         updateCourseTemplate,
         deleteCourseTemplate,
+        isUnitTemplateValid,
         saveChanges,
         resequenceField,
     };
