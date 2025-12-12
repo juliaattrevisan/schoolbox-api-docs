@@ -252,7 +252,7 @@ class Module extends BaseModule
 
         /* Generate feedback for a particular dialog agent response
          */
-        $this->register('GET', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'getGenerateFeedback', new Rule\All(
+        $this->register('POST', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'postGenerateFeedback', new Rule\All(
             $canWrite,
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
@@ -510,6 +510,8 @@ class Module extends BaseModule
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy $responseMapperProxy */
         $responseMapperProxy = $this->injector->get('dialogAgentResponseDataSource');
 
+        $baseUrl = new \Schoolbox\Url\Factory($this->getConfig())->buildFullyQualified();
+
         return new Controller(
             new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
                 $this->getRouter()->getGenerator(),
@@ -517,6 +519,10 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Access::class),
             ),
             $assessmentMapperProxy,
+            $baseUrl,
+            $this->injector->get('httpFactory'),
+            $this->injector->get('taskd.httpRequestMessageFactory'),
+            $this->injector->get('taskd.messageProducer'),
             $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(AILogMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),

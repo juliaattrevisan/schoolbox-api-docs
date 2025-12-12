@@ -13,6 +13,8 @@ namespace Schoolbox\Learning\DialogAgent;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Ramsey\Uuid\Uuid;
 use Aura\Router\Exception\RouteNotFound;
@@ -38,6 +40,8 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
 use Twig\Error\Error;
 
@@ -54,6 +58,10 @@ class Controller extends Base
      *
      * @param BreadcrumbFactory $bakery
      * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param UriInterface $baseUrl This Schoolbox instance's base URL: required for sending a polling task to the task daemon.
+     * @param RequestFactoryInterface $httpFactory A HTTP request factory: required for creating requests to send to the task daemon.
+     * @param MessageFactory $messageFactory A message factory: used to create the message to send to the task daemon.
+     * @param Producer $messageProducer Used to send messages to the task daemon once built.
      * @param OpenAI\ClientFactory $aiClientFactory
      * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
@@ -65,6 +73,10 @@ class Controller extends Base
     public function __construct(
         private BreadcrumbFactory $bakery,
         private AssessmentMapperProxy $assessmentMapperProxy,
+        private UriInterface $baseUrl,
+        private RequestFactoryInterface $httpFactory,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
         private OpenAI\ClientFactory $aiClientFactory,
         private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
@@ -519,6 +531,27 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
+        /** Set up and send off a task daemon job to generate the feedback for this response */
+        $route = $this->routeGenerator->generate(
+            'learningDialogAgent.postGenerateFeedback',
+            [
+                'assessmentId' => $assessment->getId(),
+                'studentId' => $student->getId(),
+                'responseId' => $response->getId(),
+            ],
+        );
+
+        $request = $this->httpFactory
+            ->createRequest('POST', $this->baseUrl->withPath($route))
+            ->withHeader('accept', 'application/json');
+
+        $message = $this->messageFactory
+            ->setUser($this->getUser())
+            ->setRequest($request)
+            ->build();
+
+        $this->messageProducer->send($message, maxRequeues: 10);
+
         /** Respond as JSON with a consistent translated response data */
         $this->getStatus($response);
     }
@@ -752,6 +785,7 @@ class Controller extends Base
 
     /**
      * Generate feedback for a particular dialog agent response
+     * This route is called by the task daemon after a response is submitted by a user or by the cron
      *
      * @param DialogAgent $assessment
      * @param User $student
@@ -759,11 +793,8 @@ class Controller extends Base
      * @return void
      * @throws ClientExceptionInterface
      */
-    public function getGenerateFeedback(DialogAgent $assessment, User $student, Response $response): void
+    public function postGenerateFeedback(DialogAgent $assessment, User $student, Response $response): void
     {
-        // TODO: This should be a POST and actually persist the feedback. The frontend never needs this return data
-        // TODO: Move this where it's most relevant
-
         $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
         $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
