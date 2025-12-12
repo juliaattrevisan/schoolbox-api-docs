@@ -90,6 +90,15 @@ function clearUnitTemplateValidationError(courseTemplate: CourseTemplate): void 
     courseTemplate.unitTemplateHasValidationError = undefined;
 }
 
+/**
+ * Check if a unit template ID is valid (exists in available unit templates)
+ * @param unitTemplateId - the unit template ID to check
+ * @returns true if the unit template ID exists in availableUnitTemplates
+ */
+function isUnitTemplateValid(unitTemplateId: number): boolean {
+    return props.availableUnitTemplates.some((ut) => ut.id === unitTemplateId);
+}
+
 const existingCourseTemplateCount = window.Vue.computed(() => {
     return store.courseTemplates.filter((courseTemplate) => courseTemplate.id >= 0).length;
 });
@@ -156,6 +165,9 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                                     required
                                     @change="clearUnitTemplateValidationError(element)"
                                 >
+                                    <option v-if="!isUnitTemplateValid(element.unitTemplate?.id)" disabled selected>
+                                        Please select a template
+                                    </option>
                                     <template v-for="availableUnitTemplate in props.availableUnitTemplates">
                                         <option
                                             v-if="
