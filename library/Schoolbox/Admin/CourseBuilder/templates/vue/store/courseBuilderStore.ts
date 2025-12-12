@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { CourseTemplate, Permissions } from "../courseBuilderTypes";
+import type { CourseTemplate, PageTemplate, Permissions } from "../courseBuilderTypes";
 
 export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     const courseTemplates = window.Vue.ref<CourseTemplate[]>([]); // Current state of the course templates
@@ -7,6 +7,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     const unitPermissions = window.Vue.ref<Permissions>({});
     const courseInherit = window.Vue.ref<boolean>(false);
     const unitInherit = window.Vue.ref<boolean>(false);
+    const availableUnitTemplates = window.Vue.ref<PageTemplate[]>([]); // only those page templates that have a course builder component assigned
 
     const courseTemplateToDelete = window.Vue.ref<CourseTemplate | null>(null); // The course template to delete, when set - the delete modal will open
 
@@ -20,6 +21,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      * @param $unitPermissions - the unit permissions
      * @param $courseInherit - the course inherit
      * @param $unitInherit - the unit inherit
+     * @param $availableUnitTemplates - the available unit templates
      */
     function init(
         $courseTemplates: CourseTemplate[],
@@ -27,12 +29,14 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         $unitPermissions: Permissions,
         $courseInherit: boolean,
         $unitInherit: boolean,
+        $availableUnitTemplates: PageTemplate[],
     ): void {
         courseTemplates.value = $courseTemplates;
         coursePermissions.value = $coursePermissions;
         unitPermissions.value = $unitPermissions;
         courseInherit.value = $courseInherit;
         unitInherit.value = $unitInherit;
+        availableUnitTemplates.value = $availableUnitTemplates;
     }
 
     /**

@@ -9,7 +9,7 @@ import CourseBuilderDeleteModal from "./course-builder-delete-modal.vue";
 interface Props {
     courseTemplates: CourseTemplate[];
     availableTemplates: PageTemplate[];
-    availableUnitTemplates: PageTemplate[];
+    availableUnitTemplates: PageTemplate[]; // only those page templates that have a course builder component assigned
     coursePermissions: Permissions;
     unitPermissions: Permissions;
     courseInherit: boolean;
@@ -53,6 +53,7 @@ window.Vue.onMounted(() => {
         props.unitPermissions,
         props.courseInherit,
         props.unitInherit,
+        props.availableUnitTemplates,
     );
 });
 </script>
