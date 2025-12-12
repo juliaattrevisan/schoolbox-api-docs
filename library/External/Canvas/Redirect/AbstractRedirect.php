@@ -26,9 +26,12 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class AbstractRedirect
 {
     /**
-     * Canvas course id is <folder_code><parent_folder_code>
+     * Canvas course id is {folder_code}{parent_folder_code}
+     *     options are:
+     * {class code} $folder->getCodeString()
+     * {year} $parentFolder->getCodeString()
      */
-    protected string $courseIdFormat = '%s%s';
+    protected string $courseIdFormat = '{class code}{year}';
 
     /**
      * The column used to find canvas course in courses table
@@ -144,10 +147,12 @@ class AbstractRedirect
      */
     public function getCanvasCourseId(Folder $folder, Folder $parentFolder): ?int
     {
-        $courseCode = sprintf(
-            $this->courseIdFormat,
-            $folder->getCodeString(),
-            $parentFolder->getCodeString()
+        $courseCode = strtr(
+            $this->courseIdFormat, // now formattable string
+            [
+                '{class code}' => $folder->getCodeString(),
+                '{year}' => $parentFolder->getCodeString()
+            ]
         );
 
         /* Find out if $folderCode exists in canvas as a course identifier

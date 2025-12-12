@@ -34,7 +34,7 @@ class Redirect extends AbstractRedirect
     /**
      * Canvas course id is <year> <course> <class suffix>
      */
-    protected string $courseIdFormat = '%s %s';
+    protected string $courseIdFormat = '{year} {class code}';
 
     /**
      * The column used to find canvas course in course table

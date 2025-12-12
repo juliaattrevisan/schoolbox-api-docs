@@ -19,7 +19,7 @@ class Redirect extends AbstractRedirect
     /**
      * Canvas course id is <folder_code>_<parent_folder_code>
      */
-    protected string $courseIdFormat = '%s_%s';
+    protected string $courseIdFormat = '{class code}_{year}';
 
     /**
      * The column used to find canvas course in course table
