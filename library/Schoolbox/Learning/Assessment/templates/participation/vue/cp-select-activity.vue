@@ -68,7 +68,7 @@ async function onConfirm(): Promise<void> {
                         </span>
                     </label>
                 </li>
-                <li>
+                <li v-if="props.routes.getAssessmentParticipationCopyActivity">
                     <input id="cp-copy" v-model="typePicked" type="radio" value="copy" />
                     <label for="cp-copy">
                         <span class="icon-copy f-no-icon-color">
