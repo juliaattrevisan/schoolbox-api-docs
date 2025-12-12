@@ -37,10 +37,10 @@ function onBack(): void {
  * To use the suggested AI content and navigate to the appropriate activity page
  */
 async function onConfirm(): Promise<void> {
+    proceedText.value = "Proceeding...";
     if (props.participant && hasCustomisation(props.participant)) {
         await includeParticipants([props.participant]);
     }
-    proceedText.value = "Proceeding...";
     const studentId = props.participant?.user.id ?? null;
     if (typePicked.value === "modify") {
         window.location.href = `${props.routes.getLearningPlanNewUrl}?student=${studentId}&${getReturnUrl()}`;
