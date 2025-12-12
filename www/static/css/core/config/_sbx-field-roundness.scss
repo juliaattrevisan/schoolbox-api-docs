@@ -5,7 +5,7 @@
  */
 
 :root {
-    --sbx-config-field-roundess: var(--sbx-border-radius-normal);
+    --sbx-config-field-roundness: var(--sbx-border-radius-normal);
 }
 
 .sbx-body {
@@ -49,6 +49,6 @@
     .selector label::after,
     .progress,
     .progress .meter {
-        border-radius: var(--sbx-config-field-roundess) !important;
+        border-radius: var(--sbx-config-field-roundness) !important;
     }
 }

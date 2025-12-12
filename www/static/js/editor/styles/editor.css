@@ -60,6 +60,17 @@
     --ck-color-button-action-text: var(--content-ui-submit-foreground);
 }
 
+/* CKEditor border radius follows Advanced UI field roundness */
+.sbx-body,
+.sbx-body .ck-body-wrapper {
+    --ck-border-radius: var(--sbx-config-field-roundness, 0);
+}
+
+/* Keep table insert grid buttons in the toolbar square */
+.sbx-body .ck.ck-toolbar .ck-insert-table-dropdown-grid-box {
+    border-radius: 0;
+}
+
 body.ck-fullscreen {
     /* resolve depth issues linked to the full screen plugin */
     --ck-z-fullscreen: var(--sbx-depth-pop-over);
@@ -136,7 +147,7 @@ body.ck-fullscreen {
 .ck.ck-word-count {
     background: var(--ck-color-toolbar-background);
     border: 1px solid var(--ck-color-toolbar-border);
-    border-radius: 0 0 var(--ck-border-radius);
+    border-radius: 0 0 var(--ck-border-radius) var(--ck-border-radius);
     border-top-width: 0;
     display: flex;
     font: normal normal normal var(--ck-font-size-base) / var(--ck-line-height-base) var(--ck-font-face);

@@ -42,6 +42,6 @@
     & li a:focus-visible {
         outline: 1px solid var(--sbx-color-accent);
         outline-offset: 1px;
-        border-radius: var(--sbx-config-field-roundess);
+        border-radius: var(--sbx-config-field-roundness);
     }
 }
