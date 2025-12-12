@@ -12,7 +12,7 @@
     appearance: none; // remove native styles
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundess);
     color: var(--sbx-color-accent);
     cursor: pointer;
     display: inline-grid;

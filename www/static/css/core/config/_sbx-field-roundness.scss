@@ -1,19 +1,51 @@
+/**
+ * Field roundness config
+ * Used to control border-radius of form and UI elements
+ * Scoped to Advanced UI
+ */
+
 :root {
     --sbx-config-field-roundess: var(--sbx-border-radius-normal);
 }
 
 .sbx-body {
     select,
-    .island .content,
-    .island .calendar-list li.row,
-    .calendar-list .island li.row,
-    .island .calendar-list label,
-    .calendar-list .island label,
-    .island .matching-pairs p,
-    .matching-pairs .island p,
-    .island .resource-browser .meta-panel,
-    .resource-browser .island .meta-panel,
-    textarea {
-        border-radius: var(--sbx-border-radius-normal);
+    textarea,
+    .selectize-control,
+    .ck-editor__editable,
+    .sbx-colour-picker,
+    .sbx-attachzone,
+    .sbx-chip,
+    .sbx-switch,
+    .sbx-radio-block,
+    .sbx-progress,
+    .sbx-alert,
+    .component-titlebar,
+    .context-switch,
+    .avatar-switch,
+    .checklist-container,
+    .alert-box,
+    .alert-box-icon,
+    .button-block,
+    input[type="radio"] + .block,
+    .dzone {
+        border-radius: var(--sbx-config-field-roundess);
+    }
+
+    .checklist.events li label {
+        border-radius: var(--sbx-config-field-roundess);
+    }
+
+    .c-chips label {
+        border-radius: var(--sbx-config-field-roundess);
+    }
+
+    .switch label {
+        border-radius: var(--sbx-config-field-roundess);
+    }
+
+    .selector label::before,
+    .selector label::after {
+        border-radius: var(--sbx-config-field-roundess);
     }
 }

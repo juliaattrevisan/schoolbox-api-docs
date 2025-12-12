@@ -27,7 +27,7 @@
 .sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundess);
     color: var(--sbx-color-text-primary);
     font-family: inherit;
     height: 2.25rem;
@@ -62,12 +62,12 @@
 
 .sbx-body .input-group:has(> input[type="text"] + a) input[type="text"],
 .sbx-body .input-group:has(> input[type="text"] + button) input[type="text"] {
-    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundess) 0 0 var(--sbx-config-field-roundess);
 }
 
 // States
 .sbx-body .c-filter-search-term input[type="text"].c-filter-search-term__field {
-    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundess) 0 0 var(--sbx-config-field-roundess);
 }
 
 // Selectize overrides to match input styles
