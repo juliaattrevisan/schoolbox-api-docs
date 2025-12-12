@@ -9,6 +9,7 @@ import CourseBuilderDeleteModal from "./course-builder-delete-modal.vue";
 interface Props {
     courseTemplates: CourseTemplate[];
     availableTemplates: PageTemplate[];
+    availableUnitTemplates: PageTemplate[];
     coursePermissions: Permissions;
     unitPermissions: Permissions;
     courseInherit: boolean;
@@ -72,7 +73,10 @@ window.Vue.onMounted(() => {
                         </div>
                     </header>
 
-                    <course-builder-rows :available-templates="props.availableTemplates" />
+                    <course-builder-rows
+                        :available-templates="props.availableTemplates"
+                        :available-unit-templates="props.availableUnitTemplates"
+                    />
 
                     <div class="component-action">
                         <section>

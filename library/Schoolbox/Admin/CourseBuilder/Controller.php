@@ -79,10 +79,6 @@ class Controller extends Base
 
         $courseBuilder = $this->instanceMapper->findByPredicates($pb);
 
-        /* Empty state
-         */
-        $templates[] = '';
-
         $templates[] = [
             'id'        => HomepageTemplate::HOMEPAGE_NONE,
             'name'      => HomepageTemplate::NONE_STRING,
@@ -90,16 +86,23 @@ class Controller extends Base
         ];
 
         foreach (
-            $this->homepageTemplateMapper->findByColumn(
-                'id',
-                $courseBuilder->getPropertyValues('identifier'),
-                ['deleted' => true])->sortBy("name", "asc") as $template) {
+            $this->homepageTemplateMapper->findAll(['deleted' => true])->sortBy("name", "asc") as $template
+        ) {
             $templates[] = [
                 'id'        => $template->getId(),
                 'name'      => $template->getName(),
                 'deleted'   => $template->isDeleted(),
             ];
         }
+
+        $courseBuilderTemplateIds = $courseBuilder->getPropertyValues('identifier');
+        $availableUnitTemplates = array_merge(
+            [''], //Empty state dropdown
+            array_filter(
+                $templates,
+                fn(array $template) => in_array($template['id'], $courseBuilderTemplateIds)
+            )
+        );
 
         // Render this thing out
         $this->response = $this->responseFromTemplate(
@@ -111,6 +114,7 @@ class Controller extends Base
                 'coursePermissions' => $coursePermissions,
                 'unitPermissions' => $unitPermissions,
                 'availableTemplates' => $templates,
+                'availableUnitTemplates' => $availableUnitTemplates,
                 'courseTemplates'   => $this->courseTemplateMapper->findAll()->reindex()->map(new ModelToArray()),
                 'courseInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 'unitInherit' => (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit')

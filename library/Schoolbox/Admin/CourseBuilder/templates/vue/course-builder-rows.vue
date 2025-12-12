@@ -7,6 +7,7 @@ import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 
 interface Props {
     availableTemplates: PageTemplate[];
+    availableUnitTemplates: PageTemplate[];
 }
 
 const props = defineProps<Props>();
@@ -143,18 +144,18 @@ const existingCourseTemplateCount = window.Vue.computed(() => {
                             <strong class="hide-for-medium-up">Unit Page Template:</strong>
                             <div class="select-wrapper">
                                 <select v-model="element.unitTemplate" required>
-                                    <template v-for="availableTemplate in props.availableTemplates">
+                                    <template v-for="availableUnitTemplate in props.availableUnitTemplates">
                                         <option
                                             v-if="
-                                                !availableTemplate.deleted ||
-                                                element.unitTemplate?.id === availableTemplate.id
+                                                !availableUnitTemplate.deleted ||
+                                                element.unitTemplate?.id === availableUnitTemplate.id
                                             "
-                                            :key="availableTemplate.id"
-                                            :value="availableTemplate"
-                                            :disabled="availableTemplate.deleted"
+                                            :key="availableUnitTemplate.id"
+                                            :value="availableUnitTemplate"
+                                            :disabled="availableUnitTemplate.deleted"
                                         >
-                                            {{ availableTemplate.name }}
-                                            <template v-if="availableTemplate.deleted">(Deleted)</template>
+                                            {{ availableUnitTemplate.name }}
+                                            <template v-if="availableUnitTemplate.deleted">(Deleted)</template>
                                         </option>
                                     </template>
                                 </select>
