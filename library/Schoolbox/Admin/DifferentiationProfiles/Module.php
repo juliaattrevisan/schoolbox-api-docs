@@ -39,7 +39,7 @@ class Module extends BaseModule
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL),
                 new Rule\IsSuperuser()
             ),
         );

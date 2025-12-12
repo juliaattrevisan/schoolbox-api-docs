@@ -312,7 +312,7 @@ class Controller extends Base
 
             $accessList = $this->getUser()
                            ->getAccessList()
-                           ->filterBy('service', UserAccess::SERVICE_DIFFERENTIATION_PROFILE);
+                           ->filterBy('service', UserAccess::SERVICE_DIFFERENTIATION);
 
             $hasAccess = false;
             $studentCampus = $student->getCampusCollection();

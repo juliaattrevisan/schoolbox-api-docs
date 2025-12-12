@@ -129,7 +129,7 @@ class Permissions
             $sidDisplayValue = '';
             switch ($row['serviceId']) {
                 case UserAccess::SERVICE_CALENDAR:
-                case UserAccess::SERVICE_DIFFERENTIATION_PROFILE:
+                case UserAccess::SERVICE_DIFFERENTIATION:
                     $campus = $campuses->getBy('id', $row['sid']);
                     if ($campus === null) {
                         // Campus $row['sid'] does not exist or has been deleted, so ignore this userAccess row.

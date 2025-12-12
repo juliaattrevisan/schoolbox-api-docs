@@ -46,7 +46,7 @@ class Module extends AlaressModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
+                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL)
             )
         );
 
@@ -90,7 +90,7 @@ class Module extends AlaressModule
         $this->register('POST', '/pastoral/{page:classPastoral}', 'postSavePageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
         $this->register('POST', '/pastoral/{page:classPastoral}/pushDefaultSelections', 'postPushDefaultSelectionsPastoral', $rulePastoral, $loadFactoryFactory);
 
-        // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
+        // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION need access.
         $this->register('GET', '/differentiation/{page:differentiationProfile}', 'getPageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
         $this->register('POST', '/differentiation/{page:differentiationProfile}', 'postSavePageSettingsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
         $this->register('POST', '/differentiation/{page:differentiationProfile}/pushDefaultSelections', 'postPushDefaultSelectionsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);

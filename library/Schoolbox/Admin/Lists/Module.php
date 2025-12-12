@@ -68,7 +68,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
+                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION, UserAccess::ACCESS_FULL)
             )
         );
 
@@ -121,7 +121,7 @@ class Module extends BaseModule
         $this->register('POST', "/pastoral/save/{table:$pastoralTablesRegex}", 'postPastoralSave', $rulePastoral);
         $this->register('POST', "/pastoral/delete/{table:$pastoralTablesRegex}", 'postPastoralDelete', $rulePastoral);
 
-        // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
+        // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION need access.
         $diffProfilesRegex = '(adjustment-categories|adjustment-levels)';
         $this->register('GET', "/differentiation/{table:$diffProfilesRegex}", 'getDifferentiationIndex', $ruleDiffProfiles);
         $this->register('GET', "/differentiation/data/{table:$diffProfilesRegex}", 'getDifferentiationData', $ruleDiffProfiles);
