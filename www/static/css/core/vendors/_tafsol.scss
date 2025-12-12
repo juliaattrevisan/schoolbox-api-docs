@@ -629,18 +629,6 @@ input[type="checkbox"]:not(.plain) + label::before {
    15. Progress, Alerts, Tooltips & Misc Components
    ========================================================================== */
 
-.reviewed.label,
-.submitted.label,
-.submitted-late.label,
-.unsubmitted.label,
-.success.label,
-.alert.label,
-.neutral.label,
-.label.highlight,
-.label.filter {
-    border-radius: var(--sbx-border-radius-normal);
-}
-
 .alert-box .close,
 .eotc-status .close,
 .alert-box-icon .close {
@@ -648,12 +636,7 @@ input[type="checkbox"]:not(.plain) + label::before {
 }
 
 .progress {
-    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
-
-    & .meter {
-        border-radius: var(--sbx-border-radius-normal);
-    }
 }
 
 // Modal styles

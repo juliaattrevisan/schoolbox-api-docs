@@ -9,10 +9,9 @@
 }
 
 .sbx-body {
-    select,
+    // Core elements
     textarea,
     .selectize-control,
-    .ck-editor__editable,
     .sbx-colour-picker,
     .sbx-attachzone,
     .sbx-chip,
@@ -28,24 +27,27 @@
     .alert-box-icon,
     .button-block,
     input[type="radio"] + .block,
-    .dzone {
-        border-radius: var(--sbx-config-field-roundess);
-    }
+    .dzone,
 
-    .checklist.events li label {
-        border-radius: var(--sbx-config-field-roundess);
-    }
+    // Labels
+    .reviewed.label,
+    .submitted.label,
+    .submitted-late.label,
+    .unsubmitted.label,
+    .success.label,
+    .alert.label,
+    .neutral.label,
+    .label.highlight,
+    .label.filter,
 
-    .c-chips label {
-        border-radius: var(--sbx-config-field-roundess);
-    }
-
-    .switch label {
-        border-radius: var(--sbx-config-field-roundess);
-    }
-
+    // Specific inner elements
+    .checklist.events li label,
+    .c-chips label,
+    .switch label,
     .selector label::before,
-    .selector label::after {
+    .selector label::after,
+    .progress,
+    .progress .meter {
         border-radius: var(--sbx-config-field-roundess);
     }
 }
