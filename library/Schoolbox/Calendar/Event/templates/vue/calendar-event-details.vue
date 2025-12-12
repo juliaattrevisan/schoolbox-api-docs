@@ -6,7 +6,6 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import AddResourceBookingsModal from "./add-resource-bookings-modal.vue";
-import EditResourceBookingModal from "./edit-resource-booking-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -31,7 +30,6 @@ export default {
         MediaArticle,
         SearchSelect,
         AddResourceBookingsModal,
-        EditResourceBookingModal,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -679,18 +677,13 @@ export default {
                         <cev-resource-booking-row
                             v-for="booking in event.resourceBookings"
                             :key="booking.id"
+                            :eventId="event.id"
+                            :eventSeriesId="event.eventSeriesId"
                             :booking="booking"
                             :can-modify="canModify()"
                         />
                     </div>
                 </div>
-                <edit-resource-booking-modal
-                    v-if="event.resourceBookings.length > 0"
-                    ref="editResourceBookingModal"
-                    :event-id="this.event.id"
-                    :event-series-id="this.event.seriesId"
-                    :resource-booking="event.resourceBookings[0]"
-                />
             </section>
             <div v-else class="empty-state">
                 <i class="icon-resource-booking"></i>
