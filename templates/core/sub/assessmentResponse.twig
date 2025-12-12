@@ -8,6 +8,8 @@
         {{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}
     {%- elseif response and response.assessable is task -%}
         {# no link. Caller should not render a link if assessable is a task #}
+    {%- elseif response and response.assessable is dialogAgent -%}
+        {{ routeLookup('learningAssessment.getStatus', {assessment: response.assessable, assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id }) }}
     {%- endif -%}
 {% endmacro %}
 
@@ -19,5 +21,7 @@
         Review Student Submission
     {%- elseif response.assessable is task -%}
         Review Task Completion
+    {%- elseif response.assessable is dialogAgent -%}
+        View {{ locale.dialogAgent }} status
     {%- endif -%}
 {% endmacro %}
