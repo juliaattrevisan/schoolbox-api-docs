@@ -1,18 +1,27 @@
 /**
-* SBX Colour Design Tokens
-* All colours used throughout Schoolbox are to be defined here.
-* Note that some of these colours can be configured via the Skin Config settings.
-*/
+ * SBX Colour Design Tokens
+ * All colours used throughout Schoolbox are to be defined here.
+ * Some colours can be configured via Skin Config.
+ */
 :root {
-    --sbx-color-body-background: #e5eff7; // derived as a light shade of --sbx-color-accent
+    // Background
+    --sbx-color-body-background: var(--body-background);
+
+    // Foreground
     --sbx-color-foreground-primary: #fff;
     --sbx-color-foreground-secondary: #f4f2f2;
+
+    // Text
     --sbx-color-text-primary: #000;
     --sbx-color-text-secondary: #525252;
+
+    // Status / semantic
     --sbx-color-alert: #ea0a06;
     --sbx-color-success: #3e843e;
     --sbx-color-warning: #ff7d00;
     --sbx-color-highlight: #ffd100;
-    --sbx-color-accent: #0066b0; // skin configurable
-    --sbx-color-accent-text: #fff; // derived to contrast with --sbx-color-accent
+
+    // Accent
+    --sbx-color-accent: var(--form-border-color);
+    --sbx-color-accent-text: var(--content-ui-submit-foreground);
 }
