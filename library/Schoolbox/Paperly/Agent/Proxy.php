@@ -12,13 +12,19 @@ class Proxy
 {
     /* Max number of results allowed
      */
-    private const MAX_RESULTS = 10000;
+    private const int MAX_RESULTS = 10000;
 
     /* HMAC algorithm for hashing the request
      */
-    public const PAPERLY_PROXY_HMAC_ALGO = 'sha256';
+    public const string PAPERLY_PROXY_HMAC_ALGO = 'sha256';
 
-    public const IMAGE_WILDCARD = 'image/';
+    public const string IMAGE_WILDCARD = 'image/';
+
+    /* Compatible SQL Operators
+     */
+    private const string SQL_INSERT = 'INSERT';
+    private const string SQL_SELECT = 'SELECT';
+    private const string SQL_UPDATE = 'UPDATE';
 
     public function __construct(
         private IConnector $externalDb,
@@ -47,13 +53,13 @@ class Proxy
     }
 
     /**
-     * Determine whether results will need to be fetched after execution
+     * Get the SQL operator from the query
      *
      * @param string $sql
-     * @return bool
+     * @return string
      * @throws OutOfBoundsException
      */
-    public function shouldReturnResults(string $sql): bool
+    private function getSqlOperator(string $sql): string
     {
         //Reject requests that contains semicolons as we only accept one query at a time
         if (str_contains($sql, ';')) {
@@ -68,15 +74,33 @@ class Proxy
         $regex = "/[^a-zA-Z]*(?<sqlOperator>\w+)/";
         preg_match($regex, $sql, $matches);
 
+        /* Validating if we were able to extract the SQL operator
+         */
+        if (!isset($matches['sqlOperator'])) {
+            throw new OutOfBoundsException(
+                'Invalid SQL statement. Please use a valid SQL operator.'
+            );
+        }
+
+        return strtoupper(
+            trim($matches['sqlOperator'])
+        );
+    }
+
+    /**
+     * Determine whether results will need to be fetched after execution
+     *
+     * @param string $sql
+     * @return bool
+     * @throws OutOfBoundsException
+     */
+    public function shouldReturnResults(string $sql): bool
+    {
         /* Trying to discern the type of sql query the user wants to execute
          */
-        return match (
-            strtoupper(
-                trim($matches['sqlOperator'])
-            )
-        ) {
-            'SELECT' => true,
-            'UPDATE', 'INSERT' => false,
+        return match ($this->getSqlOperator($sql)) {
+            self::SQL_SELECT, self::SQL_INSERT => true,
+            self::SQL_UPDATE => false,
             default => throw new OutOfBoundsException(
                 'Invalid SQL statement. Please use a valid SQL operator.'
             ),
@@ -92,21 +116,34 @@ class Proxy
      */
     public function retrieveResults(IQuery|Base $stmt): array
     {
-        $results = [];
-        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        /* If it's an insert query, return the last inserted ID
+         * This will only return the last ID if there are multiple rows inserted
+         *
+         * Note that it is possible that if there are anything inserted before this was executed it
+         * (ie Stored Procedures with inserts or someone inserted something in between) it
+         * might not return the correct last inserted ID. However, this is a limitation of PDO itself.
+         */
+        if (self::SQL_INSERT === $this->getSqlOperator($stmt->getSql())) {
+            $results = [
+                'lastInsertedID' => (int)$this->externalDb->lastInsertId()
+            ];
+        } else {
+            $results = [];
+            $data    = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        if (count($data) > self::MAX_RESULTS) {
-            throw new AlaressDatabaseException(
-                sprintf(
-                    "Maximum number of results exceeded. Please limit the number of results in query to be below %d.",
-                    self::MAX_RESULTS
-                )
-            );
-        }
+            if (count($data) > self::MAX_RESULTS) {
+                throw new AlaressDatabaseException(
+                    sprintf(
+                        "Maximum number of results exceeded. Please limit the number of results in query to be below %d.",
+                        self::MAX_RESULTS
+                    )
+                );
+            }
 
-        foreach ($data as $row) {
-            $row = array_map(fn($item) => $this->convertImageToBase64($item), $row);
-            $results[] = $row;
+            foreach ($data as $row) {
+                $row       = array_map(fn($item) => $this->convertImageToBase64($item), $row);
+                $results[] = $row;
+            }
         }
         return $results;
     }
