@@ -26,21 +26,6 @@ const isFormSubmittable = window.Vue.computed(() => {
 const createEditBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("editBookingForm");
 
 /**
- * Open this modal.
- * @param bookingId The id of the booking.
- */
-function open(bookingId: number): void {
-    // TODO: Open the modal matching this id somehow.
-    isEditFormOpen.value = true;
-    efficacy.value = "";
-}
-
-// Expose functions for parent components
-defineExpose({
-    open,
-});
-
-/**
  * @param toast The toast to update
  * @param responseData The server's response to an 'addBookings' request.
  */
