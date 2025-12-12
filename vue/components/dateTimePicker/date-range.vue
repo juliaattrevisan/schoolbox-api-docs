@@ -10,6 +10,8 @@ interface Props {
     idPrefix: string; // unique identifier for this date range picker
     dataTestPrefix?: string; // optional prefix for data-test attributes, defaults to idPrefix
     useTime?: boolean;
+    labelStart?: string; // optional label, defaults to 'Start date'
+    labelEnd?: string; // optional label, defaults to 'End date'
 }
 
 const props = defineProps<Props>();
@@ -121,7 +123,7 @@ defineExpose({ clearInvalidDates });
 <template>
     <div class="l-flex-row l-flex--no-wrap l-gap-m">
         <div class="l-flex-col l-flex__item--1">
-            <label :for="`${props.idPrefix}-start-date-input`">Start date</label>
+            <label :for="`${props.idPrefix}-start-date-input`">{{ props.labelStart || "Start date" }}</label>
             <input
                 :id="`${props.idPrefix}-start-date-input`"
                 ref="startDateInputEl"
@@ -136,7 +138,7 @@ defineExpose({ clearInvalidDates });
             />
         </div>
         <div class="l-flex-col l-flex__item--1">
-            <label :for="`${props.idPrefix}-end-date-input`">End date</label>
+            <label :for="`${props.idPrefix}-end-date-input`">{{ props.labelEnd || "End date" }}</label>
             <input
                 :id="`${props.idPrefix}-end-date-input`"
                 ref="endDateInputEl"
