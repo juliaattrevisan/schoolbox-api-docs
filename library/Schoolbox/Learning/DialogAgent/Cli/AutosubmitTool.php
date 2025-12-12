@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\TimeTaken;
 
 /**
  * Dialog Agent Autosubmit
@@ -194,6 +195,7 @@ HELP;
             WHERE da.duration IS NOT NULL
             AND da.duration > 0
             AND dar.submitted_at IS NULL
+            AND dar.started_at IS NOT NULL
         ");
 
         $statement->execute();
@@ -201,26 +203,14 @@ HELP;
         $updateStatement = null;
 
         $n = 0;
+        $timer = new TimeTaken();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /* Manually hydrate a Response\Model instance to get access to the universal calculator
-             */
-            $createdAt = new \Alaress_Date_Format($row['created_at'], \Alaress_Date_Format::DATABASE_FORMAT);
-            $submittedAt = $row['submitted_at'] ? new \Alaress_Date_Format($row['submitted_at'], \Alaress_Date_Format::DATABASE_FORMAT) : null;
-            $startedAt = $row['started_at'] ? new \Alaress_Date_Format($row['started_at'], \Alaress_Date_Format::DATABASE_FORMAT) : null;
-
-            $response = new \Schoolbox\Learning\Assessment\DialogAgent\Response\Model()
-                ->setStartedAt($startedAt)
-                ->setSubmittedAt($submittedAt)
-                ->setCreatedAt($createdAt);
-
-            /* Find out how long this took
-             */
-            $timeTaken = $response->getTimeTaken();
-
             /* Check if it exceeded the duration allotted; if there's still time, just keep going
              */
-            if ($timeTaken < $row['duration']) {
+            $startedAt = new \Alaress_Date_Format($row['started_at'], \Alaress_Date_Format::DATABASE_FORMAT);
+
+            if (!$timer->hasExceeded($startedAt, $row['duration'])) {
                 continue;
             }
 
