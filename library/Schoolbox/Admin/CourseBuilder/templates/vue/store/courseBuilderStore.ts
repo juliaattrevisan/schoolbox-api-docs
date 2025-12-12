@@ -56,7 +56,6 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
      * @returns true if the unit template ID exists in availableUnitTemplates
      */
     function isUnitTemplateValid(unitTemplateId: number | undefined): boolean {
-        if (unitTemplateId === undefined) return false;
         return availableUnitTemplates.value.some((ut) => ut.id === unitTemplateId);
     }
 

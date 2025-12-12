@@ -28,13 +28,14 @@ const newRowAmount = window.Vue.ref(0);
  */
 function onAddNewRow(): void {
     const firstValidTemplate = props.availableTemplates.filter((template) => !template.deleted)[0];
+    const firstValidUnitTemplate = props.availableUnitTemplates.filter((template) => !template.deleted)[0];
 
     newRowAmount.value += 1;
     store.courseTemplates.push({
         id: -newRowAmount.value, // New rows are set with an ever increasing negative increment to mark them as new for the back end
         name: "",
         courseTemplate: firstValidTemplate,
-        unitTemplate: firstValidTemplate,
+        unitTemplate: firstValidUnitTemplate,
         sequence: store.courseTemplates.length, // default this to the end of the list (may need to actually set the sequence at some point)
     });
 }
