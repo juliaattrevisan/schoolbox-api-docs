@@ -32,9 +32,9 @@ class Redirect extends AbstractRedirect
     public const SITE_SCHOOL_CODE = 'tasfg';
 
     /**
-     * Canvas course id is <folder_code>_<parent_folder_code>
+     * Canvas course id is <year> <course> <class suffix>
      */
-    protected string $courseIdFormat = '%s_%s';
+    protected string $courseIdFormat = '%s %s';
 
     /**
      * The column used to find canvas course in course table
