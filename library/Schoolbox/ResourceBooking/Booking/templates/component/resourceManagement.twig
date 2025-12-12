@@ -59,190 +59,31 @@
                 <li class="content" id="collap-{{ item.resource.id }}" data-collapse-state="uncollapsed" data-collapsable="collap-{{ item.resource.id }}">
                     <ul class="information-list">
                         {% for date in item.bookingEvents %}
-                        <li class="actions-small-1">
-                            <div>
-                                {# show date card #}
-                                <div class="card l-flex l-flex--row l-gap-l l-flex--wrap l-mar-m--bottom">
-                                    {# booking date, may have multiple bookings under this date #}
-                                    <div class="text-center">
-                                        {{ date.dateFormat.dayName }}
-                                        <h4>
-                                            {{ date.dateFormat.day }}
-                                        </h4>
-                                        {{ date.dateFormat.monthName }}
+                            <li class="actions-small-1">
+                                <div>
+                                    {# show date card #}
+                                    <div class="card l-flex l-flex--row l-gap-l l-flex--wrap l-mar-m--bottom">
+                                        {# booking date, may have multiple bookings under this date #}
+                                        <div class="text-center">
+                                            {{ date.dateFormat.dayName }}
+                                            <h4>
+                                                {{ date.dateFormat.day }}
+                                            </h4>
+                                            {{ date.dateFormat.monthName }}
+                                        </div>
+
+                                        <ul>
+                                            {% for booking in date.events %}
+                                                {% include '@resourceBooking/component/bookingGroupItem.twig' with {
+                                                    item: item,
+                                                    booking: booking,
+                                                    returnUrl: returnUrl,
+                                                } only %}
+                                            {% endfor %}
+                                        </ul>
                                     </div>
-
-                                    <ul>
-                                    {% for booking in date.events %}
-                                        {% set event = booking.event %}
-                                        <li class="actions-small-1 card">
-                                            <div class="list-item">
-
-                                                {# cardception #}
-                                                <div>
-                                                    {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
-                                                    <div class="warning">
-                                                    {% endif %}
-                                                    {# time, and only time (start - end) #}
-                                                        {# Precompute time and alert icon for readability #}
-                                                        {% set showEndTime = event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %}
-                                                        {% set startTime = event.booking.event.startDateTime.getTimeOnly() %}
-                                                        {% set startDateTime = event.booking.event.startDateTime.getDatabase() %}
-                                                        {% set endTime = event.booking.event.endDateTime.getTimeOnly() %}
-                                                        {% set endDateTime = event.booking.event.endDateTime.getDatabase() %}
-                                                        {% set showAlertIcon = booking.clash and event.booking.status.ispending %}
-                                                        <time datetime="{{ startDateTime }}">{{ startTime }}</time>
-                                                        {% if showEndTime %}
-                                                            -
-                                                            <time datetime="{{ endDateTime }}">
-                                                                {{ endTime }}
-                                                                {% if showAlertIcon %}
-                                                                    <div class="icon-alert warning">&nbsp;</div>
-                                                                {% endif %}
-                                                            </time>
-                                                        {% endif %}
-                                                    {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
-                                                    </div>
-                                                    {% endif %}
-                                                    <div class="tiny card">
-                                                        {# small portrait of booker #}
-                                                        <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                                            {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
-                                                        </a>
-
-                                                        {# meta to show on the side of the portrait #}
-                                                        <p class="meta">
-                                                            Requested by
-                                                            <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                                                            on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
-                                                            {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                                                                by
-                                                                <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
-                                                            {% endif %}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                {# clash approved booking, details #}
-                                                {% if booking.clash is not empty %}
-                                                    {% for clash in booking.clash %}
-                                                        <div class="small-12">
-                                                            <div class="warning">
-                                                                {# time, and only time (start - end) #}
-                                                                {# Precompute time and alert icon for readability #}
-                                                                {% set showEndTime = clash.booking.event.startDateTime.getShort() != clash.booking.event.endDateTime.getShort() %}
-                                                                {% set startTime = clash.booking.event.startDateTime.getTimeOnly() %}
-                                                                {% set startDateTime = clash.booking.event.startDateTime.getDatabase() %}
-                                                                {% set endTime = clash.booking.event.endDateTime.getTimeOnly() %}
-                                                                {% set endDateTime = clash.booking.event.endDateTime.getDatabase() %}
-                                                                <time datetime="{{ startDateTime }}">{{ startTime }}</time>
-                                                                {% if showEndTime %}
-                                                                    -
-                                                                    <time datetime="{{ endDateTime }}">
-                                                                        {{ endTime }}
-                                                                    </time>
-                                                                {% endif %}
-                                                            </div>
-                                                            <div class="small-12 tiny card">
-                                                                {# small portrait of booker #}
-                                                                <a href="/search/user/{{ clash.booking.event.owner.id }}">
-                                                                    {% include 'include/portrait.twig' with {user: clash.booking.event.owner} only %}
-                                                                </a>
-
-                                                                {# meta to show on the side of the portrait #}
-                                                                <p class="meta">
-                                                                    Requested by
-                                                                    <a href="/search/user/{{ clash.booking.event.owner.id }}">{{ clash.booking.event.owner.formatName }}</a>
-                                                                    on <time datetime="{{ clash.booking.createdAt.database }}">{{ clash.booking.createdAt.short }}</time>
-                                                                    {% if clash.booking.event.owner.id != clash.booking.event.author.id %}
-                                                                        by
-                                                                        <a href="/search/user/{{ clash.booking.event.author.id }}">{{ clash.booking.event.author.formatName }}</a>
-                                                                    {% endif %}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    {% endfor %}
-                                                {% endif %}
-                                            </div>
-
-                                            {# tot #}
-                                            <nav>
-                                                <sbx-pop-out content-id="resourceManagement-status-{{ event.booking.id }}"></sbx-pop-out>
-                                            </nav>
-                                            {% if booking.clash %} {# special clash tot options, special options, for modifying / approving each the original (approved) and the pending booking #}
-                                                {#
-                                                 # Modify approved booking
-                                                 # Modify clash booking
-                                                 # Approve clash booking / Reject original booking
-                                                 # Reject clash booking
-                                                 #}
-                                            <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
-                                                {% if booking.clash | length == 1 %}
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.edit', {id: booking.clash[0].booking.id}) }}?returnUrl={{ returnUrl }}"
-                                                           class="icon-modify">Modify approved booking</a>
-                                                    </li>
-                                                {% endif %}
-                                                <li>
-                                                    <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-                                                       class="icon-modify">Modify clash booking</a>
-                                                </li>
-                                                {% if booking.clash | length > 1 %}
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}"
-                                                           class="icon-modify">Manage clashes on Calendar</a>
-                                                    </li>
-                                                {% endif %}
-                                                <li class="separator">Set Status</li>
-
-                                                {% if booking.clash | length == 1 %}
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash[0].booking.id, new: event.booking.id}) }}"
-                                                           data-set-status="approved"
-                                                           class="icon-approve">Approve clash booking / Reject original booking</a>
-                                                    </li>
-                                                {% endif %}
-                                                <li>
-                                                    <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                                       data-series-id="{{ event.booking.event.seriesId }}"
-                                                       data-set-status="rejected"
-                                                       class="icon-close">Reject clash booking</a>
-                                                </li>
-                                            </ul>
-                                            {% else %} {# standard pending booking tot options #}
-                                                <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-                                                           class="icon-modify">Modify Booking</a>
-                                                    </li>
-                                                    <li class="separator">Set Status</li>
-
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
-                                                           data-series-id="{{ event.booking.event.seriesId }}"
-                                                           data-set-status="approved"
-                                                           class="icon-approve">Approved</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                                                           data-series-id="{{ event.booking.event.seriesId }}"
-                                                           data-set-status="pending"
-                                                           class="icon-undo">Pending</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
-                                                           data-series-id="{{ event.booking.event.seriesId }}"
-                                                           data-set-status="rejected"
-                                                           class="icon-close">Rejected</a>
-                                                    </li>
-                                                </ul>
-                                            {% endif %}
-                                        </li>
-                                    {% endfor %}
-                                    </ul>
                                 </div>
-                            </div>
-
-                        </li>
+                            </li>
                         {% endfor %}
                     </ul>
                 </li>

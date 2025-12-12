@@ -1,0 +1,105 @@
+{##
+ # An individual booking for a group of bookings in the list of grouped bookings for a resource
+ #
+ # @param array $item
+ # @param array $booking
+ # @param string $returnUrl
+ #}
+
+{% set event = booking.event %}
+<li class="actions-small-1 card">
+    <div class="list-item">
+
+        {# cardception #}
+        <div>
+            {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
+            <div class="warning">
+            {% endif %}
+            {# time, and only time (start - end) #}
+                {# Precompute time and alert icon for readability #}
+                {% set showEndTime = event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %}
+                {% set startTime = event.booking.event.startDateTime.getTimeOnly() %}
+                {% set startDateTime = event.booking.event.startDateTime.getDatabase() %}
+                {% set endTime = event.booking.event.endDateTime.getTimeOnly() %}
+                {% set endDateTime = event.booking.event.endDateTime.getDatabase() %}
+                {% set showAlertIcon = booking.clash and event.booking.status.ispending %}
+                <time datetime="{{ startDateTime }}">{{ startTime }}</time>
+                {% if showEndTime %}
+                    -
+                    <time datetime="{{ endDateTime }}">
+                        {{ endTime }}
+                        {% if showAlertIcon %}
+                            <div class="icon-alert warning">&nbsp;</div>
+                        {% endif %}
+                    </time>
+                {% endif %}
+            {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
+            </div>
+            {% endif %}
+            <div class="tiny card">
+                {# small portrait of booker #}
+                <a href="/search/user/{{ event.booking.event.owner.id }}">
+                    {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
+                </a>
+
+                {# meta to show on the side of the portrait #}
+                <p class="meta">
+                    Requested by
+                    <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                    on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
+                    {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                        by
+                        <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        {# clash approved booking, details #}
+        {% if booking.clash is not empty %}
+            {% for clash in booking.clash %}
+                <div class="small-12">
+                    <div class="warning">
+                        {# time, and only time (start - end) #}
+                        {# Precompute time and alert icon for readability #}
+                        {% set showEndTime = clash.booking.event.startDateTime.getShort() != clash.booking.event.endDateTime.getShort() %}
+                        {% set startTime = clash.booking.event.startDateTime.getTimeOnly() %}
+                        {% set startDateTime = clash.booking.event.startDateTime.getDatabase() %}
+                        {% set endTime = clash.booking.event.endDateTime.getTimeOnly() %}
+                        {% set endDateTime = clash.booking.event.endDateTime.getDatabase() %}
+                        <time datetime="{{ startDateTime }}">{{ startTime }}</time>
+                        {% if showEndTime %}
+                            -
+                            <time datetime="{{ endDateTime }}">
+                                {{ endTime }}
+                            </time>
+                        {% endif %}
+                    </div>
+                    <div class="small-12 tiny card">
+                        {# small portrait of booker #}
+                        <a href="/search/user/{{ clash.booking.event.owner.id }}">
+                            {% include 'include/portrait.twig' with {user: clash.booking.event.owner} only %}
+                        </a>
+
+                        {# meta to show on the side of the portrait #}
+                        <p class="meta">
+                            Requested by
+                            <a href="/search/user/{{ clash.booking.event.owner.id }}">{{ clash.booking.event.owner.formatName }}</a>
+                            on <time datetime="{{ clash.booking.createdAt.database }}">{{ clash.booking.createdAt.short }}</time>
+                            {% if clash.booking.event.owner.id != clash.booking.event.author.id %}
+                                by
+                                <a href="/search/user/{{ clash.booking.event.author.id }}">{{ clash.booking.event.author.formatName }}</a>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% include '@resourceBooking/component/bookingGroupItemActions.twig' with {
+        item: item,
+        booking: booking,
+        event: event,
+        returnUrl: returnUrl,
+    } only %}
+</li>
