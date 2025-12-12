@@ -10,6 +10,7 @@
 
 .sbx-body {
     // Core elements
+    select,
     textarea,
     .selectize-control,
     .sbx-colour-picker,
@@ -48,6 +49,6 @@
     .selector label::after,
     .progress,
     .progress .meter {
-        border-radius: var(--sbx-config-field-roundess);
+        border-radius: var(--sbx-config-field-roundess) !important;
     }
 }
