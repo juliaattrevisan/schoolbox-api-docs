@@ -35,7 +35,7 @@
     });
 </script>
 {% if bookingsByResource | length %}
-    <ul class="information-list">
+    <ul class="information-list expandable-card"> {# TODO: is expandable-card needed? #}
         {% for item in bookingsByResource %}
             {% set collapsableId = component.instance.id ~ '-collap-' ~ item.resource.id %}
 
@@ -84,8 +84,20 @@
                                                 {% include '@resourceBooking/component/bookingGroupItem.twig' with {
                                                     item: item,
                                                     booking: booking,
+                                                    event: booking.event,
                                                     returnUrl: returnUrl,
+                                                    showNav: true,
                                                 } only %}
+
+                                                {% for clash in booking.clash %}
+                                                    {% include '@resourceBooking/component/bookingGroupItem.twig' with {
+                                                        item: item,
+                                                        booking: booking,
+                                                        event: clash,
+                                                        returnUrl: returnUrl,
+                                                        showNav: false,
+                                                    } only %}
+                                                {% endfor %}
                                             {% endfor %}
                                         </ul>
                                     </div>

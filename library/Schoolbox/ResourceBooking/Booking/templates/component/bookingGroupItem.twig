@@ -1,18 +1,19 @@
 {##
  # An individual booking for a group of bookings in the list of grouped bookings for a resource
  #
- # @param array $item
- # @param array $booking
+ # @param array  $item
+ # @param array  $booking
+ # @param array  $event
  # @param string $returnUrl
+ # @param bool   $showNav
  #}
 
-{% set event = booking.event %}
 <li>
     <div class="actions-small-1">
-    <div class="list-item">
+        <div class="list-item">
              {# pending entries here are clashes, so we need to change the styling #}
             <div {% if booking.clash %}class="warning"{% endif %}>
-            {# time, and only time (start - end) #}
+                {# time, and only time (start - end) #}
                 {# Precompute time and alert icon for readability #}
                 {% set showEndTime = event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %}
                 {% set startTime = event.booking.event.startDateTime.getTimeOnly() %}
@@ -49,52 +50,14 @@
                 </p>
             </div>
         </div>
-        {# clash approved booking, details #}
-        {% if booking.clash is not empty %}
-            {% for clash in booking.clash %}
-                <div class="small-12">
-                    <div class="warning">
-                        {# time, and only time (start - end) #}
-                        {# Precompute time and alert icon for readability #}
-                        {% set showEndTime = clash.booking.event.startDateTime.getShort() != clash.booking.event.endDateTime.getShort() %}
-                        {% set startTime = clash.booking.event.startDateTime.getTimeOnly() %}
-                        {% set startDateTime = clash.booking.event.startDateTime.getDatabase() %}
-                        {% set endTime = clash.booking.event.endDateTime.getTimeOnly() %}
-                        {% set endDateTime = clash.booking.event.endDateTime.getDatabase() %}
-                        <time datetime="{{ startDateTime }}">{{ startTime }}</time>
-                        {% if showEndTime %}
-                            -
-                            <time datetime="{{ endDateTime }}">
-                                {{ endTime }}
-                            </time>
-                        {% endif %}
-                    </div>
-                    <div class="small-12 tiny card">
-                        {# small portrait of booker #}
-                        <a href="/search/user/{{ clash.booking.event.owner.id }}">
-                            {% include 'include/portrait.twig' with {user: clash.booking.event.owner} only %}
-                        </a>
 
-                        {# meta to show on the side of the portrait #}
-                        <p class="meta">
-                            Requested by
-                            <a href="/search/user/{{ clash.booking.event.owner.id }}">{{ clash.booking.event.owner.formatName }}</a>
-                            on <time datetime="{{ clash.booking.createdAt.database }}">{{ clash.booking.createdAt.short }}</time>
-                            {% if clash.booking.event.owner.id != clash.booking.event.author.id %}
-                                by
-                                <a href="/search/user/{{ clash.booking.event.author.id }}">{{ clash.booking.event.author.formatName }}</a>
-                            {% endif %}
-                        </p>
-                    </div>
-                </div>
-            {% endfor %}
+        {% if showNav %}
+            {% include '@resourceBooking/component/bookingGroupItemActions.twig' with {
+                item: item,
+                booking: booking,
+                event: event,
+                returnUrl: returnUrl,
+            } only %}
         {% endif %}
     </div>
-
-    {% include '@resourceBooking/component/bookingGroupItemActions.twig' with {
-        item: item,
-        booking: booking,
-        event: event,
-        returnUrl: returnUrl,
-    } only %}
 </li>
