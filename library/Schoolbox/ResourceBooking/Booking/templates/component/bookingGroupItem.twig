@@ -7,14 +7,11 @@
  #}
 
 {% set event = booking.event %}
-<li class="actions-small-1 card">
+<li>
+    <div class="actions-small-1">
     <div class="list-item">
-
-        {# cardception #}
-        <div>
-            {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
-            <div class="warning">
-            {% endif %}
+             {# pending entries here are clashes, so we need to change the styling #}
+            <div {% if booking.clash %}class="warning"{% endif %}>
             {# time, and only time (start - end) #}
                 {# Precompute time and alert icon for readability #}
                 {% set showEndTime = event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %}
@@ -33,9 +30,7 @@
                         {% endif %}
                     </time>
                 {% endif %}
-            {% if booking.clash %} {# pending entries here are clashes, so we need to change the styling #}
             </div>
-            {% endif %}
             <div class="tiny card">
                 {# small portrait of booker #}
                 <a href="/search/user/{{ event.booking.event.owner.id }}">
