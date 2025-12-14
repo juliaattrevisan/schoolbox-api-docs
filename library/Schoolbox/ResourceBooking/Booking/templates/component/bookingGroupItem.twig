@@ -27,7 +27,7 @@
                     <time datetime="{{ endDateTime }}">
                         {{ endTime }}
                         {% if showAlertIcon %}
-                            <div class="icon-alert warning">&nbsp;</div>
+                            <i class="icon-alert warning">&nbsp;</i>
                         {% endif %}
                     </time>
                 {% endif %}
@@ -39,15 +39,17 @@
                 </a>
 
                 {# meta to show on the side of the portrait #}
-                <p class="meta">
-                    Requested by
-                    <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
-                    on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
-                    {% if event.booking.event.owner.id != event.booking.event.author.id %}
-                        by
-                        <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
-                    {% endif %}
-                </p>
+                <div>
+                    <p class="meta">
+                        Requested by
+                        <a href="/search/user/{{ event.booking.event.owner.id }}">{{ event.booking.event.owner.formatName }}</a>
+                        on <time datetime="{{ event.booking.createdAt.database }}">{{ event.booking.createdAt.short }}</time>
+                        {% if event.booking.event.owner.id != event.booking.event.author.id %}
+                            by
+                            <a href="/search/user/{{ event.booking.event.author.id }}">{{ event.booking.event.author.formatName }}</a>
+                        {% endif %}
+                    </p>
+                </div>
             </div>
         </div>
 
