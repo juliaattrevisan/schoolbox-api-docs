@@ -257,7 +257,7 @@ class Mapper extends BaseMapper
         if (empty($options['order']['sequence'])) {
             $options['order']['sequence'] = 'asc';
         }
-        return $this->executeSelect($this->getSelectStringForParticipant($student), $this->getFromString(), $pb, [], $options)->indexBy('id');
+        return $this->executeSelect($this->getSelectString(), $this->getFromStringForParticipant($student), $pb, [], $options)->indexBy('id');
     }
 
     /**
@@ -565,8 +565,12 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Selecting from the assessment table also returns whatever assessable
-     * object is joined onto it.
+     * Selecting from the assessment table also returns:
+     * * whatever actual activity (due work, quiz, etc.) is joined onto it
+     * * the assessment's context
+     *
+     * `hydrateSelect` will then hydrate the activity's and context's
+     * sub-objects.
      *
      * @return string
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
@@ -580,60 +584,38 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('work_type', 'wt')},
-                {$this->getJoinColumnString('duework.mark_type', 'mt')},
-                {$this->getJoinColumnString('duework.instructor_mark_type', 'imt')},
-                {$this->getJoinColumnString('duework.rubric_capability_mark_type_id', 'rmt')},
-                {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
-                {$this->getJoinColumnString('duework.worksheetTemplate', 'dueworkWorksheetTemplate')},
-                {$this->getJoinColumnString('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension')},
                 {$this->getJoinColumnString('quiz', 'q')},
-                {$this->getJoinColumnString('quiz.mark_type_id', 'qmt')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
-                {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
-                {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
-                {$this->getJoinColumnString('assessment_course_unit_specification.course', 'usc')},
-                {$this->getJoinColumnString('assessment_course_unit_specification.course.folder', 'uscf')},
                 {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation.specification', 'uis')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation.specification.folder', 'uisf')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')},
                 {$this->getJoinColumnString('project_assessment', 'pa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
+        ";
+    }
 
+    /**
+     * @return string
+     */
+    public function getFromString(): string
+    {
+        return "
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
-            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
-            LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
+            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
+            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
+            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
-            LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
-            LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
-            LEFT JOIN {$this->getJoinSql('duework.instructor_mark_type', 'd', 'imt')}
-            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_mark_type_id', 'd', 'rmt')}
-            LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
-            LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
-            LEFT JOIN {$this->getJoinSql('quiz.mark_type_id', 'q', 'qmt')}
-            LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
-            LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course', 'us', 'usc', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.course.folder', 'usc', 'uscf', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification', 'ui', 'uis', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.specification.folder', 'uis', 'uisf', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic', true)}
-            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf', true)}
             LEFT JOIN {$this->getJoinSql('project_assessment', '', 'pa', true)}
             LEFT JOIN {$this->getJoinSql('assessment_specification_implementation', '', 'spec', true)}
         ";
@@ -827,15 +809,15 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Returns a SELECT string suitable for predicates that query the participant or plan tables.
+     * Returns a FROM string suitable for predicates that query the participant or plan tables.
      *
      * @param User $user
      * @return string
      * @throws BaseMapper\DefinitionException
      */
-    protected function getSelectStringForParticipant(User $user): string
+    protected function getFromStringForParticipant(User $user): string
     {
-        return $this->getSelectString() . "
+        return $this->getFromString() . "
             LEFT JOIN participant_plan pp ON pp.assessment_id = assessment.id
             LEFT JOIN participant ON participant.participant_plan_id = pp.id AND participant.user_id = {$user->getId()}
         ";
@@ -1037,7 +1019,7 @@ class Mapper extends BaseMapper
      * Retrieves a list of assessments, along with their joined objects.
      *
      * @param PDOStatement $statement
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
@@ -1049,23 +1031,24 @@ class Mapper extends BaseMapper
     /**
      * @param PDOStatement $statement
      * @param bool         $hydrateProjectContext
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      */
     private function hydrateSelectRecursive(PDOStatement $statement, bool $hydrateProjectContext = true)
     {
-        /** @var Collection|Model[] $modelList */
+        /** @var GenericCollection<Model> $modelList */
         $modelList         = $this->createCollection();
         $dueWorkIds        = [];
         $projectIds        = [];
         $taskIds           = [];
+        $unitSpecIds       = [];
+        $unitImplIds       = [];
         $contextProjectIds = [];
         $lessonPlanIds     = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            /** @var Model $model */
             $model = $this->hydrate($row);
 
             $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
@@ -1080,36 +1063,20 @@ class Mapper extends BaseMapper
             }
             // Due work?
             if ($row['d.id']) {
-                $model->setDueWork(
-                    $this->hydrateJoin($row, 'duework', 'd')
-                        ->setMarkType($this->hydrateJoin($row, 'duework.mark_type', 'mt'))
-                        ->setInstructorMarkType($this->hydrateJoin($row, 'duework.instructor_mark_type', 'imt'))
-                        ->setCapabilityMarkType($this->hydrateJoin($row, 'duework.rubric_capability_mark_type_id', 'rmt'))
-                        ->setCapabilityGradeGroup($this->hydrateJoin($row, 'duework.rubric_capability_grade_group_id', 'rcgg'))
-                        ->setWorksheetTemplate(
-                            $this->hydrateJoin($row, 'duework.worksheetTemplate', 'dueworkWorksheetTemplate')
-                                 ?->setMimeType($this->hydrateJoin($row, 'duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplateAllowedFileExtension'))
-                        )
-                );
+                $model->setDueWork($this->hydrateJoin($row, 'duework', 'd'));
                 $dueWorkIds[] = $row['d.id'];
             } else {
                 $model->setDueWork(null);
             }
             // Quiz?
             if ($row['q.assess_id']) {
-                $model->setQuiz(
-                    $this->hydrateJoin($row, 'quiz', 'q')
-                        ->setMarkType($this->hydrateJoin($row, 'quiz.mark_type_id', 'qmt'))
-                );
+                $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
             } else {
                 $model->setQuiz(null);
             }
             // LTI assessment?
             if ($row['l.id']) {
-                $model->setLtiAssessment(
-                    $this->hydrateJoin($row, 'ltiAssessment', 'l')
-                        ->setLtiTool($this->hydrateJoin($row, 'ltiAssessment.ltiTool', 'ltool'))
-                );
+                $model->setLtiAssessment($this->hydrateJoin($row, 'ltiAssessment', 'l'));
             } else {
                 $model->setLtiAssessment(null);
             }
@@ -1153,63 +1120,20 @@ class Mapper extends BaseMapper
                 // Folder
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
             } elseif ($row['us.id']) {
-                // Unit spec
-                // Be sure to hydrate course spec's folder, too
+                // Unit spec: deeper joins will be hydrated later
                 /** @var UnitSpec\Model $unitSpec */
-                $unitSpec = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification',
-                    'us'
-                );
-
-                /** @var Folder\Model $unitSpecFolder */
-                $unitSpecFolder = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification.folder',
-                    'usf',
-                );
-                $unitSpec->setFolder($unitSpecFolder);
-
-                /** @var CourseSpec\Model $courseSpec */
-                $courseSpec = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification.course',
-                    'usc',
-                );
-
-                /** @var Folder\Model $courseSpecFolder */
-                $courseSpecFolder = $this->hydrateJoin(
-                    $row,
-                    'assessment_course_unit_specification.course.folder',
-                    'uscf',
-                );
-
-                $courseSpec->setFolder($courseSpecFolder);
-                $unitSpec->setCourse($courseSpec);
-                $context = $unitSpec;
+                $unitSpec      = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us');
+                $unitSpecIds[] = $row['us.id'];
+                $context       = $unitSpec;
             } elseif ($row['ui.id']) {
-                // Unit impl
+                // Unit impl: deeper joins will be hydrated later
                 /** @var UnitImpl\Model $unitImpl */
-                $unitImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
-                /** @var CourseImpl\Model $courseImpl */
-                $courseImpl = $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
-                                   ->setFolder(
-                                       $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
-                                   );
-                $unitImpl->setCourse($courseImpl);
-                $courseImpl->getUnits()[$unitImpl->getId()] = $unitImpl;
-                /** @var UnitSpec\Model $unitSpec */
-                $unitSpec = $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification', 'uis')
-                                 ->setFolder(
-                                     $this->hydrateJoin($row, 'assessment_course_unit_implementation.specification.folder', 'uisf')
-                                 );
-                $unitImpl->setSpecification($unitSpec);
-                $unitSpec->getUnitImplementations()[$unitImpl->getId()] = $unitImpl;
-                $context = $unitImpl;
+                $unitImpl      = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
+                $unitImplIds[] = $row['ui.id'];
+                $context       = $unitImpl;
             } elseif ($row['pa.id']) {
-                // Project
-                $context = $this->hydrateJoin($row, 'project_assessment', 'pa');
-                // Load context for this project itself
+                // Project: this project's assessments will be hydrated later
+                $context             = $this->hydrateJoin($row, 'project_assessment', 'pa');
                 $contextProjectIds[] = $row['pa.assessment_id'];
             }
 
@@ -1226,6 +1150,14 @@ class Mapper extends BaseMapper
 
             $modelList->add($model);
         }
+
+        // Augment all activity sub-objects (due work, task, quiz, etc.),
+        // only if their entire object structure hasn't already been hydrated:
+        // this excludes tasks, lesson plans, dialog agents and projects.
+        $modelList = $this->augmentListWithDueWorks($modelList);
+        $modelList = $this->augmentListWithQuizzes($modelList);
+        $modelList = $this->augmentListWithLtiAssessments($modelList);
+
         // Load related 1-M models
         // Due work files and Kami worksheet
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
@@ -1240,14 +1172,14 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
-        /* TODO Maybe augment with something here; can't remember what
-         */
-
-        // Project contexts
+        // Augment all contexts
+        $modelList = $this->augmentListWithUnitSpecContexts($modelList, $unitSpecIds);
+        $modelList = $this->augmentListWithUnitImplContexts($modelList, $unitImplIds);
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
             $modelList = $this->augmentListWithProjectContexts($modelList, $contextProjectIds);
         }
+
         // Folder codes for all contexts
         $modelList = $this->augmentListWithFolderCodes($modelList);
         // Specification assessments
@@ -1548,15 +1480,17 @@ class Mapper extends BaseMapper
      * For any projects found in $modelList, identified by $projectIds, find their sub-assessments
      * and load them into the projects.
      *
-     * @param Collection|Model[] $modelList
-     * @param array      $projectIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $projectIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException
      * @throws BaseMapper\Exception
      * @throws UnderflowException
      */
-    private function augmentListWithProjectSubAssessments(Collection $modelList, array $projectIds)
-    {
+    private function augmentListWithProjectSubAssessments(
+        GenericCollection $modelList,
+        array $projectIds,
+    ): GenericCollection {
         // Project sub-assessments
         if (!\count($projectIds)) {
             return $modelList;
@@ -1599,13 +1533,13 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with Curriculum Nodes
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    protected function augmentListWithCurriculumNodes($modelList)
+    protected function augmentListWithCurriculumNodes(GenericCollection $modelList): GenericCollection
     {
         if (count($modelList) === 0) {
             return $modelList;
@@ -1655,13 +1589,13 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with due work files.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $dueWorkIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $dueWorkIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithDueWorkFiles($modelList, $dueWorkIds)
+    protected function augmentListWithDueWorkFiles(GenericCollection $modelList, array $dueWorkIds): GenericCollection
     {
         if (!empty($dueWorkIds)) {
             // Retrieve and sort list of duework files
@@ -1691,12 +1625,14 @@ class Mapper extends BaseMapper
      * Augments the list from hydrateSelect() with due work Kami worksheet
      * templates.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $dueWorkIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $dueWorkIds
+     * @return GenericCollection<Model>
      */
-    protected function augmentListWithDueWorkKamiWorksheetTemplates($modelList, $dueWorkIds)
-    {
+    protected function augmentListWithDueWorkKamiWorksheetTemplates(
+        GenericCollection $modelList,
+        array $dueWorkIds,
+    ): GenericCollection {
         if (!empty($dueWorkIds)) {
             // Retrieve and sort list of Kami docs
             $kamiDocuments = $this->getJoinMapper('duework.kamiWorksheetTemplate')
@@ -1718,13 +1654,13 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with task files.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $taskIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $taskIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithTaskFiles($modelList, $taskIds)
+    protected function augmentListWithTaskFiles(GenericCollection $modelList, array $taskIds): GenericCollection
     {
         if (!empty($taskIds)) {
             // Retrieve and sort list of duework files
@@ -1754,14 +1690,16 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with Lesson Plan Files.
      *
-     * @param Collection $modelList
-     * @param array|int[]        $lessonPlanIds
-     * @return Collection
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $lessonPlanIds
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithLessonPlanFiles(Collection $modelList, array $lessonPlanIds)
-    {
+    protected function augmentListWithLessonPlanFiles(
+        GenericCollection $modelList,
+        array $lessonPlanIds,
+    ): GenericCollection {
         if (!empty($lessonPlanIds)) {
             /* Retrieve and sort list of Lesson Plan Files
              */
@@ -1788,14 +1726,83 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Augments the list from hydrateSelect() with context unit specs.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $unitSpecIds
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithUnitSpecContexts(
+        GenericCollection $modelList,
+        array $unitSpecIds,
+    ): GenericCollection {
+        if (!empty($unitSpecIds)) {
+            /** @var UnitSpec\Mapper $contextUnitSpecMapper */
+            $contextUnitSpecMapper = $this->getJoinMapper('assessment_course_unit_specification');
+            $contextUnitSpecs      = $contextUnitSpecMapper->findByColumn(
+                'id',
+                $unitSpecIds,
+                ['deleted' => true],
+            )->indexBy('id');
+
+            foreach ($modelList as $model) {
+                $context = $model->getAssessmentContext();
+                if ($context instanceof UnitSpec\Model) {
+                    $hydratedContext = $contextUnitSpecs[$context->getId()] ?? null;
+                    if ($hydratedContext instanceof UnitSpec\Model) {
+                        $model->setAssessmentContext($hydratedContext);
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
+    /**
+     * Augments the list from hydrateSelect() with context unit implementations.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>             $unitImplIds
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithUnitImplContexts(
+        GenericCollection $modelList,
+        array $unitImplIds,
+    ): GenericCollection {
+        if (!empty($unitImplIds)) {
+            /** @var UnitImpl\Mapper $contextUnitImplMapper */
+            $contextUnitImplMapper = $this->getJoinMapper('assessment_course_unit_implementation');
+            $contextUnitImpls      = $contextUnitImplMapper->findByColumn(
+                'id',
+                $unitImplIds,
+                ['deleted' => true],
+            )->indexBy('id');
+
+            foreach ($modelList as $model) {
+                $context = $model->getAssessmentContext();
+                if ($context instanceof UnitImpl\Model) {
+                    $hydratedContext = $contextUnitImpls[$context->getId()] ?? null;
+                    if ($hydratedContext instanceof UnitImpl\Model) {
+                        $model->setAssessmentContext($hydratedContext);
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
+
+    /**
      * Augments the list from hydrateSelect() with context projects.
      *
-     * @param Collection|Model[] $modelList
-     * @param array|int[]        $contextProjectIds
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>        $contextProjectIds
+     * @return GenericCollection<Model>
      */
-    protected function augmentListWithProjectContexts($modelList, $contextProjectIds)
-    {
+    protected function augmentListWithProjectContexts(
+        GenericCollection $modelList,
+        array $contextProjectIds,
+    ): GenericCollection {
         if (!empty($contextProjectIds)) {
             // A project loaded as a context should not contain sub-assessments.
             // It should also not be cached, so if I _do_ need to load the
@@ -1830,6 +1837,7 @@ class Mapper extends BaseMapper
         }
         return $modelList;
     }
+
     /**
      * Augments the list from hydrateSelect() with their context's folder codes.
      *
@@ -1837,11 +1845,11 @@ class Mapper extends BaseMapper
      * onto in getSelectString() due to the number of optional 1-M joins this
      * would require.
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      */
-    protected function augmentListWithFolderCodes($modelList)
+    protected function augmentListWithFolderCodes(GenericCollection $modelList): GenericCollection
     {
         $folderIds = [];
         // Pass 1: load folder IDs for all non-projects
@@ -1875,10 +1883,10 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with their specification assessments.
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
      */
-    protected function augmentListWithSpecifications($modelList)
+    protected function augmentListWithSpecifications(GenericCollection $modelList): GenericCollection
     {
         $specificationIds = [];
 
@@ -1912,12 +1920,12 @@ class Mapper extends BaseMapper
     /**
      * Augments the list from hydrateSelect() with their grade groups.
      *
-     * @param Collection|Model[] $modelList
-     * @return Collection|Model[]
+     * @param GenericCollection<Model>$modelList
+     * @return GenericCollection<Model>
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception
      */
-    protected function augmentListWithGradeGroups($modelList)
+    protected function augmentListWithGradeGroups(GenericCollection $modelList): GenericCollection
     {
         // Just load grade groups one by one - let the model cache do its thing
         /** @var SubmissionBox\GradeLevel\Group\Mapper $gradeGroupMapper */
@@ -1959,13 +1967,13 @@ class Mapper extends BaseMapper
     /**
      * Assign Lesson Plan Fields to each Lesson Plan instance
      *
-     * @param Collection $modelList
-     * @param array      $lessonPlanIds
-     * @return Collection
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $lessonPlanIds
+     * @return GenericCollection<Model>
      * @throws Exception
      * @throws Deleted
      */
-    private function augmentWithLessonPlanFields(Collection $modelList, array $lessonPlanIds): Collection
+    private function augmentWithLessonPlanFields(GenericCollection $modelList, array $lessonPlanIds): GenericCollection
     {
         /* Fetch all the Lesson Plan Fields used by this Lesson Plan
          */
@@ -1999,14 +2007,16 @@ class Mapper extends BaseMapper
     /**
      * Assign Lesson Plan Linked assessments to each Lesson Plan instance
      *
-     * @param Collection $modelList
-     * @param array      $lessonPlanIds
-     * @return Collection
+     * @param GenericCollection<Model> $modelList
+     * @param array<int>               $lessonPlanIds
+     * @return GenericCollection<Model>
      * @throws Exception
      * @throws Deleted
      */
-    private function augmentWithLessonPlanAssessments(Collection $modelList, array $lessonPlanIds): Collection
-    {
+    private function augmentWithLessonPlanAssessments(
+        GenericCollection $modelList,
+        array $lessonPlanIds,
+    ): GenericCollection {
         // Project sub-assessments
         if (!\count($lessonPlanIds)) {
             return $modelList;

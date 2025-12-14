@@ -393,7 +393,7 @@ class MapperProxy
 
         // get quantitative marks only
         $markTypeMapper = SubmissionBox\MarkTypeMapper::getInstance();
-        $markTypeIds    = $markTypeMapper->findIdsbyColumn(
+        $markTypeIds    = $markTypeMapper->findIdsByColumn(
             'slug',
             [LetterGrade::SLUG, Percentage::SLUG, TotalMarkFractional::SLUG]
         );
@@ -794,8 +794,15 @@ class MapperProxy
      */
     public function findAllByCourseSpecificationId(int $courseSpecId, array $options = []): GenericCollection
     {
+        // Find all unit specs for this course spec,
+        // then return all assessables for those unit specs.
+        $unitSpecMapper = $this->baseMapper->getJoinMapper('assessment_course_unit_specification');
+        $unitSpecIds    = $unitSpecMapper->findIdsByColumn('course_specification_id', $courseSpecId);
+        if (empty($unitSpecIds)) {
+            return $this->createCollection();
+        }
         $builder = $this->convertOptionsToPredicateBuilder($options, false)
-                        ->equals('usc.id', $courseSpecId);
+                        ->in('us.id', $unitSpecIds);
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
@@ -811,8 +818,15 @@ class MapperProxy
      */
     public function findAllByCourseImplementationId(int $courseImplId, array $options = []): GenericCollection
     {
+        // Find all unit impls for this course impl,
+        // then return all assessables for those unit impls.
+        $unitImplMapper = $this->baseMapper->getJoinMapper('assessment_course_unit_implementation');
+        $unitImplIds    = $unitImplMapper->findIdsbyColumn('course_implementation_id', $courseImplId);
+        if (empty($unitImplIds)) {
+            return $this->createCollection();
+        }
         $builder = $this->convertOptionsToPredicateBuilder($options, false)
-                        ->equals('uic.id', $courseImplId);
+                        ->in('ui.id', $unitImplIds);
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
@@ -913,34 +927,6 @@ class MapperProxy
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('f.id', $folderId);
-            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
-        } catch (UnderflowException $e) {
-            return $this->createCollection();
-        }
-    }
-
-    /**
-     * Finds all assessables that have been imported into a folder through a
-     * course import.
-     *
-     * This method does not currently load participants or the rubric grid.
-     *
-     * @deprecated Use `findAllForFolderId` to find assessables in a folder,
-     *             along with any that are in a unit import on that folder.
-     *
-     * @param int   $folderId
-     * @param array $options
-     * @return GenericCollection|IAssessable[]
-     * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
-     * @throws TypeError If a PredicateBuilder method is called with wrong data type
-     * @throws LogicException If cyclic graph detected during translation
-     */
-    public function findAllByCourseImplementationFolderId($folderId, array $options = [])
-    {
-        try {
-            // uicf.id = Unit Implementation Course Folder ID
-            $builder = $this->convertOptionsToPredicateBuilder($options, false)
-                            ->equals('uicf.id', $folderId);
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
             return $this->createCollection();
