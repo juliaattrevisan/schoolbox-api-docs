@@ -393,7 +393,7 @@ class MapperProxy
 
         // get quantitative marks only
         $markTypeMapper = SubmissionBox\MarkTypeMapper::getInstance();
-        $markTypeIds    = $markTypeMapper->findIdsbyColumn(
+        $markTypeIds    = $markTypeMapper->findIdsByColumn(
             'slug',
             [LetterGrade::SLUG, Percentage::SLUG, TotalMarkFractional::SLUG]
         );
@@ -797,7 +797,7 @@ class MapperProxy
         // Find all unit specs for this course spec,
         // then return all assessables for those unit specs.
         $unitSpecMapper = $this->baseMapper->getJoinMapper('assessment_course_unit_specification');
-        $unitSpecIds    = $unitSpecMapper->findIdsbyColumn('course_specification_id', $courseSpecId);
+        $unitSpecIds    = $unitSpecMapper->findIdsByColumn('course_specification_id', $courseSpecId);
         if (empty($unitSpecIds)) {
             return $this->createCollection();
         }
