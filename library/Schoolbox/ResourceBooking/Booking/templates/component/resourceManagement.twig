@@ -37,26 +37,37 @@
 {% if bookingsByResource | length %}
     <ul class="information-list">
         {% for item in bookingsByResource %}
-        <li class="row">
-            {# Show image for item if it's there, otherwise some empty image? #}
-            <ul class="information-list expandable-card action-list">
-                <li>
-                    <div>
+            {% set collapsableId = component.instance.id ~ '-collap-' ~ item.resource.id %}
+
+            <li>
+                <div class="actions-small-1">
+                    <div class="list-item">
                         <div class="card small-12">
+                            {# TODO: routeLookupIfAuthorized? #}
                             <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
                                 {% if item.resource.image.hash is defined and item.resource.image.hash %}
                                     <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" alt="{{ item.resource.name }}" />
                                 {% else %}
+                                    {# TODO: this feels strange #}
                                     {# this icon needs to be responsive to screen size #}
                                     <span class="icon-resource-booking size-32 no-text"></span>
                                 {% endif %}
+
                                 <h3>{{ item.resource.name }}</h3>
                             </a>
                         </div>
-                        <div class="expander icon-up-arrow" data-collapser="collap-{{ item.resource.id }}"></div>
                     </div>
-                </li>
-                <li class="content" id="collap-{{ item.resource.id }}" data-collapse-state="uncollapsed" data-collapsable="collap-{{ item.resource.id }}">
+                    <nav>
+                        <a
+                            href="#"
+                            data-collapser="{{ collapsableId }}"
+                            class="expander icon-up-arrow"
+                            title="Expand/collapse content"
+                        ></a>
+                    </nav>
+                </div>
+
+                <div class="small-12" data-collapse-state="uncollapsed" data-collapsable="{{ collapsableId }}">
                     <ul class="information-list">
                         {% for date in item.bookingEvents %}
                             <li class="actions-small-1">
@@ -86,9 +97,8 @@
                             </li>
                         {% endfor %}
                     </ul>
-                </li>
-            </ul>
-        </li>
+                </div>
+            </li>
         {% endfor %}
     </ul>
     <script type="text/javascript">
