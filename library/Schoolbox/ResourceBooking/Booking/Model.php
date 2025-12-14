@@ -339,7 +339,11 @@ class Model implements ISoftDeletable, JsonSerializable
     */
     public function jsonSerialize(): array
     {
-        return array(
+        // If booking start/end times are not set, use start/end times from the linked event.
+        $bookingStartAt = $this->getBookingStartAt() ?? $this->getEvent()->getStartDateTime();
+        $bookingEndAt = $this->getBookingEndAt() ?? $this->getEvent()->getEndDateTime();
+
+        return [
             'id'       => $this->getId(),
             'name'     => $this->getName(),
             'resource' => $this->getResource()->jsonSerialize(),
@@ -347,7 +351,9 @@ class Model implements ISoftDeletable, JsonSerializable
                 'start' => $this->getEvent()->getStartDateTime()?->toIso8601String(),
                 'end'   => $this->getEvent()->getEndDateTime()?->toIso8601String(),
             ],
+            'start' => $bookingStartAt?->toIso8601String(),
+            'end' => $bookingEndAt?->toIso8601String(),
             'status' => $this->getStatus()->jsonSerialize()
-        );
+        ];
     }
 }

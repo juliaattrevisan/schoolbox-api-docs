@@ -46,6 +46,15 @@ function updateToastAndRefreshPage(toast: Toast, responseData: EditBookingRespon
 }
 
 /**
+ * The event's date, as submitted via the form.
+ * @param datetimeString {string} The datetime in ISO8601 format.
+ * @returns The datetime in local format.
+ */
+function getDateInLocalFormat(datetimeString: string): string {
+    return datetimeString ? window.dayjs(datetimeString).format(window.dateDisplayFormats.dayjsDatetime) : "";
+}
+
+/**
  * Post the booking creation form.
  */
 async function postEditBookingForm(): Promise<void> {
@@ -129,6 +138,8 @@ function toggleEditForm(): void {
                 :use-time="true"
                 :label-start="'From'"
                 :label-end="'Until'"
+                :start-value="getDateInLocalFormat(booking.start)"
+                :end-value="getDateInLocalFormat(booking.end)"
             />
             <div>
                 <label for="resource-booking-row-textarea">Notes</label>
