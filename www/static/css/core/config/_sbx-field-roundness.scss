@@ -1,0 +1,54 @@
+/**
+ * Field roundness config
+ * Used to control border-radius of form and UI elements
+ * Scoped to Advanced UI
+ */
+
+:root {
+    --sbx-config-field-roundness: var(--sbx-border-radius-normal);
+}
+
+.sbx-body {
+    // Core elements
+    select,
+    textarea,
+    .selectize-control,
+    .sbx-colour-picker,
+    .sbx-attachzone,
+    .sbx-chip,
+    .sbx-switch,
+    .sbx-radio-block,
+    .sbx-progress,
+    .sbx-alert,
+    .component-titlebar,
+    .context-switch,
+    .avatar-switch,
+    .checklist-container,
+    .alert-box,
+    .alert-box-icon,
+    .button-block,
+    input[type="radio"] + .block,
+    .dzone,
+
+    // Labels
+    .reviewed.label,
+    .submitted.label,
+    .submitted-late.label,
+    .unsubmitted.label,
+    .success.label,
+    .alert.label,
+    .neutral.label,
+    .label.highlight,
+    .label.filter,
+
+    // Specific inner elements
+    .checklist.events li label,
+    .c-chips label,
+    .switch label,
+    .selector label::before,
+    .selector label::after,
+    .progress,
+    .progress .meter {
+        border-radius: var(--sbx-config-field-roundness) !important;
+    }
+}

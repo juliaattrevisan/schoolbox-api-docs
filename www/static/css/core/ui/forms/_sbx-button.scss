@@ -25,7 +25,7 @@
 .sbx-body .introjs-button {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundness);
     color: var(--sbx-color-foreground-primary);
     &:hover,
     &:active {
@@ -64,7 +64,7 @@
 .sbx-body .input-group a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundness);
     color: var(--sbx-color-accent);
     &:hover,
     &:active {
@@ -107,7 +107,7 @@
 .sbx-body .input-group .button,
 .sbx-body .input-group a {
     border-left: none;
-    border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
+    border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
     line-height: 1;
 }
 
@@ -160,7 +160,7 @@
  */
 .sbx-body .c-filter-search-term__button {
     background-color: var(--sbx-color-accent);
-    border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
+    border-radius: 0 var(--sbx-config-field-roundness) var(--sbx-config-field-roundness) 0;
     height: auto;
 }
 
@@ -178,7 +178,7 @@
  */
 .sbx-body nav a[class*="icon-"]:hover,
 .sbx-body nav a[class^="icon-"]:hover {
-    border-radius: var(--sbx-border-radius-normal) !important;
+    border-radius: var(--sbx-config-field-roundness) !important;
 }
 
 /**

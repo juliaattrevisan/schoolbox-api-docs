@@ -4,7 +4,7 @@
 .sbx-input-text[type="text"] {
     background-color: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundess);
     color: var(--sbx-color-text-primary);
     color: var(--color-text-primary);
     font-size: max(16px, 1rem);
@@ -44,7 +44,7 @@
 }
 
 .sbx-input-text--with-button[type="text"] {
-    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundess) 0 0 var(--sbx-config-field-roundess);
 }
 .inline-input-container {
     flex-direction: row !important;

@@ -26,9 +26,6 @@ body {
     --body-background-l: 96%;
     --body-background-s: 49%;
 
-    --ck-border-radius: var(--sbx-border-radius-normal);
-    --ck-color-toolbar-border: var(--sbx-color-accent);
-
     font-family: var(--ff-primary) !important;
 
     // to prevent barcode/vjs/view file modal icons override
@@ -42,21 +39,11 @@ body {
 
 #hybrid-bar {
     margin: 1rem;
-
-    & .tab-bar {
-        background-image: var(--gradient-primary);
-        border-radius: var(--sbx-border-radius-normal);
-    }
-    & .top-menu li a:hover {
-        border-radius: var(--sbx-border-radius-normal);
-    }
 }
 
 // Notifications styles
 #notifications {
     align-items: center;
-    border-bottom-right-radius: var(--sbx-border-radius-normal);
-    border-top-right-radius: var(--sbx-border-radius-normal);
     display: flex;
     overflow: hidden;
     padding: 1rem;
@@ -125,8 +112,6 @@ body {
 // Component Container Styles
 #component-layout .component-container {
     border: 1px solid var(--sbx-color-foreground-secondary);
-    border-radius: var(--sbx-border-radius-normal);
-    box-shadow: var(--sbx-shadow-m);
 
     & .component-titlebar {
         border-color: var(--sbx-color-foreground-secondary);
@@ -147,16 +132,6 @@ body {
             font-family: var(--ff-primary);
             font-weight: 800;
         }
-    }
-
-    & .row > .columns > .component-titlebar {
-        border-top-left-radius: var(--sbx-border-radius-normal);
-        border-top-right-radius: var(--sbx-border-radius-normal);
-    }
-
-    & .row > .island section:last-child {
-        border-bottom-left-radius: var(--sbx-border-radius-normal);
-        border-bottom-right-radius: var(--sbx-border-radius-normal);
     }
 
     & .row:first-child:has(+ .row[data-collapse-state="collapsed"]) .component-titlebar {
@@ -533,7 +508,6 @@ input[type="checkbox"]:not(.plain) + label::before {
 }
 
 .checklist-container {
-    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
 
     & label:last-of-type {
@@ -541,41 +515,11 @@ input[type="checkbox"]:not(.plain) + label::before {
     }
 }
 
-.checklist.events {
-    & li label {
-        border-radius: var(--sbx-border-radius-normal);
-    }
-}
-
-.c-chips {
-    & label {
-        border-radius: var(--sbx-border-radius-normal) !important;
-    }
-}
-
 .switch {
     & label {
-        border-radius: var(--sbx-border-radius-normal);
-
         &::after {
             border-radius: var(--sbx-border-radius-full);
         }
-    }
-}
-
-.button-block,
-input[type="radio"] + .block {
-    border-radius: var(--sbx-border-radius-normal);
-}
-
-.dzone {
-    border-radius: var(--sbx-border-radius-normal);
-}
-
-.selector {
-    & label::before,
-    & label::after {
-        border-radius: var(--sbx-border-radius-normal);
     }
 }
 
@@ -683,22 +627,6 @@ input[type="radio"] + .block {
    15. Progress, Alerts, Tooltips & Misc Components
    ========================================================================== */
 
-.reviewed.label,
-.submitted.label,
-.submitted-late.label,
-.unsubmitted.label,
-.success.label,
-.alert.label,
-.neutral.label,
-.label.highlight,
-.label.filter {
-    border-radius: var(--sbx-border-radius-normal);
-}
-
-.alert-box,
-.alert-box-icon {
-    border-radius: var(--sbx-border-radius-normal);
-}
 .alert-box .close,
 .eotc-status .close,
 .alert-box-icon .close {
@@ -706,12 +634,7 @@ input[type="radio"] + .block {
 }
 
 .progress {
-    border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
-
-    & .meter {
-        border-radius: var(--sbx-border-radius-normal);
-    }
 }
 
 // Modal styles
@@ -808,7 +731,7 @@ input[type="radio"] + .block {
 
 .c-search-page__filters {
     border: var(--border);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundness);
     box-shadow: var(--sbx-shadow-m);
     height: fit-content;
     overflow: hidden;
@@ -817,14 +740,9 @@ input[type="radio"] + .block {
         border-bottom: var(--border);
     }
 
-    & .checklist {
-        // removed [data-v-3721f532] as we cannot use it in global css
-        border-radius: calc(var(--sbx-border-radius-normal) / 3);
-    }
-
     & [data-test="search-select-creator"] {
         & .results-container .results {
-            border-radius: var(--sbx-border-radius-normal) !important;
+            border-radius: var(--sbx-config-field-roundness) !important;
         }
     }
 }
@@ -834,10 +752,8 @@ input[type="radio"] + .block {
         & > .l-flex-col {
             border: var(--border);
             border-radius: var(--sbx-border-radius-normal);
-            border-width: 0.06rem;
 
             & button[data-test^="sp-results-sub-results"] {
-                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent);
                 color: var(--sbx-color-accent-text);
                 margin-bottom: 0;
             }
@@ -846,22 +762,6 @@ input[type="radio"] + .block {
         & .c-card--border-end {
             border-color: var(--sbx-color-foreground-secondary);
         }
-
-        & .c-card--child {
-            background-color: transparent;
-            border-inline-start-width: 2px;
-        }
-
-        & > [data-test="sp-results-load-more-button"] {
-            background-color: var(--sbx-color-accent);
-            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
-            color: var(--sbx-color-accent-text);
-        }
-    }
-
-    & sbx-pop-out {
-        border-radius: 50%;
-        overflow: hidden;
     }
 }
 
@@ -948,21 +848,21 @@ input[type="radio"] + .block {
 
 .fc {
     border: var(--border);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundness);
 
     & .fc-button-group {
         display: flex;
         gap: 0.5rem;
 
         & button {
-            border-radius: var(--sbx-border-radius-normal) !important;
+            border-radius: var(--sbx-config-field-roundness) !important;
             padding-inline: 1rem;
 
             &.fc-customNext-button,
             &.fc-customPrev-button {
                 background-color: transparent;
                 border: 1px solid var(--sbx-color-accent);
-                border-radius: var(--sbx-border-radius-normal);
+                border-radius: var(--sbx-config-field-roundness);
 
                 & a {
                     background-color: transparent !important;
@@ -1025,7 +925,7 @@ input[type="radio"] + .block {
     }
 
     & .fc-event {
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-config-field-roundness);
     }
 
     & .fc-toolbar-title {
@@ -1043,11 +943,11 @@ input[type="radio"] + .block {
     &:has(.no-hover) {
         border: var(--border);
         border-color: #dde5ec;
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-config-field-roundness);
         border-width: 2px;
 
         & .timetable {
-            border-radius: var(--sbx-border-radius-normal);
+            border-radius: var(--sbx-config-field-roundness);
         }
     }
 }
