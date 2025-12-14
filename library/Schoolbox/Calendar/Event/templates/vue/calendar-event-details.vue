@@ -655,7 +655,7 @@ export default {
         </div>
 
         <div v-if="event.resourceBookings" class="small-12 medium-8 island">
-            <section class="detail content">
+            <section v-if="event.resourceBookings.length > 0" class="detail content">
                 <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
                     <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
@@ -671,45 +671,43 @@ export default {
                 </div>
                 <div class="meta"></div>
                 <div class="content-section">
-                    <div v-if="event.resourceBookings.length > 0">
-                        <div
-                            v-for="booking in event.resourceBookings"
-                            :key="booking.id"
-                            class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
-                        >
-                            <div>
-                                <!-- Intentionally display the resource name here, not the booking name -->
-                                {{ booking.resource.name }}
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="label"
-                                    :class="{
-                                        pending: booking.status.isPending,
-                                        approved: booking.status.isApproved,
-                                        rejected: booking.status.isRejected,
-                                    }"
-                                    >{{ booking.status.name }}</span
-                                >
-                                <a
-                                    href="#"
-                                    class="icon-modify"
-                                    title="Modify Booking"
-                                    aria-label="Modify Booking"
-                                    onclick="alert('TODO: Implement edit booking modal (SA-21381)')"
-                                ></a>
-                            </div>
+                    <div
+                        v-for="booking in event.resourceBookings"
+                        :key="booking.id"
+                        class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
+                    >
+                        <div>
+                            <!-- Intentionally display the resource name here, not the booking name -->
+                            {{ booking.resource.name }}
                         </div>
-                    </div>
-                    <div v-else class="empty-state">
-                        <i class="icon-resource-booking"></i>
-                        <p>No resources are booked for this event.</p>
-                        <a v-if="canModify()" href="#" @click.prevent="showAddResourceBookingsModal()"
-                            >Book resources for this event</a
-                        >
+                        <div class="text-right">
+                            <span
+                                class="label"
+                                :class="{
+                                    pending: booking.status.isPending,
+                                    approved: booking.status.isApproved,
+                                    rejected: booking.status.isRejected,
+                                }"
+                                >{{ booking.status.name }}</span
+                            >
+                            <a
+                                href="#"
+                                class="icon-modify"
+                                title="Modify Booking"
+                                aria-label="Modify Booking"
+                                onclick="alert('TODO: Implement edit booking modal (SA-21381)')"
+                            ></a>
+                        </div>
                     </div>
                 </div>
             </section>
+            <div v-else class="empty-state">
+                <i class="icon-resource-booking"></i>
+                <p>No resources are booked for this event.</p>
+                <a v-if="canModify()" href="#" @click.prevent="showAddResourceBookingsModal()">
+                    Book resources for this event
+                </a>
+            </div>
         </div>
 
         <div data-toast class="toast"></div>
