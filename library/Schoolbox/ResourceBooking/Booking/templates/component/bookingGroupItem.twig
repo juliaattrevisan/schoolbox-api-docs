@@ -32,7 +32,7 @@
                     </time>
                 {% endif %}
             </div>
-            <div class="tiny card">
+            <div class="tiny card wrap-down">
                 {# small portrait of booker #}
                 <a href="/search/user/{{ event.booking.event.owner.id }}">
                     {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
