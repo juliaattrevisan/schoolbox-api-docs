@@ -83,6 +83,7 @@ class Controller extends Base
      * @param FieldContextMapper $fieldContextMapper
      * @param CriterionMapper $criterionMapper,
      * @param \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
+     * @param DialogAgentResponseMessageMapper                                $dialogAgentResponseMessageMapper
      */
     public function __construct(
         private Access $access,
@@ -103,7 +104,8 @@ class Controller extends Base
         private ScenarioMapper $scenarioMapper,
         private FieldContextMapper $fieldContextMapper,
         private CriterionMapper $criterionMapper,
-        private \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
+        private \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource,
+        private DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper,
     ) {
     }
 
@@ -553,8 +555,7 @@ class Controller extends Base
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $agentConfig,
-            // TODO inject
-            DialogAgentResponseMessageMapper::getInstance(),
+            $this->dialogAgentResponseMessageMapper,
         );
 
         try {
@@ -634,8 +635,7 @@ class Controller extends Base
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $agentConfig,
-            // TODO inject
-            DialogAgentResponseMessageMapper::getInstance(),
+            $this->dialogAgentResponseMessageMapper,
         );
 
         try {
