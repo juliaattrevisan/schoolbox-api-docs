@@ -731,7 +731,7 @@ input[type="checkbox"]:not(.plain) + label::before {
 
 .c-search-page__filters {
     border: var(--border);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundness);
     box-shadow: var(--sbx-shadow-m);
     height: fit-content;
     overflow: hidden;
@@ -742,7 +742,7 @@ input[type="checkbox"]:not(.plain) + label::before {
 
     & [data-test="search-select-creator"] {
         & .results-container .results {
-            border-radius: var(--sbx-border-radius-normal) !important;
+            border-radius: var(--sbx-config-field-roundness) !important;
         }
     }
 }
@@ -752,10 +752,8 @@ input[type="checkbox"]:not(.plain) + label::before {
         & > .l-flex-col {
             border: var(--border);
             border-radius: var(--sbx-border-radius-normal);
-            border-width: 0.06rem;
 
             & button[data-test^="sp-results-sub-results"] {
-                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent);
                 color: var(--sbx-color-accent-text);
                 margin-bottom: 0;
             }
@@ -764,22 +762,6 @@ input[type="checkbox"]:not(.plain) + label::before {
         & .c-card--border-end {
             border-color: var(--sbx-color-foreground-secondary);
         }
-
-        & .c-card--child {
-            background-color: transparent;
-            border-inline-start-width: 2px;
-        }
-
-        & > [data-test="sp-results-load-more-button"] {
-            background-color: var(--sbx-color-accent);
-            border-radius: calc(var(--sbx-border-radius-normal) / 3) !important;
-            color: var(--sbx-color-accent-text);
-        }
-    }
-
-    & sbx-pop-out {
-        border-radius: 50%;
-        overflow: hidden;
     }
 }
 
@@ -866,21 +848,21 @@ input[type="checkbox"]:not(.plain) + label::before {
 
 .fc {
     border: var(--border);
-    border-radius: var(--sbx-border-radius-normal);
+    border-radius: var(--sbx-config-field-roundness);
 
     & .fc-button-group {
         display: flex;
         gap: 0.5rem;
 
         & button {
-            border-radius: var(--sbx-border-radius-normal) !important;
+            border-radius: var(--sbx-config-field-roundness) !important;
             padding-inline: 1rem;
 
             &.fc-customNext-button,
             &.fc-customPrev-button {
                 background-color: transparent;
                 border: 1px solid var(--sbx-color-accent);
-                border-radius: var(--sbx-border-radius-normal);
+                border-radius: var(--sbx-config-field-roundness);
 
                 & a {
                     background-color: transparent !important;
@@ -943,7 +925,7 @@ input[type="checkbox"]:not(.plain) + label::before {
     }
 
     & .fc-event {
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-config-field-roundness);
     }
 
     & .fc-toolbar-title {
@@ -961,11 +943,11 @@ input[type="checkbox"]:not(.plain) + label::before {
     &:has(.no-hover) {
         border: var(--border);
         border-color: #dde5ec;
-        border-radius: var(--sbx-border-radius-normal);
+        border-radius: var(--sbx-config-field-roundness);
         border-width: 2px;
 
         & .timetable {
-            border-radius: var(--sbx-border-radius-normal);
+            border-radius: var(--sbx-config-field-roundness);
         }
     }
 }

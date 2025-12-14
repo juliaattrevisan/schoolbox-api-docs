@@ -93,7 +93,12 @@ function onAutoClickInterruptRequested(): void {
         Cancel ongoing search
     </button>
     <sp-results-error v-else-if="loadMoreResultsStore.hasLoadError" />
-    <button v-else-if="showLoadMore" data-test="sp-results-load-more-button" @click.prevent="onLoadMoreSelected">
+    <button
+        v-else-if="showLoadMore"
+        class="button"
+        data-test="sp-results-load-more-button"
+        @click.prevent="onLoadMoreSelected"
+    >
         Load more results
     </button>
     <div v-else-if="resultsStore.hasLoadedAllResults" class="alert-box" data-test="sp-results-load-more-all-loaded">
