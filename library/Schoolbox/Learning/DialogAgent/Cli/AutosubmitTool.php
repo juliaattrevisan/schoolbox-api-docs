@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent\Cli;
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\TimeTaken;
 
 /**
  * Dialog Agent Autosubmit
@@ -41,7 +40,7 @@ class AutosubmitTool extends CliTool\App
      */
     private const string QUERY_UPDATE = "
         UPDATE dialog_agent_response
-        SET 
+        SET
             submitted_at = :submittedAt,
             submitted_by = :submittedBy
         WHERE id = :id
@@ -73,14 +72,14 @@ discussion but neglect to officially submit their response to the activity. This
 to the end datetime of the activity on behalf of the student when the activity reaches its due/close date (these dates
 are synonymous specifically in Dialog Agents). The student will be presumed to be the person who submitted it since we
 don't have a "system user" to do that.
- 
+
 Usage:    autosubmit.php --expired --perform [-vvv]
 
 
 Response Duration
 -----------------
-A secondary usage is when students' responses took longer than the time that was allowed per response. That can occur 
-when students start their response, but then shut their computers and walk away until the allotted time has elapsed. 
+A secondary usage is when students' responses took longer than the time that was allowed per response. That can occur
+when students start their response, but then shut their computers and walk away until the allotted time has elapsed.
 That could be by choice (non-participation) or by circumstance (eg. the internet turned off). Such responses, if they
 remained in an unsubmitted state, will be arbitrarily submitted on behalf of the student.
 
@@ -124,7 +123,7 @@ HELP;
     private function autosubmitExpirededActivities(): void
     {
         $statement = $this->getDatabaseInternal()->prepare("
-            SELECT 
+            SELECT
                 dar.id, dar.learner_id,
                 a.title, a.due_date,
                 da.assessment_id
@@ -184,7 +183,7 @@ HELP;
         /* Find all the unsubmitted responses to dialog agents that enforce a duration per response
          */
         $statement = $this->getDatabaseInternal()->prepare("
-            SELECT 
+            SELECT
                 dar.id, dar.learner_id, dar.started_at, dar.submitted_at, dar.created_at,
                 a.title, a.due_date,
                 da.assessment_id, da.duration
