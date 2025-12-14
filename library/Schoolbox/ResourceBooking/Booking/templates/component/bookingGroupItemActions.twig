@@ -53,28 +53,28 @@
 {% else %} {# standard pending booking tot options #}
     <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
         <li>
-            <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
-                class="icon-modify">Modify Booking</a>
+            <a
+                href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
+                class="icon-modify"
+            >Modify Booking</a>
         </li>
-        <li class="separator">Set Status</li>
 
+        <li class="separator">Set Status</li>
         <li>
-            <a href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+            <a
+                href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
                 data-series-id="{{ event.booking.event.seriesId }}"
                 data-set-status="approved"
-                class="icon-approve">Approved</a>
+                class="icon-approve"
+            >Approve</a>
         </li>
         <li>
-            <a href="{{ routeLookup('resourceBooking.setPending', {id: event.booking.id}) }}"
-                data-series-id="{{ event.booking.event.seriesId }}"
-                data-set-status="pending"
-                class="icon-undo">Pending</a>
-        </li>
-        <li>
-            <a href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+            <a
+                href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
                 data-series-id="{{ event.booking.event.seriesId }}"
                 data-set-status="rejected"
-                class="icon-close">Rejected</a>
+                class="icon-close"
+            >Reject</a>
         </li>
     </ul>
 {% endif %}
