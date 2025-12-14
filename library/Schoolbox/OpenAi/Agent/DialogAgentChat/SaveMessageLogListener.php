@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent\DialogAgentChat;
 
+use Alaress_Date_Format;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as ResponseMessageMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
@@ -57,6 +58,10 @@ class SaveMessageLogListener implements IListener
                 ->setRole(Role::Assistant->value)
                 ->setStatus(Status::fromMessageEventType(MessageEventType::COMPLETE)?->value)
                 ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
+                // Set the creation time to the current time,
+                // instead of the request time:
+                // this more accurately reflects when the response was received.
+                ->setCreatedAt(Alaress_Date_Format::newFromTimestamp(time()))
             ;
             // TODO set created at as exact time, not request time
             $this->responseMessageMapper->save($responseMessageModel);
