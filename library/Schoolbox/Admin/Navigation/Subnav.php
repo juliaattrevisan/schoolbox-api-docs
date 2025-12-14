@@ -315,14 +315,14 @@ class Subnav
                         'visible'     =>
                             ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
                             (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
-                        'description' => 'Adjustment categories.',
+                        'description' => 'Configure Adjustment Categories that are available on Differentiation Profiles.',
                     ],
                     '/adminv2/lists/differentiation/adjustment-levels' => [
                         'name'        => 'Lists - Adjustment Levels',
                         'visible'     =>
                             ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
                             (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
-                        'description' => 'Adjustment levels.',
+                        'description' => 'Configure Adjustment Levels that are available on Differentiation Profiles.',
                     ],
                     '/adminv2/differentiation/differentiation-profiles' => [
                         'name'        => 'Settings - Differentiation',
