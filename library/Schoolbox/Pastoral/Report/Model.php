@@ -79,7 +79,7 @@ class Model implements ISoftDeletable
     public const THIS_YEAR        = 'first day of january';
     public const THIS_SCHOOL_YEAR = 'first day of school year';
     public const PAST_FORTNIGHT   = '14 days ago';
-    public const ACADEMIC_PERIOD  = 'academic period'; // this is the only one that isn't a strtotime string
+    public const ACADEMIC_PERIOD  = 'this term'; // this is the only one that isn't a strtotime string
     public const TODAY            = 'today';
     public const PAST_6_MONTHS    = '6 months ago';
     public const PAST_3_MONTHS    = '3 months ago';
