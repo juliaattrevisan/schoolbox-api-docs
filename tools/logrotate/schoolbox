@@ -51,7 +51,8 @@
 /var/log/schoolbox/*/learnosity-reset-failed.log
 /var/log/schoolbox/*/learnosity-deploy-credentials.log
 /var/log/schoolbox/*/firebase-deploy-credentials.log
-/var/log/schoolbox/*/S3-backup.log {
+/var/log/schoolbox/*/S3-backup.log
+/var/log/schoolbox/*/dialogagent-autosubmit.log {
     monthly
     missingok
     rotate 6
