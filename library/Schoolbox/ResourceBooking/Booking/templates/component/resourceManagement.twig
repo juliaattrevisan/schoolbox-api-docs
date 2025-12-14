@@ -86,7 +86,7 @@
                                                     booking: booking,
                                                     event: booking.event,
                                                     returnUrl: returnUrl,
-                                                    showNav: true,
+                                                    isClash: false,
                                                 } only %}
 
                                                 {% for clash in booking.clash %}
@@ -95,7 +95,7 @@
                                                         booking: booking,
                                                         event: clash,
                                                         returnUrl: returnUrl,
-                                                        showNav: false,
+                                                        isClash: true,
                                                     } only %}
                                                 {% endfor %}
                                             {% endfor %}

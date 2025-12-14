@@ -5,14 +5,18 @@
  # @param array  $booking
  # @param array  $event
  # @param string $returnUrl
- # @param bool   $showNav
+ # @param bool   $isClash
  #}
 
 <li>
     <div class="actions-small-1">
         <div class="list-item">
-             {# pending entries here are clashes, so we need to change the styling #}
-            <div {% if booking.clash %}class="warning"{% endif %}>
+            {# pending entries here are clashes, so we need to change the styling #}
+            <div {% if booking.clash or isClash %}class="warning"{% endif %}>
+                {% if isClash %}
+                    Clashes with
+                {% endif %}
+
                 {# time, and only time (start - end) #}
                 {# Precompute time and alert icon for readability #}
                 {% set showEndTime = event.booking.event.startDateTime.getShort() != event.booking.event.endDateTime.getShort() %}
@@ -20,13 +24,14 @@
                 {% set startDateTime = event.booking.event.startDateTime.getDatabase() %}
                 {% set endTime = event.booking.event.endDateTime.getTimeOnly() %}
                 {% set endDateTime = event.booking.event.endDateTime.getDatabase() %}
-                {% set showAlertIcon = booking.clash and event.booking.status.ispending %}
+
                 <time datetime="{{ startDateTime }}">{{ startTime }}</time>
                 {% if showEndTime %}
                     -
                     <time datetime="{{ endDateTime }}">
                         {{ endTime }}
-                        {% if showAlertIcon %}
+                        {# only show the alert on the main booking which contains clashes #}
+                        {% if booking.clash and not isClash %}
                             <i class="icon-alert warning">&nbsp;</i>
                         {% endif %}
                     </time>
@@ -53,7 +58,8 @@
             </div>
         </div>
 
-        {% if showNav %}
+        {# only show actions when this isn't a clash booking as the booking this is clashing with will have the actions instead  #}
+        {% if not isClash %}
             {% include '@resourceBooking/component/bookingGroupItemActions.twig' with {
                 item: item,
                 booking: booking,
