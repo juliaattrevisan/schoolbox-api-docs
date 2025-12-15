@@ -145,6 +145,8 @@ async function postEditBookingForm(): Promise<void> {
                 :use-time="true"
                 :label-start="'From'"
                 :label-end="'Until'"
+                name-start="startDatetime"
+                name-end="endDatetime"
             />
             <div>
                 <label for="resource-booking-row-textarea">Notes</label>
