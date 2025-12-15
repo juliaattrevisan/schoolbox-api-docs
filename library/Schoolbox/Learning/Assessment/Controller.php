@@ -1339,6 +1339,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
                 'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                'customisedFor' =>  $assessment->getId(),
             ]
         );
     }
@@ -1399,6 +1400,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
                 'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
                 'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                'customisedFor' =>  $assessment->getId(),
             ]
         );
     }
