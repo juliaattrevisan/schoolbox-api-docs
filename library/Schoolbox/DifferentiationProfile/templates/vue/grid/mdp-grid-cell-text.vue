@@ -43,7 +43,7 @@ const { contentHeight, componentActionHeight } = useContentHeight(
 
 // #region modifying the text content with CKEditor
 
-const initialTextboxContent = props.text ?? "";
+const initialTextboxContent = window.Vue.ref(props.text ?? "");
 const currentText = window.Vue.ref<string | null>(props.text);
 const editorContent = window.Vue.ref(props.text ?? "");
 const editorContentEl = window.Vue.ref<HTMLElement | null>(null);
@@ -188,17 +188,18 @@ function onModify(): void {
  */
 window.Vue.watch(
     () => props.text,
-    async (newText) => {
+    (newText) => {
         if (newText === currentText.value) {
             return;
         }
         currentText.value = newText;
         editorContent.value = newText ?? "";
         if (isEditorCreated.value) {
+            // update the editor data if it's already created
             editor.setData(editorContent.value);
         } else {
-            await focusEditor();
-            editor.setData(editorContent.value);
+            // otherwise just update the initial content
+            initialTextboxContent.value = editorContent.value;
         }
     },
 );
