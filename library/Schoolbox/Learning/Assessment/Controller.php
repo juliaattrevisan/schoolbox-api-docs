@@ -311,25 +311,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['participants'] = $originalAssessment
                 ->getAllParticipants()
                 ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
-                ->map(function (Participant $participant) use ($originalAssessmentId) {
-                    $student = $participant->getUser();
-                    return [
-                        'id'         => $participant->getId(),
-                        'excludedAt' => $participant->getExcludedAt(),
-                        'user'       => $student,
-                        'plan'       => $participant->getPlan(),
-                        'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($originalAssessmentId, $student->getId()),
-                        '_links'     => [
-                            'differentiationProfile' => $this->getRouteIfAuthorized(
-                                'differentiationProfiles.viewDifferentiationProfileData',
-                                [
-                                    'student' => $student,
-                                    'studentId' => $student->getId()
-                                ],
-                            ),
-                        ]
-                    ];
-                })->reindex();
+                ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $originalAssessmentId))
+                ->reindex();
         }
 
         /* When creating a new assessment, no curriculum nodes are selected by default
@@ -616,25 +599,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $student = explode(',', $this->requestQuery->get('student', ''));
         $data['participants'] = $assessment->getAllParticipants()
             ->filter(fn(Participant $participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) use ($assessment) {
-                $student = $participant->getUser();
-                return [
-                    'id'         => $participant->getId(),
-                    'excludedAt' => $participant->getExcludedAt(),
-                    'user'       => $student,
-                    'plan'       => $participant->getPlan(),
-                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getId(), $student->getId()),
-                    '_links'     => [
-                        'differentiationProfile' => $this->getRouteIfAuthorized(
-                            'differentiationProfiles.viewDifferentiationProfileData',
-                            [
-                                'student' => $student,
-                                'studentId' => $student->getId()
-                            ],
-                        ),
-                    ]
-                ];
-            })->reindex();
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getId()))
+            ->reindex();
 
 
         $this->response = $this->responseFromTemplate("@learningAssessment/create.twig", $data);
@@ -793,23 +759,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['participants'] = $assessment
             ->getAllParticipants()
             ->filter(fn($participant) => !$participant->isExcluded())
-            ->map(function ($participant) use ($assessment) {
-                $student = $participant->getUser();
-                return [
-                    'id' => $participant->getId(),
-                    'user' => $student,
-                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getOriginalAssessmentId(), $student->getId()),
-                    '_links'     => [
-                        'differentiationProfile' => $this->getRouteIfAuthorized(
-                            'differentiationProfiles.viewDifferentiationProfileData',
-                            [
-                                'student' => $student,
-                                'studentId' => $student->getId()
-                            ],
-                        ),
-                    ]
-                ];
-            })->reindex();
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getOriginalAssessmentId()))
+            ->reindex();
 
         if (null !== $assessment->getOriginalAssessmentId()) {
             $data['customisedFor'] = $assessment->getOriginalAssessmentId();
@@ -1309,25 +1260,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) use ($assessment) {
-                $student = $participant->getUser();
-                return [
-                    'id' => $participant->getId(),
-                    'excludedAt' => $participant->getExcludedAt(),
-                    'user' => $student,
-                    'plan' => $participant->getPlan(),
-                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getId(), $student->getId()),
-                    '_links'     => [
-                        'differentiationProfile' => $this->getRouteIfAuthorized(
-                            'differentiationProfiles.viewDifferentiationProfileData',
-                            [
-                                'student' => $student,
-                                'studentId' => $student->getId()
-                            ],
-                        ),
-                    ]
-                ];
-            })->reindex();
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getId()))
+            ->reindex();
 
         $assessmentData = $this->getAssessmentTwigData($assessment);
         $this->response = $this->responseFromTemplate(
@@ -1368,25 +1302,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => $plan->getParticipants()->keyExists($participant->getUser()->getId()))
-            ->map(function (Participant $participant) use ($assessment) {
-                $student = $participant->getUser();
-                return [
-                    'id' => $participant->getId(),
-                    'excludedAt' => $participant->getExcludedAt(),
-                    'user' => $student,
-                    'plan' => $participant->getPlan(),
-                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getId(), $student->getId()),
-                    '_links'     => [
-                        'differentiationProfile' => $this->getRouteIfAuthorized(
-                            'differentiationProfiles.viewDifferentiationProfileData',
-                            [
-                                'student' => $student,
-                                'studentId' => $student->getId()
-                            ],
-                        ),
-                    ]
-                ];
-            })->reindex();
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getId()))
+            ->reindex();
 
         $assessmentData = $this->getAssessmentTwigData($assessment);
 
@@ -1498,6 +1415,36 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
         }
         return $assessments;
+    }
+
+
+    /**
+     * Get participant object array for use in twig templates
+     *
+     * @param Participant $participant The participant model
+     * @param int|null $assessmentId The assessment ID for cached customisation lookup
+     * @return array The participant object array
+     * @throws RouteNotFound
+     */
+    private function getParticipantObject(Participant $participant, ?int $assessmentId): array
+    {
+        $student = $participant->getUser();
+        return [
+            'id' => $participant->getId(),
+            'excludedAt' => $participant->getExcludedAt(),
+            'user' => $student,
+            'plan' => $participant->getPlan(),
+            'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessmentId, $student->getId()),
+            '_links' => [
+                'differentiationProfile' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.viewDifferentiationProfileData',
+                    [
+                        'student' => $student,
+                        'studentId' => $student->getId()
+                    ],
+                ),
+            ]
+        ];
     }
 
     /**
