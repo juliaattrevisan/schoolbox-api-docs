@@ -3,6 +3,7 @@
   Otherwise we just show the 'Description' label as usual
 
   Usage:
+    customisedFor           boolean      whether the customisation is being created/modified for specific participants
     participants            array        the participants for whom the customisation is being created/modified
     differentiationEnabled  boolean      whether differentiation is enabled
     assessmentId            integer      the assessment id
@@ -10,7 +11,7 @@
 #}
 
 {# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
-{% set showSuggestedCustomisation = participants ?? [] is not empty and participants|length == 1 %}
+{% set showSuggestedCustomisation = customisedFor and participants ?? [] is not empty and participants|length == 1 %}
 <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
     <label for="plan-desc" class="required">Description</label>
     {% if showSuggestedCustomisation %}

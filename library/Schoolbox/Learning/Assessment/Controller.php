@@ -331,15 +331,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         ]
                     ];
                 })->reindex();
-        } else {
-            $data['participants'] = $assessment->getAllParticipants()->map(function (Participant $participant) {
-                $student = $participant->getUser();
-                return [
-                    'id'         => $participant->getId(),
-                    'fullName'   => $participant->getUser()->getFullName(),
-                ];
-            });
         }
+
         /* When creating a new assessment, no curriculum nodes are selected by default
          *
          * At a future point, we may want to "suggest" nodes to select based on the context,

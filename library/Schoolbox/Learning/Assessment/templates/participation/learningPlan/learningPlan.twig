@@ -45,10 +45,11 @@
                     <div class="columns small-12">
                         {% include '@learningAssessment/fragments/viewSuggestedCustomisation.twig'
                             with {
-                            participants:   participants,
+                            customisedFor: customisedFor ?? false,
+                            participants: participants ?? [],
                             differentiationEnabled: differentiationEnabled,
-                            assessmentId:  assessment.id,
-                            editorId:      'plan-desc',
+                            assessmentId: assessment.id,
+                            editorId: 'plan-desc',
                         } only
                         %}
                         <textarea name="plan-desc" id="plan-desc">
