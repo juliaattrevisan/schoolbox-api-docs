@@ -3,6 +3,7 @@ config:
   site_plan: { value: Canvas-Enhanced }
 
   #Modules
+  canvas_enabled: {value: true, hide: true}
   teams_enabled: { edit: true }
   curriculum_tagging_enabled: { value: false, edit: false }
   eotc_enabled: { value: false, edit: false }
