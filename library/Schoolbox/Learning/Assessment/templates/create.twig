@@ -294,7 +294,7 @@
 
                     <input type="hidden" name="part-1" data-mage-next="part-2" formmethod="GET">
                     {% if (customisedFor ?? '') | length %}
-                        <input type="hidden" name="student" value="{{ participants | json_encode }}" />
+                        <input type="hidden" name="student" value="{{ participants|map(p => p.user) | json_encode }}" />
                         <input type="hidden" name="customisedFor" value="{{ customisedFor }}" />
                     {% endif %}
 
