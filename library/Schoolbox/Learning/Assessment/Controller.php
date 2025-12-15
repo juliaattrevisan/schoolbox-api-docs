@@ -26,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
@@ -80,6 +81,9 @@ use Schoolbox\Editor\OpenAI\Helper as OpenAIHelper;
  */
 abstract class Controller extends ListController implements IAssessmentController
 {
+
+    private CacheInterface $aiCache;
+
     /**
      * Controller constructor.
      *
@@ -163,6 +167,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $learnosityConsumerKey,
             $learnosityConsumerSecret,
         );
+        $this->aiCache = $this->getDi()->get('ai.response.cache');
     }
 
 
@@ -1510,12 +1515,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     private function getCachedSuggestedCustomisation(int $assessmentId, int $studentId)
     {
-        $aiCache = $this->getDi()->get('ai.response.cache');
         $cacheKey = sprintf(
             OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
             $assessmentId,
             $studentId
         );
-        return $aiCache?->get($cacheKey);
+        return $this->aiCache?->get($cacheKey);
     }
 }
