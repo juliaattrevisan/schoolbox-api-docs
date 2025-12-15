@@ -81,7 +81,6 @@ use Schoolbox\Editor\OpenAI\Helper as OpenAIHelper;
  */
 abstract class Controller extends ListController implements IAssessmentController
 {
-
     private ?CacheInterface $aiCache = null;
 
     /**
