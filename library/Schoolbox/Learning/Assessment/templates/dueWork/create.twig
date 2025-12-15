@@ -83,10 +83,9 @@
 
     {% include '@learningAssessment/fragments/viewSuggestedCustomisation.twig'
         with {
-        customisedFor: customisedFor ?? false,
         participants: participants ?? [],
         differentiationEnabled: differentiationEnabled,
-        assessmentId: customisedFor,
+        assessmentId: customisedFor ?? 0,
         editorId: 'assessment-description',
     } only
     %}

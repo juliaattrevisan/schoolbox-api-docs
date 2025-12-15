@@ -3,16 +3,15 @@
   Otherwise we just show the 'Description' label as usual
 
   Usage:
-    customisedFor           boolean      whether the customisation is being created/modified for specific participants
     participants            array        the participants for whom the customisation is being created/modified
     differentiationEnabled  boolean      whether differentiation is enabled
-    assessmentId            integer      the assessment id
+    assessmentId            integer      the original assessment id (0 if none)
     editorId                string       the id of the description editor to link to
     isQuiz                  boolean      (optional) whether the assessment is a quiz (default: false)
 #}
 
 {# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
-{% set showSuggestedCustomisation = customisedFor and participants ?? [] is not empty and participants|length == 1 %}
+{% set showSuggestedCustomisation = assessmentId != 0 and participants ?? [] is not empty and participants|length == 1 %}
 <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
     <label for="{{ editorId }}" class="required">
         Description

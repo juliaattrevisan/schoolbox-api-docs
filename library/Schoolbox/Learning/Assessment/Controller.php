@@ -1507,8 +1507,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param int $studentId The ID of the student
      * @return mixed|null The cached customisation data, or null if not found
      */
-    private function getCachedSuggestedCustomisation(int $assessmentId, int $studentId)
+    private function getCachedSuggestedCustomisation(?int $assessmentId, int $studentId)
     {
+        if ($assessmentId === null) {
+            return null;
+        }
         if ($this->aiCache === null) {
             $this->aiCache = $this->getDi()->get('ai.response.cache');
         }
