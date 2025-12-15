@@ -106,7 +106,7 @@ HELP;
         }
         // again check if we have canvas news import enabled
         if (!$this->getConfig()->get(ConfigMapper::NAME_CANVAS_SYNC_NEWS)) {
-            $this->getLogger()->info('Not running on a canvas plan. Exiting.');
+            $this->getLogger()->info('Not syncing canvas news. Exiting.');
             exit();
         }
 
