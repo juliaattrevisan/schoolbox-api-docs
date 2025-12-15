@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -37,16 +38,13 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
+     * @var GenericCollection|null
      */
-    private ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $criteria = null;
+    private ?GenericCollection $criteria = null;
 
 
-    /**
-     * @var string|null
+    /* Getters/Setters
      */
-    private ?string $body = null;
-
 
     /**
      * @return \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
@@ -89,41 +87,21 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
+     * @return GenericCollection|null
      */
-    public function getCriteria(): ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model
+    public function getCriteria(): ?GenericCollection
     {
         return $this->criteria;
     }
 
 
     /**
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null $criteria
+     * @param GenericCollection|null $criteria
      * @return $this
      */
-    public function setCriteria(?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $criteria): self
+    public function setCriteria(?GenericCollection $criteria): self
     {
         $this->criteria = $criteria;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getBody(): ?string
-    {
-        return $this->body;
-    }
-
-
-    /**
-     * @param string|null $body
-     * @return $this
-     */
-    public function setBody(?string $body): self
-    {
-        $this->body = $body;
         return $this;
     }
 }
