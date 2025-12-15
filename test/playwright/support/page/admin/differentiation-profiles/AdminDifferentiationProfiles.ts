@@ -25,7 +25,7 @@ export default class AdminDifferentiationProfiles {
      */
     async navigateToPage(): Promise<void> {
         this.tester.isGoingTo("Visit the differentiation profiles admin page");
-        await this.page.goto("/adminv2/pastoral/differentiation-profiles");
+        await this.page.goto("/adminv2/differentiation/differentiation-profiles");
     }
 
     /**
