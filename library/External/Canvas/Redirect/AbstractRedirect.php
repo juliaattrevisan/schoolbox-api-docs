@@ -38,6 +38,21 @@ class AbstractRedirect
      */
     protected string $courseCodeColumn = 'course_code';
 
+
+    protected const SIS_SOURCE_ID_COURSE_TABLE = 'courses';
+    protected const SIS_SOURCE_ID_COURSE_SELECTIONS_TABLE = 'course_selections';
+
+    /**
+     * do we redirect to courses or course selections?
+     * course_id, section_id
+     */
+    protected string $redirectDestination = 'course_id';
+    /**
+     * table where we map the sis_source_id to get the canvas course id
+     * courses or course_selections
+     */
+    protected string $courseCodeTable = self::SIS_SOURCE_ID_COURSE_TABLE;
+
     /**
      * The host url for canvas instance at this school
      * Typically found in config.canvas_url
@@ -155,21 +170,33 @@ class AbstractRedirect
             ]
         );
 
-        /* Find out if $folderCode exists in canvas as a course identifier
-         * Only care about the states "claimed" and "available", according to the cox
-         */
-        $query = "
-            SELECT id as canvas_id
+        if ($this->courseCodeTable === self::SIS_SOURCE_ID_COURSE_TABLE) {
+            /* Find out if $folderCode exists in canvas as a course identifier
+             * Only care about the states "claimed" and "available", according to the cox
+             */
+            $query = "
+            SELECT id as course_id
             FROM courses
             WHERE {$this->courseCodeColumn} = :courseCode
             AND workflow_state IN ('claimed', 'available')";
 
-        if (!$this->canvasDb->isCanvasData2) {
-            $query = "
-            SELECT canvas_id
+            if (!$this->canvasDb->isCanvasData2) {
+                $query = "
+            SELECT course_id
             FROM course_dim
             WHERE {$this->courseCodeColumn} = :courseCode
             AND workflow_state IN ('claimed', 'available')";
+            }
+        } else {
+            $query = "
+            SELECT c.id as course_id, cs.id as section_id, cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
+             FROM courses c
+             JOIN course_sections cs ON cs.course_id = c.id
+             JOIN enrollment_terms term ON term.id = c.enrollment_term_id
+             WHERE
+                 cs.{$this->courseCodeColumn} = :courseCode
+             AND c.workflow_state in ('available', 'completed');
+            ";
         }
 
         $statement = $this->canvasDb->getConnector()->prepareQuery($query);
@@ -178,6 +205,6 @@ class AbstractRedirect
 
         $row = $statement->fetch();
 
-        return $row ? (int)$row['canvas_id'] : null;
+        return $row ? (int)$row[$this->redirectDestination] : null;
     }
 }

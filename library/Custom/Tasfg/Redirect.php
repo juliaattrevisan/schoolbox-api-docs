@@ -40,4 +40,6 @@ class Redirect extends AbstractRedirect
      * The column used to find canvas course in course table
      */
     protected string $courseCodeColumn = "sis_source_id";
+
+    protected string $courseCodeTable = self::SIS_SOURCE_ID_COURSE_SELECTIONS_TABLE;
 }
