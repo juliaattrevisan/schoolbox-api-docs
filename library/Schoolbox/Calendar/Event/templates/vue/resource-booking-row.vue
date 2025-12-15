@@ -55,6 +55,23 @@ function getDateInLocalFormat(datetimeString: string): string {
 }
 
 /**
+ *
+ */
+function toggleEditForm(): void {
+    isEditFormOpen.value = !isEditFormOpen.value;
+}
+
+/**
+ * Cancel any edits on the booking form and close the form.
+ */
+function cancelEditBookingForm(): void {
+    // Reset form values to original prop values.
+    bookingNotes.value = props.booking.notes;
+    // Close form.
+    toggleEditForm();
+}
+
+/**
  * Post the booking creation form.
  */
 async function postEditBookingForm(): Promise<void> {
@@ -88,13 +105,6 @@ async function postEditBookingForm(): Promise<void> {
     } finally {
         isProcessing.value = false;
     }
-}
-
-/**
- *
- */
-function toggleEditForm(): void {
-    isEditFormOpen.value = !isEditFormOpen.value;
 }
 </script>
 
@@ -147,7 +157,7 @@ function toggleEditForm(): void {
             </div>
             <div class="component-action">
                 <section>
-                    <button>Cancel</button>
+                    <button @click.prevent="cancelEditBookingForm()">Cancel</button>
                     <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
                     <button>Delete</button>
                 </section>
