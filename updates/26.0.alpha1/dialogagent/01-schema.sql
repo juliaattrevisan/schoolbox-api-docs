@@ -195,34 +195,53 @@ CREATE TABLE `dialog_agent_response` (
 );
 
 -- AI-generated feedback for the responses made by students
--- Note that the swamp REQUIRES you know the direct relationship betweena row in this table and the subobject
+-- This is a container row that normally represents the feedback holistically
+--
+-- Note that the swamp REQUIRES you know the direct relationship between a row in this table and the subobject
 -- to which it belongs (ie. each row knows its dialog_agent_id without having to dig through the relationships)
 -- Just Another Swamp Secret
 CREATE TABLE `dialog_agent_feedback` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `dialog_agent_id` INT NOT NULL,
     `response_id` INT NOT NULL,
-    `criteria_id` INT NOT NULL,
     `learner_id` INT UNSIGNED NOT NULL,
-    `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_daf_dialog_agent_idx` (`dialog_agent_id` ASC),
-    CONSTRAINT `fk_daf_dialog_agent`
+        CONSTRAINT `fk_daf_dialog_agent`
         FOREIGN KEY (`dialog_agent_id`)
-            REFERENCES `dialog_agent` (`id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION,
+        REFERENCES `dialog_agent` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
     INDEX `fk_daf_response_idx` (`response_id` ASC),
     CONSTRAINT `fk_daf_response`
         FOREIGN KEY (`response_id`)
-            REFERENCES `dialog_agent_response` (`id`)
+        REFERENCES `dialog_agent_response` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+-- AI-generated feedback for the responses made by students
+-- This is each cell's feedback value (ie. the feedback per scenario criteria)
+CREATE TABLE `dialog_agent_feedback_criteria` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `feedback_id` INT NOT NULL,
+    `criteria_id` INT NOT NULL,
+    `body` TEXT,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_dafc_feedback_idx` (`feedback_id` ASC),
+    CONSTRAINT `fk_dafc_feedback`
+        FOREIGN KEY (`feedback_id`)
+            REFERENCES `dialog_agent_feedback` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
-    INDEX `fk_daf_criteria_idx` (`criteria_id` ASC),
-    CONSTRAINT `fk_daf_criteria`
+    INDEX `fk_dafc_criteria_idx` (`criteria_id` ASC),
+    CONSTRAINT `fk_dafc_criteria`
         FOREIGN KEY (`criteria_id`)
             REFERENCES `dialog_agent_scenario_criteria` (`id`)
             ON DELETE NO ACTION
