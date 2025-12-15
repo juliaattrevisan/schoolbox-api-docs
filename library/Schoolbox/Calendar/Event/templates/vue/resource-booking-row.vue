@@ -48,15 +48,6 @@ function updateToastAndRefreshPage(toast: Toast, responseData: EditBookingRespon
 }
 
 /**
- * The event's date, as submitted via the form.
- * @param datetimeString {string} The datetime in ISO8601 format.
- * @returns The datetime in local format.
- */
-function getDateInLocalFormat(datetimeString: string): string {
-    return datetimeString ? window.dayjs(datetimeString).format(window.dateDisplayFormats.dayjsDatetime) : "";
-}
-
-/**
  *
  */
 function toggleEditForm(): void {
