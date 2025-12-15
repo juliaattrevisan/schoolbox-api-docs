@@ -8,14 +8,7 @@
 
 namespace Custom\Tasfg;
 
-use Alaress\Database\Exception;
-use Alaress\Database\Exception as DatabaseException;
 use External\Canvas\Redirect\AbstractRedirect;
-use PDOException;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\User;
 
 /**
  * Redirect from schoolbox homepage to canvas somewhere

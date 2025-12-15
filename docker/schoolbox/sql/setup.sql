@@ -34,6 +34,6 @@ GRANT ALL ON canvas_data2_docker.* to 'schoolboxdocker'@'%';
 GRANT ALL ON canvas_data2_docker2.* to 'schoolboxvagrant'@'localhost';
 GRANT ALL ON canvas_data2_docker2.* to 'schoolboxdocker'@'%';
 
-# grant file import privileges to these users (canvas uploades its data this way)
+# grant file import privileges to these users (canvas uploads its data this way)
 GRANT file ON *.* TO 'schoolboxvagrant'@'localhost';
 GRANT file ON *.* TO 'schoolboxdocker'@'%';
