@@ -571,9 +571,7 @@ class ListController extends Web\Controller\Base
                 'value' => AssessmentType::TYPE_DIALOG_AGENT,
                 'label' => $this->rosettaStone->translate('dialogAgent', false, true),
                 'icon'  => 'dialog-agent',
-                /* TODO probably rename this tooltip
-                 */
-                'title' => 'Converse with a scenario-based artificial intelligence',
+                'title' => 'Create an activity for students to interact with AI about a topic',
             ];
         /* TODO: } */
 
