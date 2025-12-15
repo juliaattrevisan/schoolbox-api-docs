@@ -66,7 +66,7 @@ class Mapper extends \Schoolbox\Mapper
             'learner',
         );
 
-        $this->joinsReverseMulti('feedback_id', Criteria\Mapper::class, 'feedbackCriteria', 'feedbackCriteria');
+        $this->joinsReverseMulti('feedback_id', Criteria\Mapper::class, 'criteria', 'feedbackCriteria');
     }
 
 
