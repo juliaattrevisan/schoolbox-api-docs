@@ -16,7 +16,6 @@ config (
     `field_id`,
     `type_id`,
     `editable`,
-    `hidden`,
     `required`,
     `module`,
     `sequence`
@@ -33,7 +32,6 @@ VALUES (
             field = 'boolean'
     ),
     @canvas_config_id,
-    'true',
     'true',
     'false',
     'settings',
@@ -57,7 +55,6 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
-    'true',
     'false',
     'settings',
     (
@@ -80,7 +77,6 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
-    'true',
     'false',
     'settings',
     (
@@ -102,7 +98,6 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
-    'true',
     'false',
     'settings',
     (
@@ -123,7 +118,6 @@ VALUES (
          WHERE `field` = 'input'
     ),
     @canvas_config_id,
-    'true',
     'true',
     'false',
     'settings',
@@ -147,7 +141,6 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
-    'true',
     'false',
     'settings',
     (
@@ -169,7 +162,6 @@ VALUES (
             field = 'input'
     ),
     @canvas_config_id,
-    'true',
     'true',
     'false',
     'settings',
@@ -193,7 +185,6 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
-    'true',
     'false',
     'settings',
     (
@@ -216,7 +207,6 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
-    'true',
     'false',
     'settings',
     (
@@ -238,7 +228,6 @@ VALUES (
             field = 'boolean'
     ),
     @canvas_config_id,
-    'true',
     'true',
     'false',
     'settings',
