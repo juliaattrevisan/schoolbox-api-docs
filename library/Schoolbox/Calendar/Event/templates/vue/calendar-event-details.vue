@@ -6,6 +6,7 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import AddResourceBookingsModal from "./add-resource-bookings-modal.vue";
+import ResourceBookingRow from "@schoolboxCalendarEvent/resource-booking-row.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -14,7 +15,6 @@ import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
-import ResourceBookingRow from "@schoolboxCalendarEvent/resource-booking-row.vue";
 
 const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
 const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm
