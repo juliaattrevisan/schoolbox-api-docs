@@ -8,12 +8,16 @@
     differentiationEnabled  boolean      whether differentiation is enabled
     assessmentId            integer      the assessment id
     editorId                string       the id of the description editor to link to
+    isQuiz                  boolean      (optional) whether the assessment is a quiz (default: false)
 #}
 
 {# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
 {% set showSuggestedCustomisation = customisedFor and participants ?? [] is not empty and participants|length == 1 %}
 <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
-    <label for="plan-desc" class="required">Description</label>
+    <label for="{{ editorId }}" class="required">
+        Description
+         {% if isQuiz is defined %}<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>{% endif %}
+    </label>
     {% if showSuggestedCustomisation %}
     <div id="view-suggested-customisation-container">
         <view-suggested-customisation
