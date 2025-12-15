@@ -21,8 +21,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(url);
 
     const unexpandedRowHeight: number = 250; // The default unexpanded height of a row, in px
-    const profileContentHeights = window.Vue.ref<Record<number, Record<string, number>>>({});
-    const viewMoreProfileIDs = window.Vue.ref<number[]>([]);
+    const rowContentHeights = window.Vue.ref<Record<number, Record<string, number>>>({});
+    const viewMoreIDs = window.Vue.ref<number[]>([]);
     const focusedCells = window.Vue.ref<Record<number, string[]>>({});
 
     /**
@@ -81,10 +81,10 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
      * @param profileId - the id of the profile to toggle
      */
     function toggleViewMore(profileId: number): void {
-        if (viewMoreProfileIDs.value.includes(profileId)) {
-            viewMoreProfileIDs.value = viewMoreProfileIDs.value.filter((id) => id !== profileId);
+        if (viewMoreIDs.value.includes(profileId)) {
+            viewMoreIDs.value = viewMoreIDs.value.filter((id) => id !== profileId);
         } else {
-            viewMoreProfileIDs.value.push(profileId);
+            viewMoreIDs.value.push(profileId);
         }
     }
 
@@ -96,10 +96,10 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
      * @param height - the height to set
      */
     function setContentHeight(profile: Profile, headerKey: ProfileKeys, height: number): void {
-        if (profileContentHeights.value[profile.student.id] === undefined) {
-            profileContentHeights.value[profile.student.id] = {};
+        if (rowContentHeights.value[profile.student.id] === undefined) {
+            rowContentHeights.value[profile.student.id] = {};
         }
-        profileContentHeights.value[profile.student.id][headerKey] = Math.max(height, unexpandedRowHeight);
+        rowContentHeights.value[profile.student.id][headerKey] = Math.max(height, unexpandedRowHeight);
     }
 
     /**
@@ -137,9 +137,9 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         const cellMinHeights: Record<number, Record<string, number>> = {};
         if (payload.value?.data?.profiles) {
             payload.value.data.profiles.forEach((profile) => {
-                const isViewMore = viewMoreProfileIDs.value.includes(profile.student.id);
+                const isViewMore = viewMoreIDs.value.includes(profile.student.id);
                 cellMinHeights[profile.student.id] = Object.fromEntries(
-                    Object.entries(profileContentHeights.value[profile.student.id] || {}).map(
+                    Object.entries(rowContentHeights.value[profile.student.id] || {}).map(
                         ([headerKey, contentHeight]) => {
                             if (isViewMore) return [headerKey, contentHeight];
                             if (focusedCells.value[profile.student.id]?.includes(headerKey))
@@ -181,8 +181,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         init,
         onPaginate,
         unexpandedRowHeight,
-        profileContentHeights,
-        viewMoreProfileIDs,
+        rowContentHeights,
+        viewMoreIDs,
         focusedCells,
         toggleViewMore,
         setContentHeight,
