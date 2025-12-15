@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Feedback;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper as FeedbackMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Model as DataModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentDomainObject;
@@ -108,6 +109,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         foreach ($mapperModels as $dataModel) {
             $domainObject = (new DomainObject())
+                ->setId($dataModel->getId())
                 ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()?->getAssessmentModel()->getId()))
                 ->setResponse($responseTransformer->transformDataModel($dataModel->getResponse()))
                 ->setReviewee($dataModel->getResponse()->getLearner())
@@ -167,21 +169,19 @@ class MapperProxy extends Mapper\AbstractMapperProxy
          *
          * As I suspected, utilisation of the Data Model mappers is the easiest way to accomplish large-assembly saves.
          */
-//        $responseTransformer = new Transformer();
-//
-//        foreach ($domainObjects as $domainObject) {
-//            $dataModel = new DataModel()
-//                ->setId($domainObject->getId())
-//                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
-//                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
-//                ->setBody($domainObject->getComment())
-//                ->setCriteria((new \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model())->setId($domainObject->getCriteriaId()))
-//                ->setCreatedAt($domainObject->getCreatedAt())
-//                ->setUpdatedAt($domainObject->getUpdatedAt())
-//                ->setDeletedAt($domainObject->getDeletedAt());
-//
-//            $stack->add($dataModel);
-//        }
+        $responseTransformer = new Transformer();
+
+        foreach ($domainObjects as $domainObject) {
+            $dataModel = new DataModel()
+                ->setId($domainObject->getId())
+                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
+                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setDeletedAt($domainObject->getDeletedAt());
+
+            $stack->add($dataModel);
+        }
 
         return $stack;
     }
