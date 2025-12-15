@@ -8,7 +8,6 @@ import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import { ON_FILTER_CHANGE } from "../../js/MDPEvents";
-import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
 import { useLoadData } from "../composable/useLoadData";
 
 export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
