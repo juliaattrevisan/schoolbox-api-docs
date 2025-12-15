@@ -124,7 +124,7 @@ window.Vue.onMounted(() => {
                 <p></p>
             </loading-cards>
         </div>
-        <div v-else-if="participant && aiResponse" class="l-flex-col l-gap-m f-no-margins">
+        <div v-else-if="participant && aiResponse" class="l-flex-col l-gap-s f-no-margins">
             <div class="c-vert-scroll-container l-flex-col l-gap-s">
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <div class="l-flex-col l-gap-xs f-no-margins">
@@ -141,6 +141,7 @@ window.Vue.onMounted(() => {
                     </div>
                 </div>
             </div>
+            <span class="meta">AI sometimes gets things wrong — please check important details.</span>
         </div>
         <div class="l-flex l-gap-xs f-no-margins">
             <button class="button l-flex__item--1" data-test="cp-ai-modal-cancel" @click.prevent="onCancel">
