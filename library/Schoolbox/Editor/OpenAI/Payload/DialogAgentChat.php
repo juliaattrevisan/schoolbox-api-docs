@@ -2,7 +2,10 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 class DialogAgentChat
 {
@@ -73,14 +76,14 @@ class DialogAgentChat
      * Generate the payload for having a conversation with the AI in a Dialog Agent activity
      * Optionally include a previousResponseId if this is part of a conversation
      *
-     * @param string      $agentPrompt The specific system prompt for this dialog agent activity
+     * @param DialogAgent $assessment The dialog agent activity
      * @param string      $userPrompt The user's input prompt
      * @param string|null $previousResponseId
      * @param string|null $differentiationProfile
      * @return array
      */
     public function generate(
-        string $agentPrompt,
+        DialogAgent $assessment,
         string $userPrompt,
         ?string $previousResponseId = null,
         ?string $differentiationProfile = null,
@@ -131,7 +134,7 @@ class DialogAgentChat
         $payload['input'][] = [
             'role' => 'system',
             'content' => strtr(self::PROMPT_SYSTEM_AGENT, [
-                '[DIALOG_AGENT_PROMPT]' => trim($agentPrompt),
+                '[DIALOG_AGENT_PROMPT]' => trim($assessment->getPrompt()),
             ]),
         ];
 
@@ -145,13 +148,10 @@ class DialogAgentChat
         }
 
         /* Include the activity context if available */
-        $activityContextPrompt = $this->formatActivityContextPrompt();
-        if (null !== $activityContextPrompt) {
-            $payload['input'][] = [
-                'role' => 'system',
-                'content' => $activityContextPrompt,
-            ];
-        }
+        $payload['input'][] = [
+            'role' => 'system',
+            'content' => $this->formatActivityContextPrompt($assessment),
+        ];
 
         /* The user input prompt */
         $payload['input'][] = [
@@ -190,13 +190,29 @@ class DialogAgentChat
 
     /**
      * Generate the system prompt for the activity context
-     * @return ?string
+     * @param DialogAgent $assessment
+     * @return string
      */
-    private function formatActivityContextPrompt(): ?string
+    private function formatActivityContextPrompt(DialogAgent $assessment): string
     {
-        // TODO, for now nothing, the following @var is to make stan ignore the unused string return type
-        /** @var string|null $systemPrompt */
-        $systemPrompt = null;
-        return $systemPrompt;
+        $baseContext = $assessment->getContext()->getBaseContext();
+        $unit = $baseContext instanceof UnitImplementation ? $baseContext : null;
+
+        $curriculumNodes = $assessment->getCurriculumNodes()->map(fn(Node\Model $node) => [
+            'code' => $node->getCode(),
+            'name' => $node->getName(),
+            'description' => \Scrub::html2text($node->getDescription()),
+        ]);
+
+        return strtr(
+            self::PROMPT_SYSTEM_ACTIVITY_CONTEXT,
+            [
+                '[YEAR_LEVEL]' => implode(',', $assessment->getBaseContext()->getFolder()->getYearLevels()?->getPropertyValues('name') ?? []),
+                '[CLASS_NAME]' => $assessment->getContext()->getFolder()->getName(),
+                '[COURSE_NAME]' => $unit?->getSpecification()->getCourse()->getTitle() ?? "N/A",
+                '[UNIT_NAME]' => $unit?->getTitle() ?? "N/A",
+                '[CURRICULUM_CONTENT]' => json_encode($curriculumNodes, JSON_PRETTY_PRINT),
+            ]
+        );
     }
 }
