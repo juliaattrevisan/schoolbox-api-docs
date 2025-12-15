@@ -29,19 +29,20 @@ class AgentChat implements IStrategy
 
     /**
      * @inheritDoc
-     * @return array{type:'request',data:string}
+     * @return array{type:'request',data:string,createdAt:\Alaress_Date_Format|null}
      */
     public function translateInput(Model $log): array
     {
         return [
             'type' => 'request',
             'data' => $log->getInputText(),
+            'createdAt' => $log->getCreatedAt(),
         ];
     }
 
     /**
      * @inheritDoc
-     * @return array{type:'response',data:array}
+     * @return array{type:'response',data:array,createdAt:\Alaress_Date_Format|null}
      */
     public function translateOutput(Model $log): array
     {
@@ -68,6 +69,7 @@ class AgentChat implements IStrategy
         return [
             'type' => 'response',
             'data' => $data,
+            'createdAt' => $log->getCreatedAt(),
         ];
     }
 }

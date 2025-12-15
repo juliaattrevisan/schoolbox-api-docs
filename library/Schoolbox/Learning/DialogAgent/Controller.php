@@ -38,6 +38,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\OpenAi;
 use Schoolbox\User;
 use Twig\Error\Error;
@@ -53,6 +54,7 @@ class Controller extends Base
     /**
      * Constructor.
      *
+     * @param Access $access
      * @param BreadcrumbFactory $bakery
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param OpenAI\ClientFactory $aiClientFactory
@@ -64,6 +66,7 @@ class Controller extends Base
      * @param CriteriaMapper $criteriaMapper
      */
     public function __construct(
+        private Access $access,
         private BreadcrumbFactory $bakery,
         private AssessmentMapperProxy $assessmentMapperProxy,
         private OpenAI\ClientFactory $aiClientFactory,
@@ -265,7 +268,28 @@ class Controller extends Base
                 'image' => null,
                 'message' => $assessment->getOpeningMessage()
             ],
+            'createdAt' => 0, // this message should always appear first
         ]);
+
+        /* Create an assistance request feed message if the user can see it */
+        $isViewerAnInstructor = $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
+        if ($response->getAssistanceRequestedAt() !== null && $isViewerAnInstructor) {
+            $feed->add([
+                'type' => 'alert',
+                'data' => [
+                    'side' => 'request',
+                    'severity' => 'warning-tint',
+                    'message' => \sprintf(
+                        '%s requested assistance %s',
+                        $student->getFullName(),
+                        $response->getAssistanceRequestedAt()->getRelativeTime(),
+                    ),
+                ],
+                'createdAt' => $response->getAssistanceRequestedAt(),
+            ]);
+        }
+
+        // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
 
         if ($response->getSessionId()) {
             $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
@@ -282,8 +306,9 @@ class Controller extends Base
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
-            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
         }
+
+        $feed->sortByCallback(fn ($a, $b) => $a['createdAt'] <=> $b['createdAt']);
 
         $userTranslator = new User\Translator\Author\ModelToArray();
         $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());

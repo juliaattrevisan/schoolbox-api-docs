@@ -509,11 +509,14 @@ class Module extends BaseModule
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy $responseMapperProxy */
         $responseMapperProxy = $this->injector->get('dialogAgentResponseDataSource');
 
+        $access = $this->getMapperFactory()->get(Access::class);
+
         return new Controller(
+            $access,
             new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
-                $this->getMapperFactory()->get(Access::class),
+                $access,
             ),
             $assessmentMapperProxy,
             $this->injector->get('ai.clientFactory'),
