@@ -33,13 +33,11 @@ class ModelToArray
      */
     public function __invoke(Model $response): array
     {
-        $status = (new Lookup\Status())->calculate($response);
-
         $routes = $this->linkTranslator->__invoke($response);
 
         return [
             'id' => $response->getId(),
-            'status' => $status["status"],
+            'status' => $response->getCurrentStatus(),
             'assistanceRequestedAt' => $response->getAssistanceRequestedAt()?->toRfc3339String(),
             'submittedAt' => $response->getSubmittedAt()?->toRfc3339String(),
             '_routes' => $routes,

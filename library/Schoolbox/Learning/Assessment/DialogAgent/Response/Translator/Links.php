@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 
 use Schoolbox\API\Translator\AbstractLinks;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\NextRoutes;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 
@@ -41,13 +42,13 @@ class Links extends AbstractLinks
         ];
 
         $translation['status'] = $this->getRouteIfAuthorized('learningDialogAgent.getStatus', $routeParamsResponse);
-        $translation[Status::ACTION_VIEW] = $this->getRouteIfAuthorized('learningDialogAgent.getParticularResponse', $routeParamsResponse);
-        $translation[Status::ACTION_MESSAGE] = $this->getRouteIfAuthorized('learningDialogAgent.postMessage', $routeParamsResponse);
-        $translation[Status::ACTION_SUBMIT] = $this->getRouteIfAuthorized('learningDialogAgent.postSubmit', $routeParamsResponse);
-        $translation[Status::ACTION_REOPEN] = $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse);
-        $translation[Status::ACTION_ASSISTANCE_REQUEST] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceRequest', $routeParamsResponse);
-        $translation[Status::ACTION_ASSISTANCE_RESOLVE] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse);
-        $translation[Status::ACTION_RESET] = $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_VIEW] = $this->getRouteIfAuthorized('learningDialogAgent.getParticularResponse', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_MESSAGE] = $this->getRouteIfAuthorized('learningDialogAgent.postMessage', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_SUBMIT] = $this->getRouteIfAuthorized('learningDialogAgent.postSubmit', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_REOPEN] = $this->getRouteIfAuthorized('learningDialogAgent.postReopen', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_ASSISTANCE_REQUEST] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceRequest', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_ASSISTANCE_RESOLVE] = $this->getRouteIfAuthorized('learningDialogAgent.postAssistanceResolve', $routeParamsResponse);
+        $translation[NextRoutes::ACTION_RESET] = $this->getRouteIfAuthorized('learningDialogAgent.postReset', $routeParamsResponse);
 
         return $translation;
     }

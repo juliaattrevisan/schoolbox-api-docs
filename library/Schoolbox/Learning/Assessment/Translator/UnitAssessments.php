@@ -13,11 +13,11 @@ use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 use Schoolbox\User;
 
 /**
@@ -280,18 +280,11 @@ class UnitAssessments
         /** If this is a DialogAgent, it has totally unique logic for its progress tick compared to everything else */
         if ($assessable instanceof \Schoolbox\Learning\Assessment\DialogAgent\Model) {
             $response = $participant->getAuthoritativeResponse(true);
-            $status = (new Lookup\Status())->calculate($response);
 
-            // TODO: Ideally these strings for progress tick states (including the normal ones) would in an enum somewhere
-            if ($status['status'] === Lookup\Status::STATUS_INCOMPLETE) {
-                $progress = 'incomplete';
-            } elseif ($status['status'] === Lookup\Status::STATUS_REQUIRES_ASSISTANCE) {
-                $progress = 'requires-assistance';
-            } elseif ($status['status'] === Lookup\Status::STATUS_SUBMITTED) {
-                $progress = 'submitted';
-            } else {
-                $progress = 'in-progress';
-            }
+            /* If a response exists; interrogate it for its current status; otherwise assume it's Incomplete
+             */
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
+            $progress = $response?->getCurrentStatus()->value ?? Status::INCOMPLETE->value;
 
             return [
                 'postRouteUrl'  => null, // dialog agent ticks aren't ever actionable

@@ -21,6 +21,7 @@ class Model extends AbstractResponse
     use UpdatedBy;
     use DeletedBy;
 
+
     /**
      * @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
      */
@@ -55,6 +56,42 @@ class Model extends AbstractResponse
      * @var \Alaress_Date_Format|null
      */
     private ?\Alaress_Date_Format $assistanceRequestedAt = null;
+
+
+    /**
+     * Interrogate this instance for the current state that it's in
+     *
+     * @return Status
+     */
+    public function getCurrentStatus(): Status
+    {
+        /* Submitted: disregard all other statuses
+         */
+        if (null !== $this->getSubmittedAt()) {
+            return Status::SUBMITTED;
+        }
+
+        // TODO: deal with duration eventually. still allow SOBO from staff
+
+        /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
+         * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
+         *
+         * If assistance was requested and the response is still in progress, send a special status
+         */
+        if (null !== $this->getAssistanceRequestedAt()) {
+            return Status::REQUIRES_ASSISTANCE;
+        }
+
+        /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
+         */
+        if (null === $this->getSessionId()) {
+            return Status::INCOMPLETE;
+        }
+
+        /* Otherwise we're just doing the stuff
+         */
+        return Status::IN_PROGRESS;
+    }
 
 
     /* Getters/Setters
