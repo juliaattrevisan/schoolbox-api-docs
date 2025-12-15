@@ -86,19 +86,6 @@ class Model implements ISoftDeletable
     public const PAST_MONTH       = '1 month ago';
     public const PAST_WEEK        = '7 days ago';
 
-    // Mappings of strings to labels that will be shown in the UI
-    public const RELATIVE_DATE_PRESETS = [
-        self::THIS_YEAR        => 'This year',
-        self::THIS_SCHOOL_YEAR => 'This school year',
-        self::ACADEMIC_PERIOD  => 'This term',
-        self::PAST_6_MONTHS    => 'Past 6 months',
-        self::PAST_3_MONTHS    => 'Past 3 months',
-        self::PAST_MONTH       => 'Past month',
-        self::PAST_FORTNIGHT   => 'Past fortnight',
-        self::PAST_WEEK        => 'Past week',
-        self::TODAY            => 'Today',
-    ];
-
     // Mapping for the summary table options
     public const SUMMARY_TABLES_OPTIONS = [
         Factory::STUDENT_BY_TYPE => [
