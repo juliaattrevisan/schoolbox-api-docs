@@ -3,18 +3,6 @@ INSERT INTO dialog_agent_scenario
 VALUES
     (
         1,
-        'Test scenario',
-        'This scenario is for dev testing only',
-        'You are a AI agent designed to be a helpful tutor for students. Using the context from <text_area> educate students. <switch>. Make sure your responses are in this style - <dropdown>. Respond in <language> only.
-
-<helpfulness>',
-        'custom',
-        NOW(),
-        NOW(),
-        null
-    ),
-    (
-        2,
         'Character Interview',
         'Let students explore perspectives and context through questioning a fictional or historical persona, deepening understanding and critical thinking in an engaging way.',
         'You are an AI role playing a persona for educational inquiry.
@@ -61,7 +49,7 @@ The below opening message is shown to the student to prompt them into a first re
         null
     ),
     (
-        3,
+        2,
         'Project Ideation',
         'Guide students in developing their own projects, supporting creativity, decision-making, and alignment with learning goals.',
         'You are an AI project-ideation coach.
@@ -111,7 +99,7 @@ The below opening message is shown to the student to prompt them into a first re
         null
     ),
     (
-        4,
+        3,
         'Self-Reflection',
         'Assisted self-reflection helps students articulate their understanding, recognise growth, and set goals, giving teachers deeper insights into learning progress.',
         'You are an AI reflection guide.
@@ -165,7 +153,7 @@ The below opening message is shown to the student to prompt them into a first re
         null
     ),
     (
-        5,
+        4,
         'Socratic Tutor',
         'Socratic tutoring guides students through dialogue and questioning, strengthening reasoning and deepening subject understanding.',
         'You are an AI tutor helping a student learn.
@@ -218,42 +206,6 @@ INSERT INTO dialog_agent_scenario_field
 VALUES
     (
         1,
-        'Text Area',
-        'text_area',
-        'textarea',
-        'This is a text area for adding text',
-        '{}',
-        1,
-        NOW(),
-        NOW(),
-        null
-    ),
-    (
-        1,
-        'Drop-down',
-        'dropdown',
-        'dropdown',
-        'This dropdown option is used in the prompt',
-        '{}',
-        2,
-        NOW(),
-        NOW(),
-        null
-    ),
-    (
-        1,
-        'Switch',
-        'switch',
-        'switch',
-        'This is a switch which will impact with a YES/NO',
-        '{"onText":"Yes","offText":"No","onPrompt":"Make sure you link sheep into every answer","offPrompt":"Make sure you link aliens into every answer"}',
-        3,
-        NOW(),
-        NOW(),
-        null
-    ),
-    (
-        2,
         'Persona',
         'persona',
         'textarea',
@@ -265,7 +217,7 @@ VALUES
         null
     ),
     (
-        2,
+        1,
         'Interview Theme/Focus Topic',
         'interview_theme',
         'textarea',
@@ -277,7 +229,7 @@ VALUES
         null
     ),
     (
-        2,
+        1,
         'Background Information',
         'background_information',
         'textarea',
@@ -289,7 +241,7 @@ VALUES
         null
     ),
     (
-        3,
+        2,
         'Project Scope',
         'project_scope',
         'textarea',
@@ -301,7 +253,7 @@ VALUES
         null
     ),
     (
-        3,
+        2,
         'Available Resources',
         'available_resources',
         'textarea',
@@ -313,7 +265,7 @@ VALUES
         null
     ),
     (
-        3,
+        2,
         'Expected Outcome/Deliverable',
         'expected_outcome',
         'textarea',
@@ -325,7 +277,7 @@ VALUES
         null
     ),
     (
-        3,
+        2,
         'Suggested Options',
         'suggested_options',
         'textarea',
@@ -337,7 +289,7 @@ VALUES
         null
     ),
     (
-        4,
+        3,
         'Purpose of Reflection',
         'purpose_of_reflection',
         'textarea',
@@ -349,7 +301,7 @@ VALUES
         null
     ),
     (
-        4,
+        3,
         'Focus Areas',
         'focus_areas',
         'textarea',
@@ -361,7 +313,7 @@ VALUES
         null
     ),
     (
-        4,
+        3,
         'Reflection Time-frame',
         'reflection_timeframe',
         'textarea',
@@ -373,7 +325,7 @@ VALUES
         null
     ),
     (
-        4,
+        3,
         'Depth of Reflection',
         'depth_of_reflection',
         'textarea',
@@ -385,7 +337,7 @@ VALUES
         null
     ),
     (
-        4,
+        3,
         'Goal Setting Expectations',
         'goal_setting_expectations',
         'textarea',
@@ -397,7 +349,7 @@ VALUES
         null
     ),
     (
-        5,
+        4,
         'Understanding Outcome',
         'understanding_outcome',
         'textarea',
@@ -409,7 +361,7 @@ VALUES
         null
     ),
     (
-        5,
+        4,
         'Discussion Lens',
         'discussion_lens',
         'textarea',
@@ -421,7 +373,7 @@ VALUES
         null
     ),
     (
-        5,
+        4,
         'Success Criteria',
         'success_criteria',
         'textarea',
@@ -439,15 +391,6 @@ INSERT INTO dialog_agent_scenario_criteria
 VALUES
     (
         1,
-        'Effort rating',
-        'Figure out how much effort they provided.',
-        1,
-        NOW(),
-        NOW(),
-        null
-    ),
-    (
-        2,
         'Participation & Engagement',
         'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
 
@@ -462,7 +405,7 @@ Summarise, describing:
         null
     ),
     (
-        2,
+        1,
         'Quality of Student Questions',
         'Identify the questions asked by the student.
 Note whether questions were factual, interpretive, empathetic, or analytical.
@@ -474,7 +417,7 @@ Summarise, describing: (The overall focus or style of the student’s questionin
         null
     ),
     (
-        2,
+        1,
         'Understanding of Character’s Perspective',
         'Identify moments where the student acknowledged, interpreted, or responded to the character’s feelings, motivations, or beliefs.
 Identify evidence of empathy, such as attempts to see the world through the character’s eyes or recognise their struggles, values, or decisions.
@@ -486,7 +429,7 @@ Summarise, describing: (The degree to which the student grasped the character’
         null
     ),
     (
-        2,
+        1,
         'Critical Thinking & Reasoning',
         'Identify moments where the student linked the conversation to other knowledge sources — e.g., class readings, historical events, personal experiences, or current issues.
 Identify examples of reasoning or comparison, such as drawing parallels, recognising patterns, or evaluating causes and effects.
@@ -498,7 +441,7 @@ Summarise, describing: (The types of connections the student made. How they reas
         null
     ),
     (
-        2,
+        1,
         'Connections to Learning Outcomes',
         'Read the Context Field to understand the curriculum focus, intended learning outcomes, or thematic framing set by the teacher.
 Analyse the transcript for moments where the student showed understanding of these target ideas, including: Key curriculum concepts (e.g., characterisation, author intent, historical context, ethical reasoning), Links to prior knowledge, other texts, or earlier lessons & Real-world parallels or personal connections
@@ -510,7 +453,7 @@ Summarise, describing: ( How the student connected their discussion to the learn
         null
     ),
     (
-        2,
+        1,
         'Learning Debrief',
         'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
 
@@ -525,7 +468,7 @@ Summarise, describing:
         null
     ),
     (
-        3,
+        2,
         'Participation & Engagement',
         'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
 
@@ -540,7 +483,7 @@ Summarise, describing:
         null
     ),
     (
-        3,
+        2,
         'Purpose & Relevance',
         'Review the transcript for explanations of why the student chose the topic or why the project is meaningful.
 Identify any problems, audiences, or needs the student discussed.
@@ -552,7 +495,7 @@ Summarise, describing: (The reason or motivation behind the project. The audienc
         null
     ),
     (
-        3,
+        2,
         'Process & Planning',
         'Review the transcript for any references to how the student intends to carry out their project — including tasks, sequence, or timeframes.
 Identify mentions of materials, resources, or methods the student proposed.
@@ -564,7 +507,7 @@ Summarise, describing: (The main steps or plan the student outlined. Any methods
         null
     ),
     (
-        3,
+        2,
         'Creative Thinking & Refinement',
         'Identify points in the transcript where the student brainstormed, generated alternatives, or reconsidered ideas.
 Note how the AI’s prompts or feedback influenced the student’s creative development or scope refinement.
@@ -576,7 +519,7 @@ Summarise, describing: (The ways the student used the AI to extend or improve th
         null
     ),
     (
-        3,
+        2,
         'Project Next Steps',
         'Review statements about what the student intends to do next — actions, follow-up tasks, or project milestones.
 Identify any mentions of resources, approvals, or guidance the student says they need (e.g., materials, teacher input, time, or collaboration).
@@ -588,7 +531,7 @@ Summarise, describing: (The student’s intended next steps.Whether their plan a
         null
     ),
     (
-        3,
+        2,
         'Learning Debrief',
         'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
 
@@ -603,7 +546,7 @@ Summarise, describing:
         null
     ),
     (
-        4,
+        3,
         'Participation & Engagement',
         'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
 
@@ -620,7 +563,7 @@ Consider the tone (motivated, disengaged or uncertain)',
         null
     ),
     (
-        4,
+        3,
         'Self-Awareness',
         'Identify any statements that describe the student’s actions (what they did).
 Identify any statements that describe the student’s feelings, emotions, or reflections about those actions.
@@ -634,7 +577,7 @@ The degree of reflection (surface-level or deeper insight).',
         null
     ),
     (
-        4,
+        3,
         'Explanation of Thinking / Process',
         'Identify any statements that describe the student’s approach, method, or sequence of actions.
 Note any reasoning or decision-making steps they mention (e.g. why they chose a strategy, what they changed, how they adapted).
@@ -645,7 +588,7 @@ Summarise, describing: (The task or challenge the student was working on. The st
         null
     ),
     (
-        4,
+        3,
         'Use of Feedback / Goal Setting',
         'Identify any references to feedback they received (from teachers, peers, or self-assessment).
 Note how they describe using that feedback — whether they acknowledge it, apply it, or plan to use it.
@@ -657,7 +600,7 @@ Summarise, describing: (What type of feedback the student discussed. How they re
         null
     ),
     (
-        4,
+        3,
         'Depth of Reflection ',
         'Identify evidence that the student is analysing causes, effects, or reasons behind their experiences or outcomes.
 Look for signs of learning transfer or future planning (e.g. what they would do differently next time, how they can apply what they learned).
@@ -668,7 +611,7 @@ Summarise, describing: (The main insight or analysis the student provides. Any p
         null
     ),
     (
-        4,
+        3,
         'Learning Debrief',
         'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
 
@@ -683,7 +626,7 @@ Summarise, describing:
         null
     ),
     (
-        5,
+        4,
         'Participation & Engagement',
         'Identify statements or questions that show how the student approached the activity (e.g., curiosity, sustained focus, attempts to clarify or extend understanding).
 
@@ -698,7 +641,7 @@ Summarise, describing:
         null
     ),
     (
-        5,
+        4,
         'Student’s Initial Understanding',
         'Identify what the student believed, assumed, or stated about the topic before deeper questioning occurred.
 Look for keywords or reasoning that show their starting perspective, level of confidence, or misconceptions.
@@ -709,7 +652,7 @@ Summarise this, describing: (The main idea or belief the student expressed at th
         null
     ),
     (
-        5,
+        4,
         'AI Prompting & Questioning Path',
         'Identify the types of questions the AI used to deepen the discussion — e.g. clarifying questions, hypothetical scenarios, comparisons, or challenges to assumptions.
 Note whether the AI introduced counterexamples, evidence requests, or reasoning prompts that encouraged the student to think more critically.
@@ -720,7 +663,7 @@ Summarise this describing: (The questioning strategies or patterns used by the A
         null
     ),
     (
-        5,
+        4,
         'Student’s Reasoning Development',
         'Review the dialogue, focusing on the progression of the student’s responses across the conversation.
 Identify evidence of the student reconsidering, refining, or expanding their initial ideas.
@@ -732,7 +675,7 @@ Summarise the reasoning progression, describing: (How the student’s thinking s
         null
     ),
     (
-        5,
+        4,
         'Remaining Gaps',
         'Pay attention to the student’s final responses and the areas where their reasoning remained incomplete or unclear.
 Identify any concepts the student struggled to explain, contradictions in reasoning, or questions left unresolved.
@@ -744,7 +687,7 @@ Summarise the aspects of the concept that remain misunderstood or undeveloped. A
         null
     ),
     (
-        5,
+        4,
         'Learning Debrief',
         'Identify any evidence that the student is analysing their learning, recognising challenges, consolidating concepts, or articulating what supported or hindered their progress.
 
