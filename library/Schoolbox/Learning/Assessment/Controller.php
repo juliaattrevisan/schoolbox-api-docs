@@ -296,11 +296,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
-        /* Cache interface for AI generated content (ie suggested customisation)
-         * Injecting here rather than in the module to avoid inheritance complications
-         */
-        $aiCache = $this->getDi()->get('ai.response.cache');
-
         /* Loading the data of the source/parent assessment
          */
         $originalAssessmentId = $this->requestQuery->get('customisedFor');
@@ -313,19 +308,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['participants'] = $originalAssessment
                 ->getAllParticipants()
                 ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
-                ->map(function (Participant $participant) use ($originalAssessmentId, $aiCache) {
+                ->map(function (Participant $participant) use ($originalAssessmentId) {
                     $student = $participant->getUser();
-                    $cacheKey = sprintf(
-                        OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                        $originalAssessmentId,
-                        $student->getId()
-                    );
                     return [
                         'id'         => $participant->getId(),
                         'excludedAt' => $participant->getExcludedAt(),
                         'user'       => $student,
                         'plan'       => $participant->getPlan(),
-                        'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
+                        'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($originalAssessmentId, $student->getId()),
                         '_links'     => [
                             'differentiationProfile' => $this->getRouteIfAuthorized(
                                 'differentiationProfiles.viewDifferentiationProfileData',
@@ -627,27 +617,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         }
 
-        /* Cache interface for AI generated content (ie suggested customisation)
-         * Injecting here rather than in the module to avoid inheritance complications
-         */
-        $aiCache = $this->getDi()->get('ai.response.cache');
-
         $student = explode(',', $this->requestQuery->get('student', ''));
         $data['participants'] = $assessment->getAllParticipants()
             ->filter(fn(Participant $participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) use ($assessment, $aiCache) {
+            ->map(function (Participant $participant) use ($assessment) {
                 $student = $participant->getUser();
-                $cacheKey = sprintf(
-                    OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                    $assessment->getId(),
-                    $student->getId()
-                );
                 return [
                     'id'         => $participant->getId(),
                     'excludedAt' => $participant->getExcludedAt(),
                     'user'       => $student,
                     'plan'       => $participant->getPlan(),
-                    'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
+                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getId(), $student->getId()),
                     '_links'     => [
                         'differentiationProfile' => $this->getRouteIfAuthorized(
                             'differentiationProfiles.viewDifferentiationProfileData',
@@ -812,25 +792,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
 
-        /* Cache interface for AI generated content (ie suggested customisation)
-         * Injecting here rather than in the module to avoid inheritance complications
-         */
-        $aiCache = $this->getDi()->get('ai.response.cache');
-
         $data['participants'] = $assessment
             ->getAllParticipants()
             ->filter(fn($participant) => !$participant->isExcluded())
-            ->map(function ($participant) use ($assessment, $aiCache) {
+            ->map(function ($participant) use ($assessment) {
                 $student = $participant->getUser();
-                $cacheKey = sprintf(
-                    OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                    $assessment->getOriginalAssessmentId(),
-                    $student->getId()
-                );
                 return [
                     'id' => $participant->getId(),
                     'user' => $student,
-                    'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
+                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getOriginalAssessmentId(), $student->getId()),
                     '_links'     => [
                         'differentiationProfile' => $this->getRouteIfAuthorized(
                             'differentiationProfiles.viewDifferentiationProfileData',
@@ -1339,27 +1309,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
                                    'assessment' => $assessment,
                                ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
 
-        /* Cache interface for AI generated content (ie suggested customisation)
-         * Injecting here rather than in the module to avoid inheritance complications
-         */
-        $aiCache = $this->getDi()->get('ai.response.cache');
-
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) use ($assessment, $aiCache) {
+            ->map(function (Participant $participant) use ($assessment) {
                 $student = $participant->getUser();
-                $cacheKey = sprintf(
-                    OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                    $assessment->getId(),
-                    $student->getId()
-                );
                 return [
                     'id' => $participant->getId(),
                     'excludedAt' => $participant->getExcludedAt(),
                     'user' => $student,
                     'plan' => $participant->getPlan(),
-                    'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
+                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getId(), $student->getId()),
                     '_links'     => [
                         'differentiationProfile' => $this->getRouteIfAuthorized(
                             'differentiationProfiles.viewDifferentiationProfileData',
@@ -1407,27 +1367,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
                                   'assessment' => $assessment,
                               ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
 
-        /* Cache interface for AI generated content (ie suggested customisation)
-         * Injecting here rather than in the module to avoid inheritance complications
-         */
-        $aiCache = $this->getDi()->get('ai.response.cache');
-
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => $plan->getParticipants()->keyExists($participant->getUser()->getId()))
-            ->map(function (Participant $participant) use ($assessment, $aiCache) {
+            ->map(function (Participant $participant) use ($assessment) {
                 $student = $participant->getUser();
-                $cacheKey = sprintf(
-                    OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
-                    $assessment->getId(),
-                    $student->getId()
-                );
                 return [
                     'id' => $participant->getId(),
                     'excludedAt' => $participant->getExcludedAt(),
                     'user' => $student,
                     'plan' => $participant->getPlan(),
-                    'cachedSuggestedCustomisation' => $aiCache?->get($cacheKey),
+                    'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessment->getId(), $student->getId()),
                     '_links'     => [
                         'differentiationProfile' => $this->getRouteIfAuthorized(
                             'differentiationProfiles.viewDifferentiationProfileData',
@@ -1549,5 +1499,23 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
         }
         return $assessments;
+    }
+
+    /**
+     * Get cached suggested customisation for a student from the AI cache
+     *
+     * @param int $assessmentId The ID of the assessment to retrieve cached customisation for
+     * @param int $studentId The ID of the student
+     * @return mixed|null The cached customisation data, or null if not found
+     */
+    private function getCachedSuggestedCustomisation(int $assessmentId, int $studentId)
+    {
+        $aiCache = $this->getDi()->get('ai.response.cache');
+        $cacheKey = sprintf(
+            OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
+            $assessmentId,
+            $studentId
+        );
+        return $aiCache?->get($cacheKey);
     }
 }
