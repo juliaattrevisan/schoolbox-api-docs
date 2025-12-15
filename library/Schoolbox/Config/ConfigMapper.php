@@ -138,6 +138,19 @@ class ConfigMapper extends Mapper
     public const _CANVAS_DATA2_CLIENT_ID = 'canvas_data2_client_id';
     public const _CANVAS_DATA2_SECRET    = 'canvas_data2_secret';
 
+    public const NAME_CANVAS_IMPORT_QUIZ = 'canvas_import_quiz';
+    public const NAME_CANVAS_QUIZ_WORKTYPE = 'canvas_quiz_worktype';
+    public const NAME_CANVAS_IMPORT_GRADES = 'canvas_import_grades';
+    public const NAME_CANVAS_GRADE_GROUPS = 'canvas_grade_groups';
+    public const NAME_CANVAS_SISSOURCEID_TEMPLATE = 'canvas_sissourceid_template';
+    public const NAME_CANVAS_SYNC_NEWS = 'canvas_sync_news';
+    public const NAME_CANVAS_NEWS_TOPIC = 'canvas_new_topic';
+    public const NAME_CANVAS_NEWS_AUTHOR = 'canvas_news_author';
+    public const NAME_CANVAS_REDIRECT_ASSESSMENTS = 'canvas_redirect_assessments';
+    public const NAME_CANVAS_REDIRECT_HOMEPAGES = 'canvas_redirect_homepages';
+    public const NAME_CANVAS_CODE_REDIRECT_HOMEPAGES = 'canvas_code_redirect_homepages';
+
+
     public const NAME_OTFS_ADAPTER                   = 'otfs_adapter';
     public const NAME_OTFS_S3_BUCKET                 = 'otfs_s3_bucket';
     public const NAME_OTFS_VERIFY_PREVIOUS_FILE      = 'otfs_verify_previous_file';

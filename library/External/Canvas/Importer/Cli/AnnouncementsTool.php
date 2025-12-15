@@ -11,6 +11,7 @@ namespace External\Canvas\Importer\Cli;
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * CLI Tool for processing Canvas Announcements
@@ -82,10 +83,12 @@ class AnnouncementsTool extends CliTool\App
 
 Import canvas' course announcements into schoolbox folder news articles.
 
-Mandatory: you need to specify a schoolbox user id as the default owner of these
+owner/topic will use values from admin, or can be overloaded here
+
+Overload: you need to specify a schoolbox user id as the default owner of these
 articles if we can't find their actual owner.
 
-Mandatory: you need to specify a schoolbox topic id as the default topic of these
+Overload: you need to specify a schoolbox topic id as the default topic of these
 articles because that concept doesn't exist in Canvas and articles get lost in
 the noise of everything else in schoolbox without a topic to segregate them
 
@@ -94,6 +97,17 @@ Usage: announcements.php --owner=<user id> --topic=<topic id> [--perform]
 
 HELP;
             exit;
+        }
+
+        // only run if canvas integration is enabled
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CANVAS_ENABLED)) {
+            $this->getLogger()->info('Not running on a canvas plan. Exiting.');
+            exit();
+        }
+        // again check if we have canvas news import enabled
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CANVAS_SYNC_NEWS)) {
+            $this->getLogger()->info('Not running on a canvas plan. Exiting.');
+            exit();
         }
 
         /* Check that this isn't currently running
@@ -115,16 +129,26 @@ HELP;
 
             /* Need to have a default owner param
              */
-            if ('' === trim((string)$this->getOpt(self::OPT_LONG_DEFAULT_OWNER))) {
-                $this->getLogger()->info('You need to specify a default article owner (a schoolbox user id)');
-                return;
+            $defaultOwner = $this->getOpt(self::OPT_LONG_DEFAULT_OWNER);
+            if ('' === trim((string)$defaultOwner)) {
+                // check if we have something set in admin...
+                $defaultOwner = $this->getConfig()->get(ConfigMapper::NAME_CANVAS_NEWS_AUTHOR);
+                if ('' === trim((string)$defaultOwner)) {
+                    $this->getLogger()->info('You need to specify a default article owner (a schoolbox user id)');
+                    return;
+                }
             }
 
             /* Need to have a default topic param
              */
-            if ('' === trim((string)$this->getOpt(self::OPT_LONG_DEFAULT_TOPIC))) {
-                $this->getLogger()->info('You need to specify a default topic (a schoolbox topic id)');
-                return;
+            $defaultTopic = $this->getOpt(self::OPT_LONG_DEFAULT_TOPIC);
+            if ('' === trim((string)$defaultTopic)) {
+                // check if we have something set in admin...
+                $defaultTopic = $this->getConfig()->get(ConfigMapper::NAME_CANVAS_NEWS_TOPIC);
+                if ('' === trim((string)$defaultTopic)) {
+                    $this->getLogger()->info('You need to specify a default topic (a schoolbox topic id)');
+                    return;
+                }
             }
 
             /* Used to shank a database instance
@@ -152,8 +176,8 @@ HELP;
                 \Schoolbox\Comms\News\Source\Mapper::getInstance(),
                 \Schoolbox\Comms\News\Topic\Mapper::getInstance(),
                 $strategyFactory,
-                (int)$this->getOpt(self::OPT_LONG_DEFAULT_OWNER),
-                (int)$this->getOpt(self::OPT_LONG_DEFAULT_TOPIC),
+                (int)$defaultOwner,
+                (int)$defaultTopic,
                 $this->getLogger(),
                 $lock
             ))->import();
