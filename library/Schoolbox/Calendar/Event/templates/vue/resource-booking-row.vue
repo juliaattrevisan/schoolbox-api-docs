@@ -148,12 +148,12 @@ async function postEditBookingForm(): Promise<void> {
         >
             <date-range
                 ref="dateRangeRef"
+                v-model:start-date="startDate"
+                v-model:end-date="endDate"
                 id-prefix="resource-booking-row"
                 :use-time="true"
                 :label-start="'From'"
                 :label-end="'Until'"
-                v-model:start-date="startDate"
-                v-model:end-date="endDate"
             />
             <div>
                 <label for="resource-booking-row-textarea">Notes</label>
