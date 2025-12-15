@@ -78,13 +78,13 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
 
     /**
      * Toggle the view more (expanded) state of a profile row
-     * @param profileId - the id of the profile to toggle
+     * @param $id - the id of the profile to toggle
      */
-    function toggleViewMore(profileId: number): void {
-        if (viewMoreIDs.value.includes(profileId)) {
-            viewMoreIDs.value = viewMoreIDs.value.filter((id) => id !== profileId);
+    function toggleViewMore($id: number): void {
+        if (viewMoreIDs.value.includes($id)) {
+            viewMoreIDs.value = viewMoreIDs.value.filter((id) => id !== $id);
         } else {
-            viewMoreIDs.value.push(profileId);
+            viewMoreIDs.value.push($id);
         }
     }
 
@@ -104,23 +104,23 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
 
     /**
      * Updates the focus state of a profile+header combination
-     * @param profileId - the profile to update the focus state for
+     * @param $id - the profile to update the focus state for
      * @param headerKey - the header key to update the focus state for
      * @param isFocused - whether the cell is focused
      */
-    function updateFocusedCell(profileId: number, headerKey: ProfileKeys, isFocused: boolean): void {
+    function updateFocusedCell($id: number, headerKey: ProfileKeys, isFocused: boolean): void {
         if (isFocused) {
-            if (focusedCells.value[profileId] === undefined) {
-                focusedCells.value[profileId] = [];
+            if (focusedCells.value[$id] === undefined) {
+                focusedCells.value[$id] = [];
             }
-            focusedCells.value[profileId].push(headerKey);
+            focusedCells.value[$id].push(headerKey);
         } else {
-            if (focusedCells.value[profileId] === undefined) {
+            if (focusedCells.value[$id] === undefined) {
                 return;
             }
-            focusedCells.value[profileId] = focusedCells.value[profileId].filter((h) => h !== headerKey);
-            if (focusedCells.value[profileId].length === 0) {
-                delete focusedCells.value[profileId];
+            focusedCells.value[$id] = focusedCells.value[$id].filter((h) => h !== headerKey);
+            if (focusedCells.value[$id].length === 0) {
+                delete focusedCells.value[$id];
             }
         }
     }
@@ -159,12 +159,12 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
      */
     const rowDisplayHeights = window.Vue.computed<Record<number, number>>(() => {
         return Object.fromEntries(
-            Object.entries(cellMinDisplayHeights.value).map(([profileId, cellHeights]) => {
+            Object.entries(cellMinDisplayHeights.value).map(([$id, cellHeights]) => {
                 const maxCellHeight = Math.max(...Object.values(cellHeights));
                 if (Object.values(cellHeights).length === 0) {
-                    return [profileId, unexpandedRowHeight];
+                    return [$id, unexpandedRowHeight];
                 }
-                return [profileId, maxCellHeight];
+                return [$id, maxCellHeight];
             }),
         );
     });
