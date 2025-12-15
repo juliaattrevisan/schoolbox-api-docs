@@ -12,8 +12,6 @@ interface Props {
     useTime?: boolean;
     labelStart?: string; // optional label, defaults to 'Start date'
     labelEnd?: string; // optional label, defaults to 'End date'
-    startValue?: string; // optional current value of the start date or datetime
-    endValue?: string; // optional current value of the end date or datetime
 }
 
 const props = defineProps<Props>();
@@ -137,7 +135,6 @@ defineExpose({ clearInvalidDates });
                 :data-datepicker-initial-value="startDate"
                 data-datepicker-hide-timetable="true"
                 :data-datepicker-time="props.useTime || undefined"
-                :value="props.startValue"
             />
         </div>
         <div class="l-flex-col l-flex__item--1">
@@ -153,7 +150,6 @@ defineExpose({ clearInvalidDates });
                 :data-datepicker-initial-value="endDate"
                 data-datepicker-hide-timetable="true"
                 :data-datepicker-time="props.useTime || undefined"
-                :value="props.endValue"
             />
         </div>
     </div>

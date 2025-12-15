@@ -26,6 +26,8 @@ const isFormSubmittable = window.Vue.computed(() => {
 });
 const createEditBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("editBookingForm");
 const bookingNotes = window.Vue.ref<string>(props.booking.notes);
+const startDate = window.Vue.ref<string>(props.booking.start);
+const endDate = window.Vue.ref<string>(props.booking.end);
 
 /**
  * @param toast The toast to update
@@ -67,6 +69,8 @@ function toggleEditForm(): void {
 function cancelEditBookingForm(): void {
     // Reset form values to original prop values.
     bookingNotes.value = props.booking.notes;
+    startDate.value = props.booking.start;
+    endDate.value = props.booking.end;
     // Close form.
     toggleEditForm();
 }
@@ -148,8 +152,8 @@ async function postEditBookingForm(): Promise<void> {
                 :use-time="true"
                 :label-start="'From'"
                 :label-end="'Until'"
-                :start-value="getDateInLocalFormat(booking.start)"
-                :end-value="getDateInLocalFormat(booking.end)"
+                v-model:start-date="startDate"
+                v-model:end-date="endDate"
             />
             <div>
                 <label for="resource-booking-row-textarea">Notes</label>
