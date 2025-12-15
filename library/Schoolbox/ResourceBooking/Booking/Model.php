@@ -346,6 +346,7 @@ class Model implements ISoftDeletable, JsonSerializable
         return [
             'id'       => $this->getId(),
             'name'     => $this->getName(),
+            'notes'    => $this->getNotes(),
             'resource' => $this->getResource()->jsonSerialize(),
             'event'    => [
                 'start' => $this->getEvent()->getStartDateTime()?->toIso8601String(),

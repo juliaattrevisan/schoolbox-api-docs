@@ -4,6 +4,7 @@
 export type Booking = {
     id: number;
     name: string;
+    notes: string;
     resource: Resource;
     status: BookingStatus;
     start: string;

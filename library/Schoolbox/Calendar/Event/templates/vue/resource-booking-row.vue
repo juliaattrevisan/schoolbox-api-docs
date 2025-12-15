@@ -25,7 +25,7 @@ const isFormSubmittable = window.Vue.computed(() => {
     return !isProcessing.value && (!props.eventSeriesId || efficacy.value !== "");
 });
 const createEditBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("editBookingForm");
-const bookingNotes = window.Vue.ref<string>("");
+const bookingNotes = window.Vue.ref<string>(props.booking.notes);
 
 /**
  * @param toast The toast to update
