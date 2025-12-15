@@ -121,7 +121,7 @@ $app = new class extends CliTool\App
 This finds all image generation requests in the openai log
 and attempts to migrate them to use the more maintainable Agent Chat log format.
 
-Usage: 07-migrateImageLogFormat.php
+Usage: 01-migrateImageLogFormat.php
 
 HELP;
             return;
