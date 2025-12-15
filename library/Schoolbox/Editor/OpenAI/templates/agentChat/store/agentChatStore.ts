@@ -82,7 +82,12 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     function parseFeed(logEntries: AgentChatLogEntry[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
         const parsedFeed: AgentChatFeedMessage[] = [];
 
-        const messages = logEntries.flatMap((logMessages) => logMessages);
+        const messages = [...logEntries].sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateA - dateB;
+        });
+
         for (const message of messages) {
             if (message.type === AgentChatMessageType.REQUEST) {
                 parsedFeed.push({

@@ -1,3 +1,4 @@
+import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { AgentChatApiPayload } from "./store/agentChatPayload";
@@ -16,9 +17,9 @@ type AgentChatLogDataResponse =
 type AgentChatLogDataAlert = Pick<AgentChatAlert, "side" | "severity" | "message">;
 
 export type AgentChatLogEntry =
-    | { type: AgentChatMessageType.REQUEST; data: AgentChatLogDataRequest }
-    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse }
-    | { type: AgentChatMessageType.ALERT; data: AgentChatLogDataAlert };
+    | { type: AgentChatMessageType.REQUEST; data: AgentChatLogDataRequest; createdAt: DateRFC3339 }
+    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse; createdAt: DateRFC3339 }
+    | { type: AgentChatMessageType.ALERT; data: AgentChatLogDataAlert; createdAt: DateRFC3339 };
 
 export type AgentChatImage = {
     b64: string;
