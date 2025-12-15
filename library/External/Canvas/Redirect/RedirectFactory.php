@@ -37,7 +37,7 @@ class RedirectFactory
         $className = sprintf('Custom\\%s\\Redirect', ucfirst(strtolower($this->siteSchoolCode)));
         if (class_exists($className)) {
             // TRIGS, NEWIC, TASFG are using this
-            /** @var \Custom\Trigs\Redirect|\Custom\Newic\Redirect|\Custom\TASFG\Redirect $className */
+            /** @var \Custom\Trigs\Redirect|\Custom\Newic\Redirect|\Custom\Tasfg\Redirect $className */
             return new $className(
                 trim($this->canvasUrl),
                 $this->canvasDb,
