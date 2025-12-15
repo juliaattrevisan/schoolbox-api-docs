@@ -1,0 +1,29 @@
+{#
+
+
+  Usage:
+    participants            array        the participants for whom the customisation is being created/modified
+    differentiationEnabled  boolean      whether differentiation is enabled
+    assessmentId            integer      the assessment id
+    editorId                string       the id of the description editor to link to
+#}
+
+{# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
+{% set showSuggestedCustomisation = participants ?? [] is not empty and participants|length == 1 %}
+<div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
+    <label for="plan-desc" class="required">Description</label>
+    {% if showSuggestedCustomisation %}
+    <div id="view-suggested-customisation-container">
+        <view-suggested-customisation
+            :differentiation-enabled="Boolean({{ differentiationEnabled }})"
+            :participant="{{ participants[0] | json_encode }}"
+            :routes="{{ {
+                genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
+            } | json_encode }}"
+            :assessment-id="{{ assessmentId }}"
+            editor-id="{{ editorId }}"
+        />
+    </div>
+    <script src="{{ CDN_PREFIX }}/js/bundle/viewSuggestedCustomisation.js?v={{ config.site_version }}"></script>
+    {% endif %}
+</div>
