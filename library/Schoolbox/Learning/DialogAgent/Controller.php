@@ -268,7 +268,7 @@ class Controller extends Base
                 'image' => null,
                 'message' => $assessment->getOpeningMessage()
             ],
-            'createdAt' => 0, // this message should always appear first
+            'createdAt' => $assessment->getCreatedAt(), // this message should always appear first
         ]);
 
         /* Create an assistance request feed message if the user can see it */

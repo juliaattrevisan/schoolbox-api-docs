@@ -442,6 +442,7 @@ class Controller extends Assessment\Controller
                 'image' => null,
                 'message' => $assessment->getOpeningMessage()
             ],
+            'createdAt' => $assessment->getCreatedAt(),
         ]);
 
         if ($response->getSessionId()) {
