@@ -174,7 +174,7 @@ class DialogAgentChat
     /**
      * Generate the system prompt for the differentiation profile
      * @param ?string $differentiationProfile
-     * @return string
+     * @return ?string
      */
     private function formatDifferentiationProfilePrompt(?string $differentiationProfile): ?string
     {
