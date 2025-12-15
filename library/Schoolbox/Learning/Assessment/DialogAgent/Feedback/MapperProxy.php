@@ -158,6 +158,14 @@ class MapperProxy extends Mapper\AbstractMapperProxy
          */
         $stack = new GenericCollection(DataModel::class);
 
+        /* This only saves the domain representation of a feedback, -not- its related feedback criteria fields' values.
+         * You'll have to do that separately which is how large-assembly activities do it. For example, in Due Work,
+         * you need to set kami files and submission files separately via their *data mappers* which is an interesting
+         * plot twist. The AbstractMapperProxy predominantly works on root-level objects, not constituent pieces, unless
+         * you override the save() method there...but nothing ever did in any of our learning activities.
+         *
+         * As I suspected, utilisation of the Data Model mappers is the easiest way to accomplish large-assembly saves.
+         */
 //        $responseTransformer = new Transformer();
 //
 //        foreach ($domainObjects as $domainObject) {
