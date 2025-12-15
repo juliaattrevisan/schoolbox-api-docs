@@ -59,4 +59,24 @@ class Model extends AbstractFeedback
         $this->dialogAgent = $dialogAgent;
         return $this;
     }
+
+
+    /**
+     * @return GenericCollection
+     */
+    public function getCriteria(): GenericCollection
+    {
+        return $this->criteria;
+    }
+
+
+    /**
+     * @param GenericCollection $criteria
+     * @return $this
+     */
+    public function setCriteria(GenericCollection $criteria): self
+    {
+        $this->criteria = $criteria;
+        return $this;
+    }
 }

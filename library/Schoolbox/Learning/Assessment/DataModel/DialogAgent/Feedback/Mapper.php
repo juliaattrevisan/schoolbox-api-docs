@@ -141,13 +141,13 @@ class Mapper extends \Schoolbox\Mapper
                 $feedback->setCriteria($feedbackCriteriaMapper->createCollection());
 
                 $stack->setOffset($feedback->getId(), $feedback);
-            } else {
-                /* Accumulate all the feedback criteria into a collection
-                 */
-                $feedbackCriteria = $feedbackCriteriaMapper->hydrate($row, 'feedbackCriteria');
-
-                $feedback->getCriteria()->add($feedbackCriteria);
             }
+
+            /* Accumulate all the feedback criteria into a collection
+             */
+            $feedbackCriteria = $feedbackCriteriaMapper->hydrate($row, 'feedbackCriteria');
+
+            $feedback->getCriteria()->add($feedbackCriteria);
         }
 
         return $stack;
