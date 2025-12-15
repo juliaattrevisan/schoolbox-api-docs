@@ -124,10 +124,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             /* Accumulate each Feedback Criterion into the set
              */
             foreach ($dataModel->getCriteria() as $criterion) {
-                $criterionId = $criterion->getId();
+                $criterionId = $criterion->getCriteria()->getId();
 
                 $feedbackObject = (new Criteria\Model())
-                    ->setCriteriaId($criterionId)
+                    ->setId($criterion->getId())
+                    ->setCriteriaId($criterion->getId())
                     ->setBody($criterion->getBody());
 
                 $domainObject->getCriteria()->setOffset($criterionId, $feedbackObject);

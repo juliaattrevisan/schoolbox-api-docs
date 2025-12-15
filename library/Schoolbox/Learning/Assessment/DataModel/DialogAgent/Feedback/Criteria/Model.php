@@ -68,7 +68,7 @@ class Model implements ISoftDeletable
     /**
      * @return \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
      */
-    public function getCriteria(): ?int
+    public function getCriteria(): ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model
     {
         return $this->criteria;
     }
