@@ -89,6 +89,14 @@ $app = new class extends CliTool\App
         $responseListener = new AgentChat\EventStream\ResponseListener(requireFinalImage: true);
         $logListener = new AgentChat\LogHandler\LogOutputText();
 
+        if (null === $log->getResponse()) {
+            /**
+             * Having no response at all is valid (i.e. the request to OpenAI failed),
+             * the "outputText" will remain NULL and will be correctly handled by the translator as a failed response
+             */
+            return $log;
+        }
+
         /**
          * Assuming the OpenAI format is the same, which it should be since we haven't changed anything...
          * try to re-parse the entire thing as an event stream
