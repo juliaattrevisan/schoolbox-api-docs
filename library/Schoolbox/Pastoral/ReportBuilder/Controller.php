@@ -333,7 +333,7 @@ class Controller extends Base
         return  [
             PastoralReport::THIS_YEAR        => 'This year',
             PastoralReport::THIS_SCHOOL_YEAR => 'This school year',
-            PastoralReport::ACADEMIC_PERIOD  => $this->l10n->translate('term', false, true),
+            PastoralReport::ACADEMIC_PERIOD  => ucfirst($this->l10n->translate('term')),
             PastoralReport::PAST_6_MONTHS    => 'Past 6 months',
             PastoralReport::PAST_3_MONTHS    => 'Past 3 months',
             PastoralReport::PAST_MONTH       => 'Past month',
