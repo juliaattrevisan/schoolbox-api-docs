@@ -35,7 +35,8 @@ class AgentChat implements IStrategy
     {
         return [
             'type' => 'request',
-            'data' => $log->getInputText(),
+            /** Input text shouldn't be NULL, but technically could be in the DB - handle just in case */
+            'data' => $log->getInputText() ?? '',
             'createdAt' => $log->getCreatedAt(),
         ];
     }
