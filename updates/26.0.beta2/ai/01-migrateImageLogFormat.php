@@ -145,14 +145,12 @@ HELP;
         ");
 
         /* Find all image generation logs that haven't already been migrated (any without a log_format) */
-        $imageLogQuery = sprintf(
+        $logIterator = $db->getQueryIterator(
             "SELECT id, prompt, response
             FROM openai_log
-            WHERE log_format IS NULL AND feature = '%s';",
-            Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE
+            WHERE log_format IS NULL AND feature = :feature",
+            ['feature' => Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE]
         );
-
-        $logIterator = $db->getQueryIterator($imageLogQuery);
 
         foreach ($logIterator as $logData) {
             $log = new Log\Model()
