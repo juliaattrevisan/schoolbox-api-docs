@@ -16,6 +16,7 @@ config (
     `field_id`,
     `type_id`,
     `editable`,
+    `hidden`,
     `required`,
     `module`,
     `sequence`
@@ -33,6 +34,7 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
+    'false',
     'false',
     'settings',
     (
@@ -56,6 +58,7 @@ VALUES (
     @canvas_config_id,
     'true',
     'false',
+    'false',
     'settings',
     (
         SELECT MAX(sequence) + 1
@@ -78,6 +81,7 @@ VALUES (
     @canvas_config_id,
     'true',
     'false',
+    'false',
     'settings',
     (
         SELECT MAX(sequence) + 1
@@ -99,6 +103,7 @@ VALUES (
     @canvas_config_id,
     'true',
     'false',
+    'false',
     'settings',
     (
         SELECT MAX(sequence) + 1
@@ -119,6 +124,7 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
+    'false',
     'false',
     'settings',
     (
@@ -142,6 +148,7 @@ VALUES (
     @canvas_config_id,
     'true',
     'false',
+    'false',
     'settings',
     (
         SELECT MAX(sequence) + 1
@@ -151,7 +158,7 @@ VALUES (
             AND c.type_id = @canvas_config_id
     )
 ), (
-    'canvas_new_topic',
+    'canvas_news_topic',
     'Schoolbox News Topic For Canvas News Items',
     '',
     'TBA',
@@ -163,6 +170,7 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
+    'false',
     'false',
     'settings',
     (
@@ -186,6 +194,7 @@ VALUES (
     @canvas_config_id,
     'true',
     'false',
+    'false',
     'settings',
     (
         SELECT MAX(sequence) + 1
@@ -208,6 +217,7 @@ VALUES (
     @canvas_config_id,
     'true',
     'false',
+    'false',
     'settings',
     (
         SELECT MAX(sequence) + 1
@@ -229,6 +239,7 @@ VALUES (
     ),
     @canvas_config_id,
     'true',
+    'false',
     'false',
     'settings',
     (
