@@ -82,7 +82,7 @@ use Schoolbox\Editor\OpenAI\Helper as OpenAIHelper;
 abstract class Controller extends ListController implements IAssessmentController
 {
 
-    private CacheInterface $aiCache;
+    private ?CacheInterface $aiCache = null;
 
     /**
      * Controller constructor.
@@ -167,7 +167,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $learnosityConsumerKey,
             $learnosityConsumerSecret,
         );
-        $this->aiCache = $this->getDi()->get('ai.response.cache');
     }
 
 
@@ -1516,6 +1515,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     private function getCachedSuggestedCustomisation(int $assessmentId, int $studentId)
     {
+        if ($this->aiCache === null) {
+            $this->aiCache = $this->getDi()->get('ai.response.cache');
+        }
         $cacheKey = sprintf(
             OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
             $assessmentId,
