@@ -4,20 +4,19 @@
  */
 
 import type { Ref } from "vue";
-import type { Profile, ProfileKeys } from "../../../js/types/manageDifferentiationProfilesTypes";
 import { useRowsStore } from "../../store/mdpRowsStore";
 
 /**
  * Tracks the content height and component action height of a grid cell
- * @param profile - The profile object
+ * @param id - The profile object
  * @param headerKey - The key of the profile header
  * @param contentEl - The ref to the content element
  * @param componentActionEl - The ref to the component action element
  * @returns contentHeight, componentActionHeight - The heights of the content and component action elements
  */
 export function useContentHeight(
-    profile: Profile,
-    headerKey: ProfileKeys,
+    id: number,
+    headerKey: string,
     contentEl: Ref<HTMLElement | null>,
     componentActionEl: Ref<HTMLElement | null>,
 ): {
@@ -35,7 +34,7 @@ export function useContentHeight(
     function updateContentHeight(): void {
         contentHeight.value = contentEl.value?.offsetHeight || 0;
         componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-        rowsStore.setContentHeight(profile, headerKey, contentHeight.value + componentActionHeight.value);
+        rowsStore.setContentHeight(id, headerKey, contentHeight.value + componentActionHeight.value);
     }
 
     /**

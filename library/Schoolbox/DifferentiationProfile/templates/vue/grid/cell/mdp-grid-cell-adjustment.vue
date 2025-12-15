@@ -35,7 +35,7 @@ const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations i
  * and provide these heights for the 'View more' functionality
  */
 const { contentHeight, componentActionHeight } = useContentHeight(
-    props.profile,
+    props.profile.student.id,
     props.headerKey,
     contentEl,
     componentActionEl,

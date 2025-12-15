@@ -91,15 +91,15 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     /**
      * As content is loaded, we need to keep track of the height so we can correctly
      * size other cells from that profile when it is expanded.
-     * @param profile - the profile to set the content height for
+     * @param $id - the id of the cell to set the content height for
      * @param headerKey - the header key to set the content height for
      * @param height - the height to set
      */
-    function setContentHeight(profile: Profile, headerKey: ProfileKeys, height: number): void {
-        if (rowContentHeights.value[profile.student.id] === undefined) {
-            rowContentHeights.value[profile.student.id] = {};
+    function setContentHeight($id: number, headerKey: string, height: number): void {
+        if (rowContentHeights.value[$id] === undefined) {
+            rowContentHeights.value[$id] = {};
         }
-        rowContentHeights.value[profile.student.id][headerKey] = Math.max(height, unexpandedRowHeight);
+        rowContentHeights.value[$id][headerKey] = Math.max(height, unexpandedRowHeight);
     }
 
     /**
@@ -108,7 +108,7 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
      * @param headerKey - the header key to update the focus state for
      * @param isFocused - whether the cell is focused
      */
-    function updateFocusedCell($id: number, headerKey: ProfileKeys, isFocused: boolean): void {
+    function updateFocusedCell($id: number, headerKey: string, isFocused: boolean): void {
         if (isFocused) {
             if (focusedCells.value[$id] === undefined) {
                 focusedCells.value[$id] = [];
