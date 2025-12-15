@@ -46,7 +46,7 @@
         <div id="view-suggested-customisation-container">
             <view-suggested-customisation
                 :differentiation-enabled="Boolean({{ differentiationEnabled }})"
-                :participant="{{ (participants[0] ?? []) | json_encode }}"
+                :participant="{{ participants[0] | json_encode }}"
                 :routes="{{ {
                     genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
                 } | json_encode }}"
