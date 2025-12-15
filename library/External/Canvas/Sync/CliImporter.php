@@ -193,6 +193,12 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        // only run if canvas integration is enabled
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CANVAS_ENABLED)) {
+            $this->getLogger()->debug('Not running on a canvas plan. Exiting.');
+            exit();
+        }
+
         if ($this->perform()) {
             $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
         } else {
