@@ -250,7 +250,7 @@ window.Vue.onUnmounted(() => {
                 </div>
             </div>
 
-            <div v-if="helpRequestError" class="al ert-box alert">
+            <div v-if="helpRequestError" class="alert-box alert">
                 <span>{{ helpRequestError }}</span>
                 <a href="#" class="close" @click.prevent="helpRequestError = null">×</a>
             </div>
