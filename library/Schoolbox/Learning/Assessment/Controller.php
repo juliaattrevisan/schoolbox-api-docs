@@ -300,6 +300,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
 
         /* Loading the data of the source/parent assessment
          */
@@ -309,7 +310,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $originalAssessment = $this->getAssessmentMapper()->findById($originalAssessmentId);
             $originalAssessment = $this->participantDataSource->loadParticipationIntoAssessment($originalAssessment);
             $data['customisedFor'] = $originalAssessmentId;
-            $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
             $data['participants'] = $originalAssessment
                 ->getAllParticipants()
                 ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
@@ -770,6 +770,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
+
         if ($assessment instanceof DueWork\Model) {
             // To be able to view the current student policy if enabling within the submission type
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
@@ -820,7 +822,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         if (null !== $assessment->getOriginalAssessmentId()) {
             $data['customisedFor'] = $assessment->getOriginalAssessmentId();
-            $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
         }
 
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
