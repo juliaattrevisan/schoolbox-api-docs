@@ -3,7 +3,7 @@
  * Display the last updated date and current status of a differentiation profile
  */
 
-import { ProfileStatus, type Profile } from "../../js/types/manageDifferentiationProfilesTypes";
+import { ProfileStatus, type Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
 
 const props = defineProps<{
     profile: Profile;

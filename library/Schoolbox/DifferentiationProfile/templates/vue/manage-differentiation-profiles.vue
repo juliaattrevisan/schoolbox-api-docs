@@ -23,10 +23,10 @@ import type {
     Payload,
     Profile,
 } from "../js/types/manageDifferentiationProfilesTypes";
-import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
-import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
-import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
-import MdpGridCellLastUpdated from "./grid/mdp-grid-cell-last-updated.vue";
+import MdpGridCellStudent from "./grid/cell/mdp-grid-cell-student.vue";
+import MdpGridCellAdjustment from "./grid/cell/mdp-grid-cell-adjustment.vue";
+import MdpGridCellText from "./grid/cell/mdp-grid-cell-text.vue";
+import MdpGridCellLastUpdated from "./grid/cell/mdp-grid-cell-last-updated.vue";
 import MdpAiModal from "./mdp-ai-modal.vue";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useRowsStore } from "./store/mdpRowsStore";
