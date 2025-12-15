@@ -172,10 +172,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         $responseTransformer = new Transformer();
 
         foreach ($domainObjects as $domainObject) {
+            $response = $responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId());
+
             $dataModel = new DataModel()
                 ->setId($domainObject->getId())
                 ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
-                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
+                ->setResponse($response)
+                ->setLearner($response->getLearner())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setUpdatedAt($domainObject->getUpdatedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());

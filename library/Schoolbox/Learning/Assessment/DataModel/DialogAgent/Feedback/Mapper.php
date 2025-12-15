@@ -31,6 +31,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('response_id', self::TYPE_INTEGER, null, 'response');
+        $this->uses('learner_id', self::TYPE_INTEGER, null, 'learner');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -53,6 +54,16 @@ class Mapper extends \Schoolbox\Mapper
             null,
             'response',
             'response',
+        );
+
+        $this->joins(
+            'learner_id',
+            \Schoolbox\UserMapper::class,
+            'id',
+            null,
+            null,
+            'learner',
+            'learner',
         );
 
         $this->joinsReverseMulti('feedback_id', Criteria\Mapper::class, 'feedbackCriteria', 'feedbackCriteria');
@@ -131,6 +142,7 @@ class Mapper extends \Schoolbox\Mapper
 
                     if ($learner) {
                         $response->setLearner($learner);
+                        $feedback->setLearner($learner);
                     }
 
                     $feedback->setResponse($response);

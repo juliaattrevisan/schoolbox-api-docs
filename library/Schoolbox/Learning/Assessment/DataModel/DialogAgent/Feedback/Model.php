@@ -38,6 +38,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var \Schoolbox\User|null
+     */
+    private ?\Schoolbox\User $learner = null;
+
+
+    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $criteria = null;
@@ -82,6 +88,26 @@ class Model implements ISoftDeletable
     public function setResponse(?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model $response): self
     {
         $this->response = $response;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\User|null
+     */
+    public function getLearner(): ?\Schoolbox\User
+    {
+        return $this->learner;
+    }
+
+
+    /**
+     * @param \Schoolbox\User|null $learner
+     * @return $this
+     */
+    public function setLearner(?\Schoolbox\User $learner): self
+    {
+        $this->learner = $learner;
         return $this;
     }
 
