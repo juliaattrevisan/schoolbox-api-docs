@@ -104,6 +104,12 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                     type: AgentChatMessageType.RESPONSE,
                     entryKey: getNextEntryKey(),
                 } satisfies AgentChatResponse);
+            } else if (message.type === AgentChatMessageType.ALERT) {
+                parsedFeed.push({
+                    type: AgentChatMessageType.ALERT,
+                    entryKey: getNextEntryKey(),
+                    ...message.data,
+                });
             } else {
                 assertUnreachable(message);
             }

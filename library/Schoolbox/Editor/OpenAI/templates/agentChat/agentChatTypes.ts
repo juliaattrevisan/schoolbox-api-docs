@@ -13,10 +13,12 @@ type AgentChatLogDataRequest = string;
 type AgentChatLogDataResponse =
     | Pick<AgentChatResponseError, "status" | "responseId" | "message">
     | Pick<AgentChatResponseSuccess, "status" | "responseId" | "image" | "message">;
+type AgentChatLogDataAlert = Pick<AgentChatAlert, "side" | "severity" | "message">;
 
 export type AgentChatLogEntry =
     | { type: AgentChatMessageType.REQUEST; data: AgentChatLogDataRequest }
-    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse };
+    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse }
+    | { type: AgentChatMessageType.ALERT; data: AgentChatLogDataAlert };
 
 export type AgentChatImage = {
     b64: string;
