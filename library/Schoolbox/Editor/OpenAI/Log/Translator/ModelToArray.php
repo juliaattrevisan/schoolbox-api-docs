@@ -37,12 +37,10 @@ class ModelToArray
      */
     public function __invoke(Model $log): array
     {
-        $logData = null;
         $logFormat = $log->getLogFormat() ? LogFormat::tryFrom($log->getLogFormat()) : null;
-        if (null !== $logFormat) {
-            $strategy = $this->strategyFactory->makeStrategy($logFormat);
-            $logData = $strategy->translate($log);
-        }
+        $logDataStrategy = null !== $logFormat
+            ? $this->strategyFactory->makeStrategy($logFormat)
+            : null;
 
         $translation = [
             'id' => $log->getId(),
@@ -51,7 +49,10 @@ class ModelToArray
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,
             'logFormat' => $logFormat?->value,
-            'data' => $logData,
+            'data' => $logDataStrategy ? [
+                'input' => $logDataStrategy->translateInput($log),
+                'output' => $logDataStrategy->translateOutput($log),
+            ] : null,
         ];
 
         return $translation;

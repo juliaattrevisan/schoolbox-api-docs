@@ -14,10 +14,9 @@ type AgentChatLogDataResponse =
     | Pick<AgentChatResponseError, "status" | "responseId" | "message">
     | Pick<AgentChatResponseSuccess, "status" | "responseId" | "image" | "message">;
 
-export type AiLogAgentChatData = (
+export type AgentChatLogEntry =
     | { type: AgentChatMessageType.REQUEST; data: AgentChatLogDataRequest }
-    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse }
-)[];
+    | { type: AgentChatMessageType.RESPONSE; data: AgentChatLogDataResponse };
 
 export type AgentChatImage = {
     b64: string;

@@ -10,7 +10,7 @@ import type {
     AgentChatRequest,
     AgentChatResponse,
     AgentChatResponseInProgress,
-    AiLogAgentChatData,
+    AgentChatLogEntry,
 } from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
@@ -79,7 +79,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      * @param user - The user who made the requests
      * @returns The parsed feed messages
      */
-    function parseFeed(logEntries: AiLogAgentChatData[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
+    function parseFeed(logEntries: AgentChatLogEntry[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
         const parsedFeed: AgentChatFeedMessage[] = [];
 
         const messages = logEntries.flatMap((logMessages) => logMessages);

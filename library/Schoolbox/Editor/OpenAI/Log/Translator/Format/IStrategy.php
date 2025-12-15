@@ -26,10 +26,18 @@ interface IStrategy
     public static function getLogFormat(): LogFormat;
 
     /**
-     * Translate a saved log's inputText and outputText back into structured data for display
+     * Translate a saved log's inputText back into structured data for display
      *
      * @param Model $log
      * @return array an array ready to be used in an API response
      */
-    public function translate(Model $log): array;
+    public function translateInput(Model $log): array;
+
+    /**
+     * Translate a saved log's outputText back into structured data for display
+     *
+     * @param Model $log
+     * @return array an array ready to be used in an API response
+     */
+    public function translateOutput(Model $log): array;
 }

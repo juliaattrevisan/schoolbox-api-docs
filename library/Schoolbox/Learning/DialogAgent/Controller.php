@@ -277,7 +277,8 @@ class Controller extends Base
             foreach ($logEntries as $log) {
                 $logFormat = AILogFormat::from($log->getLogFormat());
                 $strategy = $logStrategyFactory->makeStrategy($logFormat);
-                $feed->add($strategy->translate($log));
+                $feed->add($strategy->translateInput($log));
+                $feed->add($strategy->translateOutput($log));
             }
 
             // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere

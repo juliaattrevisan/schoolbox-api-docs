@@ -15,7 +15,7 @@ use Schoolbox\Editor\OpenAI\Log\Model;
 
 /**
  * Converts a stored AI log entry which uses the Agent Chat format into a structured array that can be used by the frontend
- * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/agentChatTypes.ts AiLogAgentChatData
+ * @see /library/Schoolbox/Editor/OpenAI/templates/agentChat/agentChatTypes.ts AgentChatLogEntry
  */
 class AgentChat implements IStrategy
 {
@@ -29,35 +29,45 @@ class AgentChat implements IStrategy
 
     /**
      * @inheritDoc
-     * @return (array{type:'request',data:string}|array{type:'response',data:array})[]
+     * @return array{type:'request',data:string}
      */
-    public function translate(Model $log): array
+    public function translateInput(Model $log): array
     {
-        $inputText = $log->getInputText();
-        $outputText = $log->getOutputText();
+        return [
+            'type' => 'request',
+            'data' => $log->getInputText(),
+        ];
+    }
 
-        $response = null;
+    /**
+     * @inheritDoc
+     * @return array{type:'response',data:array}
+     */
+    public function translateOutput(Model $log): array
+    {
+        $outputText = $log->getOutputText();
+        $data = null;
+
         if (!empty($outputText)) {
             try {
-                $response = json_decode($outputText, true, 512, JSON_THROW_ON_ERROR);
+                $data = json_decode($outputText, true, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
                 // noop; leave null for below
             }
         }
 
-        if (null === $response) {
+        if (null === $data) {
             /** either failed to parse, or no output at all. Fall back to an unknown output */
-            $response = [
+            $data = [
                 'status' => 'error',
                 'responseId' => null,
                 'message' => 'Unable to retrieve response',
             ];
         }
 
-        /** this could be extended to allow logs of more than 1 request/response per log entry, or even other new types */
         return [
-            ['type' => 'request', 'data' => $inputText],
-            ['type' => 'response', 'data' => $response],
+            'type' => 'response',
+            'data' => $data,
         ];
     }
 }

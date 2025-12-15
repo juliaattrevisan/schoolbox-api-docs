@@ -213,44 +213,37 @@ class DialogAgentFeedback
      */
     private function generateUserFeedPrompt(DialogAgent $assessment, Response $response): string
     {
-        $feedEntries = [];
+        $feedPrompt = new \Schoolbox\Collection();
 
         /* I suppose the opening message should be added first, the user first saw it as of createdAt */
-        $feedEntries[] = [
+        $feedPrompt->add([
             'role' => 'assistant',
             'timestamp' => $response->getCreatedAt()->toAtomString(),
             'content' => $assessment->getOpeningMessage(),
-        ];
+        ]);
 
         $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
             'order' => [ 'created_at' => 'ASC' ]
         ]);
 
-
         /** The strategy should always be AgentChat for each log */
         $strategy = new Log\Translator\Format\AgentChat();
         foreach ($logEntries as $log) {
-            $messages = $strategy->translate($log);
+            $feedPrompt->add([
+                'role' => 'student',
+                'timestamp' => $log->getCreatedAt()->toAtomString(),
+                'content' => $strategy->translateInput($log)['data'],
+            ]);
 
-            foreach ($messages as $message) {
-                /** the data from the user is just a string */
-                $entry = [
-                    'role' => 'student',
-                    'timestamp' => $log->getCreatedAt()->toAtomString(),
-                    'content' => $message['data'],
-                ];
-
-                /** otherwise if it's the assistant, then we only care about the final message */
-                if ($message['type'] === 'response') {
-                    $entry['role'] = 'assistant';
-                    $entry['content'] = $message['data']['message'] ?? 'No response';
-                }
-
-                $feedEntries[] = $entry;
-            }
+            $feedPrompt->add([
+                'role' => 'assistant',
+                'timestamp' => $log->getCreatedAt()->toAtomString(),
+                /* The AI should only care about the final message */
+                'content' => $strategy->translateOutput($log)['data']['message'] ?? 'No response',
+            ]);
         }
 
         /** Just dump it into one large JSON string for now, apparently that's what we want */
-        return json_encode($feedEntries, JSON_THROW_ON_ERROR);
+        return json_encode($feedPrompt, JSON_THROW_ON_ERROR);
     }
 }

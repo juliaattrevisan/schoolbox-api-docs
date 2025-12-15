@@ -3,12 +3,12 @@ import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 import DasActions from "../status/das-actions.vue";
 
 interface Props {
-    feed: AiLogAgentChatData[];
+    feed: AgentChatLogEntry[];
     response: DialogAgentResponse;
     student: UserAuthor;
     summaryRoute?: string | null;
