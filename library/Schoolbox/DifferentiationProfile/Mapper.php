@@ -375,7 +375,7 @@ class Mapper extends BaseMapper
 
         /* Ensure viewer has access to view differentiation profiles
          */
-        $service = UserAccess::SERVICE_DIFFERENTIATION_PROFILE;
+        $service = UserAccess::SERVICE_DIFFERENTIATION;
         $accessLevel = UserAccess::ACCESS_WRITE;
 
         $param = array_merge(

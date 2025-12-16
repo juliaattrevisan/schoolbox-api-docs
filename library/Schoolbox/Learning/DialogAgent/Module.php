@@ -525,12 +525,14 @@ class Module extends BaseModule
         $responseMapperProxy = $this->injector->get('dialogAgentResponseDataSource');
 
         $baseUrl = new \Schoolbox\Url\Factory($this->getConfig())->buildFullyQualified();
+        $access = $this->getMapperFactory()->get(Access::class);
 
         return new Controller(
+            $access,
             new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
                 $this->getRouter()->getGenerator(),
                 $this->getAuthorizer(),
-                $this->getMapperFactory()->get(Access::class),
+                $access,
             ),
             $assessmentMapperProxy,
             $baseUrl,

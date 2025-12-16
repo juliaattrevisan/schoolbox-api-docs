@@ -58,13 +58,13 @@ class Module extends BaseModule
         $getPerms = new Rule\All(
             $staffWithFeatureEnabled,
             new Rule\HasServicePermission(
-                UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+                UserAccess::SERVICE_DIFFERENTIATION,
                 UserAccess::ACCESS_WRITE
             ),
         );
 
         $hasCampusPerms =  new Rule\HasServicePermission(
-            UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+            UserAccess::SERVICE_DIFFERENTIATION,
             UserAccess::ACCESS_WRITE,
             fn (array $params) => (
                 isset($params['student'])

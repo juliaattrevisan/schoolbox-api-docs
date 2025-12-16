@@ -563,6 +563,18 @@ class ListController extends Web\Controller\Base
             ],
         ];
 
+        /* TODO: don't show dialog agent if the feature is disabled (SA-21201)
+         * if (...ai config stuff) {
+         */
+            $data['types'][] = [
+                'id'    => 'dialog-agent',
+                'value' => AssessmentType::TYPE_DIALOG_AGENT,
+                'label' => $this->rosettaStone->translate('dialogAgent', false, true),
+                'icon'  => 'dialog-agent',
+                'title' => 'Create an activity for students to interact with AI about a topic',
+            ];
+        /* TODO: } */
+
         $participants = $this->requestQuery->get('student');
 
         if ($participants) {
@@ -579,8 +591,7 @@ class ListController extends Web\Controller\Base
             $data['customisedFor'] = $this->requestQuery->get('original');
         }
 
-        /* Only duework, task and quiz can have customised activities
-         */
+        /* These activity types can't have custom participation */
         if (!isset($participants)) {
             if ($this->getConfigLoader()->get('lti_assessments_enable')) {
                 $data['types'][] = [
@@ -600,18 +611,6 @@ class ListController extends Web\Controller\Base
                 'label' => $this->rosettaStone->translate('lessonPlan', false, true),
                 'icon'  => 'lesson-plan',
                 'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
-            ];
-            /* Dialog Agents spawn directly onto homepages I suppose, without requiring a course
-             * context, just like a Due Work.
-             */
-            $data['types'][] = [
-                'id'    => 'dialog-agent',
-                'value' => AssessmentType::TYPE_DIALOG_AGENT,
-                'label' => $this->rosettaStone->translate('dialogAgent', false, true),
-                'icon'  => 'dialog-agent',
-                /* TODO probably rename this tooltip
-                 */
-                'title' => 'Converse with a scenario-based artificial intelligence',
             ];
 
             // TODO, 'types' should just be the 3 objects, and twig should do the rest

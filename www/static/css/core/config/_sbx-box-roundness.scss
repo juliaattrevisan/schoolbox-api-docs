@@ -1,0 +1,64 @@
+/**
+ * Box roundness config
+ * Applied to UI "boxes" in Advanced UI
+ * Box = surface on page background (not inside an island)
+ */
+
+:root {
+    --sbx-config-box-roundness: var(--sbx-border-radius-normal);
+}
+
+.sbx-body {
+    //Base box surfaces
+    .island,
+    .component,
+    .island section,
+    .empty-state,
+    .modal,
+    .modal-content,
+    .tabs,
+    .accordion,
+    .accordion__item,
+    .filters,
+    .filters-container,
+    .table,
+    .table-wrapper,
+    .calendar,
+    .calendar-container,
+    .v-card,
+    .c-card,
+    .c-island,
+    .fc,
+    .fc-event,
+    .swiper-horizontal,
+    .scrollable.show-for-medium-up,
+    .row:has(> #filter_panel) {
+        border-radius: var(--sbx-config-box-roundness);
+    }
+
+    // Top-only rounded elements
+    .component-titlebar,
+    .accordion dd:first-of-type > a,
+    .accordion .accordion-navigation:first-of-type > a,
+    .v-card .card-class-image,
+    .v-card > a .card-class-image,
+    .feed .subheader {
+        border-radius: var(--sbx-config-box-roundness) var(--sbx-config-box-roundness) 0 0;
+    }
+
+    // Component layout fixes
+    #component-layout .component-container .row > .island section:last-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    // Hybrid bar /top menu
+    #hybrid-bar .tab-bar {
+        border-radius: var(--sbx-config-box-roundness);
+    }
+}
+
+// Dashboard tiles
+.Schoolbox_Tile_Component_DashboardTileController .tileList .tile {
+    border-radius: var(--sbx-config-box-roundness);
+}

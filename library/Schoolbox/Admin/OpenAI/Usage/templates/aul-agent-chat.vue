@@ -18,7 +18,7 @@ const sessionFeed = window.Vue.computed<AgentChatFeedMessage[]>(() => {
     }
 
     return acStore.parseFeed(
-        props.sessionLog.map((entry) => entry.data),
+        props.sessionLog.flatMap((entry) => [entry.data.input, entry.data.output]),
         firstLog.createdBy,
     );
 });

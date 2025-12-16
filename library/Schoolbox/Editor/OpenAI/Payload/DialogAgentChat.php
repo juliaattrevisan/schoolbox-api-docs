@@ -2,7 +2,10 @@
 
 namespace Schoolbox\Editor\OpenAI\Payload;
 
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Editor\OpenAI\Helper;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 
 class DialogAgentChat
 {
@@ -17,17 +20,35 @@ class DialogAgentChat
     /**
      * Hardcoded system prompt structure to set the behaviour of the AI, possible placeholders are:
      * - [DIALOG_AGENT_PROMPT] Replaced with the value from `dialog_agent`.`prompt`
-     * - [COURSE_UNIT_CONTEXT] TODO: Figure out what this actually is, I think just the folder name if relevant?
-     * - [DIFFERENTIATION_PROFILE] If applicable, the differentiation profile of the student
      *
      * Most of the relevant placeholders are already handled by the 1st AI step which builds the full prompt
-     * into DIALOG_AGENT_PROMPT, so that can just be dumped in here. The other placeholders are subject to
-     * change more easily and hence have to be handled as additions here.
+     * into DIALOG_AGENT_PROMPT, so that can just be dumped in here
      */
-    private const string PROMPT_SYSTEM_PERSONA = "
-        [DIALOG_AGENT_PROMPT]
-        Course/Unit Context: [COURSE_UNIT_CONTEXT]
-        [DIFFERENTIATION_PROFILE]
+    private const string PROMPT_SYSTEM_AGENT = "[DIALOG_AGENT_PROMPT]";
+
+
+    /**
+     * Hardcoded system prompt structure for the differentiation profile, this prompt is optionally
+     * added if a differentiation profile exists for the student and is to be included.
+     * Possible placeholders are
+     * - [DIFFERENTIATION_PROFILE_CONTENT] Replaced with the JSON-formatted differentiation profile
+    */
+    private const string PROMPT_SYSTEM_DIFFERENTIATION_PROFILE = "
+        Here is the student's differentiation profile, formatted as a JSON object:
+        [DIFFERENTIATION_PROFILE_CONTENT]
+    ";
+
+
+    /**
+     * Hardcoded system prompt structure for context about the activity
+     */
+    private const string PROMPT_SYSTEM_ACTIVITY_CONTEXT = "
+        Here is the learning activity information:
+            Year Level: [YEAR_LEVEL]
+            Class Name: [CLASS_NAME]
+            Course Name: [COURSE_NAME]
+            Unit Name: [UNIT_NAME]
+            Curriculum: [CURRICULUM_CONTENT]
     ";
 
 
@@ -41,14 +62,12 @@ class DialogAgentChat
      * @param string $openAiModel
      * @param string $openAiDeploymentId
      * @param string $featureSystemPrompt The system prompt from admin config
-     * @param string $agentPrompt The specific system prompt for this dialog agent activity
      */
     public function __construct(
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
         private string $featureSystemPrompt,
-        private string $agentPrompt,
     ) {
     }
 
@@ -57,13 +76,17 @@ class DialogAgentChat
      * Generate the payload for having a conversation with the AI in a Dialog Agent activity
      * Optionally include a previousResponseId if this is part of a conversation
      *
-     * @param string      $userPrompt
+     * @param DialogAgent $assessment The dialog agent activity
+     * @param string      $userPrompt The user's input prompt
      * @param string|null $previousResponseId
+     * @param string|null $differentiationProfile
      * @return array
      */
     public function generate(
+        DialogAgent $assessment,
         string $userPrompt,
         ?string $previousResponseId = null,
+        ?string $differentiationProfile = null,
     ): array {
         /**
          * OpenAI uses the model name from our ui.
@@ -110,7 +133,24 @@ class DialogAgentChat
         /* The agent-specific system prompt for this activity */
         $payload['input'][] = [
             'role' => 'system',
-            'content' => $this->formatAgentSystemPrompt(),
+            'content' => strtr(self::PROMPT_SYSTEM_AGENT, [
+                '[DIALOG_AGENT_PROMPT]' => trim($assessment->getPrompt()),
+            ]),
+        ];
+
+        /* Include the differentiation profile system prompt if available */
+        $differentiationProfilePrompt = $this->formatDifferentiationProfilePrompt($differentiationProfile);
+        if (null !== $differentiationProfilePrompt) {
+            $payload['input'][] = [
+                'role' => 'system',
+                'content' => $differentiationProfilePrompt,
+            ];
+        }
+
+        /* Include the activity context if available */
+        $payload['input'][] = [
+            'role' => 'system',
+            'content' => $this->formatActivityContextPrompt($assessment),
         ];
 
         /* The user input prompt */
@@ -132,18 +172,47 @@ class DialogAgentChat
 
 
     /**
-     * Generate the system prompt for the current chat agent based on the configured fields
+     * Generate the system prompt for the differentiation profile
+     * @param ?string $differentiationProfile
+     * @return ?string
      */
-    private function formatAgentSystemPrompt(): string
+    private function formatDifferentiationProfilePrompt(?string $differentiationProfile): ?string
     {
-        $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
-            '[DIALOG_AGENT_PROMPT]' => trim($this->agentPrompt),
+        if (trim($differentiationProfile ?? '') === '') {
+            return null;
+        }
+
+        return strtr(self::PROMPT_SYSTEM_DIFFERENTIATION_PROFILE, [
+            '[DIFFERENTIATION_PROFILE_CONTENT]' => $differentiationProfile,
+        ]);
+    }
+
+
+    /**
+     * Generate the system prompt for the activity context
+     * @param DialogAgent $assessment
+     * @return string
+     */
+    private function formatActivityContextPrompt(DialogAgent $assessment): string
+    {
+        $baseContext = $assessment->getContext()->getBaseContext();
+        $unit = $baseContext instanceof UnitImplementation ? $baseContext : null;
+
+        $curriculumNodes = $assessment->getCurriculumNodes()->map(fn(Node\Model $node) => [
+            'code' => $node->getCode(),
+            'name' => $node->getName(),
+            'description' => \Scrub::html2text($node->getDescription()),
         ]);
 
-        // TODO: append unit/course context, whatever that is actually meant to be
-
-        // TODO: append differentation profile if the activity specifies to include it
-
-        return $systemPrompt;
+        return strtr(
+            self::PROMPT_SYSTEM_ACTIVITY_CONTEXT,
+            [
+                '[YEAR_LEVEL]' => implode(',', $assessment->getBaseContext()->getFolder()->getYearLevels()?->getPropertyValues('name') ?? []),
+                '[CLASS_NAME]' => $assessment->getContext()->getFolder()->getName(),
+                '[COURSE_NAME]' => $unit?->getSpecification()->getCourse()->getTitle() ?? "N/A",
+                '[UNIT_NAME]' => $unit?->getTitle() ?? "N/A",
+                '[CURRICULUM_CONTENT]' => json_encode($curriculumNodes, JSON_PRETTY_PRINT),
+            ]
+        );
     }
 }

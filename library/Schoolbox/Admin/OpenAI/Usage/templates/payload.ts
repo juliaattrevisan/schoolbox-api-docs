@@ -3,7 +3,7 @@
  * @see /library/Schoolbox/Admin/OpenAI/Usage/Controller.php
  */
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
-import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
 /**
@@ -30,7 +30,7 @@ export enum AiLogFormat {
 }
 
 type AiLogFormatDataMap = {
-    [AiLogFormat.AGENT_CHAT]: AiLogAgentChatData;
+    [AiLogFormat.AGENT_CHAT]: { input: AgentChatLogEntry; output: AgentChatLogEntry };
 };
 
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/Session/ModelToArray.php */

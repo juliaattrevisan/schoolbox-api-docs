@@ -10,7 +10,7 @@ import type {
     AgentChatRequest,
     AgentChatResponse,
     AgentChatResponseInProgress,
-    AiLogAgentChatData,
+    AgentChatLogEntry,
 } from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
@@ -79,10 +79,15 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      * @param user - The user who made the requests
      * @returns The parsed feed messages
      */
-    function parseFeed(logEntries: AiLogAgentChatData[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
+    function parseFeed(logEntries: AgentChatLogEntry[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
         const parsedFeed: AgentChatFeedMessage[] = [];
 
-        const messages = logEntries.flatMap((logMessages) => logMessages);
+        const messages = [...logEntries].sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateA - dateB;
+        });
+
         for (const message of messages) {
             if (message.type === AgentChatMessageType.REQUEST) {
                 parsedFeed.push({
@@ -104,6 +109,12 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                     type: AgentChatMessageType.RESPONSE,
                     entryKey: getNextEntryKey(),
                 } satisfies AgentChatResponse);
+            } else if (message.type === AgentChatMessageType.ALERT) {
+                parsedFeed.push({
+                    type: AgentChatMessageType.ALERT,
+                    entryKey: getNextEntryKey(),
+                    ...message.data,
+                });
             } else {
                 assertUnreachable(message);
             }

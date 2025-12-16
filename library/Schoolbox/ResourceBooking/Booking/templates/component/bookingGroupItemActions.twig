@@ -1,0 +1,68 @@
+{##
+ # The actions tot for an individual booking within a booking group
+ #
+ # @param array $item
+ # @param array $booking
+ # @param array $event
+ # @param string $returnUrl
+ #}
+
+<nav>
+    <sbx-pop-out content-id="resourceManagement-status-{{ event.booking.id }}"></sbx-pop-out>
+</nav>
+<ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
+    {% if booking.clash and booking.clash | length == 1 %}
+        <li>
+            <a
+                href="{{ routeLookup('resourceBooking.edit', {id: booking.clash[0].booking.id}) }}?returnUrl={{ returnUrl }}"
+                class="icon-modify"
+            >Modify Approved Booking</a>
+        </li>
+    {% endif %}
+
+    <li>
+        <a
+            href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
+            class="icon-modify"
+        >Modify{% if booking.clash %} Clash{% endif %} Booking</a>
+    </li>
+
+    {% if booking.clash and booking.clash | length > 1 %}
+        <li>
+            <a
+                href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}"
+                class="icon-modify"
+            >Manage Clashes on Calendar</a>
+        </li>
+    {% endif %}
+
+    <li class="separator">Set Status</li>
+
+    {% if not booking.clash %}
+        <li>
+            <a
+                href="{{ routeLookup('resourceBooking.approve', {id: event.booking.id}) }}"
+                data-series-id="{{ event.booking.event.seriesId }}"
+                data-set-status="approved"
+                class="icon-approve"
+            >Approve</a>
+        </li>
+    {% elseif booking.clash | length == 1 %}
+        <li>
+            <a
+                href="{{ routeLookup('resourceBooking.clashApprove', {old: booking.clash[0].booking.id, new: event.booking.id}) }}"
+                data-set-status="approved"
+                class="icon-approve"
+            >Approve Clash Booking / Reject Original Booking</a>
+        </li>
+    {% endif %}
+
+    <li>
+        <a
+            href="{{ routeLookup('resourceBooking.reject', {id: event.booking.id}) }}"
+            data-series-id="{{ event.booking.event.seriesId }}"
+            data-set-status="rejected"
+            class="icon-close"
+        >Reject{% if booking.clash %} Clash Booking{% endif %}</a>
+    </li>
+</ul>

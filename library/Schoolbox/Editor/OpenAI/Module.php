@@ -42,7 +42,7 @@ class Module extends BaseModule
         $hasDifferentiationProfileService = new Rule\All(
             $dpEnabled,
             new Rule\HasServicePermission(
-                UserAccess::SERVICE_DIFFERENTIATION_PROFILE,
+                UserAccess::SERVICE_DIFFERENTIATION,
                 UserAccess::ACCESS_WRITE
             ),
         );

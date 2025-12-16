@@ -7,12 +7,12 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
-    feed: AiLogAgentChatData[];
+    feed: AgentChatLogEntry[];
     response: DialogAgentResponse;
     student: UserAuthor;
     returnUrl: string;
@@ -27,6 +27,8 @@ window.Vue.onMounted(() => {
     currentResponse.value = props.response;
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
 });
+
+const isLoading = window.Vue.ref(false);
 
 const isHelpRequestChanging = window.Vue.ref(false);
 const helpRequestError = window.Vue.ref<string | null>(null);
@@ -51,11 +53,13 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
          * If a student requests assistance, then the instructor resolves it somewhere else, you'd get a 403 here.
          * When that occurs, attempt to find the latest response data to sync back up.
          */
-        if (getApiProblemStatus(response) === 403 && props.response._routes.status) {
+        if (getApiProblemStatus(response) === 403 && currentResponse.value._routes.status) {
+            isLoading.value = true;
             const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
                 method: "GET",
-                url: props.response._routes.status,
+                url: currentResponse.value._routes.status,
             });
+            isLoading.value = false;
 
             if (statusResponse.success) {
                 currentResponse.value = statusResponse.data.response;
@@ -100,6 +104,27 @@ async function submitResponse(): Promise<void> {
 
     /** If successful, redirect to the return URL - keep isSubmitting as true as the page will soon unload */
     window.location.href = props.returnUrl;
+}
+
+/**
+ * Open the submit confirmation modal
+ */
+async function openSubmitModal(): Promise<void> {
+    /** If the feed isn't empty and we don't have a submit route yet, we might be out of date... try refetch first */
+    if (acStore.feed.length > 0 && !currentResponse.value._routes.submit && currentResponse.value._routes.status) {
+        isLoading.value = true;
+        const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
+            method: "GET",
+            url: currentResponse.value._routes.status,
+        });
+        isLoading.value = false;
+
+        if (statusResponse.success) {
+            currentResponse.value = statusResponse.data.response;
+        }
+    }
+
+    isSubmitModalOpen.value = true;
 }
 
 /**
@@ -186,13 +211,13 @@ window.Vue.onUnmounted(() => {
             v-if="currentResponse._routes.assistanceRequest"
             class="button"
             type="button"
-            :disabled="isHelpRequestChanging"
+            :disabled="isHelpRequestChanging || isLoading || undefined"
             @click="changeHelpRequest(currentResponse._routes.assistanceRequest)"
         >
             {{ isHelpRequestChanging ? "Requesting Assistance..." : "Request Teacher Help" }}
         </button>
         <nav>
-            <button class="button submit icon-approve" type="submit" @click="isSubmitModalOpen = true">Submit</button>
+            <button class="button submit icon-approve" type="submit" @click="openSubmitModal">Submit</button>
         </nav>
     </div>
 
@@ -203,7 +228,7 @@ window.Vue.onUnmounted(() => {
         :max-height="maxFeedHeight"
         :feed="acStore.fullFeed"
         error-prefix="There was a problem retrieving the response."
-        :allow-retry="!!props.response._routes.message"
+        :allow-retry="!!currentResponse._routes.message"
         initially-scrolled
     >
         <template #header>
@@ -217,7 +242,7 @@ window.Vue.onUnmounted(() => {
                         v-if="currentResponse._routes.assistanceResolve"
                         class="button highlight l-mar--0"
                         type="button"
-                        :disabled="isHelpRequestChanging"
+                        :disabled="isHelpRequestChanging || isLoading || undefined"
                         @click="changeHelpRequest(currentResponse._routes.assistanceResolve)"
                     >
                         Help No Longer Needed
@@ -233,9 +258,9 @@ window.Vue.onUnmounted(() => {
     </ac-feed>
     <div class="no-print">
         <ac-prompt
-            v-if="props.response._routes.message"
+            v-if="currentResponse._routes.message"
             :request-config="{
-                messageRoute: props.response._routes.message,
+                messageRoute: currentResponse._routes.message,
                 aiSessionId: null /* session ID is already attached to a response and handled in the backend */,
                 requireImage: false,
             }"
@@ -247,7 +272,8 @@ window.Vue.onUnmounted(() => {
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 
     <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
-        <template v-if="props.response._routes.submit">
+        <div v-if="isLoading" class="loader"></div>
+        <template v-else-if="currentResponse._routes.submit">
             <h2>Confirm Submission</h2>
             <p>
                 Are you sure you want to finalise this {{ locale.dialogAgent.singular() }}? Once submitted, you will not
