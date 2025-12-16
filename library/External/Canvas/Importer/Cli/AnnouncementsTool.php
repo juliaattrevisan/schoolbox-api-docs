@@ -126,11 +126,6 @@ HELP;
             $lock = null;
         }
 
-        // log this to keep track of things
-        $runId = (string)Uuid::uuid4();
-        $importLogMapper = CanvasLogMapper::getInstance();
-        $importLog = $importLogMapper->start($runId, self::CANVAS_ANNOUNCEMENTS_SCRIPT_NAME);
-
         if ($lock) {
             $bearerToken = $this->getConfig()->get('canvas_bearer_token');
 
@@ -162,6 +157,11 @@ HELP;
                     return;
                 }
             }
+
+            // log this to keep track of things
+            $runId = (string)Uuid::uuid4();
+            $importLogMapper = CanvasLogMapper::getInstance();
+            $importLog = $importLogMapper->start($runId, self::CANVAS_ANNOUNCEMENTS_SCRIPT_NAME);
 
             /* Used to shank a database instance
              */
