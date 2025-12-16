@@ -209,6 +209,7 @@ class DialogAgentFeedback
      * @param DialogAgent $assessment
      * @param Response $response
      * @return string
+     * @throws \JsonException
      */
     private function generateUserFeedPrompt(DialogAgent $assessment, Response $response): string
     {
