@@ -506,9 +506,12 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Find all booking ids matching a given resource id and array of event ids.
+     * This is for finding all bookings of a resource in a series of events.
+     *
      * @param int        $resourceId
      * @param array<int> $eventIds
-     * @param bool       $futureBookingsOnly
+     * @param bool       $futureBookingsOnly Set to true to only include bookings that start in the future.
      * @return array<int>
      */
     public function findIdsByResourceIdForEvents(
