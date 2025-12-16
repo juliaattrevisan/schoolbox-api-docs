@@ -4,7 +4,7 @@
  */
 
 import type { Ref } from "vue";
-import type { useLazyGridRowsStore } from "../store/lgRowsStore";
+import type { useLazyGridRowsHeightStore } from "../store/lgRowsHeightStore";
 
 /**
  * Tracks the content height and component action height of a grid cell
@@ -12,7 +12,7 @@ import type { useLazyGridRowsStore } from "../store/lgRowsStore";
  * @param headerKey - The key of the header
  * @param contentEl - The ref to the content element
  * @param componentActionEl - The ref to the component action element
- * @param lgRowsStore - The lazy grid rows store instance
+ * @param lgRowsHeightStore - The lazy grid rows height store instance
  * @returns contentHeight, componentActionHeight - The heights of the content and component action elements
  */
 export function useContentHeight(
@@ -20,7 +20,7 @@ export function useContentHeight(
     headerKey: string,
     contentEl: Ref<HTMLElement | null>,
     componentActionEl: Ref<HTMLElement | null>,
-    lgRowsStore: ReturnType<typeof useLazyGridRowsStore>,
+    lgRowsHeightStore: ReturnType<typeof useLazyGridRowsHeightStore>,
 ): {
     contentHeight: Ref<number>;
     componentActionHeight: Ref<number>;
@@ -35,7 +35,7 @@ export function useContentHeight(
     function updateContentHeight(): void {
         contentHeight.value = contentEl.value?.offsetHeight || 0;
         componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-        lgRowsStore.setContentHeight(id, headerKey, contentHeight.value + componentActionHeight.value);
+        lgRowsHeightStore.setContentHeight(id, headerKey, contentHeight.value + componentActionHeight.value);
     }
 
     /**

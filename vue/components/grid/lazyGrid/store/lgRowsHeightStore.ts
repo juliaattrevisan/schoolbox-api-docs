@@ -7,7 +7,7 @@ import { defineStore } from "pinia";
 
 export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
 
-export const useLazyGridRowsStore = defineStore(`lazyGridRowsStore`, () => {
+export const useLazyGridRowsHeightStore = defineStore(`lazyGridRowsHeightStore`, () => {
     const unexpandedRowHeight: number = 250; // The default unexpanded height of a row, in px
     const rowContentHeights = window.Vue.ref<Record<number, Record<string, number>>>({});
     const viewMoreIDs = window.Vue.ref<number[]>([]);

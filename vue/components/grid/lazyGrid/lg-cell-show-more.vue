@@ -4,7 +4,7 @@
  * Displays a gradient overlay and "View More" button when content exceeds the display height
  */
 
-import { useLazyGridRowsStore } from "./store/lgRowsStore";
+import { useLazyGridRowsHeightStore } from "./store/lgRowsHeightStore";
 
 const props = defineProps<{
     rowId: number;
@@ -14,13 +14,13 @@ const props = defineProps<{
     isContentFocused: boolean;
 }>();
 
-const lgRowsStore = useLazyGridRowsStore();
+const lgRowsHeightStore = useLazyGridRowsHeightStore();
 
 /**
  * Whether to show the view more gradient and button
  */
 const showViewMoreGradient = window.Vue.computed(() => {
-    const displayHeights = lgRowsStore.rowDisplayHeights;
+    const displayHeights = lgRowsHeightStore.rowDisplayHeights;
     if (!displayHeights) return false;
     const displayHeight = displayHeights[props.rowId];
     if (!displayHeight) return false;
@@ -41,7 +41,7 @@ const showViewMoreInner = window.Vue.computed(() => {
  * Handle view more button click
  */
 function onViewMoreClick(): void {
-    lgRowsStore.toggleViewMore(props.rowId);
+    lgRowsHeightStore.toggleViewMore(props.rowId);
 }
 </script>
 

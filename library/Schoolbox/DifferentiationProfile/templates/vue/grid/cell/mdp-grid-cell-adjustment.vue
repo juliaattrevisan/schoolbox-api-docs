@@ -5,7 +5,10 @@
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
-import { useLazyGridRowsStore, ANIMATION_DURATION } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
+import {
+    useLazyGridRowsHeightStore,
+    ANIMATION_DURATION,
+} from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsHeightStore";
 import { useContentHeight } from "@schoolboxVue/components/grid/lazyGrid/composable/useContentHeight";
 import LgCellShowMore from "@schoolboxVue/components/grid/lazyGrid/lg-cell-show-more.vue";
 import type {
@@ -24,7 +27,7 @@ const props = defineProps<{
 }>();
 
 const headerStore = useHeaderStore();
-const lgRowsStore = useLazyGridRowsStore();
+const lgRowsHeightStore = useLazyGridRowsHeightStore();
 const saveStore = useSaveStore();
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
@@ -39,7 +42,7 @@ const { contentHeight, componentActionHeight } = useContentHeight(
     props.headerKey,
     contentEl,
     componentActionEl,
-    lgRowsStore,
+    lgRowsHeightStore,
 );
 
 // #region modifying the selected adjustments
@@ -61,7 +64,7 @@ const isSaving = window.Vue.ref(false);
  * Whether the content of the cell is focused
  */
 const isContentFocused = window.Vue.computed(() => {
-    return (lgRowsStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+    return (lgRowsHeightStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
 });
 
 /**
@@ -78,7 +81,7 @@ const isContentEmpty = window.Vue.computed(() => {
  * When the modify button is clicked.
  */
 function onModify(): void {
-    lgRowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
+    lgRowsHeightStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
 }
 
 // #endregion modifying the selected adjustments
@@ -105,7 +108,7 @@ async function onSave(): Promise<void> {
     isSaving.value = true;
     // If both original and new values are null/empty, don't trigger save
     if (props.adjustments === null && selectedAdjustments.value.length === 0) {
-        lgRowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
+        lgRowsHeightStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
         isSaving.value = false;
         return;
     }
@@ -115,7 +118,7 @@ async function onSave(): Promise<void> {
         [props.headerKey]: newValue,
     };
     await saveStore.save(props.profile, toSave);
-    lgRowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
+    lgRowsHeightStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
     isSaving.value = false;
 }
 </script>
@@ -127,7 +130,7 @@ async function onSave(): Promise<void> {
             'grid-cell--content-focused': isContentFocused,
         }"
         :style="{
-            height: `${lgRowsStore.rowDisplayHeights?.[props.profile.student.id]}px`,
+            height: `${lgRowsHeightStore.rowDisplayHeights?.[props.profile.student.id]}px`,
         }"
     >
         <div ref="contentEl">
