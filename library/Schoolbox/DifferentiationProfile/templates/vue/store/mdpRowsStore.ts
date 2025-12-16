@@ -76,8 +76,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     }
 
     /**
-     * Toggle the view more (expanded) state of a profile row
-     * @param $id - the id of the profile to toggle
+     * Toggle the view more (expanded) state of a row
+     * @param $id - the id of the row to toggle
      */
     function toggleViewMore($id: number): void {
         if (viewMoreIDs.value.includes($id)) {
@@ -89,8 +89,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
 
     /**
      * As content is loaded, we need to keep track of the height so we can correctly
-     * size other cells from that profile when it is expanded.
-     * @param $id - the id of the cell to set the content height for
+     * size other cells from that row when it is expanded.
+     * @param $id - the id of the row to set the content height for
      * @param headerKey - the header key to set the content height for
      * @param height - the height to set
      */
@@ -102,8 +102,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     }
 
     /**
-     * Updates the focus state of a profile+header combination
-     * @param $id - the profile to update the focus state for
+     * Updates the focus state of a row+header combination
+     * @param $id - the row to update the focus state for
      * @param headerKey - the header key to update the focus state for
      * @param isFocused - whether the cell is focused
      */
@@ -125,36 +125,41 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     }
 
     /**
+     * Set of active row IDs based on rows that have content heights recorded
+     * @returns {Set<number>} - set of row IDs
+     */
+    const activeRowIDs = window.Vue.computed<Set<number>>(() => {
+        return new Set(Object.keys(rowContentHeights.value).map(Number));
+    });
+
+    /**
      * The minimum height at which each cell should be rendered, based on:
      * - The height of the content in the cell
-     * - The unexpanded height of the profile row
+     * - The unexpanded height of the row
      * - Whether the cell is focused
-     * - Whether the profile row is in a "View More" state
-     * @returns { Record<number, Record<string, number>> } - a record of profile ID to a record of header key to minimum display height
+     * - Whether the row is in a "View More" state
+     * @returns { Record<number, Record<string, number>> } - a record of row ID to a record of header key to minimum display height
      */
     const cellMinDisplayHeights = window.Vue.computed<Record<number, Record<string, number>>>(() => {
         const cellMinHeights: Record<number, Record<string, number>> = {};
-        if (payload.value?.data?.profiles) {
-            payload.value.data.profiles.forEach((profile) => {
-                const isViewMore = viewMoreIDs.value.includes(profile.student.id);
-                cellMinHeights[profile.student.id] = Object.fromEntries(
-                    Object.entries(rowContentHeights.value[profile.student.id] || {}).map(
-                        ([headerKey, contentHeight]) => {
-                            if (isViewMore) return [headerKey, contentHeight];
-                            if (focusedCells.value[profile.student.id]?.includes(headerKey))
-                                return [headerKey, contentHeight];
-                            return [headerKey, unexpandedRowHeight];
-                        },
-                    ),
-                );
-            });
-        }
+
+        activeRowIDs.value.forEach((rowId) => {
+            const isViewMore = viewMoreIDs.value.includes(rowId);
+            cellMinHeights[rowId] = Object.fromEntries(
+                Object.entries(rowContentHeights.value[rowId] || {}).map(([headerKey, contentHeight]) => {
+                    if (isViewMore) return [headerKey, contentHeight];
+                    if (focusedCells.value[rowId]?.includes(headerKey)) return [headerKey, contentHeight];
+                    return [headerKey, unexpandedRowHeight];
+                }),
+            );
+        });
+
         return cellMinHeights;
     });
 
     /**
-     * The display height of each profile row, based on the maximum of the minimum display heights of each cell inside
-     * @returns { Record<number, number> } - a record of profile ID to display height
+     * The display height of each row, based on the maximum of the minimum display heights of each cell inside
+     * @returns { Record<number, number> } - a record of row ID to display height
      */
     const rowDisplayHeights = window.Vue.computed<Record<number, number>>(() => {
         return Object.fromEntries(
