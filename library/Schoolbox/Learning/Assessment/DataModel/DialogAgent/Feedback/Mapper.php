@@ -69,7 +69,7 @@ class Mapper extends \Schoolbox\Mapper
         /* A set of many criterion (criteria) for a feedback.
          * These are shown as content for individual cells in the status screen
          */
-        $this->joinsReverseMulti('feedback_id', Criterion\Mapper::class, 'criteria', 'feedbackCriteria');
+        $this->joinsReverseMulti('feedback_id', Criterion\Mapper::class, 'criteria', 'feedbackCriterion');
     }
 
 
@@ -86,9 +86,9 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
                 {$this->getJoinColumnString('response', 'response')},
                 {$this->getJoinColumnString('response.learner', 'response.learner')},
-                {$this->getJoinColumnString('feedbackCriteria', 'feedbackCriteria')}
+                {$this->getJoinColumnString('feedbackCriterion', 'feedbackCriterion')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('feedbackCriteria', '', 'feedbackCriteria', true)}
+            INNER JOIN {$this->getJoinSql('feedbackCriterion', '', 'feedbackCriterion', true)}
             INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
             INNER JOIN {$this->getJoinSql('response', '', 'response', true)}
             INNER JOIN {$this->getJoinSql('response.learner', 'response', 'response.learner', true)}
@@ -108,7 +108,7 @@ class Mapper extends \Schoolbox\Mapper
         $stack = $this->createCollection();
         $userMapper = $this->getJoinMapper('response.learner');
         $responseMapper = $this->getJoinMapper('response');
-        $feedbackCriteriaMapper = $this->getJoinMapper('feedbackCriteria');
+        $feedbackCriterionMapper = $this->getJoinMapper('feedbackCriterion');
 
         foreach ($statement as $row) {
             /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Model $feedback */
@@ -154,16 +154,16 @@ class Mapper extends \Schoolbox\Mapper
 
                 /* Init a collection of Feedback Criteria
                  */
-                $feedback->setCriteria($feedbackCriteriaMapper->createCollection());
+                $feedback->setCriteria($feedbackCriterionMapper->createCollection());
 
                 $stack->setOffset($feedback->getId(), $feedback);
             }
 
             /* Accumulate all the feedback criteria into a collection
              */
-            $feedbackCriteria = $feedbackCriteriaMapper->hydrate($row, 'feedbackCriteria');
+            $feedbackCriterion = $feedbackCriterionMapper->hydrate($row, 'feedbackCriterion');
 
-            $feedback->getCriteria()->add($feedbackCriteria);
+            $feedback->getCriteria()->add($feedbackCriterion);
         }
 
         return $stack;
