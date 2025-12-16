@@ -144,7 +144,7 @@ class ConfigMapper extends Mapper
     public const NAME_CANVAS_GRADE_GROUPS = 'canvas_grade_groups';
     public const NAME_CANVAS_SISSOURCEID_TEMPLATE = 'canvas_sissourceid_template';
     public const NAME_CANVAS_SYNC_NEWS = 'canvas_sync_news';
-    public const NAME_CANVAS_NEWS_TOPIC = 'canvas_new_topic';
+    public const NAME_CANVAS_NEWS_TOPIC = 'canvas_news_topic';
     public const NAME_CANVAS_NEWS_AUTHOR = 'canvas_news_author';
     public const NAME_CANVAS_REDIRECT_ASSESSMENTS = 'canvas_redirect_assessments';
     public const NAME_CANVAS_REDIRECT_HOMEPAGES = 'canvas_redirect_homepages';
