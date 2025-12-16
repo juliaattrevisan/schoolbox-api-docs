@@ -26,12 +26,18 @@ jobs:
         uses: php-actions/composer@v6
         with:
           dev: no
-          args: --profile --ignore-platform-reqs -a -vvv --no-scripts
+          args: --profile --ignore-platform-reqs -a
           php_version: '8.4'
           # Just use whatever the latest 2.x release is: only 2.2 is an LTS
           version: '2.x'
 
-      - name: Composer patches
+      - name: What's in /root/.gitconfig?
+        if: always()
+        run: |
+          sudo ls -al /root/.gitconfig
+
+      - name: Composer patches doctor
+        if: always()
         uses: php-actions/composer@v6
         with:
           dev: no
