@@ -9,9 +9,12 @@ declare(strict_types=1);
 
 namespace External\Canvas\Importer\Cli;
 
+use External\Canvas\Log\Mapper as CanvasLogMapper;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Ramsey\Uuid\Uuid;
+use Schoolbox\Mapper\Exception;
 
 /**
  * CLI Tool for processing Canvas Announcements
@@ -124,6 +127,11 @@ HELP;
             $lock = null;
         }
 
+        // log this to keep track of things
+        $runId = (string)Uuid::uuid4();
+        $importLogMapper = CanvasLogMapper::getInstance();
+        $importLog = $importLogMapper->start($runId, self::CANVAS_ANNOUNCEMENTS_SCRIPT_NAME);
+
         if ($lock) {
             $bearerToken = $this->getConfig()->get('canvas_bearer_token');
 
@@ -167,25 +175,33 @@ HELP;
             /** @var StrategyFactory $strategyFactory */
             $strategyFactory = $this->getDi()->get('commsNewsAudienceStrategyFactory');
 
-            (new \External\Canvas\Importer\Announcements(
-                new \External\Canvas\Importer\CanvasDb($this->getConfig()),
-                new \External\Canvas\Importer\Api(
-                    $this->getConfig()->get('canvas_url'),
-                    $bearerToken
-                ),
-                $this->getConfig(),
-                \Schoolbox\Resource\Folder\Mapper::getInstance(),
-                \Schoolbox\UserMapper::getInstance(),
-                \Schoolbox\Comms\News\Mapper::getInstance(),
-                \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
-                \Schoolbox\Comms\News\Source\Mapper::getInstance(),
-                \Schoolbox\Comms\News\Topic\Mapper::getInstance(),
-                $strategyFactory,
-                (int)$defaultOwner,
-                (int)$defaultTopic,
-                $this->getLogger(),
-                $lock
-            ))->import();
+            try {
+                (new \External\Canvas\Importer\Announcements(
+                    new \External\Canvas\Importer\CanvasDb($this->getConfig()),
+                    new \External\Canvas\Importer\Api(
+                        $this->getConfig()->get('canvas_url'),
+                        $bearerToken
+                    ),
+                    $this->getConfig(),
+                    \Schoolbox\Resource\Folder\Mapper::getInstance(),
+                    \Schoolbox\UserMapper::getInstance(),
+                    \Schoolbox\Comms\News\Mapper::getInstance(),
+                    \Schoolbox\Comms\News\Audience\Mapper::getInstance(),
+                    \Schoolbox\Comms\News\Source\Mapper::getInstance(),
+                    \Schoolbox\Comms\News\Topic\Mapper::getInstance(),
+                    $strategyFactory,
+                    (int)$defaultOwner,
+                    (int)$defaultTopic,
+                    $this->getLogger(),
+                    $lock
+                ))->import();
+            } catch (Exception $e) {
+                // log the error
+                $importLogMapper->error($importLog, $e->getMessage());
+
+                // re-throw
+                throw $e;
+            }
 
             /* Only commit changes in Perform mode
              */
@@ -200,6 +216,13 @@ HELP;
             /* Releasing control
              */
             $lock->release();
+
+            // log completion
+            $importLogMapper->finish($importLog);
+
+            /* Trim away ancient logs
+             */
+            $importLogMapper->prune();
         } else {
             $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit;
