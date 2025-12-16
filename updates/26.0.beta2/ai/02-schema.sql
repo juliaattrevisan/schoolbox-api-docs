@@ -25,13 +25,25 @@ CREATE TABLE `dialog_agent_feedback_criteria` (
 
 -- Ditch the old column/keys arrangement
 alter table dialog_agent_feedback
-    drop column body;
+    drop foreign key fk_daf_criteria;
 
 drop index fk_daf_criteria_idx on dialog_agent_feedback;
 
 alter table dialog_agent_feedback
-    drop foreign key fk_daf_criteria;
+    drop column body;
 
 alter table dialog_agent_feedback
     drop column criteria_id;
+
+-- Rename plural to singular
+rename table dialog_agent_feedback_criteria to dialog_agent_feedback_criterion;
+rename table dialog_agent_scenario_criteria to dialog_agent_scenario_criterion;
+
+-- Restore some keys and stuff
+alter table dialog_agent_feedback
+    add constraint fk_daf_learner_id
+        foreign key (learner_id) references user (id);
+
+
+
 

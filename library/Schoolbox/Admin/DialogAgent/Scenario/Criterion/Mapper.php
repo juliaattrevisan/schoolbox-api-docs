@@ -27,7 +27,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('dialog_agent_scenario_criteria');
+        $this->hasTable('dialog_agent_scenario_criterion');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('scenario_id', self::TYPE_INTEGER, null, 'scenario');
