@@ -15,8 +15,9 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     const route = window.Vue.ref<string>("");
     const url = window.Vue.ref<string>("");
     const limit = 20; // the current set limit for the number of records to fetch at once
+    const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
     const filters = window.Vue.ref<Nested>({});
-    const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(header, url);
+    const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError, sortBy } = useLoadData(header, url);
 
     /**
      * Adds filter search parameters to the given URLSearchParams object.
@@ -40,7 +41,10 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
             const newUrl = new URL(route.value, window.location.origin);
             const searchParams = new URLSearchParams();
             addFilterSearchParams(searchParams, filters.value);
-            searchParams.set("limit", limit.toString());
+            searchParams.set(SearchParam.LIMIT, limit.toString());
+            searchParams.set(SearchParam.SORT_BY, sortBy.value);
+            searchParams.set(SearchParam.ORDER, order.value);
+            searchParams.set(SearchParam.CURSOR, ""); // Reset cursor on sort change
             newUrl.search = searchParams.toString();
             url.value = newUrl.toString();
         });
@@ -65,8 +69,34 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         const newUrl = new URL(route.value, window.location.origin);
         const searchParams = new URLSearchParams();
         addFilterSearchParams(searchParams, filters.value);
-        searchParams.set("limit", limit.toString());
-        searchParams.set(SearchParam.CURSOR as string, cursor);
+        searchParams.set(SearchParam.LIMIT, limit.toString());
+        searchParams.set(SearchParam.SORT_BY, sortBy.value);
+        searchParams.set(SearchParam.ORDER, order.value);
+        searchParams.set(SearchParam.CURSOR, cursor);
+        newUrl.search = searchParams.toString();
+        url.value = newUrl.toString();
+    }
+
+    /**
+     * Handle sort button click
+     * @param headerKey - the key of the header that was clicked for sorting
+     */
+    function onSort(headerKey: string): void {
+        // If clicking the same header, toggle sort order
+        if (sortBy.value === headerKey) {
+            order.value = order.value === "ASC" ? "DESC" : "ASC";
+        } else {
+            // New header selected, set to ascending and update sortBy
+            sortBy.value = headerKey;
+            order.value = "ASC";
+        }
+        const newUrl = new URL(route.value, window.location.origin);
+        const searchParams = new URLSearchParams();
+        addFilterSearchParams(searchParams, filters.value);
+        searchParams.set(SearchParam.LIMIT, limit.toString());
+        searchParams.set(SearchParam.SORT_BY, sortBy.value);
+        searchParams.set(SearchParam.ORDER, order.value);
+        searchParams.set(SearchParam.CURSOR, ""); // Reset cursor on sort change
         newUrl.search = searchParams.toString();
         url.value = newUrl.toString();
     }
@@ -82,5 +112,6 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         loadError,
         init,
         onPaginate,
+        onSort,
     };
 });
