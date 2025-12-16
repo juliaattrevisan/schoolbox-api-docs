@@ -195,8 +195,9 @@ HELP;
                     $lock
                 ))->import();
             } catch (\Throwable| \Alaress\Database\Exception $e) {
-                // log the error // though this isn't storing it... its calling save, but its rolling back...\
-                // we are in a transaction after all... how we get out of this... will have to think...
+                // stop the transaction
+                $db->rollBack();
+                // log the error
                 $importLogMapper->error($importLog, $e->getMessage());
 
                 // re-throw
