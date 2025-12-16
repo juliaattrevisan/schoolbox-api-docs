@@ -35,20 +35,20 @@ jobs:
           # Just use whatever the latest 2.x release is: only 2.2 is an LTS
           version: '2.x'
 
-      - name: What's in /root/.gitconfig?
-        if: always()
-        run: |
-          sudo ls -al /root/.gitconfig
-
-      - name: Composer patches doctor
-        if: always()
-        uses: php-actions/composer@v6
-        with:
-          dev: no
-          command: patches-doctor
-          args: --profile
-          php_version: '8.4'
-          version: '2.x'
+#      - name: What's in /root/.gitconfig?
+#        if: always()
+#        run: |
+#          sudo ls -al /root/.gitconfig
+#
+#      - name: Composer patches doctor
+#        if: always()
+#        uses: php-actions/composer@v6
+#        with:
+#          dev: no
+#          command: patches-doctor
+#          args: --profile
+#          php_version: '8.4'
+#          version: '2.x'
 
       - name: Upload composer artifact
         uses: actions/upload-artifact@v4
