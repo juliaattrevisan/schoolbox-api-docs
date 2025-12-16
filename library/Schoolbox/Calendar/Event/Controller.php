@@ -1111,9 +1111,47 @@ class Controller extends Base
      */
     public function editBooking(Event $event, $bookingId): void
     {
+        $data = $this->request->getParsedBody();
+
+        $startDatetimeStr = $data['startDatetime'] ?? null;
+        $endDatetimeStr = $data['endDatetime'] ?? null;
+        $notes = $data['notes'] ?? null;
+
+        if ($startDatetimeStr === null || $endDatetimeStr === null || $notes === null || $bookingId === null) {
+            throw new SchoolboxException('Missing required data in form submission.');
+        }
+
+        try {
+            $booking = $this->bookingMapper->findById($bookingId);
+        } catch (MapperException) {
+            throw new SchoolboxException('Could not find booking with ID ' . $bookingId);
+        }
+
+        // Check that $bookingId is linked to $event.
+        if ($booking->getEvent()->getId() !== $event->getId()) {
+            throw new SchoolboxException('Booking/event mismatch when saving booking.');
+        }
+
+        $startDatetime = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        $endDatetime = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+
+        $booking->setBookingStartAt($startDatetime);
+        $booking->setBookingEndAt($endDatetime);
+        $booking->setNotes($notes);
+
+        try {
+            $this->bookingMapper->save($booking);
+        } catch (MapperException) {
+            throw new SchoolboxException('Could not save booking.');
+        }
+
         $this->response = $this->responseAsJson(
             // This data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
             [
+                'bookingId' => $booking->getId(),
+                'startDatetime' => $booking->getBookingStartAt()->getDatabase(),
+                'endDatetime' => $booking->getBookingEndAt()->getDatabase(),
+                'notes' => $booking->getNotes(),
             ]
         )->withStatus(self::HTTP_STATUS_CODE_OK);
     }

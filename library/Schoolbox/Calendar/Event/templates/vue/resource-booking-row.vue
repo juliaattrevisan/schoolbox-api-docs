@@ -74,14 +74,19 @@ async function postEditBookingForm(): Promise<void> {
         throw new Error("Missing createEditBookingFormEl."); // Shouldn't get here.
     }
     isProcessing.value = true;
-    const formContent = new FormData(createEditBookingFormEl.value);
+    const payload = {
+        startDatetime: startDate.value,
+        endDatetime: endDate.value,
+        notes: bookingNotes.value,
+    };
     const toast = window.sbProps.toastActivate("Saving...");
 
     try {
         const response = await fetch(createEditBookingFormEl.value.action, {
             method: createEditBookingFormEl.value.method,
-            body: formContent,
+            body: JSON.stringify(payload),
             headers: {
+                "Content-Type": "application/json",
                 Accept: "application/json",
             },
         });
@@ -137,6 +142,7 @@ async function postEditBookingForm(): Promise<void> {
             class="top"
             @submit.prevent="postEditBookingForm()"
         >
+            <input type="hidden" name="bookingId" :value="props.booking.id" />
             <date-range
                 ref="dateRangeRef"
                 v-model:start-date="startDate"
