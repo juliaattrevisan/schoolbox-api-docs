@@ -33,17 +33,13 @@ const endDate = window.Vue.ref<string>(props.booking.end);
  * @param toast The toast to update
  * @param responseData The server's response to an 'addBookings' request.
  */
-function updateToastAndRefreshPage(toast: Toast, responseData: EditBookingResponse): void {
+function updateToast(toast: Toast, responseData: EditBookingResponse): void {
     const isSuccess = true;
     toast.timeout({
         text: "SUCCESS",
         isSuccess,
         duration: 2000,
         fadeDuration: 1000,
-        timeoutCallback: () => {
-            // Reload the page after the timeout expires.
-            window.location.reload();
-        },
     });
 }
 
@@ -92,10 +88,11 @@ async function postEditBookingForm(): Promise<void> {
         });
         const responseData = (await response.json()) as EditBookingResponse;
         if (response.ok) {
-            updateToastAndRefreshPage(toast, responseData);
+            updateToast(toast, responseData);
+            isEditFormOpen.value = false; // Close the modal after a successful edit.
         } else {
             toast.timeout({ text: "Unable to create booking(s).", isSuccess: false });
-            isEditFormOpen.value = false; // Close the modal after an error.
+            isEditFormOpen.value = false; // Close the modal after an unsuccessful edit.
         }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
