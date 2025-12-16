@@ -1133,7 +1133,7 @@ class Controller extends Base
         }
 
         $startDatetime = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
-        $endDatetime = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        $endDatetime = new Alaress_Date_Format($endDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
 
         $booking->setBookingStartAt($startDatetime);
         $booking->setBookingEndAt($endDatetime);
@@ -1149,8 +1149,8 @@ class Controller extends Base
             // This data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
             [
                 'bookingId' => $booking->getId(),
-                'startDatetime' => $booking->getBookingStartAt()->getDatabase(),
-                'endDatetime' => $booking->getBookingEndAt()->getDatabase(),
+                'startDatetime' => $booking->getBookingStartAt()?->getDatabase(),
+                'endDatetime' => $booking->getBookingEndAt()?->getDatabase(),
                 'notes' => $booking->getNotes(),
             ]
         )->withStatus(self::HTTP_STATUS_CODE_OK);

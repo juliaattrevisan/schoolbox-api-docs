@@ -62,7 +62,8 @@ window.Vue.watch(endDate, (newValue) => {
  * @returns - The formatted date
  */
 function getDateFormatted(date: string): string {
-    return window.dayjs(date, window.dateDisplayFormats.dayjs).format();
+    const parseFormat = props.useTime ? window.dateDisplayFormats.dayjsDatetime : window.dateDisplayFormats.dayjs;
+    return window.dayjs(date, parseFormat).format();
 }
 
 /**
