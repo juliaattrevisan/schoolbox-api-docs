@@ -31,7 +31,8 @@ class Model
      */
     public const KNOWN_SCRIPTS = [
         AnnouncementsTool::CANVAS_ANNOUNCEMENTS_SCRIPT_NAME,
-        CliImporter::CANVAS_IMPORTER_SCRIPT_NAME,
+        CliImporter::CANVAS_IMPORTER_DOWNLOAD_SCRIPT_NAME,
+        CliImporter::CANVAS_IMPORTER_SYNC_SCRIPT_NAME
     ];
 
 
