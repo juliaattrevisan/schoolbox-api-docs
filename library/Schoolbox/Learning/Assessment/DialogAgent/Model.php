@@ -254,6 +254,9 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Feedback for Dialog Agents is fully AI-generated.
+     * Feedback is required if the authoritative response is submitted and does not yet have feedback
+     *
      * @param Participant $participant
      * @return bool
      */
@@ -329,16 +332,14 @@ class Model extends AbstractAssessment
 
 
     /**
-     * TODO Not entirely sure what this means for Dialog Agents atm.
-     *  I think we can get away with "no feedback required" (false) for now because the feedback
-     *  that's generated will have no requirement for a human to help compose it.
+     * Feedback for Dialog Agents is fully AI-generated.
+     * There can't ever be a draft, it will always be the final version if it exists.
      *
      * @param Participant $participant
      * @return bool
      */
     public function hasPendingDraftAuthoritativeFeedback(Participant $participant): bool
     {
-        // TODO: Implement hasPendingDraftAuthoritativeFeedback() method.
         return false;
     }
 

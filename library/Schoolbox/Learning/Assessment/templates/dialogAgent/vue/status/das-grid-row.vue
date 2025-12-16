@@ -58,7 +58,7 @@ async function generateFeedback(): Promise<void> {
 
     const toast = window.sbProps.toastActivate("Generating feedback...");
     const response = await apiRequest<Record<string, string>>({
-        method: "GET",
+        method: "POST",
         url: feedbackRoute,
     });
 

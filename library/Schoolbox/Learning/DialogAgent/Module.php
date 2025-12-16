@@ -136,6 +136,17 @@ class Module extends BaseModule
             }
         });
 
+        $isFeedbackRequired = new Rule\Callback(function (array $params): void {
+            /** @var DialogAgent\Model $assessment */
+            $assessment = $params['assessment'];
+
+            $participant = $assessment->getParticipant($params['student']);
+
+            if (!$assessment->isFeedbackRequired($participant)) {
+                throw new Unauthorized('Feedback is not required for this participant');
+            }
+        });
+
         /**
          * For a learner to be able to interact with a response, they must meet the canonical "can submit" criteria,
          * and the response must be authoritative.
@@ -252,8 +263,11 @@ class Module extends BaseModule
 
         /* Generate feedback for a particular dialog agent response
          */
-        $this->register('GET', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'getGenerateFeedback', new Rule\All(
-            $canWrite,
+        $this->register('POST', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'postGenerateFeedback', new Rule\All(
+            $canViewResponse,
+            $isAIFeatureEnabled,
+            $isAuthoritativeResponse,
+            $isFeedbackRequired,
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
     }
@@ -510,6 +524,7 @@ class Module extends BaseModule
         /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy $responseMapperProxy */
         $responseMapperProxy = $this->injector->get('dialogAgentResponseDataSource');
 
+        $baseUrl = new \Schoolbox\Url\Factory($this->getConfig())->buildFullyQualified();
         $access = $this->getMapperFactory()->get(Access::class);
 
         return new Controller(
@@ -520,6 +535,10 @@ class Module extends BaseModule
                 $access,
             ),
             $assessmentMapperProxy,
+            $baseUrl,
+            $this->injector->get('httpFactory'),
+            $this->injector->get('taskd.httpRequestMessageFactory'),
+            $this->injector->get('taskd.messageProducer'),
             $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(AILogMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
