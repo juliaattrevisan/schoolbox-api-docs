@@ -152,6 +152,8 @@
                                     {% set assessmentType = allAssessmentTypes.lti %}
                                 {% elseif assessment.hasLessonPlan %}
                                     {% set assessmentType = allAssessmentTypes.lessonPlan %}
+                                {% elseif assessment.hasDialogAgent %}
+                                    {% set assessmentType = allAssessmentTypes.dialogAgent %}
                                 {% endif %}
                                 {{ assessmentType }}
                             </td>
