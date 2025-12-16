@@ -297,24 +297,6 @@ article:has(img) p > img {
     }
 }
 
-// Feed styles
-.feed .subheader,
-.feed h1.mini,
-.feed h2.mini,
-.feed h3.mini,
-.feed h4.mini,
-.feed h5.mini,
-.feed h6.mini,
-.feed label .mini.unit-heading,
-.feed .Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .fc-list-heading-main,
-.Schoolbox_Calendar_Component_Dashboard_Controller .fc-widget-header .feed .fc-list-heading-main,
-.feed table.rubric th[colspan],
-table.rubric .feed th[colspan],
-label .feed .mini.unit-heading {
-    border-top-left-radius: var(--sbx-border-radius-normal);
-    border-top-right-radius: var(--sbx-border-radius-normal);
-}
-
 /* ==========================================================================
    8. Off-canvas Menus & Message List
    ========================================================================== */
@@ -705,8 +687,6 @@ input[type="checkbox"]:not(.plain) + label::before {
 
 // Card styles
 .v-card {
-    border-radius: var(--sbx-border-radius-normal);
-
     & .card-content {
         & .list-item {
             & h3 a {
@@ -719,30 +699,6 @@ input[type="checkbox"]:not(.plain) + label::before {
                 color: color-mix(in srgb, var(--sbx-color-text-primary) 70%, transparent);
                 font-weight: 600;
             }
-        }
-    }
-
-    & > a .card-class-image {
-        border-top-left-radius: var(--sbx-border-radius-normal);
-        border-top-right-radius: var(--sbx-border-radius-normal);
-        overflow: hidden;
-    }
-}
-
-.c-search-page__filters {
-    border: var(--border);
-    border-radius: var(--sbx-config-field-roundness);
-    box-shadow: var(--sbx-shadow-m);
-    height: fit-content;
-    overflow: hidden;
-
-    & .c-island:not(.filter) {
-        border-bottom: var(--border);
-    }
-
-    & [data-test="search-select-creator"] {
-        & .results-container .results {
-            border-radius: var(--sbx-config-field-roundness) !important;
         }
     }
 }
@@ -924,31 +880,8 @@ input[type="checkbox"]:not(.plain) + label::before {
         width: calc(100% - 1rem);
     }
 
-    & .fc-event {
-        border-radius: var(--sbx-config-field-roundness);
-    }
-
     & .fc-toolbar-title {
         font-weight: 600;
-    }
-}
-
-.scrollable:has(> .timetable) {
-    & .timetable {
-        border: var(--border);
-        border-collapse: collapse;
-        width: calc(100%);
-    }
-
-    &:has(.no-hover) {
-        border: var(--border);
-        border-color: #dde5ec;
-        border-radius: var(--sbx-config-field-roundness);
-        border-width: 2px;
-
-        & .timetable {
-            border-radius: var(--sbx-config-field-roundness);
-        }
     }
 }
 
@@ -990,8 +923,6 @@ input[type="checkbox"]:not(.plain) + label::before {
 
                         & a {
                             background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 95%);
-                            border-radius: var(--sbx-border-radius-normal);
-                            padding-block: 2rem;
 
                             &:hover {
                                 background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 0%);
@@ -1136,7 +1067,6 @@ section {
 .row:has(> #filter_panel) {
     background-color: #fff;
     border: var(--border);
-    border-radius: var(--sbx-border-radius-normal);
     box-shadow: var(--sbx-shadow-m);
     margin-bottom: 1rem;
 
