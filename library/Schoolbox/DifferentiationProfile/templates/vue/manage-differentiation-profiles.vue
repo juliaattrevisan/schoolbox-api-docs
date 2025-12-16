@@ -48,7 +48,7 @@ window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 const headerStore = useHeaderStore();
 headerStore.init(props.header);
 const rowsStore = useRowsStore();
-rowsStore.init(props.routes.getData);
+rowsStore.init(headerStore.header, props.routes.getData);
 const linkedRecordsStore = useLinkedRecordsStore();
 const genAiStore = useGenAiStore();
 genAiStore.init(props.routes.genAi);

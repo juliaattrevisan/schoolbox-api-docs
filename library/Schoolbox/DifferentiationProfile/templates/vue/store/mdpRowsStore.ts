@@ -6,15 +6,17 @@ import { defineStore } from "pinia";
 import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
+import type { Header } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import { ON_FILTER_CHANGE } from "../../js/MDPEvents";
 import { useLoadData } from "../composable/useLoadData";
 
 export const useRowsStore = defineStore(`rowsStore`, () => {
+    const header = window.Vue.ref<Header[]>([]);
     const route = window.Vue.ref<string>("");
     const url = window.Vue.ref<string>("");
     const limit = 20; // the current set limit for the number of records to fetch at once
     const filters = window.Vue.ref<Nested>({});
-    const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(url);
+    const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadData(header, url);
 
     /**
      * Adds filter search parameters to the given URLSearchParams object.
@@ -46,9 +48,11 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
 
     /**
      * store any passed through properties
+     * @param $header - the headers for the grid
      * @param $route - the route to load the rows from
      */
-    function init($route: string): void {
+    function init($header: Header[], $route: string): void {
+        header.value = $header;
         route.value = $route;
         initFilterListener();
     }
