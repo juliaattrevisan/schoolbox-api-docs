@@ -21,7 +21,7 @@ jobs:
 
       - name: What's in /root/.gitconfig
         run: |
-          ls -al /root/.gitconfig
+          sudo ls -al /root/.gitconfig
 
       # The composer install runs regardless of cache hit above, because:
       # * the cache populates Composer's cache, not vendor/
