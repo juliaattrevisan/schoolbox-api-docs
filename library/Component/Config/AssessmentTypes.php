@@ -19,8 +19,15 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null): void
     {
         $di = $page->getDi();
-        $ltiEnabled = $di->get('config')->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($ltiEnabled);
+        $configLoader = $di->get('config');
+        $ltiEnabled = $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
+
+        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $featureConfig = $aiConfig->decode((string)$configLoader->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
+
+        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($ltiEnabled, $dialogAgentEnabled);
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;

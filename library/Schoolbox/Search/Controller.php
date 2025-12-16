@@ -141,7 +141,13 @@ class Controller extends Base
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $ltiEnabled = $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-            $assessmentTypes = AssessmentType::getOptions($ltiEnabled);
+
+            // TODO: avoid this AI config copypasta to check if dialog agent is enabled
+            $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+            $featureConfig = $aiConfig->decode((string)$configLoader->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+            $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
+
+            $assessmentTypes = AssessmentType::getOptions($ltiEnabled, $dialogAgentEnabled);
 
             $subTypes = [];
             foreach ($assessmentTypes as $typeKey => $title) {

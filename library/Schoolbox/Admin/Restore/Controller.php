@@ -179,6 +179,11 @@ class Controller extends Base
         // Files
         $deletedFiles = $this->getDeletdFolderContent($this->fileMapper, $start, $end);
 
+        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $featureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
+
         $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
@@ -186,6 +191,7 @@ class Controller extends Base
             'deletedAssessments' => $deletedAssessments,
             'assessmentTypes'    => Assessment\AssessmentType::getOptions(
                 $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
+                $dialogAgentEnabled,
             ),
             'deletedUsers'       => $deletedUsers,
             'deletedFiles'       => $deletedFiles,

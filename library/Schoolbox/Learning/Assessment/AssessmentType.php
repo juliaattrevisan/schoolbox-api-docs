@@ -130,11 +130,11 @@ class AssessmentType implements IType
         }
 
         if (self::TYPE_LESSON_PLAN === $stringVal) {
-            return (new \Schoolbox\Learning\Assessment\LessonPlan\Model())->setContext($context);
+            return (new LessonPlan())->setContext($context);
         }
 
         if (self::TYPE_DIALOG_AGENT === $stringVal) {
-            return (new \Schoolbox\Learning\Assessment\DialogAgent\Model())->setContext($context);
+            return (new DialogAgent())->setContext($context);
         }
 
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
@@ -183,10 +183,11 @@ class AssessmentType implements IType
      * Returns the list of enabled assessment (activity) types
      * The mapped values are the readable type names, respecting terminology, in "Title Case"
      *
-     * @param bool $ltiEnabled      // Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
+     * @param bool $ltiEnabled         Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
+     * @param bool $dialogAgentEnabled Is Dialog Agent Enabled? check AI config for feature ConfigMapper::NAME_AI_DIALOGAGENT
      * @return array<string, string>
      */
-    public static function getOptions(bool $ltiEnabled): array
+    public static function getOptions(bool $ltiEnabled, bool $dialogAgentEnabled): array
     {
         // Bind the assessment types to their readable names
         $list = array_combine(
@@ -197,9 +198,12 @@ class AssessmentType implements IType
             )
         );
 
-        // if LTI is not enabled then remove that entry
+        /** some assessment types can be disabled, remove them from the list */
         if (!$ltiEnabled) {
-            unset($list['lti']);
+            unset($list[self::TYPE_LTI_ASSESSMENT]);
+        }
+        if (!$dialogAgentEnabled) {
+            unset($list[self::TYPE_DIALOG_AGENT]);
         }
 
         return $list;

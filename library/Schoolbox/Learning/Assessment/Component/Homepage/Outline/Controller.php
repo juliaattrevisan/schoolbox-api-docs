@@ -144,7 +144,13 @@ class Controller extends Component_Homepage_ControllerAbstract
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
         $ltiEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled);
+
+        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $featureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
+
+        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled, $dialogAgentEnabled);
 
         /**
          * if filters fail, we should use the system default, of show everything
