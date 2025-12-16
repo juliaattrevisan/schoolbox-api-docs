@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
@@ -13,10 +12,19 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    bookingDeleted: [bookingId: number];
+}>();
+
 /**
  * This defines the server response to a request to ENDPOINTS.editBookingPath().
  */
 type EditBookingResponse = { success: boolean };
+
+/**
+ * This defines the server response to a request to ENDPOINTS.deleteBookingPath().
+ */
+type DeleteBookingResponse = { success: boolean };
 
 const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
@@ -49,7 +57,7 @@ function cancelEditBookingForm(): void {
 }
 
 /**
- * Post the booking creation form.
+ * Post the 'Edit Booking' form.
  */
 async function postEditBookingForm(): Promise<void> {
     if (!createEditBookingFormEl.value) {
@@ -81,6 +89,38 @@ async function postEditBookingForm(): Promise<void> {
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         toast.timeout({ text: `Unable to update booking ${message}`, isSuccess: false });
+        console.warn(error);
+    } finally {
+        isEditFormOpen.value = false;
+        isProcessing.value = false;
+    }
+}
+
+/**
+ * Post the 'Delete Booking' form.
+ */
+async function postDeleteBookingForm(): Promise<void> {
+    isProcessing.value = true;
+    const toast = window.sbProps.toastActivate("Deleting...");
+    const endpoint = ENDPOINTS.deleteBookingPath(props.eventId, props.booking.id);
+
+    try {
+        const response = await fetch(endpoint, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+            },
+        });
+        const responseData = (await response.json()) as DeleteBookingResponse;
+        if (response.ok && responseData.success) {
+            emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has beed deleted.
+            toast.timeout({ text: "Booking deleted", isSuccess: true });
+        } else {
+            toast.timeout({ text: "Unable to delete booking", isSuccess: false });
+        }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        toast.timeout({ text: `Unable to delete booking ${message}`, isSuccess: false });
         console.warn(error);
     } finally {
         isEditFormOpen.value = false;
@@ -141,7 +181,7 @@ async function postEditBookingForm(): Promise<void> {
                 <section>
                     <button @click.prevent="cancelEditBookingForm()">Cancel</button>
                     <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
-                    <button>Delete</button>
+                    <button :disabled="isProcessing" @click.prevent="postDeleteBookingForm()">Delete</button>
                 </section>
             </div>
         </form>

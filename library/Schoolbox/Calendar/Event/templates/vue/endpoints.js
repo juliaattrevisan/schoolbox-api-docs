@@ -41,6 +41,10 @@ export const ENDPOINTS = Object.freeze({
      */
     URL_BOOKING_EDIT: "/calendar/event/{eventId}/editBooking/{bookingId}",
 
+    /* Delete a booking linked to an event.
+     */
+    URL_BOOKING_DELETE: "/calendar/event/{eventId}/deleteBooking/{bookingId}",
+
     /**
      * Generate a path via const
      *
@@ -183,6 +187,22 @@ export const ENDPOINTS = Object.freeze({
     editBookingPath: function (eventId, bookingId) {
         return this.generateUrlFromConst(
             ENDPOINTS.URL_BOOKING_EDIT,
+            eventId,
+            bookingId,
+            btoa(window.location.pathname),
+        );
+    },
+
+    /**
+     * Delete booking
+     *
+     * @param eventId
+     * @param bookingId
+     * @return string
+     */
+    deleteBookingPath: function (eventId, bookingId) {
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_BOOKING_DELETE,
             eventId,
             bookingId,
             btoa(window.location.pathname),

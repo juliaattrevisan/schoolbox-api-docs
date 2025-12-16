@@ -1124,7 +1124,7 @@ class Controller extends Base
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
-            throw new SchoolboxException('Could not find booking with ID ' . $bookingId);
+            throw new SchoolboxException("Could not find booking with id $bookingId.");
         }
 
         // Check that $bookingId is linked to $event.
@@ -1146,6 +1146,35 @@ class Controller extends Base
         }
 
         // The response data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
+        $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
+    }
+
+    /**
+     * Process a 'delete booking' request from the 'Event Details' page.
+     *  (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
+     * @param Event $event
+     * @param       $bookingId
+     */
+    public function deleteBooking(Event $event, $bookingId): void
+    {
+        try {
+            $booking = $this->bookingMapper->findById($bookingId);
+        } catch (MapperException) {
+            throw new SchoolboxException("Could not find booking with id $bookingId.");
+        }
+
+        // Check that $bookingId is linked to $event.
+        if ($booking->getEvent()->getId() !== $event->getId()) {
+            throw new SchoolboxException('Booking/event mismatch when deleting booking.');
+        }
+
+        try {
+            $this->bookingMapper->delete($booking);
+        } catch (MapperException) {
+            throw new SchoolboxException('Could not save booking.');
+        }
+
+        // The response data structure must match type 'DeleteBookingResponse' defined in edit-resource-booking-modal.vue.
         $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 

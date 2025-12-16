@@ -48,6 +48,7 @@ export default {
             numDeclined: this.event.attendance.payload.attendees.declined,
             guests: this.event.attendance.payload.attendees.guests,
             canInvite: this.event.attendance.payload.currentUser.canInvite,
+            resourceBookings: this.event.resourceBookings || [],
 
             /* Vue Select
              */
@@ -457,6 +458,14 @@ export default {
         showAddResourceBookingsModal() {
             this.$refs.addResourceBookingsModal.open();
         },
+
+        /**
+         * Remove the booking with the given id from the resourceBookings array.
+         * @param {number} bookingId - The id of the booking that was deleted
+         */
+        handleBookingDeleted(bookingId) {
+            this.resourceBookings = this.resourceBookings.filter((booking) => booking.id !== bookingId);
+        },
     },
 };
 </script>
@@ -673,14 +682,15 @@ export default {
                 </div>
                 <div class="meta"></div>
                 <div class="content-section">
-                    <div v-if="event.resourceBookings.length > 0">
+                    <div v-if="resourceBookings.length > 0">
                         <resource-booking-row
-                            v-for="booking in event.resourceBookings"
+                            v-for="booking in resourceBookings"
                             :key="booking.id"
                             :eventId="event.id"
                             :eventSeriesId="event.seriesId"
                             :booking="booking"
                             :can-modify="canModify()"
+                            @booking-deleted="handleBookingDeleted"
                         />
                     </div>
                 </div>
