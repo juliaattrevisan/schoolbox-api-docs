@@ -2,13 +2,12 @@
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 import DasActions from "../status/das-actions.vue";
 
 interface Props {
-    feed: AiLogAgentChatData[];
+    feed: AgentChatLogEntry[];
     response: DialogAgentResponse;
     student: UserAuthor;
     summaryRoute?: string | null;
@@ -18,47 +17,8 @@ interface Props {
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
-/** If the current user isn't the student, they're the instructor I guess */
-const isInstructor = window.Vue.computed(() => {
-    return props.student.id !== window.schoolboxUser.id;
-});
-
 window.Vue.onMounted(() => {
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
-
-    // TODO: all temporary, needs to inject into the right timeline position when it actually exists etc
-    if (isInstructor.value) {
-        acStore.feed.push({
-            // TODO: this would only ever come from props.feed
-            type: AgentChatMessageType.ALERT,
-            side: AgentChatMessageType.RESPONSE,
-            severity: "warning",
-            entryKey: acStore.getNextEntryKey(),
-            message: "Alert: Please check the chat above for challenging of guardrails or misuse of language.",
-        });
-
-        const assistanceTime = window.dayjs().subtract(5, "minutes").format(window.dateDisplayFormats.dayjsDatetime);
-        acStore.feed.push({
-            // TODO: a teacher can't spawn this, but they can 'resolve' it so we would need to track it somehow
-            // hence need to be able to insert it based on the createdAt time of each log entry (not currently tracked on the frontend)
-            // and then not include it when it's eventually resolved
-            type: AgentChatMessageType.ALERT,
-            side: AgentChatMessageType.REQUEST,
-            severity: "warning-tint",
-            entryKey: acStore.getNextEntryKey(),
-            message: `${window.schoolboxUser.name} requested assistance @ ${assistanceTime}`,
-        });
-
-        // This won't actually exist I think. The "requested assistance" message just gets purged
-        // const assistanceEndTime = window.dayjs().format(window.dateDisplayFormats.dayjsDatetime);
-        // acStore.feed.push({
-        //     type: "alert",
-        //     side: "request",
-        //     severity: "highlight",
-        //     entryKey: acStore.getNextEntryKey(),
-        //     message: `${window.schoolboxUser.name} stopped requesting assistance @ ${assistanceEndTime}`,
-        // });
-    }
 });
 
 /**

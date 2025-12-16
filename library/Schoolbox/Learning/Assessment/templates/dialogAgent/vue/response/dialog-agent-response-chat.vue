@@ -7,12 +7,12 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
-import type { AiLogAgentChatData } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
 
 interface Props {
-    feed: AiLogAgentChatData[];
+    feed: AgentChatLogEntry[];
     response: DialogAgentResponse;
     student: UserAuthor;
     returnUrl: string;
