@@ -4,8 +4,8 @@
  * Displays a gradient overlay and "View More" button when content exceeds the display height
  */
 
+import { useLazyGridRowsStore } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
 import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useRowsStore } from "../store/mdpRowsStore";
 
 const props = defineProps<{
     profile: Profile;
@@ -15,13 +15,13 @@ const props = defineProps<{
     isContentFocused: boolean;
 }>();
 
-const rowsStore = useRowsStore();
+const lgRowsStore = useLazyGridRowsStore();
 
 /**
  * Whether to show the view more gradient and button
  */
 const showViewMoreGradient = window.Vue.computed(() => {
-    const displayHeights = rowsStore.rowDisplayHeights;
+    const displayHeights = lgRowsStore.rowDisplayHeights;
     if (!displayHeights) return false;
     const displayHeight = displayHeights[props.profile.student.id];
     if (!displayHeight) return false;
@@ -42,7 +42,7 @@ const showViewMoreInner = window.Vue.computed(() => {
  * Handle view more button click
  */
 function onViewMoreClick(): void {
-    rowsStore.toggleViewMore(props.profile.student.id);
+    lgRowsStore.toggleViewMore(props.profile.student.id);
 }
 </script>
 

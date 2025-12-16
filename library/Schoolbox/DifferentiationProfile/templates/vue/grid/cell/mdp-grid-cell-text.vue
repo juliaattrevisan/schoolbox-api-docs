@@ -5,6 +5,7 @@
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { useLazyGridRowsStore, ANIMATION_DURATION } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
+import { useContentHeight } from "@schoolboxVue/components/grid/lazyGrid/composable/useContentHeight";
 import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
@@ -15,7 +16,6 @@ import type { Profile, ProfileTextKeys } from "../../../js/types/manageDifferent
 import { useHeaderStore } from "../../store/mdpHeaderStore";
 import { useSaveStore } from "../../store/mdpSaveStore";
 import MdpGridCellShowMore from "../mdp-grid-cell-show-more.vue";
-import { useContentHeight } from "../composable/useContentHeight";
 
 const props = defineProps<{
     profile: Profile;

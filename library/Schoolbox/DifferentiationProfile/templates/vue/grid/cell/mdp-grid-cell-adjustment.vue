@@ -6,6 +6,7 @@
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
 import { useLazyGridRowsStore, ANIMATION_DURATION } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
+import { useContentHeight } from "@schoolboxVue/components/grid/lazyGrid/composable/useContentHeight";
 import type {
     Profile,
     ProfileAdjustmentKeys,
@@ -14,7 +15,6 @@ import type {
 import { useHeaderStore } from "../../store/mdpHeaderStore";
 import { useSaveStore } from "../../store/mdpSaveStore";
 import MdpGridCellShowMore from "../mdp-grid-cell-show-more.vue";
-import { useContentHeight } from "../composable/useContentHeight";
 
 const props = defineProps<{
     profile: Profile;
