@@ -1145,15 +1145,8 @@ class Controller extends Base
             throw new SchoolboxException('Could not save booking.');
         }
 
-        $this->response = $this->responseAsJson(
-            // This data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
-            [
-                'bookingId' => $booking->getId(),
-                'startDatetime' => $booking->getBookingStartAt()?->getDatabase(),
-                'endDatetime' => $booking->getBookingEndAt()?->getDatabase(),
-                'notes' => $booking->getNotes(),
-            ]
-        )->withStatus(self::HTTP_STATUS_CODE_OK);
+        // The response data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
+        $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 

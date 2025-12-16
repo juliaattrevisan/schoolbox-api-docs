@@ -73,19 +73,17 @@ async function postEditBookingForm(): Promise<void> {
             },
         });
         const responseData = (await response.json()) as EditBookingResponse;
-        if (response.ok) {
+        if (response.ok && responseData.success) {
             toast.timeout({ text: "Booking updated", isSuccess: true });
-            isEditFormOpen.value = false; // Close the modal after a successful edit.
         } else {
             toast.timeout({ text: "Unable to update booking", isSuccess: false });
-            isEditFormOpen.value = false; // Close the modal after an unsuccessful edit.
         }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         toast.timeout({ text: `Unable to update booking ${message}`, isSuccess: false });
         console.warn(error);
-        isEditFormOpen.value = false; // Close the modal after an error.
     } finally {
+        isEditFormOpen.value = false;
         isProcessing.value = false;
     }
 }
