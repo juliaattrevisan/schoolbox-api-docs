@@ -104,6 +104,8 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     return {
         url,
         limit,
+        order,
+        sortBy,
         isNewLoading,
         isMoreLoading,
         payload,
