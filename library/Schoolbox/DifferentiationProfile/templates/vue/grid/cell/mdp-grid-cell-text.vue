@@ -10,7 +10,7 @@ import {
 } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsHeightStore";
 import { useContentHeight } from "@schoolboxVue/components/grid/lazyGrid/composable/useContentHeight";
 import LgCellShowMore from "@schoolboxVue/components/grid/lazyGrid/lg-cell-show-more.vue";
-import { EditorType } from "@js/editor/types/editorTypes";
+import { EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
@@ -126,6 +126,9 @@ async function initEditor(): Promise<void> {
             {
                 targetElements: [`#${editorId}`],
                 type: EditorType.INLINE,
+                toolbar: EditorToolbar.COMMENT_AI,
+                addToToolbar: ["insertTable"],
+                removeFromToolbar: ["link", "mediaEmbed", "resource", "emoji"],
             },
             true,
             (e) => {
