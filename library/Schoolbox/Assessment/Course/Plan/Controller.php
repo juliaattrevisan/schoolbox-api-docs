@@ -467,54 +467,6 @@ class Controller extends Base
     }
 
     /**
-     * Super Only endpoint
-     * @api POST /course/plan/{courseID}/newUnit
-     * @param CourseSpecification $course
-     * @return void
-     */
-    public function newUnit(CourseSpecification $course)
-    {
-        // assume course exists.
-        // ensure the specified title is valid whilst trimming the title
-        $unitName = trim($this->requestPost->get('name') ?? '');
-        if (!$unitName) {
-            $problem = (new ApiProblem('Could not create unit. You need to give the unit a name'))
-                ->setStatus(400)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(400);
-            return; // exit early don't try to create a new unit with no name
-        }
-
-        // create the new unit
-        try {
-            $unitSpec = $this->createUnit($unitName, $course);
-
-            /* Finding the textbox definition ID from the Unit Template
-             */
-            $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
-            $class = Textbox\Component\Homepage\Controller::class;
-            $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass(
-                $module,
-                $course->getTemplate()->getUnitTemplate()->getId(),
-                $class
-            );
-            $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
-
-            $this->response = $this->responseAsJson(
-                $this->getTranslatedUnitData($unitSpec, $course, $textboxDefId)
-            )->withStatus(201);
-        } catch (\Exception $e) {
-            $problem = (new ApiProblem($e->getMessage()))
-                ->setStatus($e->getCode())
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus($e->getCode());
-            return;
-        }
-    }
-
-    /**
      * Bulk creating units for a course
      *
      * @param CourseSpecification $course

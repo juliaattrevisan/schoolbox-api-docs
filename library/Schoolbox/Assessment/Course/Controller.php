@@ -492,8 +492,6 @@ class Controller extends Base\Base
             // respond to XHR with JSON
             $this->response = $this->responseAsJson([
                 'id'              => $courseSpec->getId(),
-                'urlModifyCourse' => $this->routeGenerator->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
-                'urlNewUnit'      => $this->routeGenerator->generate('course.newUnit', ['id' => $courseSpec->getId()]),
             ]);
         } else {
             // respond to synchronous POST with redirect
@@ -711,91 +709,6 @@ class Controller extends Base\Base
         }
 
         return Redirect::encode($path);
-    }
-
-
-    /**
-     * Post request to spawn a new unit
-     *
-     * Creates:
-     * * UnitSpec
-     * * Folder
-     * * CourseBuilder Component on the Folder
-     *
-     * @api   POST /course/{courseSpecId}/units/new
-     * @since 160
-     *
-     * @param CourseSpecification $courseSpec
-     * @var string $_POST['name'] What to name the new unit
-     * @throws Base\Exception
-     */
-    public function newUnit(CourseSpecification $courseSpec)
-    {
-        if (!$courseSpec->getId()) {
-            $this->sendError('Could not save. Course not found.');
-            return;
-        }
-
-        $post = $this->requestPost;
-        $name = trim($post->get('name'));
-
-        if (!$name) {
-            $this->sendError('Could not create unit.', ['You need to give the unit a name']);
-            return;
-        }
-
-        try {
-            // Need:
-            // base config
-            // course config
-            $rolePermissions = [];
-
-            foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
-                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
-            }
-
-            $folder = $this->persistFolder(
-                $name,
-                $courseSpec->getFolder()->getId(),
-                [],
-                $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                $courseSpec->getTemplate()->getUnitTemplate()->getId(),
-                $rolePermissions,
-                false,
-                []
-            );
-
-            // Persist the unit too
-            $unitSpec = $this->unitSpecificationMapper->createModel()
-                ->setFolder($folder)
-                ->setCourse($courseSpec);
-
-            $this->unitSpecificationMapper->save($unitSpec);
-
-            $encodedReturnUrl = $this->getReturnUrl($courseSpec->getId(), $unitSpec->getId());
-
-            $data = [
-                'unitSpec'         => $unitSpec,
-                'encodedReturnUrl' => $encodedReturnUrl,
-                '_writable'        => true,
-                '_expanded'        => true,
-                'toastSelector'    => '[data-relation="ajax-response"]',
-            ];
-
-            $this->response = $this->responseDependentOnRequest(
-                '@course/unit.twig',
-                $data,
-                self::TAB,
-            );
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-            // quite simple not able to find things we need. bye bye.
-            $this->sendError('Could not save because of an internal error.', [], 500);
-            return;
-        } catch (\Exception $e) {
-            // whatever the exception, recover from it as best you can
-            $this->sendError("Could not save because {$e->getMessage()}");
-            return;
-        }
     }
 
 

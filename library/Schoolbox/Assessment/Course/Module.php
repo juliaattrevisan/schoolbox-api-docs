@@ -160,7 +160,6 @@ class Module extends BaseModule
         $this->register('POST', '/new', 'createCourse', $basicPerms);
         $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', $basicPerms, $preloadCourseSpec);
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', $basicPerms, $preloadFolders);
-        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', $basicPerms, $preloadCourseSpec);
         $this->register('POST', '/modify/{id}', 'updateCourse', $basicPerms, $preloadCourseSpec);
         $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', $hasFolderWriteAccess, $preloadUnitSpec);
         $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', $basicPerms, $preloadUnitSpec);
