@@ -108,6 +108,7 @@ class Mapper extends \Schoolbox\Mapper
         $feedbackCriteriaMapper = $this->getJoinMapper('feedbackCriteria');
 
         foreach ($statement as $row) {
+            /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Model $feedback */
             $feedback = $stack->offsetGet($row['id']);
 
             /* First time we've encountered this $feedback; init an instance that we'll reuse later

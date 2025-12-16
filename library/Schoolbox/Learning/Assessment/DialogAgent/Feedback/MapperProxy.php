@@ -125,12 +125,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             /* Accumulate each Feedback Criterion into the set
              */
+            /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criteria\Model $criterion */
             foreach ($dataModel->getCriteria() as $criterion) {
-                $criterionId = $criterion->getCriteria()->getId();
+                $criterionId = $criterion->getScenarioCriteria()->getId();
 
                 $feedbackObject = (new Criteria\Model())
                     ->setId($criterion->getId())
-                    ->setCriteriaId($criterion->getCriteria()->getId())
+                    ->setCriteriaId($criterion->getScenarioCriteria()->getId())
                     ->setBody($criterion->getBody());
 
                 $domainObject->getCriteria()->setOffset($criterionId, $feedbackObject);

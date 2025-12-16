@@ -31,7 +31,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('feedback_id', self::TYPE_INTEGER, null, 'feedback');
-        $this->uses('criteria_id', self::TYPE_INTEGER, null, 'criteria');
+        $this->uses('criteria_id', self::TYPE_INTEGER, null, 'scenarioCriteria');
         $this->uses('body', self::TYPE_STRING, null, 'body');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -56,8 +56,8 @@ class Mapper extends \Schoolbox\Mapper
             'id',
             null,
             null,
-            'criteria',
-            'criteria',
+            'scenarioCriteria',
+            'scenarioCriteria',
         );
     }
 

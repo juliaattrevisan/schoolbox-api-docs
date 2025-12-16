@@ -33,7 +33,7 @@ class Model implements ISoftDeletable
     /**
      * @var \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
      */
-    private ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $criteria = null;
+    private ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $scenarioCriteria = null;
 
 
     /**
@@ -68,19 +68,19 @@ class Model implements ISoftDeletable
     /**
      * @return \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
      */
-    public function getCriteria(): ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model
+    public function getScenarioCriteria(): ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model
     {
-        return $this->criteria;
+        return $this->scenarioCriteria;
     }
 
 
     /**
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null $criteria
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null $scenarioCriteria
      * @return $this
      */
-    public function setCriteria(?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $criteria): self
+    public function setScenarioCriteria(?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $scenarioCriteria): self
     {
-        $this->criteria = $criteria;
+        $this->scenarioCriteria = $scenarioCriteria;
         return $this;
     }
 
