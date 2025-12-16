@@ -14,6 +14,7 @@ use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
 use Schoolbox\OpenAi\IClient;
@@ -41,7 +42,7 @@ class DialogAgentChat
      * Streams a dialog agent chat.
      *
      * @param User        $user               The user making the request.
-     * @param string      $agentPrompt        The specific system prompt for this dialog agent activity
+     * @param DialogAgent $assessment         The dialog agent activity.
      * @param string      $userPrompt         The user's input prompt.
      * @param string      $sessionId          The session ID against which this request should be logged.
      * @param string|null $previousResponseId If provided: the ID of a previous request made to OpenAI.
@@ -50,12 +51,21 @@ class DialogAgentChat
      */
     public function requestStream(
         User $user,
-        string $agentPrompt,
+        DialogAgent $assessment,
         string $userPrompt,
         string $sessionId,
         ?string $previousResponseId = null,
     ): iterable {
-        $payload = $this->buildPayload($agentPrompt, $userPrompt, $previousResponseId);
+        $payload = new PayloadGenerator(
+            trim($this->config[Config::FIELD_PROVIDER]['value']),
+            trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
+        )->generate(
+            $assessment,
+            $userPrompt,
+            $previousResponseId
+        );
 
         $log = $this->client->createLog(
             $payload,
@@ -76,30 +86,5 @@ class DialogAgentChat
             new ResponseListener(requireFinalImage: false),
             new LogOutputText(),
         );
-    }
-
-
-    /**
-     * Build a payload for the AI provider.
-     *
-     * @param string $agentPrompt
-     * @param string $userPrompt
-     * @param string|null $previousResponseId
-     * @return array
-     */
-    private function buildPayload(
-        string $agentPrompt,
-        string $userPrompt,
-        ?string $previousResponseId = null,
-    ): array {
-        $payloadGenerator = new PayloadGenerator(
-            trim($this->config[Config::FIELD_PROVIDER]['value']),
-            trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
-            trim($this->config[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
-            trim($this->config[Helper::ENDPOINT_TYPE_GENERAL][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
-            $agentPrompt,
-        );
-
-        return $payloadGenerator->generate($userPrompt, $previousResponseId);
     }
 }

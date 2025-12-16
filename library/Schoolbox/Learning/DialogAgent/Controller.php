@@ -357,7 +357,7 @@ class Controller extends Base
         try {
             $stream = $agent->requestStream(
                 $this->getUser(),
-                $assessment->getPrompt(), // TODO: this is nullable, and a requirement to be able to chat... I expect you shouldn't even be able to get to this endpoint if it's not ready yet
+                $assessment,
                 $this->requestPost->get('userPrompt'),
                 $aiSessionId,
                 previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
@@ -433,7 +433,7 @@ class Controller extends Base
         try {
             $stream = $agent->requestStream(
                 $this->getUser(),
-                $assessment->getPrompt(), // TODO: this is nullable, and a requirement to be able to chat... I expect you shouldn't even be able to get to this endpoint if it's not ready yet
+                $assessment,
                 $this->requestPost->get('userPrompt'),
                 $aiSessionId,
                 previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
