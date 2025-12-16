@@ -166,7 +166,7 @@
     },
     "scripts": {
         "post-install-cmd": [
-            "composer patches-repatch --no-scripts"
+            "composer patches-repatch --no-scripts -vvv"
         ]
     }
 }
