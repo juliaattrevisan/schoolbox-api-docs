@@ -21,7 +21,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
-use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper as CriteriaMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper as CriterionMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\LogFormat as AiLogFormat;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
@@ -70,7 +70,7 @@ class Controller extends Base
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
      * @param FieldContextMapper $fieldContextMapper
-     * @param CriteriaMapper $criteriaMapper
+     * @param CriterionMapper $criterionMapper
      */
     public function __construct(
         private Access $access,
@@ -86,7 +86,7 @@ class Controller extends Base
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
         private FieldContextMapper $fieldContextMapper,
-        private CriteriaMapper $criteriaMapper,
+        private CriterionMapper $criterionMapper,
     ) {
     }
 
