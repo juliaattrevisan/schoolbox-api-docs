@@ -23,6 +23,11 @@ class AnnouncementsTool extends CliTool\App
      */
     public const CANVAS_ANNOUNCEMENTS_LOCK_NAME = 'canvas_announcements';
 
+    /**
+     * This script name appears in the import log
+     */
+    public const CANVAS_ANNOUNCEMENTS_SCRIPT_NAME = 'Canvas Announcements';
+
 
     /**
      * --help

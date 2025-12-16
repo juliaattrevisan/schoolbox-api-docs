@@ -66,6 +66,11 @@ use function sprintf;
  */
 class CliImporter extends CliTool\App
 {
+    /**
+     * This script name appears in the import log
+     */
+    public const CANVAS_IMPORTER_SCRIPT_NAME = 'Canvas Importer';
+
     private const OPT_SHORT_HELP       = 'h';           // print help
     private const OPT_LONG_HELP        = 'help';        // print help
     private const OPT_LONG_SKIP_FETCH  = 'skip-fetch';  // Don't re-fetch files from Canvas API, use previously downloaded
