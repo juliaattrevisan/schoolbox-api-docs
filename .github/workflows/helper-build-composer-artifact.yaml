@@ -19,10 +19,6 @@ jobs:
           path: /tmp/composer-cache
           key: vendor-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
-      - name: What's in /root/.gitconfig
-        run: |
-          sudo ls -al /root/.gitconfig
-
       # The composer install runs regardless of cache hit above, because:
       # * the cache populates Composer's cache, not vendor/
       # * the autoload still needs to be built
