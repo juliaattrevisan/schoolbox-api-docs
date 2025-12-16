@@ -126,7 +126,7 @@ class DialogAgentFeedback
 
         foreach ($scenario->getCriteria() as $criterion) {
             // maybe the AI didn't return stuff for this criterion... ignore if so
-            $body = $feedbackData[PayloadGenerator::getPayloadCriteriaKey($criterion)] ?? null;
+            $body = $feedbackData[PayloadGenerator::getPayloadCriterionKey($criterion)] ?? null;
             $feedback->setOffset($criterion->getId(), $body);
         }
 
