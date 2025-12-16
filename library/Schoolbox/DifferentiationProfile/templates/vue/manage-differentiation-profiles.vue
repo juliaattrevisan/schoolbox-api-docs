@@ -84,6 +84,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                 :is-loading="rowsStore.isMoreLoading"
                 :sort-by="rowsStore.sortBy"
                 :order="rowsStore.order"
+                @sort="rowsStore.onSort"
             >
                 <template #User="{ row, header: columnHeader }">
                     <mdp-grid-cell-student :user="row[columnHeader.key] as User" :profile="row as Profile" />
