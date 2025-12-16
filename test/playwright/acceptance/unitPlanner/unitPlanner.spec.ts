@@ -81,13 +81,13 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("check all options are presented under Create Activity menu");
         await unitPlanner.clickCreateActivityButton(persuasionUnitId);
         await unitPlanner.checkCreateActivityOptions("project", persuasionUnitId);
-        await unitPlanner.checkCreateActivityOptions("due-work", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("dueWork", persuasionUnitId);
         await unitPlanner.checkCreateActivityOptions("quiz", persuasionUnitId);
         await unitPlanner.checkCreateActivityOptions("task", persuasionUnitId);
-        await unitPlanner.checkCreateActivityOptions("lesson-plan", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("lessonPlan", persuasionUnitId);
 
         tester.isGoingTo("create a due work for Persuasion and Media unit via unit planner");
-        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
+        await unitPlanner.clickCreateActivityOption("dueWork", persuasionUnitId);
 
         tester.isGoingTo("Fill out a due work assessment form and submit it");
         await assessmentForm.setTitle("Test Due Activity via unit planner");

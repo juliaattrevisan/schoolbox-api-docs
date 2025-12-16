@@ -6,8 +6,6 @@
  * If initialising this component with an existing store after, set preventStoreInit to true.
  * Note, only supports 1 instance per activitiesListStoreId where the activities will be draggable,
  * components initialised with preventStoreInit=true are only for display purposes, e.g. in the unit planner if resequencing a unit
- *
- * Must have an initialised activitiesListGlobalStore in the parent component
  */
 import type { Ref } from "vue";
 import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";

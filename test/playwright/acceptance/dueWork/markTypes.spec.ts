@@ -68,7 +68,7 @@ test.describe("Due Work - Mark type tests", () => {
             .click();
 
         tester.isGoingTo(`create a new due work with the name "${dueWorkName1}"`);
-        await unitPlanner.clickCreateActivityOption("due-work", newUnitSpecId);
+        await unitPlanner.clickCreateActivityOption("dueWork", newUnitSpecId);
 
         // Create a second due work, self reflection without rubric, input percentage, display letter grade
         await assessmentForm.setTitle(dueWorkName1);
@@ -86,7 +86,7 @@ test.describe("Due Work - Mark type tests", () => {
 
         // Create a second due work, self reflection with rubric, input total mark, display percentage
         tester.isGoingTo(`create a new due work with the name "${dueWorkName2}"`);
-        await unitPlanner.clickCreateActivityOption("due-work", newUnitSpecId);
+        await unitPlanner.clickCreateActivityOption("dueWork", newUnitSpecId);
 
         await assessmentForm.setTitle(dueWorkName2);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);

@@ -51,7 +51,7 @@
 
     {% autoescape 'js' %}
     <script>
-        {# Global properties for SchoolBox. Load these before main.js to ensure they are available and can be used throughout parts of those scripts.
+        {# Global properties for Schoolbox. Load these before main.js to ensure they are available and can be used throughout parts of those scripts.
          # Types for these should be maintained in /types/index.d.ts where possible.
          # More properties are added by @js/global/sbProps.ts while main.js is loaded.
          #}
@@ -128,6 +128,9 @@
         window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
 
         window.sbProps.gradeGradientEnabled = {{ config.grade_gradient_enable ? 'true' : 'false' }};
+
+        {# some assessment types are optional and can be disabled #}
+        window.sbProps.assessmentTypes = {{ assessmentTypes | json_encode | raw }};
 
         {# TODO Rethink this idea, because we have separate text and image ideas now
          # How we decide which feature is active and which isn't...needs some revisiting

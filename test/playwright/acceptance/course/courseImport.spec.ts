@@ -95,7 +95,7 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("via unit planner, add add a lesson plan and project with a task under it");
         await unitPlanner.goto(6); // Navigate to Year 9 English unin planner page
         await unitPlanner.clickCreateActivityButton(15); //  Click Create Activity button for Romeo and Juliet unit
-        await unitPlanner.clickCreateActivityOption("lesson-plan", 15);
+        await unitPlanner.clickCreateActivityOption("lessonPlan", 15);
         await templateList.clickTemplateLink(3);
         await tester.common.clickSubmitButton();
         await createLessonPlan.typeName(lessonPlanName);

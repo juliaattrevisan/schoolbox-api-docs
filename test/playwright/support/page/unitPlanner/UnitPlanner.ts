@@ -1,7 +1,8 @@
 import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
-import type { Page } from "@playwright/test";
+import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 
 export default class UnitPlanner {
     private tester: AcceptanceTester;
@@ -200,7 +201,7 @@ export default class UnitPlanner {
      * @param activityType - The type of activity to create
      * @param unitId - The ID of the unit
      */
-    async clickCreateActivityOption(activityType: string, unitId: number): Promise<void> {
+    async clickCreateActivityOption(activityType: ActivityType, unitId: number): Promise<void> {
         await this.page
             .getByTestId(
                 UnitPlanner.DATA_TEST_CREATE_ACTIVITY_OPTION.replace("{activityType}", activityType).replace(
@@ -248,7 +249,7 @@ export default class UnitPlanner {
      * @param activityType - The type of activity to create:: project, due-work, quiz, task or lesson-plan
      * @param unitId - The ID of the unit
      */
-    async checkCreateActivityOptions(activityType: string, unitId: number): Promise<void> {
+    async checkCreateActivityOptions(activityType: ActivityType, unitId: number): Promise<void> {
         await this.page
             .getByTestId(
                 UnitPlanner.DATA_TEST_CREATE_ACTIVITY_OPTION.replace("{activityType}", activityType).replace(
