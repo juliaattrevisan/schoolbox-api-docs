@@ -329,12 +329,11 @@ class Controller extends Base
      * Send a message to the chat agent for a particular response and stream the reply
      *
      * @param DialogAgent $assessment
-     * @param User $student
      * @param Response $response
      * @throws ClientExceptionInterface
      * @return void
      */
-    public function postMessage(DialogAgent $assessment, User $student, Response $response): void
+    public function postMessage(DialogAgent $assessment, Response $response): void
     {
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
@@ -477,12 +476,10 @@ class Controller extends Base
      * The current user requested assistance on a particular response. This applies only to authoritative responses:
      * you can't resolve assistance on non-authoritative responses.
      *
-     * @param IAssessable $assessment
-     * @param User $student
      * @param Response $response
      * @return void
      */
-    public function postAssistanceRequest(IAssessable $assessment, User $student, Response $response): void
+    public function postAssistanceRequest(Response $response): void
     {
         $response->setAssistanceRequestedAt(\Alaress_Date_Format::now());
 
@@ -497,12 +494,10 @@ class Controller extends Base
      * The teacher helped the student and that student no longer requires assistance. This applies only to authoritative
      * responses: you can't resolve assistance on non-authoritative responses.
      *
-     * @param IAssessable $assessment
-     * @param User $student
      * @param Response $response
      * @return void
      */
-    public function postAssistanceResolve(IAssessable $assessment, User $student, Response $response): void
+    public function postAssistanceResolve(Response $response): void
     {
         $response->setAssistanceRequestedAt(null);
 
@@ -561,12 +556,10 @@ class Controller extends Base
      * Reopening a dialog agent for a particular student basically means "unsubmit this student's authoritative response"
      * The responseId provided must be the student's authoritative response for it to be reopened.
      *
-     * @param IAssessable $assessment
-     * @param User $student
      * @param Response $response
      * @return void
      */
-    public function postReopen(IAssessable $assessment, User $student, Response $response): void
+    public function postReopen(Response $response): void
     {
         $response
             ->setSubmittedAt(null)
@@ -788,12 +781,11 @@ class Controller extends Base
      * This route is called by the task daemon after a response is submitted by a user or by the cron
      *
      * @param DialogAgent $assessment
-     * @param User $student
      * @param Response $response
      * @return void
      * @throws ClientExceptionInterface
      */
-    public function postGenerateFeedback(DialogAgent $assessment, User $student, Response $response): void
+    public function postGenerateFeedback(DialogAgent $assessment, Response $response): void
     {
         $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
