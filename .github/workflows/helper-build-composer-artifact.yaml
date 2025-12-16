@@ -19,6 +19,11 @@ jobs:
           path: /tmp/composer-cache
           key: vendor-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
+      - name: Install Git (for Composer install)
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install git
+
       # The composer install runs regardless of cache hit above, because:
       # * the cache populates Composer's cache, not vendor/
       # * the autoload still needs to be built
