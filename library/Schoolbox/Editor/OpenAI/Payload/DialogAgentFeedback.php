@@ -189,7 +189,7 @@ class DialogAgentFeedback
         foreach ($scenario->getCriteria() as $criterion) {
             $key = $this->getPayloadCriterionKey($criterion);
 
-            $responseFormat['schema']['properties'][] = [
+            $responseFormat['schema']['properties'][$key] = [
                 'type' => 'string',
                 'description' => strtr(self::PROMPT_SYSTEM_CRITERIA_CONTEXT, [
                     '[CRITERION_TITLE]' => $criterion->getTitle(),

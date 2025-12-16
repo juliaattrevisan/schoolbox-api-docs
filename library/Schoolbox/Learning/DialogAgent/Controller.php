@@ -251,6 +251,8 @@ class Controller extends Base
      * @param User $student
      * @param Response $response
      * @return void
+     * @throws Error
+     * @throws RouteNotFound
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
     {
@@ -356,8 +358,9 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @param Response $response
-     * @throws ClientExceptionInterface
      * @return void
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
      */
     public function postMessage(DialogAgent $assessment, Response $response): void
     {
@@ -698,7 +701,7 @@ class Controller extends Base
 
         /* Compile scenario field names as header elements
          */
-        $criteria = $this->criteriaMapper->findByColumn('scenario_id', $assessment->getScenarioId());
+        $criteria = $this->criterionMapper->findByColumn('scenario_id', $assessment->getScenarioId());
 
         $fields = [];
 
@@ -759,8 +762,8 @@ class Controller extends Base
                 /* Compute outcomes for each criterion
                  */
                 if ($authoritativeFeedback) {
-                    foreach ($authoritativeFeedback->getCriteria() as $feedbackCriteria) {
-                        $feedbackFields[$feedbackCriteria->getCriteriaId()] = $feedbackCriteria->getBody();
+                    foreach ($authoritativeFeedback->getCriteria() as $feedbackCriterion) {
+                        $feedbackFields[$feedbackCriterion->getCriteriaId()] = $feedbackCriterion->getBody();
                     }
                 }
 
@@ -810,6 +813,9 @@ class Controller extends Base
      * @param Response $response
      * @return void
      * @throws ClientExceptionInterface
+     * @throws Deleted
+     * @throws Exception
+     * @throws \JsonException
      */
     public function postGenerateFeedback(DialogAgent $assessment, Response $response): void
     {
