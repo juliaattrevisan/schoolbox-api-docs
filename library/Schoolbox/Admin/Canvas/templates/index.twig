@@ -1,0 +1,43 @@
+{##
+ # Configure your sis importer
+ #
+ # @param string pageCurrent
+ # @param array configContext
+ # @param array allNavigation
+ # @param string dataSource
+ # @param stirng logPath
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div id='option-container'>
+            <div class="small-12 columns">
+                <div class="actions-small-1">
+                    <div class="list-item">
+                        <h2 class="subheader">Canvas System Settings</h2>
+                    </div>
+                </div>
+            </div>
+
+            {% include '@settings/moduleConfig.twig' with configContext only %}
+        </div>
+
+        {% if importLogs|length %}
+            <div class="small-12 island" id="previous">
+                <h3 class="subheader">Previous Imports</h3>
+                <section>
+                    {% include '@adminImportIndex/schoolData/importLog.twig' with {
+                        importLogs: importLogs
+                    } %}
+                </section>
+            </div>
+        {% endif %}
+
+    </div>
+</div>

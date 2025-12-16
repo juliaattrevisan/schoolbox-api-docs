@@ -833,7 +833,7 @@ class Subnav
                         'searchable' => true,
                         'children' => []
                     ],
-                    '/adminv2/setting/Canvas' => [
+                    '/adminv2/canvas' => [
                         'name' => 'Canvas Connector',
                         'visible' => $this->configLoader->get(ConfigMapper::NAME_CANVAS_ENABLED),
                         'description' => 'Configure the connection to your canvas LMS instance',
