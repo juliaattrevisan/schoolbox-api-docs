@@ -2,6 +2,7 @@ name: Build Composer artifact
 
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   build-composer-artifact:
