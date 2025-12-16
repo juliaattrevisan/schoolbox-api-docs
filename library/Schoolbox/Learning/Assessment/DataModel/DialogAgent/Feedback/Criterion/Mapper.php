@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criteria;
+namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
@@ -31,7 +31,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('feedback_id', self::TYPE_INTEGER, null, 'feedback');
-        $this->uses('criteria_id', self::TYPE_INTEGER, null, 'scenarioCriteria');
+        $this->uses('criteria_id', self::TYPE_INTEGER, null, 'scenarioCriterion');
         $this->uses('body', self::TYPE_STRING, null, 'body');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -52,12 +52,12 @@ class Mapper extends \Schoolbox\Mapper
          */
         $this->joins(
             'criteria_id',
-            \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper::class,
+            \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper::class,
             'id',
             null,
             null,
-            'scenarioCriteria',
-            'scenarioCriteria',
+            'scenarioCriterion',
+            'scenarioCriterion',
         );
     }
 

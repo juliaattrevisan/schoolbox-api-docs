@@ -51,9 +51,9 @@ class Mapper extends \Schoolbox\Mapper
         );
 
         $this->hasJoin(
-            'criteria',
+            'criterion',
             [
-                'mapper'    => Criteria\Mapper::class,
+                'mapper'    => Criterion\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'scenario_id',
                 'multiple'  => true,
@@ -73,7 +73,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('criteria', 'criteria')},
+                {$this->getJoinColumnString('criterion', 'criterion')},
                 {$this->getJoinColumnString('field', 'field')}
         ";
     }
@@ -90,7 +90,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('field', '', 'field')}
-            LEFT JOIN {$this->getJoinSql('criteria', '', 'criteria')}
+            LEFT JOIN {$this->getJoinSql('criterion', '', 'criterion')}
         ";
     }
 
@@ -106,8 +106,8 @@ class Mapper extends \Schoolbox\Mapper
         /** @var \Schoolbox\Admin\DialogAgent\Scenario\Field\Mapper $scenarioFieldMapper */
         $scenarioFieldMapper = $this->getJoinMapper('field');
 
-        /** @var \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper $scenarioCriteriaMapper */
-        $scenarioCriteriaMapper = $this->getJoinMapper('criteria');
+        /** @var \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper $scenarioCriterionMapper */
+        $scenarioCriterionMapper = $this->getJoinMapper('criterion');
 
         /** @var Model[] $scenarios */
         $scenarios = [];
@@ -120,7 +120,7 @@ class Mapper extends \Schoolbox\Mapper
                 $scenario = $this->hydrate($row);
 
                 $scenario->setFields($scenarioFieldMapper->createCollection())
-                    ->setCriteria($scenarioCriteriaMapper->createCollection());
+                    ->setCriteria($scenarioCriterionMapper->createCollection());
 
                 /* Add it to the pile
                  */
@@ -141,9 +141,9 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Stack up all the adjoining criteria
              */
-            $criterion = $scenarioCriteriaMapper->hydrate($row, 'criteria');
+            $criterion = $scenarioCriterionMapper->hydrate($row, 'criterion');
 
-            if ($criterion instanceof Criteria\Model && null === $scenario->getCriteria()->getOffset($criterion->getId())) {
+            if ($criterion instanceof Criterion\Model && null === $scenario->getCriteria()->getOffset($criterion->getId())) {
                 $scenario->getCriteria()->setOffset($criterion->getId(), $criterion);
             }
         }

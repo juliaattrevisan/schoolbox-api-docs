@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criteria;
+namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -31,9 +31,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
+     * @var \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model|null
      */
-    private ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $scenarioCriteria = null;
+    private ?\Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model $scenarioCriterion = null;
 
 
     /**
@@ -66,21 +66,21 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null
+     * @return \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model|null
      */
-    public function getScenarioCriteria(): ?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model
+    public function getScenarioCriterion(): ?\Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model
     {
-        return $this->scenarioCriteria;
+        return $this->scenarioCriterion;
     }
 
 
     /**
-     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model|null $scenarioCriteria
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model|null $scenarioCriterion
      * @return $this
      */
-    public function setScenarioCriteria(?\Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model $scenarioCriteria): self
+    public function setScenarioCriterion(?\Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model $scenarioCriterion): self
     {
-        $this->scenarioCriteria = $scenarioCriteria;
+        $this->scenarioCriterion = $scenarioCriterion;
         return $this;
     }
 

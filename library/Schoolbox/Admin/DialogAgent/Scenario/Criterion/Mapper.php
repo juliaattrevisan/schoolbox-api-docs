@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\DialogAgent\Scenario\Criteria;
+namespace Schoolbox\Admin\DialogAgent\Scenario\Criterion;
 
 use Schoolbox\GenericCollection;
 

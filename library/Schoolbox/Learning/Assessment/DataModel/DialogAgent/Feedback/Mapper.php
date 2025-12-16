@@ -66,7 +66,10 @@ class Mapper extends \Schoolbox\Mapper
             'learner',
         );
 
-        $this->joinsReverseMulti('feedback_id', Criteria\Mapper::class, 'criteria', 'feedbackCriteria');
+        /* A set of many criterion (criteria) for a feedback.
+         * These are shown as content for individual cells in the status screen
+         */
+        $this->joinsReverseMulti('feedback_id', Criterion\Mapper::class, 'criteria', 'feedbackCriteria');
     }
 
 

@@ -127,11 +127,11 @@ class MapperProxy extends Mapper\AbstractMapperProxy
              */
             /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criteria\Model $criterion */
             foreach ($dataModel->getCriteria() as $criterion) {
-                $criterionId = $criterion->getScenarioCriteria()->getId();
+                $criterionId = $criterion->getScenarioCriterion()->getId();
 
                 $feedbackObject = (new Criteria\Model())
                     ->setId($criterion->getId())
-                    ->setCriteriaId($criterion->getScenarioCriteria()->getId())
+                    ->setCriteriaId($criterion->getScenarioCriterion()->getId())
                     ->setBody($criterion->getBody());
 
                 $domainObject->getCriteria()->setOffset($criterionId, $feedbackObject);
