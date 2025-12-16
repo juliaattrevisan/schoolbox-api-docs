@@ -1,15 +1,14 @@
 <script setup lang="ts">
 /**
- * Show more button component for MDP grid cells
+ * Show more button component for lazy grid cells
  * Displays a gradient overlay and "View More" button when content exceeds the display height
  */
 
-import { useLazyGridRowsStore } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
-import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
+import { useLazyGridRowsStore } from "./store/lgRowsStore";
 
 const props = defineProps<{
-    profile: Profile;
-    headerKey: ProfileKeys;
+    rowId: number;
+    headerKey: string;
     contentHeight: number;
     componentActionHeight: number;
     isContentFocused: boolean;
@@ -23,7 +22,7 @@ const lgRowsStore = useLazyGridRowsStore();
 const showViewMoreGradient = window.Vue.computed(() => {
     const displayHeights = lgRowsStore.rowDisplayHeights;
     if (!displayHeights) return false;
-    const displayHeight = displayHeights[props.profile.student.id];
+    const displayHeight = displayHeights[props.rowId];
     if (!displayHeight) return false;
     return props.contentHeight + props.componentActionHeight > displayHeight;
 });
@@ -42,7 +41,7 @@ const showViewMoreInner = window.Vue.computed(() => {
  * Handle view more button click
  */
 function onViewMoreClick(): void {
-    lgRowsStore.toggleViewMore(props.profile.student.id);
+    lgRowsStore.toggleViewMore(props.rowId);
 }
 </script>
 
@@ -50,7 +49,7 @@ function onViewMoreClick(): void {
     <div class="show-more-container" :data-visible="showViewMoreGradient">
         <button
             class="button"
-            :data-test="`mdp-grid-view-more-button-${props.profile.student.id}-${props.headerKey}`"
+            :data-test="`lg-view-more-button-${props.rowId}-${props.headerKey}`"
             :data-visible="showViewMoreInner"
             :tabindex="showViewMoreInner ? 0 : -1"
             @click.prevent="onViewMoreClick"

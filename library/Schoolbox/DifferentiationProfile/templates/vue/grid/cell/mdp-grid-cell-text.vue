@@ -6,6 +6,7 @@
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import { useLazyGridRowsStore, ANIMATION_DURATION } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
 import { useContentHeight } from "@schoolboxVue/components/grid/lazyGrid/composable/useContentHeight";
+import LgCellShowMore from "@schoolboxVue/components/grid/lazyGrid/lg-cell-show-more.vue";
 import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
@@ -15,7 +16,6 @@ import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-act
 import type { Profile, ProfileTextKeys } from "../../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../../store/mdpHeaderStore";
 import { useSaveStore } from "../../store/mdpSaveStore";
-import MdpGridCellShowMore from "../mdp-grid-cell-show-more.vue";
 
 const props = defineProps<{
     profile: Profile;
@@ -245,8 +245,8 @@ function onSave(): void {
         </div>
         <div class="content-container-fixed">
             <div v-if="!isContentEmpty" class="content-overlay">
-                <mdp-grid-cell-show-more
-                    :profile="props.profile"
+                <lg-cell-show-more
+                    :row-id="props.profile.student.id"
                     :header-key="props.headerKey"
                     :content-height="contentHeight"
                     :component-action-height="componentActionHeight"
