@@ -29,7 +29,7 @@ class Model extends AbstractFeedback
 
     /**
      * A set of criteria fields that each have feedback content, all collated here to be treated as one big unit
-     * \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criteria[]
+     * \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion[]
      *
      * phpstorm complains about putting that into the actual typedef.
      *

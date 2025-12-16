@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criteria;
+namespace Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion;
 
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -30,7 +30,7 @@ class Model
 
 
     /**
-     * This is intentionally just an id to skip hydrating a Scenario Criteria instance via the swamp (very laborious)
+     * This is intentionally just an id to skip hydrating a Scenario Criterion instance via the swamp (very laborious)
      * which would have doubled the amount of hydration and instance management throughout this whole workflow.
      *
      * Most of the time you'd never need it: feedback is interfaced by the machine, not the human, so reliance on ids

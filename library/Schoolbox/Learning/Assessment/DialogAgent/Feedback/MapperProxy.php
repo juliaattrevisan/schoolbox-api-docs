@@ -115,7 +115,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setReviewee($dataModel->getResponse()->getLearner())
                 /* Init a stack of domain representation feedback criteria
                  */
-                ->setCriteria(new GenericCollection(Criteria\Model::class))
+                ->setCriteria(new GenericCollection(Criterion\Model::class))
                 /* TODO Who owns this?
                  */
                 ->setReviewer(null)
@@ -129,7 +129,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
             foreach ($dataModel->getCriteria() as $criterion) {
                 $criterionId = $criterion->getScenarioCriterion()->getId();
 
-                $feedbackObject = (new Criteria\Model())
+                $feedbackObject = (new Criterion\Model())
                     ->setId($criterion->getId())
                     ->setCriteriaId($criterion->getScenarioCriterion()->getId())
                     ->setBody($criterion->getBody());
