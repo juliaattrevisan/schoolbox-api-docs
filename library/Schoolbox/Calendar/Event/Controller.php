@@ -1202,7 +1202,12 @@ class Controller extends Base
         if (count($bookingIdsToDelete) === 0) {
             // We did not succeed in deleting the booking, but this is an expected outcome - it will occur if the
             // booking has already been deleted.  Therefore, the status is HTTP_STATUS_CODE_OK.
-            $this->response = $this->responseAsJson(['success' => false])->withStatus(self::HTTP_STATUS_CODE_OK);
+            $this->response = $this->responseAsJson(
+                [
+                    'success' => false,
+                    'nRowsAffected' => 0,
+                ]
+            )->withStatus(self::HTTP_STATUS_CODE_OK);
             return;
         }
 
