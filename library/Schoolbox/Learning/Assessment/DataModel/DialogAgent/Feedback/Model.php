@@ -113,7 +113,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return GenericCollection|null
+     * @return GenericCollection<Criterion\Model>|null
      */
     public function getCriteria(): ?GenericCollection
     {
@@ -122,7 +122,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param GenericCollection|null $criteria
+     * @param GenericCollection<Criterion\Model>|null $criteria
      * @return $this
      */
     public function setCriteria(?GenericCollection $criteria): self
