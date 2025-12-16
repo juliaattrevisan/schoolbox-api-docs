@@ -1215,7 +1215,12 @@ class Controller extends Base
         }
 
         // The response data structure must match type 'DeleteBookingResponse' defined in edit-resource-booking-modal.vue.
-        $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
+        $this->response = $this->responseAsJson(
+            [
+                'success' => true,
+                'nRowsAffected' => count($bookingIdsToDelete)
+            ]
+        )->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 

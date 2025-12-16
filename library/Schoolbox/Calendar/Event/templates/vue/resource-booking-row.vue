@@ -25,7 +25,7 @@ type EditBookingResponse = { success: boolean };
 /**
  * This defines the server response to a request to ENDPOINTS.deleteBookingPath().
  */
-type DeleteBookingResponse = { success: boolean };
+type DeleteBookingResponse = { success: boolean; nRowsAffected: number };
 
 const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
@@ -122,13 +122,19 @@ async function postDeleteBookingForm(): Promise<void> {
         const responseData = (await response.json()) as DeleteBookingResponse;
         if (response.ok && responseData.success) {
             emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has been deleted.
-            toast.timeout({ text: "Booking deleted", isSuccess: true });
+            toast.timeout({
+                text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} deleted`,
+                isSuccess: true,
+            });
         } else {
-            toast.timeout({ text: "Unable to delete booking", isSuccess: false });
+            toast.timeout({
+                text: `Unable to delete booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
+                isSuccess: false,
+            });
         }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        toast.timeout({ text: `Unable to delete booking ${message}`, isSuccess: false });
+        toast.timeout({ text: `Unable to delete booking(s) ${message}`, isSuccess: false });
         console.warn(error);
     } finally {
         isEditFormOpen.value = false;
