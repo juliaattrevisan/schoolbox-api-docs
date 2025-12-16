@@ -1191,18 +1191,15 @@ class Controller extends Base
             $events = new GenericCollection(Event::class, [$event]);
         }
 
-        $resourceId = $booking->getResource()->getId();
-        $bookingsToDelete = new GenericCollection(BookingModel::class);
+        // Find all bookings to delete in one query.
+        $eventIds = $events->map(fn ($loopEvent) => $loopEvent->getId(), $events);
+        $bookingIdsToDelete = $this->bookingMapper->findIdsByResourceIdForEvents(
+            $booking->getResource()->getId(),
+            $eventIds->getAll(),
+            futureBookingsOnly: true
+        );
 
-        // Find all bookings of this resource linked to events in the series.
-        /** @var $loopEvent Event */
-        foreach ($events as $loopEvent) {
-            $bookingsToDelete = $bookingsToDelete->merge(
-                $this->bookingMapper->findByEventId($loopEvent->getId(), resourceId: $resourceId, futureBookingsOnly: true)
-            );
-        }
-
-        if (count($bookingsToDelete) === 0) {
+        if (count($bookingIdsToDelete) === 0) {
             // We did not succeed in deleting the booking, but this is an expected outcome - it will occur if the
             // booking has already been deleted.  Therefore, the status is HTTP_STATUS_CODE_OK.
             $this->response = $this->responseAsJson(['success' => false])->withStatus(self::HTTP_STATUS_CODE_OK);
@@ -1210,7 +1207,7 @@ class Controller extends Base
         }
 
         try {
-            $this->bookingMapper->delete($bookingsToDelete);
+            $this->bookingMapper->deleteByColumn('id', $bookingIdsToDelete);
         } catch (MapperException) {
             throw new SchoolboxException(
                 'Could not delete booking' . ($isDeleteFromSeries ? 's from series of events' : '') . '.'

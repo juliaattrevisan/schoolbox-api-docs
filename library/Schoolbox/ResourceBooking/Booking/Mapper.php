@@ -9,6 +9,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress_Date_Format;
+use PDO;
 use Schoolbox\Calendar\Event;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -512,6 +513,46 @@ class Mapper extends BaseMapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * @param int        $resourceId
+     * @param array<int> $eventIds
+     * @param bool       $futureBookingsOnly
+     * @return array<int>
+     */
+    public function findIdsByResourceIdForEvents(
+        int $resourceId,
+        array $eventIds,
+        bool $futureBookingsOnly = false
+    ): array
+    {
+        if (count($eventIds) === 0) {
+            return [];
+        }
+
+        $query = "
+            SELECT b.id
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('event', 'b', 'e')}
+            WHERE b.resource_id=:resourceId
+            AND b.event_id IN (" . implode(',', array_map('intval', $eventIds)) . ")
+            AND b.deleted_at IS NULL
+            AND e.deleted_at IS NULL
+        ";
+        $params = [
+            'resourceId' => $resourceId,
+        ];
+
+        if ($futureBookingsOnly) {
+            // If booking start/end datetimes are not set, fall back to event start/end datetimes.
+            $query .= " AND COALESCE(b.start_datetime, e.start_datetime)>NOW()";
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        return $statement->fetchAll(PDO::FETCH_COLUMN);
     }
 
 

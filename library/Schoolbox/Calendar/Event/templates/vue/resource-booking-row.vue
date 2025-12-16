@@ -121,7 +121,7 @@ async function postDeleteBookingForm(): Promise<void> {
         });
         const responseData = (await response.json()) as DeleteBookingResponse;
         if (response.ok && responseData.success) {
-            emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has beed deleted.
+            emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has been deleted.
             toast.timeout({ text: "Booking deleted", isSuccess: true });
         } else {
             toast.timeout({ text: "Unable to delete booking", isSuccess: false });

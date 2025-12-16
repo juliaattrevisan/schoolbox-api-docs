@@ -1734,6 +1734,7 @@ abstract class Mapper implements IMapper
      * @param string|string[]|int|int[] $columnValue
      * @param array                     $options
      * @return int
+     * @throws Exception
      */
     public function deleteByColumn($columnName, $columnValue, array $options = [])
     {
@@ -1748,6 +1749,7 @@ abstract class Mapper implements IMapper
      * @param array $columnList
      * @param array $options
      * @return int
+     * @throws Exception
      */
     public function deleteByColumnList($columnList, array $options = [])
     {
@@ -1764,6 +1766,7 @@ abstract class Mapper implements IMapper
      * @param array   $columnList
      * @param array   $options
      * @return int
+     * @throws Exception
      */
     protected function executeDelete($deleteString, Builder $predicate, array $columnList, array $options = [])
     {
