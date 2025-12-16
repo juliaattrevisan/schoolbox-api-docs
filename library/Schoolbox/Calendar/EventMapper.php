@@ -23,6 +23,7 @@ use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -446,6 +447,37 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             ]
         );
     }
+
+    /**
+     * Get all the events in the series.
+     *
+     * TODO: Remove function getAllInSeries() and use this function instead.
+     *       That function was left alone so as to limit the scope of the PR that introduced this function.
+     *
+     * @param int $seriesId
+     * @param bool  $futureEventsOnly
+     * @return GenericCollection<Event>
+     */
+    public function getAllInSeriesNew(int $seriesId, bool $futureEventsOnly = false): GenericCollection
+    {
+        $pb = new Builder($this->getDatabase()->getQuoter(), 'event')
+            ->equals('series_id', $seriesId);
+
+        if ($futureEventsOnly) {
+            $pb->greaterThan('start_datetime', Alaress_Date_Format::now()->getDatabase());
+        }
+
+        return $this->findByPredicates(
+            $pb,
+            [
+                'cache' => false,
+                'order' => [
+                    'start_datetime' => 'ASC'
+                ]
+            ]
+        );
+    }
+
 
     /**
      * Remove all role and campus associations to an event

@@ -1018,14 +1018,8 @@ class Controller extends Base
 
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
-            // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
-            // and events can be removed from a series once the series has been created.  Therefore, we cannot assume
-            // any regular period between events, and so must fetch each event's start/end times.
-            $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
-            $pb->equals('series_id', $event->getSeriesId());
-            $pb->greaterThan('start_datetime', Alaress_Date_Format::now()->getDatabase());
-            /** @var GenericCollection<Event> $eventById */
-            $eventById = $this->eventMapper->findByPredicates($pb);
+            $eventById = $this->eventMapper->getAllInSeriesNew($event->getSeriesId(), futureEventsOnly: true)
+                ->indexBy('id');
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
@@ -1112,7 +1106,6 @@ class Controller extends Base
     public function editBooking(Event $event, $bookingId): void
     {
         $data = $this->request->getParsedBody();
-
         $startDatetimeStr = $data['startDatetime'] ?? null;
         $endDatetimeStr = $data['endDatetime'] ?? null;
         $notes = $data['notes'] ?? null;
@@ -1158,23 +1151,23 @@ class Controller extends Base
         $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
+
     /**
      * Process a 'delete booking' request from the 'Event Details' page.
-     *  (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
+     * If the event is part of a series, delete all bookings of the resource from all events in the series.
+     * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
+     *
      * @param Event $event
      * @param       $bookingId
      */
     public function deleteBooking(Event $event, $bookingId): void
     {
         $data = $this->request->getParsedBody();
-
         $efficacy = $data['efficacy'] ?? null;
 
         if ($efficacy === null) {
             throw new SchoolboxException('Missing required data in form submission.');
         }
-
-        // TODO: If efficacy is EFFICACY_SERIES, update all events in series.
 
         try {
             $booking = $this->bookingMapper->findById($bookingId);
@@ -1187,10 +1180,41 @@ class Controller extends Base
             throw new SchoolboxException('Booking/event mismatch when deleting booking.');
         }
 
+        $isDeleteFromSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
+
+        // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
+        if ($isDeleteFromSeries) {
+            $events = $this->eventMapper->getAllInSeriesNew($event->getSeriesId(), futureEventsOnly: true);
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $events = new GenericCollection(Event::class, [$event]);
+        }
+
+        $resourceId = $booking->getResource()->getId();
+        $bookingsToDelete = new GenericCollection(BookingModel::class);
+
+        // Find all bookings of this resource linked to events in the series.
+        /** @var $loopEvent Event */
+        foreach ($events as $loopEvent) {
+            $bookingsToDelete = $bookingsToDelete->merge(
+                $this->bookingMapper->findByEventId($loopEvent->getId(), resourceId: $resourceId, futureBookingsOnly: true)
+            );
+        }
+
+        if (count($bookingsToDelete) === 0) {
+            // We did not succeed in deleting the booking, but this is an expected outcome - it will occur if the
+            // booking has already been deleted.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $this->response = $this->responseAsJson(['success' => false])->withStatus(self::HTTP_STATUS_CODE_OK);
+            return;
+        }
+
         try {
-            $this->bookingMapper->delete($booking);
+            $this->bookingMapper->delete($bookingsToDelete);
         } catch (MapperException) {
-            throw new SchoolboxException('Could not delete booking.');
+            throw new SchoolboxException(
+                'Could not delete booking' . ($isDeleteFromSeries ? 's from series of events' : '') . '.'
+            );
         }
 
         // The response data structure must match type 'DeleteBookingResponse' defined in edit-resource-booking-modal.vue.
