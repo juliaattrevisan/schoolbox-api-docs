@@ -4,6 +4,7 @@
  */
 
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import { useLazyGridRowsStore, ANIMATION_DURATION } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
 import { EditorType } from "@js/editor/types/editorTypes";
 import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import type { InlineEditor } from "ckeditor5";
@@ -12,7 +13,6 @@ import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
 import type { Profile, ProfileTextKeys } from "../../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../../store/mdpHeaderStore";
-import { useRowsStore, ANIMATION_DURATION } from "../../store/mdpRowsStore";
 import { useSaveStore } from "../../store/mdpSaveStore";
 import MdpGridCellShowMore from "../mdp-grid-cell-show-more.vue";
 import { useContentHeight } from "../composable/useContentHeight";
@@ -24,7 +24,7 @@ const props = defineProps<{
 }>();
 
 const headerStore = useHeaderStore();
-const rowsStore = useRowsStore();
+const lgRowsStore = useLazyGridRowsStore();
 const saveStore = useSaveStore();
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
@@ -39,6 +39,7 @@ const { contentHeight, componentActionHeight } = useContentHeight(
     props.headerKey,
     contentEl,
     componentActionEl,
+    lgRowsStore,
 );
 
 // #region modifying the text content with CKEditor
@@ -57,7 +58,7 @@ const isSaving = window.Vue.ref(false);
  * Whether the content of the cell is focused
  */
 const isContentFocused = window.Vue.computed(() => {
-    return (rowsStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+    return (lgRowsStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
 });
 
 /**
@@ -80,7 +81,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
     editor.ui.focusTracker.on("change:isFocused", (_, __, $isFocused: boolean) => {
         // Update focus state in the store to enable auto-growing height
-        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
+        lgRowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, $isFocused);
         // Show the empty state again if no text is entered
         if (!isContentFocused.value && currentText.value === "") {
             currentText.value = null;
@@ -101,7 +102,7 @@ function onEditorCreated(event: EditorCreatedEventInfo): void {
     setTimeout(() => editor.ui.update());
     // If the editor was focused initially, we need to update the store
     window.Vue.nextTick(() => {
-        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
+        lgRowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
     }).catch(() => {
         // noop
     });
@@ -225,7 +226,7 @@ function onSave(): void {
             'grid-cell--content-focused': isContentFocused,
         }"
         :style="{
-            height: `${rowsStore.rowDisplayHeights?.[props.profile.student.id]}px`,
+            height: `${lgRowsStore.rowDisplayHeights?.[props.profile.student.id]}px`,
             cursor: isContentEmpty ? 'pointer' : 'text',
         }"
         @click.prevent="onContentClicked"
