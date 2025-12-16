@@ -457,7 +457,7 @@ class Mapper extends BaseMapper
     /**
      * Returns a collection of resource booking objects, each with their resource and status objects hydrated.
      *
-     * @param int      $eventId
+     * @param  int $eventId
      * @return GenericCollection<Model>
      */
     public function findByEventId(int $eventId): GenericCollection
