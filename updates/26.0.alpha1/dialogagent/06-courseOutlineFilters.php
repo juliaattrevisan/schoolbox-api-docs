@@ -99,8 +99,7 @@ HELP;
 
         /** Reproduce how the instance would currently configure a new component config */
         $ltiEnabled = $this->getConfig()->get('lti_assessments_enable');
-        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled);
-        unset($assessmentTypeOptions[AssessmentType::TYPE_DIALOG_AGENT]);
+        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled, false);
 
         $updated = 0;
         foreach ($configInstances as $configInstance) {
