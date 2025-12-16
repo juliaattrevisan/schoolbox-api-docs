@@ -1,0 +1,37 @@
+-- AI-generated feedback for the responses made by students
+-- This is each cell's feedback value (ie. the feedback per scenario criteria)
+CREATE TABLE `dialog_agent_feedback_criteria` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `feedback_id` INT NOT NULL,
+    `criteria_id` INT NOT NULL,
+    `body` TEXT,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `fk_dafc_feedback_idx` (`feedback_id` ASC),
+    CONSTRAINT `fk_dafc_feedback`
+        FOREIGN KEY (`feedback_id`)
+        REFERENCES `dialog_agent_feedback` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_dafc_criteria_idx` (`criteria_id` ASC),
+    CONSTRAINT `fk_dafc_criteria`
+        FOREIGN KEY (`criteria_id`)
+        REFERENCES `dialog_agent_scenario_criteria` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+);
+
+-- Ditch the old column/keys arrangement
+alter table dialog_agent_feedback
+    drop column body;
+
+drop index fk_daf_criteria_idx on dialog_agent_feedback;
+
+alter table dialog_agent_feedback
+    drop foreign key fk_daf_criteria;
+
+alter table dialog_agent_feedback
+    drop column criteria_id;
+
