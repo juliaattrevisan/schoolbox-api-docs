@@ -14,7 +14,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Ramsey\Uuid\Uuid;
-use Schoolbox\Mapper\Exception;
 
 /**
  * CLI Tool for processing Canvas Announcements
@@ -195,8 +194,9 @@ HELP;
                     $this->getLogger(),
                     $lock
                 ))->import();
-            } catch (Exception $e) {
-                // log the error
+            } catch (\Throwable| \Alaress\Database\Exception $e) {
+                // log the error // though this isn't storing it... its calling save, but its rolling back...\
+                // we are in a transaction after all... how we get out of this... will have to think...
                 $importLogMapper->error($importLog, $e->getMessage());
 
                 // re-throw
