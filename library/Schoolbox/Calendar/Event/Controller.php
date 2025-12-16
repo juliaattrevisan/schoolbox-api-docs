@@ -1116,10 +1116,19 @@ class Controller extends Base
         $startDatetimeStr = $data['startDatetime'] ?? null;
         $endDatetimeStr = $data['endDatetime'] ?? null;
         $notes = $data['notes'] ?? null;
+        $efficacy = $data['efficacy'] ?? null;
 
-        if ($startDatetimeStr === null || $endDatetimeStr === null || $notes === null || $bookingId === null) {
+        if (
+            $startDatetimeStr === null ||
+            $endDatetimeStr === null ||
+            $notes === null ||
+            $bookingId === null ||
+            $efficacy === null
+        ) {
             throw new SchoolboxException('Missing required data in form submission.');
         }
+
+        // TODO: If efficacy is EFFICACY_SERIES, update all events in series.
 
         try {
             $booking = $this->bookingMapper->findById($bookingId);
@@ -1157,6 +1166,16 @@ class Controller extends Base
      */
     public function deleteBooking(Event $event, $bookingId): void
     {
+        $data = $this->request->getParsedBody();
+
+        $efficacy = $data['efficacy'] ?? null;
+
+        if ($efficacy === null) {
+            throw new SchoolboxException('Missing required data in form submission.');
+        }
+
+        // TODO: If efficacy is EFFICACY_SERIES, update all events in series.
+
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
@@ -1171,7 +1190,7 @@ class Controller extends Base
         try {
             $this->bookingMapper->delete($booking);
         } catch (MapperException) {
-            throw new SchoolboxException('Could not save booking.');
+            throw new SchoolboxException('Could not delete booking.');
         }
 
         // The response data structure must match type 'DeleteBookingResponse' defined in edit-resource-booking-modal.vue.

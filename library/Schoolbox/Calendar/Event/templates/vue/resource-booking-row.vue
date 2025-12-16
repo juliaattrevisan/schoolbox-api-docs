@@ -2,6 +2,7 @@
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
+import { EFFICACY_SELF, EFFICACY_SERIES } from "@schoolboxCalendarEvent/eventTypes";
 import type { Booking } from "./resourceBookingTypes";
 
 interface Props {
@@ -68,7 +69,9 @@ async function postEditBookingForm(): Promise<void> {
         startDatetime: startDate.value,
         endDatetime: endDate.value,
         notes: bookingNotes.value,
+        efficacy: efficacy.value, // Efficacy will be a blank string if the event is not part of a series.
     };
+
     const toast = window.sbProps.toastActivate("Saving...");
 
     try {
@@ -101,13 +104,18 @@ async function postEditBookingForm(): Promise<void> {
  */
 async function postDeleteBookingForm(): Promise<void> {
     isProcessing.value = true;
+    const payload = {
+        efficacy: efficacy.value,
+    };
     const toast = window.sbProps.toastActivate("Deleting...");
     const endpoint = ENDPOINTS.deleteBookingPath(props.eventId, props.booking.id);
 
     try {
         const response = await fetch(endpoint, {
             method: "DELETE",
+            body: JSON.stringify(payload),
             headers: {
+                "Content-Type": "application/json",
                 Accept: "application/json",
             },
         });
@@ -177,11 +185,22 @@ async function postDeleteBookingForm(): Promise<void> {
                 <label for="resource-booking-row-textarea">Notes</label>
                 <text-editor id="resource-booking-row-textarea" v-model:body="bookingNotes" />
             </div>
+            <template v-if="eventSeriesId">
+                <hr />
+                <h3>This event is part of a series</h3>
+                <p>Would you like to affect only this event, or all in the series?</p>
+                <div class="radiolist l-grid l-gap-l l-grid--2-col">
+                    <input id="radioEfficacySelf" v-model="efficacy" type="radio" :value="EFFICACY_SELF" />
+                    <label for="radioEfficacySelf">Only this event</label>
+                    <input id="radioEfficacySeries" v-model="efficacy" type="radio" :value="EFFICACY_SERIES" />
+                    <label for="radioEfficacySeries">All events in series</label>
+                </div>
+            </template>
             <div class="component-action">
                 <section>
                     <button @click.prevent="cancelEditBookingForm()">Cancel</button>
                     <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
-                    <button :disabled="isProcessing" @click.prevent="postDeleteBookingForm()">Delete</button>
+                    <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm()">Delete</button>
                 </section>
             </div>
         </form>
