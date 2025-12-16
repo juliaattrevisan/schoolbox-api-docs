@@ -458,11 +458,9 @@ class Mapper extends BaseMapper
      * Returns a collection of resource booking objects, each with their resource and status objects hydrated.
      *
      * @param int      $eventId
-     * @param int|null $resourceId Supply this to filter the results to bookings for a specific resource.
-     * @param bool     $futureBookingsOnly Set to true to only return future bookings.
      * @return GenericCollection<Model>
      */
-    public function findByEventId(int $eventId, ?int $resourceId = null, bool $futureBookingsOnly = false): GenericCollection
+    public function findByEventId(int $eventId): GenericCollection
     {
         $query = "
             SELECT
@@ -472,22 +470,13 @@ class Mapper extends BaseMapper
             FROM {$this->getTable()} b
             INNER JOIN {$this->getJoinSql('resource', 'b', 'r')}
             INNER JOIN {$this->getJoinSql('status', 'b', 's')}
-            INNER JOIN {$this->getJoinSql('event', 'b', 'e')}
             WHERE b.event_id=:eventId
             AND b.deleted_at IS NULL
             AND r.deleted_at IS NULL
         ";
-        $params = ['eventId' => $eventId];
-        if ($resourceId !== null) {
-            $query .= " AND b.resource_id=:resourceId";
-            $params['resourceId'] = $resourceId;
-        }
-        if ($futureBookingsOnly) {
-            // If booking start/end datetimes are not set, fall back to event start/end datetimes.
-            $query .= " AND COALESCE(b.start_datetime, e.start_datetime)>NOW()";
-        }
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute($params);
+        $statement->bindValue('eventId', $eventId);
+        $statement->execute();
 
         $collection = new GenericCollection(Model::class);
         foreach ($statement as $row) {
