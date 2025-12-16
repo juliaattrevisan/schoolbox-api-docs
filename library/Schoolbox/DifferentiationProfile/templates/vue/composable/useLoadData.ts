@@ -11,6 +11,7 @@ import type { Payload } from "../../js/types/manageDifferentiationProfilesTypes"
 
 /**
  * load the table data from the given url.
+ * @param header - the headers for the grid
  * @param url - the url to load the table data
  * @returns - isNewLoading, isMoreLoading, payload, sortBy, isEmpty, hasRows, loadError
  */
