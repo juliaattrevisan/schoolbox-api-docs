@@ -19,11 +19,6 @@ jobs:
           path: /tmp/composer-cache
           key: vendor-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
-      - name: Install Git (for Composer install)
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install git
-
       # The composer install runs regardless of cache hit above, because:
       # * the cache populates Composer's cache, not vendor/
       # * the autoload still needs to be built
@@ -31,10 +26,10 @@ jobs:
         uses: php-actions/composer@v6
         with:
           dev: no
-          args: --profile --ignore-platform-reqs -a
+          args: --profile --ignore-platform-reqs -a -vvv
           php_version: '8.4'
-          # The Composer action takes `2.2.x` but not `2.8.x`? Srsly?
-          version: '2.8.6'
+          # Just use whatever the latest 2.x release is: only 2.2 is an LTS
+          version: '2.x'
 
       - name: Upload composer artifact
         uses: actions/upload-artifact@v4
