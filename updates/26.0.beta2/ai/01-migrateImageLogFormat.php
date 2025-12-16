@@ -89,6 +89,14 @@ $app = new class extends CliTool\App
         $responseListener = new AgentChat\EventStream\ResponseListener(requireFinalImage: true);
         $logListener = new AgentChat\LogHandler\LogOutputText();
 
+        if (null === $log->getResponse()) {
+            /**
+             * Having no response at all is valid (i.e. the request to OpenAI failed),
+             * the "outputText" will remain NULL and will be correctly handled by the translator as a failed response
+             */
+            return $log;
+        }
+
         /**
          * Assuming the OpenAI format is the same, which it should be since we haven't changed anything...
          * try to re-parse the entire thing as an event stream
@@ -121,7 +129,7 @@ $app = new class extends CliTool\App
 This finds all image generation requests in the openai log
 and attempts to migrate them to use the more maintainable Agent Chat log format.
 
-Usage: 07-migrateImageLogFormat.php
+Usage: 01-migrateImageLogFormat.php
 
 HELP;
             return;
@@ -137,14 +145,12 @@ HELP;
         ");
 
         /* Find all image generation logs that haven't already been migrated (any without a log_format) */
-        $imageLogQuery = sprintf(
+        $logIterator = $db->getQueryIterator(
             "SELECT id, prompt, response
             FROM openai_log
-            WHERE log_format IS NULL AND feature = '%s';",
-            Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE
+            WHERE log_format IS NULL AND feature = :feature",
+            ['feature' => Schoolbox\Editor\OpenAI\Helper::FEATURE_IMAGE]
         );
-
-        $logIterator = $db->getQueryIterator($imageLogQuery);
 
         foreach ($logIterator as $logData) {
             $log = new Log\Model()
