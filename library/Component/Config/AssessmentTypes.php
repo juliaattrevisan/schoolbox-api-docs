@@ -2,6 +2,7 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 
 class Component_Config_AssessmentTypes extends Component_Config_Abstract
 {
@@ -20,14 +21,11 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     {
         $di = $page->getDi();
         $configLoader = $di->get('config');
-        $ltiEnabled = $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
 
-        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $featureConfig = $aiConfig->decode((string)$configLoader->get(ConfigMapper::NAME_AI_DIALOGAGENT));
-        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
-
-        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($ltiEnabled, $dialogAgentEnabled);
+        $assessmentTypeOptions = Assessment\AssessmentType::getOptions(
+            $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
+            new ValidDialogAgentEnabled($configLoader)->isSatisfied()
+        );
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;

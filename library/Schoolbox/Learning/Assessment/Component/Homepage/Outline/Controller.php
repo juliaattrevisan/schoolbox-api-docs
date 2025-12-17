@@ -31,6 +31,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -143,14 +144,10 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->courseImplementation = null;
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
-        $ltiEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-
-        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $featureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
-        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
-
-        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled, $dialogAgentEnabled);
+        $assessmentTypeOptions = AssessmentType::getOptions(
+            $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
+            new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied(),
+        );
 
         /**
          * if filters fail, we should use the system default, of show everything
@@ -298,15 +295,10 @@ class Controller extends Component_Homepage_ControllerAbstract
             );
         }
 
-        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $featureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
-        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
-
         $data = [
             'assessmentTypes'      => AssessmentType::getOptions(
                 $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
-                $dialogAgentEnabled,
+                new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied(),
             ),
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,

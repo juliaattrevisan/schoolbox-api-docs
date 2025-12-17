@@ -12,6 +12,7 @@ namespace Alaress\Web\Output\DataGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 
 /**
  * Generate data for rendering a list of enabled assessment types.
@@ -30,16 +31,9 @@ class AssessmentTypes implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $ltiEnabled = $this->configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-
-        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $featureConfig = $aiConfig->decode((string)$this->configLoader->get(ConfigMapper::NAME_AI_DIALOGAGENT));
-        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
-
         return AssessmentType::getOptions(
-            $ltiEnabled,
-            $dialogAgentEnabled,
+            $this->configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
+            new ValidDialogAgentEnabled($this->configLoader)->isSatisfied(),
         );
     }
 }
