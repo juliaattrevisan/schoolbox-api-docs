@@ -8,14 +8,20 @@
 {% endblock studentMessage %}
 
 {% block teacherMessage %}
-    <a href="{{ createRouteType }}" data-test="component-dialogAgent-empty-create-button">
-        Create {{ locale.dialogAgent.indefiniteArticle }} {{ locale.dialogAgent }}
-    </a>
-    that is not a part of your course to assess your students.
+    {% if dialogAgentEnabled %}
+        <a href="{{ createRouteType }}" data-test="component-dialogAgent-empty-create-button">
+            Create {{ locale.dialogAgent.indefiniteArticle }} {{ locale.dialogAgent }}
+        </a>
+        that is not a part of your course to assess your students.
+    {% else %}
+        The {{ locale.dialogAgent.proper }} feature is currently disabled, please contact your admin to enable this feature.
+    {% endif %}
 {% endblock teacherMessage %}
 
 {% block createButton %}
-    <a href="{{ createRouteType }}" class="button" data-test="component-dialogAgent-create-button">
-        Create {{ locale.dialogAgent.proper }}
-    </a>
+    {% if dialogAgentEnabled %}
+        <a href="{{ createRouteType }}" class="button" data-test="component-dialogAgent-create-button">
+            Create {{ locale.dialogAgent.proper }}
+        </a>
+    {% endif %}
 {% endblock createButton %}
