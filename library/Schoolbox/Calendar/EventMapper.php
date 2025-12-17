@@ -23,7 +23,6 @@ use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
-use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
