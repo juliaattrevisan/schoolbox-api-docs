@@ -163,7 +163,7 @@ class AbstractRedirect
     public function getCanvasCourseId(Folder $folder, Folder $parentFolder): ?int
     {
         $courseCode = strtr(
-            $this->courseIdFormat, // now formattable string
+            $this->canvasDb->sissourceid_template, // now formattable string
             [
                 '{folderCode}' => $folder->getCodeString(),
                 '{parentCode}' => $parentFolder->getCodeString()
