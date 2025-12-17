@@ -1132,7 +1132,6 @@ class Controller extends Base
             throw new SchoolboxException('Booking/event mismatch when saving booking.');
         }
 
-        /** @var BookingItemModel $resource */
         try {
             $resource = $this->bookingItemMapper->findById($booking->getResource()->getId());
         } catch (MapperException $e) {
