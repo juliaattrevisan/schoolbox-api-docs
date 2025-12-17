@@ -206,3 +206,15 @@
         }
     }
 }
+
+/**
+ * Border radius for sub-nav links
+ */
+.sub-nav {
+    li a,
+    dd a,
+    li.active a,
+    dd.active a {
+        border-radius: var(--sbx-config-field-roundness);
+    }
+}
