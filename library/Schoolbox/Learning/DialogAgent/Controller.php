@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
@@ -252,6 +254,7 @@ class Controller extends Base
      * @param Response $response
      * @return void
      * @throws Error
+     * @throws Exception
      * @throws RouteNotFound
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
@@ -439,6 +442,8 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @return void
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
      */
     public function postSandboxMessage(DialogAgent $assessment): void
     {
@@ -545,6 +550,10 @@ class Controller extends Base
      * @param User $student
      * @param Response $response
      * @return void
+     * @throws RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
      */
     public function postSubmit(IAssessable $assessment, User $student, Response $response): void
     {
@@ -641,7 +650,7 @@ class Controller extends Base
 
     /**
      * Provides a json payload conversion of $response including routes/status
-     * Used for asyncronous calls when the response state may have changed
+     * Used for asynchronous calls when the response state may have changed
      *
      * @param Response $response
      * @return void
