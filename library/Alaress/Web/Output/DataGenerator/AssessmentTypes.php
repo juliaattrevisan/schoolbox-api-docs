@@ -22,7 +22,8 @@ class AssessmentTypes implements IDataGenerator
     /**
      * @param IConfigLoader $configLoader
      */
-    public function __construct(private IConfigLoader $configLoader) {
+    public function __construct(private IConfigLoader $configLoader)
+    {
     }
 
 
