@@ -35,7 +35,7 @@ test.describe("Manage Differentiation Profiles", () => {
             await expect(noPermissionText).toBeVisible();
         } finally {
             tester.isGoingTo("Clean up: Remove service permission from Jack Coles user");
-            await db.dontHaveInDatabase("userAccess", { uid: 22, service: 16 });
+            await db.dontHaveInDatabase("userAccess", { uid: 22, service: 16, sid: 1, type: 2 });
         }
     });
 
