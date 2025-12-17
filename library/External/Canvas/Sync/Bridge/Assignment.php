@@ -16,6 +16,7 @@ use External\Canvas\Importer\CanvasDb;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeLevelGroupModel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -41,7 +42,8 @@ class Assignment
     public const MARK_COMPLETE = 'complete';
     public const MARK_INCOMPLETE = 'incomplete';
 
-    protected array $gradeGroups = [];
+    /** @var GenericCollection|GradeLevelGroupModel[] */
+    protected $gradeGroups;
 
     /** @var GenericCollection|SubmissionBox\MarkType[] */
     protected $markTypes;
@@ -61,7 +63,7 @@ class Assignment
     )
     {
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypes    = $this->workTypes->indexBy('id');
+        $this->workTypes    = $workTypes->indexBy('id');
     }
 
     /**
