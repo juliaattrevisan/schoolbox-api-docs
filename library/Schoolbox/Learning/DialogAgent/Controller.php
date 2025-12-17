@@ -69,10 +69,14 @@ class Controller extends Base
      * @param OpenAI\ClientFactory $aiClientFactory
      * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper $scenarioCriterionMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper $feedbackDataModelMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion\Mapper $feedbackCriterionMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
      * @param FieldContextMapper $fieldContextMapper
-     * @param CriterionMapper $criterionMapper
+     * @param CriterionMapper $criterionMapper,
+     * @param \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
      */
     public function __construct(
         private Access $access,
@@ -85,10 +89,14 @@ class Controller extends Base
         private OpenAI\ClientFactory $aiClientFactory,
         private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
+        private \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper $scenarioCriterionMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper $feedbackDataModelMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion\Mapper $feedbackCriterionMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
         private FieldContextMapper $fieldContextMapper,
         private CriterionMapper $criterionMapper,
+        private \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
     ) {
     }
 
@@ -863,17 +871,45 @@ class Controller extends Base
             return;
         }
 
-
         /* Spawn a new feedback row
          */
+        $now = \Alaress_Date_Format::now();
+
+        $feedback = $this->feedbackDataSource->createModel()
+            ->setAssessable($assessment)
+            ->setResponse($response)
+            ->setReviewee($response->getSubmittedOnBehalfOf())
+            ->setReviewer(null)
+            ->setCriteria(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model::class))
+            ->setPublishedAt($now)
+            ->setCreatedAt($now)
+            ->setUpdatedAt($now)
+            ->setDeletedAt(null);
+
+        $this->feedbackDataSource->save($feedback);
 
         /* Grab its id and then persist each cell's data
          */
+        foreach ($feedbackData as $scenarioCriterionId => $value) {
+            $feedbackCriterion = $this->feedbackCriterionMapper->createModel()
+                /* This strange awkwardness about Scenario Criterion and Feedback is something of a swampy byproduct where
+                 * you can't tell how much hydration you actually needed vs expected; plus, we never really hydrated stuff
+                 * to this extent prior to now (closest is Rubric Grids which are dealt with totally separately)
+                 * You could possibly just replace scenario criterion instances with just an id, but that is a bit weird in
+                 * and of itself these days.
+                 */
+                ->setFeedback($this->feedbackDataModelMapper->createModel()->setId($feedback->getId()))
+                ->setScenarioCriterion($this->scenarioCriterionMapper->createModel()->setId($scenarioCriterionId))
+                /* Set the ai's text and various meta here forcibly coercing $value to something nice
+                 */
+                ->setBody(trim((string)$value))
+                ->setCreatedAt($now)
+                ->setUpdatedAt($now)
+                ->setDeletedAt(null);
 
-        /* Redirect somewhere, I suppose
-         */
+                $this->feedbackCriterionMapper->save($feedbackCriterion);
+        }
 
-        // TODO: this should just be responseEmpty, but leaving for now so we can manually verify the feedback generation
-        $this->response = $this->responseAsJson($feedbackData);
+        $this->response = $this->responseEmpty(200);
     }
 }
