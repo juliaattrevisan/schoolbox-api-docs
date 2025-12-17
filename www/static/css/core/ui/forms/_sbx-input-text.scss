@@ -46,12 +46,13 @@
     }
 
     &[readonly] {
-        border: none;
-        padding: 0;
+        background-color: var(--sbx-color-foreground-secondary) !important;
+
         &:hover {
-            background-color: inherit; // foundation fix
-            border-color: transparent; // foundation fix
-            color: inherit; // foundation fix
+            background-color: var(--sbx-color-foreground-secondary);
+            color: var(--sbx-color-text-secondary) !important;
+            cursor: not-allowed;
+            pointer-events: auto;
         }
         &:focus {
             @include sbx-form.form-input-focus-not-visible;
