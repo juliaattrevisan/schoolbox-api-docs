@@ -1257,9 +1257,9 @@ class Controller extends Base
      * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
      *
      * @param Event $event
-     * @param       $bookingId
+     * @param int $bookingId
      */
-    public function deleteBooking(Event $event, $bookingId): void
+    public function deleteBooking(Event $event, int $bookingId): void
     {
         $data = $this->request->getParsedBody();
         $efficacy = $data['efficacy'] ?? null;
