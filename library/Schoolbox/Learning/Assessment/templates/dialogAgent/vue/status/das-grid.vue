@@ -102,7 +102,6 @@ const filteredParticipants = window.Vue.computed(() => {
                         :participant="participant"
                         :criteria="props.criteria"
                         @update-response="(data) => applyParticipantUpdates(participant, data)"
-                        @feedback="(data) => (participant.feedback = data)"
                     />
                 </tbody>
             </table>
