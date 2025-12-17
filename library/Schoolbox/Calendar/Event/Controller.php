@@ -1115,7 +1115,6 @@ class Controller extends Base
             $startDatetimeStr === null ||
             $endDatetimeStr === null ||
             $notes === null ||
-            $bookingId === null ||
             $efficacy === null
         ) {
             throw new SchoolboxException('Missing required data in form submission.');
