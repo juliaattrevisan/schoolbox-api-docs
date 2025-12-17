@@ -55,7 +55,7 @@ test.describe("Curriculum Coverage Report Tests", () => {
         await curriculumSelector.selectNodes([302, 304, 1, 135]);
         await curriculumSelector.saveModal(); // Select Select, closing the modal
 
-        // link for reference: https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId=6%2C2%2C14&nodeId=302%2C304%2C1%2C135
+        // link for reference: /curriculum/reports/coverage?courseId=6%2C2%2C14&nodeId=302%2C304%2C1%2C135
 
         tester.isGoingTo("Try and generate a report again");
         await coverageReport.submit(); // Generate the report
