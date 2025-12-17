@@ -1097,9 +1097,9 @@ class Controller extends Base
 
 
     /**
-     * Process a 'save' request from the 'edit booking' modal that appears on the 'Event Details' page.
+     * Process a 'save' request from the 'edit booking' form that appears on the 'Event Details' page.
      * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
-     * (Find the 'edit booking' modal by clicking on an 'edit' button on a resource booking.)
+     * (Find the 'edit booking' form by clicking on an 'edit' button on a resource booking.)
      * @param Event $event
      * @param $bookingId
      */
