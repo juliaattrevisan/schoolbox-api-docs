@@ -1383,10 +1383,11 @@ class Controller extends Base
      * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
      * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
      * TODO: Move this function into a helper class.
-     * @param GenericCollection<int, BookingItemModel> $resourceById
-     *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
+     *
      * @param GenericCollection<int, BookingModel> $movedBookings
      *  - Bookings to check for clashes.  This array should contain all the bookings that are moved in $movedBookings.
+     * @param GenericCollection<int, BookingItemModel> $resourceById
+     *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
      * @return array
      */
     private function checkForClashesIfResourceBookingsMoved(
