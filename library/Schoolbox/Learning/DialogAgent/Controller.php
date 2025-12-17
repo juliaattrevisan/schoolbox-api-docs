@@ -763,9 +763,10 @@ class Controller extends Base
                  */
                 if ($authoritativeFeedback) {
                     foreach ($authoritativeFeedback->getCriteria() as $feedbackCriterion) {
-                        $feedbackFields[$feedbackCriterion->getCriterion()] = $feedbackCriterion->getBody();
+                        $feedbackFields[$feedbackCriterion->getScenarioCriterionId()] = $feedbackCriterion->getBody();
                     }
                 }
+
 
                 /* Slam them all together if they're part of the requested set of states
                  */

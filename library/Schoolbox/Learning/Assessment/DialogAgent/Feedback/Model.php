@@ -59,7 +59,7 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return GenericCollection
+     * @return GenericCollection<\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model>
      */
     public function getCriteria(): GenericCollection
     {
@@ -68,7 +68,7 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @param GenericCollection $criteria
+     * @param GenericCollection<\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model> $criteria
      * @return $this
      */
     public function setCriteria(GenericCollection $criteria): self
