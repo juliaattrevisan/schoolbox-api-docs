@@ -175,48 +175,73 @@ async function postDeleteBookingForm(): Promise<void> {
             ></a>
         </div>
     </div>
-    <div v-if="isEditFormOpen">
-        <form
-            ref="editBookingForm"
-            method="post"
-            :action="ENDPOINTS.editBookingPath(props.eventId, props.booking.id)"
-            class="top"
-            @submit.prevent="postEditBookingForm()"
-        >
-            <input type="hidden" name="bookingId" :value="props.booking.id" />
-            <date-range
-                ref="dateRangeRef"
-                v-model:start-date="startDate"
-                v-model:end-date="endDate"
-                id-prefix="resource-booking-row"
-                :use-time="true"
-                :label-start="'From'"
-                :label-end="'Until'"
-            />
-            <div>
-                <label for="resource-booking-row-textarea">Notes</label>
-                <text-editor id="resource-booking-row-textarea" v-model:body="bookingNotes" />
-            </div>
-            <template v-if="eventSeriesId">
-                <hr />
-                <h3>This event is part of a series</h3>
-                <p>Would you like to affect only this event, or all in the series?</p>
-                <div class="radiolist l-grid l-gap-l l-grid--2-col">
-                    <input id="radioEfficacySelf" v-model="efficacy" type="radio" :value="EFFICACY_SELF" />
-                    <label for="radioEfficacySelf">Only this event</label>
-                    <input id="radioEfficacySeries" v-model="efficacy" type="radio" :value="EFFICACY_SERIES" />
-                    <label for="radioEfficacySeries">All events in series</label>
+    <Transition name="drawer">
+        <div v-if="isEditFormOpen" class="drawer-container">
+            <form
+                ref="editBookingForm"
+                method="post"
+                :action="ENDPOINTS.editBookingPath(props.eventId, props.booking.id)"
+                class="top"
+                @submit.prevent="postEditBookingForm()"
+            >
+                <input type="hidden" name="bookingId" :value="props.booking.id" />
+                <date-range
+                    ref="dateRangeRef"
+                    v-model:start-date="startDate"
+                    v-model:end-date="endDate"
+                    id-prefix="resource-booking-row"
+                    :use-time="true"
+                    :label-start="'From'"
+                    :label-end="'Until'"
+                />
+                <div>
+                    <label for="resource-booking-row-textarea">Notes</label>
+                    <text-editor id="resource-booking-row-textarea" v-model:body="bookingNotes" />
                 </div>
-            </template>
-            <div class="component-action">
-                <section>
-                    <button @click.prevent="cancelEditBookingForm()">Cancel</button>
-                    <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
-                    <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm()">Delete</button>
-                </section>
-            </div>
-        </form>
-    </div>
+                <template v-if="eventSeriesId">
+                    <hr />
+                    <h3>This event is part of a series</h3>
+                    <p>Would you like to affect only this event, or all in the series?</p>
+                    <div class="radiolist l-grid l-gap-l l-grid--2-col">
+                        <input id="radioEfficacySelf" v-model="efficacy" type="radio" :value="EFFICACY_SELF" />
+                        <label for="radioEfficacySelf">Only this event</label>
+                        <input id="radioEfficacySeries" v-model="efficacy" type="radio" :value="EFFICACY_SERIES" />
+                        <label for="radioEfficacySeries">All events in series</label>
+                    </div>
+                </template>
+                <div class="component-action">
+                    <section>
+                        <button @click.prevent="cancelEditBookingForm()">Cancel</button>
+                        <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
+                        <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm()">Delete</button>
+                    </section>
+                </div>
+            </form>
+        </div>
+    </Transition>
 </template>
 
-<style scoped></style>
+<style scoped>
+.drawer-container {
+    overflow: hidden;
+}
+
+.drawer-enter-active,
+.drawer-leave-active {
+    transition: all 0.5s ease;
+}
+
+.drawer-enter-from,
+.drawer-leave-to {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.drawer-enter-to,
+.drawer-leave-from {
+    max-height: 1000px;
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
