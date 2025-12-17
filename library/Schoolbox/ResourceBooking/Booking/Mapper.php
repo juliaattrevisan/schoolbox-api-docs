@@ -548,6 +548,42 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Return a data structure allowing quick lookup of which resources are booked for a set of events.
+     *
+     * @param $eventIds array<int> An array of event ids.
+     * @return array<int, array<int>> An array of arrays of resource ids, indexed by event id.
+     */
+    public function getBookedResourceIdsByEventId(array $eventIds): array
+    {
+        if (count($eventIds) === 0) {
+            return [];
+        }
+
+        $query = '
+            SELECT event_id, resource_id
+            FROM resource_booking rb
+            JOIN event e ON (rb.event_id = e.id AND e.deleted_at IS NULL)
+            WHERE event_id IN (' . implode(',', array_map('intval', $eventIds)) . ')
+            AND rb.deleted_at IS NULL;
+        ';
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $resourceIdsByEventId = [];
+
+        foreach ($statement as $row) {
+            if (!array_key_exists($row['event_id'], $resourceIdsByEventId)) {
+                $resourceIdsByEventId[$row['event_id']] = [];
+            }
+
+            $resourceIdsByEventId[$row['event_id']][] = $row['resource_id'];
+        }
+
+        return $resourceIdsByEventId;
+    }
+
+
+    /**
      * Return an array of collections of ResourceBookingModels, indexed by eventId.
      *
      * @param  array<int> $eventIds

@@ -1046,12 +1046,23 @@ class Controller extends Base
         $nBookingsCreatedWithoutClash = 0;
         $nBookingsCreatedWithClash = 0;
 
-        // Create a list of booking models to be persisted depending on validation results.
+        // Note we are not only interested in resources booked in the future here.
+        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the future.
+        $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
+
+        // Create a list of booking models to be persisted depending on:
+        //  * whether the resource has already been booked for the event
+        //  * whether the booking would clash with another approved booking of the same resource.
         /** @var Event $loopEvent */
         foreach ($eventById as $eventId => $loopEvent) {
+            $bookedResourceIds = $bookedResourceIdsByEventId[$eventId] ?? [];
             $isClashByResourceId = $isClashByResourceIdByEventId[$eventId] ?? [];
             /** @var BookingItemModel $resource */
             foreach ($resourceById as $resourceId => $resource) {
+                if (in_array($resourceId, $bookedResourceIds, false)) {
+                    continue; // This resource is already booked for this event, so skip.
+                }
+
                 $isClash = $isClashByResourceId[$resourceId] ?? false;
                 if (!$isClash || $resource->getAllowClashBookings()) {
                     // Build the booking.
