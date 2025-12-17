@@ -53,6 +53,11 @@ class CanvasDb
     public readonly bool $redirect_assessments;
     public readonly bool $redirect_homepages;
     public readonly string $code_redirect_homepages;
+    // options
+    // course code:subject code:subject code from section
+    public const REDIRECT_COURSE_CODE = 'course_code';
+    public const REDIRECT_SUBJECT_CODE = 'subject_code';
+    public const REDIRECT_SUBJECT_CODE_SECTION = 'subject_code_section';
 
     /**
      * @param IConfigLoader $config
