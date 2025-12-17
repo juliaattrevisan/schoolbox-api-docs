@@ -131,7 +131,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
                 $feedbackObject = (new Criterion\Model())
                     ->setId($criterion->getId())
-                    ->setCriteriaId($criterion->getScenarioCriterion()->getId())
+                    ->setScenarioCriterionId($criterion->getScenarioCriterion()->getId())
                     ->setBody($criterion->getBody());
 
                 $domainObject->getCriteria()->setOffset($criterionId, $feedbackObject);

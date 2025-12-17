@@ -43,7 +43,7 @@ class Model
      *
      * @var int|null
      */
-    private ?int $criteriaId = null;
+    private ?int $scenarioCriterionId = null;
 
 
     /* Getters/Setters
@@ -72,19 +72,19 @@ class Model
     /**
      * @return int|null
      */
-    public function getCriteriaId(): ?int
+    public function getScenarioCriterionId(): ?int
     {
-        return $this->criteriaId;
+        return $this->scenarioCriterionId;
     }
 
 
     /**
-     * @param int|null $criteriaId
+     * @param int|null $scenarioCriterionId
      * @return $this
      */
-    public function setCriteriaId(?int $criteriaId): self
+    public function setScenarioCriterionId(?int $scenarioCriterionId): self
     {
-        $this->criteriaId = $criteriaId;
+        $this->scenarioCriterionId = $scenarioCriterionId;
         return $this;
     }
 }

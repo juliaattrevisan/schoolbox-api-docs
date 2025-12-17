@@ -763,7 +763,7 @@ class Controller extends Base
                  */
                 if ($authoritativeFeedback) {
                     foreach ($authoritativeFeedback->getCriteria() as $feedbackCriterion) {
-                        $feedbackFields[$feedbackCriterion->getCriteriaId()] = $feedbackCriterion->getBody();
+                        $feedbackFields[$feedbackCriterion->getCriterion()] = $feedbackCriterion->getBody();
                     }
                 }
 

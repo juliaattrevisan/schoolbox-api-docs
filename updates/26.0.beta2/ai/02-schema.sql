@@ -1,9 +1,9 @@
 -- AI-generated feedback for the responses made by students
 -- This is each cell's feedback value (ie. the feedback per scenario criterion)
-CREATE TABLE `dialog_agent_feedback_criteria` (
+CREATE TABLE `dialog_agent_feedback_criterion` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `feedback_id` INT NOT NULL,
-    `criteria_id` INT NOT NULL,
+    `scenario_criterion_id` INT NOT NULL,
     `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
@@ -15,10 +15,10 @@ CREATE TABLE `dialog_agent_feedback_criteria` (
         REFERENCES `dialog_agent_feedback` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,
-    INDEX `fk_dafc_criteria_idx` (`criteria_id` ASC),
-    CONSTRAINT `fk_dafc_criteria`
-        FOREIGN KEY (`criteria_id`)
-        REFERENCES `dialog_agent_scenario_criteria` (`id`)
+    INDEX `fk_dafc_scenario_criterion_idx` (`scenario_criterion_id` ASC),
+    CONSTRAINT `fk_dafc_scenario_criterion`
+        FOREIGN KEY (`scenario_criterion_id`)
+        REFERENCES `dialog_agent_scenario_criterion` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
@@ -36,14 +36,10 @@ alter table dialog_agent_feedback
     drop column criteria_id;
 
 -- Rename plural to singular
-rename table dialog_agent_feedback_criteria to dialog_agent_feedback_criterion;
 rename table dialog_agent_scenario_criteria to dialog_agent_scenario_criterion;
 
 -- Restore some keys and stuff
 alter table dialog_agent_feedback
     add constraint fk_daf_learner_id
         foreign key (learner_id) references user (id);
-
-
-
 
