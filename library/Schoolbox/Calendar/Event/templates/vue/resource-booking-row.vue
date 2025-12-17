@@ -39,7 +39,7 @@ const startDate = window.Vue.ref<string>(props.booking.start);
 const endDate = window.Vue.ref<string>(props.booking.end);
 
 /**
- *
+ * Open or close the 'edit booking' drawer.
  */
 function toggleEditForm(): void {
     isEditFormOpen.value = !isEditFormOpen.value;
