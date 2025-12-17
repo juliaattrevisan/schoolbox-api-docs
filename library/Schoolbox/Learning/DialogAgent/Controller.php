@@ -816,6 +816,8 @@ class Controller extends Base
 
 
     /**
+     * taskd postback webhook
+     *
      * Generate feedback for a particular dialog agent response
      * This route is called by the task daemon after a response is submitted by a user or by the cron
      *
@@ -861,7 +863,15 @@ class Controller extends Base
             return;
         }
 
-        // TODO: persist it
+
+        /* Spawn a new feedback row
+         */
+
+        /* Grab its id and then persist each cell's data
+         */
+
+        /* Redirect somewhere, I suppose
+         */
 
         // TODO: this should just be responseEmpty, but leaving for now so we can manually verify the feedback generation
         $this->response = $this->responseAsJson($feedbackData);
