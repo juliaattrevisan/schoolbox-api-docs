@@ -41,7 +41,7 @@ echo "... setting up instance data"
 mariadb schoolbox < "$initialdir"/data/schoolbox.sql
 
 echo "... updating instance data"
-mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','mail_enable');"
+mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','mail_enable','differentiation_profiles_enabled');"
 mariadb schoolbox -e "UPDATE config SET value='0' WHERE name IN ('tours_enabled');"
 echo "MariaDB setup complete"
 

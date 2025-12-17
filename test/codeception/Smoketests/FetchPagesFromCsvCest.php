@@ -29,7 +29,8 @@ class FetchPagesFromCsvCest
         'LMS Moderator'          => ['username' => 'staff14', 'password' => 'password'], //  |
         'News Moderator'         => ['username' => 'staff15', 'password' => 'password'], //  |
         'Pastoral Moderator'     => ['username' => 'staff16', 'password' => 'password'], //  |
-        'Timetable Moderator'    => ['username' => 'staff17', 'password' => 'password'], // /
+        'Timetable Moderator'    => ['username' => 'staff17', 'password' => 'password'], //  |
+        'Differentiation Moderator'        => ['username' => 'staff18', 'password' => 'password'], // /
     ];
 
     protected $users = [];
@@ -49,6 +50,7 @@ class FetchPagesFromCsvCest
             'News Moderator'      => UserAccess::SERVICE_NEWS,
             'Pastoral Moderator'  => UserAccess::SERVICE_PASTORAL,
             'Timetable Moderator' => UserAccess::SERVICE_TIMETABLE,
+            'Differentiation Moderator'     => UserAccess::SERVICE_DIFFERENTIATION,
         ];
 
         foreach ($serviceIdByPersonaName as $personaName => $serviceId) {
