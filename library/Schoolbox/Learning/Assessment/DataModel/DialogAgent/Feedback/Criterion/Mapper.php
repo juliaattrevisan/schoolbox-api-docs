@@ -51,7 +51,7 @@ class Mapper extends \Schoolbox\Mapper
          * but you can probably consider converting this to a criteria instance if you needed that
          */
         $this->joins(
-            'criteria_id',
+            'scenario_criterion_id',
             \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper::class,
             'id',
             null,
