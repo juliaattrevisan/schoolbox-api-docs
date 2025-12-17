@@ -1,5 +1,5 @@
 -- AI-generated feedback for the responses made by students
--- This is each cell's feedback value (ie. the feedback per scenario criteria)
+-- This is each cell's feedback value (ie. the feedback per scenario criterion)
 CREATE TABLE `dialog_agent_feedback_criteria` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `feedback_id` INT NOT NULL,
