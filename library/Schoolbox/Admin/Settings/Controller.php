@@ -428,7 +428,7 @@ class Controller extends ConfigController
                 return '/adminv2/ai-services';
 
             case ConfigMapper::MODULE_DIFFERENTIATION_PROFILES:
-                return '/adminv2/pastoral/differentiation-profiles';
+                return '/adminv2/differentiation/differentiation-profiles';
 
             default:
                 return "/adminv2/$module"; // E.g. /adminv2/lti
