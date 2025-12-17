@@ -438,7 +438,7 @@ class LessonPlanCest
     private function createUnit(IntegrationTester $i, int $courseSpecId, string $unit_name): void
     {
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($courseSpecId);
-        $unitSpecPayload->setFormParam('name', $unit_name);
+        $unitSpecPayload->setName($unit_name);
         $i->amGoingTo('Send request create a unit spec');
         $i->sendRequest($unitSpecPayload);
     }
