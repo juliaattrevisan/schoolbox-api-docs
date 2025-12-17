@@ -511,7 +511,7 @@ class Mapper extends BaseMapper
      *
      * @param int        $resourceId
      * @param array<int> $eventIds
-     * @param bool       $futureBookingsOnly Set to true to only include bookings that start in the future.
+     * @param bool       $futureBookingsOnly Set to true to only include bookings that finish in the future.
      * @return array<int>
      */
     public function findIdsByResourceIdForEvents(
@@ -538,7 +538,7 @@ class Mapper extends BaseMapper
 
         if ($futureBookingsOnly) {
             // If booking start/end datetimes are not set, fall back to event start/end datetimes.
-            $query .= " AND COALESCE(b.start_datetime, e.start_datetime)>NOW()";
+            $query .= " AND COALESCE(b.end_datetime, e.end_datetime)>NOW()";
         }
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);

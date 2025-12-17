@@ -454,7 +454,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      *       That function was left alone so as to limit the scope of the PR that introduced this function.
      *
      * @param int $seriesId
-     * @param bool $futureEventsOnly Set to true to only return events that start in the future.
+     * @param bool $futureEventsOnly Set to true to only return events that finish in the future.
      * @return GenericCollection<Event>
      */
     public function getAllInSeriesNew(int $seriesId, bool $futureEventsOnly = false): GenericCollection
@@ -463,7 +463,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             ->equals('series_id', $seriesId);
 
         if ($futureEventsOnly) {
-            $pb->greaterThan('start_datetime', Alaress_Date_Format::now()->getDatabase());
+            $pb->greaterThan('end_datetime', Alaress_Date_Format::now()->getDatabase());
         }
 
         return $this->findByPredicates(
