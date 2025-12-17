@@ -22,7 +22,8 @@
 .sbx-body .introjs-nextbutton.introjs-fullbutton,
 .sbx-body .introjs-skipbutton,
 .sbx-body .introjs-prevbutton,
-.sbx-body .introjs-button {
+.sbx-body .introjs-button,
+.sbx-body .fc .fc-button {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);

@@ -855,24 +855,6 @@ input[type="checkbox"]:not(.plain) + label::before {
                 width: 100%;
             }
         }
-
-        &
-            > .fc-button:where(
-                [title="Filters"],
-                [title="List view"],
-                [title="Month view"],
-                [title="Day view"],
-                [title="Export"],
-                [title="Week view"]
-            ) {
-            background-color: transparent !important;
-            border-radius: 0 !important;
-            color: var(--sbx-color-text-primary);
-
-            &:hover {
-                color: var(--sbx-color-text-primary) !important;
-            }
-        }
     }
 
     & .fc-daygrid-day-events {
