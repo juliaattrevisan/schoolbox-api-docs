@@ -131,7 +131,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                     ->setScenarioCriterionId($criterion->getScenarioCriterion()->getId())
                     ->setBody($criterion->getBody());
 
-                $domainObject->getCriteria()->setOffset($criterion->getScenarioCriterion()->getId(), $feedbackObject);
+                $domainObject->getCriteria()->add($feedbackObject);
             }
 
             /* Add this user's collated criteria feedback as one big unit
