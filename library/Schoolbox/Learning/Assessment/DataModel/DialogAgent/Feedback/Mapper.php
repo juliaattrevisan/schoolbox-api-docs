@@ -70,6 +70,10 @@ class Mapper extends \Schoolbox\Mapper
          * These are shown as content for individual cells in the status screen
          */
         $this->joinsReverseMulti('feedback_id', Criterion\Mapper::class, 'criteria', 'feedbackCriterion');
+
+        /* Soft-delete feedback criteria if a feedback is deleted
+         */
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbackCriteria']);
     }
 
 
@@ -167,5 +171,20 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $stack;
+    }
+
+    /* Callbacks
+     */
+    /**
+     * Soft deletes all feedback criterions/criteria associated with this feedback
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function softDeleteFeedbackCriteria(Model $model): void
+    {
+        $mapper = $this->getJoinMapper('feedbackCriterion');
+
+        $mapper->softDelete($mapper->findByColumn('feedback_id', $model->getId()));
     }
 }

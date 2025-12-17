@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
+use Interop\Queue\Exception\InvalidDestinationException;
+use Interop\Queue\Exception\InvalidMessageException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
@@ -69,10 +71,14 @@ class Controller extends Base
      * @param OpenAI\ClientFactory $aiClientFactory
      * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper $scenarioCriterionMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper $feedbackDataModelMapper
+     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion\Mapper $feedbackCriterionMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
      * @param FieldContextMapper $fieldContextMapper
-     * @param CriterionMapper $criterionMapper
+     * @param CriterionMapper $criterionMapper,
+     * @param \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
      */
     public function __construct(
         private Access $access,
@@ -86,10 +92,14 @@ class Controller extends Base
         private OpenAI\ClientFactory $aiClientFactory,
         private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
+        private \Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper $scenarioCriterionMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper $feedbackDataModelMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion\Mapper $feedbackCriterionMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
         private FieldContextMapper $fieldContextMapper,
         private CriterionMapper $criterionMapper,
+        private \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
     ) {
     }
 
@@ -255,6 +265,7 @@ class Controller extends Base
      * @param ?Response $response - If null, will find the authoritative response for the participant if any
      * @return void
      * @throws Error
+     * @throws Exception
      * @throws RouteNotFound
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, ?Response $response): void
@@ -536,6 +547,8 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @return void
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
      */
     public function postSandboxMessage(DialogAgent $assessment): void
     {
@@ -642,6 +655,10 @@ class Controller extends Base
      * @param User $student
      * @param Response $response
      * @return void
+     * @throws RouteNotFound
+     * @throws \Interop\Queue\Exception
+     * @throws InvalidDestinationException
+     * @throws InvalidMessageException
      */
     public function postSubmit(IAssessable $assessment, User $student, Response $response): void
     {
@@ -693,6 +710,11 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
+        /* Soft-delete any feedbacks and feedback criteria that might already have existed; this caters for the Reopen
+         * scenario which would have already spawned a feedback.
+         */
+        $this->feedbackDataModelMapper->deleteByColumn('response_id', $response->getId());
+
         /** Respond as JSON with a consistent translated response data */
         $this->getStatus($response);
     }
@@ -738,7 +760,7 @@ class Controller extends Base
 
     /**
      * Provides a json payload conversion of $response including routes/status
-     * Used for asyncronous calls when the response state may have changed
+     * Used for asynchronous calls when the response state may have changed
      *
      * @param Response $response
      * @return void
@@ -904,6 +926,8 @@ class Controller extends Base
 
 
     /**
+     * taskd postback webhook
+     *
      * Generate feedback for a particular dialog agent response
      * This route is called by the task daemon after a response is submitted by a user or by the cron
      *
@@ -949,9 +973,45 @@ class Controller extends Base
             return;
         }
 
-        // TODO: persist it
+        /* Spawn a new feedback row
+         */
+        $now = \Alaress_Date_Format::now();
 
-        // TODO: this should just be responseEmpty, but leaving for now so we can manually verify the feedback generation
-        $this->response = $this->responseAsJson($feedbackData);
+        $feedback = $this->feedbackDataSource->createModel()
+            ->setAssessable($assessment)
+            ->setResponse($response)
+            ->setReviewee($response->getSubmittedOnBehalfOf())
+            ->setReviewer(null)
+            ->setCriteria(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model::class))
+            ->setPublishedAt($now)
+            ->setCreatedAt($now)
+            ->setUpdatedAt($now)
+            ->setDeletedAt(null);
+
+        $this->feedbackDataSource->save($feedback);
+
+        /* Grab its id and then persist each cell's data
+         */
+        foreach ($feedbackData as $scenarioCriterionId => $value) {
+            $feedbackCriterion = $this->feedbackCriterionMapper->createModel()
+                /* This strange awkwardness about Scenario Criterion and Feedback is something of a swampy byproduct where
+                 * you can't tell how much hydration you actually needed vs expected; plus, we never really hydrated stuff
+                 * to this extent prior to now (closest is Rubric Grids which are dealt with totally separately)
+                 * You could possibly just replace scenario criterion instances with just an id, but that is a bit weird in
+                 * and of itself these days.
+                 */
+                ->setFeedback($this->feedbackDataModelMapper->createModel()->setId($feedback->getId()))
+                ->setScenarioCriterion($this->scenarioCriterionMapper->createModel()->setId($scenarioCriterionId))
+                /* Set the ai's text and various meta here forcibly coercing $value to something nice
+                 */
+                ->setBody(trim((string)$value))
+                ->setCreatedAt($now)
+                ->setUpdatedAt($now)
+                ->setDeletedAt(null);
+
+                $this->feedbackCriterionMapper->save($feedbackCriterion);
+        }
+
+        $this->response = $this->responseEmpty(200);
     }
 }

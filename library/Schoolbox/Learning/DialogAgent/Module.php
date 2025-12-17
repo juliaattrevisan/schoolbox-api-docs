@@ -567,10 +567,14 @@ class Module extends BaseModule
             $this->injector->get('ai.clientFactory'),
             $this->getMapperFactory()->get(AILogMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Criterion\Mapper::class),
             $responseMapperProxy,
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper::class),
+            $this->injector->get('dialogAgentFeedbackDataSource')
         );
     }
 

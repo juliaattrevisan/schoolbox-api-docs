@@ -630,8 +630,8 @@ class Controller extends Assessment\Controller
                  * ...at which point you can display it on the status screen.
                  */
                 if ($authoritativeResponse !== null && null !== $authoritativeResponse->getSubmittedAt() && $authoritativeFeedback) { // also maybe if it's been submitted?
-                    foreach ($authoritativeFeedback->getCriteria() as $criterionId => $feedbackCriterion) {
-                        $feedback->{$criterionId} = $feedbackCriterion->getBody();
+                    foreach ($authoritativeFeedback->getCriteria() as $feedbackCriterion) {
+                        $feedback->{$feedbackCriterion->getScenarioCriterionId()} = $feedbackCriterion->getBody();
                     }
                 }
 
