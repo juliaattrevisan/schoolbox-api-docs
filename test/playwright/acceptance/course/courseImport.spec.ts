@@ -436,7 +436,7 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("navigate to the class homepage to create a due work and a task via course outline");
         await page.goto(`/homepage/${folderId}`);
 
-        await courseOutline.selectOptionUnitDotMenu(unitName, "due-work");
+        await courseOutline.selectOptionUnitDotMenu(unitName, "dueWork");
 
         tester.isGoingTo("Create a due work with open date in the future");
         const dueWorkOpenDate = new Date();
@@ -566,10 +566,10 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("check Jack Coles can see the proper options under the unit 3-dot menu");
         await courseOutline.clickUnitDotMenu("Romeo and Juliet");
         await expect(componentCourseOutline.getByTestId("course-outline-menu-add-project")).toContainText("Project");
-        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-due-work")).toContainText("Due Work");
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-dueWork")).toContainText("Due Work");
         await expect(componentCourseOutline.getByTestId("course-outline-menu-add-quiz")).toContainText("Quiz");
         await expect(componentCourseOutline.getByTestId("course-outline-menu-add-task")).toContainText("Task");
-        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-lesson-plan")).toContainText(
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-lessonPlan")).toContainText(
             "Lesson Plan",
         );
         await expect(componentCourseOutline.getByTestId("course-outline-menu-course-markbook")).toContainText(

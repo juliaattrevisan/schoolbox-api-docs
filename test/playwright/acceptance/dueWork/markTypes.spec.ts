@@ -140,7 +140,7 @@ test.describe("Due Work - Mark type tests", () => {
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
         newUnitId = Number(await courseOutlineUnit.getAttribute("data-unit"));
         await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-unit-options${newUnitId}-button`).click();
-        await courseOutlineUnit.locator("[data-dropdown-content] [data-add-button].icon-due-work").click();
+        await courseOutlineUnit.getByTestId(`course-outline-menu-add-dueWork`).click(); // TODO: this should use selectOptionUnitDotMenu from CourseOutline
 
         // Create a new due work, but now on the unit implementation
         tester.isGoingTo(`create a new due work with the name "${dueWorkName3}"`);

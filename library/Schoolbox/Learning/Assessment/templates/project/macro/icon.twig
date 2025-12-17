@@ -1,19 +1,26 @@
+{% macro renderClassForType(assessmentType) %}
+    {# these are equivalent to assessment.getFamilyName() but you can't call that from twig #}
+    {% if assessmentType == 'project' %}
+        icon-project
+    {% elseif assessmentType == 'task' %}
+        icon-task
+    {% elseif assessmentType == 'quiz' %}
+        icon-quiz
+    {% elseif assessmentType == 'dueWork' %}
+        icon-due-work
+    {% elseif assessmentType == 'lti' %}
+        icon-lti
+    {% elseif assessmentType == 'lessonPlan' %}
+        icon-lesson-plan
+    {% elseif assessmentType == 'dialogAgent' %}
+        icon-dialog-agent
+    {% endif %}
+{% endmacro %}
+
 {% macro renderClass(assessment) %}
 {% apply spaceless %}
-    {% if assessment is project %}
-        icon-project
-    {% elseif assessment is task %}
-        icon-task
-    {% elseif assessment is quiz %}
-        icon-quiz
-    {% elseif assessment is dueWork %}
-        icon-due-work
-    {% elseif assessment is lti %}
-        icon-lti
-    {% elseif assessment is lessonPlan %}
-        icon-lesson-plan
-    {% elseif assessment is dialogAgent %}
-        icon-dialog-agent
+    {% if assessment %}
+        {{ _self.renderClassForType(assessment.familyName) }}
     {% endif %}
 {% endapply %}
 {% endmacro %}

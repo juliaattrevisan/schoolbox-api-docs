@@ -304,6 +304,10 @@ class Controller extends Component_Homepage_ControllerAbstract
         $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
 
         $data = [
+            'assessmentTypes'      => AssessmentType::getOptions(
+                $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
+                $dialogAgentEnabled,
+            ),
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
@@ -311,7 +315,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,
             'accessibleFolderIds'  => $accessibleFolderIds,
-            'dialogAgentEnabled'   => $dialogAgentEnabled,
             'componentInstance'    => $this->getInstance(),
             'returnUrlName'        => Redirect::RETURN_URL,
             'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId()),
