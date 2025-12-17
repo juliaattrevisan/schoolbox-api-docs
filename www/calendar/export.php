@@ -131,7 +131,7 @@ switch ($_GET['format'] ?? '') {
  */
 try {
     // Actually build the export
-    $token              = $_GET['token'];
+    $token              = $_GET['token'] ?? null;
     $export_type        = $_GET['export'] ?? null;
     $filename           = 'calendar';
     $resourceId         = (int)($_GET['resource_id'] ?? 0);
