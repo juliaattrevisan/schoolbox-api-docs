@@ -97,8 +97,7 @@ async function postEditBookingForm(): Promise<void> {
             });
         }
     } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        toast.timeout({ text: `Unable to update booking(s) ${message}`, isSuccess: false });
+        toast.timeout({ text: "Unable to update booking(s)", isSuccess: false });
         console.warn(error);
     } finally {
         isProcessing.value = false;
@@ -140,8 +139,7 @@ async function postDeleteBookingForm(): Promise<void> {
             });
         }
     } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        toast.timeout({ text: `Unable to delete booking(s) ${message}`, isSuccess: false });
+        toast.timeout({ text: "Unable to delete booking(s)", isSuccess: false });
         console.warn(error);
     } finally {
         isProcessing.value = false;

@@ -1259,13 +1259,14 @@ class Controller extends Base
             );
         }
 
-        $this->response = $this->responseAsJson(
-            // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
-            [
-                'success' => true,
-                'nRowsAffected' => count($bookingIdsToUpdate),
-            ]
-        )->withStatus(self::HTTP_STATUS_CODE_OK);
+echo "This is not JSON";
+//        $this->response = $this->responseAsJson(
+//            // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
+//            [
+//                'success' => true,
+//                'nRowsAffected' => count($bookingIdsToUpdate),
+//            ]
+//        )->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 

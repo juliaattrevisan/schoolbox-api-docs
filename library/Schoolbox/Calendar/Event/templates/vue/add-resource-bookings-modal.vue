@@ -139,11 +139,10 @@ async function createNewBooking(): Promise<void> {
             updateToastAndRefreshPage(toast, responseData);
             isModalOpen.value = false; // Close the modal only on success.
         } else {
-            toast.timeout({ text: "Unable to create booking(s).", isSuccess: false });
+            toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });
         }
     } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        toast.timeout({ text: `Unable to create booking(s). ${message}`, isSuccess: false });
+        toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });
         console.warn(error);
     } finally {
         isProcessing.value = false;
