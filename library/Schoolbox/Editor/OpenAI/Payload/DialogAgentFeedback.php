@@ -5,7 +5,7 @@ namespace Schoolbox\Editor\OpenAI\Payload;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Admin\DialogAgent\Scenario\Model as Scenario;
-use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model as Criteria;
+use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model as Criterion;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as Response;
 
@@ -56,10 +56,10 @@ class DialogAgentFeedback
      * to be included inside the RESPONSE_FORMAT properties
      *
      * Placeholders:
-     * [CRITERIA_TITLE]
-     * [CRITERIA_PROMPT]
+     * [CRITERION_TITLE]
+     * [CRITERION_PROMPT]
      */
-    private const string PROMPT_SYSTEM_CRITERIA_CONTEXT = "[CRITERIA_TITLE]:\n-----\n[CRITERIA_PROMPT]";
+    private const string PROMPT_SYSTEM_CRITERIA_CONTEXT = "[CRITERION_TITLE]:\n-----\n[CRITERION_PROMPT]";
 
 
     /**
@@ -100,12 +100,12 @@ class DialogAgentFeedback
     /**
      * Get the key of a particular criteria for the structured output part of the prompt
      *
-     * @param Criteria $criterion
+     * @param Criterion $criterion
      * @return string
      */
-    public static function getPayloadCriteriaKey(Criteria $criterion): string
+    public static function getPayloadCriterionKey(Criterion $criterion): string
     {
-        return \sprintf("criteria_%d", $criterion->getId());
+        return \sprintf("criterion_%d", $criterion->getId());
     }
 
 
@@ -115,6 +115,7 @@ class DialogAgentFeedback
      * @param Scenario $scenario
      * @param Response $response
      * @return array
+     * @throws \JsonException
      */
     public function generate(Scenario $scenario, Response $response): array
     {
@@ -186,18 +187,18 @@ class DialogAgentFeedback
         $responseFormat = self::RESPONSE_FORMAT;
 
         foreach ($scenario->getCriteria() as $criterion) {
-            $fieldKey = \sprintf("criteria_%d", $criterion->getId());
+            $key = $this->getPayloadCriterionKey($criterion);
 
-            $responseFormat['schema']['properties'][self::getPayloadCriteriaKey($criterion)] = [
+            $responseFormat['schema']['properties'][$key] = [
                 'type' => 'string',
                 'description' => strtr(self::PROMPT_SYSTEM_CRITERIA_CONTEXT, [
-                    '[CRITERIA_TITLE]' => $criterion->getTitle(),
-                    '[CRITERIA_PROMPT]' => $criterion->getPrompt(),
+                    '[CRITERION_TITLE]' => $criterion->getTitle(),
+                    '[CRITERION_PROMPT]' => $criterion->getPrompt(),
                 ]),
             ];
 
             /* strict mode, so all property keys must be required  */
-            $responseFormat['schema']['required'][] = $fieldKey;
+            $responseFormat['schema']['required'][] = $key;
         }
 
         return $responseFormat;
@@ -210,6 +211,7 @@ class DialogAgentFeedback
      * @param DialogAgent $assessment
      * @param Response $response
      * @return string
+     * @throws \JsonException
      */
     private function generateUserFeedPrompt(DialogAgent $assessment, Response $response): string
     {

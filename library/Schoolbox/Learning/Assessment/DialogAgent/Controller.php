@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent;
 
 use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model as CriteriaModel;
+use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Model as CriteriaModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Term;

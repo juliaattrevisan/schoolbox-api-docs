@@ -29,11 +29,8 @@ class Model extends AbstractFeedback
 
     /**
      * A set of criteria fields that each have feedback content, all collated here to be treated as one big unit
-     * \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criteria[]
      *
-     * phpstorm complains about putting that into the actual typedef.
-     *
-     * @var GenericCollection
+     * @var GenericCollection<\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model>
      */
     private GenericCollection $criteria;
 
@@ -62,7 +59,7 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @return GenericCollection
+     * @return GenericCollection<\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model>
      */
     public function getCriteria(): GenericCollection
     {
@@ -71,7 +68,7 @@ class Model extends AbstractFeedback
 
 
     /**
-     * @param GenericCollection $criteria
+     * @param GenericCollection<\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model> $criteria
      * @return $this
      */
     public function setCriteria(GenericCollection $criteria): self

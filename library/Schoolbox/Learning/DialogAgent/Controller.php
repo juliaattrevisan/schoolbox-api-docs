@@ -21,7 +21,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
-use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper as CriteriaMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper as CriterionMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\LogFormat as AiLogFormat;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
@@ -70,7 +70,7 @@ class Controller extends Base
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
      * @param ScenarioMapper $scenarioMapper
      * @param FieldContextMapper $fieldContextMapper
-     * @param CriteriaMapper $criteriaMapper
+     * @param CriterionMapper $criterionMapper
      */
     public function __construct(
         private Access $access,
@@ -86,7 +86,7 @@ class Controller extends Base
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
         private ScenarioMapper $scenarioMapper,
         private FieldContextMapper $fieldContextMapper,
-        private CriteriaMapper $criteriaMapper,
+        private CriterionMapper $criterionMapper,
     ) {
     }
 
@@ -251,6 +251,8 @@ class Controller extends Base
      * @param User $student
      * @param Response $response
      * @return void
+     * @throws Error
+     * @throws RouteNotFound
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
     {
@@ -356,8 +358,9 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @param Response $response
-     * @throws ClientExceptionInterface
      * @return void
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
      */
     public function postMessage(DialogAgent $assessment, Response $response): void
     {
@@ -698,7 +701,7 @@ class Controller extends Base
 
         /* Compile scenario field names as header elements
          */
-        $criteria = $this->criteriaMapper->findByColumn('scenario_id', $assessment->getScenarioId());
+        $criteria = $this->criterionMapper->findByColumn('scenario_id', $assessment->getScenarioId());
 
         $fields = [];
 
@@ -759,8 +762,9 @@ class Controller extends Base
                 /* Compute outcomes for each criterion
                  */
                 if ($authoritativeFeedback) {
-                    foreach ($authoritativeFeedback->getCriteria() as $feedbackCriteria) {
-                        $feedbackFields[$feedbackCriteria->getCriteriaId()] = $feedbackCriteria->getBody();
+                    /** @var \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model $feedbackCriterion */
+                    foreach ($authoritativeFeedback->getCriteria() as $feedbackCriterion) {
+                        $feedbackFields[$feedbackCriterion->getScenarioCriterionId()] = $feedbackCriterion->getBody();
                     }
                 }
 
@@ -810,6 +814,9 @@ class Controller extends Base
      * @param Response $response
      * @return void
      * @throws ClientExceptionInterface
+     * @throws Deleted
+     * @throws Exception
+     * @throws \JsonException
      */
     public function postGenerateFeedback(DialogAgent $assessment, Response $response): void
     {

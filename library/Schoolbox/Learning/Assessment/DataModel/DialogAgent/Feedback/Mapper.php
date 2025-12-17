@@ -31,8 +31,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('response_id', self::TYPE_INTEGER, null, 'response');
-        $this->uses('criteria_id', self::TYPE_INTEGER, null, 'criteria');
-        $this->uses('body', self::TYPE_STRING, null, 'body');
+        $this->uses('learner_id', self::TYPE_INTEGER, null, 'learner');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -58,14 +57,19 @@ class Mapper extends \Schoolbox\Mapper
         );
 
         $this->joins(
-            'criteria_id',
-            \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper::class,
+            'learner_id',
+            \Schoolbox\UserMapper::class,
             'id',
             null,
             null,
-            'criteria',
-            'criteria',
+            'learner',
+            'learner',
         );
+
+        /* A set of many criterion (criteria) for a feedback.
+         * These are shown as content for individual cells in the status screen
+         */
+        $this->joinsReverseMulti('feedback_id', Criterion\Mapper::class, 'criteria', 'feedbackCriterion');
     }
 
 
@@ -76,17 +80,21 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString()
     {
-        return "
+        $select = "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
                 {$this->getJoinColumnString('response', 'response')},
-                {$this->getJoinColumnString('response.learner', 'response.learner')}
+                {$this->getJoinColumnString('response.learner', 'response.learner')},
+                {$this->getJoinColumnString('feedbackCriterion', 'feedbackCriterion')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('feedbackCriterion', '', 'feedbackCriterion', true)}
             INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
             INNER JOIN {$this->getJoinSql('response', '', 'response', true)}
             INNER JOIN {$this->getJoinSql('response.learner', 'response', 'response.learner', true)}
         ";
+
+        return $select;
     }
 
 
@@ -100,40 +108,62 @@ class Mapper extends \Schoolbox\Mapper
         $stack = $this->createCollection();
         $userMapper = $this->getJoinMapper('response.learner');
         $responseMapper = $this->getJoinMapper('response');
+        $feedbackCriterionMapper = $this->getJoinMapper('feedbackCriterion');
 
         foreach ($statement as $row) {
-            $feedback = $this->hydrate($row);
+            /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Model $feedback */
+            $feedback = $stack->offsetGet($row['id']);
 
-            /* The dialog agent needs an assessmentModel's id to associate responses with an assessment.
-             * Eventually this gets hydrated into Participant, which gives you access to each student's
-             * IResponse collections in the business logic as a convenience.
+            /* First time we've encountered this $feedback; init an instance that we'll reuse later
              */
-            /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessmentModel */
-            $assessmentModel = $this->createJoinModel('dialogAgent.assessmentModel', $row['dialogAgent.assessment_id']);
+            if (null === $feedback) {
+                /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Model $feedback */
+                $feedback = $this->hydrate($row);
 
-            /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent */
-            $dialogAgent = $this->createJoinModel('dialogAgent', $row['dialogAgent.id']);
-            $dialogAgent->setAssessmentModel($assessmentModel);
-
-            $feedback->setDialogAgent($dialogAgent);
-
-            /* Hydrate a corresponding Response instance
-             */
-            $response = $responseMapper->hydrate($row, 'response');
-
-            if ($response) {
-                /* Assign learner instance (wild! I don't think we have ever done it this way before)
+                /* The dialog agent needs an assessmentModel's id to associate responses with an assessment.
+                 * Eventually this gets hydrated into Participant, which gives you access to each student's
+                 * IResponse collections in the business logic as a convenience.
                  */
-                $learner = $userMapper->hydrate($row, 'response.learner');
+                /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessmentModel */
+                $assessmentModel = $this->createJoinModel('dialogAgent.assessmentModel', $row['dialogAgent.assessment_id']);
 
-                if ($learner) {
-                    $response->setLearner($learner);
+                /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent */
+                $dialogAgent = $this->createJoinModel('dialogAgent', $row['dialogAgent.id']);
+                $dialogAgent->setAssessmentModel($assessmentModel);
+
+                $feedback->setDialogAgent($dialogAgent);
+
+                /* Hydrate a corresponding Response instance
+                 */
+                /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model|null $response */
+                $response = $responseMapper->hydrate($row, 'response');
+
+                if ($response) {
+                    /* Assign learner instance (wild! I don't think we have ever done it this way before)
+                     */
+                    /** @var \Schoolbox\User|null $learner */
+                    $learner = $userMapper->hydrate($row, 'response.learner');
+
+                    if ($learner) {
+                        $response->setLearner($learner);
+                        $feedback->setLearner($learner);
+                    }
+
+                    $feedback->setResponse($response);
                 }
 
-                $feedback->setResponse($response);
+                /* Init a collection of Feedback Criteria
+                 */
+                $feedback->setCriteria($feedbackCriterionMapper->createCollection());
+
+                $stack->setOffset($feedback->getId(), $feedback);
             }
 
-            $stack->add($feedback);
+            /* Accumulate all the feedback criteria into a collection
+             */
+            $feedbackCriterion = $feedbackCriterionMapper->hydrate($row, 'feedbackCriterion');
+
+            $feedback->getCriteria()->add($feedbackCriterion);
         }
 
         return $stack;

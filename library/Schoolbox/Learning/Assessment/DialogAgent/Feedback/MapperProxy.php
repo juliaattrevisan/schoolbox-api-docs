@@ -107,53 +107,31 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         $responseTransformer = new Transformer();
 
-        /* $mapperModels contains EVERYONE's feedback rows so you have to group them by user, then by response id
-         * They might appear totally out of order so you maybe can't assume sequentially grouped rows nicely
-         */
-        $feedbackStacks = [];
-
         foreach ($mapperModels as $dataModel) {
-            $userId = $dataModel->getResponse()->getLearner()->getId();
-            $responseId = $dataModel->getResponse()->getId();
-
-            $feedbackStacks[$userId][$responseId][] = $dataModel;
-        }
-
-        /* Foreach of those, compile each feedback $dataModel into the set of Criteria in a Domain representation
-         */
-        foreach ($feedbackStacks as $userId => $feedbackData) {
-            /* These can't really have a primary key: they are an aggregation of many..........
-             * Init a GenericCollection to start with
-             */
             $domainObject = (new DomainObject())
-                ->setCriteria(new GenericCollection(\Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criteria::class));
+                ->setId($dataModel->getId())
+                ->setAssessable((new DialogAgentDomainObject())->setId($dataModel->getDialogAgent()?->getAssessmentModel()->getId()))
+                ->setResponse($responseTransformer->transformDataModel($dataModel->getResponse()))
+                ->setReviewee($dataModel->getResponse()->getLearner())
+                /* Init a stack of domain representation feedback criteria
+                 */
+                ->setCriteria(new GenericCollection(Criterion\Model::class))
+                /* TODO Who owns this?
+                 */
+                ->setReviewer(null)
+                ->setCreatedAt($dataModel->getCreatedAt())
+                ->setUpdatedAt($dataModel->getUpdatedAt())
+                ->setDeletedAt($dataModel->getDeletedAt());
 
-            /* Collate all the feedback per criterion into one big set
+            /* Accumulate each Feedback Criterion into the set
              */
-            foreach ($feedbackData as $responseId => $feedbacks) {
-                foreach ($feedbacks as $feedback) {
-                    /* Populating the feedback object for the first time; you only need to do this once, but you need
-                     * something from the $feedback instance to do it (.............wow)
-                     */
-                    if (!$domainObject->getCriteria()->count()) {
-                        $domainObject->setAssessable((new DialogAgentDomainObject())->setId($feedback->getDialogAgent()?->getAssessmentModel()->getId()))
-                            ->setResponse($responseTransformer->transformDataModel($feedback->getResponse()))
-                            ->setReviewee($feedback->getResponse()->getLearner())
-                            /* TODO Who owns this?
-                             */
-                            ->setReviewer(null)
-                            ->setCreatedAt($feedback->getCreatedAt())
-                            ->setUpdatedAt($feedback->getUpdatedAt())
-                            ->setDeletedAt($feedback->getDeletedAt());
-                    }
+            foreach ($dataModel->getCriteria() as $criterion) {
+                $feedbackObject = (new Criterion\Model())
+                    ->setId($criterion->getId())
+                    ->setScenarioCriterionId($criterion->getScenarioCriterion()->getId())
+                    ->setBody($criterion->getBody());
 
-                    $feedbackObject = (new Criteria())
-                        ->setCriteriaId($feedback->getCriteria()->getId())
-                        ->setBody($feedback->getBody());
-
-
-                    $domainObject->getCriteria()->setOffset($feedback->getCriteria()->getId(), $feedbackObject);
-                }
+                $domainObject->getCriteria()->add($feedbackObject);
             }
 
             /* Add this user's collated criteria feedback as one big unit
@@ -181,21 +159,30 @@ class MapperProxy extends Mapper\AbstractMapperProxy
          */
         $stack = new GenericCollection(DataModel::class);
 
-//        $responseTransformer = new Transformer();
-//
-//        foreach ($domainObjects as $domainObject) {
-//            $dataModel = new DataModel()
-//                ->setId($domainObject->getId())
-//                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
-//                ->setResponse($responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId()))
-//                ->setBody($domainObject->getComment())
-//                ->setCriteria((new \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model())->setId($domainObject->getCriteriaId()))
-//                ->setCreatedAt($domainObject->getCreatedAt())
-//                ->setUpdatedAt($domainObject->getUpdatedAt())
-//                ->setDeletedAt($domainObject->getDeletedAt());
-//
-//            $stack->add($dataModel);
-//        }
+        /* This only saves the domain representation of a feedback, -not- its related feedback criteria fields' values.
+         * You'll have to do that separately which is how large-assembly activities do it. For example, in Due Work,
+         * you need to set kami files and submission files separately via their *data mappers* which is an interesting
+         * plot twist. The AbstractMapperProxy predominantly works on root-level objects, not constituent pieces, unless
+         * you override the save() method there...but nothing ever did in any of our learning activities.
+         *
+         * As I suspected, utilisation of the Data Model mappers is the easiest way to accomplish large-assembly saves.
+         */
+        $responseTransformer = new Transformer();
+
+        foreach ($domainObjects as $domainObject) {
+            $response = $responseTransformer->transformDomainObject($domainObject->getResponse(), $domainObject->getAssessable()->getId());
+
+            $dataModel = new DataModel()
+                ->setId($domainObject->getId())
+                ->setDialogAgent((new DialogAgentDataModel())->setId($this->getInternalValue($domainObject->getAssessable()->getId())))
+                ->setResponse($response)
+                ->setLearner($response->getLearner())
+                ->setCreatedAt($domainObject->getCreatedAt())
+                ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setDeletedAt($domainObject->getDeletedAt());
+
+            $stack->add($dataModel);
+        }
 
         return $stack;
     }
