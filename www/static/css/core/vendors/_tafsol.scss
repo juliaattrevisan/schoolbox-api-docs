@@ -1072,28 +1072,14 @@ section {
         padding-inline: 0;
 
         & .applied-filter-tab {
-            & .label {
-                margin-bottom: 0.5rem;
-            }
-
             & .label,
             & .selected-item {
                 padding-block: 1rem !important;
             }
 
             & .selected-item {
-                background-color: #f7fafc;
-                border-radius: calc(var(--sbx-border-radius-normal) / 2);
-
-                &:not(:last-child) {
-                    margin-bottom: 0.5rem;
-                }
+                border-radius: calc(var(--sbx-border-radius-normal));
             }
-        }
-
-        & .filter-interaction {
-            border: 0 !important;
-            padding-bottom: 1.5rem;
         }
 
         & .filter-dropdown.flex-list {
@@ -1114,14 +1100,6 @@ section {
             background-color: transparent;
             display: flex;
             flex-direction: column;
-
-            & div:first-child {
-                order: 2;
-            }
-
-            & div:last-child {
-                order: 1;
-            }
 
             & .no-pad {
                 border-bottom: var(--border);
