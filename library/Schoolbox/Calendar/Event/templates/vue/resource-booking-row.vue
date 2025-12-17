@@ -89,6 +89,7 @@ async function postEditBookingForm(): Promise<void> {
                 text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} updated`,
                 isSuccess: true,
             });
+            isEditFormOpen.value = false; // Close edit form only on success.
         } else {
             toast.timeout({
                 text: `Unable to update booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
@@ -100,7 +101,6 @@ async function postEditBookingForm(): Promise<void> {
         toast.timeout({ text: `Unable to update booking(s) ${message}`, isSuccess: false });
         console.warn(error);
     } finally {
-        isEditFormOpen.value = false;
         isProcessing.value = false;
     }
 }
@@ -132,6 +132,7 @@ async function postDeleteBookingForm(): Promise<void> {
                 text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} deleted`,
                 isSuccess: true,
             });
+            isEditFormOpen.value = false; // Close edit form only on success.
         } else {
             toast.timeout({
                 text: `Unable to delete booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
@@ -143,7 +144,6 @@ async function postDeleteBookingForm(): Promise<void> {
         toast.timeout({ text: `Unable to delete booking(s) ${message}`, isSuccess: false });
         console.warn(error);
     } finally {
-        isEditFormOpen.value = false;
         isProcessing.value = false;
     }
 }
