@@ -613,6 +613,11 @@ class Controller extends Base
 
         $this->dialogAgentResponseMapper->save($response);
 
+        /* Soft-delete any feedbacks and feedback criteria that might already have existed; this caters for the Reopen
+         * scenario which would have already spawned a feedback.
+         */
+        $this->feedbackDataModelMapper->deleteByColumn('response_id', $response->getId());
+
         /** Respond as JSON with a consistent translated response data */
         $this->getStatus($response);
     }
