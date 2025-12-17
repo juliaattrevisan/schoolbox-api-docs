@@ -247,7 +247,7 @@ $selectize-caret-margin-rtl: 0 4px 0 -2px !default;
     [data-selectable] {
         cursor: pointer;
         overflow: hidden;
-        .highlight {
+        .highlight:not(.status) {
             background: $selectize-color-highlight;
             @include selectize-border-radius(1px);
         }

@@ -37,6 +37,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
@@ -64,6 +65,7 @@ class Controller extends Base
      * @param RequestFactoryInterface $httpFactory A HTTP request factory: required for creating requests to send to the task daemon.
      * @param MessageFactory $messageFactory A message factory: used to create the message to send to the task daemon.
      * @param Producer $messageProducer Used to send messages to the task daemon once built.
+     * @param Participant\DataSource $participantDataSource
      * @param OpenAI\ClientFactory $aiClientFactory
      * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
@@ -80,6 +82,7 @@ class Controller extends Base
         private RequestFactoryInterface $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
+        private Participant\DataSource $participantDataSource,
         private OpenAI\ClientFactory $aiClientFactory,
         private AILogMapper $aiLogMapper,
         private DialogAgentDataModelMapper $dialogAgentDataModelMapper,
@@ -249,12 +252,12 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @param User $student
-     * @param Response $response
+     * @param ?Response $response - If null, will find the authoritative response for the participant if any
      * @return void
      * @throws Error
      * @throws RouteNotFound
      */
-    public function getParticularResponse(DialogAgent $assessment, User $student, Response $response): void
+    public function getParticularResponse(DialogAgent $assessment, User $student, ?Response $response): void
     {
         $participant = $assessment->getParticipant($student);
 
@@ -265,6 +268,11 @@ class Controller extends Base
         $returnUrl = null;
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        }
+
+        if (!$response) {
+            /** @var ?Response $response */
+            $response = $participant->getAuthoritativeResponse(false);
         }
 
         /**
@@ -284,41 +292,43 @@ class Controller extends Base
             'createdAt' => $assessment->getCreatedAt(), // this message should always appear first
         ]);
 
-        /* Create an assistance request feed message if the user can see it */
-        $isViewerAnInstructor = $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
-        if ($response->getAssistanceRequestedAt() !== null && $isViewerAnInstructor) {
-            $feed->add([
-                'type' => 'alert',
-                'data' => [
-                    'side' => 'request',
-                    'severity' => 'warning-tint',
-                    'message' => \sprintf(
-                        '%s requested assistance %s',
-                        $student->getFullName(),
-                        $response->getAssistanceRequestedAt()->getRelativeTime(),
-                    ),
-                ],
-                'createdAt' => $response->getAssistanceRequestedAt(),
-            ]);
-        }
-
-        // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
-
-        if ($response->getSessionId()) {
-            $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
-                'order' => [ 'created_at' => 'ASC' ]
-            ]);
-
-            /** The strategy should always be AgentChat for each log */
-            $logStrategyFactory = new AILogTranslator\Format\StrategyFactory();
-            foreach ($logEntries as $log) {
-                $logFormat = AILogFormat::from($log->getLogFormat());
-                $strategy = $logStrategyFactory->makeStrategy($logFormat);
-                $feed->add($strategy->translateInput($log));
-                $feed->add($strategy->translateOutput($log));
+        if ($response) {
+            /* Create an assistance request feed message if the user can see it */
+            $isViewerAnInstructor = $this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
+            if ($response->getAssistanceRequestedAt() !== null && $isViewerAnInstructor) {
+                $feed->add([
+                    'type' => 'alert',
+                    'data' => [
+                        'side' => 'request',
+                        'severity' => 'warning-tint',
+                        'message' => \sprintf(
+                            '%s requested assistance %s',
+                            $student->getFullName(),
+                            $response->getAssistanceRequestedAt()->getRelativeTime(),
+                        ),
+                    ],
+                    'createdAt' => $response->getAssistanceRequestedAt(),
+                ]);
             }
 
-            // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+            // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
+
+            if ($response->getSessionId()) {
+                $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
+                    'order' => [ 'created_at' => 'ASC' ]
+                ]);
+
+                /** The strategy should always be AgentChat for each log */
+                $logStrategyFactory = new AILogTranslator\Format\StrategyFactory();
+                foreach ($logEntries as $log) {
+                    $logFormat = AILogFormat::from($log->getLogFormat());
+                    $strategy = $logStrategyFactory->makeStrategy($logFormat);
+                    $feed->add($strategy->translateInput($log));
+                    $feed->add($strategy->translateOutput($log));
+                }
+
+                // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+            }
         }
 
         $feed->sortByCallback(fn ($a, $b) => $a['createdAt'] <=> $b['createdAt']);
@@ -327,18 +337,76 @@ class Controller extends Base
         $responseLinksTranslator = new Translator\Links($this->routeGenerator, $this->getAuthorizer(), $this->getUser());
         $responseTranslator = new Translator\ModelToArray($responseLinksTranslator);
 
+        /**
+         * Generate the participant carousel, only if you have access to the status page
+         */
+        $statusRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ]);
+
+        $participantCarousel = [];
+        if ($statusRoute) {
+            /** since this route is loaded for a specific participant, only that participant is hydrated by the module. we need the rest */
+            $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
+            foreach ($assessment->getAllParticipants() as $participant) {
+                /* Are they excluded? ignore them */
+                if ($participant->isExcluded()) {
+                    continue;
+                }
+
+                $authoritativeResponse = null;
+                if ($participant->getAllResponses()->count()) {
+                    /** @var Response|null $authoritativeResponse */
+                    $authoritativeResponse = $assessment->getAuthoritativeResponse($participant, true);
+                }
+
+                $status = $authoritativeResponse?->getCurrentStatus() ?? Status::INCOMPLETE;
+
+                $participantCarousel[] = [
+                    'id' => $participant->getUser()->getId(),
+                    'value' => $this->getRouteIfAuthorized('learningDialogAgent.getParticularResponse', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId(),
+                        'student' => $participant->getUser(),
+                        'studentId' => $participant->getUser()->getId(),
+                    ]),
+                    'user' => $userTranslator->__invoke($participant->getUser()),
+                    'status' => $status,
+                    'statusLabel' => $status->translate(),
+                ];
+            }
+        }
+
+        /* If you can get to the status page, use that as it's more relevant.
+         * otherwise since students can access this route, fall back to the summary page
+         */
+        $assessmentCrumbRoute = $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ]);
+        if (!$assessmentCrumbRoute) {
+            $assessmentCrumbRoute = $this->getRouteIfAuthorized('learningAssessment.getSummary', [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId(),
+                'student' => $student,
+                'studentId' => $student->getId(),
+            ]);
+        }
+
         $data = [
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
                 $assessment->getTitle(),
-                $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+                $assessmentCrumbRoute,
             ])->add(['Response']),
             'assessment' => $assessment,
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
             'response' => $response,
-            'responseData' => $responseTranslator->__invoke($response),
+            'responseData' => $response ? $responseTranslator->__invoke($response) : null,
             'interactionLocked' => false, // TODO
             'returnUrl' => $returnUrl,
+            'participantCarousel' => $participantCarousel,
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -350,6 +418,35 @@ class Controller extends Base
                 $assessment->getTitle(),
             )
         );
+    }
+
+
+    /**
+     * Redirect user to the view page for the first participant in the assessment list
+     *
+     * @param DialogAgent $assessment
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getFirstParticipantResponse(DialogAgent $assessment)
+    {
+        $participants = $assessment->getAllParticipants()->filter(fn($participant) => !$participant->isExcluded());
+        $firstParticipant = $participants->first()?->getUser();
+
+        if ($firstParticipant instanceof User) {
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate('learningDialogAgent.getParticularResponse', [
+                    'assessment' => $assessment,
+                    'assessmentId' => $assessment->getId(),
+                    'student' => $firstParticipant,
+                    'studentId' => $firstParticipant->getId(),
+                ]),
+            );
+            return;
+        }
+
+        /* If the participant list is empty, nothing can be shown */
+        throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
     }
 
 

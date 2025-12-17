@@ -179,6 +179,15 @@ Data:
                                                 <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                                             {% endif %}
                                         {% endif %}
+                                        {% if assessable is dialogAgent %}
+                                            {% set viewResponseRoute = routeLookupIfAuthorized('learningDialogAgent.getFirstParticipantResponse', {
+                                                assessmentId: assessable.id,
+                                                assessment: assessable,
+                                            }) %}
+                                            {% if viewResponseRoute %}
+                                                <li><a class="icon-task" href="{{ viewResponseRoute }}">View Responses</a></li>
+                                            {% endif %}
+                                        {% endif %}
                                         {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
                                             assessmentId: assessable.id,
                                             assessment: assessable

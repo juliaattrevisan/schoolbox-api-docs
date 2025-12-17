@@ -8,12 +8,19 @@
  # @param array $feed                     The agent chat feed data current response
  # @param array $student                  Array of author info about the student who owns the response
  # @param DialogAgent\Response $response  The response that we are viewing
- # @param array $responseData             Array translation of the response to pass to Vue
+ # @param array|null $responseData        Array translation of the response to pass to Vue
  # @param bool $interactionLocked         Is the assessment due in an archived term?
  # @param string|null $returnUrl          An optional redirect destination, otherwise actions reload the page
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
+
+{% if participantCarousel is defined and participantCarousel|length > 1 %}
+    {% include '@learningAssessment/dialogAgent/fragments/participantCarousel.twig' with {
+        students: participantCarousel,
+        selectedStudentId: student.id
+    } only %}
+{% endif %}
 
 <div class="actions-small-1 row">
     <div class="small-12 island">
@@ -22,17 +29,9 @@
         {% import '@learning/macro/dueDate.twig' as dueDate %}
         {% import '@learningAssessment/fragments/macro/duration.twig' as duration %}
         <ul class="meta">
-            <li class="icon-user">
-                {{ locale.dialogAgent.proper }} with
-
-                {% if student._links.profile is defined %}
-                    <a href="{{ student._links.profile }}">{{ student.fullName }}</a>
-                {% else %}
-                    {{ student.fullName }}
-                {% endif %}
-            </li>
-
-            {% if response.isSubmitted %}
+            {% if not response %}
+                {# noop; empty state below #}
+            {% elseif response.isSubmitted %}
                 <li class="icon-calendar">
                     Submitted <time title="{{ response.submittedAt.local }}">{{ response.submittedAt.relativeDayWithoutMidnight }}</time>
                 </li>
@@ -62,23 +61,20 @@
 
 <div class="row">
     <div class="small-12 island">
-        {# Apparently we _really_ want this to be a centered snowflake #}
-        <section class="content c-max-width--medium l-mar--auto-horiz">
-            <div id="dialog-agent-response-container" data-test="dialog-agent-response-container">
-                {% set summaryRoute = routeLookup('learningAssessment.getSummary', {
-                    assessmentId: assessment.id,
-                    assessment: assessment,
-                    studentId: student.id
-                }) %}
-                <dialog-agent-response-view
-                    :feed="{{ feed |json_encode }}"
-                    :response="{{ responseData |json_encode }}"
-                    :student="{{ student |json_encode }}"
-                    summary-route="{{ summaryRoute }}"
-                    return-url="{{ returnUrl }}"
-                />
-            </div>
-            <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentResponse.js?v={{ config.site_version }}"></script>
-        </section>
+        <div id="dialog-agent-response-container" data-test="dialog-agent-response-container">
+            {% set summaryRoute = routeLookup('learningAssessment.getSummary', {
+                assessmentId: assessment.id,
+                assessment: assessment,
+                studentId: student.id
+            }) %}
+            <dialog-agent-response-view
+                :feed="{{ feed |json_encode }}"
+                :response="{{ responseData |json_encode }}"
+                :student="{{ student |json_encode }}"
+                summary-route="{{ summaryRoute }}"
+                return-url="{{ returnUrl }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentResponse.js?v={{ config.site_version }}"></script>
     </div>
 </div>

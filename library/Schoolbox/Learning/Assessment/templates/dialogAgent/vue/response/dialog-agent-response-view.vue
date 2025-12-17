@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import locale from "@js/terminology/rosettaStone";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
@@ -48,15 +49,22 @@ function onAction(): void {
         />
     </Teleport>
 
-    <ac-feed
-        ref="feedRef"
-        class="l-mar-m--bottom ac-feed"
-        min-height="20rem"
-        :max-height="undefined"
-        :feed="acStore.fullFeed"
-        error-prefix="There was a problem retrieving the response."
-    />
-    <span class="meta">AI sometimes gets things wrong — please check important details.</span>
+    <div v-if="!props.response" class="empty-state">
+        <i class="icon-dialog-agent"></i>
+        <p>{{ props.student.fullName }} has not started a response for this {{ locale.dialogAgent.singular() }} yet.</p>
+    </div>
+    <!-- Apparently we _really_ want this to be a centered snowflake -->
+    <section v-else class="content c-max-width--medium l-mar--auto-horiz">
+        <ac-feed
+            ref="feedRef"
+            class="l-mar-m--bottom ac-feed"
+            min-height="20rem"
+            :max-height="undefined"
+            :feed="acStore.fullFeed"
+            error-prefix="There was a problem retrieving the response."
+        />
+        <span class="meta">AI sometimes gets things wrong — please check important details.</span>
+    </section>
 </template>
 
 <style scoped lang="scss">
