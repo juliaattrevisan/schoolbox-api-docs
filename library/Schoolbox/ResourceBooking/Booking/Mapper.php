@@ -706,7 +706,11 @@ class Mapper extends BaseMapper
      *              Eg. getPeriodsOfFutureApprovedBookingsByResourceId($resourceIds, sortByStartDatetimeAsc: true)
      * @return array
      */
-    public function getPeriodsOfFutureApprovedBookingsByResourceId(array $resourceIds, bool $sortByStartDatetimeAsc = false): array
+    public function getPeriodsOfFutureApprovedBookingsByResourceId(
+        array $resourceIds,
+        bool $sortByStartDatetimeAsc = false,
+        array $bookingIdsToExclude = [],
+    ): array
     {
         if (count($resourceIds) === 0) {
             return [];
@@ -724,6 +728,7 @@ class Mapper extends BaseMapper
             AND rb.deleted_at IS NULL
             AND rb.resource_id IN (" . implode(',', array_map('intval', $resourceIds)) . ")
             AND COALESCE(rb.end_datetime, e.end_datetime) > NOW()
+            " . ($bookingIdsToExclude ? "AND rb.id NOT IN (" . implode(',', array_map('intval', $bookingIdsToExclude)) . ")" : '') . "
             " . ($sortByStartDatetimeAsc ? 'ORDER BY COALESCE(rb.start_datetime, e.start_datetime) ASC' : '') . '
         ';
         $statement = $this->getDatabase()->prepare($query);

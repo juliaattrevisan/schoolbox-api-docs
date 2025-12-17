@@ -1132,6 +1132,21 @@ class Controller extends Base
             throw new SchoolboxException('Booking/event mismatch when saving booking.');
         }
 
+        /** @var BookingItemModel $resource */
+        try {
+            $resource = $this->bookingItemMapper->findById($booking->getResource()->getId());
+        } catch (MapperException $e) {
+            throw new SchoolboxException('Cannot find the booked resource.');
+        }
+
+        // Check whether the user has permission to book the resource.
+        $route = 'resourceBooking.createBooking';
+        if (!$this->authorizer->isPathAuthorizedForUser($route, [$resource->getId()], $this->user)) {
+            throw new SchoolboxException(
+                "You do not have permission to create bookings for resource '{$resource->getName()}'."
+            );
+        }
+
         $isEditOfSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
 
         // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
@@ -1197,6 +1212,22 @@ class Controller extends Base
                 $loopBooking->setBookingEndAt($loopEventEnd->addMinutes($endIncrementFromEventInMinutes));
             }
             $loopBooking->setNotes($notes);
+        }
+
+        // Check whether each hypothetical moved booking would result in a clash.
+        $isClashByBookingId = $this->checkForClashesIfResourceBookingsMoved(
+            $bookingsToUpdate,
+            new GenericCollection(
+                BookingItemModel::class,
+                [$booking->getResource()->getId() => $booking->getResource()]
+            )
+        );
+
+        // Set booking status to pending the booking is a clash.  Otherwise the status can stay as it was.
+        foreach ($bookingsToUpdate as $bookingToUpdate) {
+            if ($isClashByBookingId[$bookingToUpdate->getId()]) {
+                $bookingToUpdate->setStatus(BookingStatusModel::STATUS_PENDING);
+            }
         }
 
         try {
@@ -1345,6 +1376,53 @@ class Controller extends Base
         return $isClashByResourceIdByEventId;
     }
 
+    /**
+     * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
+     * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
+     * TODO: Move this function into a helper class.
+     * @param GenericCollection<int, BookingItemModel> $resourceById
+     *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
+     * @param GenericCollection<int, BookingModel> $movedBookings
+     *  - Bookings to check for clashes.  This array should contain all the bookings that are moved in $movedBookings.
+     * @return array
+     */
+    private function checkForClashesIfResourceBookingsMoved(
+        GenericCollection $movedBookings,
+        GenericCollection $resourceById,
+    ): array {
+        $isClashByBookingId = [];
+
+        $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
+            $resourceById->keys(),
+            sortByStartDatetimeAsc: true,
+            // Exclude the moved bookings themselves when finding periods of approved bookings that potentially clash.
+            bookingIdsToExclude: $movedBookings->map(fn ($movedBooking) => $movedBooking->getId(), $movedBookings)->getAll()
+        );
+
+        // For each booking, check for clashes with existing approved bookings of the same resource.
+        /** @var BookingModel $movedBooking*/
+        foreach ($movedBookings as $movedBooking) {
+            $isClashByBookingId[$movedBooking->getId()] = false; // Assume no clash until a clash is found.
+            $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$movedBooking->getResource()->getId()] ?? [];
+            foreach ($periodsOfApprovedBookings as $period) {
+                if ($period['startDatetime']->gt($movedBooking->getBookingEndAt())) {
+                    // The $periods are sorted by start datetime ascending,
+                    // so we can be sure that no other periods will clash with $movedBooking.
+                    break;
+                }
+
+                if (
+                    $period['startDatetime']->lt($movedBooking->getBookingEndAt()) &&
+                    $period['endDatetime']->gt($movedBooking->getBookingStartAt())
+                ) {
+                    // If $movedBooking was persisted, it would clash with an approved booking for $period.
+                    $isClashByBookingId[$movedBooking->getId()] = true;
+                }
+            }
+        }
+
+        return $isClashByBookingId;
+    }
 
     /**
      * Return the status to be set for a new booking that does not clash with any existing booking.
