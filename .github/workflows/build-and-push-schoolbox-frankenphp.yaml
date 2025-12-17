@@ -41,9 +41,9 @@ jobs:
     strategy:
       matrix:
         build:
-          - runs-on: onprem-k3s
-            platform: linux
-            arch: amd64
+#          - runs-on: onprem-k3s
+#            platform: linux
+#            arch: amd64
           - runs-on: onprem-k3s-arm
             platform: linux
             arch: arm64
