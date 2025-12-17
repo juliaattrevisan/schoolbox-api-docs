@@ -142,7 +142,7 @@ class DataSync
             $this->schoolboxDb->beginTransaction();
         }
         try {
-            $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
+            $bridgeFactory = new BridgeFactory($this->canvasDb);
 
             $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
             $accountBridge    = new Bridge\Account($this->schoolboxDb);
@@ -162,7 +162,6 @@ class DataSync
             $this->syncCourseQuiz($assignmentBridge, $courseBridge);
             // Defer building this one till as late as possible (it can take a while)
             $sectionBridge = $bridgeFactory->getCourseSection(
-                $this->canvasDb,
                 $this->schoolboxDb,
                 $this->folderMapper,
                 $courseBridge,

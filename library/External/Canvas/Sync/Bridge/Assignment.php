@@ -12,6 +12,7 @@ namespace External\Canvas\Sync\Bridge;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
+use External\Canvas\Importer\CanvasDb;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
@@ -51,11 +52,16 @@ class Assignment
     /**
      * @param GenericCollection|SubmissionBox\MarkType[] $markTypes
      * @param GenericCollection|WorkType\Model[]         $workTypes
+     * @param CanvasDb                                 $canvasDb
      */
-    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
+    public function __construct(
+        GenericCollection $markTypes,
+        GenericCollection $workTypes,
+        private CanvasDb $canvasDb,
+    )
     {
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypes    = $workTypes->shallowClone()->indexBy('name');
+        $this->workTypes    = $this->workTypes->indexBy('id');
     }
 
     /**
@@ -180,22 +186,7 @@ class Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        $config = [
-            self::QUIZ_TYPE_PRACTICE      => 11,
-            self::QUIZ_TYPE_ASSIGNMENT    => 11,
-            self::QUIZ_TYPE_SURVEY        => 11,
-            self::QUIZ_TYPE_GRADED_SURVEY => 11,
-        ];
-        if (!array_key_exists($quizType, $config)) {
-            return null;
-        }
-        $workTypeId = $config[$quizType];
-        foreach ($this->workTypes as $workType) {
-            if ($workType->getId() === $workTypeId) {
-                return $workType;
-            }
-        }
-        return null;
+        return $this->workTypes[$this->canvasDb->quiz_worktype] ?? null;
     }
 
     /**

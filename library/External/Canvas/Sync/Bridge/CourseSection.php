@@ -128,7 +128,7 @@ class CourseSection
      */
     public function syncCanvasMarks(): bool
     {
-        return true;
+        return $this->canvasDb->import_grades;
     }
 
     /**
