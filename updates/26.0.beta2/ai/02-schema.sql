@@ -1,3 +1,6 @@
+-- Rename plural to singular
+rename table dialog_agent_scenario_criteria to dialog_agent_scenario_criterion;
+
 -- AI-generated feedback for the responses made by students
 -- This is each cell's feedback value (ie. the feedback per scenario criterion)
 CREATE TABLE `dialog_agent_feedback_criterion` (
@@ -34,9 +37,6 @@ alter table dialog_agent_feedback
 
 alter table dialog_agent_feedback
     drop column criteria_id;
-
--- Rename plural to singular
-rename table dialog_agent_scenario_criteria to dialog_agent_scenario_criterion;
 
 -- Restore some keys and stuff
 alter table dialog_agent_feedback
