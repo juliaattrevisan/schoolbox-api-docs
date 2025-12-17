@@ -710,8 +710,7 @@ class Mapper extends BaseMapper
         array $resourceIds,
         bool $sortByStartDatetimeAsc = false,
         array $bookingIdsToExclude = [],
-    ): array
-    {
+    ): array {
         if (count($resourceIds) === 0) {
             return [];
         }
