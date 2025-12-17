@@ -22,18 +22,29 @@ class Create extends Request
     {
         $this->courseSpecId = $courseSpecId;
 
-        $this->setReferer("/course/modify/$courseSpecId");
-        $this->setFormParam('name', '');
+        $this->setReferer("/course/plan/$courseSpecId");
+        $this->setContentType('application/json');
+        $this->setFormParam('names', ['']);
+    }
+
+    /**
+     * This is always POST
+     *
+     * @return string
+     */
+    public function getMethod(): string
+    {
+        return 'POST';
     }
 
     public function setName(string $name): void
     {
-        $this->setFormParam('name', $name);
+        $this->setFormParam('names', [$name]);
     }
 
 
     public function getUrl(): string
     {
-        return "/course/{$this->courseSpecId}/unitspecs/new";
+        return "/course/plan/{$this->courseSpecId}/newUnits";
     }
 }
