@@ -1168,7 +1168,7 @@ class Controller extends Base
             // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
             // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
             $this->response = $this->responseAsJson(
-                // The data structure here must match type 'EditBookingResponse' in edit-resource-booking-modal.vue.
+                // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
                 [
                     'success' => false,
                     'nRowsAffected' => 0,
@@ -1242,7 +1242,7 @@ class Controller extends Base
         }
 
         $this->response = $this->responseAsJson(
-            // The data structure here must match type 'EditBookingResponse' in edit-resource-booking-modal.vue.
+            // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
             [
                 'success' => true,
                 'nRowsAffected' => count($bookingIdsToUpdate),
@@ -1302,7 +1302,7 @@ class Controller extends Base
             // We did not succeed in deleting the booking, but this is an expected outcome - it will occur if the
             // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
             $this->response = $this->responseAsJson(
-                // The data structure here must match type 'DeleteBookingResponse' in edit-resource-booking-modal.vue.
+                // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
                 [
                     'success' => false,
                     'nRowsAffected' => 0,
@@ -1320,7 +1320,7 @@ class Controller extends Base
         }
 
         $this->response = $this->responseAsJson(
-            // The data structure here must match type 'DeleteBookingResponse' in edit-resource-booking-modal.vue.
+            // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
             [
                 'success' => true,
                 'nRowsAffected' => count($bookingIdsToDelete)
