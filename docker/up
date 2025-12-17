@@ -16,6 +16,7 @@ declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
 declare RABBITMQ_MANAGEMENT_PUBLISHED_PORT
 declare BASE_PHP_IMAGE_BUILD_FROM_LOCAL
+declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
 declare PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID
@@ -233,6 +234,21 @@ function start_containers() {
                 --build-arg "ENV=dev" \
                 --build-arg "PHP_MAJOR_VERSION=${PHP_MAJOR_VERSION}" \
                 "docker/base-images/php-frankenphp/"
+            ;;
+        *)
+            ;;
+    esac
+
+    # If TASKD_BUILD_FROM_LOCAL:
+    # run `composer install` locally
+    case "${TASKD_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            (cd ../taskd && docker run -it \
+                --volume $PWD:/app \
+                --user "${SUDO_UID:-$(id -u)}:${SUDO_GID:-$(id -g)}" \
+                composer:2.8 \
+                install --ignore-platform-reqs
+            )
             ;;
         *)
             ;;

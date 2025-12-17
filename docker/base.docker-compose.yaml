@@ -360,17 +360,6 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
 
-  schoolbox-taskd:
-    container_name: schoolbox-taskd
-    depends_on:
-      redis-storage:
-        condition: service_healthy
-    build:
-      context: ./schoolbox-taskd
-    env_file:
-      - path: ./schoolbox-taskd/default.env
-        required: true
-
   # This has the devkit mounted
   devkit-lti1p3-nginx:
     container_name: devkit-lti1p3-nginx
