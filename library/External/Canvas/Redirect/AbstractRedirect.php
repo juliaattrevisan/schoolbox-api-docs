@@ -43,11 +43,16 @@ class AbstractRedirect
      */
     private const NAME = 'View in Canvas';
 
+
+    /** start deprecations these are now unused */
+
     /**
      * Canvas course id is {folder_code}{parent_folder_code}
      *     options are:
      * {folderCode} $folder->getCodeString()
      * {parentCode} $parentFolder->getCodeString()
+     *
+     * @deprecated now handled in admin config canvas_sissourceid_template
      */
     protected string $courseIdFormat = '{folderCode}{parentCode}';
 
@@ -70,6 +75,8 @@ class AbstractRedirect
      * courses or course_selections
      */
     protected string $courseCodeTable = self::SIS_SOURCE_ID_COURSE_TABLE;
+
+    /** end deprecation space */
 
     /**
      * The host url for canvas instance at this school
