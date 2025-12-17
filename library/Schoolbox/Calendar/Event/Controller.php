@@ -1121,8 +1121,6 @@ class Controller extends Base
             throw new SchoolboxException('Missing required data in form submission.');
         }
 
-        // TODO: If efficacy is EFFICACY_SERIES, update all events in series.
-
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
@@ -1134,21 +1132,88 @@ class Controller extends Base
             throw new SchoolboxException('Booking/event mismatch when saving booking.');
         }
 
-        $startDatetime = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
-        $endDatetime = new Alaress_Date_Format($endDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        $isEditOfSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
 
-        $booking->setBookingStartAt($startDatetime);
-        $booking->setBookingEndAt($endDatetime);
-        $booking->setNotes($notes);
-
-        try {
-            $this->bookingMapper->save($booking);
-        } catch (MapperException) {
-            throw new SchoolboxException('Could not save booking.');
+        // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
+        if ($isEditOfSeries) {
+            $eventById = $this->eventMapper->getAllInSeriesNew($event->getSeriesId(), futureEventsOnly: true)->indexBy('id');
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
         }
 
-        // The response data structure must match type 'EditBookingResponse' defined in edit-resource-booking-modal.vue.
-        $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
+        // Find all bookings to update in one query.
+        $bookingIdsToUpdate = $this->bookingMapper->findIdsByResourceIdForEvents(
+            $booking->getResource()->getId(),
+            $eventById->keys(),
+            futureBookingsOnly: true
+        );
+
+        if (count($bookingIdsToUpdate) === 0) {
+            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
+            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $this->response = $this->responseAsJson(
+                // The data structure here must match type 'EditBookingResponse' in edit-resource-booking-modal.vue.
+                [
+                    'success' => false,
+                    'nRowsAffected' => 0,
+                ]
+            )->withStatus(self::HTTP_STATUS_CODE_OK);
+            return;
+        }
+
+        // When updating booking start/end datetimes, we don't want to set all bookings in the series to the same period.
+        // Instead, we want to set each booking period to start at the same time relative to the linked event, and end
+        // at the same time relative to the linked event.
+        // Example: If we have a series of events recurring Monday to Friday from 1pm to 2pm, and the user edits the
+        // Monday booking to start half an hour before the event, and end half an hour after the event, then we want
+        // each booking in the series to also start half an hour before the event and end half an hour after the event.
+        $eventStart = $booking->getEvent()->getStartDateTime();
+        $eventEnd = $booking->getEvent()->getEndDateTime();
+        $newBookingStart = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        $newBookingEnd = new Alaress_Date_Format($endDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        $startIncrementFromEventInMinutes = $eventStart?->diffInMinutes($newBookingStart, false);
+        $endIncrementFromEventInMinutes = $eventEnd?->diffInMinutes($newBookingEnd, false);
+
+        // Get the bookings to update from the ids obtained earlier, and hydrate the linked events.
+        $bookingsToUpdate = $this->bookingMapper->findByColumn('id', $bookingIdsToUpdate);
+        foreach ($bookingsToUpdate as $bookingToUpdate) {
+            $bookingToUpdate->setEvent($eventById[$bookingToUpdate->getEvent()->getId()]);
+        }
+
+        foreach ($bookingsToUpdate as $loopBooking) {
+            $loopEventStart = $loopBooking->getEvent()->getStartDateTime();
+            $loopEventEnd = $loopBooking->getEvent()->getEndDateTime();
+
+            // Only update the booking period if we have the necessary ingredients for the calculation.
+            if (
+                $loopEventStart !== null &&
+                $loopEventEnd !== null &&
+                $startIncrementFromEventInMinutes !== null &&
+                $endIncrementFromEventInMinutes !== null
+            ) {
+                $loopBooking->setBookingStartAt($loopEventStart->addMinutes($startIncrementFromEventInMinutes));
+                $loopBooking->setBookingEndAt($loopEventEnd->addMinutes($endIncrementFromEventInMinutes));
+            }
+            $loopBooking->setNotes($notes);
+        }
+
+        try {
+            $this->bookingMapper->save($bookingsToUpdate);
+        } catch (MapperException) {
+            throw new SchoolboxException(
+                'Could not update booking' . ($isEditOfSeries ? 's in series of events' : '') . '.'
+            );
+        }
+
+        $this->response = $this->responseAsJson(
+            // The data structure here must match type 'EditBookingResponse' in edit-resource-booking-modal.vue.
+            [
+                'success' => true,
+                'nRowsAffected' => count($bookingIdsToUpdate),
+            ]
+        )->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
@@ -1201,8 +1266,9 @@ class Controller extends Base
 
         if (count($bookingIdsToDelete) === 0) {
             // We did not succeed in deleting the booking, but this is an expected outcome - it will occur if the
-            // booking has already been deleted.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
             $this->response = $this->responseAsJson(
+                // The data structure here must match type 'DeleteBookingResponse' in edit-resource-booking-modal.vue.
                 [
                     'success' => false,
                     'nRowsAffected' => 0,
@@ -1219,8 +1285,8 @@ class Controller extends Base
             );
         }
 
-        // The response data structure must match type 'DeleteBookingResponse' defined in edit-resource-booking-modal.vue.
         $this->response = $this->responseAsJson(
+            // The data structure here must match type 'DeleteBookingResponse' in edit-resource-booking-modal.vue.
             [
                 'success' => true,
                 'nRowsAffected' => count($bookingIdsToDelete)

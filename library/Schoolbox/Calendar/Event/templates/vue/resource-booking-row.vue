@@ -20,7 +20,7 @@ const emit = defineEmits<{
 /**
  * This defines the server response to a request to ENDPOINTS.editBookingPath().
  */
-type EditBookingResponse = { success: boolean };
+type EditBookingResponse = { success: boolean; nRowsAffected: number };
 
 /**
  * This defines the server response to a request to ENDPOINTS.deleteBookingPath().
@@ -85,13 +85,19 @@ async function postEditBookingForm(): Promise<void> {
         });
         const responseData = (await response.json()) as EditBookingResponse;
         if (response.ok && responseData.success) {
-            toast.timeout({ text: "Booking updated", isSuccess: true });
+            toast.timeout({
+                text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} updated`,
+                isSuccess: true,
+            });
         } else {
-            toast.timeout({ text: "Unable to update booking", isSuccess: false });
+            toast.timeout({
+                text: `Unable to update booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
+                isSuccess: false,
+            });
         }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        toast.timeout({ text: `Unable to update booking ${message}`, isSuccess: false });
+        toast.timeout({ text: `Unable to update booking(s) ${message}`, isSuccess: false });
         console.warn(error);
     } finally {
         isEditFormOpen.value = false;
