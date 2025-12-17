@@ -762,11 +762,11 @@ class Controller extends Base
                 /* Compute outcomes for each criterion
                  */
                 if ($authoritativeFeedback) {
+                    /** @var \Schoolbox\Learning\Assessment\DialogAgent\Feedback\Criterion\Model $feedbackCriterion */
                     foreach ($authoritativeFeedback->getCriteria() as $feedbackCriterion) {
                         $feedbackFields[$feedbackCriterion->getScenarioCriterionId()] = $feedbackCriterion->getBody();
                     }
                 }
-
 
                 /* Slam them all together if they're part of the requested set of states
                  */
