@@ -698,10 +698,16 @@ class SitePage
      */
     public function goLoginPage()
     {
-        $parts = parse_url($_SERVER['REQUEST_URI']);
-        if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
-            if ($parts['path'] != '/') {
-                $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        // Use PHP_URL_PATH to get the path as a string; fall back to '/' if unavailable.
+        $path = parse_url($requestUri, PHP_URL_PATH);
+        if ($path === false || $path === null || $path === '') {
+            $path = '/';
+        }
+
+        if (!($path === '/login/' || $path === '/login')) {
+            if ($path !== '/') {
+                $this->localRedir('/login/?page=' . rawurlencode($requestUri));
             } else {
                 $this->localRedir('/login/');
             }
