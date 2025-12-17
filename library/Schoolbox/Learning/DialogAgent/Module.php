@@ -161,7 +161,7 @@ class Module extends BaseModule
                 $canWrite,
                 new AssessmentNotDeleted(),
                 new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
-            )
+            ),
         );
 
         /* Route Definitions
@@ -172,8 +172,14 @@ class Module extends BaseModule
 
         /* Create a dialog agent's configuration
          */
-        $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
-        $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', new Rule\All(
+            $isFeatureEnabled,
+            $canModify,
+        ), $preloadAssessment);
+        $this->register('POST', "{$assRoute}/configure", 'postUpdate', new Rule\All(
+            $isFeatureEnabled,
+            $canModify,
+        ), $preloadAssessment);
 
         /* Instructor sends a message to the chat agent sandbox
          */
