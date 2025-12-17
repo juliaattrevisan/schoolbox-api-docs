@@ -52,7 +52,7 @@ class Controller extends ConfigController
      * @throws MapperException
      * @throws RouteNotFound
      * @throws \Twig\Error\Error
-     * @api GET /adminv2/pastoral/differentiation-profiles
+     * @api GET /adminv2/differentiation/differentiation-profiles
      */
     public function getIndex(): void
     {
@@ -109,7 +109,7 @@ class Controller extends ConfigController
      *
      * @throws \Exception
      * @throws MapperException
-     * @api POST /adminv2/pastoral/differentiation-profiles
+     * @api POST /adminv2/differentiation/differentiation-profiles
      */
     public function postConfig(): void
     {

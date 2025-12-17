@@ -229,31 +229,41 @@ class Controller extends Base
 
         $pastoralIds = $this->pastoralMapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
 
-        $cursor = new MapperCursor(
-            $this->pastoralMapper,
-            $this->mapper::DEFAULT_LIMIT,
-            /* Sort the pastoral records by the most recently created first
-             */
-            ['created_at' => PastoralMapper::SORT_ORDER_DESC],
-            $this->pastoralMapper->getPredicateBuilder()
-                                 ->in('id', $pastoralIds)
-        );
+        if (\count($pastoralIds) > 0) {
+            $cursor = new MapperCursor(
+                $this->pastoralMapper,
+                $this->mapper::DEFAULT_LIMIT,
+                /* Sort the pastoral records by the most recently created first
+                 */
+                ['created_at' => PastoralMapper::SORT_ORDER_DESC],
+                $this->pastoralMapper->getPredicateBuilder()
+                                     ->in('id', $pastoralIds)
+            );
 
-        $data           = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
-        $this->response = $this->responseAsJson(
-            [
-                'data'     => [
-                    'results' => $data->map($this->pastoralTranslator),
+            $results = $cursor->retrieveResults($this->requestQuery->get('cursor'));
+            $data    = $results->map($this->pastoralTranslator);
+            $count   = $cursor->retrieveResultCount();
+            $next    = $cursor->next($results);
+            $current = $cursor->current($results);
+        } else {
+            $data    = [];
+            $count   = 0;
+            $next    = null;
+            $current = null;
+        }
+
+        $this->response = $this->responseAsJson([
+            'data'     => [
+                'results' => $data,
+            ],
+            'metadata' => [
+                'count'  => $count,
+                'cursor' => [
+                    'next'    => $next,
+                    'current' => $current,
                 ],
-                'metadata' => [
-                    'count'  => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'next'    => $cursor->next($data),
-                        'current' => $cursor->current($data),
-                    ],
-                ],
-            ]
-        );
+            ],
+        ]);
     }
 
     /**
