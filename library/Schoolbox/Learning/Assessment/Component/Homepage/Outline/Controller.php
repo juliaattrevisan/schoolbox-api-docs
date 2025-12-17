@@ -298,6 +298,11 @@ class Controller extends Component_Homepage_ControllerAbstract
             );
         }
 
+        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $featureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+        $dialogAgentEnabled = $aiConfig->isEnabled($featureConfig);
+
         $data = [
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
@@ -306,6 +311,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,
             'accessibleFolderIds'  => $accessibleFolderIds,
+            'dialogAgentEnabled'   => $dialogAgentEnabled,
             'componentInstance'    => $this->getInstance(),
             'returnUrlName'        => Redirect::RETURN_URL,
             'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId()),

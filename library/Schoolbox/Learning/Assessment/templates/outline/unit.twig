@@ -39,10 +39,12 @@
                     <li><a href="{{ createAssessmentRoute }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-test="course-outline-menu-add-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
                     <li><a href="{{ createAssessmentRoute }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task" data-test="course-outline-menu-add-task">Task</a></li>
                     {% if config.lti_assessments_enable %}
-                    <li><a href="{{ createAssessmentRoute }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">3rd Party Assessment</a></li>
+                        <li><a href="{{ createAssessmentRoute }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">3rd Party Assessment</a></li>
                     {% endif %}
                     <li><a href="{{ createAssessmentRoute }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan" data-test="course-outline-menu-add-lesson-plan">{{ locale.lessonPlan.proper }}</a></li>
-                    <li><a href="{{ createAssessmentRoute }}?type=dialogAgent&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-dialog-agent" data-test="course-outline-menu-add-dialog-agent">{{ locale.dialogAgent.proper }}</a></li>
+                    {% if dialogAgentEnabled %}
+                        <li><a href="{{ createAssessmentRoute }}?type=dialogAgent&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-dialog-agent" data-test="course-outline-menu-add-dialog-agent">{{ locale.dialogAgent.proper }}</a></li>
+                    {% endif %}
                     {% endif %}
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
