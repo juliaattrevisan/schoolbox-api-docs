@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -1007,9 +1006,19 @@ class Controller extends Base
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
         // Check whether the user has permission to book the selected resources.
-        $route = 'resourceBooking.createBooking';
+        // Note the 'calendarEvent.addBookings' permission will have been checked in Calendar/Event/Module.php.
+        // A user can create a booking in the resource booking section if they can access the 'resourceBooking.createBooking' route.
         foreach ($resourceById as $resourceId => $resource) {
-            if (!$this->authorizer->isPathAuthorizedForUser($route, [$resourceId], $this->user)) {
+            if (
+                !$this->authorizer->isPathAuthorizedForUser(
+                    'resourceBooking.createBooking',
+                    [
+                        'id' => $resourceId,
+                        'item' => $resource,
+                    ],
+                    $this->user
+                )
+            ) {
                 throw new SchoolboxException(
                     "You do not have permission to create bookings for resource '{$resource->getName()}'."
                 );
@@ -1138,8 +1147,18 @@ class Controller extends Base
         }
 
         // Check whether the user has permission to book the resource.
-        $route = 'resourceBooking.createBooking';
-        if (!$this->authorizer->isPathAuthorizedForUser($route, [$resource->getId()], $this->user)) {
+        // Note the 'calendarEvent.editBooking' permission will have been checked in Calendar/Event/Module.php.
+        // A user can edit a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
+        if (
+            !$this->authorizer->isPathAuthorizedForUser(
+                'resourceBooking.edit',
+                [
+                    'id' => $resource->getId(),
+                    'item' => $resource,
+                ],
+                $this->user
+            )
+        ) {
             throw new SchoolboxException(
                 "You do not have permission to create bookings for resource '{$resource->getName()}'."
             );
@@ -1276,6 +1295,24 @@ class Controller extends Base
         // Check that $bookingId is linked to $event.
         if ($booking->getEvent()->getId() !== $event->getId()) {
             throw new SchoolboxException('Booking/event mismatch when deleting booking.');
+        }
+
+        // Check whether the user has permission to delete the booking.
+        // Note the 'calendarEvent.deleteBooking' permission will have been checked in Calendar/Event/Module.php.
+        // A user can delete a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
+        if (
+            !$this->authorizer->isPathAuthorizedForUser(
+                'resourceBooking.edit',
+                [
+                    'id' => $booking->getResource()->getId(),
+                    'item' => $booking->getResource(),
+                ],
+                $this->user
+            )
+        ) {
+            throw new SchoolboxException(
+                "You do not have permission to delete bookings of resource '{$booking->getResource()->getName()}'."
+            );
         }
 
         $isDeleteFromSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
