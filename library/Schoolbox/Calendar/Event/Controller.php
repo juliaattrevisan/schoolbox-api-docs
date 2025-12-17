@@ -1101,9 +1101,9 @@ class Controller extends Base
      * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
      * (Find the 'edit booking' form by clicking on an 'edit' button on a resource booking.)
      * @param Event $event
-     * @param $bookingId
+     * @param int $bookingId
      */
-    public function editBooking(Event $event, $bookingId): void
+    public function editBooking(Event $event, int $bookingId): void
     {
         $data = $this->request->getParsedBody();
         $startDatetimeStr = $data['startDatetime'] ?? null;
@@ -1226,7 +1226,7 @@ class Controller extends Base
             )
         );
 
-        // Set booking status to pending the booking is a clash.  Otherwise the status can stay as it was.
+        // Set booking status to pending if the booking has a clash.  Otherwise the status can stay as it was.
         foreach ($bookingsToUpdate as $bookingToUpdate) {
             if ($isClashByBookingId[$bookingToUpdate->getId()]) {
                 $bookingToUpdate->setStatus(BookingStatusModel::STATUS_PENDING);
