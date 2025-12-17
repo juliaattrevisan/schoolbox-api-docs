@@ -455,7 +455,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      *       That function was left alone so as to limit the scope of the PR that introduced this function.
      *
      * @param int $seriesId
-     * @param bool  $futureEventsOnly
+     * @param bool $futureEventsOnly Set to true to only return events that start in the future.
      * @return GenericCollection<Event>
      */
     public function getAllInSeriesNew(int $seriesId, bool $futureEventsOnly = false): GenericCollection
