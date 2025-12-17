@@ -101,7 +101,7 @@ if (
     ));
 
     try {
-        $redirectUrl = $redirect?->generateRedirect($folder);
+        $redirectUrl = $redirect->generateRedirect($folder);
     } catch (\Alaress\Database\Exception $e) {
         // Don't know where to go: just go to Canvas
         // Log first I guess
