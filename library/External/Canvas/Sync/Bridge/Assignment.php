@@ -100,7 +100,7 @@ class Assignment
      */
     public function prepareLetterGrades(GradeLevelGroupMapper $gradeLevelGroupMapper, GradeLevelMapper $gradeLevelMapper, UserMapper $userMapper): void
     {
-        // do nothing
+        $this->gradeGroups = $gradeLevelGroupMapper->findAll()->indexBy('id');
     }
 
     /**
@@ -253,7 +253,7 @@ class Assignment
      */
     public function getGradeGroup(?string $gradingType): ?SubmissionBox\GradeLevel\Group\Model
     {
-        return null;
+        return $this->gradeGroups[$this->canvasDb->grade_groups] ?? null;
     }
 
     /**
