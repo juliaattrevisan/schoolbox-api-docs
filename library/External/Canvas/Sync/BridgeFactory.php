@@ -20,6 +20,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 
 /**
+ * @deprecated, not overloading for each school now...
  * Creates a bridge class for a canvas entity
  */
 class BridgeFactory
