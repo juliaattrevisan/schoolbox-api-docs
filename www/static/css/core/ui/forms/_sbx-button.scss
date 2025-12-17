@@ -227,3 +227,11 @@
     display: inline-flex;
     align-items: center;
 }
+
+/**
+ * FullCalendar button hover border radius fix
+ */
+.fc-event,
+.fc-event:hover {
+    border-radius: var(--sbx-config-field-roundness) !important;
+}
