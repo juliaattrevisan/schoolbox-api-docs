@@ -1185,8 +1185,12 @@ class Controller extends Base
         // each booking in the series to also start half an hour before the event and end half an hour after the event.
         $eventStart = $booking->getEvent()->getStartDateTime();
         $eventEnd = $booking->getEvent()->getEndDateTime();
-        $newBookingStart = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
-        $newBookingEnd = new Alaress_Date_Format($endDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        try {
+            $newBookingStart = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+            $newBookingEnd = new Alaress_Date_Format($endDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        } catch (InvalidArgumentException) {
+            throw new SchoolboxException("Start and/or end date times in invalid format.");
+        }
         $startIncrementFromEventInMinutes = $eventStart?->diffInMinutes($newBookingStart, false);
         $endIncrementFromEventInMinutes = $eventEnd?->diffInMinutes($newBookingEnd, false);
 
