@@ -518,8 +518,7 @@ class Mapper extends BaseMapper
         int $resourceId,
         array $eventIds,
         bool $futureBookingsOnly = false
-    ): array
-    {
+    ): array {
         if (count($eventIds) === 0) {
             return [];
         }
