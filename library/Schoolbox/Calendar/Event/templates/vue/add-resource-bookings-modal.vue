@@ -10,6 +10,7 @@ import { EFFICACY_SELF, EFFICACY_SERIES } from "./eventTypes";
 //  * function 'createNewBooking' should be 'postAddBookingsForm'
 //  * 'booking' should be 'bookings' in lots of places
 //  * 'create' bookings should be 'add' bookings for consistency
+//  * compare with resource-booking-row.vue.
 
 interface Props {
     resourceBookings: Booking[];
