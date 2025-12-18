@@ -185,7 +185,7 @@ class Controller extends Base
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
             /** Specificaly include all assessment types, even disabled ones - this is used to render the "Type" column */
-            'allAssessmentTypes'    => Assessment\AssessmentType::getOptions(true, true),
+            'allAssessmentTypes'    => Assessment\AssessmentType::getOptions(),
             'deletedUsers'       => $deletedUsers,
             'deletedFiles'       => $deletedFiles,
 

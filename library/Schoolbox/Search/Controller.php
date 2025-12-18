@@ -141,10 +141,7 @@ class Controller extends Base
         $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $assessmentTypes = AssessmentType::getOptions(
-                $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
-                new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied(),
-            );
+            $assessmentTypes = AssessmentType::getEnabledOptions($configLoader);
 
             $subTypes = [];
             foreach ($assessmentTypes as $typeKey => $title) {

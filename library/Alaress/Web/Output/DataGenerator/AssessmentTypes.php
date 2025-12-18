@@ -32,9 +32,6 @@ class AssessmentTypes implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        return AssessmentType::getOptions(
-            $this->configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
-            new ValidDialogAgentEnabled($this->configLoader)->isSatisfied(),
-        );
+        return AssessmentType::getEnabledOptions($this->configLoader);
     }
 }
