@@ -98,7 +98,7 @@
         {% block emptyDateField %}{% endblock %}
     {% elseif 'publish' == struct.type %}
         {% block publishDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, assessment.publishAt, '', next) }}
+            {{ dateForm.dateField(struct.label, struct.type, assessment.publishAt, prev, next) }}
         {% endblock %}
     {% elseif 'open' == struct.type %}
         {% block openDateField %}
@@ -110,7 +110,7 @@
         {% endblock %}
     {% elseif 'close' == struct.type %}
         {% block closeDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, assessment.closeAt, prev, '' )}}
+            {{ dateForm.dateField(struct.label, struct.type, assessment.closeAt, prev, next )}}
         {% endblock %}
     {% endif %}
 {% endfor %}

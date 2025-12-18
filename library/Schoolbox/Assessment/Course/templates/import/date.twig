@@ -26,10 +26,10 @@
            data-datepicker-time
            data-datepicker-buttontext=""
            data-assessment-id="{{ assessmentId }}"
-            {% if dateSyncStart is defined %}
+            {% if dateSyncStart is defined and dateSyncStart %}
                 data-datesync-startdate="#{{ id }}_{{ dateSyncStart }}_date"
             {% endif %}
-           {% if dateSyncEnd is defined %}
+           {% if dateSyncEnd is defined and dateSyncEnd %}
                 data-datesync-enddate="#{{ id }}_{{ dateSyncEnd }}_date"
            {% endif %}
            {% if endOfDay is defined and endOfDay %}
