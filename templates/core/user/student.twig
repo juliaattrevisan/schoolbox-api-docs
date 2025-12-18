@@ -141,6 +141,10 @@
                                     {% if viewerCanSeeField and fieldHasValue %}
                                         {# Now render each of the flags/tuples in some manner #}
 
+                                        {# The differentiation profile field is special and gets its own template
+                                         # so it opens up a modal with the DP details when clicked like in
+                                         # the class list and student participation areas
+                                         #}
                                         {% if selectedField.field in ['differentiationProfile'] %}
                                         {% include '@searchUser/field/differentiationProfile/differentiationProfile.twig' with {
                                             selectedField: selectedField,

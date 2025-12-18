@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
- * To view the DP modal
+ * To view the DP modal, currently only used on the user profile page,
+ * hence why we are using the alert-box style
  */
 
 import locale from "@js/terminology/rosettaStone";

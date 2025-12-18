@@ -78,9 +78,8 @@ class Controller extends BaseController
      * @param \Schoolbox\External\User                   $userRelationHydrator
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
-     * @param Calendar_Api_Factory                         $calendarApiFactory
+     * @param Calendar_Api_Factory                       $calendarApiFactory
      * @param \Schoolbox\DifferentiationProfile\Mapper   $differentiationProfileMapper
-     * @param \Schoolbox\Admin\DifferentiationProfiles\Mapper $differentiationProfileConfigMapper
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -102,7 +101,6 @@ class Controller extends BaseController
         private RosettaStone $rosettaStone,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\DifferentiationProfile\Mapper $differentiationProfileMapper,
-        private \Schoolbox\Admin\DifferentiationProfiles\Mapper $differentiationProfileConfigMapper,
     ) {
     }
 
@@ -236,6 +234,8 @@ class Controller extends BaseController
                         return null;
                     }
 
+                    /* Otherwise return the data needed to view the differentiation profile in the modal
+                     */
                     return [
                         'student' => $viewee,
                         'route' => $this->getRouteIfAuthorized(
