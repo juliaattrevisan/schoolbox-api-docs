@@ -665,8 +665,8 @@ export default {
             </template>
         </div>
 
-        <div v-if="event.resourceBookings" class="small-12 medium-8 island">
-            <section v-if="event.resourceBookings.length > 0" class="detail content">
+        <div v-if="resourceBookings" class="small-12 medium-8 island">
+            <section v-if="resourceBookings.length > 0" class="detail content">
                 <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
                     <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
@@ -714,11 +714,11 @@ export default {
             :is-group="this.isGroupEvent"
         />
         <add-resource-bookings-modal
-            v-if="event.resourceBookings"
+            v-if="resourceBookings"
             ref="addResourceBookingsModal"
             :event-id="this.event.id"
             :event-series-id="this.event.seriesId"
-            :resource-bookings="this.event.resourceBookings"
+            :resource-bookings="resourceBookings"
         />
     </div>
 </template>
