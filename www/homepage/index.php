@@ -92,7 +92,7 @@ if (
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
     '' !== $folder->getCodeString()
-    && $this->getDi()->get('config')->get(ConfigMapper::NAME_CANVAS_CODE_REDIRECT_HOMEPAGES)
+    && $this->getDi()->get('config')->get(ConfigMapper::NAME_CANVAS_REDIRECT_HOMEPAGES)
 ) {
     $redirect = (new \External\Canvas\Redirect\Redirect(
         (string)$canvasUrl,
