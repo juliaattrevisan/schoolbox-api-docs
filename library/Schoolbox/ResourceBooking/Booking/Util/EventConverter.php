@@ -55,7 +55,7 @@ class EventConverter
 
         $event->setPublishDate($eventItem->getPublishDateTime());
 
-        $event->setTitle($booking->getName());
+        $event->setTitle($booking->getResource()->getName());
         $event->setAccess($eventItem->getAccess());
 
         // Set the event's type and color if there's a type for bookings
