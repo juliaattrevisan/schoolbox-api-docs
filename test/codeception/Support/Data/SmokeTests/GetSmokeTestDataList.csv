@@ -1501,7 +1501,7 @@ Pastoral,"View class pastoral care report",Superuser,/pastoral/class/83?30=&31=&
 Pastoral,"View class pastoral care report",Teacher,/pastoral/class/83?30=&31=&32=,200
 Pastoral,"View class pastoral care report",Student,/pastoral/class/83?30=&31=&32=,403
 Pastoral,"View class pastoral care report",Parent,/pastoral/class/83?30=&31=&32=,403
-Pastoral,"Differentiation Manage",Superuser,/differentiation-profiles/manage,200
+Pastoral,"Differentiation Manage",Superuser,/differentiation-profiles/manage,403
 Pastoral,"Differentiation Manage","Badges Moderator",/differentiation-profiles/manage,401
 Pastoral,"Differentiation Manage","CMS Moderator",/differentiation-profiles/manage,401
 Pastoral,"Differentiation Manage","Calendar Moderator",/differentiation-profiles/manage,401

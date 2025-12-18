@@ -41,7 +41,7 @@ echo "... setting up instance data"
 mariadb schoolbox < "$initialdir"/data/schoolbox.sql
 
 echo "... updating instance data"
-mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','mail_enable','differentiation_profiles_enabled');"
+mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('resource_booking_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled','qr_login_enabled','mail_enable');"
 mariadb schoolbox -e "UPDATE config SET value='0' WHERE name IN ('tours_enabled');"
 echo "MariaDB setup complete"
 
@@ -128,6 +128,8 @@ cd tools || exit 1
 ./schema/charset.php --perform
 echo "enabling summative report exporter"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = 'summative_report_enabled';"
+echo "enabling differentiation profiles"
+mariadb schoolbox -e "UPDATE config SET value='1' WHERE name = 'differentiation_profiles_enabled';"
 ./module/refresh-cache.php
 echo "re building project result Cache" # When we upgrade sales to after 23.0.alpha1 we can remove this
 php assessment/projectResultCacheReload.php --perform
