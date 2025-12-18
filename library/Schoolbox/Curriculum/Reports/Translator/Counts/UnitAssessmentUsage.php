@@ -53,7 +53,8 @@ class UnitAssessmentUsage
             ($unitUsage[AssessmentType::TYPE_QUIZ] ?? 0) +
             ($unitUsage[AssessmentType::TYPE_LTI_ASSESSMENT] ?? 0) +
             ($unitUsage[AssessmentType::TYPE_DUE_WORK] ?? 0) +
-            ($unitUsage[AssessmentType::TYPE_PROJECT] ?? 0);
+            ($unitUsage[AssessmentType::TYPE_PROJECT] ?? 0) +
+            ($unitUsage[AssessmentType::TYPE_DIALOG_AGENT] ?? 0);
         $lessonPlanCount =
             ($unitUsage[AssessmentType::TYPE_LESSON_PLAN] ?? 0);
 

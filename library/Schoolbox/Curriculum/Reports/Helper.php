@@ -133,6 +133,9 @@ class Helper
                  UNION
                  SELECT :project type, p.assessment_id
                  FROM project p
+                 UNION
+                 SELECT :dialogAgent type, dialogAgent.assessment_id
+                 FROM dialog_agent dialogAgent
             ) activity
             INNER JOIN curriculum_node_for_assessment cnfa
                 ON cnfa.assessment_id = activity.assessment_id
@@ -194,6 +197,7 @@ class Helper
             'lti' => AssessmentType::TYPE_LTI_ASSESSMENT,
             'dueWork' => AssessmentType::TYPE_DUE_WORK,
             'project' => AssessmentType::TYPE_PROJECT,
+            'dialogAgent' => AssessmentType::TYPE_DIALOG_AGENT,
             'lpType' => AssessmentType::TYPE_LESSON_PLAN,
             'nodeId' => $nodeId,
             'courseId' => $courseId,

@@ -210,6 +210,9 @@ class Cursor implements ICursor
                      UNION
                      SELECT '%s' type, p.assessment_id
                      FROM project p
+                     UNION
+                     SELECT '%s' type, dialogAgent.assessment_id
+                     FROM dialog_agent dialogAgent
                 ) activity
                 INNER JOIN curriculum_node_for_assessment cnfa
                     ON cnfa.assessment_id = activity.assessment_id
@@ -234,6 +237,7 @@ class Cursor implements ICursor
                 AssessmentType::TYPE_LTI_ASSESSMENT,
                 AssessmentType::TYPE_DUE_WORK,
                 AssessmentType::TYPE_PROJECT,
+                AssessmentType::TYPE_DIALOG_AGENT,
                 $nodesPlaceHolder,
                 $coursePlaceHolder
             );
