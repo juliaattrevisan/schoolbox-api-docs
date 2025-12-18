@@ -24,6 +24,8 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
 
     /**
      * In the case of newington, we should be capturing the details but we shouldn't be allowing users to submit online.
+     *
+     * @deprecated Product-ise canvas decisions, to remove this option
      * @inheritDoc
      */
     public function getAcceptOnline(string|array $submissionTypes): bool
