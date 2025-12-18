@@ -169,7 +169,7 @@ async function postDeleteBookingForm(): Promise<void> {
                 class="icon-modify"
                 title="Modify Booking"
                 aria-label="Modify Booking"
-                @click.prevent="toggleEditForm()"
+                @click.prevent="toggleEditForm"
             ></a>
         </div>
     </div>
@@ -180,7 +180,7 @@ async function postDeleteBookingForm(): Promise<void> {
                 method="post"
                 :action="ENDPOINTS.editBookingPath(props.eventId, props.booking.id)"
                 class="top"
-                @submit.prevent="postEditBookingForm()"
+                @submit.prevent="postEditBookingForm"
             >
                 <input type="hidden" name="bookingId" :value="props.booking.id" />
                 <date-range
@@ -222,9 +222,9 @@ async function postDeleteBookingForm(): Promise<void> {
                 </template>
                 <div class="component-action">
                     <section>
-                        <button @click.prevent="cancelEditBookingForm()">Cancel</button>
-                        <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm()">Save</button>
-                        <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm()">Delete</button>
+                        <button @click.prevent="cancelEditBookingForm">Cancel</button>
+                        <button :disabled="!isFormSubmittable" @click.prevent="postEditBookingForm">Save</button>
+                        <button :disabled="!isFormSubmittable" @click.prevent="postDeleteBookingForm">Delete</button>
                     </section>
                 </div>
             </form>
