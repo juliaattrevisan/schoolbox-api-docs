@@ -1190,7 +1190,7 @@ class Controller extends Base
         $bookingIdsToUpdate = $this->bookingMapper->findIdsByResourceIdForEvents(
             $booking->getResource()->getId(),
             $eventById->keys(),
-            futureBookingsOnly: true
+            futureBookingsOnly: $isEditOfSeries // Only allow update of past bookings if updating a single booking.
         );
 
         if (count($bookingIdsToUpdate) === 0) {
@@ -1342,7 +1342,7 @@ class Controller extends Base
         $bookingIdsToDelete = $this->bookingMapper->findIdsByResourceIdForEvents(
             $booking->getResource()->getId(),
             $eventIds->getAll(),
-            futureBookingsOnly: true
+            futureBookingsOnly: $isDeleteFromSeries // Only allow delete of past bookings if updating a single booking.
         );
 
         if (count($bookingIdsToDelete) === 0) {
