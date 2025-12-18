@@ -230,13 +230,13 @@ function getStatusMapper()
 /**
  * Helper for getting a booking from an event.
  *
- * @param  Item\Model     $resource
- * @param  Calendar\Event $event
- *
+ * @param Item\Model      $resource
+ * @param Event           $event
+ * @param \Schoolbox\User $user
  * @return Model
  * @throws \Schoolbox\Mapper\Exception
  */
-function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user)
+function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user): Model
 {
     $booking = new Model();
     $booking
