@@ -6,6 +6,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Reports\Cursor;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
 
@@ -97,8 +98,8 @@ class DetailedUsage
             );
         }
 
-        if ($this->models[Cursor::COURSE_ACTIVITY_LESSON_PLAN]->count() > 0) {
-            $translation['lessonPlan'] = $this->models[Cursor::COURSE_ACTIVITY_LESSON_PLAN]->map(
+        if ($this->models[AssessmentType::TYPE_LESSON_PLAN]->count() > 0) {
+            $translation['lessonPlan'] = $this->models[AssessmentType::TYPE_LESSON_PLAN]->map(
                 fn($lessaonPlan) => [
                     'name'   => $lessaonPlan->getTitle(),
                     '_links' => [
