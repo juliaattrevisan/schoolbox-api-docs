@@ -161,7 +161,7 @@ async function postDeleteBookingForm(): Promise<void> {
                     approved: props.booking.status.isApproved,
                     rejected: props.booking.status.isRejected,
                 }"
-                >{{ booking.status.name }}</span
+                >{{ props.booking.status.name }}</span
             >
             <a
                 v-if="canModify"
