@@ -508,21 +508,10 @@ class CourseSection
      */
     public function parseYearFromSisSourceId(string $sisSourceId, string $termName): ?string
     {
-        // using the sprintf structure from $this->canvasDb->sissourceid_template extract the subject code {parentCode} from $sisSourceId
-        $template = $this->canvasDb->sissourceid_template ?? '';
-        if ($template === '') {
-            return null;
+        if (preg_match('/(\d{4})/', $termName, $matches)) {
+            return $matches[1];
         }
-
-        // If template contains an explicit placeholder-like token, support it
-        if (strpos($template, '{parentCode}') !== false) {
-            $pattern = '#^' . str_replace('\{parentCode\}', '(.+?)', preg_quote($template, '#')) . '$#';
-            if (preg_match($pattern, $sisSourceId, $m)) {
-                return preg_replace("#^[^/]+/#", '', $m[1]);
-            }
-            return null;
-        }
-        return $sisSourceId;
+        return null;
     }
 
 
