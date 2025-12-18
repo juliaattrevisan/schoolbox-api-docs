@@ -85,16 +85,13 @@ async function postEditBookingForm(): Promise<void> {
             },
         });
         const responseData = (await response.json()) as EditBookingResponse;
-        console.info("postEditBookingForm() responseData: ", responseData);
         if (response.ok && responseData.success) {
-            console.info("postEditBookingForm() success");
             toast.timeout({
                 text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} updated`,
                 isSuccess: true,
             });
             isEditFormOpen.value = false; // Close edit form only on success.
         } else {
-            console.info("postEditBookingForm() failure");
             toast.timeout({
                 text: responseData.errorMessage
                     ? responseData.errorMessage
