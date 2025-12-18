@@ -682,17 +682,15 @@ export default {
                 </div>
                 <div class="meta"></div>
                 <div class="content-section">
-                    <div v-if="resourceBookings.length > 0">
-                        <resource-booking-row
-                            v-for="booking in resourceBookings"
-                            :key="booking.id"
-                            :eventId="event.id"
-                            :eventSeriesId="event.seriesId"
-                            :booking="booking"
-                            :can-modify="canModify()"
-                            @booking-deleted="handleBookingDeleted"
-                        />
-                    </div>
+                    <resource-booking-row
+                        v-for="booking in resourceBookings"
+                        :key="booking.id"
+                        :eventId="event.id"
+                        :eventSeriesId="event.seriesId"
+                        :booking="booking"
+                        :can-modify="canModify()"
+                        @booking-deleted="handleBookingDeleted"
+                    />
                 </div>
             </section>
             <div v-else class="empty-state">
