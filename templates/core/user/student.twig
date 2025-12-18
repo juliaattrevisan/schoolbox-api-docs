@@ -141,11 +141,17 @@
                                     {% if viewerCanSeeField and fieldHasValue %}
                                         {# Now render each of the flags/tuples in some manner #}
 
+                                        {% if selectedField.field in ['differentiationProfile'] %}
+                                        {% include '@searchUser/field/differentiationProfile.twig' with {
+                                            selectedField: selectedField,
+                                            differentiationProfile: selectedField.value,
+                                        } only %}
+
                                         {# Presence of icon and css means it renders as a flag/alert
                                          # Flags always display fullwidth and I can cheat by rendering
                                          # a full-width definition title without a definition data lol
                                          #}
-                                        {% if selectedField.icon and selectedField.css %}
+                                        {% elseif selectedField.icon and selectedField.css %}
                                             <dt class="full-width">
                                                 <div
                                                     class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}"
@@ -165,11 +171,6 @@
                                                         {% elseif selectedField.field in ['Comment'] %}
                                                             {# A string that displays on its own in a flag#}
                                                             {{ selectedField.value|nl2br }}
-                                                        {% elseif selectedField.field in ['differentiationProfile'] %}
-                                                            {# Display differentiation profile data grouped by adjustments and text #}
-                                                            {% include '@searchUser/field/differentiationProfile.twig' with {
-                                                                differentiationProfile: selectedField.value,
-                                                            } only %}
                                                         {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                             {% block parentsSeparated %}
                                                                 {# A special flag that has a hardcoded text string #}

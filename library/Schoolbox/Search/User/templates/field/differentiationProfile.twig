@@ -1,31 +1,10 @@
 {##
  # Renders the differentiation profile field for a student on the profile page
  #
- # @param array differentiationProfile  The differentiation profile data containing adjustmentData and textData
+ # @param array selectedField - The selected field data
+ # @param array differentiationProfile - The differentiation profile data containing adjustmentData and textData
  #}
 
-<h3 class="u-inline-block">{{ locale.differentiationProfile.proper }}</h3>
-<div class="l-flex-col l-gap-s f-no-margins">
-    {# Display adjustment data (array values) #}
-    {% for item in differentiationProfile.adjustmentData %}
-    <div class="l-flex-col l-gap-xs f-no-margins">
-        <h5><strong>{{ item.terminology }}</strong></h5>
-        <article>
-            <ul>
-                {% for value in item.value %}
-                <li>{{ value.name }}</li>
-                {% endfor %}
-            </ul>
-        </article>
-    </div>
-    {% endfor %}
-    {# Display text data (string values with HTML) #}
-    {% for item in differentiationProfile.textData %}
-    <div class="l-flex-col l-gap-xs f-no-margins">
-        <h5><strong>{{ item.terminology }}</strong></h5>
-        <article>
-            {{ item.value|raw }}
-        </article>
-    </div>
-    {% endfor %}
-</div>
+<dt class="full-width l-flex-row">
+    <button class="button l-flex__item--1-auto {{ selectedField.icon }}">View {{ locale.differentiationProfile.proper }}</button>
+</dt>
