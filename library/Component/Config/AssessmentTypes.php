@@ -22,10 +22,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
         $di = $page->getDi();
         $configLoader = $di->get('config');
 
-        $assessmentTypeOptions = Assessment\AssessmentType::getOptions(
-            $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
-            new ValidDialogAgentEnabled($configLoader)->isSatisfied()
-        );
+        $assessmentTypeOptions = Assessment\AssessmentType::getEnabledOptions($configLoader);
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;
