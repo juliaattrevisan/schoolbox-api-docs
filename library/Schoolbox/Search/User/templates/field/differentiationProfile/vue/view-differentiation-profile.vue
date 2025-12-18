@@ -23,10 +23,17 @@ function onViewDP(): void {
 </script>
 
 <template>
-    <dt class="full-width l-flex-row">
-        <button class="button l-flex__item--1-auto icon-learning-support" @click="onViewDP">
+    <dt class="full-width">
+        <div
+            class="alert-box highlight icon-learning-support u-cursor-pointer"
+            role="button"
+            tabindex="0"
+            @click="onViewDP"
+            @keydown.enter="onViewDP"
+            @keydown.space.prevent="onViewDP"
+        >
             View {{ locale.differentiationProfile.translate(false, true) }}
-        </button>
+        </div>
     </dt>
     <view-dp-modal v-model:student="studentWithDP" :route="props.route" />
 </template>
