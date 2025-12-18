@@ -193,9 +193,9 @@ async function postDeleteBookingForm(): Promise<void> {
                     :label-end="'Until'"
                 />
                 <div>
-                    <label :for="'resource-booking-row-textarea-' + props.booking.id">Notes</label>
+                    <label :for="`resource-booking-row-textarea-${props.booking.id}`">Notes</label>
                     <text-editor
-                        :id="'resource-booking-row-textarea-' + props.booking.id"
+                        :id="`resource-booking-row-textarea-${props.booking.id}`"
                         v-model:body="bookingNotes"
                     />
                 </div>
@@ -205,19 +205,19 @@ async function postDeleteBookingForm(): Promise<void> {
                     <p>Would you like to affect only this event, or all in the series?</p>
                     <div class="radiolist l-grid l-gap-l l-grid--2-col">
                         <input
-                            :id="'radioEfficacySelf-' + props.booking.id"
+                            :id="`radioEfficacySelf-${props.booking.id}`"
                             v-model="efficacy"
                             type="radio"
                             :value="EFFICACY_SELF"
                         />
-                        <label :for="'radioEfficacySelf-' + props.booking.id">Only this event</label>
+                        <label :for="`radioEfficacySelf-${props.booking.id}`">Only this event</label>
                         <input
-                            :id="'radioEfficacySeries-' + props.booking.id"
+                            :id="`radioEfficacySeries-${props.booking.id}`"
                             v-model="efficacy"
                             type="radio"
                             :value="EFFICACY_SERIES"
                         />
-                        <label :for="'radioEfficacySeries-' + props.booking.id">All events in series</label>
+                        <label :for="`radioEfficacySeries-${props.booking.id}`">All events in series</label>
                     </div>
                 </template>
                 <div class="component-action">
