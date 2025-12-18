@@ -32,6 +32,15 @@ class AssessmentTypes implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        return AssessmentType::getEnabledOptions($this->configLoader);
+        $options = [];
+
+        foreach (AssessmentType::getEnabledOptions($this->configLoader) as $key => $name) {
+            $options[$key] = [
+                'name' => $name,
+                'icon' => AssessmentType::getIconClassSuffixForType($key),
+            ];
+        }
+
+        return $options;
     }
 }

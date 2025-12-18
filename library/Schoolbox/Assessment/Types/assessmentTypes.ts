@@ -17,17 +17,6 @@ export type ActivityType =
     | typeof ACTIVITY_TYPE_LTI_ASSESSMENT
     | typeof ACTIVITY_TYPE_LESSON_PLAN;
 
-/** @see library/Schoolbox/Learning/Assessment/templates/project/macro/icon.twig */
-export const ACTIVITY_TYPE_ICON = {
-    [ACTIVITY_TYPE_PROJECT]: "icon-project",
-    [ACTIVITY_TYPE_TASK]: "icon-task",
-    [ACTIVITY_TYPE_QUIZ]: "icon-quiz",
-    [ACTIVITY_TYPE_DUE_WORK]: "icon-due-work",
-    [ACTIVITY_TYPE_LTI_ASSESSMENT]: "icon-lti",
-    [ACTIVITY_TYPE_LESSON_PLAN]: "icon-lesson-plan",
-    [ACTIVITY_TYPE_DIALOG_AGENT]: "icon-dialog-agent",
-};
-
 export type Activity = {
     id: number;
     title: string;

@@ -6,7 +6,6 @@
  */
 import { sbProps } from "@js/util/sbx/pageUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import { ACTIVITY_TYPE_ICON } from "@schoolboxAssessment/Types/assessmentTypes";
 
 interface Props {
     contentId: string;
@@ -18,12 +17,12 @@ const props = defineProps<Props>();
 
 <template>
     <ul :id="props.contentId" class="f-dropdown" data-dropdown-content>
-        <li v-for="(label, activityType) in sbProps.assessmentTypes" :key="activityType">
+        <li v-for="(activityType, key) in sbProps.assessmentTypes" :key="key">
             <a
-                :class="ACTIVITY_TYPE_ICON[activityType]"
-                :href="getReturnUrl(`${props.createRoute}?type=${activityType}`)"
-                :data-test="`unit-planner-create-${activityType}-${$props.contentId}`"
-                >{{ label }}
+                :class="`icon-${activityType.icon}`"
+                :href="getReturnUrl(`${props.createRoute}?type=${key}`)"
+                :data-test="`unit-planner-create-${key}-${$props.contentId}`"
+                >{{ activityType.name }}
             </a>
         </li>
     </ul>

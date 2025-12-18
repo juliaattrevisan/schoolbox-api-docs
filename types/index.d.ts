@@ -49,7 +49,13 @@ declare global {
         MediaElementPlayer: MediaElementPlayer;
         sbProps: {
             /** Enabled assessment types, mapped to default readable name, translated to match the current terminology */
-            assessmentTypes: Record<Partial<ActivityType>, string>;
+            assessmentTypes: Record<
+                Partial<ActivityType>,
+                {
+                    name: string;
+                    icon: string;
+                }
+            >;
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
             siteTitle: string;
