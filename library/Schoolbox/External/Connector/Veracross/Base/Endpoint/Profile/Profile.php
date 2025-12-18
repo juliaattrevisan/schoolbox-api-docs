@@ -262,7 +262,7 @@ class Profile implements IStrategy
         $contactInfoLookup = [];
 
         if ($this->validStrats->isFamiliesStratEnabled()) {
-            /* Prefetch a list of households, which contain Parents
+            /* Prefetch a list of parents
              */
             $this->log->debug('Prefetching parents...');
             $parentLookup = (new Parents($this->api))->generate();
@@ -630,7 +630,7 @@ class Profile implements IStrategy
                         $this->importParentsOfStudent(
                             $studentBaseProfile,
                             $contactInfoLookup,
-                            $relationshipLookup[$externalId],
+                            $relationshipLookup[$externalId] ?? [],
                             $parentLookup
                         );
                     }
@@ -691,7 +691,7 @@ class Profile implements IStrategy
 
             // Skip if parent record is missing
             if (is_null($parent)) {
-                $this->log->info(sprintf('Skipping parent relation %s, no parent record found', $relation['parent_id']));
+                $this->log->info(sprintf('Skipping parent relation %s, no parent record found', $relation['related_person_id']));
                 continue;
             }
 
