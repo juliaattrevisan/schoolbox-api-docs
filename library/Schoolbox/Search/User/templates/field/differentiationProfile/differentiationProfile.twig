@@ -5,6 +5,11 @@
  # @param array differentiationProfile - The differentiation profile data containing adjustmentData and textData
  #}
 
-<dt class="full-width l-flex-row">
-    <button class="button l-flex__item--1-auto {{ selectedField.icon }}">View {{ locale.differentiationProfile.proper }}</button>
-</dt>
+
+<div id="view-differentiation-profile-container">
+    <view-differentiation-profile
+        :student="{{ differentiationProfile.student|json_encode }}"
+        :route="{{ differentiationProfile.route|json_encode }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/viewDifferentiationProfile.js?v={{ config.site_version }}"></script>
