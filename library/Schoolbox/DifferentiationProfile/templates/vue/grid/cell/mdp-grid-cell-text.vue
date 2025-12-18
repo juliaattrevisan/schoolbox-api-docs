@@ -127,7 +127,7 @@ async function initEditor(): Promise<void> {
                 targetElements: [`#${editorId}`],
                 type: EditorType.INLINE,
                 toolbar: EditorToolbar.COMMENT_AI,
-                addToToolbar: ["insertTable"],
+                addToToolbar: [{ name: "insertTable", after: "link" }],
                 removeFromToolbar: ["link", "mediaEmbed", "resource", "emoji"],
             },
             true,
