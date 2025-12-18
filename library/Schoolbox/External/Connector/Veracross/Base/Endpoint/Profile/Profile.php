@@ -386,16 +386,7 @@ class Profile implements IStrategy
                     /* Alerts
                      */
                     $comments = $alertLookup[$externalId]['academic_alert'] ?? null;
-
-                    /* TODO Find out how a split family is represented in pilot school
-                     *
-                     * $legal might be inferred from relationships:list,
-                     * which provides (bool)legal_custody and (string)custody_status
-                     * The relationships lookup specifically filters to legal_custody 1
-                     * so anyone appearing here is legally allowed to do so
-                     */
                     $legal = $alertLookup[$externalId]['family_alert'] ?? null;
-
                     $medical = $alertLookup[$externalId]['medical_alert'] ?? null;
                     $messages = $alertLookup[$externalId]['general_alert'] ?? null;
 
