@@ -16,7 +16,7 @@
 {# Replace array syntax for jQuery. eg 'unit[5][a][367]' => 'unit-5-a-367' #}
 {% set id = inputPrefix | replace({'][': '-'}) | replace({'[': '-', ']': ''}) %}
 <div class="small-12 medium-6 large-3 columns">
-    <label for="{{ inputPrefix }}_{{ dateProperty }}_date">{{ dateLabel }} Date</label>
+    <label for="{{ id }}_{{ dateProperty }}_date">{{ dateLabel }} Date</label>
     <input id="{{ id }}_{{ dateProperty }}_date"
            name="{{ inputPrefix }}[dates][{{ dateProperty }}]"
            type="text"
