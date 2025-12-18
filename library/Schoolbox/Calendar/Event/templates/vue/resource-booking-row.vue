@@ -140,7 +140,9 @@ async function postDeleteBookingForm(): Promise<void> {
             isEditFormOpen.value = false; // Close edit form only on success.
         } else {
             toast.timeout({
-                text: `Unable to delete booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
+                text: responseData.errorMessage
+                    ? responseData.errorMessage
+                    : `Unable to delete booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
                 isSuccess: false,
             });
         }
