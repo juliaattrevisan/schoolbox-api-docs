@@ -1130,6 +1130,12 @@ class Controller extends Base
         $endDatetimeStr = $data['endDatetime'] ?? null;
         $notes = $data['notes'] ?? null;
         $efficacy = $data['efficacy'] ?? null;
+        $responseData = [
+            // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
+            'success' => false,
+            'nRowsAffected' => 0,
+            // Note 'errorMessage' is an optional field.
+        ];
 
         if (
             $startDatetimeStr === null ||
@@ -1143,7 +1149,11 @@ class Controller extends Base
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
-            throw new SchoolboxException("Could not find booking with id $bookingId.");
+            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
+            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $responseData['errorMessage'] = "Could not find booking with id $bookingId.";
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            return;
         }
 
         // Check that $bookingId is linked to $event.
@@ -1170,9 +1180,11 @@ class Controller extends Base
                 $this->user
             )
         ) {
-            throw new SchoolboxException(
-                "You do not have permission to create bookings for resource '{$resource->getName()}'."
-            );
+            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if
+            // permissions have changed since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $responseData['errorMessage'] = "You do not have permission to edit bookings for resource '{$resource->getName()}'.";
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            return;
         }
 
         $isEditOfSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
@@ -1195,14 +1207,9 @@ class Controller extends Base
 
         if (count($bookingIdsToUpdate) === 0) {
             // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
-            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
-            $this->response = $this->responseAsJson(
-                // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
-                [
-                    'success' => false,
-                    'nRowsAffected' => 0,
-                ]
-            )->withStatus(self::HTTP_STATUS_CODE_OK);
+            // user attempts to edit a series consisting of past bookings.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $responseData['errorMessage'] = 'No editable bookings found.  Note past bookings are not editable as part of a series.';
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
             return;
         }
 
@@ -1270,13 +1277,9 @@ class Controller extends Base
             );
         }
 
-        $this->response = $this->responseAsJson(
-            // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
-            [
-                'success' => true,
-                'nRowsAffected' => count($bookingIdsToUpdate),
-            ]
-        )->withStatus(self::HTTP_STATUS_CODE_OK);
+        $responseData['success'] = true;
+        $responseData['nRowsAffected'] = count($bookingsToUpdate);
+        $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
@@ -1292,6 +1295,12 @@ class Controller extends Base
     {
         $data = $this->request->getParsedBody();
         $efficacy = $data['efficacy'] ?? null;
+        $responseData = [
+            // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
+            'success' => false,
+            'nRowsAffected' => 0,
+            // Note 'errorMessage' is an optional field.
+        ];
 
         if ($efficacy === null) {
             throw new SchoolboxException('Missing required data in form submission.');
@@ -1300,7 +1309,11 @@ class Controller extends Base
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
-            throw new SchoolboxException("Could not find booking with id $bookingId.");
+            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
+            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $responseData['errorMessage'] = "Could not find booking with id $bookingId.";
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            return;
         }
 
         // Check that $bookingId is linked to $event.
@@ -1321,9 +1334,11 @@ class Controller extends Base
                 $this->user
             )
         ) {
-            throw new SchoolboxException(
-                "You do not have permission to delete bookings of resource '{$booking->getResource()->getName()}'."
-            );
+            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if
+            // permissions have changed since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $responseData['errorMessage'] = "You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'.";
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            return;
         }
 
         $isDeleteFromSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
@@ -1346,15 +1361,10 @@ class Controller extends Base
         );
 
         if (count($bookingIdsToDelete) === 0) {
-            // We did not succeed in deleting the booking, but this is an expected outcome - it will occur if the
-            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
-            $this->response = $this->responseAsJson(
-                // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
-                [
-                    'success' => false,
-                    'nRowsAffected' => 0,
-                ]
-            )->withStatus(self::HTTP_STATUS_CODE_OK);
+            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
+            // user attempts to delete a series consisting of past bookings.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            $responseData['errorMessage'] = 'No deletable bookings found.  Note past bookings are not deletable as part of a series.';
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
             return;
         }
 
@@ -1366,13 +1376,9 @@ class Controller extends Base
             );
         }
 
-        $this->response = $this->responseAsJson(
-            // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
-            [
-                'success' => true,
-                'nRowsAffected' => count($bookingIdsToDelete)
-            ]
-        )->withStatus(self::HTTP_STATUS_CODE_OK);
+        $responseData['success'] = true;
+        $responseData['nRowsAffected'] = count($bookingIdsToDelete);
+        $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 

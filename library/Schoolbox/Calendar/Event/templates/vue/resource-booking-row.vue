@@ -21,12 +21,12 @@ const emit = defineEmits<{
 /**
  * This defines the server response to a request to ENDPOINTS.editBookingPath().
  */
-type EditBookingResponse = { success: boolean; nRowsAffected: number };
+type EditBookingResponse = { success: boolean; nRowsAffected: number; errorMessage?: string };
 
 /**
  * This defines the server response to a request to ENDPOINTS.deleteBookingPath().
  */
-type DeleteBookingResponse = { success: boolean; nRowsAffected: number };
+type DeleteBookingResponse = { success: boolean; nRowsAffected: number; errorMessage?: string };
 
 const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
@@ -85,15 +85,20 @@ async function postEditBookingForm(): Promise<void> {
             },
         });
         const responseData = (await response.json()) as EditBookingResponse;
+        console.info("postEditBookingForm() responseData: ", responseData);
         if (response.ok && responseData.success) {
+            console.info("postEditBookingForm() success");
             toast.timeout({
                 text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} updated`,
                 isSuccess: true,
             });
             isEditFormOpen.value = false; // Close edit form only on success.
         } else {
+            console.info("postEditBookingForm() failure");
             toast.timeout({
-                text: `Unable to update booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
+                text: responseData.errorMessage
+                    ? responseData.errorMessage
+                    : `Unable to update booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
                 isSuccess: false,
             });
         }
