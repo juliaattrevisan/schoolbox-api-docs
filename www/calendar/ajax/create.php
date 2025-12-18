@@ -243,7 +243,7 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         ->setEvent($event)
         ->setResource($resource)
         ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
-        ->setName($_POST['title'] ?? '')
+        ->setName($resource->getName())
         ->setNotes($_POST['detail'] ?? '')
         ->setRelatedBookingList(new GenericCollection(Model::class));
 
