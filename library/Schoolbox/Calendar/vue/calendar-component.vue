@@ -253,7 +253,7 @@ export default {
 
         <full-calendar ref="fullCalendar" :options="calendarOptions">
             <template v-slot:eventContent="arg">
-                <customised-calendar-event :content="arg" />
+                <customised-calendar-event :content="arg" allow-bookings-warning />
             </template>
         </full-calendar>
 

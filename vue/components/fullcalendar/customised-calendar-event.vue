@@ -17,6 +17,15 @@ export default {
             type: Object,
             required: true,
         },
+        /**
+         * Whether a warning icon can be shown for this event if there are bookings that require attention
+         * Intended for the calendar component, not tested in other usages yet
+         */
+        allowBookingsWarning: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
 
     computed: {
@@ -81,11 +90,38 @@ export default {
                 return "";
             }
         },
+
+        /**
+         * Whether a warning icon should be shown
+         * Intended for the calendar component, not tested in other usages yet
+         *
+         * @returns { Boolean }
+         */
+        showWarningIcon() {
+            if (!this.allowBookingsWarning) {
+                return false;
+            }
+
+            /** The event must be booked by the current user */
+            const authorId = this.content.event?.extendedProps?.data?.meta?.authorId ?? null;
+            if (authorId !== window.schoolboxUser.id) {
+                return false;
+            }
+
+            /** At least one booking must exist in a pending or denied status */
+            const bookings = this.content.event?.extendedProps?.data?.bookings ?? [];
+            return bookings.some((booking) => booking.status.isPending || booking.status.isRejected);
+        },
     },
 
     mounted() {
         this.updateTextColor();
         this.checkBackgroundColor();
+
+        if (document.readyState === "complete" && this.warningMessage) {
+            // When there's a warning, need to reflow tooltips to ensure they work
+            $(document).foundation("tooltip", "reflow");
+        }
     },
 
     methods: {
@@ -128,12 +164,20 @@ export default {
 </script>
 
 <template>
-    <div ref="eventContainer" class="event-container" :class="getAttendanceClass">
+    <div
+        ref="eventContainer"
+        class="event-container"
+        :class="{
+            [getAttendanceClass]: getAttendanceClass !== '',
+            'event-container--has-warning': showWarningIcon,
+        }"
+    >
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
         <input v-if="isTask" v-model="isTaskComplete" type="checkbox" class="checkbox plain" name="completed" />
         <span ref="titleText" class="fc-event-title" :class="{ strike: isTaskComplete }">
             {{ content.event.title }}
         </span>
+        <i v-if="showWarningIcon" class="icon-alert warning"></i>
     </div>
 </template>
 
@@ -141,6 +185,12 @@ export default {
 //apply padding as .fc-event-title will lose its padding from display: inline
 .event-container {
     padding: 0px 2px 2px 2px; // make top padding zero to align the text to the top of the event in calendar
+
+    &--has-warning {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 }
 
 //needs to be inline to ensure the .strike class works
