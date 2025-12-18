@@ -142,7 +142,7 @@
                                         {# Now render each of the flags/tuples in some manner #}
 
                                         {% if selectedField.field in ['differentiationProfile'] %}
-                                        {% include '@searchUser/field/differentiationProfile.twig' with {
+                                        {% include '@searchUser/field/differentiationProfile/differentiationProfile.twig' with {
                                             selectedField: selectedField,
                                             differentiationProfile: selectedField.value,
                                         } only %}
