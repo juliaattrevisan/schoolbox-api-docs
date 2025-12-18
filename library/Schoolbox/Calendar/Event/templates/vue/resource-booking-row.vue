@@ -179,7 +179,6 @@ async function postDeleteBookingForm(): Promise<void> {
                 ref="editBookingForm"
                 method="post"
                 :action="ENDPOINTS.editBookingPath(props.eventId, props.booking.id)"
-                class="top"
                 @submit.prevent="postEditBookingForm"
             >
                 <input type="hidden" name="bookingId" :value="props.booking.id" />
