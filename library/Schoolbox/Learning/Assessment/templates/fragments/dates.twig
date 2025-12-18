@@ -1,19 +1,116 @@
 {##
  # The Four Canonical Dates
  #
- # @param bool $acceptingResponses  A controller-defined var
+ # @param IAssessable $assessment
  #}
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
 
-{# Accommodate the odd occasion where acceptingResponses wasn't defined in an activity's
- # controller via getAssessmentTwigData struct
+{# Note: Contradictory logic
+ #
+ # Contrarily, Lesson Plans do *not* accept submissions nor have feedbacks.
+ # They however must have their dates synced, to avoid an andyland enforcement
+ # that an open date must exist. Having acceptingResponses evaluate to (bool)true
+ # allows date syncs to execute. There are alternative, but equally bad, syntaxes.
+ #
+ # Note: unused var in backend
+ #
+ # There's an array key 'acceptingResponses' that isn't used in this Course Import
+ # workflow so don't change that expecting it to affect behaviours here.
+ # $acceptingResponses is passed quietly and implicitly into fragments/dates.twig
+ # (not mentioned in this twig file) where it's used to decide which natpickers to show
+ #
+ # TODO verify this statement made in 2023
  #}
-{% if acceptingResponses ?? false %}
-    {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
-    {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
-    {{ dateForm.dateField('Due',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
-    {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
-{% else %}
-    {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#dueDate') }}
-    {{ dateForm.dateField('Due',     'due',     assessment.dueAt,     '#publishDate', '') }}
+
+{# Default dates
+ # lti, lesson plan, task, project etc. all default to needing just two dates.
+ # null elements here cause an empty table cell to be rendered so it's somehat indicative of the ui
+ # This accommodates the growing variety of activites' esoteric requirements
+ #
+ # These come as (type, label) tuples so you can
+ #     - conditionally decide which dates are relevant without copypasting A LOT of functional code
+ #     - arbitrarily rename a label for those special activities
+ #     - change the order and thus the implicit sequencing
+ #     - insert empty columns whenever you need one
+ #}
+{% set dates = [
+    { 'type': 'publish', 'label': 'Publish' },
+    null,
+    { 'type': 'due', 'label': 'Due' },
+    null,
+] %}
+
+{# Ideally these fragments would be somewhere in each assessment's folder, but that's part of a bigger
+ # swamp problem where we need to reorganise how features interrogate activities' particular behaviours
+ #}
+{% if assessment is dueWork %}
+    {% if not assessment.acceptNone %}
+        {# Due Work uniquely offers offline submissions; online submissions require all four dates #}
+        {% set dates = [
+            { 'type': 'publish', 'label': 'Publish' },
+            { 'type': 'open', 'label': 'Open' },
+            { 'type': 'due', 'label': 'Due' },
+            { 'type': 'close', 'label': 'Late' },
+        ] %}
+    {% endif %}
+{% elseif assessment is quiz %}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Publish' },
+        { 'type': 'open', 'label': 'Open' },
+        { 'type': 'due', 'label': 'Due' },
+        { 'type': 'close', 'label': 'Late' },
+    ] %}
+{% elseif assessment is dialogAgent %}
+    {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui)
+     # ...and the due date is put in the same place as Close Date, for cosmetic reasons only: it still retains
+     # the same programmatic meaning as Due Date despite this positioning
+     #}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Publish' },
+        { 'type': 'open', 'label': 'Open' },
+        null,
+        { 'type': 'due', 'label': 'Close' },
+    ] %}
+{% elseif assessment is lessonPlan %}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Publish' },
+        null,
+        { 'type': 'due', 'label': locale.translate('lessonPlan', false, true) },
+        null,
+    ] %}
 {% endif %}
+
+{# Process each assessment's date scheme algorithmically #}
+{% for struct in dates %}
+    {# YES I know this is a bit ugly-looking but twig just isn't that great
+     # The idea here is that there are only four canonical dates, a fixed domain-limited quantity,
+     # which won't expand trivially: we'd have to invest A LOT to make a fifth date or remove one
+     # of them (this is consequential on a galactic level)
+     #
+     # So to save a bunch of kerfuffle around twig for loops we can count on this somewhat assumed
+     # rule of the universe and just look ahead (or look behind) to find the nearest non-null
+     # neighbouring date to sync against. This is super cheap, not super artistic.
+     #}
+    {% set next = dates[loop.index0 + 1]['type'] ?? dates[loop.index0 + 2]['type'] ?? dates[loop.index0 + 3]['type'] ?? null %}
+    {% set prev = dates[loop.index0 - 1]['type'] ?? dates[loop.index0 - 2]['type'] ?? dates[loop.index0 - 3]['type'] ?? null %}
+
+    {% if struct is null %}
+        {% block emptyDateField %}{% endblock %}
+    {% elseif 'publish' == struct.type %}
+        {% block publishDateField %}
+            {{ dateForm.dateField(struct.label, struct.type, assessment.publishAt, '', next) }}
+        {% endblock %}
+    {% elseif 'open' == struct.type %}
+        {% block openDateField %}
+            {{ dateForm.dateField(struct.label, struct.type, assessment.openAt, prev, next )}}
+        {% endblock %}
+    {% elseif 'due' == struct.type %}
+        {% block dueDateField %}
+            {{ dateForm.dateField(struct.label, struct.type, assessment.dueAt, prev, next )}}
+        {% endblock %}
+    {% elseif 'close' == struct.type %}
+        {% block closeDateField %}
+            {{ dateForm.dateField(struct.label, struct.type, assessment.closeAt, prev, '' )}}
+        {% endblock %}
+    {% endif %}
+{% endfor %}

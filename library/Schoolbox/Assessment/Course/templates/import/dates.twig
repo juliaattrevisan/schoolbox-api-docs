@@ -1,0 +1,59 @@
+
+{% extends "@learningAssessment/fragments/dates.twig" %}
+
+{% block emptyDateField %}
+    {# an empty placeholder cell for grid niceness #}
+    <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+{% endblock %}
+
+{% block publishDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+        assessmentDate: assessment.publishAt,
+        unitDate: unitImpl.openDate,
+        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}
+
+{% block openDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+        assessmentDate: assessment.openAt,
+        unitDate: unitImpl.openDate,
+        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}
+
+{% block dueDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+        assessmentDate: assessment.dueAt,
+        unitDate: defaultDueDate,
+        endOfDay: true,
+        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}
+
+{% block closeDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
+        assessmentDate: assessment.closeAt,
+        unitDate: unitImpl.dueDate.endOfDay,
+        endOfDay: true,
+        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+    } only %}
+{% endblock %}
