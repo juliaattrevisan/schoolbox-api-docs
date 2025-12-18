@@ -251,7 +251,7 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
     if ($event->getAllDay()) {
         $booking->setBookingStartAt($event->getStartDateTime());
         $endDate = clone $event->getStartDateTime();
-        $endDate = $endDate->endOfDay();
+        $endDate = $endDate?->endOfDay();
         $booking->setBookingEndAt($endDate);
     } else {
         $booking->setBookingStartAt($event->getStartDateTime());
