@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\DialogAgent\Scenario\Criteria\Model as CriteriaModel;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as DialogAgentScenarioMapper;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Editor\OpenAI\Log\LogFormat as AILogFormat;
@@ -47,6 +48,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
@@ -390,6 +392,18 @@ class Controller extends Assessment\Controller
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
         /** @var Model $assessment */
+
+        /**
+         * Due to the swamp, we can't make the canonical check in the model (canLearnerCreateResponse)
+         * use configLoader to check the AI config for whether this should be possible.
+         * To avoid an instanceof in the module, we've decided to do a simple check here instead.
+         *
+         * Ending up here is only possible if dialog agent was once enabled, an activity was created,
+         * dialog agent was then disabled, and then a student tries to get here before the activity closes
+         */
+        if (!new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied()) {
+            throw new Misconfigured("{$assessment->getTitle()} is not available, contact your system administrator");
+        }
 
         $participant = $assessment->getParticipantIfExtant($student);
 
