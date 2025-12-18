@@ -23,7 +23,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Alert;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Parents;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Photo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
@@ -256,7 +256,7 @@ class Profile implements IStrategy
 
         /* Only available when Families strat is enabled
          */
-        $householdLookup = [];
+        $parentLookup = [];
         $relationshipLookup = [];
         $emergencyContactsLookup = [];
         $contactInfoLookup = [];
@@ -264,8 +264,8 @@ class Profile implements IStrategy
         if ($this->validStrats->isFamiliesStratEnabled()) {
             /* Prefetch a list of households, which contain Parents
              */
-            $this->log->debug('Prefetching households...');
-            $householdLookup = (new Household($this->api))->generate();
+            $this->log->debug('Prefetching parents...');
+            $parentLookup = (new Parents($this->api))->generate();
 
             /* Prefetch a list of relationships
              */
@@ -628,11 +628,10 @@ class Profile implements IStrategy
                      */
                     if ($this->validStrats->isFamiliesStratEnabled()) {
                         $this->importParentsOfStudent(
-                            $externalId,
                             $studentBaseProfile,
                             $contactInfoLookup,
-                            $relationshipLookup,
-                            $householdLookup[$student['household_id']] ?? []
+                            $relationshipLookup[$externalId],
+                            $parentLookup
                         );
                     }
                 }
@@ -663,28 +662,39 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param string $studentExternalId
      * @param Model  $studentBaseProfile
      * @param array  $contactInfoLookup
      * @param array  $relationshipLookup
-     * @param array  $household
+     * @param array  $parentLookup
      * @throws DefinitionException
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
     private function importParentsOfStudent(
-        string $studentExternalId,
         UserProfile\Model $studentBaseProfile,
         array $contactInfoLookup,
         array $relationshipLookup,
-        array $household
+        array $parentLookup
     ): void {
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
-        foreach ($household as $parent) {
+        foreach ($relationshipLookup as $relation) {
+            //Don't create parents who don't have portal access
+            if (!$relation['parent_portal_access']) {
+                continue;
+            }
+
+            $parent = $parentLookup[$relation['related_person_id']] ?? null;
+
+            // Skip if parent record is missing
+            if (is_null($parent)) {
+                $this->log->info(sprintf('Skipping parent relation %s, no parent record found', $relation['parent_id']));
+                continue;
+            }
+
             $externalId = trim((string)$parent['id']);
             $email = trim((string)$parent['email_1']);
 
@@ -702,7 +712,7 @@ class Profile implements IStrategy
 
             /* Dig out some info about these guys' relationships to a student
              */
-            $relationship = trim((string)($relationshipLookup[$studentExternalId][$externalId]['relationship'] ?? ''));
+            $relationship = trim((string)($relation['relationship'] ?? ''));
 
             $title = trim((string)$parent['name_prefix']);
             $username = trim((string)$parent['username']);
