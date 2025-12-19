@@ -1,0 +1,186 @@
+name: Build and push presidio-analyzer
+
+# Build presidio-analyzer images from microsoft/presidio repo:
+# * manually (workflow_dispatch)
+# * when custom nlp.yaml config changes on master or develop
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'docker/presidio-analyzer/config/nlp.yaml'
+      - '.github/workflows/build-and-push-presidio-analyzer.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-analyzer:
+    env:
+      AWS_REGION: ap-southeast-2
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        build:
+          - runs-on: onprem-k3s
+            platform: linux
+            arch: amd64
+          - runs-on: onprem-k3s-arm
+            platform: linux
+            arch: arm64
+    runs-on: ${{ matrix.build.runs-on }}
+    outputs:
+      presidio_hash: ${{ steps.presidio-hash.outputs.short_sha }}
+    steps:
+      - name: Checkout schoolbox repository
+        uses: actions/checkout@v4
+        with:
+          path: schoolbox
+
+      - name: Checkout Presidio repository
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/presidio
+          ref: main
+          path: presidio
+
+      - name: Get Presidio commit hash
+        id: presidio-hash
+        working-directory: presidio
+        run: echo "short_sha=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Copy custom NLP config
+        run: |
+          cp schoolbox/docker/presidio-analyzer/config/nlp.yaml \
+             presidio/presidio-analyzer/presidio_analyzer/conf/nlp.yaml
+
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.PRESIDIO_BUILD_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+
+      - name: Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push presidio-analyzer
+        id: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: presidio/presidio-analyzer
+          load: true
+          provenance: false
+          sbom: false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            NLP_CONF_FILE=presidio_analyzer/conf/nlp.yaml
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer
+            ${{ vars.ECR_NAMESPACE }}/presidio-analyzer
+          cache-from: type=gha
+          cache-to: type=gha
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build-and-push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload presidio-analyzer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-presidio-analyzer-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: 'error'
+          retention-days: 1
+
+  join-analyzer:
+    env:
+      AWS_REGION: ap-southeast-2
+    timeout-minutes: 15
+    needs:
+      - build-and-push-analyzer
+    runs-on: onprem-k3s
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.PRESIDIO_BUILD_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Download presidio-analyzer artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-presidio-analyzer-*
+          merge-multiple: 'true'
+
+      - name: Join presidio-analyzer images
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          declare -a DOCKERHUB_IMAGES
+          declare -a ECR_IMAGES
+
+          # All I need is the hashes, which are in /digests:
+          # the hashes are the same between both Dockerhub and ECR
+          for file in $(ls -1 ${{ runner.temp }}/digests); do
+              DOCKERHUB_IMAGES+=("${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer@sha256:$file")
+              ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/presidio-analyzer@sha256:$file")
+          done
+
+          # Extract branch name from GITHUB_REF
+          BRANCH_NAME=${GITHUB_REF/refs\/heads\//}
+          
+          # Build tag arguments based on branch
+          DOCKERHUB_TAGS="-t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:${{ needs.build-and-push-analyzer.outputs.presidio_hash }}"
+          DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:${BRANCH_NAME}"
+          
+          ECR_TAGS="-t ${{ vars.ECR_NAMESPACE }}/presidio-analyzer:${{ needs.build-and-push-analyzer.outputs.presidio_hash }}"
+          ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-analyzer:${BRANCH_NAME}"
+          
+          # Add latest/testing tag based on branch
+          if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:latest"
+            ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-analyzer:latest"
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:testing"
+            ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-analyzer:testing"
+          fi
+
+          docker buildx imagetools create $DOCKERHUB_TAGS "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create $ECR_TAGS "${ECR_IMAGES[@]}"
