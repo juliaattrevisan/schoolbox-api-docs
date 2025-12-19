@@ -66,6 +66,8 @@ class AutosubmitTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
+Discussion Activity: Autosubmit Authoritative Responses
+
 Activity Expiry
 ---------------
 Dialog Agents (Discussion Activities) allow students to interact with an AI to discuss topics. Students can start a
@@ -110,7 +112,7 @@ HELP;
 
         if ($this->getOpt(self::OPT_LONG_EXPIRED)) {
             $this->getLogger()->info('');
-            $this->autosubmitExpirededActivities();
+            $this->autosubmitExpiredActivities();
         }
 
         $this->getLogger()->info('');
@@ -127,18 +129,19 @@ HELP;
      *
      * @return void
      */
-    private function autosubmitExpirededActivities(): void
+    private function autosubmitExpiredActivities(): void
     {
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT
                 dar.id, dar.learner_id,
-                a.title, a.due_date,
+                a.title, a.close_date,
                 da.assessment_id
             FROM assessment a
             INNER JOIN dialog_agent da ON da.assessment_id = a.id
             INNER JOIN dialog_agent_response dar ON dar.dialog_agent_id = da.id
             INNER JOIN user u ON dar.learner_id = u.id
             WHERE a.close_date < NOW()
+            AND dar.authoritative = 1
             AND dar.submitted_at IS NULL
         ");
 
@@ -160,7 +163,7 @@ HELP;
             if ($this->perform()) {
                 $updateStatement->execute([
                     'id' => $row['id'],
-                    'submittedAt' => $row['due_date'],
+                    'submittedAt' => $row['close_date'],
                     'submittedBy' => $row['learner_id'],
                 ]);
             }
@@ -192,7 +195,7 @@ HELP;
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT
                 dar.id, dar.learner_id, dar.started_at, dar.submitted_at, dar.created_at,
-                a.title, a.due_date,
+                a.title, a.close_date,
                 da.assessment_id, da.duration
             FROM assessment a
             INNER JOIN dialog_agent da ON da.assessment_id = a.id
@@ -200,6 +203,7 @@ HELP;
             INNER JOIN user u ON dar.learner_id = u.id
             WHERE da.duration IS NOT NULL
             AND da.duration > 0
+            AND dar.authoritative = 1
             AND dar.submitted_at IS NULL
             AND dar.started_at IS NOT NULL
             AND TIMESTAMPDIFF(SECOND, dar.started_at, NOW()) > da.duration
@@ -223,7 +227,7 @@ HELP;
             if ($this->perform()) {
                 $updateStatement->execute([
                     'id' => $row['id'],
-                    'submittedAt' => $row['due_date'],
+                    'submittedAt' => $row['close_date'],
                     'submittedBy' => $row['learner_id'],
                 ]);
             }
