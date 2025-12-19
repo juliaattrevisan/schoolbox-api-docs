@@ -59,6 +59,16 @@ export type AdjustmentType = {
 export type AdjustmentText = string | null;
 
 /**
+ * The status options for a differentiation profile
+ */
+export enum ProfileStatus {
+    ACTIVE = "active",
+    EXPIRED = "expired",
+    OUT_OF_DATE = "outOfDate",
+    UNPOPULATED = "unpopulated",
+}
+
+/**
  * Differentiation profile data
  */
 export type Profile = {
@@ -74,6 +84,7 @@ export type Profile = {
     created_at: string | null;
     updated_at: string | null;
     deleted_at: string | null;
+    status: ProfileStatus[];
     _routes: {
         linkedRecords?: string;
         edit?: string;

@@ -1,29 +1,28 @@
 <script setup lang="ts">
 /**
- * Show more button component for MDP grid cells
+ * Show more button component for lazy grid cells
  * Displays a gradient overlay and "View More" button when content exceeds the display height
  */
 
-import type { Profile, ProfileKeys } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useRowsStore } from "../store/mdpRowsStore";
+import { useLazyGridRowsHeightStore } from "./store/lgRowsHeightStore";
 
 const props = defineProps<{
-    profile: Profile;
-    headerKey: ProfileKeys;
+    rowId: number;
+    headerKey: string;
     contentHeight: number;
     componentActionHeight: number;
     isContentFocused: boolean;
 }>();
 
-const rowsStore = useRowsStore();
+const lgRowsHeightStore = useLazyGridRowsHeightStore();
 
 /**
  * Whether to show the view more gradient and button
  */
 const showViewMoreGradient = window.Vue.computed(() => {
-    const displayHeights = rowsStore.rowDisplayHeights;
+    const displayHeights = lgRowsHeightStore.rowDisplayHeights;
     if (!displayHeights) return false;
-    const displayHeight = displayHeights[props.profile.student.id];
+    const displayHeight = displayHeights[props.rowId];
     if (!displayHeight) return false;
     return props.contentHeight + props.componentActionHeight > displayHeight;
 });
@@ -42,7 +41,7 @@ const showViewMoreInner = window.Vue.computed(() => {
  * Handle view more button click
  */
 function onViewMoreClick(): void {
-    rowsStore.toggleViewMore(props.profile.student.id);
+    lgRowsHeightStore.toggleViewMore(props.rowId);
 }
 </script>
 
@@ -50,7 +49,7 @@ function onViewMoreClick(): void {
     <div class="show-more-container" :data-visible="showViewMoreGradient">
         <button
             class="button"
-            :data-test="`mdp-grid-view-more-button-${props.profile.student.id}-${props.headerKey}`"
+            :data-test="`lg-view-more-button-${props.rowId}-${props.headerKey}`"
             :data-visible="showViewMoreInner"
             :tabindex="showViewMoreInner ? 0 : -1"
             @click.prevent="onViewMoreClick"

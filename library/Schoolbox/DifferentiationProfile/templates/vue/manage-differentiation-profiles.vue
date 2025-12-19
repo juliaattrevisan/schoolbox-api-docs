@@ -23,9 +23,10 @@ import type {
     Payload,
     Profile,
 } from "../js/types/manageDifferentiationProfilesTypes";
-import MdpGridCellStudent from "./grid/mdp-grid-cell-student.vue";
-import MdpGridCellAdjustment from "./grid/mdp-grid-cell-adjustment.vue";
-import MdpGridCellText from "./grid/mdp-grid-cell-text.vue";
+import MdpGridCellStudent from "./grid/cell/mdp-grid-cell-student.vue";
+import MdpGridCellAdjustment from "./grid/cell/mdp-grid-cell-adjustment.vue";
+import MdpGridCellText from "./grid/cell/mdp-grid-cell-text.vue";
+import MdpGridCellLastUpdated from "./grid/cell/mdp-grid-cell-last-updated.vue";
 import MdpAiModal from "./mdp-ai-modal.vue";
 import { useHeaderStore } from "./store/mdpHeaderStore";
 import { useRowsStore } from "./store/mdpRowsStore";
@@ -106,11 +107,8 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                     :text="(row[columnHeader.key] as string | null)"
                 />
                 </template>
-                <template #Date="{ row, header: columnHeader }">
-                    <div class="l-pad-s">
-                        <!-- Just a basic display -->
-                        {{ row[columnHeader.key] ? (row[columnHeader.key] as string) : "" }}
-                    </div>
+                <template #Date="{ row }">
+                    <mdp-grid-cell-last-updated :profile="row as Profile" />
                 </template>
             </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />

@@ -5,12 +5,19 @@
 
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import LgCellActionSave from "@schoolboxVue/components/grid/lazyGrid/lg-cell-action-save.vue";
-import type { Profile, ProfileAdjustmentKeys, AdjustmentType } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useHeaderStore } from "../store/mdpHeaderStore";
-import { useRowsStore, ANIMATION_DURATION } from "../store/mdpRowsStore";
-import { useSaveStore } from "../store/mdpSaveStore";
-import MdpGridCellShowMore from "./mdp-grid-cell-show-more.vue";
-import { useContentHeight } from "./composable/useContentHeight";
+import {
+    useLazyGridRowsHeightStore,
+    ANIMATION_DURATION,
+} from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsHeightStore";
+import { useContentHeight } from "@schoolboxVue/components/grid/lazyGrid/composable/useContentHeight";
+import LgCellShowMore from "@schoolboxVue/components/grid/lazyGrid/lg-cell-show-more.vue";
+import type {
+    Profile,
+    ProfileAdjustmentKeys,
+    AdjustmentType,
+} from "../../../js/types/manageDifferentiationProfilesTypes";
+import { useHeaderStore } from "../../store/mdpHeaderStore";
+import { useSaveStore } from "../../store/mdpSaveStore";
 
 const props = defineProps<{
     profile: Profile;
@@ -20,7 +27,7 @@ const props = defineProps<{
 }>();
 
 const headerStore = useHeaderStore();
-const rowsStore = useRowsStore();
+const lgRowsHeightStore = useLazyGridRowsHeightStore();
 const saveStore = useSaveStore();
 const contentEl = window.Vue.ref<HTMLElement | null>(null);
 const componentActionEl = window.Vue.ref<HTMLElement | null>(null);
@@ -31,10 +38,11 @@ const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations i
  * and provide these heights for the 'View more' functionality
  */
 const { contentHeight, componentActionHeight } = useContentHeight(
-    props.profile,
+    props.profile.student.id,
     props.headerKey,
     contentEl,
     componentActionEl,
+    lgRowsHeightStore,
 );
 
 // #region modifying the selected adjustments
@@ -56,8 +64,7 @@ const isSaving = window.Vue.ref(false);
  * Whether the content of the cell is focused
  */
 const isContentFocused = window.Vue.computed(() => {
-    const store = rowsStore as unknown as { focusedCells?: Record<number, string[]> };
-    return (store.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
+    return (lgRowsHeightStore.focusedCells?.[props.profile.student.id] ?? []).includes(props.headerKey);
 });
 
 /**
@@ -74,7 +81,7 @@ const isContentEmpty = window.Vue.computed(() => {
  * When the modify button is clicked.
  */
 function onModify(): void {
-    rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
+    lgRowsHeightStore.updateFocusedCell(props.profile.student.id, props.headerKey, true);
 }
 
 // #endregion modifying the selected adjustments
@@ -101,7 +108,7 @@ async function onSave(): Promise<void> {
     isSaving.value = true;
     // If both original and new values are null/empty, don't trigger save
     if (props.adjustments === null && selectedAdjustments.value.length === 0) {
-        rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
+        lgRowsHeightStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
         isSaving.value = false;
         return;
     }
@@ -111,7 +118,7 @@ async function onSave(): Promise<void> {
         [props.headerKey]: newValue,
     };
     await saveStore.save(props.profile, toSave);
-    rowsStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
+    lgRowsHeightStore.updateFocusedCell(props.profile.student.id, props.headerKey, false);
     isSaving.value = false;
 }
 </script>
@@ -123,7 +130,7 @@ async function onSave(): Promise<void> {
             'grid-cell--content-focused': isContentFocused,
         }"
         :style="{
-            height: `${rowsStore.rowDisplayHeights?.[props.profile.student.id]}px`,
+            height: `${lgRowsHeightStore.rowDisplayHeights?.[props.profile.student.id]}px`,
         }"
     >
         <div ref="contentEl">
@@ -160,8 +167,8 @@ async function onSave(): Promise<void> {
         </div>
         <div class="content-container-fixed">
             <div v-if="!isContentEmpty" class="content-overlay">
-                <mdp-grid-cell-show-more
-                    :profile="props.profile"
+                <lg-cell-show-more
+                    :row-id="props.profile.student.id"
                     :header-key="props.headerKey"
                     :content-height="contentHeight"
                     :component-action-height="componentActionHeight"

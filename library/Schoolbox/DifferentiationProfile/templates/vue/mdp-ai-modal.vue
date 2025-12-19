@@ -65,7 +65,7 @@ function onConfirmSelected(): void {
 <template>
     <basic-modal v-model:is-open="genAiStore.isOpen">
         <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirmSelected">
-            <h2 data-test="up-delete-units-title">
+            <h2>
                 Suggested {{ locale.differentiationProfile.translate(false, true) }} for
                 {{ genAiStore.profile?.student.givenName }}
                 {{ genAiStore.profile?.student.lastName }}
@@ -103,6 +103,7 @@ function onConfirmSelected(): void {
                     <div v-if="item.response !== null && item.response !== ''" v-html="item.response"></div>
                     <p v-else class="meta">No response provided.</p>
                 </div>
+                <span class="meta">AI sometimes gets things wrong — please check important details.</span>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button

@@ -6,10 +6,10 @@
 import { sbProps } from "@js/util/sbx/pageUtils";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import type { Profile } from "../../js/types/manageDifferentiationProfilesTypes";
-import { useHeaderStore } from "../store/mdpHeaderStore";
-import { useLinkedRecordsStore } from "../store/mdpLinkedRecordsStore";
-import { useGenAiStore } from "../store/mdpGenAiStore";
+import type { Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
+import { useHeaderStore } from "../../store/mdpHeaderStore";
+import { useLinkedRecordsStore } from "../../store/mdpLinkedRecordsStore";
+import { useGenAiStore } from "../../store/mdpGenAiStore";
 
 const props = defineProps<{
     user: User;

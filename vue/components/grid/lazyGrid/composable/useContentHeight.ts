@@ -4,27 +4,27 @@
  */
 
 import type { Ref } from "vue";
-import type { Profile, ProfileKeys } from "../../../js/types/manageDifferentiationProfilesTypes";
-import { useRowsStore } from "../../store/mdpRowsStore";
+import type { useLazyGridRowsHeightStore } from "../store/lgRowsHeightStore";
 
 /**
  * Tracks the content height and component action height of a grid cell
- * @param profile - The profile object
- * @param headerKey - The key of the profile header
+ * @param id - The row ID
+ * @param headerKey - The key of the header
  * @param contentEl - The ref to the content element
  * @param componentActionEl - The ref to the component action element
+ * @param lgRowsHeightStore - The lazy grid rows height store instance
  * @returns contentHeight, componentActionHeight - The heights of the content and component action elements
  */
 export function useContentHeight(
-    profile: Profile,
-    headerKey: ProfileKeys,
+    id: number,
+    headerKey: string,
     contentEl: Ref<HTMLElement | null>,
     componentActionEl: Ref<HTMLElement | null>,
+    lgRowsHeightStore: ReturnType<typeof useLazyGridRowsHeightStore>,
 ): {
     contentHeight: Ref<number>;
     componentActionHeight: Ref<number>;
 } {
-    const rowsStore = useRowsStore();
     const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
     const contentHeight = window.Vue.ref(0);
     const componentActionHeight = window.Vue.ref(0);
@@ -35,7 +35,7 @@ export function useContentHeight(
     function updateContentHeight(): void {
         contentHeight.value = contentEl.value?.offsetHeight || 0;
         componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
-        rowsStore.setContentHeight(profile, headerKey, contentHeight.value + componentActionHeight.value);
+        lgRowsHeightStore.setContentHeight(id, headerKey, contentHeight.value + componentActionHeight.value);
     }
 
     /**
