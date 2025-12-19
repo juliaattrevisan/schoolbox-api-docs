@@ -1,0 +1,166 @@
+name: Build and push presidio-anonymizer
+
+# Build presidio-anonymizer images from microsoft/presidio repo:
+# * manually (workflow_dispatch)
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-anonymizer:
+    env:
+      AWS_REGION: ap-southeast-2
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        build:
+          - runs-on: onprem-k3s
+            platform: linux
+            arch: amd64
+          - runs-on: onprem-k3s-arm
+            platform: linux
+            arch: arm64
+    runs-on: ${{ matrix.build.runs-on }}
+    outputs:
+      presidio_hash: ${{ steps.presidio-hash.outputs.short_sha }}
+    steps:
+      - name: Checkout Presidio repository
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/presidio
+          ref: main
+          path: presidio
+
+      - name: Get Presidio commit hash
+        id: presidio-hash
+        working-directory: presidio
+        run: echo "short_sha=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
+
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.PRESIDIO_BUILD_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            network=host
+
+      - name: Meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push presidio-anonymizer
+        id: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: presidio/presidio-anonymizer
+          load: true
+          provenance: false
+          sbom: false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer
+            ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer
+          cache-from: type=gha
+          cache-to: type=gha
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build-and-push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload presidio-anonymizer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-presidio-anonymizer-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: 'error'
+          retention-days: 1
+
+  join-anonymizer:
+    env:
+      AWS_REGION: ap-southeast-2
+    timeout-minutes: 15
+    needs:
+      - build-and-push-anonymizer
+    runs-on: onprem-k3s
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.PRESIDIO_BUILD_ECR_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Download presidio-anonymizer artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-presidio-anonymizer-*
+          merge-multiple: 'true'
+
+      - name: Join presidio-anonymizer images
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          declare -a DOCKERHUB_IMAGES
+          declare -a ECR_IMAGES
+
+          # All I need is the hashes, which are in /digests:
+          # the hashes are the same between both Dockerhub and ECR
+          for file in $(ls -1 ${{ runner.temp }}/digests); do
+              DOCKERHUB_IMAGES+=("${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer@sha256:$file")
+              ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/presidio-anonymizer@sha256:$file")
+          done
+
+          # Extract branch name from GITHUB_REF
+          BRANCH_NAME=${GITHUB_REF/refs\/heads\//}
+          
+          # Build tag arguments based on branch
+          DOCKERHUB_TAGS="-t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${{ needs.build-and-push-anonymizer.outputs.presidio_hash }}"
+          DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${BRANCH_NAME}"
+          
+          ECR_TAGS="-t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${{ needs.build-and-push-anonymizer.outputs.presidio_hash }}"
+          ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${BRANCH_NAME}"
+          
+          # Add latest/testing tag based on branch
+          if [ "${{ github.ref }}" == "refs/heads/master" ]; then
+            DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:latest"
+            ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:latest"
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:testing"
+            ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:testing"
+          fi
+
+          docker buildx imagetools create $DOCKERHUB_TAGS "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create $ECR_TAGS "${ECR_IMAGES[@]}"
