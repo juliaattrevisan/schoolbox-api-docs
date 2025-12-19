@@ -66,6 +66,13 @@
         { 'type': 'due', 'label': 'Due' },
         { 'type': 'close', 'label': 'Late' },
     ] %}
+{% elseif assessment is lti %}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Publish' },
+        { 'type': 'open', 'label': 'Open' },
+        { 'type': 'due', 'label': 'Due' },
+        { 'type': 'close', 'label': 'Late' },
+    ] %}
 {% elseif assessment is dialogAgent %}
     {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui)
      # ...and the due date is put in the same place as Close Date, for cosmetic reasons only: it still retains
