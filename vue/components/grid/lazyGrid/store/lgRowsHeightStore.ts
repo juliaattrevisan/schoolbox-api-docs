@@ -50,7 +50,9 @@ export const useLazyGridRowsHeightStore = defineStore(`lazyGridRowsHeightStore`,
             if (focusedCells.value[$id] === undefined) {
                 focusedCells.value[$id] = [];
             }
-            focusedCells.value[$id].push(headerKey);
+            if (!focusedCells.value[$id].includes(headerKey)) {
+                focusedCells.value[$id].push(headerKey);
+            }
         } else {
             if (focusedCells.value[$id] === undefined) {
                 return;
