@@ -289,7 +289,8 @@ body.ck-fullscreen {
     clear: both;
 }
 
-.ck.ck-content p:first-child {
+.ck.ck-content p:first-child,
+.ck.ck-content ul:first-child {
     margin-top: 0;
 }
 
