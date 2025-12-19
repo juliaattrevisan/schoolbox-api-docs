@@ -254,8 +254,10 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
         $endDate = $endDate?->endOfDay();
         $booking->setBookingEndAt($endDate);
     } else {
-        $booking->setBookingStartAt($event->getStartDateTime());
-        $booking->setBookingEndAt($event->getEndDateTime());
+        // Since the bookings should have the same start and end dates as the event, set them as null.
+        // This way, if the event is moved to another time, the resource bookings will move with it.
+        $booking->setBookingStartAt(null);
+        $booking->setBookingEndAt(null);
     }
 
     // What about the resource? If it's an open resource, confirm the
