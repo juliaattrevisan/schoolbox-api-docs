@@ -54,13 +54,13 @@
                         {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
                         {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
                         {% if acceptingResponses is defined and acceptingResponses %}
-                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', '#planOpenDate' ) }}
-                            {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, '#planPublishDate', '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planOpenDate'   , '#planCloseDate') }}
-                            {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, '#planDueDate'    , ''              ) }}
+                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', 'planOpen' ) }}
+                            {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, 'planPublish', 'planDue'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, 'planOpen' , 'planClose') }}
+                            {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, 'planDue' , '' ) }}
                         {% else %}
-                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, ''                , '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planPublishDate', ''              ) }}
+                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '' , 'planDue'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, 'planPublish', '' ) }}
                         {% endif %}
                     </div>
                     {% for participant in participants %}

@@ -109,10 +109,10 @@
         <legend>Submission Dates</legend>
         <div class="row">
             <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '', 'open') }}
             </div>
             <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
+                {{ dateForm.dateField('Open', 'open', assessment.openAt, 'publish', 'due') }}
             </div>
             {# In dialog agents, Due Date is known as Close Date.
             #
@@ -124,11 +124,11 @@
             # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
             #}
             <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
+                {{ dateForm.dateField('Close', 'due', assessment.dueAt, 'open', 'close') }}
             </div>
             {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
             <div style="display:none">
-                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
+                {{ dateForm.dateField('Late', 'close', assessment.closeAt, 'due', '') }}
             </div>
         </div>
     </fieldset>
