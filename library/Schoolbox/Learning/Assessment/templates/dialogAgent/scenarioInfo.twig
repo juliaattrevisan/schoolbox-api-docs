@@ -39,8 +39,8 @@
     <ul>
         {% for criterion in scenario.criteria %}
             <li>
-                <strong>{{ criterion.title }}</strong>
-                <p class="meta">{{ criterion.prompt|nl2br }}</p>
+                <span>{{ criterion.title }}</span>
+                <span class="hint has-tip tip-top" data-tooltip title="{{ criterion.prompt|nl2br }}">?</span>
             </li>
         {% endfor %}
     </ul>
