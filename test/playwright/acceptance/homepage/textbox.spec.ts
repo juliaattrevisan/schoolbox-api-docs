@@ -175,7 +175,7 @@ test.describe("Textbox Tests", () => {
             deleted_at: null,
             "name LIKE": folderName,
         })) as number;
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${homepageId}`);
+        await page.goto(`/homepage/${homepageId}`);
         tester.isGoingTo("Unlock the components and edit the textbox settings");
         await homepage.clickLockToggle();
         const component = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
@@ -213,7 +213,7 @@ test.describe("Textbox Tests", () => {
         await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Untitled textbox");
         await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Jana to be hidden");
         tester.isGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${homepageId}`);
+        await page.goto(`/homepage/${homepageId}`);
         await expect(page.locator("#container")).toContainText("Jamal to be presented");
         await expect(page.locator("#container")).not.toContainText("Jana to be hidden");
     });

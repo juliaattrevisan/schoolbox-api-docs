@@ -57,22 +57,22 @@ test.describe("Group Permission Tests", () => {
 
         tester.isGoingTo("get logged in as a junior student to check the group is presented to them");
         await tester.impersonate(studentJunior);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).toContainText("Group Free");
 
         tester.isGoingTo("get logged in as a middle student to check the group is NOT presented to them");
         await tester.impersonateViaUserProfilePage(studentMiddle);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Free");
 
         tester.isGoingTo("get logged in as a senior student to check the group is presented to them");
         await tester.impersonateViaUserProfilePage(studentSenior);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).toContainText("Group Free");
 
         tester.isGoingTo("get logged in as Eloise White and check she is able to leave the group");
         await tester.impersonateViaUserProfilePage(groupMember);
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
+        await page.goto(`/homepage/${folderId}`);
         await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Group Free");
         await page.getByText("Leave Group").click();
@@ -131,22 +131,22 @@ test.describe("Group Permission Tests", () => {
 
         tester.isGoingTo("get logged in as a junior student to check the group is presented to them");
         await tester.impersonate(studentJunior);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).toContainText("Group Moderated");
 
         tester.isGoingTo("get  logged in as a middle student to check the group is NOT presented to them");
         await tester.impersonateViaUserProfilePage(studentMiddle);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Moderated");
 
         tester.isGoingTo("get logged in as a senior student to check the group is presented to them");
         await tester.impersonateViaUserProfilePage(studentSenior);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).toContainText("Group Moderated");
 
         tester.isGoingTo("get logged in as Eloise White and check she is able to leave the group");
         await tester.impersonateViaUserProfilePage(groupMember);
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
+        await page.goto(`/homepage/${folderId}`);
         await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Leave Group");
         await page.getByText("Leave Group").click();
@@ -206,22 +206,22 @@ test.describe("Group Permission Tests", () => {
 
         tester.isGoingTo("get logged in as a junior student to check the group is NOT presented to them");
         await tester.impersonate(studentJunior);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Restricted");
 
         tester.isGoingTo("get  logged in as a middle student to check the group is NOT presented to them");
         await tester.impersonateViaUserProfilePage(studentMiddle);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Restricted");
 
         tester.isGoingTo("get logged in as a senior student to check the group is NOT presented to them");
         await tester.impersonateViaUserProfilePage(studentSenior);
-        await page.goto("https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join");
+        await page.goto("/groups#groups-i-can-join");
         await expect(page.locator("#container")).not.toContainText("Group Restricted");
 
         tester.isGoingTo("get logged in as Jana Reed and check she is able to leave the group");
         await tester.impersonateViaUserProfilePage(groupMember);
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
+        await page.goto(`/homepage/${folderId}`);
         await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).not.toContainText("Leave Group");
     });
@@ -294,7 +294,7 @@ test.describe("Group Permission Tests", () => {
 
         tester.isGoingTo("Impersonate Jane Reed and access the sub folder");
         await tester.impersonate("Jana Reed");
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
+        await page.goto(`/homepage/${folderId}`);
         await expect(page.locator("#container")).not.toContainText("Group 1");
         await expect(page.locator("#container")).toContainText("You do not have permission to view this page");
     });

@@ -86,7 +86,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         // Navigate to newly created folder
         tester.isGoingTo("navigate to the newly created folder and store its location for later tests");
-        await page.goto("https://vagrant.dev.schoolbox.cloud/resources/");
+        await page.goto("/resources/");
 
         const resourceTreeItem = page.getByRole("treeitem", { name: folderName });
         await resourceTreeItem.click();

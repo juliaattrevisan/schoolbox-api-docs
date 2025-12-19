@@ -7,7 +7,7 @@ export default class QuizContentsPage {
 
     private page: Page;
 
-    static readonly URL = "https://vagrant.dev.schoolbox.cloud/learning/quiz/{quiz_id}/content";
+    static readonly URL = "/learning/quiz/{quiz_id}/content";
 
     // Constants for selectors - these are from learnosity and we will need to get updated in case they update it iin their end
     static readonly ITEM_BUTTON = "span.lrn-author-button-text";

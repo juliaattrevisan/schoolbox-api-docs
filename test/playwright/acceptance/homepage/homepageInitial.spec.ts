@@ -3,8 +3,7 @@
  * add content to the components and check its contents as different users, delete the component,
  * delete the homepage(by clicking cancel in the confirmation dialog it is not deleted, by confirming it is deleted)
  * 1. Provision sales.tar.gz data
- * 2. vagrant ssh
- * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Homepage/ComponentsCest
+ * 2. npx playwright test homepageInitial.spec.ts
  */
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
