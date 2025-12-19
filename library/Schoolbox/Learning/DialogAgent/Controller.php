@@ -197,6 +197,20 @@ class Controller extends Base
     {
         $postArray = $this->requestPost->getArrayCopy();
 
+        $requiredTextFields = ['openingMessage', 'rules'];
+        foreach ($requiredTextFields as $field) {
+            if (empty(trim((string)$postArray[$field]))) {
+                $problem = new ApiProblem(\sprintf('The "%s" field is required.', $field))
+                    ->setStatus(400)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus(400);
+
+                return;
+            }
+        }
+
         $assessment->setHelpfulness(Helpfulness::from($postArray['helpfulness']))
             ->setLanguage($postArray['language'])
             ->setOpeningMessage($postArray['openingMessage'])
@@ -219,7 +233,19 @@ class Controller extends Base
         $existingFieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId)->indexBy('id');
 
         foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
-            $existingFieldContexts[$fieldContextId]->setBody($postArray['fieldContexts'][$fieldContextId]);
+            $body = trim((string)($postArray['fieldContexts'][$fieldContextId] ?? ''));
+            if (empty($body)) {
+                $problem = new ApiProblem(\sprintf('The "%s" field is required.', $fieldContext->getField()->getTitle()))
+                    ->setStatus(400)
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus(400);
+
+                return;
+            }
+
+            $existingFieldContexts[$fieldContextId]->setBody();
         }
 
         /* I'll save them. I'll save them all.
