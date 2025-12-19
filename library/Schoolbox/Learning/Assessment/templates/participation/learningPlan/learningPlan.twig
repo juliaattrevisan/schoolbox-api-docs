@@ -49,19 +49,13 @@
                         </textarea>
                     </div>
                     <div class="columns small-12">
-                        {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
-                        {% set openAt = plan is defined ? plan.openDate : assessment.openAt %}
-                        {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
-                        {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
-                        {% if acceptingResponses is defined and acceptingResponses %}
-                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', 'planOpen' ) }}
-                            {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, 'planPublish', 'planDue'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, 'planOpen' , 'planClose') }}
-                            {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, 'planDue' , '' ) }}
-                        {% else %}
-                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '' , 'planDue'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, 'planPublish', '' ) }}
-                        {% endif %}
+                        {% include '@learningAssessment/fragments/dates.twig' with {
+                            assessment,
+                            publishAt: plan is defined ? plan.publishDate : assessment.publishAt,
+                            openAt:    plan is defined ? plan.openDate    : assessment.openAt,
+                            dueAt:     plan is defined ? plan.dueDate     : assessment.dueAt,
+                            lateAt:    plan is defined ? plan.closeDate   : assessment.closeAt,
+                        } only %}
                     </div>
                     {% for participant in participants %}
                         {% set user = participant.user %}
@@ -107,19 +101,19 @@
                     }
                 },
                 "plan-desc": "required",
-                planPublishDate: {
+                publishDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                planOpenDate: {
+                openDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                planDueDate: {
+                dueDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                planCloseDate: {
+                closeDate: {
                     required: true,
                     datepickerDate: true,
                 },
