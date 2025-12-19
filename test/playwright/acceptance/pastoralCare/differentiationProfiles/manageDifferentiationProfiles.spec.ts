@@ -19,12 +19,30 @@ test.describe("Manage Differentiation Profiles", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Verify the page can't be accessed when profiles are disabled", async ({ tester, page }) => {
+    test("Verify the page can't be accessed when Differentiation is disabled", async ({ tester, page }) => {
         const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
         await manageDifferentiationProfiles.navigateToPage();
-        tester.isGoingTo("Verify that 'You do not have permission to view this page.' is shown");
+        tester.isGoingTo("Verify that 'You do not have permission to view this page.' is shown for super users");
         const noPermissionText = page.getByText("You do not have permission to view this page.");
         await expect(noPermissionText).toBeVisible();
+    });
+
+    test("Verify the page can't be accessed when user has Differentiation service permission", async ({
+        tester,
+        page,
+        db,
+    }) => {
+        try {
+            const manageDifferentiationProfiles = new ManageDifferentiationProfiles(tester, page);
+            await db.haveInDatabase("userAccess", { uid: 22, service: 16, sid: 1, type: 2 });
+            await tester.impersonateTeacher();
+            await manageDifferentiationProfiles.navigateToPage();
+            const noPermissionText = page.getByText("You do not have permission to view this page.");
+            await expect(noPermissionText).toBeVisible();
+        } finally {
+            tester.isGoingTo("Clean up: Remove service permission from Jack Coles user");
+            await db.dontHaveInDatabase("userAccess", { uid: 22, service: 16, sid: 1, type: 2 });
+        }
     });
 
     test("Verify the page can't be accessed without service permission enabled", async ({ tester, page, db }) => {
@@ -43,7 +61,7 @@ test.describe("Manage Differentiation Profiles", () => {
         }
     });
 
-    test("Verify the page can be accessed once profiles are enabled and service permission is granted", async ({
+    test("Verify the page can be accessed once Differentiation is enabled and service permission is granted", async ({
         tester,
         page,
         db,
