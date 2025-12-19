@@ -16,6 +16,7 @@ import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
 import type { SelectizeSelectorOptions } from "@js/vendors/selectize/selectizeSelectorTypes";
 import type { AiFeature } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
+import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
 type Dropzone = {
@@ -47,6 +48,14 @@ declare global {
         Dropzone: Dropzone;
         MediaElementPlayer: MediaElementPlayer;
         sbProps: {
+            /** Enabled assessment types, mapped to default readable name, translated to match the current terminology */
+            assessmentTypes: Record<
+                Partial<ActivityType>,
+                {
+                    name: string;
+                    icon: string;
+                }
+            >;
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
             siteTitle: string;

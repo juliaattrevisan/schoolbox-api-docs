@@ -153,7 +153,7 @@ test.describe("Lesson Plan Activity", () => {
 
         tester.isGoingTo("click New Lesson Plan button to create a lesson plan");
         await unitPlanner.clickCreateActivityButton(unitId);
-        await unitPlanner.clickCreateActivityOption("lesson-plan", unitId);
+        await unitPlanner.clickCreateActivityOption("lessonPlan", unitId);
         await page.waitForLoadState("domcontentloaded");
         const lessonPlanTemplateId = (await db.grabFromDatabase("lesson_plan_template", "id", {
             deleted_at: null,
@@ -262,7 +262,7 @@ test.describe("Lesson Plan Activity", () => {
         );
         await unitPlanner.goto(6);
         await unitPlanner.clickCreateActivityButton(unitPersuasionAndMediaId);
-        await unitPlanner.clickCreateActivityOption("lesson-plan", unitPersuasionAndMediaId);
+        await unitPlanner.clickCreateActivityOption("lessonPlan", unitPersuasionAndMediaId);
         await page.waitForLoadState("domcontentloaded");
         await templateList.clickTemplateLink(lessonPlanTemplateId);
         await tester.common.clickSubmitButton();

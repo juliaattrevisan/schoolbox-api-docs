@@ -10,6 +10,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use ValueError;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\AssessmentType;
 
 /**
  * Cursor for curriculum coverage report
@@ -39,26 +40,12 @@ class Cursor implements ICursor
 
     public const COURSE_COURSE_SPECIFICATION = 'courseSpecification';
     public const COURSE_UNIT = 'unit';
-    public const COURSE_ACTIVITY_TASK = 'task';
-    public const COURSE_ACTIVITY_QUIZ = 'quiz';
-    public const COURSE_ACTIVITY_LTI = 'LTI';
-    public const COURSE_ACTIVITY_DUE_WORK = 'dueWork';
-    public const COURSE_ACTIVITY_PROJECT = 'project';
-    public const COURSE_ACTIVITY_LESSON_PLAN = 'lessonPlan';
     public const COURSE_ACTIVITY = 'activity';
     public const COURSE_RUBRIC_CAPABILITY = 'rubricCapability';
     public const COURSE_UNIT_RUBRIC_CAPABILITY = 'unitRubricCapability';
     public const COURSE_RUBRIC_INDICATOR = 'rubricIndicator';
     public const COURSE_UNIT_RUBRIC_INDICATOR = 'unitRubricIndicator';
     public const COURSE_IN_USE_RUBRIC = 'inUseRubric';
-    public const ACTIVITY_ICON_LIST = [
-        self::COURSE_ACTIVITY_DUE_WORK => 'due-work',
-        self::COURSE_ACTIVITY_TASK => 'task',
-        self::COURSE_ACTIVITY_QUIZ => 'quiz',
-        self::COURSE_ACTIVITY_LTI => 'lti',
-        self::COURSE_ACTIVITY_PROJECT => 'project',
-        self::COURSE_ACTIVITY_LESSON_PLAN => 'lesson-plan',
-    ];
 
     public function __construct(
         private CurriculumMapper $curriculumMapper,
@@ -223,6 +210,9 @@ class Cursor implements ICursor
                      UNION
                      SELECT '%s' type, p.assessment_id
                      FROM project p
+                     UNION
+                     SELECT '%s' type, dialogAgent.assessment_id
+                     FROM dialog_agent dialogAgent
                 ) activity
                 INNER JOIN curriculum_node_for_assessment cnfa
                     ON cnfa.assessment_id = activity.assessment_id
@@ -242,11 +232,12 @@ class Cursor implements ICursor
                 INNER JOIN assessment a ON a.id = activity.assessment_id AND a.deleted_at IS NULL
                 GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
-                self::COURSE_ACTIVITY_TASK,
-                self::COURSE_ACTIVITY_QUIZ,
-                self::COURSE_ACTIVITY_LTI,
-                self::COURSE_ACTIVITY_DUE_WORK,
-                self::COURSE_ACTIVITY_PROJECT,
+                AssessmentType::TYPE_TASK,
+                AssessmentType::TYPE_QUIZ,
+                AssessmentType::TYPE_LTI_ASSESSMENT,
+                AssessmentType::TYPE_DUE_WORK,
+                AssessmentType::TYPE_PROJECT,
+                AssessmentType::TYPE_DIALOG_AGENT,
                 $nodesPlaceHolder,
                 $coursePlaceHolder
             );
@@ -278,7 +269,7 @@ class Cursor implements ICursor
                 WHERE lp.deleted_at IS NULL
                 GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
-                self::COURSE_ACTIVITY_LESSON_PLAN,
+                AssessmentType::TYPE_LESSON_PLAN,
                 $nodesPlaceHolder,
                 $coursePlaceHolder
             );

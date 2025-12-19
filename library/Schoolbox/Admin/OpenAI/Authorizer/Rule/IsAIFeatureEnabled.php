@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\OpenAI\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Schoolbox\Admin\OpenAI\ValidAIFeatureEnabled;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 
@@ -33,11 +34,8 @@ class IsAIFeatureEnabled implements IAuthorizationRule
      */
     public function authorize(array $params = [], ?User $user = null): void
     {
-        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
-        $featureConfig = $aiConfig->decode((string)$this->configLoader->get($this->featureConfigName));
-
-        if (!$aiConfig->isEnabled($featureConfig)) {
-            throw new Unauthorized(sprintf(
+        if (!(new ValidAIFeatureEnabled($this->configLoader)->isSatisfiedBy($this->featureConfigName))) {
+            throw new Unauthorized(\sprintf(
                 'AI feature %s is not enabled',
                 $this->featureConfigName
             ));

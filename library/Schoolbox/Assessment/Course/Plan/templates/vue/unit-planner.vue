@@ -5,7 +5,6 @@
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import DummyInlineEditor from "@schoolboxVue/components/ckeditor/dummy-inline-editor.vue";
-import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
@@ -25,7 +24,6 @@ interface Props {
     units: Unit[];
     routeFolderSequence: string | null;
     routeImportIntoClasses: string | null;
-    ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
     routeCurriculumCoverage: string | null;
     editorTemplates: EditorTemplate[]; // the editor templates available for insertion into textboxes
@@ -33,7 +31,6 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
-const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
 const tabs = createTabs(props.template);
@@ -125,7 +122,6 @@ window.Vue.watch(
 
 window.Vue.onBeforeMount(() => {
     store.init(props.courseId, props.units, props.template, props.editorTemplates);
-    activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
         unitPlannerContainerEl as Ref<HTMLElement>, // Override type as it will be defined here.

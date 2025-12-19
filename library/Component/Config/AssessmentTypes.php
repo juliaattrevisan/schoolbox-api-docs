@@ -2,6 +2,7 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 
 class Component_Config_AssessmentTypes extends Component_Config_Abstract
 {
@@ -19,8 +20,9 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null): void
     {
         $di = $page->getDi();
-        $ltiEnabled = $di->get('config')->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-        $assessmentTypeOptions = Assessment\AssessmentType::getOptions($ltiEnabled);
+        $configLoader = $di->get('config');
+
+        $assessmentTypeOptions = Assessment\AssessmentType::getEnabledOptions($configLoader);
 
         // if config doesn't exist, then default to all options...
         $setConfig = $assessmentTypeOptions;

@@ -8,7 +8,6 @@
         {% set routeImportIntoClasses = routeLookup('courseImport.getImport', { courseSpecId: course.id ?? 0, folderId: 0, componentId: 0 }) %}
         :route-import-into-classes="{{ routeImportIntoClasses ? (routeImportIntoClasses |json_encode) : 'null' }}"
         :units="{{ units |json_encode }}"
-        :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
         :template="{{ template |json_encode }}"
         {% set routeCurriculumReport = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
         :route-curriculum-coverage="{{ routeCurriculumReport ? (routeCurriculumReport|json_encode) : 'null' }}"

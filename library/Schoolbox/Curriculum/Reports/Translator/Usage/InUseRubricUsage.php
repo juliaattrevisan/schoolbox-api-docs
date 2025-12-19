@@ -6,6 +6,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Reports\Cursor;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 
@@ -32,7 +33,7 @@ class InUseRubricUsage
         $capabilities = $usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()];
         return [
             'name' => $assessment->getTitle(),
-            'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
+            'icon' => AssessmentType::getIconClassSuffixForType(AssessmentType::TYPE_DUE_WORK),
             'rubric' => [
                 'capabilities' => array_map(
                     function ($cap) use ($capabilities) {

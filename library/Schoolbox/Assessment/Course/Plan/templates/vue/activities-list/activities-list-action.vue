@@ -4,7 +4,6 @@
  * Currently has the ability to create a new activity via a dropdown of activity types
  */
 import locale from "@js/terminology/rosettaStone";
-import { useActivitiesListGlobalStore } from "./store/activitiesListGlobalStore";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import ActivitiesListActionCreateInner from "./activities-list-action-create-inner.vue";
 
@@ -13,7 +12,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
 </script>
 
@@ -29,7 +27,6 @@ const activitiesListStore = useActivitiesListStore(props.activitiesListStoreId);
             <activities-list-action-create-inner
                 :content-id="`dropdown-activities-list-activity-${props.activitiesListStoreId}`"
                 :create-route="activitiesListStore().routes.create!"
-                :lti-assessments-enabled="activitiesListGlobalStore.ltiAssessmentsEnabled"
             ></activities-list-action-create-inner>
         </section>
     </div>

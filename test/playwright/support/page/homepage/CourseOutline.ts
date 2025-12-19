@@ -1,6 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 import { expect } from "@schoolboxTest/playwright/support/integrations";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import Homepage from "./Homepage";
 
 export default class CourseOutline {
@@ -51,9 +52,9 @@ export default class CourseOutline {
      * Uses the course outline component to find an unit and clicks its 3-dot menu
      * clicks one of the options in the menu: project, task, due work, quiz, lesson plan
      * @param unitName - The name of the unit to find in the course outline
-     * @param menuOption - The name of the menu option to click: project, task, due-work, quiz, lesson-plan
+     * @param menuOption - The assessment type to add
      */
-    async selectOptionUnitDotMenu(unitName: string, menuOption: string): Promise<void> {
+    async selectOptionUnitDotMenu(unitName: string, menuOption: ActivityType): Promise<void> {
         // Find the course outline and the unit we created inside it
         this.tester.isGoingTo("find the unit in the course outline");
         const courseOutline = this.homepage.locateComponentByName("Course Outline");

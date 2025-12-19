@@ -31,6 +31,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as Unit;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -143,8 +144,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->courseImplementation = null;
         $filters = json_decode(html_entity_decode($this->getConfig('assessmentTypes')), true);
 
-        $ltiEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-        $assessmentTypeOptions = AssessmentType::getOptions($ltiEnabled);
+        $assessmentTypeOptions = AssessmentType::getEnabledOptions($this->getConfigLoader());
 
         /**
          * if filters fail, we should use the system default, of show everything
@@ -293,6 +293,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         $data = [
+            'assessmentTypes'      => AssessmentType::getEnabledOptions($this->getConfigLoader()),
             'filterList'           => $this->filterList,
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,

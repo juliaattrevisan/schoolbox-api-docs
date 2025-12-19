@@ -13,6 +13,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\Search\Api\Database\ResultType;
@@ -140,8 +141,7 @@ class Controller extends Base
         $configLoader = $this->getConfigLoader();
 
         if ($configLoader->get(ConfigMapper::NAME_LMS_ENABLED)) {
-            $ltiEnabled = $configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);
-            $assessmentTypes = AssessmentType::getOptions($ltiEnabled);
+            $assessmentTypes = AssessmentType::getEnabledOptions($configLoader);
 
             $subTypes = [];
             foreach ($assessmentTypes as $typeKey => $title) {

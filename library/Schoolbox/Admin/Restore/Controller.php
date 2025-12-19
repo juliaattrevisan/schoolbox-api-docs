@@ -184,9 +184,8 @@ class Controller extends Base
             'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
-            'assessmentTypes'    => Assessment\AssessmentType::getOptions(
-                $this->getConfigLoader()->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE),
-            ),
+            /** Specificaly include all assessment types, even disabled ones - this is used to render the "Type" column */
+            'allAssessmentTypes'    => Assessment\AssessmentType::getOptions(),
             'deletedUsers'       => $deletedUsers,
             'deletedFiles'       => $deletedFiles,
 

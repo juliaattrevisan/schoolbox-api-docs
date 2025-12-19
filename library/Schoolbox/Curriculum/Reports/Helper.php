@@ -8,6 +8,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityM
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\Access;
 
@@ -132,6 +133,9 @@ class Helper
                  UNION
                  SELECT :project type, p.assessment_id
                  FROM project p
+                 UNION
+                 SELECT :dialogAgent type, dialogAgent.assessment_id
+                 FROM dialog_agent dialogAgent
             ) activity
             INNER JOIN curriculum_node_for_assessment cnfa
                 ON cnfa.assessment_id = activity.assessment_id
@@ -188,12 +192,13 @@ class Helper
 
         $param = [
             'type' => Cursor::COURSE_ACTIVITY,
-            'task' => Cursor::COURSE_ACTIVITY_TASK,
-            'quiz' => Cursor::COURSE_ACTIVITY_QUIZ,
-            'lti' => Cursor::COURSE_ACTIVITY_LTI,
-            'dueWork' => Cursor::COURSE_ACTIVITY_DUE_WORK,
-            'project' => Cursor::COURSE_ACTIVITY_PROJECT,
-            'lpType' => Cursor::COURSE_ACTIVITY_LESSON_PLAN,
+            'task' => AssessmentType::TYPE_TASK,
+            'quiz' => AssessmentType::TYPE_QUIZ,
+            'lti' => AssessmentType::TYPE_LTI_ASSESSMENT,
+            'dueWork' => AssessmentType::TYPE_DUE_WORK,
+            'project' => AssessmentType::TYPE_PROJECT,
+            'dialogAgent' => AssessmentType::TYPE_DIALOG_AGENT,
+            'lpType' => AssessmentType::TYPE_LESSON_PLAN,
             'nodeId' => $nodeId,
             'courseId' => $courseId,
             'unitId' => $unitId,
@@ -205,7 +210,7 @@ class Helper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][$row['id']] = [
                 'id' => $row['id'],
-                'icon' => Cursor::ACTIVITY_ICON_LIST[$row['assessmentType']],
+                'icon' => AssessmentType::getIconClassSuffixForType($row['assessmentType']),
             ];
         }
 
@@ -381,10 +386,10 @@ class Helper
                 array_keys($usage[Cursor::COURSE_ACTIVITY] ?? []),
             )->reindex();
 
-        $result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] =
+        $result[AssessmentType::TYPE_LESSON_PLAN] =
             $this->assessmentMapper->findByColumn(
                 'id',
-                array_keys($usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []),
+                array_keys($usage[AssessmentType::TYPE_LESSON_PLAN] ?? []),
             )->reindex();
 
         $result[Cursor::COURSE_IN_USE_RUBRIC] =

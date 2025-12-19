@@ -23,6 +23,7 @@ use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -563,9 +564,10 @@ class ListController extends Web\Controller\Base
             ],
         ];
 
-        /* TODO: don't show dialog agent if the feature is disabled (SA-21201)
-         * if (...ai config stuff) {
-         */
+        // TODO: avoid this AI config copypasta to check if dialog agent is enabled
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $dialogAgentAIFeatureConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+        if ($aiConfig->isEnabled($dialogAgentAIFeatureConfig)) {
             $data['types'][] = [
                 'id'    => 'dialog-agent',
                 'value' => AssessmentType::TYPE_DIALOG_AGENT,
@@ -573,7 +575,7 @@ class ListController extends Web\Controller\Base
                 'icon'  => 'dialog-agent',
                 'title' => 'Create an activity for students to interact with AI about a topic',
             ];
-        /* TODO: } */
+        }
 
         $participants = $this->requestQuery->get('student');
 

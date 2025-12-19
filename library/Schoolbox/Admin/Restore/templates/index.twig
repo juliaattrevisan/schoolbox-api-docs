@@ -141,17 +141,19 @@
                             <td>
                                 {% set assessmentType = '' %}
                                 {% if assessment.hasProject %}
-                                    {% set assessmentType = assessmentTypes.project %}
+                                    {% set assessmentType = allAssessmentTypes.project %}
                                 {% elseif assessment.hasTask %}
-                                    {% set assessmentType = assessmentTypes.task %}
+                                    {% set assessmentType = allAssessmentTypes.task %}
                                 {% elseif assessment.hasQuiz %}
-                                    {% set assessmentType = assessmentTypes.quiz %}
+                                    {% set assessmentType = allAssessmentTypes.quiz %}
                                 {% elseif assessment.hasDueWork %}
-                                    {% set assessmentType = assessmentTypes.dueWork %}
+                                    {% set assessmentType = allAssessmentTypes.dueWork %}
                                 {% elseif assessment.hasLtiAssessment %}
-                                    {% set assessmentType = assessmentTypes.lti %}
+                                    {% set assessmentType = allAssessmentTypes.lti %}
                                 {% elseif assessment.hasLessonPlan %}
-                                    {% set assessmentType = assessmentTypes.lessonPlan %}
+                                    {% set assessmentType = allAssessmentTypes.lessonPlan %}
+                                {% elseif assessment.hasDialogAgent %}
+                                    {% set assessmentType = allAssessmentTypes.dialogAgent %}
                                 {% endif %}
                                 {{ assessmentType }}
                             </td>

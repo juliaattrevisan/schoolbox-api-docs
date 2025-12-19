@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
@@ -17,6 +19,7 @@ use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 
 /**
  * Encapsulates the mapping between Assessment Types and:
@@ -130,11 +133,11 @@ class AssessmentType implements IType
         }
 
         if (self::TYPE_LESSON_PLAN === $stringVal) {
-            return (new \Schoolbox\Learning\Assessment\LessonPlan\Model())->setContext($context);
+            return (new LessonPlan())->setContext($context);
         }
 
         if (self::TYPE_DIALOG_AGENT === $stringVal) {
-            return (new \Schoolbox\Learning\Assessment\DialogAgent\Model())->setContext($context);
+            return (new DialogAgent())->setContext($context);
         }
 
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
@@ -180,26 +183,39 @@ class AssessmentType implements IType
     }
 
     /**
-     * Returns the list of enabled assessment (activity) types
+     * Returns the list of all assessment (activity) types
      * The mapped values are the readable type names, respecting terminology, in "Title Case"
      *
-     * @param bool $ltiEnabled      // Is LTI Enabled? check ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE
      * @return array<string, string>
      */
-    public static function getOptions(bool $ltiEnabled): array
+    public static function getOptions(): array
     {
         // Bind the assessment types to their readable names
         $list = array_combine(
             self::ALL_TYPES,
-            array_map(
-                fn($type) => self::stringToReadableName($type),
-                self::ALL_TYPES,
-            )
+            array_map(self::stringToReadableName(...), self::ALL_TYPES)
         );
 
-        // if LTI is not enabled then remove that entry
-        if (!$ltiEnabled) {
-            unset($list['lti']);
+        return $list;
+    }
+
+    /**
+     * Returns the list of enabled assessment (activity) types
+     * The mapped values are the readable type names, respecting terminology, in "Title Case"
+     *
+     * @param IConfigLoader $configLoader
+     * @return array<string, string>
+     */
+    public static function getEnabledOptions(IConfigLoader $configLoader): array
+    {
+        $list = self::getOptions();
+
+        /** some assessment types can be disabled, remove them from the list */
+        if (!$configLoader->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE)) {
+            unset($list[self::TYPE_LTI_ASSESSMENT]);
+        }
+        if (!new ValidDialogAgentEnabled($configLoader)->isSatisfied()) {
+            unset($list[self::TYPE_DIALOG_AGENT]);
         }
 
         return $list;

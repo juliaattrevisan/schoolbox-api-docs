@@ -1,4 +1,5 @@
 {% import '@learningAssessment/fragments/macro/unit/completed.twig' as status %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
 
 <ul class="information-list">
     {% for unit in courseImplementation.units %}
@@ -30,20 +31,21 @@
                     <sbx-pop-out content-id="component{{ componentInstance.id }}-unit-options{{ unit.id }}"></sbx-pop-out>
                 </nav>
                 <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-unit-options{{ unit.id }}">
-
                     {% if unit.isAfterDueDate == false %}
-                    <li class="separator">Create</li>
-                    {% set createAssessmentRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) %}
-                    <li><a href="{{ createAssessmentRoute }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project" data-test="course-outline-menu-add-project">{{ locale.project.proper }}</a></li>
-                    <li><a href="{{ createAssessmentRoute }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-test="course-outline-menu-add-due-work" data-add-button data-form_class="for-due-work">{{ locale.dueWork.proper }}</a></li>
-                    <li><a href="{{ createAssessmentRoute }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-test="course-outline-menu-add-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
-                    <li><a href="{{ createAssessmentRoute }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task" data-test="course-outline-menu-add-task">Task</a></li>
-                    {% if config.lti_assessments_enable %}
-                    <li><a href="{{ createAssessmentRoute }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">3rd Party Assessment</a></li>
+                        <li class="separator">Create</li>
+                        {% set createAssessmentRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) %}
+
+                        {% for type, label in assessmentTypes %}
+                            <li>
+                                <a
+                                    href="{{ createAssessmentRoute }}?type={{ type }}&{{ returnUrlName }}={{ encodedReturnUrl }}"
+                                    class="{{ icon.renderClassForType(type) }}"
+                                    data-test="course-outline-menu-add-{{ type }}"
+                                >{{ label }}</a>
+                            </li>
+                        {% endfor %}
                     {% endif %}
-                    <li><a href="{{ createAssessmentRoute }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan" data-test="course-outline-menu-add-lesson-plan">{{ locale.lessonPlan.proper }}</a></li>
-                    <li><a href="{{ createAssessmentRoute }}?type=dialogAgent&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-dialog-agent" data-test="course-outline-menu-add-dialog-agent">{{ locale.dialogAgent.proper }}</a></li>
-                    {% endif %}
+
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
                     {% if courseMarkbookRoute %}

@@ -19,7 +19,6 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Schoolbox\Admin\OpenAI\Authorizer\Rule\IsAIFeatureEnabled;
 use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
@@ -137,7 +136,7 @@ class Module extends BaseModule
         $canViewResponse = $this->buildAuthRuleCanViewResponse();
         $canSubmit = $this->buildAuthRuleCanSubmit();
         $canWrite = $this->buildAuthRuleHasInstructorOrHomepageAccess();
-        $isAIFeatureEnabled = new IsAIFeatureEnabled(ConfigMapper::NAME_AI_DIALOGAGENT, $this->getConfig());
+        $isFeatureEnabled = $this->buildIsFeatureEnabledAuthRule();
 
         $isAuthoritativeResponse = new Rule\Callback(function (array $params): void {
             /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
@@ -173,7 +172,7 @@ class Module extends BaseModule
                 $canWrite,
                 new AssessmentNotDeleted(),
                 new IsModifyUnLocked(new LockedChecker($this->getTermMapper()))
-            )
+            ),
         );
 
         /* Route Definitions
@@ -185,13 +184,19 @@ class Module extends BaseModule
 
         /* Create a dialog agent's configuration
          */
-        $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', $canModify, $preloadAssessment);
-        $this->register('POST', "{$assRoute}/configure", 'postUpdate', $canModify, $preloadAssessment);
+        $this->register('GET', "{$assRoute}/configure", 'getUpdateForm', new Rule\All(
+            $isFeatureEnabled,
+            $canModify,
+        ), $preloadAssessment);
+        $this->register('POST', "{$assRoute}/configure", 'postUpdate', new Rule\All(
+            $isFeatureEnabled,
+            $canModify,
+        ), $preloadAssessment);
 
         /* Instructor sends a message to the chat agent sandbox
          */
         $this->register('POST', "{$assRoute}/configure/message", 'postSandboxMessage', new Rule\All(
-            $isAIFeatureEnabled,
+            $isFeatureEnabled,
             $canModify,
         ), $preloadAssessment);
 
@@ -222,7 +227,7 @@ class Module extends BaseModule
         /* Student sends a message to the chat agent for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/message/{$responseParam}", 'postMessage', new Rule\All(
-            $isAIFeatureEnabled,
+            $isFeatureEnabled,
             $canInteractWithResponse,
             $this->buildRuleCanAction(NextRoutes::ACTION_MESSAGE),
             $this->buildIsConfiguredAuthRule()
@@ -286,12 +291,32 @@ class Module extends BaseModule
          */
         $this->register('POST', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'postGenerateFeedback', new Rule\All(
             $canViewResponse,
-            $isAIFeatureEnabled,
+            $isFeatureEnabled,
             $isAuthoritativeResponse,
             $isFeedbackRequired,
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
     }
+
+
+    /**
+     * Ensure the Dialog Agent feature is enabled
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function buildIsFeatureEnabledAuthRule(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params): void {
+                if (new ValidDialogAgentEnabled($this->getConfig())->isSatisfied()) {
+                    return;
+                }
+
+                throw new Unauthorized('Feature is not enabled');
+            })
+        );
+    }
+
 
 
     /**
