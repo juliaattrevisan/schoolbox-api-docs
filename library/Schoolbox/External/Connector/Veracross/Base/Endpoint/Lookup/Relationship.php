@@ -60,7 +60,7 @@ class Relationship
              * We don't need random associates
              */
             $generator = $this->api->retrieve('GET', 'relationships', Profile::SCOPE, [
-                'legal_custody' => true
+                'parent_portal_access' => true
             ]);
 
             foreach ($generator as $page) {

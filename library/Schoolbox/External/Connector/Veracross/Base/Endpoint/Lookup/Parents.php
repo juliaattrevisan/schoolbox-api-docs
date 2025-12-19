@@ -13,14 +13,13 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
 
 /**
- * Grab all the Parents from everywhere. This is the Household concept
- * in Veracross. Making individual requests "gimme parents of student x"
+ * Grab all the Parents from everywhere. Making individual requests "gimme parents of student x"
  * costs just over 1 second to execute, just to transfer the data.
  *
  * To dodge around the diabolical exchange rate we can index entire
- * families by their household id
+ * parents indexed by their ID
  */
-class Household
+class Parents
 {
     /**
      * Remember the output we might have previously generated
@@ -70,7 +69,7 @@ class Household
                     $compiledRecord['name_prefix'] = $valueLists['name_prefix'][$compiledRecord['name_prefix']];
                     $compiledRecord['name_suffix'] = $valueLists['name_suffix'][$compiledRecord['name_suffix']];
 
-                    $this->lookup[$record['household_id']][] = $compiledRecord;
+                    $this->lookup[$record['id']] = $compiledRecord;
                 }
             }
         }
