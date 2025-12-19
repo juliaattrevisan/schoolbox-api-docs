@@ -1965,7 +1965,6 @@ class Controller extends Assessment\Controller
 
         // setup some data...
         $data = [
-            'acceptingResponses' => true,
             'attachzone'         => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
             'allMarkTypes'       => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'    => $this->getAllGradeSchemes(),

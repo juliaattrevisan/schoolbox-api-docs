@@ -136,7 +136,6 @@ class Controller extends Assessment\Controller
         return [
             'types'                   => new Assessment\AssessmentType(),
             'selectedSummator'        => $selectedSummator,
-            'acceptingResponses'      => false,
             'allSummators'            => $summatorMapping,
             'allMarkTypes'            => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'         => $this->getAllGradeSchemes(),

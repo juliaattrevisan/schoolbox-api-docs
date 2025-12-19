@@ -125,11 +125,6 @@ class Controller extends Assessment\Controller
         $zoneFactory = new Assessment\Attachzone\Factory();
 
         return [
-            /* This is only used when creating assessments outside of the Course Import
-             * workflow. Lesson Plans must always go through Course Import so this var
-             * isn't really used at all
-             */
-            'acceptingResponses' => false,
             'attachzone' => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
         ];
     }
