@@ -40,6 +40,8 @@ class Mapper extends BaseMapper
     ];
 
     public const int DEFAULT_LIMIT = 20;
+
+    public const string FAR_FAR_AWAY_FULL_DATE = '9999-12-31';
     /**
      * Setup mapper
      */
@@ -354,93 +356,112 @@ class Mapper extends BaseMapper
             ]);
         }
 
+        $statusSubquery = $statusSelect = "";
+        $statusParam = [];
         if (!empty($status)) {
-            /* Build conditions for each status type
+            /* Build conditions for each status type using the computed status flags
              */
             $statusConditions = $this->getPredicateBuilder();
 
             /* Active records
              */
             if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_ACTIVE_RECORDS, $status)) {
-                $activeConditions = $this->getPredicateBuilder();
-
-                /* At least one active pastoral record
-                 */
-                $activeConditions->rawWhere("COALESCE(p.expires_at, '9999-12-31') >= :p_expires_at_active", [
-                    'p_expires_at_active' => \Alaress_Date_Format::now()->getDatabaseDate(),
-                ]);
-
-                /* Differentiation profile is up to date
-                 */
-                $activeConditions->rawWhere("COALESCE(p.updated_at, p.created_at) <= COALESCE(differentiation_profiles.updated_at, '9999-12-31')", []);
-
-                /* Differentiation profile has at least one field populated
-                 */
-                $tempPb = $this->getPredicateBuilder();
-
-                foreach (self::CONFIG_METHOD_MAPPING as $configKey => $methodName) {
-                    $key = "differentiation_profiles.$configKey";
-                    $tempPb = $tempPb->notAll(
-                        $this->getPredicateBuilder()->isNull($key)
-                             ->equals($key, '')
-                    );
-                }
-
-                $activeConditions->any($tempPb);
-                $statusConditions->all($activeConditions);
+                $statusConditions->equals('status_flags.is_active', 1);
             }
 
             /* Out of date records
              */
             if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_OUT_OF_DATE_RECORDS, $status)) {
-                /* Differentiation profile becomes out of date when there's a pastoral record updated after it
-                 */
-                $statusConditions->any(
-                    $this->getPredicateBuilder()->rawWhere("COALESCE(p.updated_at, p.created_at) > COALESCE(differentiation_profiles.updated_at, '9999-12-31')", [])
-                );
+                $statusConditions->equals('status_flags.is_out_of_date', 1);
             }
 
             /* Unpopulated records
              */
             if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_UNPOPULATED_RECORDS, $status)) {
-                /* Differentiation profile has no fields populated
-                 */
-                $tempPb = $this->getPredicateBuilder();
-
-                foreach (self::CONFIG_METHOD_MAPPING as $configKey => $methodName) {
-                    $key = "differentiation_profiles.$configKey";
-                    $tempPb = $tempPb->any(
-                        $this->getPredicateBuilder()->isNull($key)
-                             ->equals($key, '')
-                    );
-                }
-
-                $statusConditions->any($tempPb);
+                $statusConditions->equals('status_flags.is_unpopulated', 1);
             }
 
             /* Expired records
              */
             if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_EXPIRED_RECORDS, $status)) {
-                /* All pastoral records are expired
-                 */
-                $statusConditions->any(
-                    $this->getPredicateBuilder()->rawWhere("p.student_id NOT IN (
-                        SELECT DISTINCT p2.student_id
-                        FROM pastoral p2
-                        LEFT JOIN lu_pastoral_type lpt2 ON p2.type_id = lpt2.id
-                        LEFT JOIN lu_pastoral_subtype lps2 ON p2.subtype_id = lps2.id
-                        WHERE p2.deleted_at IS NULL
-                        AND (lpt2.contribute_differentiation_profile OR lps2.contribute_differentiation_profile)
-                        AND COALESCE(p2.expires_at, '9999-12-31') >= :p_expires_at_expired_subquery
-                    )", [
-                        'p_expires_at_expired_subquery' => \Alaress_Date_Format::now()->getDatabaseDate(),
-                    ])
-                );
+                $statusConditions->equals('status_flags.is_expired', 1);
             }
 
             if (!empty($statusConditions->getWhere())) {
                 $pb->any($statusConditions);
             }
+
+            $today = \Alaress_Date_Format::now()->getDatabaseDate();
+
+            $tempPb = $this->getPredicateBuilder();
+
+            foreach (self::CONFIG_METHOD_MAPPING as $configKey => $methodName) {
+                $key = "differentiation_profiles.$configKey";
+                $tempPb = $tempPb->All(
+                    $this->getPredicateBuilder()->notNull($key)
+                         ->notEquals($key, '')
+                );
+            }
+            $isPouplated = implode(' OR ', $tempPb->getWhere());
+
+            /* Build status flags as a derived table to avoid duplication
+             */
+            $statusFlagsSubquery = "
+                SELECT
+                    p.student_id,
+                    CASE
+                        /* At least one active pastoral record
+                         */
+                        WHEN COALESCE(MAX(p.expires_at), :farfaraway) >= '{$today}'
+                        /* Differentiation profile is up to date
+                         */
+                        AND COALESCE(MAX(COALESCE(p.updated_at, p.created_at)), :farfaraway) <= COALESCE(differentiation_profiles.updated_at, :farfaraway)
+                        /* Differentiation profile has at least one field populated
+                         */
+                        AND ({$isPouplated})
+                        THEN 1 ELSE 0
+                    END as is_active,
+                    CASE
+                        /* Out of date records
+                         */
+                        WHEN MAX(COALESCE(p.updated_at, p.created_at)) > COALESCE(differentiation_profiles.updated_at, :farfaraway)
+                        THEN 1 ELSE 0
+                    END as is_out_of_date,
+                    CASE
+                        /* Differentiation profile has no fields populated
+                         */
+                        WHEN (NOT ({$isPouplated}))
+                        THEN 1 ELSE 0
+                    END as is_unpopulated,
+                    CASE
+                        /* All pastoral records are expired
+                         */
+                        WHEN p.student_id NOT IN (
+                            SELECT DISTINCT p2.student_id
+                            FROM pastoral p2
+                            LEFT JOIN lu_pastoral_type lpt2 ON p2.type_id = lpt2.id
+                            LEFT JOIN lu_pastoral_subtype lps2 ON p2.subtype_id = lps2.id
+                            WHERE p2.deleted_at IS NULL
+                            AND (lpt2.contribute_differentiation_profile OR lps2.contribute_differentiation_profile)
+                            AND COALESCE(p2.expires_at, :farfaraway) >= '{$today}'
+                        )
+                        THEN 1 ELSE 0
+                    END as is_expired
+                FROM differentiation_profiles
+                RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
+                LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+                LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
+                WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+                GROUP BY p.student_id
+            ";
+
+            $statusSelect = ", status_flags.*";
+            $statusSubquery = "LEFT JOIN ({$statusFlagsSubquery}) status_flags ON status_flags.student_id = p.student_id";
+            $statusParam =
+                array_merge(
+                    ['farfaraway' => self::FAR_FAR_AWAY_FULL_DATE],
+                    $tempPb->getParams(),
+                );
         }
 
         $pb->isNull('differentiation_profiles.deleted_at');
@@ -468,7 +489,8 @@ class Mapper extends BaseMapper
                 'service'     => $service,
                 'accessLevel' => $accessLevel,
                 'viewerId'    => $viewer->getId(),
-            ]
+            ],
+            $statusParam,
         );
 
         $limit = null === $limit ? '' : "LIMIT {$limit}";
@@ -478,12 +500,13 @@ class Mapper extends BaseMapper
             $order,
         )) . ',') . ' p.student_id asc';
 
-        $query = "{$this->getSelectString()}
+        $query = "{$this->getSelectString()}{$statusSelect}
                 {$this->getFromString()}
                 INNER JOIN userCampus sc ON s.id = sc.uid
                 INNER JOIN userAccess ua ON sc.campus = ua.sid AND ua.service = :service AND ua.type >= :accessLevel AND ua.uid = :viewerId
                 LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
                 LEFT JOIN differentiation_profiles_adjustment_level al ON FIND_IN_SET(al.id, differentiation_profiles.adjustment_level)
+                {$statusSubquery}
                 WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
                 {$where}
                 GROUP BY p.student_id, s.lastname, s.chosen_name
@@ -508,6 +531,8 @@ class Mapper extends BaseMapper
             $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
             $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
             $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
+            $model->setOutOfDate(isset($row['is_out_of_date']) && (bool)$row['is_out_of_date']);
+            $model->setExpired(isset($row['is_expired']) && (bool)$row['is_expired']);
             $collection->add($model);
         }
 

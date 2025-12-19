@@ -30,6 +30,8 @@ class Model implements ISoftDeletable
     private ?string $needs_challenges = null;
     private ?string $strategies_adjustments = null;
     private ?string $goals = null;
+    private ?bool $expired = null;
+    private ?bool $out_of_date = null;
 
     /** @var User $student */
     protected User $student;
@@ -250,5 +252,43 @@ class Model implements ISoftDeletable
     {
         $this->goals = $goals;
         return $this;
+    }
+
+    public function setExpired(?bool $expired): self
+    {
+        $this->expired = $expired;
+        return $this;
+    }
+
+    public function getExpired(): ?bool
+    {
+        return $this->expired;
+    }
+
+    public function setOutOfDate(?bool $out_of_date): self
+    {
+        $this->out_of_date = $out_of_date;
+        return $this;
+    }
+
+    public function getOutOfDate(): ?bool
+    {
+        return $this->out_of_date;
+    }
+
+    public function isPopulated(): bool
+    {
+        return !empty($this->getOverview()) ||
+               !empty($this->getInterestsStrengths()) ||
+               !empty($this->getNeedsChallenges()) ||
+               !empty($this->getStrategiesAdjustments()) ||
+               !empty($this->getGoals()) ||
+               !empty($this->getAdjustmentCategoryIds()) ||
+               !empty($this->getAdjustmentLevelIds());
+    }
+
+    public function isActive(): bool
+    {
+        return !$this->getExpired() && !$this->getOutOfDate() && $this->isPopulated() && !$this->isDeleted();
     }
 }
