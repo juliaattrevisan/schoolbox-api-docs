@@ -474,6 +474,10 @@ Admin,"System Settings AI Services",Superuser,/adminv2/ai-services,200
 Admin,"System Settings AI Services",Teacher,/adminv2/ai-services,401
 Admin,"System Settings AI Services",Student,/adminv2/ai-services,401
 Admin,"System Settings AI Services",Parent,/adminv2/ai-services,401
+Admin,"System Settings AI Usage Log",Superuser,/adminv2/aiLog,200
+Admin,"System Settings AI Usage Log",Teacher,/adminv2/aiLog,401
+Admin,"System Settings AI Usage Log",Student,/adminv2/aiLog,401
+Admin,"System Settings AI Usage Log",Parent,/adminv2/aiLog,401
 Admin,"System Settings Debugging",Superuser,/adminv2/setting/Debugging,200
 Admin,"System Settings Debugging",Teacher,/adminv2/setting/Debugging,401
 Admin,"System Settings Debugging",Student,/adminv2/setting/Debugging,401
@@ -1046,6 +1050,58 @@ Admin,"Editor Templates","Timetable Moderator",/adminv2/editor-templates,403
 Admin,"Editor Templates",Teacher,/adminv2/editor-templates,403
 Admin,"Editor Templates",Student,/adminv2/editor-templates,403
 Admin,"Editor Templates",Parent,/adminv2/editor-templates,403
+Admin,"Differentiation Settings",Superuser,/adminv2/differentiation/differentiation-profiles,200
+Admin,"Differentiation Settings","Badges Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","CMS Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","Calendar Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","Design Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","LMS Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","News Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","Pastoral Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","Timetable Moderator",/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings","Differentiation Moderator",/adminv2/differentiation/differentiation-profiles,200
+Admin,"Differentiation Settings",Teacher,/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings",Student,/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Settings",Parent,/adminv2/differentiation/differentiation-profiles,401
+Admin,"Differentiation Filters",Superuser,/adminv2/filters/differentiation/differentiationProfile,200
+Admin,"Differentiation Filters","Badges Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","CMS Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","Calendar Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","Design Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","LMS Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","News Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","Pastoral Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","Timetable Moderator",/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters","Differentiation Moderator",/adminv2/filters/differentiation/differentiationProfile,200
+Admin,"Differentiation Filters",Teacher,/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters",Student,/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Filters",Parent,/adminv2/filters/differentiation/differentiationProfile,401
+Admin,"Differentiation Categories",Superuser,/adminv2/lists/differentiation/adjustment-categories,200
+Admin,"Differentiation Categories","Badges Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","CMS Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","Calendar Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","Design Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","LMS Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","News Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","Pastoral Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","Timetable Moderator",/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories","Differentiation Moderator",/adminv2/lists/differentiation/adjustment-categories,200
+Admin,"Differentiation Categories",Teacher,/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories",Student,/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Categories",Parent,/adminv2/lists/differentiation/adjustment-categories,401
+Admin,"Differentiation Levels",Superuser,/adminv2/lists/differentiation/adjustment-levels,200
+Admin,"Differentiation Levels","Badges Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","CMS Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","Calendar Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","Design Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","LMS Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","News Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","Pastoral Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","Timetable Moderator",/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels","Differentiation Moderator",/adminv2/lists/differentiation/adjustment-levels,200
+Admin,"Differentiation Levels",Teacher,/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels",Student,/adminv2/lists/differentiation/adjustment-levels,401
+Admin,"Differentiation Levels",Parent,/adminv2/lists/differentiation/adjustment-levels,401
 Calendar,"View calendar",Superuser,/calendar,200
 Calendar,"View calendar",Teacher,/calendar,200
 Calendar,"View calendar",Student,/calendar,200
@@ -1271,6 +1327,10 @@ LMS,Create lesson plan,Superuser,/learning/unitspecs/5/assessments/new?lpt=3&typ
 LMS,Create lesson plan,Teacher,/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
 LMS,Create lesson plan,Student,/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
 LMS,Create lesson plan,Parent,/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
+LMS,Create discussion,Superuser,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,200
+LMS,Create discussion,Teacher,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,200
+LMS,Create discussion,Student,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,401
+LMS,Create discussion,Parent,/learning/unitspecs/5/assessments/new?type=dialogAgent&returnUrl=L2NvdXJzZS9wbGFuLzY=,401
 LMS,"View due work",Superuser,/learning/due,200
 LMS,"View due work",Teacher,/learning/due,200
 LMS,"View due work",Student,/learning/due,200
@@ -1441,6 +1501,19 @@ Pastoral,"View class pastoral care report",Superuser,/pastoral/class/83?30=&31=&
 Pastoral,"View class pastoral care report",Teacher,/pastoral/class/83?30=&31=&32=,200
 Pastoral,"View class pastoral care report",Student,/pastoral/class/83?30=&31=&32=,403
 Pastoral,"View class pastoral care report",Parent,/pastoral/class/83?30=&31=&32=,403
+Pastoral,"Differentiation Manage",Superuser,/differentiation-profiles/manage,403
+Pastoral,"Differentiation Manage","Badges Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","CMS Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","Calendar Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","Design Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","LMS Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","News Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","Pastoral Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","Timetable Moderator",/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage","Differentiation Moderator",/differentiation-profiles/manage,200
+Pastoral,"Differentiation Manage",Teacher,/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage",Student,/differentiation-profiles/manage,401
+Pastoral,"Differentiation Manage",Parent,/differentiation-profiles/manage,401
 News,"Get an RSS feed",Superuser,/news/feed/baf8da85532750735975e1809?topic=all,200
 News,"Get an RSS feed",Teacher,/news/feed/baf8da85532750735975e1809?topic=all,200
 News,"Get an RSS feed",Student,/news/feed/baf8da85532750735975e1809?topic=all,200
