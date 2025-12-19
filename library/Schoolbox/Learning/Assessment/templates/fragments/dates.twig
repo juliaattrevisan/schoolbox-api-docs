@@ -50,15 +50,13 @@
  # swamp problem where we need to reorganise how features interrogate activities' particular behaviours
  #}
 {% if assessment is dueWork %}
-    {% if not assessment.acceptNone %}
-        {# Due Work uniquely offers offline submissions; online submissions require all four dates #}
-        {% set dates = [
-            { 'type': 'publish', 'label': 'Publish' },
-            { 'type': 'open', 'label': 'Open' },
-            { 'type': 'due', 'label': 'Due' },
-            { 'type': 'close', 'label': 'Late' },
-        ] %}
-    {% endif %}
+    {# Due Work uniquely offers offline submissions; online submissions require all four dates #}
+    {% set dates = [
+        { 'type': 'publish', 'label': 'Publish' },
+        { 'type': 'open', 'label': 'Open', 'hide': assessment.acceptNone },
+        { 'type': 'due', 'label': 'Due' },
+        { 'type': 'close', 'label': 'Late', 'hide': assessment.acceptNone },
+    ] %}
 {% elseif assessment is quiz %}
     {% set dates = [
         { 'type': 'publish', 'label': 'Publish' },
@@ -107,27 +105,37 @@
     {% set next = dates[loop.index0 + 1]['type'] ?? dates[loop.index0 + 2]['type'] ?? dates[loop.index0 + 3]['type'] ?? null %}
     {% set prev = dates[loop.index0 - 1]['type'] ?? dates[loop.index0 - 2]['type'] ?? dates[loop.index0 - 3]['type'] ?? null %}
 
+    {# Some assessments (due work) have optional submission requirements,
+     # you don't need the open/close (late) dates if it doesn't require submissions
+     #
+     # On the course import page, these are never shown if not required
+     # HOWEVER on the create/modify page, there's an actual toggle to change this requirement
+     # which uses JS to hide or show the fields, so they must be "hidden" away rather than not
+     # there at all.
+     #}
+    {% set hide = struct.hide is defined and struct.hide %}
+
     {% if struct is null %}
         {% block emptyDateField %}{% endblock %}
     {% elseif 'publish' == struct.type %}
         {% set dateValue = publishAt is defined and publishAt ? publishAt : assessment.publishAt %}
         {% block publishDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next) }}
+            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next) }}
         {% endblock %}
     {% elseif 'open' == struct.type %}
         {% set dateValue = openAt is defined and openAt ? openAt : assessment.openAt %}
         {% block openDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next )}}
+            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next )}}
         {% endblock %}
     {% elseif 'due' == struct.type %}
         {% set dateValue = dueAt is defined and dueAt ? dueAt : assessment.dueAt %}
         {% block dueDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next )}}
+            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next )}}
         {% endblock %}
     {% elseif 'close' == struct.type %}
         {% set dateValue = closeAt is defined and closeAt ? closeAt : assessment.closeAt %}
         {% block closeDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next )}}
+            {{ dateForm.dateField(struct.label, struct.type, hide, dateValue, prev, next )}}
         {% endblock %}
     {% endif %}
 {% endfor %}

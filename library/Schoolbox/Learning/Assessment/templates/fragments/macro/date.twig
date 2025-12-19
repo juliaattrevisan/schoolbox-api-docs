@@ -1,5 +1,5 @@
-{%  macro dateField(dateTitle, dateProperty, dateValue, syncStartDateProperty, syncEndDateProperty) %}
-<div class="row" id="{{ dateProperty }}">
+{%  macro dateField(dateTitle, dateProperty, hide, dateValue, syncStartDateProperty, syncEndDateProperty) %}
+<div class="row" id="{{ dateProperty }}" {% if hide %}style="display:none;"{% endif %}>
 
     <div class="column small-12">
         <label>
