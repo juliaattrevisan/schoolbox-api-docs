@@ -1,5 +1,5 @@
 {##
- # The Four Canonical Dates
+ # The Four Canonical Dates of the Apocalypse
  #
  # @param IAssessable $assessment
  #
@@ -75,6 +75,13 @@
     {# Dialog Agents are unique in that they only use three dates (due is renamed to Close in the ui)
      # ...and the due date is put in the same place as Close Date, for cosmetic reasons only: it still retains
      # the same programmatic meaning as Due Date despite this positioning
+     #
+     # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
+     # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
+     # "Due Date" in the schema and business logic.
+     #
+     # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
+     # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
      #}
     {% set dates = [
         { 'type': 'publish', 'label': 'Publish' },
