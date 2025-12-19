@@ -6,14 +6,19 @@ import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { isNewUrl } from "@js/util/queryUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { Header } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import type { Payload } from "../../js/types/manageDifferentiationProfilesTypes";
 
 /**
  * load the table data from the given url.
+ * @param header - the headers for the grid
  * @param url - the url to load the table data
  * @returns - isNewLoading, isMoreLoading, payload, sortBy, isEmpty, hasRows, loadError
  */
-export function useLoadData(url: Ref<string>): {
+export function useLoadData(
+    header: Ref<Header[]>,
+    url: Ref<string>,
+): {
     isNewLoading: Ref<boolean>;
     isMoreLoading: Ref<boolean>;
     payload: Ref<Payload | null>;
@@ -40,6 +45,19 @@ export function useLoadData(url: Ref<string>): {
         () => payload.value !== null && payload.value.data.profiles.length > 0 && payload.value.metadata.count > 0,
     ); // To show that the report table has rows
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+
+    /**
+     * get the default sortBy field based on the first sortable header in header structure
+     * @returns the default sortBy field
+     */
+    function getDefaultSortBy(): string {
+        // we assume that the first tableHeader is isSortable true is the default sortBy
+        if (header.value && header.value.length > 0) {
+            const firstSortableHeader = header.value.find(($header) => $header.isSortable);
+            return firstSortableHeader ? firstSortableHeader.key : "";
+        }
+        return "";
+    }
 
     /**
      * search for payload that match the current query
@@ -89,6 +107,7 @@ export function useLoadData(url: Ref<string>): {
             console.error(error);
         } finally {
             if (isNewLoad.value) {
+                sortBy.value = getDefaultSortBy();
                 isNewLoading.value = false;
             } else {
                 isMoreLoading.value = false;

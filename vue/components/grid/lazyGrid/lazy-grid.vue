@@ -9,6 +9,12 @@ const props = defineProps<{
     header: Header[];
     rows: { [key: string]: unknown }[];
     isLoading: boolean;
+    sortBy: string;
+    order: "ASC" | "DESC";
+}>();
+
+const emit = defineEmits<{
+    sort: [key: string];
 }>();
 
 /**
@@ -17,6 +23,14 @@ const props = defineProps<{
 const gridTemplateColumns = window.Vue.computed(() => {
     return props.header.map((item) => `${item.width}px`).join(" ");
 });
+
+/**
+ * Handles the sort action when a sortable header is clicked
+ * @param key - the key of the header that was clicked
+ */
+function onSortSelected(key: string): void {
+    emit("sort", key);
+}
 </script>
 
 <template>
@@ -30,7 +44,22 @@ const gridTemplateColumns = window.Vue.computed(() => {
                     'u-sticky-left': item.isSticky,
                 }"
             >
-                {{ item.title }}
+                <button
+                    v-if="item.isSortable"
+                    class="title-button f-always-show"
+                    @click.prevent="onSortSelected(item.key)"
+                >
+                    <span>
+                        {{ item.title }}
+                    </span>
+                    <sbx-icon
+                        v-if="props.sortBy === item.key"
+                        :name="`${props.order === 'ASC' ? 'sort-up' : 'sort-down'}`"
+                        size="0.825rem"
+                    />
+                    <sbx-icon v-else name="sortable" size="0.825rem" />
+                </button>
+                <template v-else>{{ item.title }}</template>
             </div>
         </div>
         <template v-if="!props.isLoading">
@@ -95,5 +124,22 @@ const gridTemplateColumns = window.Vue.computed(() => {
 
 .u-sticky-top.u-sticky-left {
     z-index: calc(var(--sbx-depth-ui-sticky) + 3); // On top of both the left column, the header, and the dropdowns
+}
+
+.title-button {
+    align-items: center;
+    background: none;
+    display: flex;
+    gap: var(--spacing-m);
+    justify-content: space-between;
+    height: auto;
+    margin: 0;
+    min-height: auto;
+    padding: 0;
+    text-align: left;
+    width: 100%;
+    &:hover {
+        background: none;
+    }
 }
 </style>

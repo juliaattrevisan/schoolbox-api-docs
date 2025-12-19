@@ -48,7 +48,7 @@ window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 const headerStore = useHeaderStore();
 headerStore.init(props.header);
 const rowsStore = useRowsStore();
-rowsStore.init(props.routes.getData);
+rowsStore.init(headerStore.header, props.routes.getData);
 const linkedRecordsStore = useLinkedRecordsStore();
 const genAiStore = useGenAiStore();
 genAiStore.init(props.routes.genAi);
@@ -82,6 +82,9 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                 :header="headerStore.header"
                 :rows="rowsStore.payload.data.profiles"
                 :is-loading="rowsStore.isMoreLoading"
+                :sort-by="rowsStore.sortBy"
+                :order="rowsStore.order"
+                @sort="rowsStore.onSort"
             >
                 <template #User="{ row, header: columnHeader }">
                     <mdp-grid-cell-student :user="row[columnHeader.key] as User" :profile="row as Profile" />
