@@ -2,6 +2,12 @@
  # The Four Canonical Dates
  #
  # @param IAssessable $assessment
+ #
+ # Optionally override the value of each date:
+ # @param Alaress_Date_Format $publishAt
+ # @param Alaress_Date_Format $openAt
+ # @param Alaress_Date_Format $dueAt
+ # @param Alaress_Date_Format $closeAt
  #}
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
 
@@ -97,20 +103,24 @@
     {% if struct is null %}
         {% block emptyDateField %}{% endblock %}
     {% elseif 'publish' == struct.type %}
+        {% set dateValue = publishAt is defined and publishAt ? publishAt : assessment.publishAt %}
         {% block publishDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, assessment.publishAt, prev, next) }}
+            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next) }}
         {% endblock %}
     {% elseif 'open' == struct.type %}
+        {% set dateValue = openAt is defined and openAt ? openAt : assessment.openAt %}
         {% block openDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, assessment.openAt, prev, next )}}
+            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next )}}
         {% endblock %}
     {% elseif 'due' == struct.type %}
+        {% set dateValue = dueAt is defined and dueAt ? dueAt : assessment.dueAt %}
         {% block dueDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, assessment.dueAt, prev, next )}}
+            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next )}}
         {% endblock %}
     {% elseif 'close' == struct.type %}
+        {% set dateValue = closeAt is defined and closeAt ? closeAt : assessment.closeAt %}
         {% block closeDateField %}
-            {{ dateForm.dateField(struct.label, struct.type, assessment.closeAt, prev, next )}}
+            {{ dateForm.dateField(struct.label, struct.type, dateValue, prev, next )}}
         {% endblock %}
     {% endif %}
 {% endfor %}

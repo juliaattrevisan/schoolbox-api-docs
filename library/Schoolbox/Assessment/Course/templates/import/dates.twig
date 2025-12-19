@@ -1,6 +1,9 @@
 
 {% extends "@learningAssessment/fragments/dates.twig" %}
 
+{% set assessmentId = isImplOnly ? assessmentImpl.id : assessmentSpec.id %}
+{% set inputPrefix = inputPrefix ~ '[' ~ assessment.id ~ ']' %}
+
 {% block emptyDateField %}
     {# an empty placeholder cell for grid niceness #}
     <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
@@ -8,10 +11,11 @@
 
 {% block publishDateField %}
     {% include '@course/import/date.twig' with {
-        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
-        assessmentDate: assessment.publishAt,
+        assessmentId,
+        inputPrefix,
         unitDate: unitImpl.openDate,
-        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        endOfDay: false,
+        assessmentDate: dateValue,
         dateProperty: struct.type,
         dateLabel: struct.label,
         dateSyncStart: prev,
@@ -21,10 +25,11 @@
 
 {% block openDateField %}
     {% include '@course/import/date.twig' with {
-        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
-        assessmentDate: assessment.openAt,
+        assessmentId,
+        inputPrefix,
         unitDate: unitImpl.openDate,
-        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        endOfDay: false,
+        assessmentDate: dateValue,
         dateProperty: struct.type,
         dateLabel: struct.label,
         dateSyncStart: prev,
@@ -34,11 +39,11 @@
 
 {% block dueDateField %}
     {% include '@course/import/date.twig' with {
-        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
-        assessmentDate: assessment.dueAt,
+        assessmentId,
+        inputPrefix,
         unitDate: defaultDueDate,
         endOfDay: true,
-        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        assessmentDate: dateValue,
         dateProperty: struct.type,
         dateLabel: struct.label,
         dateSyncStart: prev,
@@ -48,11 +53,11 @@
 
 {% block closeDateField %}
     {% include '@course/import/date.twig' with {
-        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id,
-        assessmentDate: assessment.closeAt,
+        assessmentId,
+        inputPrefix,
         unitDate: unitImpl.dueDate.endOfDay,
         endOfDay: true,
-        inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
+        assessmentDate: dateValue,
         dateProperty: struct.type,
         dateLabel: struct.label,
         dateSyncStart: prev,
