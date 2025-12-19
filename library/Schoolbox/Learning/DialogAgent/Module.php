@@ -236,6 +236,7 @@ class Module extends BaseModule
         /* Student requests assistance for a particular response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/assistance/{$responseParam}", 'postAssistanceRequest', new Rule\All(
+            $isFeatureEnabled,
             $canInteractWithResponse,
             $this->buildRuleCanAction(NextRoutes::ACTION_ASSISTANCE_REQUEST),
             $this->buildIsConfiguredAuthRule()
@@ -245,6 +246,7 @@ class Module extends BaseModule
          * This action could be from an instructor or from the student dismissing it themself
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/resolve/{$responseParam}", 'postAssistanceResolve', new Rule\All(
+            $isFeatureEnabled,
             new Rule\Any(
                 $canWrite,
                 $canInteractWithResponse,
@@ -257,6 +259,7 @@ class Module extends BaseModule
          * or an instructor forcibly finalises a response on behalf of the student
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/submit/{$responseParam}", 'postSubmit', new Rule\All(
+            $isFeatureEnabled,
             new Rule\Any(
                 $canWrite,
                 $canSubmit,
@@ -269,6 +272,7 @@ class Module extends BaseModule
         /* Reopens a dialog agent chat, which basically unsubmits the authoritative response
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/reopen/{$responseParam}", 'postReopen', new Rule\All(
+            $isFeatureEnabled,
             $canWrite,
             $this->buildRuleCanAction(NextRoutes::ACTION_REOPEN),
             $this->buildIsConfiguredAuthRule()
@@ -278,6 +282,7 @@ class Module extends BaseModule
          * setting all other responses to non-authoritative, basically letting students start afresh.
          */
         $this->register('POST', "{$assRoute}/{$studentParam}/reset/{$responseParam}", 'postReset', new Rule\All(
+            $isFeatureEnabled,
             $canWrite,
             $this->buildRuleCanAction(NextRoutes::ACTION_RESET),
             $this->buildIsConfiguredAuthRule()
@@ -290,8 +295,8 @@ class Module extends BaseModule
         /* Generate feedback for a particular dialog agent response
          */
         $this->register('POST', "$assRoute/{$studentParam}/feedback/{$responseParam}", 'postGenerateFeedback', new Rule\All(
-            $canViewResponse,
             $isFeatureEnabled,
+            $canViewResponse,
             $isAuthoritativeResponse,
             $isFeedbackRequired,
             $this->buildIsConfiguredAuthRule()

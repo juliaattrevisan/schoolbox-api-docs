@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 
 /**
  * Dialog Agent Autosubmit
@@ -95,6 +96,12 @@ HELP;
         $this->getLogger()->info('');
         $this->getLogger()->info('Dialog Agent Autosubmit');
         $this->getLogger()->info('');
+
+        if (!new ValidDialogAgentEnabled($this->getConfig())->isSatisfied()) {
+            $this->getLogger()->info('Feature is not enabled. Exiting.');
+            $this->getLogger()->info('');
+            return;
+        }
 
         if ($this->getOpt(self::OPT_LONG_DURATION)) {
             $this->getLogger()->info('');
