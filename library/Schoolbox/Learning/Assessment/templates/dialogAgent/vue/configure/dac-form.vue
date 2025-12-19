@@ -173,6 +173,9 @@ async function onSubmit(): Promise<void> {
                     <label :for="`field-${fieldContext.field.id}`" class="required">
                         {{ fieldContext.field.title }}
                     </label>
+                    <p v-if="fieldContext.field.meta" class="meta">
+                        {{ fieldContext.field.meta }}
+                    </p>
                     <textarea
                         :id="`fieldcontext-${fieldContext.id}`"
                         v-model="fieldContext.body"
