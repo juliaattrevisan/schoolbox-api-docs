@@ -106,10 +106,11 @@ config:
   turnitin_api_host: {value: '', hide: true}
 
   # 3rd party configs
-  canvas_data_api_key: {hide: false}
+  canvas_data_api_key: {hide: true} # this was canvas CD1, not used now
   canvas_data2_secret : { hide : false }
   canvas_data2_client_id : { hide : false }
   canvas_url : { hide : false }
+  canvas_bearer_token : { hide : false } # used for news and announcements (component)
 
 topMenu:
   hide:
