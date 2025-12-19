@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\DifferentiationProfile\Status;
 
 use Schoolbox\Filter\AbstractFactory;
-use Schoolbox\Filter\Filters\DifferentiationProfile\Status\Definition;
-use Schoolbox\Filter\Filters\DifferentiationProfile\Status\KeyConverter;
 use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\IKeyConverter;
 use Schoolbox\Filter\Model;
