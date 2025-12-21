@@ -92,7 +92,7 @@ jobs:
           load: true
           provenance: false
           sbom: false
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=false
           build-args: |
             NLP_CONF_FILE=presidio_analyzer/conf/nlp.yaml
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
@@ -165,14 +165,14 @@ jobs:
 
           # Extract branch name from GITHUB_REF
           BRANCH_NAME=${GITHUB_REF/refs\/heads\//}
-          
+
           # Build tag arguments based on branch
           DOCKERHUB_TAGS="-t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:${{ needs.build-and-push-analyzer.outputs.presidio_hash }}"
           DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:${BRANCH_NAME}"
-          
+
           ECR_TAGS="-t ${{ vars.ECR_NAMESPACE }}/presidio-analyzer:${{ needs.build-and-push-analyzer.outputs.presidio_hash }}"
           ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-analyzer:${BRANCH_NAME}"
-          
+
           # Add latest/testing tag based on branch
           if [ "${{ github.ref }}" == "refs/heads/master" ]; then
             DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-analyzer:latest"

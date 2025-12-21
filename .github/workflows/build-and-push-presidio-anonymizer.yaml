@@ -74,7 +74,7 @@ jobs:
           load: true
           provenance: false
           sbom: false
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=false
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
@@ -145,14 +145,14 @@ jobs:
 
           # Extract branch name from GITHUB_REF
           BRANCH_NAME=${GITHUB_REF/refs\/heads\//}
-          
+
           # Build tag arguments based on branch
           DOCKERHUB_TAGS="-t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${{ needs.build-and-push-anonymizer.outputs.presidio_hash }}"
           DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${BRANCH_NAME}"
-          
+
           ECR_TAGS="-t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${{ needs.build-and-push-anonymizer.outputs.presidio_hash }}"
           ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${BRANCH_NAME}"
-          
+
           # Add latest/testing tag based on branch
           if [ "${{ github.ref }}" == "refs/heads/master" ]; then
             DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:latest"
