@@ -71,10 +71,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: presidio/presidio-anonymizer
-          load: true
+          load: false
           provenance: false
           sbom: false
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |

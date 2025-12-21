@@ -89,10 +89,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: presidio/presidio-analyzer
-          load: true
+          load: false
           provenance: false
           sbom: false
-          outputs: type=image,push-by-digest=true,name-canonical=true,push=true,oci-mediatypes=false
+          outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           build-args: |
             NLP_CONF_FILE=presidio_analyzer/conf/nlp.yaml
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
