@@ -11,10 +11,17 @@ use Schoolbox\User;
 
 class Cursor implements ICursor
 {
+    public const string CURSOR_DEFAULT_ORDER_BY = 'student';
+    public const string CURSOR_ORDER_BY_UPDATED_AT = 'updated_at';
+
+    public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'differentiation_profiles.student_id';
+    public const string CURSOR_ORDER_BY_UPDATED_AT_COLUMN = 'differentiation_profiles.updated_at';
+
     public function __construct(
         private User $viewer,
         private Finder $finder,
         private array|Collection $completedFilters,
+        private ?string $orderBy = self::CURSOR_DEFAULT_ORDER_BY,
         private ?array $order = null,
         private ?int $limit = null,
         private ?ICodec $codec = null,
@@ -46,17 +53,27 @@ class Cursor implements ICursor
             return null;
         }
 
+        /** @var Model $lastRecord */
         $lastRecord = $collection->last();
         if (!isset($lastRecord)) {
             return null;
         }
 
+        /* Return differentiation profile collection if ordered by updated at
+         */
+        if ($this->orderBy === self::CURSOR_ORDER_BY_UPDATED_AT) {
+            return $this->codec->encode([
+                self::CURSOR_ORDER_BY_UPDATED_AT_COLUMN => $lastRecord->getUpdatedAt()?->getDatabase(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getStudent()->getId(),
+            ]);
+        }
 
-
+        /* Return student collection if default order by is used
+         */
         return $this->codec->encode([
             's.chosen_name' => $lastRecord->getStudent()->getGivenName(),
             's.lastname'    => $lastRecord->getStudent()->getLastName(),
-            'p.student_id' => $lastRecord->getStudent()->getId(),
+            self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getStudent()->getId(),
         ]);
     }
 
