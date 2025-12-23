@@ -68,9 +68,18 @@ class Module extends \Alaress\Module\Module
             new Rule\IsSuperuser(),
             new Rule\HasHomepageAccess(
                 UserAccess::ACCESS_READ,
-                static function (array $params): int {
+                function (array $params): int {
                     if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
                         return $params['courseSpec']->getFolder()->getId();
+                    } else if (isset($params['courseSpecId'])) {
+                        /* Try to load the course spec if hasn't already to get the folder id
+                         */
+                        try {
+                            $courseSpec = $this->getCourseSpecificationMapper()->findById($params['courseSpecId']);
+                            return $courseSpec->getFolder()->getId();
+                        } catch (MapperException $e) {
+                            // noop
+                        }
                     }
                     throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
                 },
