@@ -1229,7 +1229,7 @@ window.Vue.onMounted(async () => {
 .checklist > label,
 .checklist > ul,
 .option-list > li {
-    display: inline-block;
+    display: flex;
 }
 
 .checklist > label,

@@ -891,34 +891,6 @@ input[type="checkbox"]:not(.plain) + label::before {
             margin-inline: -16px;
             width: calc(100% + 32px);
         }
-
-        & .feed.filter-container:nth-of-type(1) {
-            & .activity-feed {
-                border-bottom: 0;
-                max-width: 100%;
-
-                & .profile-learning-actions {
-                    & > div {
-                        gap: 1rem;
-                        margin-top: 1rem;
-                        max-width: 100%;
-
-                        & a {
-                            background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 95%);
-
-                            &:hover {
-                                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 0%);
-                            }
-                        }
-                    }
-                }
-            }
-
-            & .feed-column.left,
-            & .feed-column.right {
-                display: none;
-            }
-        }
     }
 }
 
