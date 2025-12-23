@@ -26,13 +26,16 @@ use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Twig\Error\LoaderError;
+use Alaress\Authorizer\Rule;
 
 class Module extends \Alaress\Module\Module
 {
@@ -58,8 +61,27 @@ class Module extends \Alaress\Module\Module
             ];
         };
 
+        /* Course folder read access
+         */
+        $courseReadAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_READ,
+                    static function (array $params): int {
+                        if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
+                            return $params['courseSpec']->getFolder()->getId();
+                        }
+                        throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                    },
+                    $this->getMapperFactory()->get(Access::class),
+                ),
+            )
+        );
+
         // courseSpecId + folderId required (even if 0), componentId optional
-        $this->register('GET', '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport', $staffOnly, $preloadImport);
+        $this->register('GET', '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport', $courseReadAccess, $preloadImport);
         $this->register('GET', '/{courseImplId:\d+}/modify', 'getModify', $staffOnly, $preloadCourse);
         $this->register('GET', '/management/{folderId}', 'getManagement', $staffOnly);
 
