@@ -645,9 +645,7 @@ td {
         cursor: $cursor-default-value;
         min-height: $checkbox-size;
         line-height: $checkbox-size;
-        padding: 0 0 0 ($checkbox-size + $checkbox-margin);
         font-weight: $font-weight-normal;
-        margin: 0 0 $checkbox-margin 0;
         &:before,
         &:after {
             transition:
@@ -1216,9 +1214,6 @@ body.sbx-body {
         }
 
         & + label.radio-label {
-            margin: 0;
-            padding: 0;
-
             &::before,
             &::after {
                 display: none;

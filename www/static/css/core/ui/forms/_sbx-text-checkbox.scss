@@ -16,15 +16,14 @@
     color: var(--sbx-color-accent);
     cursor: pointer;
     display: inline-grid;
-    height: 1.875rem;
+    height: 1.5rem;
     line-height: 1;
-    margin: 0.5rem 0 0.5rem 0;
     min-height: auto;
     opacity: 1;
     place-content: center;
     position: static;
     transform: translateY(-0.075em);
-    width: 1.875rem;
+    width: 1.5rem;
 
     &:hover:not(:disabled):not(:read-only) {
         // no reduced contrast on hover
@@ -48,14 +47,6 @@
 
     &:checked::before {
         transform: scale(1);
-    }
-
-    /**
-    * We don't always use a label with a checkbox
-    * so ensure empty labels don't impact the display flow
-    */
-    & + label:empty {
-        display: none;
     }
 
     /* focus / disabled use shared mixins like text input */
@@ -126,4 +117,14 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 // Hide labels for checkboxes in buttons container
 .sbx-body .buttons-container .checklist input[type="checkbox"] + label {
     display: none;
+}
+
+// Layout fixes for checkboxes inside option lists
+.sbx-body .option-list li {
+    display: flex;
+    align-items: flex-start;
+}
+.sbx-body .option-list input[type="checkbox"] {
+    align-self: center;
+    flex: 0 0 auto;
 }
