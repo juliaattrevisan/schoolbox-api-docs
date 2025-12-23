@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Component_ConfigDefinitionMapper;
@@ -63,25 +64,59 @@ class Module extends \Alaress\Module\Module
 
         /* Course folder read access
          */
-        $courseReadAccess = new Rule\All(
+        $courseReadAccess = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_READ,
+                static function (array $params): int {
+                    if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
+                        return $params['courseSpec']->getFolder()->getId();
+                    }
+                    throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                },
+                $this->getMapperFactory()->get(Access::class),
+            ),
+        );
+
+        /* Class folder write access
+         */
+        $classWriteAccess = new Rule\Any(
+            new Rule\IsSuperuser(),
+            /* Allow if folderId is 0 (ie no folder selected for import yet)
+             */
+            new Rule\Callback(function (array $params, ?\Schoolbox\User $user): bool {
+                if (isset($params['folderId']) && 0 == $params['folderId']) {
+                    return true;
+                }
+                throw new Unauthorized();
+            }),
+            /* Otherwise check write access on the specified folder
+             */
+            new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                static function (array $params): int {
+                    if (isset($params['folderId']) && $params['folderId'] > 0) {
+                        return (int)$params['folderId'];
+                    }
+                    throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                },
+                $this->getMapperFactory()->get(Access::class),
+            ),
+        );
+
+        $courseImportAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasHomepageAccess(
-                    UserAccess::ACCESS_READ,
-                    static function (array $params): int {
-                        if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
-                            return $params['courseSpec']->getFolder()->getId();
-                        }
-                        throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
-                    },
-                    $this->getMapperFactory()->get(Access::class),
-                ),
+                new Rule\All(
+                    $courseReadAccess,
+                    $classWriteAccess
+                )
             )
         );
 
         // courseSpecId + folderId required (even if 0), componentId optional
-        $this->register('GET', '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport', $courseReadAccess, $preloadImport);
+        $this->register('GET', '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport', $courseImportAccess, $preloadImport);
         $this->register('GET', '/{courseImplId:\d+}/modify', 'getModify', $staffOnly, $preloadCourse);
         $this->register('GET', '/management/{folderId}', 'getManagement', $staffOnly);
 
