@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\Exporter;
 
+use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
@@ -22,11 +23,14 @@ use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -75,7 +79,53 @@ class Module extends BaseModule
 
         $canExportForUnit = new Rule\All(
             new Rule\IsLoggedIn(),
-            $isStaff
+            new Rule\Any(
+                $isSuperuser,
+                new Rule\All(
+                    new HasRole(Role::STAFF),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function (array $params): int {
+                            if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpecification\Model) {
+                                return $params['unitSpec']->getFolder()->getId();
+                            } else if (isset($params['unitSpecId'])) {
+                                /* Try to load the course spec if hasn't already to get the folder id
+                                 */
+                                try {
+                                    $unitSpec = $this->getUnitSpecificationMapper()->findById($params['unitSpecId']);
+                                    return $unitSpec->getFolder()->getId();
+                                } catch (MapperException $e) {
+                                    // noop
+                                }
+                            }
+                            throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    ),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_READ,
+                        function (array $params): int {
+                            if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpecification\Model) {
+                                return $params['unitSpec']->getCourse()->getFolder()->getId();
+                            } else if (isset($params['unitSpecId'])) {
+                                /* Try to load the course spec if hasn't already to get the folder id
+                                 */
+                                try {
+                                    $unitSpec = $this->getUnitSpecificationMapper()->findById($params['unitSpecId']);
+                                    return $unitSpec->getCourse()->getFolder()->getId();
+                                } catch (MapperException $e) {
+                                    // noop
+                                }
+                            }
+                            throw new \Schoolbox\Application\Exception\NotFound('No context preloaded');
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    )
+                )
+            ),
+
+
+
         );
 
         // register the routes

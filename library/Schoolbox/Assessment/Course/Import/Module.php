@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Component_ConfigDefinitionMapper;
@@ -35,6 +36,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Role;
 use Twig\Error\LoaderError;
 use Alaress\Authorizer\Rule;
 
@@ -118,6 +120,7 @@ class Module extends \Alaress\Module\Module
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\All(
+                    new HasRole(Role::STAFF),
                     $courseReadAccess,
                     $classWriteAccess
                 )
