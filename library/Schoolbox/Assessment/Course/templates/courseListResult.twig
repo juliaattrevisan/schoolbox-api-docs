@@ -98,7 +98,7 @@ Usage:
     {% if hasTot %}
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
         <li>
-            <a href="{{ importUrl }}" class="icon-download">Import into classes</a>
+            <a href="{{ importUrl }}" class="icon-download">Import into {{ locale.class.properPlural }}</a>
         </li>
         <li>
         {% if courseSpec.folder.hasHomepage %}
