@@ -68,6 +68,9 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     private const int HTTP_STATUS_CODE_OK = 200;
+    private const int HTTP_STATUS_CODE_NO_CONTENT = 204;
+    private const int HTTP_STATUS_CODE_FORBIDDEN = 403;
+    private const int HTTP_STATUS_CODE_NOT_FOUND = 404;
     private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
 
 
@@ -921,12 +924,12 @@ class Controller extends Base
         if (count($bookingErrors)) {
             $this->response = $this->responseAsJson(
                 ['errors' => $bookingErrors],
-            )->withStatus(200);
+            )->withStatus(self::HTTP_STATUS_CODE_OK);
             return;
         }
 
         // Return empty '200 OK' regardless of whether JSON was requested.
-        $this->response = $this->responseEmpty()->withStatus(200);
+        $this->response = $this->responseEmpty()->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
@@ -979,7 +982,7 @@ class Controller extends Base
             ]);
         } else {
             if ($this->isJsonRequest()) {
-                $this->response = $this->responseEmpty()->withStatus(204); // HTTP status 204 means 'No Content'.
+                $this->response = $this->responseEmpty()->withStatus(self::HTTP_STATUS_CODE_NO_CONTENT);
             } else {
                 $this->response = $this->redirectFound($redirect);
             }
@@ -1149,10 +1152,9 @@ class Controller extends Base
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
-            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
-            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
-            $responseData['errorMessage'] = "Could not find booking with id $bookingId.";
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            // This will occur if the booking has been deleted since the form page was generated.
+            $responseData['errorMessage'] = 'Booking not found.';
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1180,10 +1182,9 @@ class Controller extends Base
                 $this->user
             )
         ) {
-            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if
-            // permissions have changed since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            // This will occur if permissions have changed since the form page was generated.
             $responseData['errorMessage'] = "You do not have permission to edit bookings for resource '{$resource->getName()}'.";
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
 
@@ -1206,10 +1207,9 @@ class Controller extends Base
         );
 
         if (count($bookingIdsToUpdate) === 0) {
-            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
-            // user attempts to edit a series consisting of past bookings.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            // This will occur if the user attempts to edit a series consisting of past bookings.
             $responseData['errorMessage'] = 'No editable bookings found.  Note past bookings are not editable as part of a series.';
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1309,10 +1309,9 @@ class Controller extends Base
         try {
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
-            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
-            // booking has been deleted since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
-            $responseData['errorMessage'] = "Could not find booking with id $bookingId.";
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            // This will occur if the booking has been deleted since the form page was generated.
+            $responseData['errorMessage'] = 'Booking not found.';
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1334,10 +1333,9 @@ class Controller extends Base
                 $this->user
             )
         ) {
-            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if
-            // permissions have changed since the form page was generated.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            // This will occur if permissions have changed since the form page was generated.
             $responseData['errorMessage'] = "You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'.";
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
 
@@ -1361,10 +1359,9 @@ class Controller extends Base
         );
 
         if (count($bookingIdsToDelete) === 0) {
-            // We did not succeed in updating the booking, but this is an expected outcome - it will occur if the
-            // user attempts to delete a series consisting of past bookings.  Therefore, the status is HTTP_STATUS_CODE_OK.
+            // This will occur if the user attempts to delete a series consisting of past bookings.
             $responseData['errorMessage'] = 'No deletable bookings found.  Note past bookings are not deletable as part of a series.';
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
