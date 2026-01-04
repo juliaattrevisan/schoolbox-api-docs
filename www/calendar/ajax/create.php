@@ -230,20 +230,20 @@ function getStatusMapper()
 /**
  * Helper for getting a booking from an event.
  *
- * @param  Item\Model     $resource
- * @param  Calendar\Event $event
- *
+ * @param Item\Model      $resource
+ * @param Event           $event
+ * @param \Schoolbox\User $user
  * @return Model
  * @throws \Schoolbox\Mapper\Exception
  */
-function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user)
+function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, Schoolbox\User $user): Model
 {
     $booking = new Model();
     $booking
         ->setEvent($event)
         ->setResource($resource)
         ->setStatus(getStatusMapper()->createModel(Status\Model::STATUS_PENDING))
-        ->setName($_POST['title'] ?? '')
+        ->setName($resource->getName())
         ->setNotes($_POST['detail'] ?? '')
         ->setRelatedBookingList(new GenericCollection(Model::class));
 
@@ -251,11 +251,13 @@ function getBookingFromEvent(Item\Model $resource, Calendar\Event $event, School
     if ($event->getAllDay()) {
         $booking->setBookingStartAt($event->getStartDateTime());
         $endDate = clone $event->getStartDateTime();
-        $endDate = $endDate->endOfDay();
+        $endDate = $endDate?->endOfDay();
         $booking->setBookingEndAt($endDate);
     } else {
-        $booking->setBookingStartAt($event->getStartDateTime());
-        $booking->setBookingEndAt($event->getEndDateTime());
+        // Since the bookings should have the same start and end dates as the event, set them as null.
+        // This way, if the event is moved to another time, the resource bookings will move with it.
+        $booking->setBookingStartAt(null);
+        $booking->setBookingEndAt(null);
     }
 
     // What about the resource? If it's an open resource, confirm the

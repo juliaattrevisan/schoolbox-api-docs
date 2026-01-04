@@ -43,7 +43,7 @@ class Event extends Day\Event
      */
     public function getTitle()
     {
-        return $this->getBooking()->getName() ?: $this->getBooking()->getResource()->getName();
+        return $this->getBooking()->getResource()->getName();
     }
 
     /**
