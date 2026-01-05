@@ -18,9 +18,12 @@ export default class BaseTester {
         // If the schoolbox directory does not exist:
         // this command is running on the host, instead of in Docker (or Vagrant),
         // thus it needs to be passed through.
-        if (!existsSync("/usr/share/schoolbox") && !command.startsWith("vagrant ssh -c ")) {
-            const vagrantCommand = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
-            return this.runShellCommand(vagrantCommand);
+        if (!existsSync("/usr/share/schoolbox")) {
+            if (process.env.DOCKER === "1") {
+                command = `docker/exec "${command.replace(/"/g, '\\"')}"`
+            } else {
+                command = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
+            }
         }
 
         return new Promise((resolve, reject) => {
