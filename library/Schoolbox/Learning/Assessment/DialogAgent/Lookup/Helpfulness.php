@@ -17,6 +17,8 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Lookup;
  */
 enum Helpfulness: string
 {
+    public const Helpfulness DEFAULT = self::GUIDED;
+
     case EXPLORATORY = 'exploratory';
     case GUIDED = 'guided';
     case DIRECTED = 'directed';

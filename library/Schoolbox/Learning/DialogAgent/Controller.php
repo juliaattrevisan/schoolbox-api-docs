@@ -145,7 +145,7 @@ class Controller extends Base
                 'description' => $scenario->getDescription(),
             ],
             'assessmentConfig' => [
-                'helpfulness' => $assessment->getHelpfulness(),
+                'helpfulness' => $assessment->getHelpfulness() ?? Helpfulness::DEFAULT,
                 'language' => $assessment->getLanguage() ?? Language::DEFAULT,
                 'openingMessage' => $assessment->getOpeningMessage(),
                 'rules' => $assessment->getRules() ?: $scenario->getDefaultRules(),
