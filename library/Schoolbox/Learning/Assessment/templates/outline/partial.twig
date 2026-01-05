@@ -42,7 +42,7 @@
                 assessmentId: assessment.id,
                 assessment: assessment
             }) %}
-            {% if viewCustomParticipationRoute and assessment is not project and assessment is not lessonPlan %}
+            {% if viewCustomParticipationRoute %}
                 <li><a class="icon-group" data-test="course-outline-custom-participation-{{ assessment.id }}" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
             {% endif %}
             {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}

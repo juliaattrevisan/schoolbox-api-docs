@@ -87,7 +87,7 @@
             assessmentId: assessment.id,
             assessment: assessment
         }) %}
-        {% if viewCustomParticipationRoute and assessment.isImplementation and (assessment is dueWork or assessment is quiz or assessment is task or assessment is dialogAgent) %}
+        {% if viewCustomParticipationRoute and assessment.isImplementation %}
             <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
         {% endif %}
 
