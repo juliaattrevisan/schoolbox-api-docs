@@ -181,8 +181,8 @@ async function postDeleteBookingForm(): Promise<void> {
                 v-model:end-date="endDate"
                 id-prefix="resource-booking-row"
                 :use-time="true"
-                :label-start="'From'"
-                :label-end="'Until'"
+                label-start="From"
+                label-end="Until"
             />
             <div>
                 <label :for="`resource-booking-row-textarea-${props.booking.id}`">Notes</label>
