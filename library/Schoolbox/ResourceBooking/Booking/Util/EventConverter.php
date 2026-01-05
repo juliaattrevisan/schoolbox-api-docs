@@ -75,6 +75,7 @@ class EventConverter
         // Resource booking events: not editable in the conventional way
 
         $event->setIsEditable(false);
+        $event->setEventVariant($eventItem->getVariant());
         return $event;
     }
 

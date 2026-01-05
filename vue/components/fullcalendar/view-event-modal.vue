@@ -201,6 +201,7 @@ export default {
                     numStudents: data?.custom?.numStudents,
                     numStaff: data?.custom?.numStaff,
                 },
+                variant: metadata?.variant,
                 links: {
                     view: data?.custom?.moreDetailsLink,
                     modify: modifyLink,
@@ -1072,6 +1073,22 @@ export default {
                             <span v-if="eventExtendedProps.folder.id">
                                 <a class="button" :href="'/homepage/' + String(eventExtendedProps.folder.id)"
                                     >Go to homepage</a
+                                >
+                            </span>
+                            <span v-if="eventExtendedProps.variant === 'booking'">
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.links.view"
+                                    data-test="view-event-modal-add-to-calendar-button"
+                                    >Add to Calendar</a
+                                >
+                            </span>
+                            <span v-if="eventExtendedProps.variant === 'event'">
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.links.view"
+                                    data-test="view-event-modal-add-to-calendar-button"
+                                    >View Event</a
                                 >
                             </span>
                             <span v-if="eventExtendedProps.links.view">
