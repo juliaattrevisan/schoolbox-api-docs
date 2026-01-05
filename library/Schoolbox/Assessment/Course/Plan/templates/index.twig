@@ -15,6 +15,8 @@
         :editor-templates="{{ editorTemplates |json_encode }}"
         {% endif %}
         :route-new-units="{{ routeNewUnits ? (routeNewUnits|json_encode) : 'null' }}"
+        {% set routeModifyCourse = routeLookupIfAuthorized('course.modifyCourse', { courseSpec: course, id: course.id}) %}
+        :route-modify-course="{{ routeModifyCourse ? (routeModifyCourse|json_encode) : 'null' }}"
     ></unit-planner>
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>
