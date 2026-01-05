@@ -56,6 +56,12 @@ class Model implements ISoftDeletable
     /**
      * @var string|null
      */
+    private ?string $defaultRules = null;
+
+
+    /**
+     * @var string|null
+     */
     private ?string $type = null;
 
 
@@ -160,6 +166,26 @@ class Model implements ISoftDeletable
     public function setPromptTemplate(?string $promptTemplate): self
     {
         $this->promptTemplate = $promptTemplate;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getDefaultRules(): string
+    {
+        return $this->defaultRules;
+    }
+
+
+    /**
+     * @param string $defaultRules
+     * @return $this
+     */
+    public function setDefaultRules(string $defaultRules): self
+    {
+        $this->defaultRules = $defaultRules;
         return $this;
     }
 
