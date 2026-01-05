@@ -188,6 +188,7 @@ async function onSubmit(): Promise<void> {
             <fieldset class="content" :disabled="isSubmitting || undefined">
                 <div class="small-12 columns">
                     <label for="dac-opening-message" class="required">Opening Message</label>
+                    <p class="meta">Used by the AI to start the conversation and frame the learning discussion.</p>
                     <textarea
                         id="dac-opening-message"
                         v-model="assessmentConfig.openingMessage"
@@ -201,6 +202,10 @@ async function onSubmit(): Promise<void> {
 
                 <div class="small-12 columns">
                     <label for="dac-rules" class="required">Rules</label>
+                    <p class="meta">
+                        Sets ongoing guidelines the AI follows to maintain focus, tone, and boundaries during the
+                        conversation.
+                    </p>
                     <textarea
                         id="dac-rules"
                         v-model="assessmentConfig.rules"
