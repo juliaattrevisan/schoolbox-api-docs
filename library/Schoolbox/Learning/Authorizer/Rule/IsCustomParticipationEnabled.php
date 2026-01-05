@@ -7,8 +7,7 @@
 
 namespace Schoolbox\Learning\Authorizer\Rule;
 
-use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\User;
@@ -22,7 +21,7 @@ class IsCustomParticipationEnabled extends AbstractAssessableRule
         /* If the assessment is a customised assessment then shouldn't allow customisation from it
          */
         if (null !== $assessable->getOriginalAssessmentId()) {
-            throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw new InvalidPath();
         }
 
         /* Only allow the assessment that can have custom participation have access
@@ -31,7 +30,7 @@ class IsCustomParticipationEnabled extends AbstractAssessableRule
             $assessable instanceof Project ||
             $assessable instanceof LessonPlan
         ) {
-            throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw new InvalidPath();
         }
     }
 }
