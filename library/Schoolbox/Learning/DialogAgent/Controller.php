@@ -32,6 +32,7 @@ use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
@@ -165,11 +166,11 @@ class Controller extends Base
                     ]),
                 ],
             ],
-            'helpfulnessOptions' => [
-                DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
-                DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
-                DialogAgentDataModel::HELPFULNESS_EXTREME => 'Extreme',
-            ],
+            // derive from the Helpfulness enum
+            'helpfulnessOptions' => array_map(fn (Helpfulness $case) => [
+                'value' => $case->value,
+                'label' => $case->label(),
+            ], Helpfulness::cases()),
             'languageOptions' => Language::AVAILABLE,
         ];
 
@@ -194,7 +195,7 @@ class Controller extends Base
     {
         $postArray = $this->requestPost->getArrayCopy();
 
-        $assessment->setHelpfulness($postArray['helpfulness'])
+        $assessment->setHelpfulness(Helpfulness::from($postArray['helpfulness']))
             ->setLanguage($postArray['language'])
             ->setOpeningMessage($postArray['openingMessage'])
             ->setRules($postArray['rules'])

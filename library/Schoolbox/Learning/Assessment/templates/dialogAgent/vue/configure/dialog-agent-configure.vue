@@ -3,12 +3,12 @@ import { cloneDeep } from "lodash";
 import { sbProps } from "@js/util/sbx/pageUtils";
 import DacForm from "./dac-form.vue";
 import DacSandbox from "./dac-sandbox.vue";
-import type { DialogAgentAssessmentConfig, DialogAgentScenario } from "./dacTypes";
+import type { DialogAgentAssessmentConfig, DialogAgentHelpfulness, DialogAgentScenario } from "./dacTypes";
 
 interface Props {
     scenario: DialogAgentScenario;
     assessmentConfig: DialogAgentAssessmentConfig;
-    helpfulnessOptions: Record<string, string>;
+    helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
     postUpdate: string | null;
 }

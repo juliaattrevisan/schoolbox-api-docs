@@ -6,11 +6,12 @@ import type {
     DialogAgentAssessmentConfig,
     DialogAgentConfigureApiRequest,
     DialogAgentConfigureApiResponse,
+    DialogAgentHelpfulness,
 } from "./dacTypes";
 
 interface Props {
     scenario: DialogAgentScenario;
-    helpfulnessOptions: Record<string, string>;
+    helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
     postUpdate: string | null;
 }
@@ -111,8 +112,8 @@ async function onSubmit(): Promise<void> {
                         required
                         :disabled="!props.postUpdate"
                     >
-                        <option v-for="(name, value) in props.helpfulnessOptions" :key="value" :value="value">
-                            {{ name }}
+                        <option v-for="option in props.helpfulnessOptions" :key="option.value" :value="option.value">
+                            {{ option.label }}
                         </option>
                     </select>
                 </div>

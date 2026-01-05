@@ -3495,7 +3495,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\DataModel\\IAssessableDataModel\:\:getHelpfulness\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DialogAgent.php
 
 		-

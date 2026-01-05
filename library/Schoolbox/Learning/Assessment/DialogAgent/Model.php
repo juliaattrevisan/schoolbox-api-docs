@@ -14,6 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -51,9 +52,9 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @var string|null
+     * @var Helpfulness|null
      */
-    private ?string $helpfulness = null;
+    private ?Helpfulness $helpfulness = null;
 
 
     /**
@@ -598,19 +599,19 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @return string|null
+     * @return Helpfulness|null
      */
-    public function getHelpfulness(): ?string
+    public function getHelpfulness(): ?Helpfulness
     {
         return $this->helpfulness;
     }
 
 
     /**
-     * @param string|null $helpfulness
+     * @param Helpfulness|null $helpfulness
      * @return $this
      */
-    public function setHelpfulness(?string $helpfulness): self
+    public function setHelpfulness(?Helpfulness $helpfulness): self
     {
         $this->helpfulness = $helpfulness;
         return $this;
