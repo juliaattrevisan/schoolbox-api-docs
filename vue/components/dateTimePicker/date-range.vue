@@ -138,7 +138,7 @@ defineExpose({ clearInvalidDates });
                 data-datepicker-vue
                 data-datepicker-buttontext
                 :data-datesync-enddate="`#${props.idPrefix}-end-date-input`"
-                :data-datepicker-initial-value="startDate"
+                data-datepicker-initial-value="startDate"
                 data-datepicker-hide-timetable="true"
                 :data-datepicker-time="props.useTime || undefined"
             />
@@ -153,7 +153,7 @@ defineExpose({ clearInvalidDates });
                 data-datepicker-vue
                 data-datepicker-buttontext
                 :data-datesync-startdate="`#${props.idPrefix}-start-date-input`"
-                :data-datepicker-initial-value="endDate"
+                data-datepicker-initial-value="endDate"
                 data-datepicker-hide-timetable="true"
                 :data-datepicker-time="props.useTime || undefined"
             />
