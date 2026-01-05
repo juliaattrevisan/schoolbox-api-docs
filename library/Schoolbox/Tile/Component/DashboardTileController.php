@@ -18,7 +18,6 @@ use SitePage;
 
 class DashboardTileController extends Component_Dashboard_ControllerAbstract implements TileControllerInterface
 {
-
     /**
      * @var Layout\Model
      */

@@ -10,7 +10,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * The sort options made available to the dropdown
      *

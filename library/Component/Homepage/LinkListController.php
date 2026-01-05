@@ -14,7 +14,6 @@ use Schoolbox\Resource\LinkMapper;
  */
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Link Mapper
      *

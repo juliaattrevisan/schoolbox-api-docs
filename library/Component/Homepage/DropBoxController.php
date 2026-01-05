@@ -11,7 +11,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      *

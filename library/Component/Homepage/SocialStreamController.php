@@ -59,10 +59,9 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                             'FORM_CLASS' => ''
                         )
                     );
-                }
-                /* Use hidden cloneable
-                 */
-                else {
+                } else {
+                    /* Use hidden cloneable
+                     */
                     if ($authenticator->canComment()) {
                         $this->setVar(
                             array(

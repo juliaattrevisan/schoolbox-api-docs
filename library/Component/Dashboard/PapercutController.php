@@ -10,7 +10,6 @@
 
 class Component_Dashboard_PapercutController extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * Outputs HTML template defined by config variable 'template'
      *
