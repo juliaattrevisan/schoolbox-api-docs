@@ -153,7 +153,7 @@ abstract class Component_FactoryAbstract
      * Builds dependencies from a component controller's constructor.
      *
      * @param string $class
-     * @param Integer $offset
+     * @param int $offset
      * @return array
      */
     protected function buildDependencyList($class, $offset = 0)
