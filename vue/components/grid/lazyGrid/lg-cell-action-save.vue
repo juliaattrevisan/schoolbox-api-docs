@@ -30,11 +30,17 @@ function onSaveClicked(): void {
 
 <template>
     <div class="component-action">
-        <section>
-            <button v-if="props.hasChanged && !props.isSaving" data-role="dirty-indicator" disabled>
+        <section class="f-no-margins">
+            <div
+                v-if="props.hasChanged && !props.isSaving"
+                class="meta l-pad-s"
+                data-role="dirty-indicator"
+                role="status"
+                aria-live="polite"
+            >
                 Changes not saved
-            </button>
-            <button v-if="props.isSaving" class="button">Saving...</button>
+            </div>
+            <div v-if="props.isSaving" class="meta l-pad-s" role="status" aria-live="polite">Saving...</div>
             <button
                 v-else-if="!props.hasChanged && !props.isFocused"
                 class="button"

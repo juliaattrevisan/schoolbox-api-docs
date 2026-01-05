@@ -131,7 +131,7 @@ function onOpenIncludeInExistingModal(): void {
         <td v-if="props.differentiationEnabled">
             <button
                 v-if="props.participant._links.differentiationProfile"
-                class="button f-no-margins"
+                class="button icon-learning-support f-no-margins"
                 type="button"
                 :data-test="`cp-participant-${props.participant.user.id}-view-differentiation-profile`"
                 @click.prevent="onViewDP"

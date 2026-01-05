@@ -162,6 +162,8 @@ module.exports = {
         lessonPlanner:
             "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/lessonPlanner/lessonPlanner.ts",
         activityStatusPage: "./library/Schoolbox/Learning/Assessment/templates/status/activityStatusPage.ts",
+        viewDifferentiationProfile:
+            "./library/Schoolbox/Search/User/templates/field/differentiationProfile/vue/viewDifferentiationProfile.ts",
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",

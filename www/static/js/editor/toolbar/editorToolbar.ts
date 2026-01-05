@@ -130,20 +130,44 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     }
 
     /**
+     * add any individual plugins for specific use cases for example
+     * the Blank plugin for Quiz cloze questions
+     */
+    if (config.addToToolbar) {
+        config.addToToolbar.forEach((item) => {
+            if (typeof item === "string") {
+                // String items are appended to the end
+                items.push(item);
+            } else {
+                // Object items with name and after properties are inserted after the specified item
+                const afterIndex = items.findIndex((toolbarItem) => {
+                    // Handle both string items and objects with label property
+                    if (typeof toolbarItem === "string") {
+                        return toolbarItem === item.after;
+                    }
+                    if (typeof toolbarItem === "object" && toolbarItem !== null && "label" in toolbarItem) {
+                        return toolbarItem.label === item.after;
+                    }
+                    return false;
+                });
+                if (afterIndex !== -1) {
+                    // Insert after the found item
+                    items.splice(afterIndex + 1, 0, item.name);
+                } else {
+                    // If the after item is not found, append to the end
+                    items.push(item.name);
+                }
+            }
+        });
+    }
+
+    /**
      * remove any individual plugins for specific use cases
      * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
      */
     let removeItems: Array<string> = [];
     if (config.removeFromToolbar) {
         removeItems = config.removeFromToolbar;
-    }
-
-    /**
-     * add any individual plugins for specific use cases for example
-     * the Blank plugin for Quiz cloze questions
-     */
-    if (config.addToToolbar) {
-        items = [...items, ...config.addToToolbar];
     }
 
     return {

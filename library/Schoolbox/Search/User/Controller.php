@@ -78,9 +78,8 @@ class Controller extends BaseController
      * @param \Schoolbox\External\User                   $userRelationHydrator
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
-     * @param Calendar_Api_Factory                         $calendarApiFactory
+     * @param Calendar_Api_Factory                       $calendarApiFactory
      * @param \Schoolbox\DifferentiationProfile\Mapper   $differentiationProfileMapper
-     * @param \Schoolbox\Admin\DifferentiationProfiles\Mapper $differentiationProfileConfigMapper
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -102,7 +101,6 @@ class Controller extends BaseController
         private RosettaStone $rosettaStone,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\DifferentiationProfile\Mapper $differentiationProfileMapper,
-        private \Schoolbox\Admin\DifferentiationProfiles\Mapper $differentiationProfileConfigMapper,
     ) {
     }
 
@@ -225,7 +223,7 @@ class Controller extends BaseController
                     /* Return null if no differentiation profile exists for this student
                      */
                     try {
-                        $profile = $this->differentiationProfileMapper->findOneByColumn(
+                        $this->differentiationProfileMapper->findOneByColumn(
                             'student_id',
                             $viewee->getId(),
                             [
@@ -236,48 +234,17 @@ class Controller extends BaseController
                         return null;
                     }
 
-                    $configs = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1)->indexBy('name');
-                    $configKey = \Schoolbox\DifferentiationProfile\Mapper::CONFIG_METHOD_MAPPING;
-
-                    $data = $configs->reduce(function ($carry, $config) use ($profile, $configKey) {
-                        /** @var \Schoolbox\Admin\DifferentiationProfiles\Model $config */
-                        if (array_key_exists($config->getName(), $configKey)) {
-                            $method  = $configKey[$config->getName()];
-                            $value   = call_user_func([$profile, $method]);
-
-                            if ($config->getModule() === \Schoolbox\Admin\DifferentiationProfiles\Mapper::MODULE_ADJUSTMENTS && $value instanceof \Schoolbox\Collection) {
-                                $value = ($value->count() > 0) ?
-                                    $value->map(fn(AdjustmentCategoriesModel|AdjustmentLevelsModel $adjustment) => [
-                                        'name' => $adjustment->getName(),
-                                    ])->getAll() : null;
-                            }
-
-                            $carry[] = [
-                                'terminology' => $config->getTerminology() ?? $config->getTitle(),
-                                'value'       => $value
-                            ];
-                        }
-                        return $carry;
-                    }, []);
-
-                    /* Group differentiation data into adjustmentData (array values) and textData (string values)
-                     * so we can vary their display in the frontend
+                    /* Otherwise return the data needed to view the differentiation profile in the modal
                      */
-                    $adjustmentData = [];
-                    $textData = [];
-
-                    foreach ($data as $item) {
-                        if (is_array($item['value'])) {
-                            $adjustmentData[] = $item;
-                        } elseif (null !== $item['value']) {
-                            $item['value'] = \Scrub::html($item['value']);
-                            $textData[] = $item;
-                        }
-                    }
-
                     return [
-                        'adjustmentData' => $adjustmentData,
-                        'textData' => $textData,
+                        'student' => $viewee,
+                        'route' => $this->getRouteIfAuthorized(
+                            'differentiationProfiles.viewDifferentiationProfileData',
+                            [
+                                'student' => $viewee,
+                                'studentId' => $viewee->getId()
+                            ],
+                        )
                     ];
                 }
             ]);

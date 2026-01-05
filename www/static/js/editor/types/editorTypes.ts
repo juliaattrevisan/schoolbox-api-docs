@@ -37,7 +37,7 @@ export interface SbxEditorConfig {
     hasTokens?: boolean; // whether or not to enable the tokens plugin
     tokenList?: string[]; // the list of tokens to use for the ckeditor
     baseHref?: string; // the base url to be prepended to relative links or assets included in the ckeditor
-    addToToolbar?: string[]; // the list of extra plugins to add to the ckeditor outside of the scope of the EditorToolbar options
+    addToToolbar?: (string | { name: string; after: string })[]; // the list of extra plugins to add to the ckeditor - strings are appended to the end, objects with name and after properties are inserted after the specified toolbar item
     removeFromToolbar?: string[]; // the list of plugins to remove from the ckeditor outside of the scope of the EditorToolbar options
     maxCharCount: number; // The maximum number of bytes allowed in the editor.  For ASCII text, 1 byte = 1 character.  Unicode characters can be multi-byte.
     addMaxCharCountDefaultEventListeners?: boolean; // Whether to add the default event listeners for dealing with events relating to max char count.
