@@ -87,6 +87,7 @@ async function onSubmit(): Promise<void> {
         return;
     }
 
+    assessmentConfig.value.prompt = response.data.prompt;
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
     emit("saved");
 }

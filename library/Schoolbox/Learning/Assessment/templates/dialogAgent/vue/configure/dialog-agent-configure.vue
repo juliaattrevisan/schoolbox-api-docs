@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cloneDeep } from "lodash";
 import { sbProps } from "@js/util/sbx/pageUtils";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DacForm from "./dac-form.vue";
 import DacSandbox from "./dac-sandbox.vue";
 import type { DialogAgentAssessmentConfig, DialogAgentScenario } from "./dacTypes";
@@ -17,6 +18,8 @@ const props = defineProps<Props>();
 
 const assessmentConfigInfo = window.Vue.ref<DialogAgentAssessmentConfig>(cloneDeep(props.assessmentConfig));
 const isSubmitting = window.Vue.ref<boolean>(false);
+
+const isPromptModalOpen = window.Vue.ref<boolean>(false);
 
 /**
  * Whether the sandbox section is visible, not necessarily whether it can be used
@@ -45,6 +48,14 @@ function updateSandbox(): void {
     sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
     sandboxRef.value?.resetFeed();
 }
+
+/**
+ * Callback when the form has been successfully saved
+ */
+function onFormSaved(): void {
+    updateSandbox();
+    isPromptModalOpen.value = true;
+}
 </script>
 
 <template>
@@ -58,7 +69,7 @@ function updateSandbox(): void {
                 :helpfulness-options="props.helpfulnessOptions"
                 :language-options="props.languageOptions"
                 :post-update="props.postUpdate"
-                @saved="updateSandbox"
+                @saved="onFormSaved"
             />
         </div>
 
@@ -85,6 +96,17 @@ function updateSandbox(): void {
             </section>
         </div>
     </div>
+
+    <basic-modal v-model:is-open="isPromptModalOpen" :has-background-click="true">
+        <h2>Agent Prompt</h2>
+        <p>The following prompt has been created for the agent based on your configuration:</p>
+        <blockquote class="dac-prompt-preview">{{ assessmentConfigInfo.prompt }}</blockquote>
+        <button class="button full-width" @click="isPromptModalOpen = false">Close</button>
+    </basic-modal>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.dac-prompt-preview {
+    white-space: pre-wrap;
+}
+</style>
