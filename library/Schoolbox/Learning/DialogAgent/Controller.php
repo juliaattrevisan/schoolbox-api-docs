@@ -130,9 +130,9 @@ class Controller extends Base
          * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
          * but sub-object's fields don't really surface through the domain model for a reason.
          */
-        $dialogAgent = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
+        $dialogAgentId = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId();
 
-        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId());
+        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId);
 
         $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
@@ -144,11 +144,11 @@ class Controller extends Base
                 'description' => $scenario->getDescription(),
             ],
             'assessmentConfig' => [
-                'helpfulness' => $dialogAgent->getHelpfulness(),
-                'language' => $dialogAgent->getLanguage() ?? Language::DEFAULT,
-                'openingMessage' => $dialogAgent->getOpeningMessage(),
-                'rules' => $dialogAgent->getRules() ?: $scenario->getDefaultRules(),
-                'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
+                'helpfulness' => $assessment->getHelpfulness(),
+                'language' => $assessment->getLanguage() ?? Language::DEFAULT,
+                'openingMessage' => $assessment->getOpeningMessage(),
+                'rules' => $assessment->getRules() ?: $scenario->getDefaultRules(),
+                'useDifferentiationProfile' => $assessment->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
                     'body' => $fieldContext->getBody(),
