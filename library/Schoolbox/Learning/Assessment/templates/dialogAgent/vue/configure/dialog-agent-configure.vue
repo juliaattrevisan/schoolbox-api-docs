@@ -107,6 +107,8 @@ function onFormSaved(): void {
 
 <style scoped lang="scss">
 .dac-prompt-preview {
+    max-height: 50vh;
+    overflow-y: auto;
     white-space: pre-wrap;
 }
 </style>
