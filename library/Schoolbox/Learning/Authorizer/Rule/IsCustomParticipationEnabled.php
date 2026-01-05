@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\User;
 
