@@ -9,6 +9,7 @@ type DialogAgentFieldContext = {
     field: {
         id: number;
         title: string;
+        meta: string | null;
     };
 };
 

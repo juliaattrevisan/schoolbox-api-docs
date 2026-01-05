@@ -22,6 +22,7 @@ use Ramsey\Uuid\Uuid;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
+use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as ScenarioFieldContext;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper as CriterionMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -148,12 +149,13 @@ class Controller extends Base
                 'openingMessage' => $dialogAgent->getOpeningMessage(),
                 'rules' => $dialogAgent->getRules(),
                 'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
-                'fieldContexts' => $fieldContexts->map(fn ($fieldContext) => [
+                'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
                     'body' => $fieldContext->getBody(),
                     'field' => [
                         'id' => $fieldContext->getField()->getId(),
                         'title' => $fieldContext->getField()->getTitle(),
+                        'meta' => $fieldContext->getField()->getMeta(),
                     ],
                 ])->reindex(),
                 '_routes' => [
