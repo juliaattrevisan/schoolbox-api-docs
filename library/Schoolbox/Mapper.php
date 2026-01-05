@@ -4019,7 +4019,7 @@ abstract class Mapper implements IMapper
     /**
      * @brief Returns an SQL fragment containing a comma separated list of column names possibly aliased
      *
-     * @param String $alias
+     * @param string $alias
      * @param array  $whitelist If not empty, a whitelist of column names to use
      *
      * @return String
@@ -4176,7 +4176,7 @@ abstract class Mapper implements IMapper
     /**
      * @brief Converts an underscore separated string to camel case
      *
-     * @param String $string
+     * @param string $string
      *
      * @return String
      */
@@ -4192,7 +4192,7 @@ abstract class Mapper implements IMapper
     /**
      * @brief Explodes a camel case string apart at the humps using underscores
      *
-     * @param String $string
+     * @param string $string
      *
      * @return String
      */

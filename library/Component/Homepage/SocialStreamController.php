@@ -10,7 +10,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
     /**
      * Outputs HTML template defined by config variable 'template'
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

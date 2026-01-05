@@ -29,7 +29,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

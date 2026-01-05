@@ -61,7 +61,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     }
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return bool
      */

@@ -204,7 +204,7 @@ interface IMapper
     /**
      * Returns a collection with models filtered by column/property
      *
-     * @param String $columnName
+     * @param string $columnName
      * @param mixed|mixed[] $columnValue
      * @param array  $options @see findByColumnList() $options param
      *

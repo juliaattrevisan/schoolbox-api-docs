@@ -133,7 +133,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      * @throws RuntimeException
      * @throws LoaderError

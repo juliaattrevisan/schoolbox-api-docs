@@ -56,7 +56,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

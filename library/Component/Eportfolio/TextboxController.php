@@ -28,7 +28,7 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
      *
      * Note that textboxes have a 1:1 relationship with their component instance
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

@@ -152,7 +152,7 @@ abstract class Component_FactoryAbstract
     /**
      * Builds dependencies from a component controller's constructor.
      *
-     * @param String $class
+     * @param string $class
      * @param Integer $offset
      * @return array
      */

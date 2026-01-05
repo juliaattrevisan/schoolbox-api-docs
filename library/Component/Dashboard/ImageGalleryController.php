@@ -50,7 +50,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

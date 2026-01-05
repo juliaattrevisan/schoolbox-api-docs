@@ -53,7 +53,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return boolean
      * @throws PDOException

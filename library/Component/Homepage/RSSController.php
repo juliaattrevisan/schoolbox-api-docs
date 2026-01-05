@@ -15,7 +15,7 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
 {
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

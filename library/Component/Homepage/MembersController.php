@@ -31,7 +31,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      * @throws \Schoolbox\Mapper\Exception

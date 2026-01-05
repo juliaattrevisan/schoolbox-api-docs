@@ -191,7 +191,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
 
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      * @throws Exception
      */

@@ -36,7 +36,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

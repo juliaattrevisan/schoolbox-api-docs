@@ -27,7 +27,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
     /**
      * Outputs HTML template defined by config variable 'template'
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

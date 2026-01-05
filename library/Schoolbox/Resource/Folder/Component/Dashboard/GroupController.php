@@ -125,7 +125,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return bool
      */
