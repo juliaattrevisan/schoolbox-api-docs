@@ -9,7 +9,8 @@ import { existsSync } from "fs";
 export default class BaseTester {
     /**
      * Executes a shell command and returns the result.
-     * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command via `vagrant ssh -c '...'`
+     * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command within a Docker or
+     * Vagrant environment.
      * @param command - The command to execute.
      * @returns The stdout from the command.
      * @throws { Error } If the command fails.
