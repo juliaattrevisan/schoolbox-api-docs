@@ -144,7 +144,7 @@ class Controller extends Base
             ],
             'assessmentConfig' => [
                 'helpfulness' => $dialogAgent->getHelpfulness(),
-                'language' => $dialogAgent->getLanguage(),
+                'language' => $dialogAgent->getLanguage() ?? Language::DEFAULT,
                 'openingMessage' => $dialogAgent->getOpeningMessage(),
                 'rules' => $dialogAgent->getRules(),
                 'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
