@@ -514,7 +514,7 @@ class Mapper extends BaseMapper
                     'start' => (clone $now)->getStartOfSchoolYear(),
                     'end'   => (clone $now)->endOfSchoolYear(),
                 ],
-            PastoralReport::THIS_TERM        =>
+            PastoralReport::ACADEMIC_PERIOD  =>
                 [
                     'start' => $thisTerm->getStart(),
                     'end'   => $thisTerm->getActualFinish(),
