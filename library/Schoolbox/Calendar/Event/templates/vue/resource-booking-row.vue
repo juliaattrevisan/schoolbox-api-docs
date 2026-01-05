@@ -97,6 +97,7 @@ async function postEditBookingForm(): Promise<void> {
 
     isProcessing.value = false;
 
+    // Multiple bookings may have been affected if we are dealing with an event series.
     let bookingsPlural = "(s)";
     if (response.data && typeof response.data === "object" && "nRowsAffected" in response.data) {
         bookingsPlural = response.data.nRowsAffected === 1 ? "" : "s";
@@ -128,7 +129,7 @@ async function postDeleteBookingForm(): Promise<void> {
 
     isProcessing.value = false;
 
-    // Multiple bookings may be deleted if we are dealing with an event series.
+    // Multiple bookings may have been affected if we are dealing with an event series.
     let bookingsPlural = "(s)";
     if (response.data && typeof response.data === "object" && "nRowsAffected" in response.data) {
         bookingsPlural = response.data.nRowsAffected === 1 ? "" : "s";
