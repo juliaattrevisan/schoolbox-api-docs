@@ -61,8 +61,9 @@ up the Vagrant development environment.
 - `down`: stops containers
 - `provision`: sets up the Schoolbox instance in the started containers
   (`up` must be run first)
-- `ssh`: create a shell session in the `schoolbox-cli` container, for running
-  commands
+- `ssh`: create a shell session (in the `schoolbox-cli` container by default),
+  for running commands
+- `exec`: execute a shell session in the `schoolbox-cli` container directly
 - `logs`: view logs for containers in the development environment
 - `clean`: cleans up the temporary and cache files which the Docker development
   environment may create

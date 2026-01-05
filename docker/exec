@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Execute a command in the schoolbox-cli container
+"$(dirname "$0")/compose" exec schoolbox-cli "$@"
