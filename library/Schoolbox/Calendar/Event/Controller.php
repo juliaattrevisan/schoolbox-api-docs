@@ -1154,7 +1154,7 @@ class Controller extends Base
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
             // This will occur if the booking has been deleted since the form page was generated.
-            $problem = new ApiProblem('Booking not found')
+            $problem = new ApiProblem('Booking not found.')
                 ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)

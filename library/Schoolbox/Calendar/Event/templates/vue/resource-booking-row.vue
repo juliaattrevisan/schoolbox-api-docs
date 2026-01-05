@@ -36,9 +36,17 @@ type EditBookingApiRequest = {
 type EditBookingApiResponse = { nRowsAffected: number };
 
 /**
- * This defines the server response to a request to ENDPOINTS.deleteBookingPath().
+ * Request format expected by the server at ENDPOINTS.deleteBookingPath().
  */
-type DeleteBookingApiResponse = { success: boolean; nRowsAffected: number; errorMessage?: string };
+type DeleteBookingApiRequest = {
+    efficacy: string; // Efficacy will be a blank string if the event is not part of a series.
+};
+
+/**
+ * Success response format expected from the server at ENDPOINTS.deleteBookingPath().
+ * For error response formats, see apiUtils.ts.
+ */
+type DeleteBookingApiResponse = { nRowsAffected: number };
 
 const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
@@ -108,43 +116,32 @@ async function postEditBookingForm(): Promise<void> {
  */
 async function postDeleteBookingForm(): Promise<void> {
     isProcessing.value = true;
-    const payload = {
-        efficacy: efficacy.value,
-    };
-    const toast = window.sbProps.toastActivate("Deleting...");
-    const endpoint = ENDPOINTS.deleteBookingPath(props.eventId, props.booking.id);
 
-    try {
-        const response = await fetch(endpoint, {
-            method: "DELETE",
-            body: JSON.stringify(payload),
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        });
-        const responseData = (await response.json()) as DeleteBookingApiResponse;
-        if (response.ok && responseData.success) {
-            emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has been deleted.
-            toast.timeout({
-                text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} deleted`,
-                isSuccess: true,
-            });
-            isEditFormOpen.value = false; // Close edit form only on success.
-        } else {
-            toast.timeout({
-                text: responseData.errorMessage
-                    ? responseData.errorMessage
-                    : `Unable to delete booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
-                isSuccess: false,
-            });
-        }
-    } catch (error) {
-        toast.timeout({ text: "Unable to delete booking(s)", isSuccess: false });
-        console.warn(error);
-    } finally {
-        isProcessing.value = false;
+    const toast = window.sbProps.toastActivate("Deleting...");
+    const response = await apiRequest<DeleteBookingApiResponse, DeleteBookingApiRequest>({
+        method: "DELETE",
+        url: ENDPOINTS.deleteBookingPath(props.eventId, props.booking.id),
+        body: {
+            efficacy: efficacy.value,
+        },
+    });
+
+    isProcessing.value = false;
+
+    // Multiple bookings may be deleted if we are dealing with an event series.
+    let bookingsPlural = "(s)";
+    if (response.data && typeof response.data === "object" && "nRowsAffected" in response.data) {
+        bookingsPlural = response.data.nRowsAffected === 1 ? "" : "s";
     }
+
+    if (!response.success) {
+        toast.timeout({ text: response.message || `Unable to delete booking${bookingsPlural}`, isSuccess: false });
+        return;
+    }
+
+    emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has been deleted.
+    toast.timeout({ text: `Booking${bookingsPlural} deleted`, isSuccess: true });
+    isEditFormOpen.value = false; // Close edit form only on success.
 }
 </script>
 
