@@ -174,7 +174,7 @@
                     <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-download" title="Download a file to reuse this quiz elsewhere">Export quiz as file</a>
                 </li>
             {% endif %}
-            {% if viewCustomParticipationRoute and assessment.isImplementation and (assessment is dueWork or assessment is quiz or assessment is task) %}
+            {% if viewCustomParticipationRoute and assessment.isImplementation and (assessment is dueWork or assessment is quiz or assessment is task or assessment is dialogAgent) %}
                 <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
             {% endif %}
             {% if deleteRoute %}
