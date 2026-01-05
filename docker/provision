@@ -66,11 +66,11 @@ esac
 case "${LTI_DEVKIT_ENABLE}" in
     1 | true | yes | on)
         # Current location of devkit is hardcoded, as is its hostname
-        PUBLIC_KEY=$(docker exec -e $env_args -it schoolbox-cli tools/instance-mariadb.sh \
+        PUBLIC_KEY=$(docker exec -it $env_args schoolbox-cli tools/instance-mariadb.sh \
             --skip-column-names --batch --raw \
             -e "SELECT value FROM config WHERE name='jwt_public_key'" \
             | sed -e 's/[[:space:]]*$//' )
-        DEPLOYMENT_ID=$(docker exec -e $env_args -it schoolbox-cli "tools/provision/create-devkit-lti-tool.php" \
+        DEPLOYMENT_ID=$(docker exec -it $env_args schoolbox-cli "tools/provision/create-devkit-lti-tool.php" \
             --key "$(cat ../devkit-lti1p3/config/keys/public.key)" \
             --host "http://devkit-lti1p3.localhost:${LTI_DEVKIT_PUBLISHED_PORT}" \
             | sed -e 's/[[:space:]]*$//' )
