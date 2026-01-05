@@ -52,7 +52,7 @@
                             publishAt: plan is defined ? plan.publishDate : assessment.publishAt,
                             openAt:    plan is defined ? plan.openDate    : assessment.openAt,
                             dueAt:     plan is defined ? plan.dueDate     : assessment.dueAt,
-                            lateAt:    plan is defined ? plan.closeDate   : assessment.closeAt,
+                            closeAt:    plan is defined ? plan.closeDate   : assessment.closeAt,
                         } only %}
                     </div>
                     {% for participant in participants %}
