@@ -99,7 +99,6 @@ async function postEditBookingForm(): Promise<void> {
     }
 
     if (!response.success) {
-        console.info("resource-booking-row.vue postEditBookingForm() response: ", response);
         toast.timeout({ text: response.message || `Unable to update booking${bookingsPlural}`, isSuccess: false });
         return;
     }
