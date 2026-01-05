@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -35,17 +34,13 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
-use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
-use Schoolbox\Learning\Assessment\Lti\Model as LTI;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
-use Schoolbox\Learning\Authorizer\Rule\IsCustomParticipationEnabled;
+use Schoolbox\Learning\Authorizer\Rule\IsCustomParticipationModifiable;
+use Schoolbox\Learning\Authorizer\Rule\IsCustomParticipationCopyable;
 use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
@@ -189,31 +184,7 @@ class Module extends BaseModule
             new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
             /* Check if the custom participation is available
              */
-            new IsCustomParticipationEnabled(),
-            new Rule\Any(
-                $isSuper,
-                new Rule\All(
-                    $canWrite,
-                    new AssessmentNotDeleted(),
-                    new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
-                )
-            )
-        );
-
-        $canModifyLearningPlan = new Rule\All(
-        /* Should only be accessible if the custom participation config is enabled
-         */
-            new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
-            new Rule\Callback(function (array $param): void {
-                /* No learning plan for project or lesson plan type assessments
-                 */
-                if (
-                    $param['assessment'] instanceof Project ||
-                    $param['assessment'] instanceof LessonPlan
-                ) {
-                    throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-                }
-            }),
+            new IsCustomParticipationModifiable(),
             new Rule\Any(
                 $isSuper,
                 new Rule\All(
@@ -226,24 +197,7 @@ class Module extends BaseModule
 
         $canCopyAssessmentCustomParticipation = new Rule\All(
             $canModifyCustomParticipation,
-            new Rule\Callback(function (array $param): void {
-                /* At the moment, we want to restrict the copying of custom participation
-                 * for LTI assessments and quizzes, which will be handled in the future, so
-                 * for the time being, we will leave it out.
-                 */
-                $assessmentType = AssessmentType::objectToString($param['assessment']);
-                if (
-                    $param['assessment'] instanceof LTI ||
-                    $param['assessment'] instanceof Quiz ||
-                    $param['assessment'] instanceof DialogAgent
-                ) {
-                    throw new Unauthorized(sprintf(
-                        '"%s" (%s) cannot be copied via custom participation',
-                        $param['assessment']->getTitle(),
-                        $assessmentType
-                    ));
-                }
-            }),
+            new IsCustomParticipationCopyable(),
         );
 
         // pluralise for REST
@@ -285,7 +239,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/new", 'postCreateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyLearningPlan, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/customisation/include", 'postExistingCustomisationInclude', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
 

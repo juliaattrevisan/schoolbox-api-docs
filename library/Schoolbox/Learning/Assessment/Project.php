@@ -725,6 +725,14 @@ class Project extends AbstractAssessment implements AssessmentContext
     /**
      * @inheritDoc
      */
+    public function isCustomParticipationModifiable(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getLocationId(): string
     {
         return 'project-' . $this->getId();

@@ -602,4 +602,13 @@ class Model extends AbstractAssessment
         $this->duration = $duration;
         return $this;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isCustomParticipationModifiable(): bool
+    {
+        return false;
+    }
 }

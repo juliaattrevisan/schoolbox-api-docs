@@ -1386,6 +1386,39 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * @inheritDoc
+     */
+    public function isCustomParticipationModifiable(): bool
+    {
+        /* If the assessment is a customised assessment then shouldn't allow customisation from it */
+        if (null !== $this->getOriginalAssessmentId()) {
+            return false;
+        }
+
+        /* Custom participation isn't available for specifications */
+        if ($this->isSpecification()) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isCustomParticipationCopyable(): bool
+    {
+        /* Must be able to modify */
+        if (!$this->isCustomParticipationModifiable()) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
      * @return null|Plan
      */
     public function getDynamicPlan(): ?Plan
