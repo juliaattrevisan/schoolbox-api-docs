@@ -28,7 +28,6 @@ use Twig\Error\SyntaxError;
  */
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var ComponentDelegate
      */
