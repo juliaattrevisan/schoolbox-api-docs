@@ -235,6 +235,7 @@ class Controller extends Base
             '<opening_message>' => $assessment->getOpeningMessage(),
             '<rules>' => $assessment->getRules(),
             '<language>' => $assessment->getLanguage(),
+            '<helpfulness>' => $assessment->getHelpfulness()->prompt(),
         ];
         foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
             $fieldPlaceholder = \sprintf('<%s>', $fieldContext->getField()->getSlug());
