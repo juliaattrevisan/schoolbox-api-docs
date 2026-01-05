@@ -4,6 +4,7 @@ import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
 import { EFFICACY_SELF, EFFICACY_SERIES } from "@schoolboxCalendarEvent/eventTypes";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { Booking } from "./resourceBookingTypes";
 
 interface Props {
@@ -19,14 +20,25 @@ const emit = defineEmits<{
 }>();
 
 /**
- * This defines the server response to a request to ENDPOINTS.editBookingPath().
+ * Request format expected by the server at ENDPOINTS.editBookingPath().
  */
-type EditBookingResponse = { success: boolean; nRowsAffected: number; errorMessage?: string };
+type EditBookingApiRequest = {
+    startDatetime: string;
+    endDatetime: string;
+    notes: string;
+    efficacy: string; // Efficacy will be a blank string if the event is not part of a series.
+};
+
+/**
+ * Success response format expected from the server at ENDPOINTS.editBookingPath().
+ * For error response formats, see apiUtils.ts.
+ */
+type EditBookingApiResponse = { nRowsAffected: number };
 
 /**
  * This defines the server response to a request to ENDPOINTS.deleteBookingPath().
  */
-type DeleteBookingResponse = { success: boolean; nRowsAffected: number; errorMessage?: string };
+type DeleteBookingApiResponse = { success: boolean; nRowsAffected: number; errorMessage?: string };
 
 const isEditFormOpen = window.Vue.ref<boolean>(false);
 const isProcessing = window.Vue.ref<boolean>(false);
@@ -66,45 +78,34 @@ async function postEditBookingForm(): Promise<void> {
         throw new Error("Missing createEditBookingFormEl."); // Shouldn't get here.
     }
     isProcessing.value = true;
-    const payload = {
-        startDatetime: startDate.value,
-        endDatetime: endDate.value,
-        notes: bookingNotes.value,
-        efficacy: efficacy.value, // Efficacy will be a blank string if the event is not part of a series.
-    };
 
     const toast = window.sbProps.toastActivate("Saving...");
+    const response = await apiRequest<EditBookingApiResponse, EditBookingApiRequest>({
+        method: "POST",
+        url: ENDPOINTS.editBookingPath(props.eventId, props.booking.id),
+        body: {
+            startDatetime: startDate.value,
+            endDatetime: endDate.value,
+            notes: bookingNotes.value,
+            efficacy: efficacy.value,
+        },
+    });
 
-    try {
-        const response = await fetch(createEditBookingFormEl.value.action, {
-            method: createEditBookingFormEl.value.method,
-            body: JSON.stringify(payload),
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-        });
-        const responseData = (await response.json()) as EditBookingResponse;
-        if (response.ok && responseData.success) {
-            toast.timeout({
-                text: `Booking${responseData.nRowsAffected > 1 ? "s" : ""} updated`,
-                isSuccess: true,
-            });
-            isEditFormOpen.value = false; // Close edit form only on success.
-        } else {
-            toast.timeout({
-                text: responseData.errorMessage
-                    ? responseData.errorMessage
-                    : `Unable to update booking${responseData.nRowsAffected > 1 ? "s" : ""}`,
-                isSuccess: false,
-            });
-        }
-    } catch (error) {
-        toast.timeout({ text: "Unable to update booking(s)", isSuccess: false });
-        console.warn(error);
-    } finally {
-        isProcessing.value = false;
+    isProcessing.value = false;
+
+    let bookingsPlural = "(s)";
+    if (response.data && typeof response.data === "object" && "nRowsAffected" in response.data) {
+        bookingsPlural = response.data.nRowsAffected === 1 ? "" : "s";
     }
+
+    if (!response.success) {
+        console.info("resource-booking-row.vue postEditBookingForm() response: ", response);
+        toast.timeout({ text: response.message || `Unable to update booking${bookingsPlural}`, isSuccess: false });
+        return;
+    }
+
+    toast.timeout({ text: `Booking${bookingsPlural} updated`, isSuccess: true });
+    isEditFormOpen.value = false; // Close edit form only on success.
 }
 
 /**
@@ -127,7 +128,7 @@ async function postDeleteBookingForm(): Promise<void> {
                 Accept: "application/json",
             },
         });
-        const responseData = (await response.json()) as DeleteBookingResponse;
+        const responseData = (await response.json()) as DeleteBookingApiResponse;
         if (response.ok && responseData.success) {
             emit("bookingDeleted", props.booking.id); // Tell the parent component that this component has been deleted.
             toast.timeout({
