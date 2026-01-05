@@ -207,7 +207,6 @@ class Controller extends Assessment\Controller
         return [
             // The message handler only accepts deep linking responses
             'deepLinkingResponseMessageType' => LtiMessageInterface::LTI_MESSAGE_TYPE_DEEP_LINKING_RESPONSE,
-            'acceptingResponses'             => true,
             'ltiTools'                       => $this->ltiToolMapper->findAllAvailableForAssessment()
                                                                     ->sortNaturally('name'),
         ];

@@ -24,7 +24,6 @@
  # @param $canRelocate
  # @param $courseManaged
  # @param $lessonPlanTemplates
- # @param bool $acceptingResponses                                   Whether this assessment can accept responses (see dates.twig)
  # @param \Schoolbox\GenericCollection $scenarios                    A list of predefined scenarios users can choose
  #}
 
@@ -107,30 +106,7 @@
     {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
     <fieldset>
         <legend>Submission Dates</legend>
-        <div class="row">
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
-            </div>
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
-            </div>
-            {# In dialog agents, Due Date is known as Close Date.
-            #
-            # This is strictly enforced by Andrew. I _KNOW_ it misconstrues the data but for some reason this was
-            # absolutely non-negotiable: you'll have to **just know** that "Close Date" for a dialog agent means
-            # "Due Date" in the schema and business logic.
-            #
-            # I would have preferred to rename Due Date to some other word that *means* the same thing as Close
-            # Date, such as "Completion Date", "Conclusion Date", etc. but this is apparently not legal here
-            #}
-            <div class="small-12 medium-4 columns">
-                {{ dateForm.dateField('Close',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
-            </div>
-            {# Mandatory to get past our traditonal javascript validation, but end users aren't supposed to see it #}
-            <div style="display:none">
-                {{ dateForm.dateField('Late',    'close',   assessment.closeAt,   '#dueDate',     '') }}
-            </div>
-        </div>
+        {% include '@learningAssessment/fragments/dates.twig' %}
     </fieldset>
 {% endif %}
 

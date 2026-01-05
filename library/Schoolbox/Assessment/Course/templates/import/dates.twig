@@ -1,0 +1,70 @@
+
+{% extends "@learningAssessment/fragments/dates.twig" %}
+
+{% set assessmentId = isImplOnly ? assessmentImpl.id : assessmentSpec.id %}
+{% set inputPrefix = inputPrefix ~ '[' ~ assessment.id ~ ']' %}
+
+{% block emptyDateField %}
+    {# an empty placeholder cell for grid niceness #}
+    <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
+{% endblock %}
+
+{% block publishDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId,
+        inputPrefix,
+        unitDate: unitImpl.openDate,
+        endOfDay: false,
+        assessmentDate: dateValue,
+        hide,
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}
+
+{% block openDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId,
+        inputPrefix,
+        unitDate: unitImpl.openDate,
+        endOfDay: false,
+        assessmentDate: dateValue,
+        hide,
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}
+
+{% block dueDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId,
+        inputPrefix,
+        unitDate: defaultDueDate,
+        endOfDay: true,
+        assessmentDate: dateValue,
+        hide,
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}
+
+{% block closeDateField %}
+    {% include '@course/import/date.twig' with {
+        assessmentId,
+        inputPrefix,
+        unitDate: unitImpl.dueDate.endOfDay,
+        endOfDay: true,
+        assessmentDate: dateValue,
+        hide,
+        dateProperty: struct.type,
+        dateLabel: struct.label,
+        dateSyncStart: prev,
+        dateSyncEnd: next,
+    } only %}
+{% endblock %}

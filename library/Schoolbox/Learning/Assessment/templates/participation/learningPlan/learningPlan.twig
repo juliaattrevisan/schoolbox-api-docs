@@ -2,11 +2,9 @@
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
 
 {#
-# Modal for creating/modifying a custom learning plan on an assessment.
-# This is split out into a separate file in order to include this outside of the main form (this contains a form).
-#
-# @param bool      $acceptingResponses     a boolean is this assessment something students will attempt
-#}
+ # Modal for creating/modifying a custom learning plan on an assessment.
+ # This is split out into a separate file in order to include this outside of the main form (this contains a form).
+ #}
 {{ bread.crumbsArray(breadcrumbs) }}
 <div class="row actions-small-1">
     <div class="small-12 columns">
@@ -49,19 +47,13 @@
                         </textarea>
                     </div>
                     <div class="columns small-12">
-                        {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
-                        {% set openAt = plan is defined ? plan.openDate : assessment.openAt %}
-                        {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
-                        {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
-                        {% if acceptingResponses is defined and acceptingResponses %}
-                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', '#planOpenDate' ) }}
-                            {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, '#planPublishDate', '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planOpenDate'   , '#planCloseDate') }}
-                            {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, '#planDueDate'    , ''              ) }}
-                        {% else %}
-                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, ''                , '#planDueDate'  ) }}
-                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planPublishDate', ''              ) }}
-                        {% endif %}
+                        {% include '@learningAssessment/fragments/dates.twig' with {
+                            assessment,
+                            publishAt: plan is defined ? plan.publishDate : assessment.publishAt,
+                            openAt:    plan is defined ? plan.openDate    : assessment.openAt,
+                            dueAt:     plan is defined ? plan.dueDate     : assessment.dueAt,
+                            closeAt:    plan is defined ? plan.closeDate   : assessment.closeAt,
+                        } only %}
                     </div>
                     {% for participant in participants %}
                         {% set user = participant.user %}
@@ -107,19 +99,19 @@
                     }
                 },
                 "plan-desc": "required",
-                planPublishDate: {
+                publishDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                planOpenDate: {
+                openDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                planDueDate: {
+                dueDate: {
                     required: true,
                     datepickerDate: true,
                 },
-                planCloseDate: {
+                closeDate: {
                     required: true,
                     datepickerDate: true,
                 },

@@ -834,6 +834,11 @@ class ListController extends Web\Controller\Base
                 $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }
+            /* Artificially enforce close = due for dialog agents
+             */
+            if ($assessment instanceof DialogAgent) {
+                $planData['close_date'] = $planData['due_date'];
+            }
 
             if ($planId > 0 && isset($plans[$planId])) {
                 // existing plan updates
@@ -1641,10 +1646,10 @@ class ListController extends Web\Controller\Base
             'id' => $planId,
             'name' =>  $postData['plan-name'],
             'description' => $postData['plan-desc'],
-            'publish_date' =>  $postData['planPublishDate'],
-            'open_date' => $postData['planOpenDate'],
-            'due_date' => $postData['planDueDate'],
-            'close_date' => $postData['planCloseDate'],
+            'publish_date' =>  $postData['publishDate'],
+            'open_date' => $postData['openDate'],
+            'due_date' => $postData['dueDate'],
+            'close_date' => $postData['closeDate'],
         ];
         // Note: in the returned collection
         //    - any plans CREATED by this method will be NEGATIVELY INDEXED (the object has a real ID though)

@@ -568,7 +568,6 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
-        $data['acceptingResponses'] = true;
         $data['allMarkTypes'] = $this->getAllMarkTypes($assessment);
         $data['allGradeSchemes'] = $this->getAllGradeSchemes();
 

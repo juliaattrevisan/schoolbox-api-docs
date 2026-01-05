@@ -565,9 +565,6 @@ class Controller extends Assessment\Controller
          *  Not sure atm if that idea overlaps whatever this meant
          */
         return [
-            /* This is only used when creating assessments outside the Course Import workflow.
-             */
-            'acceptingResponses' => true,
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
     }
