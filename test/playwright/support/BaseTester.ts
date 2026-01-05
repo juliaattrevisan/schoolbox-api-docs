@@ -15,7 +15,9 @@ export default class BaseTester {
      * @throws { Error } If the command fails.
      */
     async runShellCommand(command: string): Promise<string> {
-        // Try to run in vagrant if the schoolbox directory does not exist
+        // If the schoolbox directory does not exist:
+        // this command is running on the host, instead of in Docker (or Vagrant),
+        // thus it needs to be passed through.
         if (!existsSync("/usr/share/schoolbox") && !command.startsWith("vagrant ssh -c ")) {
             const vagrantCommand = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
             return this.runShellCommand(vagrantCommand);
