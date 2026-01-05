@@ -832,8 +832,7 @@ class ListController extends Web\Controller\Base
                 $planData['open_date'] = $planData['publish_date'];
                 $planData['close_date'] = $planData['due_date'];
             }
-            /* Artificially enforce close = due for dialog agents *specifically before* translation because something
-             * else will persist $assessable specially, not just the $dataModel itself.
+            /* Artificially enforce close = due for dialog agents
              */
             if ($assessment instanceof DialogAgent) {
                 $planData['close_date'] = $planData['due_date'];
