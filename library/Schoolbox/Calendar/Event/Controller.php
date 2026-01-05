@@ -12,6 +12,7 @@ namespace Schoolbox\Calendar\Event;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
+use Crell\ApiProblem\ApiProblem;
 use DateTimeInterface;
 use External_Timetable;
 use InvalidArgumentException;
@@ -1153,8 +1154,11 @@ class Controller extends Base
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
             // This will occur if the booking has been deleted since the form page was generated.
-            $responseData['errorMessage'] = 'Booking not found.';
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $problem = new ApiProblem('Booking not found')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1183,8 +1187,11 @@ class Controller extends Base
             )
         ) {
             // This will occur if permissions have changed since the form page was generated.
-            $responseData['errorMessage'] = "You do not have permission to edit bookings for resource '{$resource->getName()}'.";
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            $problem = new ApiProblem("You do not have permission to edit bookings for resource '{$resource->getName()}'.")
+                ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
 
@@ -1208,8 +1215,11 @@ class Controller extends Base
 
         if (count($bookingIdsToUpdate) === 0) {
             // This will occur if the user attempts to edit a series consisting of past bookings.
-            $responseData['errorMessage'] = 'No editable bookings found.  Note past bookings are not editable as part of a series.';
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $problem = new ApiProblem('No editable bookings found.  Note past bookings are not editable as part of a series.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1310,8 +1320,11 @@ class Controller extends Base
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
             // This will occur if the booking has been deleted since the form page was generated.
-            $responseData['errorMessage'] = 'Booking not found.';
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $problem = new ApiProblem('Booking not found.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1334,8 +1347,11 @@ class Controller extends Base
             )
         ) {
             // This will occur if permissions have changed since the form page was generated.
-            $responseData['errorMessage'] = "You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'.";
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            $problem = new ApiProblem("You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'.")
+                ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
 
@@ -1360,8 +1376,11 @@ class Controller extends Base
 
         if (count($bookingIdsToDelete) === 0) {
             // This will occur if the user attempts to delete a series consisting of past bookings.
-            $responseData['errorMessage'] = 'No deletable bookings found.  Note past bookings are not deletable as part of a series.';
-            $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $problem = new ApiProblem('No deletable bookings found.  Note past bookings are not deletable as part of a series.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
