@@ -123,9 +123,6 @@ class Module extends BaseModule
                     )
                 )
             ),
-
-
-
         );
 
         // register the routes
