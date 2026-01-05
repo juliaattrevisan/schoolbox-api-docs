@@ -22,10 +22,11 @@ $kernel = new Kernel(
             $this->getLogger()->info('Removing Redis data');
             /** @var ClientInterface $redis */
             $redis = $this->getDi()->get('redis.storage');
+            $count = 0;
             foreach ($redis->keys('msg:*') as $key) {
-                $redis->del($key);
+                $count += $redis->del($key);
             }
-            $this->getLogger()->info('Finished.');
+            $this->getLogger()->info('Finished (deleted ' . $count . ' messages)');
         }
     },
     [
