@@ -35,6 +35,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('title', self::TYPE_STRING, null, 'title');
         $this->uses('description', self::TYPE_STRING, null, 'description');
         $this->uses('prompt_template', self::TYPE_STRING, null, 'promptTemplate');
+        $this->uses('default_rules', self::TYPE_STRING, null, 'defaultRules');
         $this->uses('type', self::TYPE_STRING, null, 'type');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

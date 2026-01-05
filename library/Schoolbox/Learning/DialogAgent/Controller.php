@@ -147,7 +147,7 @@ class Controller extends Base
                 'helpfulness' => $dialogAgent->getHelpfulness(),
                 'language' => $dialogAgent->getLanguage() ?? Language::DEFAULT,
                 'openingMessage' => $dialogAgent->getOpeningMessage(),
-                'rules' => $dialogAgent->getRules(),
+                'rules' => $dialogAgent->getRules() ?: $scenario->getDefaultRules(),
                 'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
