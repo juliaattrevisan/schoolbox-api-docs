@@ -15,7 +15,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\User;
@@ -55,7 +55,7 @@ class UnitAssessments
                 // Remove Lesson plans, no linking to other lessons
                 $assessments = $assessments->filter(function ($assessment) {
                     /** @var IAssessable $assessment */
-                    return !($assessment instanceof Model);
+                    return !($assessment instanceof LessonPlan);
                 });
             }
         }
@@ -149,8 +149,9 @@ class UnitAssessments
             if (
                 $assessment->getBaseContext() instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model
                 && $assessment instanceof Project === false
-                && $assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model === false
+                && $assessment instanceof LessonPlan === false
                 && $assessment->getOriginalAssessmentId() === null
+                // TODO: IsCustomParticipationEnabled basically does this...
             ) {
                 $studentParticipationLink = [
                     "route" => "learningAssessment.getAssessmentParticipationForm",
