@@ -148,7 +148,7 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
              * Otherwise just sync one event
              */
             if ($event->getSeriesId()) {
-                $allEvents = $eventMapper->getAllInSeries($event);
+                $allEvents = $eventMapper->getAllInSeries($event->getSeriesId());
             } else {
                 $allEvents = new Collection();
                 $allEvents->add($event);

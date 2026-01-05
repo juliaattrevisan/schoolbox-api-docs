@@ -420,44 +420,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $bookingMapper->delete($bookings);
     }
 
-    /**
-    * Get all the events in the series
-    *
-    * @param Event $event
-    * @return Collection|Event[]
-    */
-    public function getAllInSeries($event)
-    {
-        $seriesId = $event->getSeriesId();
-
-        if (null === $seriesId) {
-            return new Collection();
-        }
-
-        return $this->findByColumnList(
-            [
-                'series_id' => $seriesId,
-            ],
-            [
-                'cache' => false,
-                'order' => array(
-                    'start_datetime' => 'ASC'
-                )
-            ]
-        );
-    }
 
     /**
      * Get all the events in the series.
-     *
-     * TODO: Remove function getAllInSeries() and use this function instead.
-     *       That function was left alone so as to limit the scope of the PR that introduced this function.
      *
      * @param int $seriesId
      * @param bool $futureEventsOnly Set to true to only return events that finish in the future.
      * @return GenericCollection<Event>
      */
-    public function getAllInSeriesNew(int $seriesId, bool $futureEventsOnly = false): GenericCollection
+    public function getAllInSeries(int $seriesId, bool $futureEventsOnly = false): GenericCollection
     {
         $pb = new Builder($this->getDatabase()->getQuoter(), 'event')
             ->equals('series_id', $seriesId);

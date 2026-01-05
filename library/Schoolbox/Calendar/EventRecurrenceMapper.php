@@ -59,7 +59,7 @@ class EventRecurrenceMapper
      */
     public function getSeriesRecurrence($event)
     {
-        $series = $this->eventMapper->getAllInSeries($event);
+        $series = $this->eventMapper->getAllInSeries($event->getSeriesId());
 
         if (count($series) <= 1) {
             return array();
@@ -226,7 +226,7 @@ class EventRecurrenceMapper
         /* Update details of an already-existing set of recurring event incidents
          * (Change details of each instance of a recurring event, for example)
          */
-        $series = $this->eventMapper->getAllInSeries($event);
+        $series = $this->eventMapper->getAllInSeries($event->getSeriesId());
 
 
         if ($series->count() == 0) {
