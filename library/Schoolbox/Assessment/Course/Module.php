@@ -101,20 +101,50 @@ class Module extends BaseModule
         /* Making sure the user has WRITE access to the folder the unit spec is in
          */
         $hasFolderWriteAccess = new Rule\All(
-            $basicPerms,
-            new Rule\HasHomepageAccess(
-                UserAccess::ACCESS_WRITE,
-                function (array $params) {
-                    if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpecificationModel) {
-                        return $params['unitSpec']->getFolder()->getId();
-                    }
-                    try {
-                        return $this->getUnitSpecificationMapper()->findById($params['id'])->getFolder()->getId();
-                    } catch (MapperException\NotFound $e) {
-                        throw new MapperException\NotFound($e->getMessage());
-                    }
-                },
-                $this->getMapperFactory()->get(Access::class),
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function (array $params) {
+                            if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpecificationModel) {
+                                return $params['unitSpec']->getFolder()->getId();
+                            }
+                            try {
+                                return $this->getUnitSpecificationMapper()->findById($params['id'])->getFolder()->getId();
+                            } catch (MapperException\NotFound $e) {
+                                throw new MapperException\NotFound($e->getMessage());
+                            }
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    )
+                )
+            )
+        );
+
+        $hasCourseWriteAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function (array $params): int {
+                            if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
+                                return $params['courseSpec']->getFolder()->getId();
+                            }
+                            try {
+                                return $this->getCourseSpecificationMapper()->findById($params['id'])->getFolder()->getId();
+                            } catch (MapperException\NotFound $e) {
+                                throw new MapperException\NotFound($e->getMessage());
+                            }
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    ),
+                )
             )
         );
 
@@ -124,7 +154,7 @@ class Module extends BaseModule
         $this->register('GET', '/parent{/folderId}', 'parentList', $basicPerms);
         $this->register('GET', '/{folderId}/nodes', 'listNodes', $basicPerms);
         $this->register('POST', '/finalise', 'persistCourse', $basicPerms);
-        $this->register('GET', '/modify/{id}', 'modifyCourse', $basicPerms, $preloadCourseSpec);
+        $this->register('GET', '/modify/{id}', 'modifyCourse', $hasCourseWriteAccess, $preloadCourseSpec);
         $this->register('POST', '/new', 'createCourse', $basicPerms);
         $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', $basicPerms, $preloadCourseSpec);
         $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', $basicPerms, $preloadFolders);
