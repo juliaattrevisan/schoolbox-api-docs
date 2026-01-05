@@ -46,7 +46,6 @@ const efficacy = window.Vue.ref<string>("");
 const isFormSubmittable = window.Vue.computed(() => {
     return !isProcessing.value && (!props.eventSeriesId || efficacy.value !== "");
 });
-const createEditBookingFormEl = window.Vue.useTemplateRef<HTMLFormElement>("editBookingForm");
 const bookingNotes = window.Vue.ref<string>(props.booking.notes);
 const startDate = window.Vue.ref<string>(props.booking.start);
 const endDate = window.Vue.ref<string>(props.booking.end);
@@ -74,9 +73,6 @@ function cancelEditBookingForm(): void {
  * Post the 'Edit Booking' form.
  */
 async function postEditBookingForm(): Promise<void> {
-    if (!createEditBookingFormEl.value) {
-        throw new Error("Missing createEditBookingFormEl."); // Shouldn't get here.
-    }
     isProcessing.value = true;
 
     const toast = window.sbProps.toastActivate("Saving...");
@@ -179,13 +175,7 @@ async function postDeleteBookingForm(): Promise<void> {
         </div>
     </div>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-        <form
-            v-if="isEditFormOpen"
-            ref="editBookingForm"
-            method="post"
-            :action="ENDPOINTS.editBookingPath(props.eventId, props.booking.id)"
-            @submit.prevent="postEditBookingForm"
-        >
+        <form v-if="isEditFormOpen" @submit.prevent="postEditBookingForm">
             <input type="hidden" name="bookingId" :value="props.booking.id" />
             <date-range
                 ref="dateRangeRef"
