@@ -270,6 +270,18 @@ class Controller extends Base
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, ?Response $response): void
     {
+        /** If you can access the submit form, go there instead */
+        $createFormRoute = $this->getRouteIfAuthorized('learningAssessment.getCreateResponseForm', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student' => $student,
+            'studentId' => $student->getId(),
+        ]);
+        if ($createFormRoute) {
+            $this->response = $this->redirectTemporary($createFormRoute);
+            return;
+        }
+
         $participant = $assessment->getParticipant($student);
 
         /* Prepare a redirection url if one was provided
