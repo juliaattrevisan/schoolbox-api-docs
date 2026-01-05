@@ -35,7 +35,7 @@ class Mapper extends Schoolbox\Mapper
      * Override of getUpdateString() to only ever increment the hit count, and
      * to update the last visit time to the current time.
      *
-     * @return String
+     * @return string
      */
     public function getUpdateString(): string
     {

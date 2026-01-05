@@ -164,7 +164,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @param int $dayNumber
      *
-     * @return String
+     * @return string
      */
     public function getDayName($dayNumber): string
     {
