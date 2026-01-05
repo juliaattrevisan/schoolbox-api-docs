@@ -15,6 +15,7 @@ export default class BaseTester {
      * @returns The stdout from the command.
      * @throws { Error } If the command fails.
      */
+    // eslint-disable-next-line class-methods-use-this -- this method makes sense as non-static despite not using this
     async runShellCommand(command: string): Promise<string> {
         // If the schoolbox directory does not exist:
         // this command is running on the host, instead of in Docker (or Vagrant),
