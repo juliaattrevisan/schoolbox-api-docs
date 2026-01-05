@@ -219,6 +219,7 @@ export const ENDPOINTS = Object.freeze({
         return this.generateUrlFromConst(
             ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE,
             eventId,
+            null,
             btoa(window.location.pathname),
         );
     },
@@ -230,6 +231,11 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     rsvpDeletePath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE,
+            eventId,
+            null,
+            btoa(window.location.pathname),
+        );
     },
 });
