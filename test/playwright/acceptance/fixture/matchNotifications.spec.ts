@@ -8,7 +8,7 @@ test.describe("Fixture match notification tests", () => {
     test.beforeEach(async ({ tester }) => {
         tester.isGoingTo("clear all notifications");
         await tester.runShellCommand(
-            `php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php`,
+            `php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php -vvv`,
         );
 
         await tester.loginAsAdmin();
