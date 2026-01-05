@@ -626,16 +626,6 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        /* Only allow the assessment that can have custom participation have access
-         */
-        $assessmentType = AssessmentType::objectToString($assessment);
-        if (
-            AssessmentType::TYPE_PROJECT === $assessmentType ||
-            AssessmentType::TYPE_LESSON_PLAN === $assessmentType
-        ) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-        }
-
         /* Should only have custom participation for implementations
          */
         if ($assessment->getBaseContext()->isSpecificationContext()) {
