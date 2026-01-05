@@ -20,7 +20,7 @@ export default class BaseTester {
         // thus it needs to be passed through.
         if (!existsSync("/usr/share/schoolbox")) {
             if (process.env.DOCKER === "1") {
-                command = `docker/exec "${command.replace(/"/g, '\\"')}"`
+                command = `docker/exec ${command}`
             } else {
                 command = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
             }
