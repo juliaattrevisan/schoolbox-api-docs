@@ -1078,7 +1078,13 @@ export default {
                             <span v-if="eventExtendedProps.variant === 'booking'">
                                 <a
                                     class="button"
-                                    :href="eventExtendedProps.links.view"
+                                    :href="
+                                        ENDPOINTS.generateUrlFromConst(
+                                            ENDPOINTS.URL_EVENT_ADD_TO_CALENDAR,
+                                            eventExtendedProps.eventId,
+                                            returnUrl,
+                                        )
+                                    "
                                     data-test="view-event-modal-add-to-calendar-button"
                                     >Add to Calendar</a
                                 >

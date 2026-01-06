@@ -1398,6 +1398,24 @@ class Controller extends Base
     }
 
 
+    /*
+     * @param Event $event
+     * @return void
+     */
+    public function addToCalendar(Event $event): void
+    {
+        $event->setVariant(Event::VARIANT_EVENT);
+
+        try {
+            $this->eventMapper->save($event);
+        } catch (MapperException) {
+            throw new SchoolboxException('Could not add event to calendar.');
+        }
+
+        $this->response = $this->redirectFound(Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL)));
+    }
+
+
     /**
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
      * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are

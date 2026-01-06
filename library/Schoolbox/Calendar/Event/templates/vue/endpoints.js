@@ -11,6 +11,7 @@ export const ENDPOINTS = Object.freeze({
      */
     URL_EVENT_MODIFY_FORM: "/calendar/event/{eventId}/modify",
     URL_EVENT_MODIFY_FORM_ACTION: "/calendar/modifyForm.php",
+    URL_EVENT_ADD_TO_CALENDAR: "/calendar/event/{eventId}/addToCalendar",
 
     /* Attendance Payload for data about a given event
      */
