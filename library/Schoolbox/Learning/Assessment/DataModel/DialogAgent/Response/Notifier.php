@@ -106,10 +106,8 @@ class Notifier extends AbstractModuleNotifier
             ));
         }
 
-        /* I guess we refetch this to ensure we got all the parts, but this seems either wrong or unnecessary
-         *
-         * TODO hopefully Amri can help me understand; for whatever reason this was necessary in Moment/Notifier.php
-         *  but that makes me think that it shouldn't be considered the canonical way of making these notifiers
+        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
+         * You can refetch using a mapper to get more hydrated parts if you needed them.
          */
         /** @var ResponseDataModel $response */
         $response = $this->mapper->findById($model->getId());
@@ -119,9 +117,8 @@ class Notifier extends AbstractModuleNotifier
         $recipientId = $response->getLearner()->getId();
 
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
-         * TODO find an assessment id somewhere
          */
-        $href = sprintf(self::PATTERN_HREF, 1576, $recipientId);
+        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
