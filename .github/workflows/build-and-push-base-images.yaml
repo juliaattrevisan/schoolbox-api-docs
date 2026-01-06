@@ -17,6 +17,13 @@ permissions:
   id-token: write
   contents: read
 
+
+# Apparently a reliable method for determining the base branch:
+# see https://stackoverflow.com/a/71158878.
+# Should work for both push to a branch, and workflow_dispatch.
+env:
+  BASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   build-and-push-frankenphp-to-dockerhub:
     env:
@@ -153,14 +160,12 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:$file")
           done
 
-          # github.base_ref is empty when triggering via workflow_dispatch:
-          # instead, it's in github.ref, and needs to be extracted.
-          # May as well always extract from env var GITHUB_REF for consistency
+          # Now build and push the joined images
           docker buildx imagetools create \
-            -t "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${GITHUB_REF/refs\/heads\//}" \
+            -t "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ env.BASE_BRANCH }}" \
             "${DOCKERHUB_IMAGES[@]}"
           docker buildx imagetools create \
-            -t "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${GITHUB_REF/refs\/heads\//}" \
+            -t "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ env.BASE_BRANCH }}" \
             "${ECR_IMAGES[@]}"
 
   build-and-push-schoolbox-cli-to-dockerhub:
@@ -225,7 +230,7 @@ jobs:
             ENV=${{ matrix.env }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
             PRIVATE_CONTAINER_REGISTRY=${{ vars.ECR_NAMESPACE }}
-            BASE_BRANCH=${GITHUB_REF/refs\/heads\//}
+            BASE_BRANCH=${{ env.BASE_BRANCH }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
@@ -300,12 +305,10 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}@sha256:$file")
           done
 
-          # github.base_ref is empty when triggering via workflow_dispatch:
-          # instead, it's in github.ref, and needs to be extracted.
-          # May as well always extract from env var GITHUB_REF for consistency
+          # Now build and push the joined images
           docker buildx imagetools create \
-            -t "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${GITHUB_REF/refs\/heads\//}" \
+            -t "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ env.BASE_BRANCH }}" \
             "${DOCKERHUB_IMAGES[@]}"
           docker buildx imagetools create \
-            -t "${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${GITHUB_REF/refs\/heads\//}" \
+            -t "${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ env.BASE_BRANCH }}" \
             "${ECR_IMAGES[@]}"
