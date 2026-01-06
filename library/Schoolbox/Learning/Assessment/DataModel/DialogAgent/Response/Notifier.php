@@ -13,6 +13,9 @@ namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -50,13 +53,35 @@ class Notifier extends AbstractModuleNotifier
 
     /** Text for each notification
      */
-    private const PATTERN_SOMEONE_REOPENED_TITLE = ':effector reopened :action';
+    private const PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
 
 
     /**
      * A link to the summary screen, for now
      */
     private const PATTERN_HREF = '/learning/assessments/%d/%d';
+
+
+    /**
+     * @var RosettaStone $l10n
+     */
+    private RosettaStone $l10n;
+
+
+    /**
+     * Add some extra doodads for you to use, such as a RosettaStone for localisation/Terminology replacements.
+     *
+     * @param array $dependencies
+     */
+    public function loadDependencies($dependencies = null)
+    {
+        if (empty($dependencies['l10n'])) {
+            $stoneFactory = new RosettaStoneFactory();
+            $dependencies['l10n'] = $stoneFactory->build(L10nMapper::getInstance());
+        }
+
+        parent::loadDependencies($dependencies);
+    }
 
 
     /**
@@ -132,8 +157,9 @@ class Notifier extends AbstractModuleNotifier
              */
             ->setParams([
                 'action' => new Param(sprintf(
-                    'your response to %s',
-                    $response->getDialogAgent()->getAssessmentModel()->getTitle()
+                    'your %s %s',
+                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
                 'effector' => new UserParam($effector)
             ]);
@@ -165,5 +191,19 @@ class Notifier extends AbstractModuleNotifier
 //        print_r($diff);
 
         return new Envelope();
+    }
+
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @param RosettaStone $l10n
+     * @return $this
+     */
+    public function setL10n(RosettaStone $l10n): self
+    {
+        $this->l10n = $l10n;
+        return $this;
     }
 }
