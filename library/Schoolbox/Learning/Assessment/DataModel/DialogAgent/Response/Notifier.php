@@ -132,19 +132,14 @@ class Notifier extends AbstractModuleNotifier
         }
 
         /* If staff was doing a sobo, ignore it: that isn't reopening a response
-         * SOBOing has the same signature as reopening, since it's setting submitted_at to a different value
-         *
-         * This kind of precludes staff doing professional development though, so idk how we can dodge around it
-         * with the current design of this feature. Unfortunately $effector doesn't have a fully-hydrated Role instance
-         * so you need to fetch that manually.
+         * SOBOing has the same signature as reopening, since it's setting submitted_at to a different value; what we
+         * can infer is that:
+         *     - changing submittedAt from a meaningful value to a NULLish value equates to a Reopen
+         *     - changing submittedAt from a NULLish value to a meaningful value equates to a SOBO
          *
          * Note: this might be a reason you get strange notifs about reopening when you shouldn't.
          */
-        print_r($diff);
-        var_dump($effector->getRole()->isStaff());
-        var_dump($effector->getRole());
-
-        if (isset($diff['submittedBy']) && $effector->getRole()->isStaff()) {
+        if ('' === trim((string)$diff['submittedAt'][1])) {
             return new Envelope();
         }
 
