@@ -53,7 +53,7 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * Notify relevant users when a response was put into Reopened state:
+     * Notify students when a response was put into Reopened state:
      *     - submitted_at is null now, but previously wasn't
      *
      * @param string $roleType
@@ -62,14 +62,14 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyReopened(string $roleType, ResponseModel $model, User $effector, ?array $diff): Envelope
+    public function notifyStudentReopened(string $roleType, ResponseModel $model, User $effector, ?array $diff): Envelope
     {
         print_r($diff);
     }
 
 
     /**
-     * Notify relevant users when a response was reset:
+     * Notify students when a response was reset:
      *     - authoritative is 0 now, but previously wasn't
      *
      * @param string $roleType
@@ -78,7 +78,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyReset(string $roleType, ResponseModel $model, User $effector, ?array $diff): Envelope
+    public function notifyStudentReset(string $roleType, ResponseModel $model, User $effector, ?array $diff): Envelope
     {
         print_r($diff);
     }
