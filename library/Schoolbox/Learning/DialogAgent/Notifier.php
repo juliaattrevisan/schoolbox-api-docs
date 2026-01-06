@@ -26,7 +26,6 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-
 class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_REOPENED = 'reopen';
@@ -117,18 +116,16 @@ class Notifier extends AbstractModuleNotifier
          */
         $response = $this->mapper->findById($model);
 
-        /* TODO replace this 1576 with a mapper fetch, I guess, to get the actual assessment id
-         * I don't think $model has it right now, even via $model->getDialogAgent()
+        /* Define the recipient
          */
-        $href = sprintf(self::PATTERN_HREF, 1576, $model->getCreatedBy());
+        $student = $this->userMapper->findById($response->getCreatedBy());
+
+        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
+         */
+        $href = sprintf(self::PATTERN_HREF, $response->getAssessable()->getId(), $student->getId());
 
         /* Basically string replacements to compose the message in the notification
          */
-        $params = [
-            'action' => new Param('your discussion activity response', $href, Param::STACKING_REPLACE_NO_DECORATION),
-            'effector' => new UserParam($effector)
-        ];
-
         $bob = (new Builder())
             ->setTitle(self::PATTERN_SOMEONE_REOPENED_TITLE)
             ->setIcon($this->getUserIcon($effector))
@@ -137,15 +134,16 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
-            ->setParams($params);
+            /* Basically string replacements to compose the message in the notification
+             */
+            ->setParams([
+                'action' => new Param('your discussion activity response', $href, Param::STACKING_REPLACE_NO_DECORATION),
+                'effector' => new UserParam($effector)
+            ]);
 
         /* Craft the message we're gonna send
          */
         $instance = $bob->build();
-
-        /* Define the recipient
-         */
-        $student = $this->userMapper->findById($response->getCreatedBy());
 
         /* Slide that $instance into the $envelope and send it to recipients
          */
