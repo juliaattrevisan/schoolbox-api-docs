@@ -200,6 +200,8 @@ class Notifier extends AbstractModuleNotifier
      * @param User $effector
      * @param array|null $diff
      * @return Envelope
+     * @throws Deleted
+     * @throws Exception
      */
     public function notifyStudentReset(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
