@@ -102,7 +102,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return bool
      * @throws \Exception

@@ -13,7 +13,6 @@
 
 class Component_Dashboard_DailyQuoteController extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -27,7 +26,7 @@ class Component_Dashboard_DailyQuoteController extends Component_Dashboard_Contr
     /**
      * Outputs HTML template defined by config variable 'template'
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

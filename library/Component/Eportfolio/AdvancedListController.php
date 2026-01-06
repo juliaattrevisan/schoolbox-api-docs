@@ -30,7 +30,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
     /**
      * Outputs HTML template defined by config variable 'template'
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

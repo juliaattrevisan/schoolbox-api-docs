@@ -29,7 +29,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
     /**
      * Outputs HTML template defined by config variable 'template'
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

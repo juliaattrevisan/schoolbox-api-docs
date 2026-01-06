@@ -49,7 +49,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

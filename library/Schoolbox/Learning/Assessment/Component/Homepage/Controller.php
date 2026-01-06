@@ -149,7 +149,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      *
      * Should never be called if some sort of rendering is not to take place.
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      * @throws \RuntimeException
      * @throws LoaderError

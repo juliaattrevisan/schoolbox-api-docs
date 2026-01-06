@@ -50,7 +50,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
     /**
      * {@inheritdoc}
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

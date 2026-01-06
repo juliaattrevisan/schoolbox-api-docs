@@ -45,7 +45,7 @@ class Component_Dashboard_SlideshowController extends Component_Dashboard_Contro
 
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)

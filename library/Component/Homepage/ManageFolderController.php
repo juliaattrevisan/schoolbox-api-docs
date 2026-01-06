@@ -35,7 +35,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
 
     /**
      * Renders the data into the SitePage. Presentation logic.
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Psr\Container\ContainerExceptionInterface

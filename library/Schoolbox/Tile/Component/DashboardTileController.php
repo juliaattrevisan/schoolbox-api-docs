@@ -18,7 +18,6 @@ use SitePage;
 
 class DashboardTileController extends Component_Dashboard_ControllerAbstract implements TileControllerInterface
 {
-
     /**
      * @var Layout\Model
      */
@@ -61,7 +60,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
     }
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return bool
      */

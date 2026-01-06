@@ -185,7 +185,7 @@ class RecursiveUndeleterCli extends CliTool\App
      * If so, return a blank string. If not, return the reason why not as a string.
      *
      * @param RecursiveUndeleter $recursiveUndeleter
-     * @return String
+     * @return string
      */
     private function checkThatUndeletionIsPossible(RecursiveUndeleter $recursiveUndeleter): string
     {

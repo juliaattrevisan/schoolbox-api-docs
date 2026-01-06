@@ -4019,10 +4019,10 @@ abstract class Mapper implements IMapper
     /**
      * @brief Returns an SQL fragment containing a comma separated list of column names possibly aliased
      *
-     * @param String $alias
+     * @param string $alias
      * @param array  $whitelist If not empty, a whitelist of column names to use
      *
-     * @return String
+     * @return string
      */
     public function getColumnString($alias = '', $whitelist = array())
     {
@@ -4061,7 +4061,7 @@ abstract class Mapper implements IMapper
 
     /**
      * @brief Returns a comma separated list of PDO placeholders. Works with Mapper::getColumnString
-     * @return String
+     * @return string
      */
     public function getPlaceholderString()
     {
@@ -4112,7 +4112,7 @@ abstract class Mapper implements IMapper
 
     /**
      * @brief Returns an SQL fragment containing the assignment portion of an UPDATE query
-     * @return String
+     * @return string
      */
     public function getUpdateString()
     {
@@ -4176,9 +4176,9 @@ abstract class Mapper implements IMapper
     /**
      * @brief Converts an underscore separated string to camel case
      *
-     * @param String $string
+     * @param string $string
      *
-     * @return String
+     * @return string
      */
     protected function toCamelcase($string)
     {
@@ -4192,9 +4192,9 @@ abstract class Mapper implements IMapper
     /**
      * @brief Explodes a camel case string apart at the humps using underscores
      *
-     * @param String $string
+     * @param string $string
      *
-     * @return String
+     * @return string
      */
     public function toUnderscore($string)
     {

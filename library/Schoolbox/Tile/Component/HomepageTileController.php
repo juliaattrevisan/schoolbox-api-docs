@@ -67,7 +67,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     }
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return bool
      */

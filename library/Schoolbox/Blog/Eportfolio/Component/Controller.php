@@ -42,7 +42,7 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     }
 
     /**
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return bool
      */

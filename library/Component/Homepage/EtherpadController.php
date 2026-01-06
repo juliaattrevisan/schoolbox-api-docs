@@ -10,7 +10,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * The sort options made available to the dropdown
      *
@@ -47,7 +46,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
     /**
      * Outputs HTML template defined by config variable 'template'
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      */
     public function renderTemplate($templateHandle)

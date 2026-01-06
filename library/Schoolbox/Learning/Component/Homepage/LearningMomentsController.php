@@ -43,7 +43,7 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
     /**
      * Output the data we collected in execute()
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      * @return bool
      * @throws LoaderError
      * @throws RuntimeError

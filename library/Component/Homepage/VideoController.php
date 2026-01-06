@@ -65,7 +65,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
-     * @param String $templateHandle
+     * @param string $templateHandle
      *
      * @return boolean
      * @throws PDOException

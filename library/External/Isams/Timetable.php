@@ -165,7 +165,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      * Returns the day name
      *
      * @param int $dayNumber
-     * @return String
+     * @return string
      */
     public function getDayName($dayNumber): string
     {
