@@ -224,6 +224,8 @@ jobs:
           build-args: |
             ENV=${{ matrix.env }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
+            PRIVATE_CONTAINER_REGISTRY=${{ vars.ECR_NAMESPACE }}
+            BASE_BRANCH=${GITHUB_REF/refs\/heads\//}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
