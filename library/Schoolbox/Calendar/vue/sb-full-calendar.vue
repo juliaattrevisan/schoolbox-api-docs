@@ -816,7 +816,7 @@ export default {
                 // Listen for Foundation's reveal close event.
                 $(document).on("closed.fndtn.reveal", "[data-reveal]", handleModalClosed);
 
-                // Close the modal
+                // Close the modal.
                 this.$refs.event.$refs.modal.close();
             }
         },
