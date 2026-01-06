@@ -104,6 +104,7 @@ export default {
          * @return {Object}
          */
         eventExtendedProps() {
+            console.info("view-event-modal.vue eventExtendedProps() e");
             // Also need to render the event's buttons
 
             /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
@@ -146,12 +147,7 @@ export default {
                 }
             }
 
-            // Sanity check.
-            if (data?.booking && data?.bookings) {
-                console.error("Only one of {'data.booking', 'data.bookings'} should be filled.");
-            }
-
-            return {
+            const extendedProps = {
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
                 editable: metadata?.editable,
@@ -170,17 +166,6 @@ export default {
                     id: Math.max(0, data?.links?.category?.id || 0),
                 },
                 dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
-                // If the modal is for a booking item (representing a row of the resource_booking table),
-                // there will be one booking, so 'booking' will be filled, and 'bookings' will not be filled.
-                booking: {
-                    isBooking: (data?.booking?.status || "").length,
-                    status: data?.booking?.status,
-                    related: data?.booking?.related || [],
-                    actions: (data?.booking?.buttons || []).filter((button) => button?.href),
-                },
-                // If the modal is for an event item (representing a row of the event table),
-                // there may be zero or multiple bookings, so 'booking' will not be filled, but 'bookings' may be filled.
-                bookings: data?.bookings || [],
                 timetable: {
                     code: data?.timetable?.code,
                     staff: data?.timetable?.staff,
@@ -209,6 +194,35 @@ export default {
                     path: data?.links?.path,
                 },
             };
+
+            // Sanity check.
+            if (data?.booking && data?.bookings) {
+                console.error("Only one of {'data.booking', 'data.bookings'} should be filled.");
+            }
+
+            if (data?.booking) {
+                // The modal is for a booking item (representing a row of the resource_booking table).
+                // There will be one booking, so data.booking will be filled, and data.bookings will not be filled.
+                extendedProps.bookings = [];
+                extendedProps.booking = {
+                    status: data?.booking?.status,
+                    related: data?.booking?.related || [],
+                    actions: (data?.booking?.buttons || []).filter((button) => button?.href),
+                };
+            } else {
+                // The modal is for an event item (representing a row of the event table).
+                // There may be zero or multiple bookings, so data.booking will not be filled, but data.bookings may be filled.
+                extendedProps.bookings = data?.bookings || [];
+                extendedProps.booking = null;
+            }
+
+            console.info("view-event-modal.vue eventExtendedProps() variant: ", extendedProps.variant);
+            console.info("view-event-modal.vue eventExtendedProps() booking: ", extendedProps.booking);
+            console.info("view-event-modal.vue eventExtendedProps() bookings: ", extendedProps.bookings);
+            console.info("view-event-modal.vue eventExtendedProps() eventId: ", extendedProps.eventId);
+            console.info("view-event-modal.vue eventExtendedProps() eventTitle: ", event?.title);
+            console.info("view-event-modal.vue eventExtendedProps() x");
+            return extendedProps;
         },
     },
 
@@ -243,7 +257,7 @@ export default {
                 this.eventExtendedProps.links.modify ||
                 this.eventExtendedProps.links.delete ||
                 this.eventExtendedProps.classAttendance.url ||
-                this.eventExtendedProps.booking.actions.length > 0 ||
+                this.eventExtendedProps.booking?.actions.length > 0 ||
                 this.canRsvp(
                     this.eventExtendedProps.attendance.payload.level,
                     this.eventExtendedProps.attendance.payload.attendees.guests,
@@ -411,6 +425,23 @@ export default {
                 });
                 submit.prop("disabled", false);
             }
+        },
+
+        /**
+         *
+         */
+        viewEvent() {
+            let self = this;
+            self.$refs.modal.close();
+            // TODO: Open the modal for the linked event.
+            console.info(
+                "view-event-modal.vue viewEvent() self.eventExtendedProps.eventId: ",
+                self.eventExtendedProps.eventId,
+            );
+            console.info(
+                "view-event-modal.vue viewEvent() self.eventExtendedProps.booking: ",
+                self.eventExtendedProps.booking,
+            );
         },
 
         /**
@@ -709,7 +740,7 @@ export default {
             let data = new URLSearchParams({
                     efficacy: efficacy,
                 }),
-                cancelActionUrl = this.eventExtendedProps.booking.actions.find(
+                cancelActionUrl = this.eventExtendedProps.booking?.actions.find(
                     (action) => action.action === "cancel",
                 ).href;
             return fetch(cancelActionUrl, {
@@ -746,7 +777,7 @@ export default {
             let data = new URLSearchParams({
                     efficacy: efficacy,
                 }),
-                approveActionUrl = this.eventExtendedProps.booking.actions.find(
+                approveActionUrl = this.eventExtendedProps.booking?.actions.find(
                     (action) => action.action === "approve",
                 ).href;
             return fetch(approveActionUrl, {
@@ -783,7 +814,7 @@ export default {
             let data = new URLSearchParams({
                     efficacy: efficacy,
                 }),
-                rejectActionUrl = this.eventExtendedProps.booking.actions.find(
+                rejectActionUrl = this.eventExtendedProps.booking?.actions.find(
                     (action) => action.action === "reject",
                 ).href;
             fetch(rejectActionUrl, {
@@ -870,8 +901,8 @@ export default {
                         <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
                             <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
                         </template>
-                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{
-                            eventExtendedProps.booking.status.name
+                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking?.status">{{
+                            eventExtendedProps.booking?.status.name
                         }}</meta-item>
                         <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{
                             eventExtendedProps.dateSpan
@@ -955,11 +986,11 @@ export default {
                     <media-article :content="eventExtendedProps.detail"></media-article>
                 </div>
                 <div class="medium-4 small-12">
-                    <template v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking?.related.length">
                         <h3>Related Bookings</h3>
                         <meta-list>
                             <meta-item
-                                v-for="booking in eventExtendedProps.booking.related"
+                                v-for="booking in eventExtendedProps.booking?.related"
                                 :key="booking.id"
                                 :class="{
                                     'icon-approve': booking.status.isApproved,
@@ -1089,13 +1120,8 @@ export default {
                                     >Add to Calendar</a
                                 >
                             </span>
-                            <span v-if="eventExtendedProps.variant === 'event'">
-                                <a
-                                    class="button"
-                                    :href="eventExtendedProps.links.view"
-                                    data-test="view-event-modal-add-to-calendar-button"
-                                    >View Event</a
-                                >
+                            <span v-if="eventExtendedProps.variant === 'event' && eventExtendedProps.booking">
+                                <button @click.prevent="viewEvent">View Event</button>
                             </span>
                             <span v-if="eventExtendedProps.links.view">
                                 <a
@@ -1131,7 +1157,7 @@ export default {
                                 >
                             </span>
                             <!-- Booking buttons: handle random events -->
-                            <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
+                            <span v-for="(action, index) in eventExtendedProps.booking?.actions" :key="index">
                                 <a
                                     class="button"
                                     :data-booking-action="String(action.action)"
@@ -1206,7 +1232,7 @@ export default {
                 <h2>This booking is part of a recurring series</h2>
                 <p>
                     Would you like to delete only this booking, or all recurrences in the series?
-                    <template v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking?.related.length">
                         (All bookings for related resources for any deleted bookings will also be deleted.)
                     </template>
                 </p>
@@ -1224,7 +1250,7 @@ export default {
                 <h2>Please confirm</h2>
                 <p>
                     Are you sure you wish to delete this booking?
-                    <template v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking?.related.length">
                         (All bookings for related resources will also be deleted.)
                     </template>
                 </p>
