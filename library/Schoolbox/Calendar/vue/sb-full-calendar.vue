@@ -806,7 +806,7 @@ export default {
                 const handleModalClosed = (foundationEvent) => {
                     // Ensure the event modal is the one we want.
                     if (foundationEvent.target === modalElement) {
-                        // Remove the event listener
+                        // Remove the event listener.
                         $(document).off("closed.fndtn.reveal", handleModalClosed);
                         // Open the new modal.
                         this.$refs.event.open(event);
