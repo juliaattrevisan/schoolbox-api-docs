@@ -15,7 +15,7 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\Dialogagent\Response\Model as ResponseModel;
+use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 
 class Notifier extends AbstractModuleNotifier
 {

@@ -8,13 +8,13 @@ VALUES
     (
         (SELECT id FROM msg_namespace WHERE slug = 'dialog_agent' LIMIT 1),
         'reset',
-        'staff',
+        'student',
         'a response to a {:dialogAgent} has been reset'
     ),
     (
         (SELECT id FROM msg_namespace WHERE slug = 'dialog_agent' LIMIT 1),
         'reopened',
-        'staff',
+        'student',
         'a response to a {:dialogAgent} has been reopened'
     );
 
@@ -24,12 +24,12 @@ SELECT (SELECT id
         FROM `msg_source`
         WHERE `namespace` = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'dialog_agent')
           AND `key` = 'reset'
-          AND `role_type` = 'staff'),
+          AND `role_type` = 'student'),
        `groups`.id,
        'MU,DI,IN,MO,EM',
        'IN'
 FROM `groups`
-WHERE `groups`.`group_type` = 'staff';
+WHERE `groups`.`group_type` = 'student';
 
 -- Default settings for Reopen
 INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
@@ -37,9 +37,9 @@ SELECT (SELECT id
         FROM `msg_source`
         WHERE `namespace` = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'dialog_agent')
           AND `key` = 'reopened'
-          AND `role_type` = 'staff'),
+          AND `role_type` = 'student'),
        `groups`.id,
        'MU,DI,IN,MO,EM',
        'IN'
 FROM `groups`
-WHERE `groups`.`group_type` = 'staff';
+WHERE `groups`.`group_type` = 'student';
