@@ -234,10 +234,10 @@ function build_image_names() {
     case "${SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
             base_branch="master"
-            base_php_image="schoolbox-cli"
+            schoolbox_cli_image="schoolbox-cli"
             ;;
         *)
-            base_php_image="${private_container_registry}/schoolbox-cli:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
+            schoolbox_cli_image="${private_container_registry}/schoolbox-cli:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
             ;;
     esac
 }
