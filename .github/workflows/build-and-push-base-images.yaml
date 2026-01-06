@@ -1,7 +1,8 @@
 name: Build and push base images
 
 # Build new base images (for frankenphp and schoolbox-cli):
-# * whenever docker/base-images/** or this file changes
+# * whenever the base image or schoolbox-cli definitions change
+# * whenever this file changes
 # * manually (workflow_dispatch)
 on:
   push:
@@ -10,13 +11,13 @@ on:
      - develop
    paths:
      - 'docker/base-images/**'
+     - 'docker/schoolbox-cli/**'
      - '.github/workflows/build-and-push-base-images.yaml'
   workflow_dispatch:
 
 permissions:
   id-token: write
   contents: read
-
 
 # Apparently a reliable method for determining the base branch:
 # see https://stackoverflow.com/a/71158878.
