@@ -240,8 +240,6 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            console.info("sb-full-calendar.vue events() e");
-            console.info("sb-full-calendar.vue events() callback: ", callback);
             const toast = window.sbProps.toastActivate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -266,7 +264,6 @@ export default {
                     toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
-            console.info("sb-full-calendar.vue events() x");
         },
 
         /**
@@ -456,12 +453,9 @@ export default {
          * @param eventInfo
          */
         onEventClick(eventInfo) {
-            console.info("sb-full-calendar.vue onEventClick() e");
-            console.info("sb-full-calendar.vue onEventClick() eventInfo: ", eventInfo);
             // Ideally the current event would be a part of the modal,
             // not this component, but :shrug:
             this.$refs.event.open(eventInfo.event);
-            console.info("sb-full-calendar.vue onEventClick() x");
         },
 
         /**
@@ -800,34 +794,21 @@ export default {
          *
          */
         onViewEventLinkedFromBooking(eventId, clickEventObj) {
-            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() e");
-            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() eventId: ", eventId);
-            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() clickEventObj: ", clickEventObj);
-
             const eventIdWithSourceName = "Day-" + eventId; // This must match the id set in Day/Renderer/Javascript.php.
-            console.info(
-                "sb-full-calendar.vue onViewEventLinkedFromBooking() eventIdWithSourceName: ",
-                eventIdWithSourceName,
-            );
 
             // Find the linked event.
             const event = this.calendarApi.getEventById(eventIdWithSourceName);
-            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() event: ", event);
 
             if (event) {
                 const modalElement = this.$refs.event.$refs.modal.$el;
 
                 // Define a handler that will run when the Foundation modal closes.
                 const handleModalClosed = (foundationEvent) => {
-                    console.info(
-                        "sb-full-calendar.vue onViewEventLinkedFromBooking() Foundation modal closed event received",
-                    );
                     // Ensure the event modal is the one we want.
                     if (foundationEvent.target === modalElement) {
-                        console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() opening new modal");
                         // Remove the event listener
                         $(document).off("closed.fndtn.reveal", handleModalClosed);
-                        // Open the new modal
+                        // Open the new modal.
                         this.$refs.event.open(event);
                     }
                 };
@@ -838,8 +819,6 @@ export default {
                 // Close the modal
                 this.$refs.event.$refs.modal.close();
             }
-
-            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() x");
         },
     },
 };
