@@ -37,6 +37,13 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier
 {
+    /**
+     * These triggers dynamically compute to generate a callback method. Your trigger names must correspond exactly to
+     * msg_source.key - any mismatch returns an error message about a trigger not having callbacks.
+     *
+     * e.g. Trigger for 'Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model:1 reopen' has no callbacks
+     *
+     */
     public const TRIGGER_REOPENED = 'reopened';
     public const TRIGGER_RESET = 'reset';
 
@@ -105,7 +112,7 @@ class Notifier extends AbstractModuleNotifier
          *  but that makes me think that it shouldn't be considered the canonical way of making these notifiers
          */
         /** @var ResponseDataModel $response */
-        $response = $this->mapper->findById($model);
+        $response = $this->mapper->findById($model->getId());
 
         /* Define the recipient; all we need is their id
          */
