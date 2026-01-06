@@ -1,10 +1,8 @@
-name: Build and push frankenphp
+name: Build and push base images
 
-# Build new frankenphp images:
-# * whenever docker/base-images/** or this file changes?
-#   (develop only for now: master and develop will use the same base images)
-# * manually (workflow_dispatch)?
-# * on a cron?
+# Build new base images (for frankenphp and schoolbox-cli):
+# * whenever docker/base-images/** or this file changes
+# * manually (workflow_dispatch)
 on:
   push:
    branches:
@@ -12,7 +10,7 @@ on:
      - develop
    paths:
      - 'docker/base-images/**'
-     - '.github/workflows/build-and-push-frankenphp.yaml'
+     - '.github/workflows/build-and-push-base-images.yaml'
   workflow_dispatch:
 
 permissions:
