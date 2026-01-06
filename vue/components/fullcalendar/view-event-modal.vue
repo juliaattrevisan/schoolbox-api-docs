@@ -18,6 +18,7 @@ import checks from "@schoolboxCalendarEvent/checks";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 
 const EVENT_MODIFIED = "eventModified";
 const EVENT_DELETED = "eventDeleted";
@@ -423,6 +424,30 @@ export default {
                 });
                 submit.prop("disabled", false);
             }
+        },
+
+        /**
+         * Send a request to the server to add an event to the calendar.
+         * This is done by updating event.variant in the database to 'event'.
+         * If the request is successful, emit an EVENT_MODIFIED event.  This will cause sb-full-calendar.vue to reload events.
+         */
+        async addEventToCalendar() {
+            const toast = window.sbProps.toastActivate("Adding event to calendar...");
+            const response = await apiRequest({
+                method: "POST",
+                url: ENDPOINTS.addEventToCalendarPath(this.eventExtendedProps.eventId),
+            });
+
+            if (!response.success) {
+                toast.timeout({ text: response.message || "Unable to add event to calendar", isSuccess: false });
+                return;
+            }
+
+            toast.timeout({ text: "Event added to calendar", isSuccess: true });
+            this.$refs.modal.close(); // Close modal only on success.
+
+            // Notify listening components that an event has been modified (this will cause the calendar to reload events).
+            this.$emit(EVENT_MODIFIED, this.event);
         },
 
         /**
@@ -1096,18 +1121,7 @@ export default {
                             </span>
                             <!-- If the modal represents a booking, and the linked event's variant is 'booking'... -->
                             <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'booking'">
-                                <a
-                                    class="button"
-                                    :href="
-                                        ENDPOINTS.generateUrlFromConst(
-                                            ENDPOINTS.URL_EVENT_ADD_TO_CALENDAR,
-                                            eventExtendedProps.eventId,
-                                            returnUrl,
-                                        )
-                                    "
-                                    data-test="view-event-modal-add-to-calendar-button"
-                                    >Add to Calendar</a
-                                >
+                                <button @click.prevent="addEventToCalendar">Add to Calendar</button>
                             </span>
                             <!-- If the modal represents a booking, and the linked event's variant is 'event'... -->
                             <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'event'">

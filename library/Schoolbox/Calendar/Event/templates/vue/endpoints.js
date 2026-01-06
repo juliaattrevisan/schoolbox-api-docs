@@ -179,6 +179,16 @@ export const ENDPOINTS = Object.freeze({
     },
 
     /**
+     * Add event to calendar
+     *
+     * @param eventId
+     * @return string
+     */
+    addEventToCalendarPath: function (eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_ADD_TO_CALENDAR, eventId, null, null);
+    },
+
+    /**
      * Edit booking
      *
      * @param eventId

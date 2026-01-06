@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
 use Crell\ApiProblem\ApiProblem;
-use Aura\Router\Exception\RouteNotFound;
 use DateTimeInterface;
 use External_Timetable;
 use InvalidArgumentException;
@@ -1404,7 +1403,6 @@ class Controller extends Base
      *
      * @param Event $event
      * @return void
-     * @throws RouteNotFound
      */
     public function addToCalendar(Event $event): void
     {
@@ -1413,17 +1411,15 @@ class Controller extends Base
         try {
             $this->eventMapper->save($event);
         } catch (MapperException) {
-            throw new SchoolboxException('Could not add event to calendar.');
+            $problem = new ApiProblem('Could not save event.')
+                ->setStatus(self::HTTP_STATUS_CODE_SERVER_ERROR)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_SERVER_ERROR);
+            return;
         }
 
-        $returnUrlEncoded = $this->requestQuery->get(Redirect::RETURN_URL);
-        $this->response = $this->redirectFound(
-            $returnUrlEncoded !== null
-            ? Redirect::decode($returnUrlEncoded)
-            : $this->router->getGenerator()->generate('calendar.getOwnCalendar', [
-                'selectedDate' => $event->getStartDateTime()?->getURLDate()
-            ])
-        );
+        $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
