@@ -62,7 +62,7 @@ function onGenerateSelected(): void {
             class="button icon-ai f-no-margins"
             @click="onGenerateSelected"
         >
-            Generate with AI
+            Extract with AI
         </button>
     </div>
 </template>
