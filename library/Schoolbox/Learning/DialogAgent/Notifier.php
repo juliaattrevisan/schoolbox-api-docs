@@ -30,6 +30,9 @@ use Schoolbox\User;
  * Check scheduled logs to see what happened at runtime
  *     docker:  sudo docker/logs schoolbox-scheduled
  *     vagrant: sudo journalctl -u schoolbox-cloud-scheduled@vagrantx -f
+ *
+ * Restart the scheduled
+ *     docker:  sudo docker/compose restart schoolbox-scheduled
  */
 class Notifier extends AbstractModuleNotifier
 {
