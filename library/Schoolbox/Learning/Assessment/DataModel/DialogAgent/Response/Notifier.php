@@ -55,6 +55,7 @@ class Notifier extends AbstractModuleNotifier
     /** Text for each notification
      */
     private const PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
+    private const PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
 
 
     /**
@@ -158,8 +159,9 @@ class Notifier extends AbstractModuleNotifier
              */
             ->setParams([
                 'action' => new Param(sprintf(
-                    'your %s %s',
+                    'your %s %s. You can now resume your %s.',
                     $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
                 'effector' => new UserParam($effector)
@@ -189,9 +191,58 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentReset(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
-//        print_r($diff);
+        /* authoritative stayed the same: this wasn't reset
+         */
+        if (!isset($diff['authoritative'])) {
+            return new Envelope();
+        }
 
-        return new Envelope();
+        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
+         * You can refetch using a mapper to get more hydrated parts if you needed them.
+         */
+        /** @var ResponseDataModel $response */
+        $response = $this->mapper->findById($model->getId());
+
+        /* Define the recipient; all we need is their id
+         */
+        $recipientId = $response->getLearner()->getId();
+
+        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
+         */
+        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+
+        /* Basically string replacements to compose the message in the notification
+         */
+        $bob = (new Builder())
+            ->setTitle(self::PATTERN_SOMEONE_RESET_TITLE)
+            ->setIcon($this->getUserIcon($effector))
+            ->setHref($href)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
+            /* Basically string replacements to compose the message in the notification
+             */
+            ->setParams([
+                'action' => new Param(sprintf(
+                    'your %s %s. You can now restart your %s.',
+                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $this->l10n->translate('dialogAgent'),
+                    $this->l10n->translate('dialogAgent')
+                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+                'effector' => new UserParam($effector)
+            ]);
+
+        /* Craft the message we're gonna send
+         */
+        $instance = $bob->build();
+
+        /* Slide that $instance into the $envelope and send it to recipients
+         */
+        $envelope = new Envelope();
+        $envelope->targetToUser($recipientId, $instance);
+
+        return $envelope;
     }
 
 
