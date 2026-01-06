@@ -27,7 +27,7 @@ use Schoolbox\User;
  * Useful diagnostics:
  *
  * Check scheduled logs to see what happened at runtime
- *     docker:  sudo docker/logs schoolbox-scheduled
+ *     docker:  sudo docker/logs schoolbox-scheduled -f
  *     vagrant: sudo journalctl -u schoolbox-cloud-scheduled@vagrantx -f
  *
  * Restart the scheduled
