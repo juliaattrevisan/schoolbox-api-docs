@@ -9,9 +9,17 @@ import { EMPTY_DATE, INVALID_DATE } from "./datePickerTypes";
 interface Props {
     idPrefix: string; // unique identifier for this date range picker
     dataTestPrefix?: string; // optional prefix for data-test attributes, defaults to idPrefix
+    useTime?: boolean;
+    labelStart?: string; // optional label, see default value defined below
+    labelEnd?: string; // optional label, see default value defined below
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    dataTestPrefix: undefined,
+    labelStart: "Start date",
+    labelEnd: "End date",
+});
+
 const startDate = defineModel<string>("startDate", { default: "" });
 const endDate = defineModel<string>("endDate", { default: "" });
 
@@ -59,7 +67,8 @@ window.Vue.watch(endDate, (newValue) => {
  * @returns - The formatted date
  */
 function getDateFormatted(date: string): string {
-    return window.dayjs(date, window.dateDisplayFormats.dayjs).format();
+    const parseFormat = props.useTime ? window.dateDisplayFormats.dayjsDatetime : window.dateDisplayFormats.dayjs;
+    return window.dayjs(date, parseFormat).format();
 }
 
 /**
@@ -120,7 +129,7 @@ defineExpose({ clearInvalidDates });
 <template>
     <div class="l-flex-row l-flex--no-wrap l-gap-m">
         <div class="l-flex-col l-flex__item--1">
-            <label :for="`${props.idPrefix}-start-date-input`">Start date</label>
+            <label :for="`${props.idPrefix}-start-date-input`">{{ props.labelStart }}</label>
             <input
                 :id="`${props.idPrefix}-start-date-input`"
                 ref="startDateInputEl"
@@ -131,10 +140,11 @@ defineExpose({ clearInvalidDates });
                 :data-datesync-enddate="`#${props.idPrefix}-end-date-input`"
                 :data-datepicker-initial-value="startDate"
                 data-datepicker-hide-timetable="true"
+                :data-datepicker-time="props.useTime || undefined"
             />
         </div>
         <div class="l-flex-col l-flex__item--1">
-            <label :for="`${props.idPrefix}-end-date-input`">End date</label>
+            <label :for="`${props.idPrefix}-end-date-input`">{{ props.labelEnd }}</label>
             <input
                 :id="`${props.idPrefix}-end-date-input`"
                 ref="endDateInputEl"
@@ -145,6 +155,7 @@ defineExpose({ clearInvalidDates });
                 :data-datesync-startdate="`#${props.idPrefix}-start-date-input`"
                 :data-datepicker-initial-value="endDate"
                 data-datepicker-hide-timetable="true"
+                :data-datepicker-time="props.useTime || undefined"
             />
         </div>
     </div>

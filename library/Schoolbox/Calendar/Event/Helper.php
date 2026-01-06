@@ -121,9 +121,14 @@ class Helper
      */
     public function getResourceBookingsCollection(Event $event): array
     {
+        // Get resource booking objects and ensure their linked event is hydrated.
+        $resourceBookings = $this->resourceBookingMapper->findByEventId($event->getId());
+        foreach ($resourceBookings as $resourceBooking) {
+            $resourceBooking->setEvent($event);
+        }
+
         $result = [];
 
-        $resourceBookings = $this->resourceBookingMapper->findByEventId($event->getId());
         /** @var ResourceBookingModel $resourceBooking */
         foreach ($resourceBookings as $resourceBooking) {
             $result[] = $resourceBooking->jsonSerialize();

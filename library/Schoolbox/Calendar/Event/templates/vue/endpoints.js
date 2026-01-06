@@ -33,12 +33,17 @@ export const ENDPOINTS = Object.freeze({
 
     URL_BOOKING_SELECTIZE: "/resource-booking/item/search",
 
+    /* Add bookings to an event.
+     */
     URL_BOOKINGS_ADD: "/calendar/event/{eventId}/addBookings",
 
-    /* Edit bookings on events.
-     * TODO: This has not yet been implemented on the back-end.
+    /* Edit a booking linked to an event.
      */
-    URL_BOOKING_EDIT: "/resource-booking/booking/edit",
+    URL_BOOKING_EDIT: "/calendar/event/{eventId}/editBooking/{bookingId}",
+
+    /* Delete a booking linked to an event.
+     */
+    URL_BOOKING_DELETE: "/calendar/event/{eventId}/deleteBooking/{bookingId}",
 
     /**
      * Generate a path via const
@@ -49,15 +54,21 @@ export const ENDPOINTS = Object.freeze({
      * @param {String}      str       the base path
      * @param {Number|null} eventId   the event's id: if set will replace
      *                                "{eventId}" in the generated path
+     * @param {Number|null} bookingId the booking's id: if set will replace
+     *                                "{bookingId}" in the generated path
      * @param {String|null} returnUrl a url to visit after saving: if set will
      *                                be appended as the "returnUrl" query param
      * @return {String}
      */
-    generateUrlFromConst(str, eventId, returnUrl) {
+    generateUrlFromConst(str, eventId, bookingId, returnUrl) {
         let url = str;
 
         if (eventId !== undefined && eventId !== null) {
             url = url.replace("{eventId}", String(eventId));
+        }
+
+        if (bookingId !== undefined && bookingId !== null) {
+            url = url.replace("{bookingId}", String(bookingId));
         }
 
         if (returnUrl !== undefined && returnUrl !== null) {
@@ -103,7 +114,12 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     modifyPath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_MODIFY_FORM, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_EVENT_MODIFY_FORM,
+            eventId,
+            null,
+            btoa(window.location.pathname),
+        );
     },
 
     /**
@@ -113,7 +129,12 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     createAttendancePath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_CREATE, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_ATTENDANCE_CREATE,
+            eventId,
+            null,
+            btoa(window.location.pathname),
+        );
     },
 
     /**
@@ -123,7 +144,12 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     deleteAttendancePath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_DELETE, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_ATTENDANCE_DELETE,
+            eventId,
+            null,
+            btoa(window.location.pathname),
+        );
     },
 
     /**
@@ -133,7 +159,12 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     rsvpAcceptPath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT,
+            eventId,
+            null,
+            btoa(window.location.pathname),
+        );
     },
 
     /**
@@ -143,7 +174,39 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     addBookingsPath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, null, btoa(window.location.pathname));
+    },
+
+    /**
+     * Edit booking
+     *
+     * @param eventId
+     * @param bookingId
+     * @return string
+     */
+    editBookingPath: function (eventId, bookingId) {
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_BOOKING_EDIT,
+            eventId,
+            bookingId,
+            btoa(window.location.pathname),
+        );
+    },
+
+    /**
+     * Delete booking
+     *
+     * @param eventId
+     * @param bookingId
+     * @return string
+     */
+    deleteBookingPath: function (eventId, bookingId) {
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_BOOKING_DELETE,
+            eventId,
+            bookingId,
+            btoa(window.location.pathname),
+        );
     },
 
     /**
@@ -156,6 +219,7 @@ export const ENDPOINTS = Object.freeze({
         return this.generateUrlFromConst(
             ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE,
             eventId,
+            null,
             btoa(window.location.pathname),
         );
     },
@@ -167,6 +231,11 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     rsvpDeletePath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE, eventId, btoa(window.location.pathname));
+        return this.generateUrlFromConst(
+            ENDPOINTS.URL_ATTENDANCE_RSVP_DELETE,
+            eventId,
+            null,
+            btoa(window.location.pathname),
+        );
     },
 });

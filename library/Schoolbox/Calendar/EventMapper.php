@@ -420,32 +420,34 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $bookingMapper->delete($bookings);
     }
 
-    /**
-    * Get all the events in the series
-    *
-    * @param Event $event
-    * @return Collection|Event[]
-    */
-    public function getAllInSeries($event)
-    {
-        $seriesId = $event->getSeriesId();
 
-        if (null === $seriesId) {
-            return new Collection();
+    /**
+     * Get all the events in the series.
+     *
+     * @param int $seriesId
+     * @param bool $futureEventsOnly Set to true to only return events that finish in the future.
+     * @return GenericCollection<Event>
+     */
+    public function getAllInSeries(int $seriesId, bool $futureEventsOnly = false): GenericCollection
+    {
+        $pb = new Builder($this->getDatabase()->getQuoter(), 'event')
+            ->equals('series_id', $seriesId);
+
+        if ($futureEventsOnly) {
+            $pb->greaterThan('end_datetime', Alaress_Date_Format::now()->getDatabase());
         }
 
-        return $this->findByColumnList(
-            [
-                'series_id' => $seriesId,
-            ],
+        return $this->findByPredicates(
+            $pb,
             [
                 'cache' => false,
-                'order' => array(
+                'order' => [
                     'start_datetime' => 'ASC'
-                )
+                ]
             ]
         );
     }
+
 
     /**
      * Remove all role and campus associations to an event

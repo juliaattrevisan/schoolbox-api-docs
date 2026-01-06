@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
+use Crell\ApiProblem\ApiProblem;
 use DateTimeInterface;
 use External_Timetable;
 use InvalidArgumentException;
@@ -69,6 +69,9 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     private const int HTTP_STATUS_CODE_OK = 200;
+    private const int HTTP_STATUS_CODE_NO_CONTENT = 204;
+    private const int HTTP_STATUS_CODE_FORBIDDEN = 403;
+    private const int HTTP_STATUS_CODE_NOT_FOUND = 404;
     private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
 
 
@@ -922,12 +925,12 @@ class Controller extends Base
         if (count($bookingErrors)) {
             $this->response = $this->responseAsJson(
                 ['errors' => $bookingErrors],
-            )->withStatus(200);
+            )->withStatus(self::HTTP_STATUS_CODE_OK);
             return;
         }
 
         // Return empty '200 OK' regardless of whether JSON was requested.
-        $this->response = $this->responseEmpty()->withStatus(200);
+        $this->response = $this->responseEmpty()->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
@@ -944,7 +947,7 @@ class Controller extends Base
         if ($event->getSeriesId() !== null) {
             $efficacy = $this->requestPost->get('efficacy', EventRecurrenceMapper::EFFICACY_SELF);
             if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
-                $allEvents = $this->eventMapper->getAllInSeries($event);
+                $allEvents = $this->eventMapper->getAllInSeries($event->getSeriesId());
 
                 foreach ($allEvents as $currentEvent) {
                     $this->eventMapper->delete($currentEvent);
@@ -980,7 +983,7 @@ class Controller extends Base
             ]);
         } else {
             if ($this->isJsonRequest()) {
-                $this->response = $this->responseEmpty()->withStatus(204); // HTTP status 204 means 'No Content'.
+                $this->response = $this->responseEmpty()->withStatus(self::HTTP_STATUS_CODE_NO_CONTENT);
             } else {
                 $this->response = $this->redirectFound($redirect);
             }
@@ -1007,9 +1010,19 @@ class Controller extends Base
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
 
         // Check whether the user has permission to book the selected resources.
-        $route = 'resourceBooking.createBooking';
+        // Note the 'calendarEvent.addBookings' permission will have been checked in Calendar/Event/Module.php.
+        // A user can create a booking in the resource booking section if they can access the 'resourceBooking.createBooking' route.
         foreach ($resourceById as $resourceId => $resource) {
-            if (!$this->authorizer->isPathAuthorizedForUser($route, [$resourceId], $this->user)) {
+            if (
+                !$this->authorizer->isPathAuthorizedForUser(
+                    'resourceBooking.createBooking',
+                    [
+                        'id' => $resourceId,
+                        'item' => $resource,
+                    ],
+                    $this->user
+                )
+            ) {
                 throw new SchoolboxException(
                     "You do not have permission to create bookings for resource '{$resource->getName()}'."
                 );
@@ -1018,14 +1031,8 @@ class Controller extends Base
 
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
-            // Get all future events in the series.  Note the repeat period of the series is not recorded in the database,
-            // and events can be removed from a series once the series has been created.  Therefore, we cannot assume
-            // any regular period between events, and so must fetch each event's start/end times.
-            $pb = new Builder($this->eventMapper->getDatabase()->getQuoter(), 'event');
-            $pb->equals('series_id', $event->getSeriesId());
-            $pb->greaterThan('start_datetime', Alaress_Date_Format::now()->getDatabase());
-            /** @var GenericCollection<Event> $eventById */
-            $eventById = $this->eventMapper->findByPredicates($pb);
+            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)
+                ->indexBy('id');
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
@@ -1043,12 +1050,23 @@ class Controller extends Base
         $nBookingsCreatedWithoutClash = 0;
         $nBookingsCreatedWithClash = 0;
 
-        // Create a list of booking models to be persisted depending on validation results.
+        // Note we are not only interested in resources booked in the future here.
+        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the future.
+        $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
+
+        // Create a list of booking models to be persisted depending on:
+        //  * whether the resource has already been booked for the event
+        //  * whether the booking would clash with another approved booking of the same resource.
         /** @var Event $loopEvent */
         foreach ($eventById as $eventId => $loopEvent) {
+            $bookedResourceIds = $bookedResourceIdsByEventId[$eventId] ?? [];
             $isClashByResourceId = $isClashByResourceIdByEventId[$eventId] ?? [];
             /** @var BookingItemModel $resource */
             foreach ($resourceById as $resourceId => $resource) {
+                if (in_array($resourceId, $bookedResourceIds, false)) {
+                    continue; // This resource is already booked for this event, so skip.
+                }
+
                 $isClash = $isClashByResourceId[$resourceId] ?? false;
                 if (!$isClash || $resource->getAllowClashBookings()) {
                     // Build the booking.
@@ -1092,13 +1110,291 @@ class Controller extends Base
         // Only unexpected errors require non-success code.
         // It is expected that some or all attempts to book resources may fail for validation reasons.
         $this->response = $this->responseAsJson(
-        // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
+            // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
                 'nBookingsAttempted' => $nBookingsAttempted,
                 'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
                 'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
             ]
         )->withStatus($httpStatusCode);
+    }
+
+
+    /**
+     * Process a 'save' request from the 'edit booking' form that appears on the 'Event Details' page.
+     * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
+     * (Find the 'edit booking' form by clicking on an 'edit' button on a resource booking.)
+     * @param Event $event
+     * @param int $bookingId
+     */
+    public function editBooking(Event $event, int $bookingId): void
+    {
+        $data = $this->request->getParsedBody();
+        $startDatetimeStr = $data['startDatetime'] ?? null;
+        $endDatetimeStr = $data['endDatetime'] ?? null;
+        $notes = $data['notes'] ?? null;
+        $efficacy = $data['efficacy'] ?? null;
+        $responseData = [
+            // The data structure here must match type 'EditBookingResponse' in resource-booking-row.vue.
+            'success' => false,
+            'nRowsAffected' => 0,
+            // Note 'errorMessage' is an optional field.
+        ];
+
+        if (
+            $startDatetimeStr === null ||
+            $endDatetimeStr === null ||
+            $notes === null ||
+            $efficacy === null
+        ) {
+            throw new SchoolboxException('Missing required data in form submission.');
+        }
+
+        try {
+            $booking = $this->bookingMapper->findById($bookingId);
+        } catch (MapperException) {
+            // This will occur if the booking has been deleted since the form page was generated.
+            $problem = new ApiProblem('Booking not found.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            return;
+        }
+
+        // Check that $bookingId is linked to $event.
+        if ($booking->getEvent()->getId() !== $event->getId()) {
+            throw new SchoolboxException('Booking/event mismatch when saving booking.');
+        }
+
+        try {
+            $resource = $this->bookingItemMapper->findById($booking->getResource()->getId());
+        } catch (MapperException $e) {
+            throw new SchoolboxException('Cannot find the booked resource.');
+        }
+
+        // Check whether the user has permission to book the resource.
+        // Note the 'calendarEvent.editBooking' permission will have been checked in Calendar/Event/Module.php.
+        // A user can edit a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
+        if (
+            !$this->authorizer->isPathAuthorizedForUser(
+                'resourceBooking.edit',
+                [
+                    'id' => $resource->getId(),
+                    'item' => $resource,
+                ],
+                $this->user
+            )
+        ) {
+            // This will occur if permissions have changed since the form page was generated.
+            $problem = new ApiProblem("You do not have permission to edit bookings for resource '{$resource->getName()}'.")
+                ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            return;
+        }
+
+        $isEditOfSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
+
+        // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
+        if ($isEditOfSeries) {
+            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)->indexBy('id');
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
+        }
+
+        // Find all bookings to update in one query.
+        $bookingIdsToUpdate = $this->bookingMapper->findIdsByResourceIdForEvents(
+            $booking->getResource()->getId(),
+            $eventById->keys(),
+            futureBookingsOnly: $isEditOfSeries // Only allow update of past bookings if updating a single booking.
+        );
+
+        if (count($bookingIdsToUpdate) === 0) {
+            // This will occur if the user attempts to edit a series consisting of past bookings.
+            $problem = new ApiProblem('No editable bookings found.  Note past bookings are not editable as part of a series.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            return;
+        }
+
+        // When updating booking start/end datetimes, we don't want to set all bookings in the series to the same period.
+        // Instead, we want to set each booking period to start at the same time relative to the linked event, and end
+        // at the same time relative to the linked event.
+        // Example: If we have a series of events recurring Monday to Friday from 1pm to 2pm, and the user edits the
+        // Monday booking to start half an hour before the event, and end half an hour after the event, then we want
+        // each booking in the series to also start half an hour before the event and end half an hour after the event.
+        $eventStart = $booking->getEvent()->getStartDateTime();
+        $eventEnd = $booking->getEvent()->getEndDateTime();
+        try {
+            $newBookingStart = new Alaress_Date_Format($startDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+            $newBookingEnd = new Alaress_Date_Format($endDatetimeStr, Alaress_Date_Format::FORMAT_RFC3339_W3C);
+        } catch (InvalidArgumentException) {
+            throw new SchoolboxException("Start and/or end date times in invalid format.");
+        }
+        $startIncrementFromEventInMinutes = $eventStart?->diffInMinutes($newBookingStart, false);
+        $endIncrementFromEventInMinutes = $eventEnd?->diffInMinutes($newBookingEnd, false);
+
+        // Get the bookings to update from the ids obtained earlier, and hydrate the linked events.
+        $bookingsToUpdate = $this->bookingMapper->findByColumn('id', $bookingIdsToUpdate);
+        foreach ($bookingsToUpdate as $bookingToUpdate) {
+            $bookingToUpdate->setEvent($eventById[$bookingToUpdate->getEvent()->getId()]);
+        }
+
+        foreach ($bookingsToUpdate as $loopBooking) {
+            $loopEventStart = $loopBooking->getEvent()->getStartDateTime();
+            $loopEventEnd = $loopBooking->getEvent()->getEndDateTime();
+
+            // Only update the booking period if we have the necessary ingredients for the calculation.
+            if (
+                $loopEventStart !== null &&
+                $loopEventEnd !== null &&
+                $startIncrementFromEventInMinutes !== null &&
+                $endIncrementFromEventInMinutes !== null
+            ) {
+                $loopBooking->setBookingStartAt($loopEventStart->addMinutes($startIncrementFromEventInMinutes));
+                $loopBooking->setBookingEndAt($loopEventEnd->addMinutes($endIncrementFromEventInMinutes));
+            }
+            $loopBooking->setNotes($notes);
+        }
+
+        // Check whether each hypothetical moved booking would result in a clash.
+        $isClashByBookingId = $this->checkForClashesIfResourceBookingsMoved(
+            $bookingsToUpdate,
+            new GenericCollection(
+                BookingItemModel::class,
+                [$booking->getResource()->getId() => $booking->getResource()]
+            )
+        );
+
+        // Set booking status to pending if the booking has a clash.  Otherwise the status can stay as it was.
+        foreach ($bookingsToUpdate as $bookingToUpdate) {
+            if ($isClashByBookingId[$bookingToUpdate->getId()]) {
+                $bookingToUpdate->setStatus(BookingStatusModel::STATUS_PENDING);
+            }
+        }
+
+        try {
+            $this->bookingMapper->save($bookingsToUpdate);
+        } catch (MapperException) {
+            throw new SchoolboxException(
+                'Could not update booking' . ($isEditOfSeries ? 's in series of events' : '') . '.'
+            );
+        }
+
+        $responseData['success'] = true;
+        $responseData['nRowsAffected'] = count($bookingsToUpdate);
+        $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+    }
+
+
+    /**
+     * Process a 'delete booking' request from the 'Event Details' page.
+     * If the event is part of a series, delete all bookings of the resource from all events in the series.
+     * (Find the 'Event Details' page by clicking on a calendar event, then clicking 'Details' in the event modal.)
+     *
+     * @param Event $event
+     * @param int $bookingId
+     */
+    public function deleteBooking(Event $event, int $bookingId): void
+    {
+        $data = $this->request->getParsedBody();
+        $efficacy = $data['efficacy'] ?? null;
+        $responseData = [
+            // The data structure here must match type 'DeleteBookingResponse' in resource-booking-row.vue.
+            'success' => false,
+            'nRowsAffected' => 0,
+            // Note 'errorMessage' is an optional field.
+        ];
+
+        if ($efficacy === null) {
+            throw new SchoolboxException('Missing required data in form submission.');
+        }
+
+        try {
+            $booking = $this->bookingMapper->findById($bookingId);
+        } catch (MapperException) {
+            // This will occur if the booking has been deleted since the form page was generated.
+            $problem = new ApiProblem('Booking not found.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            return;
+        }
+
+        // Check that $bookingId is linked to $event.
+        if ($booking->getEvent()->getId() !== $event->getId()) {
+            throw new SchoolboxException('Booking/event mismatch when deleting booking.');
+        }
+
+        // Check whether the user has permission to delete the booking.
+        // Note the 'calendarEvent.deleteBooking' permission will have been checked in Calendar/Event/Module.php.
+        // A user can delete a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
+        if (
+            !$this->authorizer->isPathAuthorizedForUser(
+                'resourceBooking.edit',
+                [
+                    'id' => $booking->getResource()->getId(),
+                    'item' => $booking->getResource(),
+                ],
+                $this->user
+            )
+        ) {
+            // This will occur if permissions have changed since the form page was generated.
+            $problem = new ApiProblem("You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'.")
+                ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            return;
+        }
+
+        $isDeleteFromSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
+
+        // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
+        if ($isDeleteFromSeries) {
+            $events = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true);
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $events = new GenericCollection(Event::class, [$event]);
+        }
+
+        // Find all bookings to delete in one query.
+        $eventIds = $events->map(fn ($loopEvent) => $loopEvent->getId(), $events);
+        $bookingIdsToDelete = $this->bookingMapper->findIdsByResourceIdForEvents(
+            $booking->getResource()->getId(),
+            $eventIds->getAll(),
+            futureBookingsOnly: $isDeleteFromSeries // Only allow delete of past bookings if updating a single booking.
+        );
+
+        if (count($bookingIdsToDelete) === 0) {
+            // This will occur if the user attempts to delete a series consisting of past bookings.
+            $problem = new ApiProblem('No deletable bookings found.  Note past bookings are not deletable as part of a series.')
+                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            return;
+        }
+
+        try {
+            $this->bookingMapper->deleteByColumn('id', $bookingIdsToDelete);
+        } catch (MapperException) {
+            throw new SchoolboxException(
+                'Could not delete booking' . ($isDeleteFromSeries ? 's from series of events' : '') . '.'
+            );
+        }
+
+        $responseData['success'] = true;
+        $responseData['nRowsAffected'] = count($bookingIdsToDelete);
+        $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
@@ -1152,6 +1448,54 @@ class Controller extends Base
         return $isClashByResourceIdByEventId;
     }
 
+    /**
+     * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
+     * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
+     * TODO: Move this function into a helper class.
+     *
+     * @param GenericCollection<int, BookingModel> $movedBookings
+     *  - Bookings to check for clashes.  This array should contain all the bookings that are moved in $movedBookings.
+     * @param GenericCollection<int, BookingItemModel> $resourceById
+     *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
+     * @return array
+     */
+    private function checkForClashesIfResourceBookingsMoved(
+        GenericCollection $movedBookings,
+        GenericCollection $resourceById,
+    ): array {
+        $isClashByBookingId = [];
+
+        $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
+            $resourceById->keys(),
+            sortByStartDatetimeAsc: true,
+            // Exclude the moved bookings themselves when finding periods of approved bookings that potentially clash.
+            bookingIdsToExclude: $movedBookings->map(fn ($movedBooking) => $movedBooking->getId(), $movedBookings)->getAll()
+        );
+
+        // For each booking, check for clashes with existing approved bookings of the same resource.
+        /** @var BookingModel $movedBooking*/
+        foreach ($movedBookings as $movedBooking) {
+            $isClashByBookingId[$movedBooking->getId()] = false; // Assume no clash until a clash is found.
+            $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$movedBooking->getResource()->getId()] ?? [];
+            foreach ($periodsOfApprovedBookings as $period) {
+                if ($period['startDatetime']->gt($movedBooking->getBookingEndAt())) {
+                    // The $periods are sorted by start datetime ascending,
+                    // so we can be sure that no other periods will clash with $movedBooking.
+                    break;
+                }
+
+                if (
+                    $period['startDatetime']->lt($movedBooking->getBookingEndAt()) &&
+                    $period['endDatetime']->gt($movedBooking->getBookingStartAt())
+                ) {
+                    // If $movedBooking was persisted, it would clash with an approved booking for $period.
+                    $isClashByBookingId[$movedBooking->getId()] = true;
+                }
+            }
+        }
+
+        return $isClashByBookingId;
+    }
 
     /**
      * Return the status to be set for a new booking that does not clash with any existing booking.

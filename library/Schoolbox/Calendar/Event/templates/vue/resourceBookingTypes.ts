@@ -4,8 +4,11 @@
 export type Booking = {
     id: number;
     name: string;
+    notes: string;
     resource: Resource;
     status: BookingStatus;
+    start: string;
+    end: string;
     // More key:value pairs are available in ResourceBooking/Booking/Model->jsonSerialize().  Add them as they are needed.
 };
 

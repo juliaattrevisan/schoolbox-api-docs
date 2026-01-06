@@ -6,6 +6,7 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import AddResourceBookingsModal from "./add-resource-bookings-modal.vue";
+import ResourceBookingRow from "@schoolboxCalendarEvent/resource-booking-row.vue";
 import MediaArticle from "@schoolboxVue/components/media-article";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
@@ -24,6 +25,7 @@ export default {
     name: "event-details",
 
     components: {
+        ResourceBookingRow,
         AudiencesModal,
         MediaArticle,
         SearchSelect,
@@ -46,6 +48,7 @@ export default {
             numDeclined: this.event.attendance.payload.attendees.declined,
             guests: this.event.attendance.payload.attendees.guests,
             canInvite: this.event.attendance.payload.currentUser.canInvite,
+            resourceBookings: this.event.resourceBookings || [],
 
             /* Vue Select
              */
@@ -455,6 +458,14 @@ export default {
         showAddResourceBookingsModal() {
             this.$refs.addResourceBookingsModal.open();
         },
+
+        /**
+         * Remove the booking with the given id from the resourceBookings array.
+         * @param {number} bookingId - The id of the booking that was deleted
+         */
+        handleBookingDeleted(bookingId) {
+            this.resourceBookings = this.resourceBookings.filter((booking) => booking.id !== bookingId);
+        },
     },
 };
 </script>
@@ -654,8 +665,8 @@ export default {
             </template>
         </div>
 
-        <div v-if="event.resourceBookings" class="small-12 medium-8 island">
-            <section v-if="event.resourceBookings.length > 0" class="detail content">
+        <div v-if="resourceBookings" class="small-12 medium-8 island">
+            <section v-if="resourceBookings.length > 0" class="detail content">
                 <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
                     <nav v-if="canModify()" class="l-flex-row l-flex--align-center f-no-margins">
@@ -671,34 +682,15 @@ export default {
                 </div>
                 <div class="meta"></div>
                 <div class="content-section">
-                    <div
-                        v-for="booking in event.resourceBookings"
+                    <resource-booking-row
+                        v-for="booking in resourceBookings"
                         :key="booking.id"
-                        class="l-grid l-gap-l l-grid--2-col l-mar-m--bottom"
-                    >
-                        <div>
-                            <!-- Intentionally display the resource name here, not the booking name -->
-                            {{ booking.resource.name }}
-                        </div>
-                        <div class="text-right">
-                            <span
-                                class="label"
-                                :class="{
-                                    pending: booking.status.isPending,
-                                    approved: booking.status.isApproved,
-                                    rejected: booking.status.isRejected,
-                                }"
-                                >{{ booking.status.name }}</span
-                            >
-                            <a
-                                href="#"
-                                class="icon-modify"
-                                title="Modify Booking"
-                                aria-label="Modify Booking"
-                                onclick="alert('TODO: Implement edit booking modal (SA-21381)')"
-                            ></a>
-                        </div>
-                    </div>
+                        :eventId="event.id"
+                        :eventSeriesId="event.seriesId"
+                        :booking="booking"
+                        :can-modify="canModify()"
+                        @booking-deleted="handleBookingDeleted"
+                    />
                 </div>
             </section>
             <div v-else class="empty-state">
@@ -720,11 +712,11 @@ export default {
             :is-group="this.isGroupEvent"
         />
         <add-resource-bookings-modal
-            v-if="event.resourceBookings"
+            v-if="resourceBookings"
             ref="addResourceBookingsModal"
             :event-id="this.event.id"
             :event-series-id="this.event.seriesId"
-            :resource-bookings="this.event.resourceBookings"
+            :resource-bookings="resourceBookings"
         />
     </div>
 </template>

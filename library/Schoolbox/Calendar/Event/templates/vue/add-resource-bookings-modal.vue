@@ -6,6 +6,12 @@ import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { Booking, Resource } from "./resourceBookingTypes";
 import { EFFICACY_SELF, EFFICACY_SERIES } from "./eventTypes";
 
+// TODO: Lots of items in this file need renaming.
+//  * function 'createNewBooking' should be 'postAddBookingsForm'
+//  * 'booking' should be 'bookings' in lots of places
+//  * 'create' bookings should be 'add' bookings for consistency
+//  * compare with resource-booking-row.vue.
+
 interface Props {
     resourceBookings: Booking[];
     eventId: number;
@@ -132,15 +138,13 @@ async function createNewBooking(): Promise<void> {
         const responseData = (await response.json()) as AddBookingsToEventResponse;
         if (response.ok) {
             updateToastAndRefreshPage(toast, responseData);
+            isModalOpen.value = false; // Close the modal only on success.
         } else {
-            toast.timeout({ text: "Unable to create booking(s).", isSuccess: false });
-            isModalOpen.value = false; // Close the modal after an error.
+            toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });
         }
     } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        toast.timeout({ text: `Unable to create booking(s). ${message}`, isSuccess: false });
+        toast.timeout({ text: "Unable to create booking(s)", isSuccess: false });
         console.warn(error);
-        isModalOpen.value = false; // Close the modal after an error.
     } finally {
         isProcessing.value = false;
     }

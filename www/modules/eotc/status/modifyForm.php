@@ -73,9 +73,8 @@ $isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
  */
 if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
     $page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
-} /* EOTC Administrators and event authors can edit this event
- */
-elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+} elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+    // EOTC Administrators and event authors can edit this event
     /* Remember original states so we know which obs to spawn
      */
     $originalStatus = $event->getMetadata()->getStatus()->getId();
@@ -148,7 +147,7 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
              * Otherwise just sync one event
              */
             if ($event->getSeriesId()) {
-                $allEvents = $eventMapper->getAllInSeries($event);
+                $allEvents = $eventMapper->getAllInSeries($event->getSeriesId());
             } else {
                 $allEvents = new Collection();
                 $allEvents->add($event);

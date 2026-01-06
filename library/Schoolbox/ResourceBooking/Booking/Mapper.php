@@ -9,6 +9,7 @@
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress_Date_Format;
+use PDO;
 use Schoolbox\Calendar\Event;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -505,6 +506,84 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Find all booking ids matching a given resource id and array of event ids.
+     * This is for finding all bookings of a resource in a series of events.
+     *
+     * @param int        $resourceId
+     * @param array<int> $eventIds
+     * @param bool       $futureBookingsOnly Set to true to only include bookings that finish in the future.
+     * @return array<int>
+     */
+    public function findIdsByResourceIdForEvents(
+        int $resourceId,
+        array $eventIds,
+        bool $futureBookingsOnly = false
+    ): array {
+        if (count($eventIds) === 0) {
+            return [];
+        }
+
+        $query = "
+            SELECT b.id
+            FROM {$this->getTable()} b
+            INNER JOIN {$this->getJoinSql('event', 'b', 'e')}
+            WHERE b.resource_id=:resourceId
+            AND b.event_id IN (" . implode(',', array_map('intval', $eventIds)) . ")
+            AND b.deleted_at IS NULL
+            AND e.deleted_at IS NULL
+        ";
+        $params = [
+            'resourceId' => $resourceId,
+        ];
+
+        if ($futureBookingsOnly) {
+            // If booking start/end datetimes are not set, fall back to event start/end datetimes.
+            $query .= " AND COALESCE(b.end_datetime, e.end_datetime)>NOW()";
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        return $statement->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * Return a data structure allowing quick lookup of which resources are booked for a set of events.
+     *
+     * @param $eventIds array<int> An array of event ids.
+     * @return array<int, array<int>> An array of arrays of resource ids, indexed by event id.
+     */
+    public function getBookedResourceIdsByEventId(array $eventIds): array
+    {
+        if (count($eventIds) === 0) {
+            return [];
+        }
+
+        $query = '
+            SELECT event_id, resource_id
+            FROM resource_booking rb
+            JOIN event e ON (rb.event_id = e.id AND e.deleted_at IS NULL)
+            WHERE event_id IN (' . implode(',', array_map('intval', $eventIds)) . ')
+            AND rb.deleted_at IS NULL;
+        ';
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $resourceIdsByEventId = [];
+
+        foreach ($statement as $row) {
+            if (!array_key_exists($row['event_id'], $resourceIdsByEventId)) {
+                $resourceIdsByEventId[$row['event_id']] = [];
+            }
+
+            $resourceIdsByEventId[$row['event_id']][] = $row['resource_id'];
+        }
+
+        return $resourceIdsByEventId;
+    }
+
+
+    /**
      * Return an array of collections of ResourceBookingModels, indexed by eventId.
      *
      * @param  array<int> $eventIds
@@ -663,8 +742,11 @@ class Mapper extends BaseMapper
      *              Eg. getPeriodsOfFutureApprovedBookingsByResourceId($resourceIds, sortByStartDatetimeAsc: true)
      * @return array
      */
-    public function getPeriodsOfFutureApprovedBookingsByResourceId(array $resourceIds, bool $sortByStartDatetimeAsc = false): array
-    {
+    public function getPeriodsOfFutureApprovedBookingsByResourceId(
+        array $resourceIds,
+        bool $sortByStartDatetimeAsc = false,
+        array $bookingIdsToExclude = [],
+    ): array {
         if (count($resourceIds) === 0) {
             return [];
         }
@@ -681,6 +763,7 @@ class Mapper extends BaseMapper
             AND rb.deleted_at IS NULL
             AND rb.resource_id IN (" . implode(',', array_map('intval', $resourceIds)) . ")
             AND COALESCE(rb.end_datetime, e.end_datetime) > NOW()
+            " . ($bookingIdsToExclude ? "AND rb.id NOT IN (" . implode(',', array_map('intval', $bookingIdsToExclude)) . ")" : '') . "
             " . ($sortByStartDatetimeAsc ? 'ORDER BY COALESCE(rb.start_datetime, e.start_datetime) ASC' : '') . '
         ';
         $statement = $this->getDatabase()->prepare($query);
