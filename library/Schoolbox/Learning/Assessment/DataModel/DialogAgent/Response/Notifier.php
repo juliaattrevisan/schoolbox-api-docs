@@ -37,7 +37,7 @@ use Schoolbox\User;
  */
 class Notifier extends AbstractModuleNotifier
 {
-    public const TRIGGER_REOPENED = 'reopen';
+    public const TRIGGER_REOPENED = 'reopened';
     public const TRIGGER_RESET = 'reset';
 
 
@@ -91,6 +91,14 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentReopened(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
+        if ($diff['submittedAt'][0] === $diff['submittedAt'][1]) {
+            print_r(sprintf(
+                '%s is equivalent to %s; this was not reopened',
+                $diff['submittedAt'][0],
+                $diff['submittedAt'][1]
+            ));
+        }
+
         /* I guess we refetch this to ensure we got all the parts, but this seems either wrong or unnecessary
          *
          * TODO hopefully Amri can help me understand; for whatever reason this was necessary in Moment/Notifier.php
@@ -149,7 +157,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentReset(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
-        print_r($diff);
+//        print_r($diff);
 
         return new Envelope();
     }
