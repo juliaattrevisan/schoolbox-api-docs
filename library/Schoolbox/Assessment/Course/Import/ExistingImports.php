@@ -57,7 +57,12 @@ class ExistingImports
      */
     public function generate(int $courseSpecificationId): array
     {
-        $query = "
+        $queryParts = [];
+
+        /* Find all folder ids which have a Course Outline component
+         * with this course specification id imported
+         */
+        $queryParts[] = "
             SELECT DISTINCT
                 ci.identifier AS folder_id,
                 course_implementation.course_specification_id
@@ -71,8 +76,22 @@ class ExistingImports
             AND ccd.key = :key
             AND course_specification_id = :courseSpecificationId
             AND f.deleted_at IS NULL
-            ORDER BY identifier
         ";
+
+        /* Find all the Course implementation which have previously been imported but
+         * the Course Outline component was removed (ie in archived state)
+         */
+        $queryParts[] = "
+            SELECT DISTINCT course_implementation.folder_id,
+                            course_implementation.course_specification_id
+            FROM course_implementation
+            WHERE course_specification_id = :courseSpecificationId
+              AND course_implementation.deleted_at IS NULL
+        ";
+
+        $query = implode(' UNION ', $queryParts);
+
+        $query .= " ORDER BY folder_id ASC ";
 
         $result = $this->database->executeQuery($query, [
             'controller' => self::COMPONENT_CONTROLLER,
