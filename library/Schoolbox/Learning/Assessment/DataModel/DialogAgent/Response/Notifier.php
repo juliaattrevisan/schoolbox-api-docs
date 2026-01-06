@@ -32,6 +32,8 @@ use Schoolbox\User;
  *
  * Restart the scheduled
  *     docker:  sudo docker/compose restart schoolbox-scheduled
+ *     vagrant: sudo /usr/share/schoolbox/tools/notif/allrestart
+ *
  */
 class Notifier extends AbstractModuleNotifier
 {
