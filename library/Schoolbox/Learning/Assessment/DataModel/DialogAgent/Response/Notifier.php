@@ -8,13 +8,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\DialogAgent;
+namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
-use Psr\Container\ContainerInterface;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -61,20 +60,6 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * Define the mappers you need in this notifier. This presumably lets you bypass the implicit expectation in
-     * AbstractModuleNotifier's setMapper() that Notifier.php be directly adjacent to a corresponding Mapper/Model.
-     */
-    public static function getSetters(ContainerInterface $di): array
-    {
-        return [
-            /* We presumably got a Response domain objects whose corresponding mapper is actually a mapper proxy...
-             * .............which sounds really weird here fyi
-             */
-            'setMapper'     => $di->get('dialogAgentResponseDataSource'),
-        ];
-    }
-
-    /**
      * Attaches and detaches triggers properly depending on the dialog agent response status and transition
      *
      * @param TriggerBundleInterface $bundle
@@ -95,29 +80,31 @@ class Notifier extends AbstractModuleNotifier
      * Notify students when a response was put into Reopened state:
      *     - submitted_at is null now, but previously wasn't
      *
-     * @param ResponseModel $model
+     * @param ResponseDataModel $model
      * @param User $effector
      * @param array|null $diff
      * @return Envelope
      * @throws Exception
      * @throws Deleted
      */
-    public function notifyStudentReopened(ResponseModel $model, User $effector, ?array $diff): Envelope
+    public function notifyStudentReopened(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
         /* I guess we refetch this to ensure we got all the parts, but this seems either wrong or unnecessary
          *
          * TODO hopefully Amri can help me understand; for whatever reason this was necessary in Moment/Notifier.php
          *  but that makes me think that it shouldn't be considered the canonical way of making these notifiers
          */
+        /** @var ResponseDataModel $response */
         $response = $this->mapper->findById($model);
 
         /* Define the recipient; all we need is their id
          */
-        $recipientId = $response->getCreatedBy();
+        $recipientId = $response->getLearner();
 
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
+         * TODO find an assessment id somewhere
          */
-        $href = sprintf(self::PATTERN_HREF, $response->getAssessable()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_HREF, 1576, $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -153,13 +140,15 @@ class Notifier extends AbstractModuleNotifier
      * Notify students when a response was reset:
      *     - authoritative is 0 now, but previously wasn't
      *
-     * @param ResponseModel $model
+     * @param ResponseDataModel $model
      * @param User $effector
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentReset(ResponseModel $model, User $effector, ?array $diff): Envelope
+    public function notifyStudentReset(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
         print_r($diff);
+
+        return new Envelope();
     }
 }
