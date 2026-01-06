@@ -47,6 +47,8 @@ class Javascript extends Base
         $classes = $this->getEvent()->getEventClasses();
 
         $event = [
+            // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
+            'id'         => 'Day-' . $this->event->getEventId(),
             'resourceId' => $this->getEvent()->getResourceId(),
             'title'      => $this->getEvent()->getTitle(),
             'start'      => $start,

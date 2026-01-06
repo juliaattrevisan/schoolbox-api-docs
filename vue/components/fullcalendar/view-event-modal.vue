@@ -148,6 +148,7 @@ export default {
             }
 
             const extendedProps = {
+                id: event.id,
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
                 editable: metadata?.editable,
@@ -220,6 +221,7 @@ export default {
             // If eventExtendedProps.booking is non-null, the modal represents a row of the `resource_booking` table.
             // If eventExtendedProps.booking is     null, the modal represents a row of the `event`            table.
 
+            console.info("view-event-modal.vue eventExtendedProps() id: ", extendedProps.id);
             console.info("view-event-modal.vue eventExtendedProps() variant: ", extendedProps.variant);
             console.info("view-event-modal.vue eventExtendedProps() booking: ", extendedProps.booking);
             console.info("view-event-modal.vue eventExtendedProps() bookings: ", extendedProps.bookings);
@@ -436,16 +438,17 @@ export default {
          */
         viewEvent() {
             let self = this;
-            self.$refs.modal.close();
+            //            self.$refs.modal.close();
+
             // TODO: Open the modal for the linked event.
+            //       The linked event is the one with id self.eventExtendedProps.eventId.
             console.info(
                 "view-event-modal.vue viewEvent() self.eventExtendedProps.eventId: ",
                 self.eventExtendedProps.eventId,
             );
-            console.info(
-                "view-event-modal.vue viewEvent() self.eventExtendedProps.booking: ",
-                self.eventExtendedProps.booking,
-            );
+
+            // Emit event to parent with the linked event ID.
+            self.$emit("viewEventLinkedFromBooking", self.eventExtendedProps.eventId);
         },
 
         /**
@@ -486,6 +489,8 @@ export default {
          * Open this modal.
          */
         open(event) {
+            console.info("view-event-modal.vue open() e");
+            console.info("view-event-modal.vue open() event: ", event);
             let self = this;
 
             /* Initialise data
@@ -551,6 +556,7 @@ export default {
                      * in our local db
                      */
                 });
+            console.info("view-event-modal.vue open() x");
         },
 
         /**

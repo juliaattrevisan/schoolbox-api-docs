@@ -31,6 +31,8 @@ class Javascript extends Base
     {
         $event         = $this->deriveCore();
         $event['data'] = [
+            // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
+            'id'         => 'Submission-' . $this->event->getEventId(),
             'meta'       => $this->deriveMeta(),
             'links'      => $this->deriveLinks(),
             'styles'     => $this->deriveStyles(),

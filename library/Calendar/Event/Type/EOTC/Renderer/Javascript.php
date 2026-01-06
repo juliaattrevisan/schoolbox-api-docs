@@ -78,6 +78,8 @@ class Javascript extends Base
         }
 
         $event = [
+            // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
+            'id'        => 'EOTC-' . $this->getEvent()->getEventId(),
             'title'     => $this->getEvent()->getTitle(),
             'start'     => "$start",
             'end'       => "$end",

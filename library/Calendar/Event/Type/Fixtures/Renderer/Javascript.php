@@ -68,6 +68,8 @@ class Javascript extends Base
         /* Flatten the representation into a standardised structure
          */
         $event = [
+            // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
+            'id'        => 'Fixtures-' . $this->event->getEventId(),
             'title'     => $this->event->getTitle(),
             'start'     => $this->event->getStartTimeForCalendar(),
             'end'       => $this->event->getEndTimeForCalendar(),

@@ -240,6 +240,8 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
+            console.info("sb-full-calendar.vue events() e");
+            console.info("sb-full-calendar.vue events() callback: ", callback);
             const toast = window.sbProps.toastActivate("Retrieving calendar events...");
             const params = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -264,6 +266,7 @@ export default {
                     toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
+            console.info("sb-full-calendar.vue events() x");
         },
 
         /**
@@ -453,9 +456,12 @@ export default {
          * @param eventInfo
          */
         onEventClick(eventInfo) {
+            console.info("sb-full-calendar.vue onEventClick() e");
+            console.info("sb-full-calendar.vue onEventClick() eventInfo: ", eventInfo);
             // Ideally the current event would be a part of the modal,
             // not this component, but :shrug:
             this.$refs.event.open(eventInfo.event);
+            console.info("sb-full-calendar.vue onEventClick() x");
         },
 
         /**
@@ -789,6 +795,40 @@ export default {
 
             this.updateListViewDateRangeField(value.selectedDate, value.selectedDate);
         },
+
+        /**
+         *
+         */
+        onViewEventLinkedFromBooking(eventId) {
+            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() e");
+            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() eventId: ", eventId);
+
+            const eventIdWithSourceName = "Day-" + eventId; // This must match the id set in Day/Renderer/Javascript.php.
+            console.info(
+                "sb-full-calendar.vue onViewEventLinkedFromBooking() eventIdWithSourceName: ",
+                eventIdWithSourceName,
+            );
+
+            // Find the linked event.
+            const event = this.calendarApi.getEventById(eventIdWithSourceName);
+            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() event: ", event);
+
+            if (event) {
+                // Create eventInfo object similar to what FullCalendar provides
+                const eventInfo = {
+                    event: event,
+                    el: null, // DOM element (not needed for your use case)
+                    jsEvent: null, // original click event (not needed)
+                    view: this.calendarApi.view,
+                };
+                console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() eventInfo: ", eventInfo);
+
+                // Trigger the onEventClick handler
+                this.onEventClick(eventInfo);
+            }
+
+            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() x");
+        },
     },
 };
 </script>
@@ -846,6 +886,7 @@ export default {
             :return-url="returnUrl()"
             @eventModified="reloadEvents"
             @eventDeleted="reloadEvents"
+            @viewEventLinkedFromBooking="onViewEventLinkedFromBooking"
         />
 
         <full-calendar ref="fullCalendar" :options="calendarOptions">
