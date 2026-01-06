@@ -142,9 +142,11 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
                 {$this->getJoinColumnString('learner', 'learner')},
-                {$this->getJoinColumnString('submittedBy', 'submittedBy')}
+                {$this->getJoinColumnString('submittedBy', 'submittedBy')},
+                {$this->getJoinColumnString('dialogAgent.assessmentModel', 'dialogAgentAssessmentModel')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
+            INNER JOIN {$this->getJoinSql('dialogAgent.assessmentModel', 'dialogAgent', 'dialogAgentAssessmentModel', true)}
             INNER JOIN {$this->getJoinSql('learner', '', 'learner', true)}
             LEFT JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
         ";
@@ -169,6 +171,7 @@ class Mapper extends \Schoolbox\Mapper
              */
             /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessmentModel */
             $assessmentModel = $this->createJoinModel('dialogAgent.assessmentModel', $row['dialogAgent.assessment_id']);
+            $assessmentModel->setTitle($row['dialogAgentAssessmentModel.title']);
 
             /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent */
             $dialogAgent = $this->createJoinModel('dialogAgent', $row['dialogAgent.id']);

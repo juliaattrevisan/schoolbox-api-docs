@@ -131,7 +131,10 @@ class Notifier extends AbstractModuleNotifier
             /* Basically string replacements to compose the message in the notification
              */
             ->setParams([
-                'action' => new Param('your discussion activity response', $href, Param::STACKING_REPLACE_NO_DECORATION),
+                'action' => new Param(sprintf(
+                    'your response to %s',
+                    $response->getDialogAgent()->getAssessmentModel()->getTitle()
+                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
                 'effector' => new UserParam($effector)
             ]);
 
