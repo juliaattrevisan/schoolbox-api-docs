@@ -1106,7 +1106,8 @@ export default {
                                     >Go to homepage</a
                                 >
                             </span>
-                            <span v-if="eventExtendedProps.variant === 'booking'">
+                            <!-- If the modal represents a booking, and the linked event's variant is 'booking'... -->
+                            <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'booking'">
                                 <a
                                     class="button"
                                     :href="
@@ -1120,7 +1121,8 @@ export default {
                                     >Add to Calendar</a
                                 >
                             </span>
-                            <span v-if="eventExtendedProps.variant === 'event' && eventExtendedProps.booking">
+                            <!-- If the modal represents a booking, and the linked event's variant is 'event'... -->
+                            <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'event'">
                                 <button @click.prevent="viewEvent">View Event</button>
                             </span>
                             <span v-if="eventExtendedProps.links.view">
