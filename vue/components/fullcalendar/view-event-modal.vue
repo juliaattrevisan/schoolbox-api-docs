@@ -147,7 +147,7 @@ export default {
             }
 
             const extendedProps = {
-                id: event.id,
+                id: event.id, // This is a unique composite id for the FullCalendar event, set in the Calendar/Event/Type/{eventType}/Renderer/Javascript.php files.
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
                 editable: metadata?.editable,
