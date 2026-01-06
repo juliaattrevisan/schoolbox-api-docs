@@ -102,7 +102,7 @@ function login_to_aws() {
 
     [sso-session ${aws_profile}]
     sso_region = ${AWS_REGION}
-    sso_start_url = ${AWS_START_URL}" > .aws/config
+    sso_start_url = ${AWS_START_URL}"  | sed -e 's/^[ \t]*//' > .aws/config
 
     # Then log in to AWS, if not already logged in
     log "Testing if logged in to AWS (region: ${AWS_REGION})..."
