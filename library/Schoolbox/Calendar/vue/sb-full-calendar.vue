@@ -799,9 +799,10 @@ export default {
         /**
          *
          */
-        onViewEventLinkedFromBooking(eventId) {
+        onViewEventLinkedFromBooking(eventId, clickEventObj) {
             console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() e");
             console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() eventId: ", eventId);
+            console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() clickEventObj: ", clickEventObj);
 
             const eventIdWithSourceName = "Day-" + eventId; // This must match the id set in Day/Renderer/Javascript.php.
             console.info(
@@ -814,17 +815,28 @@ export default {
             console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() event: ", event);
 
             if (event) {
-                // Create eventInfo object similar to what FullCalendar provides
-                const eventInfo = {
-                    event: event,
-                    el: null, // DOM element (not needed for your use case)
-                    jsEvent: null, // original click event (not needed)
-                    view: this.calendarApi.view,
-                };
-                console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() eventInfo: ", eventInfo);
+                const modalElement = this.$refs.event.$refs.modal.$el;
 
-                // Trigger the onEventClick handler
-                this.onEventClick(eventInfo);
+                // Define a handler that will run when the Foundation modal closes.
+                const handleModalClosed = (foundationEvent) => {
+                    console.info(
+                        "sb-full-calendar.vue onViewEventLinkedFromBooking() Foundation modal closed event received",
+                    );
+                    // Ensure the event modal is the one we want.
+                    if (foundationEvent.target === modalElement) {
+                        console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() opening new modal");
+                        // Remove the event listener
+                        $(document).off("closed.fndtn.reveal", handleModalClosed);
+                        // Open the new modal
+                        this.$refs.event.open(event);
+                    }
+                };
+
+                // Listen for Foundation's reveal close event.
+                $(document).on("closed.fndtn.reveal", "[data-reveal]", handleModalClosed);
+
+                // Close the modal
+                this.$refs.event.$refs.modal.close();
             }
 
             console.info("sb-full-calendar.vue onViewEventLinkedFromBooking() x");

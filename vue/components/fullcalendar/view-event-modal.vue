@@ -436,19 +436,17 @@ export default {
         /**
          *
          */
-        viewEvent() {
+        viewEvent(e) {
             let self = this;
+
             //            self.$refs.modal.close();
 
-            // TODO: Open the modal for the linked event.
-            //       The linked event is the one with id self.eventExtendedProps.eventId.
             console.info(
                 "view-event-modal.vue viewEvent() self.eventExtendedProps.eventId: ",
                 self.eventExtendedProps.eventId,
             );
 
-            // Emit event to parent with the linked event ID.
-            self.$emit("viewEventLinkedFromBooking", self.eventExtendedProps.eventId);
+            self.$emit("viewEventLinkedFromBooking", self.eventExtendedProps.eventId, e);
         },
 
         /**
