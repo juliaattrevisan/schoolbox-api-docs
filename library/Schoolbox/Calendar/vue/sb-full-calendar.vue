@@ -793,7 +793,7 @@ export default {
         /**
          *
          */
-        onViewEventLinkedFromBooking(eventId, clickEventObj) {
+        onViewEventLinkedFromBooking(eventId) {
             const eventIdWithSourceName = "Day-" + eventId; // This must match the id set in Day/Renderer/Javascript.php.
 
             // Find the linked event.
