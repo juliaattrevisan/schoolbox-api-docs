@@ -216,6 +216,10 @@ export default {
                 extendedProps.booking = null;
             }
 
+            // IMPORTANT NOTE:
+            // If eventExtendedProps.booking is non-null, the modal represents a row of the `resource_booking` table.
+            // If eventExtendedProps.booking is     null, the modal represents a row of the `event`            table.
+
             console.info("view-event-modal.vue eventExtendedProps() variant: ", extendedProps.variant);
             console.info("view-event-modal.vue eventExtendedProps() booking: ", extendedProps.booking);
             console.info("view-event-modal.vue eventExtendedProps() bookings: ", extendedProps.bookings);
