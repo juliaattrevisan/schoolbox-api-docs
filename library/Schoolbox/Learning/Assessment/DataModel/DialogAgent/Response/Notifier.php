@@ -131,6 +131,23 @@ class Notifier extends AbstractModuleNotifier
             return new Envelope();
         }
 
+        /* If staff was doing a sobo, ignore it: that isn't reopening a response
+         * SOBOing has the same signature as reopening, since it's setting submitted_at to a different value
+         *
+         * This kind of precludes staff doing professional development though, so idk how we can dodge around it
+         * with the current design of this feature. Unfortunately $effector doesn't have a fully-hydrated Role instance
+         * so you need to fetch that manually.
+         *
+         * Note: this might be a reason you get strange notifs about reopening when you shouldn't.
+         */
+        print_r($diff);
+        var_dump($effector->getRole()->isStaff());
+        var_dump($effector->getRole());
+
+        if (isset($diff['submittedBy']) && $effector->getRole()->isStaff()) {
+            return new Envelope();
+        }
+
         /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
          * You can refetch using a mapper to get more hydrated parts if you needed them.
          */
