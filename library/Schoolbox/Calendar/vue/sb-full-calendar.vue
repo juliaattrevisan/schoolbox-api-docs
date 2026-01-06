@@ -791,7 +791,7 @@ export default {
         },
 
         /**
-         *
+         * Close any currently open event/booking modal, and open the modal pertaining to the given eventId.
          */
         onViewEventLinkedFromBooking(eventId) {
             const eventIdWithSourceName = "Day-" + eventId; // This must match the id set in Day/Renderer/Javascript.php.
