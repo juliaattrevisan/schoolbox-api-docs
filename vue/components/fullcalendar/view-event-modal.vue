@@ -426,11 +426,10 @@ export default {
         },
 
         /**
-         *
+         * Emit an event to tell any listening component that the user has requested the opening of an event modal.
          */
-        viewEvent() {
-            let self = this;
-            self.$emit("viewEventLinkedFromBooking", self.eventExtendedProps.eventId);
+        viewEventLinkedFromBooking() {
+            this.$emit("viewEventLinkedFromBooking", this.eventExtendedProps.eventId);
         },
 
         /**
@@ -1112,7 +1111,7 @@ export default {
                             </span>
                             <!-- If the modal represents a booking, and the linked event's variant is 'event'... -->
                             <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'event'">
-                                <button @click.prevent="viewEvent">View Event</button>
+                                <button @click.prevent="viewEventLinkedFromBooking">View Event</button>
                             </span>
                             <span v-if="eventExtendedProps.links.view">
                                 <a
