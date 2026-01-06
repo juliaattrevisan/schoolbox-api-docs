@@ -98,12 +98,10 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentReopened(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
-        if ($diff['submittedAt'][0] === $diff['submittedAt'][1]) {
-            print_r(sprintf(
-                '%s is equivalent to %s; this was not reopened',
-                $diff['submittedAt'][0],
-                $diff['submittedAt'][1]
-            ));
+        /* submitted_at stayed the same: this wasn't reopened
+         */
+        if (!isset($diff['submittedAt'])) {
+            return new Envelope();
         }
 
         /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
