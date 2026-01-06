@@ -17,14 +17,12 @@ use Psr\Container\ContainerInterface;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -44,12 +42,6 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
-     * @var UserMapper
-     */
-    private UserMapper $userMapper;
-
-
-    /**
      * @inheritdoc
      */
     protected function getSlug()
@@ -64,15 +56,11 @@ class Notifier extends AbstractModuleNotifier
      */
     public static function getSetters(ContainerInterface $di): array
     {
-        /** @var MapperFactory $mf */
-        $mf = $di->get('mapperFactory');
-
         return [
             /* We presumably got a Response domain objects whose corresponding mapper is actually a mapper proxy...
              * .............which sounds really weird here fyi
              */
             'setMapper'     => $di->get('dialogAgentResponseDataSource'),
-            'setUserMapper' => $mf->get(UserMapper::class),
         ];
     }
 
@@ -84,9 +72,6 @@ class Notifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle)
     {
-        /** @var ResponseModel $response */
-        $response = $bundle->getEvent()->getObject();
-
         $crudMethod = $bundle->getMethod();
 
         if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
@@ -116,13 +101,13 @@ class Notifier extends AbstractModuleNotifier
          */
         $response = $this->mapper->findById($model);
 
-        /* Define the recipient
+        /* Define the recipient; all we need is their id
          */
-        $student = $this->userMapper->findById($response->getCreatedBy());
+        $recipientId = $response->getCreatedBy();
 
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_HREF, $response->getAssessable()->getId(), $student->getId());
+        $href = sprintf(self::PATTERN_HREF, $response->getAssessable()->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -148,7 +133,7 @@ class Notifier extends AbstractModuleNotifier
         /* Slide that $instance into the $envelope and send it to recipients
          */
         $envelope = new Envelope();
-        $envelope->targetToUser($student, $instance);
+        $envelope->targetToUser($recipientId, $instance);
 
         return $envelope;
     }
