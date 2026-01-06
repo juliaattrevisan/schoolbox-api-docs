@@ -2,7 +2,7 @@
 
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @copyright   Copyright 2026, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -30,6 +30,7 @@ use Schoolbox\User;
  * Useful diagnostics:
  *
  * Check scheduled logs to see what happened at runtime
+ * Note that in docker, when you're developing, you need to restart every time you make a change.
  *     docker:  sudo docker/logs schoolbox-scheduled -f
  *     vagrant: sudo journalctl -u schoolbox-cloud-scheduled@vagrantx -f
  *
