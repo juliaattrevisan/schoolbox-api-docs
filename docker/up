@@ -16,6 +16,7 @@ declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
 declare RABBITMQ_MANAGEMENT_PUBLISHED_PORT
 declare BASE_PHP_IMAGE_BUILD_FROM_LOCAL
+declare SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
@@ -38,6 +39,7 @@ declare SECOND_INSTANCE_ENABLE
 declare private_container_registry
 declare base_php_image
 declare base_branch
+declare schoolbox_cli_image
 declare docker_compose_args
 
 function verify_executables() {
@@ -156,30 +158,6 @@ function login_to_container_registry() {
             exit 1
             ;;
     esac
-
-    # Also determine base image
-    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
-        1 | true | yes | on)
-            base_branch="master"
-            base_php_image="php-frankenphp"
-            ;;
-        *)
-            # Determine base image tag from current branch:
-            # assume master if nothing better known.
-            # Possibly, if the current branch is very old then the current
-            # master-tagged image won't work: in that case, must use
-            # BASE_PHP_IMAGE_BUILD_FROM_LOCAL=1.
-
-            # Anyway, what's the branch name?
-            branch_name=$(git rev-parse --abbrev-ref HEAD 2> /dev/null) || exit
-            base_branch="master"
-            if [[ $branch_name =~ develop ]]; then
-                base_branch="develop"
-            fi
-
-            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
-            ;;
-    esac
 }
 
 function build_docker_compose_env() {
@@ -224,6 +202,31 @@ function build_schoolbox_config_ini() {
     SENTRY_ERROR_SAMPLE_RATE       = ${SENTRY_ERROR_SAMPLE_RATE}
     SENTRY_TRACE_SAMPLE_RATE       = ${SENTRY_TRACE_SAMPLE_RATE}
     SENTRY_PROFILE_SAMPLE_RATE     = ${SENTRY_PROFILE_SAMPLE_RATE}" | sed -e 's/^[ \t]*//' > ./docker/schoolbox/config/config.ini
+}
+
+function build_image_names() {
+    # Determine base image tag from current branch:
+    # assume master if nothing better known.
+    # Possibly, if the current branch is very old then the current master-tagged
+    # image won't work:
+    # in that case, must use BASE_PHP_IMAGE_BUILD_FROM_LOCAL=1.
+    # Anyway, what's the branch name?
+    branch_name=$(git rev-parse --abbrev-ref HEAD 2> /dev/null) || exit
+    base_branch="master"
+    if [[ $branch_name =~ develop ]]; then
+        base_branch="develop"
+    fi
+
+    # determine base images for PHP and Schoolbox CLI
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            base_branch="master"
+            base_php_image="php-frankenphp"
+            ;;
+        *)
+            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
+            ;;
+    esac
 }
 
 function build_docker_compose_args() {
@@ -295,6 +298,7 @@ function main() {
     load_config
     login_to_aws
     login_to_container_registry
+    build_image_names
     build_docker_compose_args "$@"
     build_docker_compose_env
     build_schoolbox_config_ini
