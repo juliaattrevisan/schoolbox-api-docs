@@ -26,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
@@ -67,6 +68,7 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\OpenAI\Helper as OpenAIHelper;
 
 /**
  * Class Controller
@@ -79,6 +81,8 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 abstract class Controller extends ListController implements IAssessmentController
 {
+    private ?CacheInterface $aiCache = null;
+
     /**
      * Controller constructor.
      *
@@ -294,6 +298,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
 
         /* Loading the data of the source/parent assessment
          */
@@ -306,25 +311,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['participants'] = $originalAssessment
                 ->getAllParticipants()
                 ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
-                ->map(function (Participant $participant) {
-                    $student = $participant->getUser();
-                    return [
-                        'id'         => $student->getId(),
-                        'fullName'   => $participant->getUser()->getFullName(),
-                        'excludedAt' => $participant->getExcludedAt(),
-                        'user'       => $student,
-                        'plan'       => $participant->getPlan(),
-                    ];
-                });
-        } else {
-            $data['participants'] = $assessment->getAllParticipants()->map(function (Participant $participant) {
-                $student = $participant->getUser();
-                return [
-                    'id'         => $student->getId(),
-                    'fullName'   => $participant->getUser()->getFullName(),
-                ];
-            });
+                ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $originalAssessmentId))
+                ->reindex();
         }
+
         /* When creating a new assessment, no curriculum nodes are selected by default
          *
          * At a future point, we may want to "suggest" nodes to select based on the context,
@@ -571,6 +561,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];
 
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
+
         if ($clonedAssessment instanceof DueWork\Model) {
             // To be able to view the current student policy if enabling within the submission type
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
@@ -607,16 +599,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $student = explode(',', $this->requestQuery->get('student', ''));
         $data['participants'] = $assessment->getAllParticipants()
             ->filter(fn(Participant $participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) {
-                $student = $participant->getUser();
-                return [
-                    'id'         => $student->getId(),
-                    'fullName'   => $participant->getUser()->getFullName(),
-                    'excludedAt' => $participant->getExcludedAt(),
-                    'user'       => $student,
-                    'plan'       => $participant->getPlan(),
-                ];
-            });
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getId()))
+            ->reindex();
 
 
         $this->response = $this->responseFromTemplate("@learningAssessment/create.twig", $data);
@@ -743,6 +727,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
+        $data['differentiationEnabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
+
         if ($assessment instanceof DueWork\Model) {
             // To be able to view the current student policy if enabling within the submission type
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
@@ -769,15 +755,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
+
         $data['participants'] = $assessment
             ->getAllParticipants()
             ->filter(fn($participant) => !$participant->isExcluded())
-            ->map(
-                fn($participant) => [
-                    'id' => $participant->getUser()->getId(),
-                    'fullName' => $participant->getUser()->getFullName(),
-                ]
-            );
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getOriginalAssessmentId()))
+            ->reindex();
 
         if (null !== $assessment->getOriginalAssessmentId()) {
             $data['customisedFor'] = $assessment->getOriginalAssessmentId();
@@ -1277,16 +1260,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
-            ->map(function (Participant $participant) {
-                $student = $participant->getUser();
-                return [
-                    'id' =>  $student->getId(),
-                    'fullName' => $participant->getUser()->getFullName(),
-                    'excludedAt' => $participant->getExcludedAt(),
-                    'user' => $student,
-                    'plan' => $participant->getPlan(),
-                ];
-            })->reindex();
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getId()))
+            ->reindex();
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
@@ -1295,6 +1270,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'assessment' => $assessment,
                 'participants' => $participant,
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+                'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                'customisedFor' =>  $assessment->getId(),
             ]
         );
     }
@@ -1320,20 +1297,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
                                   'assessment' => $assessment,
                               ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
 
-
         $participant = $assessment
             ->getAllParticipants()
             ->filter(fn ($participant) => $plan->getParticipants()->keyExists($participant->getUser()->getId()))
-            ->map(function (Participant $participant) {
-                $student = $participant->getUser();
-                return [
-                    'id' =>  $student->getId(),
-                    'fullName' => $participant->getUser()->getFullName(),
-                    'excludedAt' => $participant->getExcludedAt(),
-                    'user' => $student,
-                    'plan' => $participant->getPlan(),
-                ];
-            })->reindex();
+            ->map(fn(Participant $participant) => $this->getParticipantObject($participant, $assessment->getId()))
+            ->reindex();
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
@@ -1343,6 +1311,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'participants' => $participant,
                 'plan' => $plan,
                 'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
+                'differentiationEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                'customisedFor' =>  $assessment->getId(),
             ]
         );
     }
@@ -1440,5 +1410,58 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
         }
         return $assessments;
+    }
+
+
+    /**
+     * Get participant object array for use in twig templates
+     *
+     * @param Participant $participant The participant model
+     * @param int|null $assessmentId The assessment ID for cached customisation lookup
+     * @return array The participant object array
+     * @throws RouteNotFound
+     */
+    private function getParticipantObject(Participant $participant, ?int $assessmentId): array
+    {
+        $student = $participant->getUser();
+        return [
+            'id' => $participant->getId(),
+            'excludedAt' => $participant->getExcludedAt(),
+            'user' => $student,
+            'plan' => $participant->getPlan(),
+            'cachedSuggestedCustomisation' => $this->getCachedSuggestedCustomisation($assessmentId, $student->getId()),
+            '_links' => [
+                'differentiationProfile' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.viewDifferentiationProfileData',
+                    [
+                        'student' => $student,
+                        'studentId' => $student->getId()
+                    ],
+                ),
+            ]
+        ];
+    }
+
+    /**
+     * Get cached suggested customisation for a student from the AI cache
+     *
+     * @param int $assessmentId The ID of the assessment to retrieve cached customisation for
+     * @param int $studentId The ID of the student
+     * @return mixed|null The cached customisation data, or null if not found
+     */
+    private function getCachedSuggestedCustomisation(?int $assessmentId, int $studentId)
+    {
+        if ($assessmentId === null) {
+            return null;
+        }
+        if ($this->aiCache === null) {
+            $this->aiCache = $this->getDi()->get('ai.response.cache');
+        }
+        $cacheKey = sprintf(
+            OpenAIHelper::DIFFERENTIATION_PROFILE_CACHE_KEY,
+            $assessmentId,
+            $studentId
+        );
+        return $this->aiCache?->get($cacheKey);
     }
 }

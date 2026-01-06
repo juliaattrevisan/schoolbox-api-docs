@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display or regenerate AI content for a studentId customisation
+ * To display or regenerate AI content for a student customisation
  * This content is displayed both on a Student Participation page as well
  * as on the modify/new/copy activity pages.
  */
@@ -16,12 +16,13 @@ const props = defineProps<{
     route: string;
     assessmentId: number;
     participant: Participant | null;
+    confirmText: string;
 }>();
 
 const emit = defineEmits<{
     (event: "newResponse", response: CustomisedSuggestionResponse): void;
     (event: "cancel"): void;
-    (event: "customiseActivity"): void;
+    (event: "confirm"): void;
 }>();
 
 const aiResponse = defineModel<CustomisedSuggestionResponse | null>("ai-response", { default: null });
@@ -83,7 +84,7 @@ function onCancel(): void {
  * To use the suggested AI content
  */
 function onConfirm(): void {
-    emit("customiseActivity");
+    emit("confirm");
 }
 
 /**
@@ -108,7 +109,10 @@ window.Vue.onMounted(() => {
 <template>
     <form class="l-flex-col l-gap-m f-no-margins" @submit.prevent="onConfirm">
         <div class="l-flex-row l-flex--justify-space l-gap-s f-no-margins">
-            <h2>Suggested Customisation</h2>
+            <h2>
+                Suggested Customisation
+                {{ props.participant?.user.fullName ? ` for ${props.participant.user.fullName}` : "" }}
+            </h2>
             <button v-if="aiResponse" class="button icon-ai" @click.prevent="onRegenerate">Regenerate</button>
         </div>
         <request-error v-if="loadError" :further-info="loadError" />
@@ -145,7 +149,7 @@ window.Vue.onMounted(() => {
         </div>
         <div class="l-flex l-gap-xs f-no-margins">
             <button class="button l-flex__item--1" data-test="cp-ai-modal-cancel" @click.prevent="onCancel">
-                Cancel
+                {{ isProcessing ? "Cancel" : "Close" }}
             </button>
             <button
                 v-if="!isProcessing && aiResponse"
@@ -154,7 +158,7 @@ window.Vue.onMounted(() => {
                 data-test="cp-ai-modal-confirm"
                 @click.prevent="onConfirm"
             >
-                Customise {{ locale.activity.translate(false, true) }}
+                {{ props.confirmText }}
             </button>
         </div>
     </form>

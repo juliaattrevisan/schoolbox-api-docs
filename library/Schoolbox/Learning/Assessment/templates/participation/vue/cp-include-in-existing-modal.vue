@@ -92,11 +92,7 @@ function handleConfirm(): void {
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="handleCancel">Cancel</button>
-                <button
-                    class="button submit l-flex__item--1"
-                    :disabled="!selectedActivity"
-                    @click.prevent="handleConfirm"
-                >
+                <button v-if="selectedActivity" class="button submit l-flex__item--1" @click.prevent="handleConfirm">
                     Confirm
                 </button>
             </div>

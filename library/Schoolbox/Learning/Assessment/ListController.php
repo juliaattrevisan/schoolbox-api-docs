@@ -585,8 +585,10 @@ class ListController extends Web\Controller\Base
             $data['participants'] = $this->userMapper
                 ->findByColumn('id', explode(',', $participants))
                 ->map(fn($participant) => [
-                    'id'       => $participant->getId(),
-                    'fullName' => $participant->getFullName(),
+                    'user' => [
+                        'id'       => $participant->getId(),
+                        'fullName' => $participant->getFullName(),
+                    ],
                 ]);
             /* Get the source/parent assessment id
              */

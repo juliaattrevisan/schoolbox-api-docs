@@ -38,9 +38,14 @@
     {# ----------------------------------------------------------- #}
     {# Description #}
     {# ----------------------------------------------------------- #}
-    <label for="assessment-description">
-        Description
-    </label>
+    {% include '@learningAssessment/fragments/viewSuggestedCustomisation.twig'
+        with {
+        participants: participants ?? [],
+        differentiationEnabled: differentiationEnabled,
+        assessmentId: customisedFor ?? 0,
+        editorId: 'assessment-description',
+    } only
+    %}
     <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
 
     {# ----------------------------------------------------------- #}

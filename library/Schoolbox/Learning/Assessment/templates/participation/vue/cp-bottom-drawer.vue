@@ -65,7 +65,7 @@ function clearSelection(): void {
         <div class="l-flex-row l-flex--justify l-gap-xs">
             <template v-if="hasCustomisedInSelection">
                 <button
-                    class="icon-close button"
+                    class="icon-close button l-flex__item--1-auto"
                     data-test="custom-participation-remove-customisation"
                     @click.prevent="handleActionSelected(selectedList, 'removeCustomisation')"
                 >

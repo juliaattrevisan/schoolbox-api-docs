@@ -1,0 +1,34 @@
+{#
+  To display a button to generate/view suggested customisation for an assessment customisation when there is only one participant.
+  Otherwise we just show the 'Description' label as usual
+
+  Usage:
+    participants            array        the participants for whom the customisation is being created/modified
+    differentiationEnabled  boolean      whether differentiation is enabled
+    assessmentId            integer      the original assessment id (0 if none)
+    editorId                string       the id of the description editor to link to
+    isQuiz                  boolean      (optional) whether the assessment is a quiz (default: false)
+#}
+
+{# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
+{% set showSuggestedCustomisation = assessmentId != 0 and participants ?? [] is not empty and participants|length == 1 %}
+<div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
+    <label for="{{ editorId }}" class="required">
+        Description
+         {% if isQuiz is defined %}<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>{% endif %}
+    </label>
+    {% if showSuggestedCustomisation %}
+    <div id="view-suggested-customisation-container">
+        <view-suggested-customisation
+            :differentiation-enabled="Boolean({{ differentiationEnabled }})"
+            :participant="{{ participants[0] | json_encode }}"
+            :routes="{{ {
+                genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
+            } | json_encode }}"
+            :assessment-id="{{ assessmentId }}"
+            editor-id="{{ editorId }}"
+        />
+    </div>
+    <script src="{{ CDN_PREFIX }}/js/bundle/viewSuggestedCustomisation.js?v={{ config.site_version }}"></script>
+    {% endif %}
+</div>

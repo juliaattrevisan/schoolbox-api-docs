@@ -53,9 +53,15 @@
     {# ----------------------------------------------------------- #}
     {# Description #}
     {# ----------------------------------------------------------- #}
-    <label for="assessment-description">
-        Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
-    </label>
+    {% include '@learningAssessment/fragments/viewSuggestedCustomisation.twig'
+        with {
+        participants: participants ?? [],
+        differentiationEnabled: differentiationEnabled,
+        assessmentId: customisedFor ?? 0,
+        editorId: 'assessment-description',
+        isQuiz: true,
+    } only
+    %}
     <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
 
     {# ----------------------------------------------------------- #}

@@ -139,9 +139,10 @@ function onConfirm(): void {
                 :route="props.routes.genAI"
                 :assessment-id="props.assessmentId"
                 :participant="participant"
+                :confirm-text="`Customise ${locale.activity.translate(false, true)}`"
                 @new-response="onNewResponse"
                 @cancel="onCancel"
-                @customise-activity="onCustomiseActivity"
+                @confirm="onCustomiseActivity"
             />
             <cp-confirm-modify
                 v-else-if="status === 'confirm'"

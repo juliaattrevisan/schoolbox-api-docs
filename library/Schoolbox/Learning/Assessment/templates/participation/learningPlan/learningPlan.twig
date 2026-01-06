@@ -16,7 +16,7 @@
         <li>
             {% include 'sub/userListMetadata.twig'
                 with {
-                users:   participants,
+                users:   participants|map(p => p.user),
                 message: 'Customisation for '
             } only
             %}
@@ -41,7 +41,14 @@
                         >
                     </div>
                     <div class="columns small-12">
-                        <label for="plan-desc" class="required">Description</label>
+                        {% include '@learningAssessment/fragments/viewSuggestedCustomisation.twig'
+                            with {
+                            participants: participants ?? [],
+                            differentiationEnabled: differentiationEnabled,
+                            assessmentId: assessment.id,
+                            editorId: 'plan-desc',
+                        } only
+                        %}
                         <textarea name="plan-desc" id="plan-desc">
                             {{ plan is defined ? plan.description : assessment.description }}
                         </textarea>

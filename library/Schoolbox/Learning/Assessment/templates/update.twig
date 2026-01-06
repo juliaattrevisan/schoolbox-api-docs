@@ -193,7 +193,7 @@
                 <li>
                     {% include 'sub/userListMetadata.twig'
                         with {
-                        users:    participants,
+                        users:   participants|map(p => p.user),
                         message: 'Updating for '
                     } only
                     %}

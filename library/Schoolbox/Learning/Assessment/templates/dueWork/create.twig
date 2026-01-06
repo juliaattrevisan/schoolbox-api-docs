@@ -81,7 +81,14 @@
         parentFolderId: parentFolderId ?? null,
     } %}
 
-    <label for="assessment-description">Description</label>
+    {% include '@learningAssessment/fragments/viewSuggestedCustomisation.twig'
+        with {
+        participants: participants ?? [],
+        differentiationEnabled: differentiationEnabled,
+        assessmentId: customisedFor ?? 0,
+        editorId: 'assessment-description',
+    } only
+    %}
     <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
 
     {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
