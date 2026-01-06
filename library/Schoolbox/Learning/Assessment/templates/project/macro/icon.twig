@@ -17,10 +17,17 @@
     {% endif %}
 {% endmacro %}
 
+{# Render an icon corresponding to $assessment.
+ #
+ # Note that assessment.familiyName isn't always defined:
+ # there's an arbitarily-constructed assessment in pendingAsssessmentsContext.twig which is used as a template
+ # so it won't have a familyName (or many other presumed methods) making it totally alien to what you'd presume
+ # to be a standard IAssessable instance.
+#}
 {% macro renderClass(assessment) %}
-{% apply spaceless %}
-    {% if assessment %}
-        {{ _self.renderClassForType(assessment.familyName) }}
-    {% endif %}
-{% endapply %}
+    {% apply spaceless %}
+        {% if assessment and assessment.familyName is defined %}
+            {{ _self.renderClassForType(assessment.familyName) }}
+        {% endif %}
+    {% endapply %}
 {% endmacro %}
