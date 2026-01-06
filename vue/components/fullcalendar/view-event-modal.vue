@@ -428,9 +428,9 @@ export default {
         /**
          *
          */
-        viewEvent(e) {
+        viewEvent() {
             let self = this;
-            self.$emit("viewEventLinkedFromBooking", self.eventExtendedProps.eventId, e);
+            self.$emit("viewEventLinkedFromBooking", self.eventExtendedProps.eventId);
         },
 
         /**
