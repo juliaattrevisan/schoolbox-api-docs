@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller;
  */
 class ExistingImports
 {
-
     /**
      * Course Outline Component controller
      */
