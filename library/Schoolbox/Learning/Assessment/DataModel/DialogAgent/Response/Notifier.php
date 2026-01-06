@@ -116,7 +116,7 @@ class Notifier extends AbstractModuleNotifier
 
         /* Define the recipient; all we need is their id
          */
-        $recipientId = $response->getLearner();
+        $recipientId = $response->getLearner()->getId();
 
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          * TODO find an assessment id somewhere
