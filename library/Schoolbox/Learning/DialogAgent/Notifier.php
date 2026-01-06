@@ -24,6 +24,13 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
 
+/**
+ * Useful diagnostics:
+ *
+ * Check scheduled logs to see what happened at runtime
+ *     docker:  sudo docker/logs schoolbox-scheduled
+ *     vagrant: sudo journalctl -u schoolbox-cloud-scheduled@vagrantx -f
+ */
 class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_REOPENED = 'reopen';
