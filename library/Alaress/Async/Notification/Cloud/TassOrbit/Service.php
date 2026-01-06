@@ -66,7 +66,7 @@ class Service extends AbstractService
              * Parent Code = Number of characters specified by external_tass_parent_id_length
              * Split Family Number = Appending characters up to 5 characters
              */
-            $regex = '/(?:[P,%s])(?<parCode>[0-9]{%d})(?<sfaNum>[0-9]{0,%d})/';
+            $regex = '/(?:[P,%s])(?<parCode>[0-9A-Za-z]{%d})(?<sfaNum>[0-9]{0,%d})/';
             preg_match(
                 sprintf(
                     $regex,
