@@ -89,6 +89,13 @@ class LearningActivityCustomisationGeneration
         return [$fieldData, 200];
     }
 
+    /**
+     * Generate file prompts from assessable's attachments and flattening its content.
+     *
+     * @param IAssessable $assessable The assessable learning activity.
+     * @return string The generated file prompts.
+     * @throws FilesystemException
+     */
     private function generateFilePrompts(IAssessable $assessable): string
     {
         if (!is_callable([$assessable, 'getAttachedFiles'])) {
