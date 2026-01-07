@@ -40,6 +40,7 @@ class NSMapper extends Mapper
     const NS_EVIDENCE                = 'moment';
     const NS_EVIDENCE_COMMENT        = 'moment_comment';
     const NS_BADGE                   = 'badge';
+    public const string NS_DIALOG_AGENT = 'dialog_agent';
 
 
     /**
