@@ -314,7 +314,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_SUBMITTED)
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
             /* Basically string replacements to compose the message in the notification
              */
@@ -337,9 +337,6 @@ class Notifier extends AbstractModuleNotifier
          * and make an $instance for each. To do that we can send it to the WRITE access users of the assessment's folder.
          */
         $folder = $response->getDialogAgent()->getAssessmentModel()->getAssessmentContext()->getFolder();
-
-        /* TODO But..........I don't have that hydrated atm. hmm
-         */
 
         /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
          */
