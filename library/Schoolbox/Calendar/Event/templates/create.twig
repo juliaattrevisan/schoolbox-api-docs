@@ -149,10 +149,6 @@
                             <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{{ event.publishDateTime.local }}"/>
                         </label>
                     </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <legend>Recurrence</legend>
                     <div class="small-12 columns">
                         <div class="row">
                             {% if recurrence|length %}
@@ -186,6 +182,10 @@
                             {% endif %}
                         </div>
                     </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Recurrence</legend>
                 </fieldset>
 
                 <fieldset class="content">
