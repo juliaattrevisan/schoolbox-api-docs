@@ -28,7 +28,7 @@ function onLinkedRecordsSelected(): void {
 }
 
 /**
- * When the generate with AI button is clicked
+ * When the extract with AI button is clicked
  */
 function onGenerateSelected(): void {
     void genAiStore.prompt(props.profile);
