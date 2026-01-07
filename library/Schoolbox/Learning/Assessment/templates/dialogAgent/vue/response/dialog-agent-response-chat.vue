@@ -2,6 +2,7 @@
 import { useEventBus, useMousePressed, useTimestamp } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import { getRfc3339String } from "@js/util/dateUtils";
+import type { DateRFC3339 } from "@js/util/dateUtils";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -18,6 +19,7 @@ interface Props {
     response: DialogAgentResponse;
     student: UserAuthor;
     duration: number | null;
+    closeAt: DateRFC3339;
     returnUrl: string;
 }
 
@@ -229,6 +231,11 @@ window.Vue.onUnmounted(() => {
 const durationExceeded = window.Vue.computed<boolean>(() => {
     if (props.duration === null) return false; // unlimited time
     if (timeTaken.value === null) return false; // not started yet
+
+    /** Past the close date? treat as exceeded */
+    if (currentTimestamp.value >= new Date(props.closeAt).getTime()) {
+        return true;
+    }
 
     return timeTaken.value > props.duration;
 });
