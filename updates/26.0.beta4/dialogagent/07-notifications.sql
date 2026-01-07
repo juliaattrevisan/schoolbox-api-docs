@@ -16,9 +16,15 @@ VALUES
         'reopened',
         'student',
         'a response to a {:dialogAgent} has been reopened'
+    ),
+    (
+        (SELECT id FROM msg_namespace WHERE slug = 'dialog_agent' LIMIT 1),
+        'submitted',
+        'staff',
+        'a response to a {:dialogAgent} has been submitted'
     );
 
--- Default settings for Reset
+-- Default settings for Reset trigger
 INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
 SELECT (SELECT id
         FROM `msg_source`
@@ -31,7 +37,7 @@ SELECT (SELECT id
 FROM `groups`
 WHERE `groups`.`group_type` = 'student';
 
--- Default settings for Reopen
+-- Default settings for Reopen trigger
 INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
 SELECT (SELECT id
         FROM `msg_source`
@@ -43,3 +49,16 @@ SELECT (SELECT id
        'IN'
 FROM `groups`
 WHERE `groups`.`group_type` = 'student';
+
+-- Default settings for Submitted trigger
+INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
+SELECT (SELECT id
+        FROM `msg_source`
+        WHERE `namespace` = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'dialog_agent')
+          AND `key` = 'submitted'
+          AND `role_type` = 'staff'),
+       `groups`.id,
+       'MU,DI,IN,MO,EM',
+       'IN'
+FROM `groups`
+WHERE `groups`.`group_type` = 'staff';

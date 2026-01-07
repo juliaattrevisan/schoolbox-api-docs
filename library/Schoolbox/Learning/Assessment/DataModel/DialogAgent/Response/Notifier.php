@@ -50,6 +50,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public const TRIGGER_REOPENED = 'reopened';
     public const TRIGGER_RESET = 'reset';
+    public const TRIGGER_SUBMITTED = 'submitted';
 
 
     /** Text for each notification
@@ -109,6 +110,7 @@ class Notifier extends AbstractModuleNotifier
         if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
             $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         }
     }
 
