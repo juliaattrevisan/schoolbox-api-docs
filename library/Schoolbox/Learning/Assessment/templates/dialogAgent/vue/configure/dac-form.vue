@@ -197,7 +197,7 @@ async function onSubmit(): Promise<void> {
                     </p>
                     <textarea
                         :id="`fieldcontext-${fieldContext.id}`"
-                        v-model="fieldContext.body"
+                        v-model.trim="fieldContext.body"
                         :name="`fieldContexts[${fieldContext.id}]`"
                         style="resize: vertical"
                         rows="4"
@@ -213,7 +213,7 @@ async function onSubmit(): Promise<void> {
                     <p class="meta">Used by the AI to start the conversation and frame the learning discussion.</p>
                     <textarea
                         id="dac-opening-message"
-                        v-model="assessmentConfig.openingMessage"
+                        v-model.trim="assessmentConfig.openingMessage"
                         name="openingMessage"
                         style="resize: vertical"
                         rows="4"
@@ -230,7 +230,7 @@ async function onSubmit(): Promise<void> {
                     </p>
                     <textarea
                         id="dac-rules"
-                        v-model="assessmentConfig.rules"
+                        v-model.trim="assessmentConfig.rules"
                         name="rules"
                         style="resize: vertical"
                         rows="4"
