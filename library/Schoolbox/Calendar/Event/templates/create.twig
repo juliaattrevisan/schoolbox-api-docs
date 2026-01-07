@@ -147,6 +147,13 @@
                         </label>
                         <input name="endDate" id="endDate" data-datepicker data-datepicker-time data-datepicker-alldayswitch data-datepicker-alldayinput="allDay" data-datepicker-call="event" data-datepicker-endofperiod data-datesync-startdate="#startDate" type="text" size="15" maxlength="30" value="{{ event.allDay ? event.endDateTime.localShort : event.endDateTime.local }}"/>
                     </div>
+                    <div class="small-12 columns">
+                        <label class="required">
+                            Publish Date
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
+                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{{ event.publishDateTime.local }}"/>
+                        </label>
+                    </div>
                 </fieldset>
 
                 <fieldset class="content" data-collapsable-container>
@@ -203,13 +210,6 @@
 
                 <fieldset class="content">
                     <legend>Availability</legend>
-                    <div class="small-12 columns">
-                        <label class="required">
-                            Publish Date
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This event will only be visible to the public on or after this date">?</span>
-                            <input id="publishDate" name="publishDate" data-datepicker data-datepicker-alldayswitch data-datepicker-time data-datepicker-format="datetime" type="text" size="15" maxlength="30" value="{{ event.publishDateTime.local }}"/>
-                        </label>
-                    </div>
                     <div class="small-12 columns">
                         <label>
                             Level
