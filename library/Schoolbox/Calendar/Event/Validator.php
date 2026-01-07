@@ -143,7 +143,7 @@ class Validator
         if (array_key_exists('guests', (array)$requestPost) && is_string($requestPost['guests'])) {
             // Convert comma-separated string of ids to array of object stubs.
             $guestIds = (
-            strlen($requestPost['guests']) == 0
+                strlen($requestPost['guests']) == 0
                 ? []
                 : array_map(
                     fn($guestId) => (int)$guestId,
@@ -158,6 +158,16 @@ class Validator
             foreach ($guestIds as $guestId) {
                 $requestPost['guests'][] = ['id' => $guestId];
             }
+        }
+
+        // Account for special case of key 'resourceIds' (posted by the calendar/event/create and modify pages).
+        if (array_key_exists('resourceIds', (array)$requestPost) && is_array($requestPost['resourceIds'])) {
+            // Convert array of ids to array of object stubs.
+            $requestPost['resources'] = [];
+            foreach ($requestPost['resourceIds'] as $resourceId) {
+                $requestPost['resources'][] = ['id' => $resourceId];
+            }
+            unset($requestPost['resourceIds']);
         }
 
         // Account for special case of key 'maxAttendees' (posted by the calendar/event/create and modify pages).
@@ -255,7 +265,7 @@ class Validator
         }
 
         // Check arrays.
-        foreach (['roles', 'campuses', 'folders', 'guests'] as $arrayKey) {
+        foreach (['roles', 'campuses', 'folders', 'guests', 'resources'] as $arrayKey) {
             if (array_key_exists($arrayKey, (array)$requestPost)) {
                 if (!is_array($requestPost[$arrayKey])) {
                     throw new SchoolboxException(
