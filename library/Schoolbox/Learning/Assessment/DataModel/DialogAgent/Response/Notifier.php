@@ -152,7 +152,7 @@ class Notifier extends AbstractModuleNotifier
          * Note that $diff[0] is "the current state of the object"
          * Note that $diff[1] is "the previous state of the object"
          */
-        if ('' === trim((string)$diff['submittedAt'][0])) {
+        if ('' !== trim((string)$diff['submittedAt'][0])) {
             return new Envelope();
         }
 
