@@ -64,7 +64,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * A link to the summary screen, for now
      */
-    private const string PATTERN_HREF = '/learning/assessments/%d/%d';
+    private const string PATTERN_STUDENT_HREF = '/learning/assessments/%d/%d';
 
 
     /**
@@ -165,7 +165,7 @@ class Notifier extends AbstractModuleNotifier
 
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_STUDENT_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -233,7 +233,7 @@ class Notifier extends AbstractModuleNotifier
 
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_STUDENT_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
