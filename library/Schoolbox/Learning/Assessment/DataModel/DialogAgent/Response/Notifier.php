@@ -115,8 +115,8 @@ class Notifier extends AbstractModuleNotifier
         $crudMethod = $bundle->getMethod();
 
         if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
-//            $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
-//            $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         }
     }
