@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 
 class NextRoutes
@@ -66,6 +67,9 @@ class NextRoutes
             ];
         }
 
+        /** @var DialogAgent $assessment */
+        $assessment = $authoritativeResponse->getAssessable();
+
         /* The response is in progress
          */
         return [
@@ -73,7 +77,10 @@ class NextRoutes
             /* You can keep sending messages until the duration has been exceeded (if any),
              * after that, the response is either submitted, or about to be submitted by the frontend/SOBO/the cron later on
              */
-            self::ACTION_MESSAGE => true, // TODO duration
+            self::ACTION_MESSAGE =>
+                null === $authoritativeResponse->getStartedAt()
+                || $assessment->isDurationUnlimited()
+                || $authoritativeResponse->getTimeTaken() < $assessment->getDuration(),
             /* You can submit or reset only once the attempt has actually started
              * (student sent the first message to AI so a session id exists).
              *
