@@ -111,6 +111,21 @@
                         <label class="required" for="title">Title</label>
                         <input name="title" id="title" type="text" maxlength="250" value="{{ event.title }}" required />
                     </div>
+                    <div class="small-12 column">
+                        <label for="type">
+                            Type
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
+                            {% if eventTypes|length %}
+                                <select name="type">
+                                    {% for eventType in eventTypes %}
+                                        <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <input type="hidden" id="type" name="type" value="{{ event.type.id }}" />
+                            {% endif %}
+                        </label>
+                    </div>
                     <div class="small-6 columns">
                         <label class="required" for="startDate">
                             From
@@ -169,21 +184,6 @@
 
                 <fieldset class="content">
                     <legend>Event Details</legend>
-                    <div class="small-12 column">
-                        <label for="type">
-                            Type
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
-                            {% if eventTypes|length %}
-                                <select name="type">
-                                    {% for eventType in eventTypes %}
-                                        <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
-                                    {% endfor %}
-                                </select>
-                            {% else %}
-                                <input type="hidden" id="type" name="type" value="{{ event.type.id }}" />
-                            {% endif %}
-                        </label>
-                    </div>
                     <div class="small-12 column">
                         <label for="location">
                             Location
