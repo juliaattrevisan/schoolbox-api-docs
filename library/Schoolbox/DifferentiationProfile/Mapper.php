@@ -477,7 +477,7 @@ class Mapper extends BaseMapper
                 CASE
                     /* Out of date records
                      */
-                    WHEN MAX(COALESCE(p.updated_at, p.created_at)) > COALESCE(differentiation_profiles.updated_at, :farfaraway)
+                    WHEN MAX(p.updated_at) > COALESCE(differentiation_profiles.updated_at, :farfaraway)
                     THEN 1 ELSE 0
                 END as is_out_of_date
             ",
