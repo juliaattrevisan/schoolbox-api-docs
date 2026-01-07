@@ -266,105 +266,99 @@
                             </ul>
                         </fieldset>
                     </div>
-                </fieldset>
+                    {% if canInvite %}
+                        <div class="small-12 column">
+                            <label>
+                                Enable attendance?
+                                <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You may use attendance to invite specific guests, or publish an open event that people may choose to  join. Open personal events will be visible on your calendar.">?</span>
 
-                {% if canInvite %}
-                <fieldset id="attendance" class="content">
-                    <legend>Attendance</legend>
+                                <select name="attendance" id="attendanceLevelSelector">
+                                    {% for value, label in attendanceLevels %}
+                                        <option value="{{ value }}" {% if value == event.attendance %}selected="selected"{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </label>
 
-                    <div class="small-12 column">
-                        <label>
-                            Enable attendance?
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You may use attendance to invite specific guests, or publish an open event that people may choose to  join. Open personal events will be visible on your calendar.">?</span>
-
-                            <select name="attendance" id="attendanceLevelSelector">
-                                {% for value, label in attendanceLevels %}
-                                    <option value="{{ value }}" {% if value == event.attendance %}selected="selected"{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-
-                        {# Hide the attendance inputs if No Attendance is selected
-                         # Otherwise, show the attendance inputs
-                         #}
-                        <script>
-                            $(function() {
-                                /* Init the attendance options based on dropdown's current value
-                                 */
-                                if ('{{ attendanceLevelNoAttendance }}' == $('#attendanceLevelSelector').val()) {
-                                    $('#attendance-guests').hide();
-                                }
-
-                                $('#attendanceLevelSelector').on('change', function(event) {
-                                    if ($(this).val() == '{{ attendanceLevelNoAttendance }}') {
+                            {# Hide the attendance inputs if No Attendance is selected
+                             # Otherwise, show the attendance inputs
+                             #}
+                            <script>
+                                $(function() {
+                                    /* Init the attendance options based on dropdown's current value
+                                     */
+                                    if ('{{ attendanceLevelNoAttendance }}' == $('#attendanceLevelSelector').val()) {
                                         $('#attendance-guests').hide();
-                                    } else {
-                                        $('#attendance-guests').show();
                                     }
-                                });
-                            });
-                        </script>
-                    </div>
 
-                    <div id="attendance-guests" class="small-12 columns" {% if event.attendance == '{{ attendanceLevelNoAttendance }}' %}style="display:none"{% endif %}>
-                        <div class="row">
-                            <div class="small-12 columns">
-                                <label>Invite Guests</label>
-                                <input id='add-guests' name="guests" type='text' value='' placeholder="Search for people to invite" />
-                                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
-                                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-                                <script type="text/javascript">
-                                    $(function() {
-                                        $('#add-guests').userSelectizeSelector({
-                                            ajax: {
-                                                data:     {groupID: 0, showCampus: true},
-                                            },
-                                            value: [
-                                                {% for guest in guests %}
-                                                {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
-                                                {% endfor %}
-                                            ],
-                                            multiple: true
-                                        });
+                                    $('#attendanceLevelSelector').on('change', function(event) {
+                                        if ($(this).val() == '{{ attendanceLevelNoAttendance }}') {
+                                            $('#attendance-guests').hide();
+                                        } else {
+                                            $('#attendance-guests').show();
+                                        }
                                     });
-                                </script>
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
-                                <input name="maxAttendees" maxlength="5" type="number" inputmode="numeric" value="{{ event.maxAttendees }}" />
-                            </div>
-                            <div class="small-12 medium-6 columns">
-                                <label for="showAttendees" class="inline-block">
-                                    Show Guest List <span class="hint has-tip tip-top" title="Control the visibility of the guest list to other guests, you will always see the guest list." data-tooltip>?</span>
-                                </label>
-                                <div class="switch">
-                                    <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
-                                    <label for="showAttendees">
-                                        <span>On</span>
-                                        <span>Off</span>
+                                });
+                            </script>
+                        </div>
+
+                        <div id="attendance-guests" class="small-12 columns" {% if event.attendance == '{{ attendanceLevelNoAttendance }}' %}style="display:none"{% endif %}>
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <label>Invite Guests</label>
+                                    <input id='add-guests' name="guests" type='text' value='' placeholder="Search for people to invite" />
+                                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+                                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+                                    <script type="text/javascript">
+                                        $(function() {
+                                            $('#add-guests').userSelectizeSelector({
+                                                ajax: {
+                                                    data:     {groupID: 0, showCampus: true},
+                                                },
+                                                value: [
+                                                    {% for guest in guests %}
+                                                    {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
+                                                    {% endfor %}
+                                                ],
+                                                multiple: true
+                                            });
+                                        });
+                                    </script>
+                                </div>
+                                <div class="small-12 medium-6 columns">
+                                    <label>Maximum Attendees <span class="hint has-tip tip-top" title="The maximum amount of people who can attend your event" data-tooltip>?</span></label>
+                                    <input name="maxAttendees" maxlength="5" type="number" inputmode="numeric" value="{{ event.maxAttendees }}" />
+                                </div>
+                                <div class="small-12 medium-6 columns">
+                                    <label for="showAttendees" class="inline-block">
+                                        Show Guest List <span class="hint has-tip tip-top" title="Control the visibility of the guest list to other guests, you will always see the guest list." data-tooltip>?</span>
                                     </label>
+                                    <div class="switch">
+                                        <input id="showAttendees" name="showAttendees" type="checkbox" value="1" {{ event.showAttendees ? 'checked="checked"' : '' }}>
+                                        <label for="showAttendees">
+                                            <span>On</span>
+                                            <span>Off</span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
-                        </div>
-
-                        {# Show the Guests input if attendance is enabled
-                         # Hide the Guests input if attendance is disabled
-                         #}
-                        <script>
-                            $(function() {
-                                $('#attendanceCheckbox').on('change', function(event) {
-                                    if ($(this).is(':checked')) {
-                                        $('#attendance-guests').show();
-                                    } else {
-                                        $('#attendance-guests').hide();
-                                    }
+                            {# Show the Guests input if attendance is enabled
+                             # Hide the Guests input if attendance is disabled
+                             #}
+                            <script>
+                                $(function() {
+                                    $('#attendanceCheckbox').on('change', function(event) {
+                                        if ($(this).is(':checked')) {
+                                            $('#attendance-guests').show();
+                                        } else {
+                                            $('#attendance-guests').hide();
+                                        }
+                                    });
                                 });
-                            });
-                        </script>
-                    </div>
+                            </script>
+                        </div>
+                    {% endif %}
                 </fieldset>
-                {% endif %}
             </section>
             <input id="calendar-modify-submit" type="submit" value="{{ action }} Event" />
         </form>
