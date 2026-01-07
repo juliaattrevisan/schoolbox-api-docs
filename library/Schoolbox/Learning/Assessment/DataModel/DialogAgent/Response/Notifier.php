@@ -175,7 +175,12 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_REOPENED
+            ))
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
             /* Basically string replacements to compose the message in the notification
              */
@@ -243,7 +248,12 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_RESET
+            ))
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
             /* Basically string replacements to compose the message in the notification
              */
@@ -314,7 +324,12 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_SUBMITTED)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_SUBMITTED
+            ))
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
             /* Basically string replacements to compose the message in the notification
              */
