@@ -22,14 +22,16 @@ Usage:
 #}
 {% set collapsePrefix = collapsePrefix ?: 'course' %}
 
-{% set importUrl = routeLookup('courseImport.getImport', {
+{% set importUrl = routeLookupIfAuthorized('courseImport.getImport', {
     courseSpecId: courseSpec.id ?: 0,
     folderId:     folder.id ?? 0,
     componentId:  component.id ?? 0
 }) %}
 
 {% if encodedReturnUrl | length %}
-    {% set importUrl = importUrl ~ '?' ~ returnUrlKey ~ '=' ~ encodedReturnUrl %}
+    {% if importUrl %}
+        {% set importUrl = importUrl ~ '?' ~ returnUrlKey ~ '=' ~ encodedReturnUrl %}
+    {% endif %}
 {% endif %}
 
 {# Where should CourseSpec title link point ? #}
@@ -97,9 +99,11 @@ Usage:
 
     {% if hasTot %}
     <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
-        <li>
-            <a href="{{ importUrl }}" class="icon-download">Import into classes</a>
-        </li>
+        {% if importUrl %}
+            <li>
+                <a href="{{ importUrl }}" class="icon-download">Import into {{ locale.class.properPlural }}</a>
+            </li>
+        {% endif %}
         <li>
         {% if courseSpec.folder.hasHomepage %}
             <a href="/homepage/{{ courseSpec.folder.id }}/" class="icon-home">Course Homepage</a>

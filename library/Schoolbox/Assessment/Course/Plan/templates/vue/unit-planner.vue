@@ -27,6 +27,8 @@ interface Props {
     template: UnitTemplate; // the course framework template that units are linked to
     routeCurriculumCoverage: string | null;
     editorTemplates: EditorTemplate[]; // the editor templates available for insertion into textboxes
+    routeNewUnits: string | null;
+    routeModifyCourse: string | null;
 }
 
 const props = defineProps<Props>();
@@ -159,6 +161,8 @@ window.Vue.onUnmounted(() => {
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
         :route-import-into-classes="props.routeImportIntoClasses"
+        :route-new-units="props.routeNewUnits"
+        :route-modify-course="props.routeModifyCourse"
     />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">

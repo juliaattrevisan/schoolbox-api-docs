@@ -13,6 +13,8 @@ interface Props {
     folderId: number;
     routeCurriculumCoverage: string | null;
     routeImportIntoClasses: string | null;
+    routeNewUnits: string | null;
+    routeModifyCourse: string | null;
 }
 const props = defineProps<Props>();
 
@@ -32,6 +34,7 @@ function onPrintSelected(): void {
             <h1>Unit Planner - {{ props.courseTitle }}</h1>
             <div class="l-flex-row l-gap-s">
                 <button
+                    v-if="routeNewUnits"
                     class="button icon-add"
                     data-test="unit-planner-create-units"
                     @click.prevent="addStore.prompt()"
@@ -72,9 +75,9 @@ function onPrintSelected(): void {
                 >Curriculum Coverage</a
             >
         </li>
-        <li class="separator">Manage</li>
-        <li>
-            <a :href="`/course/modify/${props.courseId}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
+        <li v-if="routeModifyCourse" class="separator">Manage</li>
+        <li v-if="routeModifyCourse">
+            <a :href="`${props.routeModifyCourse}?${getReturnUrl()}`" class="icon-modify">Modify Course</a>
         </li>
     </ul>
 </template>

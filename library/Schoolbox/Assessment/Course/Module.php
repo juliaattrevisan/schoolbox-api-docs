@@ -8,12 +8,12 @@
 
 namespace Schoolbox\Assessment\Course;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_InstanceMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Twig\Error\LoaderError;
@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -42,42 +43,6 @@ class Module extends BaseModule
 {
     /** @var string */
     protected $basename = 'course';
-
-    /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param string $basePath The base route for this module
-     */
-    public function initRoutes(string $basePath)
-    {
-        $routes = [
-            'GET' => [
-                '/list'                                => 'courseList',
-                '/list/ajax'                           => 'courseListAjax',
-                '/new{/name}'                          => 'newCourse',
-                '/parent{/folderId}'                   => 'parentList',
-                '/{folderId}/nodes'                    => 'listNodes',
-            ],
-            'POST' => [
-                '/finalise'         => 'persistCourse',
-                // AFAICT this was never used - I'm re-purposing it
-
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($alias, $basePath, $path);
-        }
-    }
 
     /**
      * @return void
@@ -125,31 +90,82 @@ class Module extends BaseModule
             }
         };
 
-        $this->register('GET', '/modify/{id}', 'modifyCourse', null, $preloadCourseSpec);
-        $this->register('POST', '/new', 'createCourse');
-        $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', null, $preloadCourseSpec);
-        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', null, $preloadFolders);
-        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', null, $preloadCourseSpec);
-        $this->register('POST', '/modify/{id}', 'updateCourse', null, $preloadCourseSpec);
-        $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', null, $preloadUnitSpec);
-        $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', null, $preloadUnitSpec);
-        $this->register('POST', '/reapply/{id}', 'reApplyFramework', null, $preloadCourseSpec);
-        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', null, $preloadUnitImpl);
-    }
+        $basicPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF)
+            )
+        );
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF)
+        /* Making sure the user has WRITE access to the unit specification folder
+         */
+        $hasFolderWriteAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function (array $params) {
+                            if (isset($params['unitSpec']) && $params['unitSpec'] instanceof UnitSpecificationModel) {
+                                return $params['unitSpec']->getFolder()->getId();
+                            }
+                            try {
+                                return $this->getUnitSpecificationMapper()->findById($params['id'])->getFolder()->getId();
+                            } catch (MapperException\NotFound $e) {
+                                throw new MapperException\NotFound($e->getMessage());
+                            }
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    )
                 )
-            ));
+            )
+        );
+
+        /* Making sure the user has WRITE access to the course specification folder
+         */
+        $hasCourseWriteAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\All(
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function (array $params): int {
+                            if (isset($params['courseSpec']) && $params['courseSpec'] instanceof CourseSpecificationModel) {
+                                return $params['courseSpec']->getFolder()->getId();
+                            }
+                            try {
+                                return $this->getCourseSpecificationMapper()->findById($params['id'])->getFolder()->getId();
+                            } catch (MapperException\NotFound $e) {
+                                throw new MapperException\NotFound($e->getMessage());
+                            }
+                        },
+                        $this->getMapperFactory()->get(Access::class),
+                    ),
+                )
+            )
+        );
+
+        $this->register('GET', '/list', 'courseList', $basicPerms);
+        $this->register('GET', '/list/ajax', 'courseListAjax', $basicPerms);
+        $this->register('GET', '/new{/name}', 'newCourse', $basicPerms);
+        $this->register('GET', '/parent{/folderId}', 'parentList', $basicPerms);
+        $this->register('GET', '/{folderId}/nodes', 'listNodes', $basicPerms);
+        $this->register('POST', '/finalise', 'persistCourse', $basicPerms);
+        $this->register('GET', '/modify/{id}', 'modifyCourse', $hasCourseWriteAccess, $preloadCourseSpec);
+        $this->register('POST', '/new', 'createCourse', $basicPerms);
+        $this->register('POST', '/delete/{id}', 'deleteCourseSpecification', $basicPerms, $preloadCourseSpec);
+        $this->register('POST', '/convert/{courseFolderId:\d+}/{unitFolderId:\d+}', 'convertFolders', $basicPerms, $preloadFolders);
+        $this->register('POST', '/{id}/unitspecs/new', 'newUnit', $basicPerms, $preloadCourseSpec);
+        $this->register('POST', '/modify/{id}', 'updateCourse', $basicPerms, $preloadCourseSpec);
+        $this->register('POST', '/unitspecs/{id}/delete', 'deleteUnitSpecification', $hasFolderWriteAccess, $preloadUnitSpec);
+        $this->register('POST', '/unitspecs/{id}/sequence', 'saveAssessmentSequence', $basicPerms, $preloadUnitSpec);
+        $this->register('POST', '/reapply/{id}', 'reApplyFramework', $basicPerms, $preloadCourseSpec);
+        $this->register('DELETE', '/units/{id}', 'deleteUnitImplementation', $basicPerms, $preloadUnitImpl);
     }
 
     /**

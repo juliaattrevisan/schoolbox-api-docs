@@ -254,6 +254,13 @@ class Controller extends Base
                 'activities' => $courseBuilderTemplate,
             ],
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'routeNewUnits' => $this->getRouteIfAuthorized(
+                'coursePlan.newUnits',
+                [
+                    'id' => $course->getId(),
+                    'course' => $course,
+                ]
+            ),
         ], "Unit Planner - {$course->getTitle()}");
     }
 

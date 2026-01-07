@@ -22,7 +22,15 @@ function onDeleteUnit(): void {
 </script>
 
 <template>
-    <div v-if="props.unit._routes.modify || props.unit._routes.delete" class="component-action">
+    <div
+        v-if="
+            props.unit._routes.modify ||
+            props.unit._routes.delete ||
+            props.unit._routes.courseMarkbook ||
+            props.unit._routes.importIntoClasses
+        "
+        class="component-action"
+    >
         <section>
             <sbx-pop-out
                 :content-id="`dropdown-unit-${props.unit.id}-modify`"
