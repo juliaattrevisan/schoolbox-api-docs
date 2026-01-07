@@ -56,6 +56,7 @@ class Notifier extends AbstractModuleNotifier
      */
     private const PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
     private const PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
+    private const PATTERN_SOMEONE_SUBMITTED_TITLE = ':effector has submitted their :action for review.';
 
 
     /**
@@ -255,6 +256,94 @@ class Notifier extends AbstractModuleNotifier
          */
         $envelope = new Envelope();
         $envelope->targetToUser($recipientId, $instance);
+
+        return $envelope;
+    }
+
+
+    /**
+     * Notify staff when a response was submitted:
+     *      - submitted_at is meaningful now, but previously wasn't
+     *
+     * @param Model $model
+     * @param User $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws Deleted
+     * @throws Exception
+     */
+    public function notifyStaffSubmitted(ResponseDataModel $model, User $effector, ?array $diff): Envelope
+    {
+        /* submitted_at stayed the same: this wasn't reopened
+         */
+        if (!isset($diff['submittedAt'])) {
+            return new Envelope();
+        }
+
+        /* If staff was doing a sobo, ignore it: they don't need to be notified about something they did.
+         * This is implicit if the $effector is the same as the guy who's logged in and is already dismissed.
+         */
+        if ('' === trim((string)$diff['submittedAt'][1])) {
+            return new Envelope();
+        }
+
+        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
+         * You can refetch using a mapper to get more hydrated parts if you needed them.
+         */
+        /** @var ResponseDataModel $response */
+        $response = $this->mapper->findById($model->getId());
+
+        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
+         * You can refetch using a mapper to get more hydrated parts if you needed them.
+         */
+        /** @var ResponseDataModel $response */
+        $response = $this->mapper->findById($model->getId());
+
+        /* Define the recipient; all we need is their id.
+         *
+         * TODO For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
+         *  and make an $instance for each. There has to be a precedent for this mass-notification idea.
+         */
+
+        /* TODO Otherwise each $bob is probably the same.
+         */
+
+
+//        $recipientId = $response->getLearner()->getId();
+//
+//        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
+//         */
+//        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+//
+//        /* Basically string replacements to compose the message in the notification
+//         */
+//        $bob = (new Builder())
+//            ->setTitle(self::PATTERN_SOMEONE_SUBMITTED_TITLE)
+//            ->setIcon($this->getUserIcon($effector))
+//            ->setHref($href)
+//            ->setNamespace($this->getSlug())
+//            ->setSeverity(Logger::INFO)
+//            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+//            ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
+//            /* Basically string replacements to compose the message in the notification
+//             */
+//            ->setParams([
+//                'action' => new Param(sprintf(
+//                    '%s %s',
+//                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+//                    $this->l10n->translate('dialogAgent')
+//                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+//                'effector' => new UserParam($effector)
+//            ]);
+//
+//        /* Craft the message we're gonna send
+//         */
+//        $instance = $bob->build();
+
+        /* Slide that $instance into the $envelope and send it to recipients
+         */
+        $envelope = new Envelope();
+//        $envelope->targetToUser($recipientId, $instance);
 
         return $envelope;
     }
