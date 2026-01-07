@@ -49,28 +49,28 @@ class Notifier extends AbstractModuleNotifier
      * e.g. Trigger for 'Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model:1 reopen' has no callbacks
      *
      */
-    public const TRIGGER_REOPENED = 'reopened';
-    public const TRIGGER_RESET = 'reset';
-    public const TRIGGER_SUBMITTED = 'submitted';
+    public const string TRIGGER_REOPENED = 'reopened';
+    public const string TRIGGER_RESET = 'reset';
+    public const string TRIGGER_SUBMITTED = 'submitted';
 
 
     /** Text for each notification
      */
-    private const PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
-    private const PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
-    private const PATTERN_SOMEONE_SUBMITTED_TITLE = ':effector has submitted their :action for review.';
+    private const string PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
+    private const string PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
+    private const string PATTERN_SOMEONE_SUBMITTED_TITLE = ':effector has submitted their :action for review.';
 
 
     /**
      * A link to the summary screen, for now
      */
-    private const PATTERN_HREF = '/learning/assessments/%d/%d';
+    private const string PATTERN_HREF = '/learning/assessments/%d/%d';
 
 
     /**
      * A link to the status screen, for now
      */
-    private const PATTERN_STAFF_HREF = '/learning/assessments/%d/status';
+    private const string PATTERN_STAFF_HREF = '/learning/assessments/%d/status';
 
 
     /**
@@ -180,13 +180,13 @@ class Notifier extends AbstractModuleNotifier
             /* Basically string replacements to compose the message in the notification
              */
             ->setParams([
+                'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     'your %s %s. You can now resume your %s.',
                     $response->getDialogAgent()->getAssessmentModel()->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
-                'effector' => new UserParam($effector)
             ]);
 
         /* Craft the message we're gonna send
@@ -248,13 +248,13 @@ class Notifier extends AbstractModuleNotifier
             /* Basically string replacements to compose the message in the notification
              */
             ->setParams([
+                'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     'your %s %s. You can now restart your %s.',
                     $response->getDialogAgent()->getAssessmentModel()->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
-                'effector' => new UserParam($effector)
             ]);
 
         /* Craft the message we're gonna send
@@ -319,12 +319,12 @@ class Notifier extends AbstractModuleNotifier
             /* Basically string replacements to compose the message in the notification
              */
             ->setParams([
+                'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     '%s %s',
                     $response->getDialogAgent()->getAssessmentModel()->getTitle(),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
-                'effector' => new UserParam($effector)
             ]);
 
         /* Craft the message we're gonna send
