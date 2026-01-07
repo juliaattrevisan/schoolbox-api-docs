@@ -465,11 +465,10 @@ class Mapper extends BaseMapper
     /**
      * Build status flags subquery
      *
-     * @param string $today
      * @param string $isPopulated
      * @return array
      */
-    private function buildStatusFlagsSubquery(string $today, string $isPopulated): array
+    private function buildStatusFlagsSubquery(string $isPopulated): array
     {
         /* Build status flags as a derived table to avoid duplication
          */
@@ -501,7 +500,7 @@ class Mapper extends BaseMapper
                         LEFT JOIN lu_pastoral_subtype lps2 ON p2.subtype_id = lps2.id
                         WHERE p2.deleted_at IS NULL
                         AND (lpt2.contribute_differentiation_profile OR lps2.contribute_differentiation_profile)
-                        AND COALESCE(p2.expires_at, :farfaraway) >= '{$today}'
+                        AND COALESCE(p2.expires_at, :farfaraway) >= :today
                     )
                     THEN 1 ELSE 0
                 END as is_expired
@@ -571,7 +570,7 @@ class Mapper extends BaseMapper
         }
         $isPouplated = implode(' OR ', $tempPb->getWhere());
 
-        $statusFlagsSubquery = $this->buildStatusFlagsSubquery($today, $isPouplated);
+        $statusFlagsSubquery = $this->buildStatusFlagsSubquery($isPouplated);
 
         $statusFlagsSubquerySelect = "
                 SELECT
@@ -587,11 +586,11 @@ class Mapper extends BaseMapper
 
         $statusSelect = ", status_flags.*";
         $statusSubquery = "LEFT JOIN ({$statusFlagsSubquerySelect}) status_flags ON status_flags.student_id = p.student_id";
-        $statusParam =
-            array_merge(
-                ['farfaraway' => self::FAR_FAR_AWAY_FULL_DATE],
-                $tempPb->getParams(),
-            );
+        $statusParam = [
+            'farfaraway' => self::FAR_FAR_AWAY_FULL_DATE,
+            'today'     => $today,
+            ...$tempPb->getParams(),
+        ];
         return [$pb, $statusSelect, $statusSubquery, $statusParam];
     }
 
