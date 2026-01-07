@@ -474,20 +474,6 @@ class Mapper extends BaseMapper
         /* Build status flags as a derived table to avoid duplication
          */
         $statusFlagsSubquery = [
-            "is_active" => "
-                CASE
-                    /* At least one active pastoral record
-                     */
-                    WHEN COALESCE(MAX(p.expires_at), :farfaraway) >= '{$today}'
-                    /* Differentiation profile is up to date
-                     */
-                    AND COALESCE(MAX(COALESCE(p.updated_at, p.created_at)), :farfaraway) <= COALESCE(differentiation_profiles.updated_at, :farfaraway)
-                    /* Differentiation profile has at least one field populated
-                     */
-                    AND ({$isPopulated})
-                    THEN 1 ELSE 0
-                END as is_active
-            ",
             "is_out_of_date" => "
                 CASE
                     /* Out of date records
@@ -540,7 +526,14 @@ class Mapper extends BaseMapper
         /* Active records
          */
         if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_ACTIVE_RECORDS, $status)) {
-            $statusConditions->equals('status_flags.is_active', 1);
+            /* if not out of date, not unpopulated, not all linked pastoral have expired then it is considered as active
+             */
+            $statusConditions->all(
+                $this->getPredicateBuilder()
+                     ->notEquals('status_flags.is_out_of_date', 1)
+                     ->notEquals('status_flags.is_unpopulated', 1)
+                     ->notEquals('status_flags.is_expired', 1)
+            );
         }
 
         /* Out of date records
