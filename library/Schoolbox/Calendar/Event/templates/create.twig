@@ -45,6 +45,15 @@
             functionLabel: "{{ action ?? '' }}",
             deleteButton: $('[data-action="delete"]')
         });
+
+        $('[data-resourcebookingsuggest]').selectizeSelector({
+            ajax: {
+                url: '/resource-booking/item/search',
+                type: 'GET',
+                dataType: 'json'
+            },
+            multiple: true
+        });
     });
 </script>
 
@@ -193,7 +202,8 @@
                         </label>
                     </div>
                     <div class="small-12 column">
-                        <p>TODO: Add 'Resources' field<p>
+                        <label for="resources">Resources</label>
+                        <select id="resources" data-resourcebookingsuggest name="resources[]" multiple placeholder="Start typing the name of a resource"></select>
                     </div>
                 </fieldset>
 
