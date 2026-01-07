@@ -245,7 +245,7 @@ class Controller extends Base
                 return;
             }
 
-            $existingFieldContexts[$fieldContextId]->setBody();
+            $existingFieldContexts[$fieldContextId]->setBody($body);
         }
 
         /* I'll save them. I'll save them all.
