@@ -324,16 +324,18 @@ class Mapper extends BaseMapper
         }
 
         if (!empty($adjustmentCategories)) {
-            $categories = implode(',', $adjustmentCategories);
-            $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN ( $categories )", [
+            $categoriesPlaceholders = Builder::getArrayPlaceholders($adjustmentCategories, 'adjustmentCategory');
+            $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN $categoriesPlaceholders", [
                 'adjustment_categories_none_key' => DifferentiationProfile\AdjustmentCategory\KeyConverter::NONE_KEY_VALUE,
+                ...Builder::getArrayParameters($adjustmentCategories, 'adjustmentCategory')
             ]);
         }
 
         if (!empty($adjustmentLevels)) {
-            $levels = implode(',', $adjustmentLevels);
-            $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN ( $levels )", [
+            $levelsPlaceholders = Builder::getArrayPlaceholders($adjustmentLevels, 'adjustmentLevel');
+            $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN $levelsPlaceholders", [
                 'adjustment_levels_none_key' => DifferentiationProfile\AdjustmentLevel\KeyConverter::NONE_KEY_VALUE,
+                ...Builder::getArrayParameters($adjustmentLevels, 'adjustmentLevel')
             ]);
         }
 
