@@ -16,7 +16,6 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\OpenAi\IClient;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\Presidio\Client;
-use Schoolbox\Presidio\Anonymiser;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
@@ -37,6 +36,15 @@ class DifferentiationProfileGeneration
     ) {
     }
 
+    /**
+     * @param User        $user
+     * @param Collection  $pastoralRecords
+     * @param Collection  $enabledFields
+     * @param User        $student
+     * @param string|null $aiSessionId
+     * @return array
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
     public function request(
         User $user,
         Collection $pastoralRecords,
@@ -115,6 +123,12 @@ class DifferentiationProfileGeneration
         return [$fieldData, 200];
     }
 
+    /**
+     * Generate file prompts from pastoral records and flattening its attachments.
+     *
+     * @param Collection $pastoralRecords The collection of pastoral records.
+     * @return string The generated file prompts.
+     */
     private function generateFilePrompts(Collection $pastoralRecords): string
     {
         $processed = $pastoralRecords->map(

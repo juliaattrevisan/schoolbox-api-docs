@@ -15,7 +15,6 @@ use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Ramsey\Uuid\Uuid;
-use Schoolbox\Admin\DifferentiationProfiles\Model;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
@@ -61,7 +60,7 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private ParserFactory $parserFactory,
         private ClientFactory $clientFactory,
-        private Client $presidioClient,
+        private ?Client $presidioClient,
         private DifferentiationProfileMapper $differentiationProfileMapper,
         private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
         private FolderMapper $folderMapper,
@@ -284,6 +283,22 @@ class Controller extends Base
     public function postDifferentiation(): void
     {
         $this->setAllowBackToTheFuture(false);
+
+        /* Presidio client is required for this feature
+         * if not set then error out early
+         */
+        if (null === $this->presidioClient) {
+            $returnCode = 500;
+
+            $problem = (new ApiProblem("Presidio client is not configured."))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
 
         $aiConfig = new Config();
         $diffConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIFFERENTIATION));
