@@ -23,6 +23,8 @@ interface Props {
     returnUrl: string;
 }
 
+const CLOSE_DATE_BUFFER_MS = 5000; // students can't submit after the close date, so trigger that kind of submission slightly earlier
+
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 const acPromptEventBus = useEventBus(acPromptEventKey);
@@ -233,7 +235,7 @@ const durationExceeded = window.Vue.computed<boolean>(() => {
     if (timeTaken.value === null) return false; // not started yet
 
     /** Past the close date? treat as exceeded */
-    if (currentTimestamp.value >= new Date(props.closeAt).getTime()) {
+    if (currentTimestamp.value >= new Date(props.closeAt).getTime() - CLOSE_DATE_BUFFER_MS) {
         return true;
     }
 
