@@ -115,8 +115,8 @@ class Notifier extends AbstractModuleNotifier
         $crudMethod = $bundle->getMethod();
 
         if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
-            $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
-            $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
+//            $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
+//            $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         }
     }
@@ -148,8 +148,11 @@ class Notifier extends AbstractModuleNotifier
          *     - changing submittedAt from a NULLish value to a meaningful value equates to a SOBO
          *
          * Note: this might be a reason you get strange notifs about reopening when you shouldn't.
+         *
+         * Note that $diff[0] is "the current state of the object"
+         * Note that $diff[1] is "the previous state of the object"
          */
-        if ('' === trim((string)$diff['submittedAt'][1])) {
+        if ('' === trim((string)$diff['submittedAt'][0])) {
             return new Envelope();
         }
 
@@ -301,8 +304,11 @@ class Notifier extends AbstractModuleNotifier
 
         /* If staff was doing a sobo, ignore it: they don't need to be notified about something they did.
          * This is implicit if the $effector is the same as the guy who's logged in and is already dismissed.
+         *
+         * Note that $diff[0] is "the current state of the object"
+         * Note that $diff[1] is "the previous state of the object"
          */
-        if ('' === trim((string)$diff['submittedAt'][1])) {
+        if ('' === trim((string)$diff['submittedAt'][0])) {
             return new Envelope();
         }
 
