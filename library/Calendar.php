@@ -478,7 +478,7 @@ class Calendar extends DeprecatedModel
                 );
                 $event->setAllDay(!empty($currentEvent['allday']));
                 $event->setSeriesId($currentEvent['series_id']);
-                $event->setBookingsCollection($resourceBookingModelsByEventId[$currentEvent['id']]);
+                $event->setBookingCollection($resourceBookingModelsByEventId[$currentEvent['id']]);
 
                 /* If you have write access to the event
                  */

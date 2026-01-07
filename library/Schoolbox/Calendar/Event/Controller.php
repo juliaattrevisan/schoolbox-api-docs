@@ -171,7 +171,7 @@ class Controller extends Base
 
         // Only include resource booking data if the resource booking module is enabled.
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
-            $data['resourceBookingsCollection'] = $helper->getResourceBookingsCollection($event);
+            $data['resourceBookingCollection'] = $helper->getResourceBookingCollection($event);
         }
 
         $this->response = $this->responseFromTemplate('@calendarEvent/event.twig', $data, $event->getTitle());

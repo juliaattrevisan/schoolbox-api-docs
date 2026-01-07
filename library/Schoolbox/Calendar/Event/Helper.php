@@ -119,7 +119,7 @@ class Helper
      * @param Event $event
      * @return array
      */
-    public function getResourceBookingsCollection(Event $event): array
+    public function getResourceBookingCollection(Event $event): array
     {
         // Get resource booking objects and ensure their linked event is hydrated.
         $resourceBookings = $this->resourceBookingMapper->findByEventId($event->getId());
