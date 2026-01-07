@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Display a student and access to select linked records and generate with AI
+ * Display a student and access to select linked records and extract with AI
  */
 
 import { sbProps } from "@js/util/sbx/pageUtils";
