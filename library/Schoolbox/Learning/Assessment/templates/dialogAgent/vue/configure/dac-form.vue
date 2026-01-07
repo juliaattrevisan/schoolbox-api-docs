@@ -68,6 +68,7 @@ async function onSubmit(): Promise<void> {
         fieldContexts[fc.id] = fc.body;
     }
 
+    const toast = window.sbProps.toastActivate("Saving...");
     const response = await apiRequest<DialogAgentConfigureApiResponse, DialogAgentConfigureApiRequest>({
         method: "POST",
         url: props.postUpdate,
@@ -84,9 +85,13 @@ async function onSubmit(): Promise<void> {
     isSubmitting.value = false;
     if (!response.success) {
         submitError.value = response.message;
+        toast.timeout({ text: response.message, isSuccess: false });
         return;
     }
 
+    toast.timeout({ text: "Configuration saved", isSuccess: true });
+
+    assessmentConfig.value.prompt = response.data.prompt;
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
     emit("saved");
 }
