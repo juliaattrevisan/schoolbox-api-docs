@@ -34,14 +34,6 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * Helpfulness enum values
-     */
-    public const string HELPFULNESS_MINIMAL = 'minimal';
-    public const string HELPFULNESS_MODERATE = 'moderate';
-    public const string HELPFULNESS_EXTREME = 'extreme';
-
-
-    /**
      * @var int|null
      */
     private ?int $scenarioId = null;
@@ -93,45 +85,6 @@ class Model implements IAssessableDataModel, ISoftDeletable
      * @var \Schoolbox\GenericCollection|null
      */
     private ?\Schoolbox\GenericCollection $fields = null;
-
-
-    /* Modest conveniences
-     */
-
-    /**
-     * Shortcut to setting minimal helpfulness
-     *
-     * @return $this
-     */
-    public function setHelpfulnessMinimal(): self
-    {
-        $this->setHelpfulness(self::HELPFULNESS_MINIMAL);
-        return $this;
-    }
-
-
-    /**
-     * Shortcut to setting moderate helpfulness
-     *
-     * @return $this
-     */
-    public function setHelpfulnessModerate(): self
-    {
-        $this->setHelpfulness(self::HELPFULNESS_MODERATE);
-        return $this;
-    }
-
-
-    /**
-     * Shortcut to setting EXTREEEEEEEEEEEEEME helpfulness
-     *
-     * @return $this
-     */
-    public function setHelpfulnessExtreme(): self
-    {
-        $this->setHelpfulness(self::HELPFULNESS_EXTREME);
-        return $this;
-    }
 
 
     /**

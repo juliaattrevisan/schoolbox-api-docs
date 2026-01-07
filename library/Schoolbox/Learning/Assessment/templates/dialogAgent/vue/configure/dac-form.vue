@@ -6,11 +6,12 @@ import type {
     DialogAgentAssessmentConfig,
     DialogAgentConfigureApiRequest,
     DialogAgentConfigureApiResponse,
+    DialogAgentHelpfulness,
 } from "./dacTypes";
 
 interface Props {
     scenario: DialogAgentScenario;
-    helpfulnessOptions: Record<string, string>;
+    helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
     postUpdate: string | null;
 }
@@ -108,7 +109,20 @@ async function onSubmit(): Promise<void> {
             </fieldset>
             <fieldset class="content" :disabled="isSubmitting || undefined">
                 <div class="small-12 large-6 columns">
-                    <label for="dac-helpfulness" class="required">Helpfulness</label>
+                    <label for="dac-helpfulness">
+                        <span class="required-with-tip">Helpfulness</span>
+                        <span
+                            class="hint has-tip tip-top"
+                            data-tooltip
+                            title="Controls how much direction the AI provides to the learner.
+<br>
+<br><strong>Exploratory</strong>: encourages independent thinking with minimal guidance.
+<br><strong>Guided</strong>: supports learning through structured prompts and guiding questions.
+<br><strong>Directed</strong>: provides clear instructions and explicit guidance when learners need stronger support."
+                        >
+                            ?
+                        </span>
+                    </label>
                     <select
                         id="dac-helpfulness"
                         v-model="assessmentConfig.helpfulness"
@@ -116,8 +130,8 @@ async function onSubmit(): Promise<void> {
                         required
                         :disabled="!props.postUpdate"
                     >
-                        <option v-for="(name, value) in props.helpfulnessOptions" :key="value" :value="value">
-                            {{ name }}
+                        <option v-for="option in props.helpfulnessOptions" :key="option.value" :value="option.value">
+                            {{ option.label }}
                         </option>
                     </select>
                 </div>

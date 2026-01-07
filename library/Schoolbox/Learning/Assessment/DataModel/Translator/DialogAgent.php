@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentModel;
+use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
 use Schoolbox\Learning\MarkScheme\None;
 
@@ -71,7 +72,7 @@ class DialogAgent implements IAssessmentTypeTranslator
     {
         $dataModel->setScenarioId($domainObject->getScenarioId());
         $dataModel->setLanguage($domainObject->getLanguage());
-        $dataModel->setHelpfulness($domainObject->getHelpfulness());
+        $dataModel->setHelpfulness($domainObject->getHelpfulness()?->value);
         $dataModel->setOpeningMessage($domainObject->getOpeningMessage());
         $dataModel->setUseDifferentiationProfile($domainObject->getUseDifferentiationProfile());
         $dataModel->setRules($domainObject->getRules());
@@ -90,7 +91,7 @@ class DialogAgent implements IAssessmentTypeTranslator
     {
         $domainObject->setScenarioId($dataModel->getScenarioId());
         $domainObject->setLanguage($dataModel->getLanguage());
-        $domainObject->setHelpfulness($dataModel->getHelpfulness());
+        $domainObject->setHelpfulness($dataModel->getHelpfulness() ? Helpfulness::from($dataModel->getHelpfulness()) : null);
         $domainObject->setUseDifferentiationProfile($dataModel->getUseDifferentiationProfile());
         $domainObject->setOpeningMessage($dataModel->getOpeningMessage());
         $domainObject->setRules($dataModel->getRules());

@@ -32,6 +32,7 @@ use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
@@ -130,9 +131,9 @@ class Controller extends Base
          * also had to be fetched separately to its assessment instance. A bit frustrating to need that,
          * but sub-object's fields don't really surface through the domain model for a reason.
          */
-        $dialogAgent = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
+        $dialogAgentId = $this->dialogAgentDataModelMapper->findOneByColumn('assessment_id', $assessment->getId())->getId();
 
-        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgent->getId());
+        $fieldContexts = $this->fieldContextMapper->findByColumn('dialog_agent_id', $dialogAgentId);
 
         $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
 
@@ -144,11 +145,11 @@ class Controller extends Base
                 'description' => $scenario->getDescription(),
             ],
             'assessmentConfig' => [
-                'helpfulness' => $dialogAgent->getHelpfulness(),
-                'language' => $dialogAgent->getLanguage() ?? Language::DEFAULT,
-                'openingMessage' => $dialogAgent->getOpeningMessage(),
-                'rules' => $dialogAgent->getRules() ?: $scenario->getDefaultRules(),
-                'useDifferentiationProfile' => $dialogAgent->getUseDifferentiationProfile(),
+                'helpfulness' => $assessment->getHelpfulness() ?? Helpfulness::DEFAULT,
+                'language' => $assessment->getLanguage() ?? Language::DEFAULT,
+                'openingMessage' => $assessment->getOpeningMessage(),
+                'rules' => $assessment->getRules() ?: $scenario->getDefaultRules(),
+                'useDifferentiationProfile' => $assessment->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
                     'body' => $fieldContext->getBody(),
@@ -166,11 +167,11 @@ class Controller extends Base
                     ]),
                 ],
             ],
-            'helpfulnessOptions' => [
-                DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
-                DialogAgentDataModel::HELPFULNESS_MODERATE => 'Moderate',
-                DialogAgentDataModel::HELPFULNESS_EXTREME => 'Extreme',
-            ],
+            // derive from the Helpfulness enum
+            'helpfulnessOptions' => array_map(fn (Helpfulness $case) => [
+                'value' => $case->value,
+                'label' => $case->label(),
+            ], Helpfulness::cases()),
             'languageOptions' => Language::AVAILABLE,
         ];
 
@@ -195,7 +196,7 @@ class Controller extends Base
     {
         $postArray = $this->requestPost->getArrayCopy();
 
-        $assessment->setHelpfulness($postArray['helpfulness'])
+        $assessment->setHelpfulness(Helpfulness::from($postArray['helpfulness']))
             ->setLanguage($postArray['language'])
             ->setOpeningMessage($postArray['openingMessage'])
             ->setRules($postArray['rules'])
@@ -235,6 +236,7 @@ class Controller extends Base
             '<opening_message>' => $assessment->getOpeningMessage(),
             '<rules>' => $assessment->getRules(),
             '<language>' => $assessment->getLanguage(),
+            '<helpfulness>' => $assessment->getHelpfulness()->prompt(),
         ];
         foreach ($existingFieldContexts as $fieldContextId => $fieldContext) {
             $fieldPlaceholder = \sprintf('<%s>', $fieldContext->getField()->getSlug());

@@ -13,8 +13,15 @@ type DialogAgentFieldContext = {
     };
 };
 
+/** @see /library/Schoolbox/Learning/Assessment/DialogAgent/Lookup/Helpfulness.php */
+export enum DialogAgentHelpfulness {
+    EXPLORATORY = "exploratory",
+    GUIDED = "guided",
+    DIRECTED = "directed",
+}
+
 export type DialogAgentAssessmentConfig = {
-    helpfulness: string | null;
+    helpfulness: DialogAgentHelpfulness | null;
     language: string | null;
     useDifferentiationProfile: boolean;
     openingMessage: string | null;
