@@ -454,9 +454,10 @@ class Mapper extends BaseMapper
      */
     private function buildYearLevelPredicate(Builder $pb, array $yearLevelIds): Builder
     {
-        $yearLevels = implode(',', $yearLevelIds);
-        $pb = $pb->rawWhere("COALESCE(s.year_id, :year_levels_none_key) IN ( $yearLevels )", [
+        $yearlevelPlaceholders = Builder::getArrayPlaceholders($yearLevelIds, 'yearLevelId');
+        $pb = $pb->rawWhere("COALESCE(s.year_id, :year_levels_none_key) IN $yearlevelPlaceholders", [
             'year_levels_none_key' => DifferentiationProfile\YearLevel\KeyConverter::NONE_KEY_VALUE,
+            ...Builder::getArrayParameters($yearLevelIds, 'yearLevelId')
         ]);
         return $pb;
     }
