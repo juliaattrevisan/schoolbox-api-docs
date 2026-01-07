@@ -45,11 +45,6 @@
             functionLabel: "{{ action ?? '' }}",
             deleteButton: $('[data-action="delete"]')
         });
-
-        // Collapsables
-        $('[data-collapser=true]').collapsable({
-            container: '[data-collapsable-container]'
-        });
     });
 </script>
 
@@ -156,14 +151,9 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="content" data-collapsable-container>
-                    <legend>
-                        <span data-collapser="true" href="#" class="icon-down-arrow">
-                            <a href="#" title="Collapse Content">Recurrence</a>
-                        </span>
-
-                    </legend>
-                    <div class="small-12 columns {{ recurrence|length ? '' : 'hide' }}" data-collapsable="true" data-collapse-state="{{ recurrence|length ? 'uncollapsed' : 'collapsed' }}">
+                <fieldset class="content">
+                    <legend>Recurrence</legend>
+                    <div class="small-12 columns">
                         <div class="row">
                             {% if recurrence|length %}
                                 <div id="repeat-reminder" class="small-12 columns">
