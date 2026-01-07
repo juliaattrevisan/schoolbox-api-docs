@@ -79,6 +79,9 @@ class Module extends BaseModule
 
         $canExportForUnit = new Rule\All(
             new Rule\IsLoggedIn(),
+            /* If Staff is not a superuser they will need to have write access to the unit folder
+             * and read access to the course folder
+             */
             new Rule\Any(
                 $isSuperuser,
                 new Rule\All(

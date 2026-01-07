@@ -115,6 +115,9 @@ class Module extends \Alaress\Module\Module
             ),
         );
 
+        /* Course import require the staff to be either superuser or have
+         * course folder read access and class folder write access
+         */
         $courseImportAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(

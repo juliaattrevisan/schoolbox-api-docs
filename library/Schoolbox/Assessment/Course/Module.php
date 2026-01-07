@@ -98,7 +98,7 @@ class Module extends BaseModule
             )
         );
 
-        /* Making sure the user has WRITE access to the folder the unit spec is in
+        /* Making sure the user has WRITE access to the unit specification folder
          */
         $hasFolderWriteAccess = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -124,6 +124,8 @@ class Module extends BaseModule
             )
         );
 
+        /* Making sure the user has WRITE access to the course specification folder
+         */
         $hasCourseWriteAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
