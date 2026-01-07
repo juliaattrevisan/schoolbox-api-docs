@@ -19,6 +19,7 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -330,39 +331,20 @@ class Notifier extends AbstractModuleNotifier
          */
         $instance = $bob->build();
 
-        /* This is the student who submitted the response. Arguably it's a more-hydrated version of $effector
-         */
-        $student = $response->getLearner();
-
         /* Define the recipient; all we need is their id.
          *
          * For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
-         * and make an $instance for each.
-         *
-         * First find the teachers of a student...
+         * and make an $instance for each. To do that we can send it to the WRITE access users of the assessment's folder.
          */
-        $this->externalUser->loadTeachers([$student]);
+        $folder = $response->getDialogAgent()->getAssessmentModel()->getAssessmentContext()->getFolder();
+
+        /* TODO But..........I don't have that hydrated atm. hmm
+         */
 
         /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
          */
         $envelope = new Envelope();
-
-        /** @var User $teacher */
-        foreach ($student->getTeacherCollection() as $teacher) {
-            /* I _suppose_ this might be desired? It'd prevent non-academic staff members associated with a homepage from
-             * doing academic-related stuff, though I'm not certain whether that's something experienced by schools. By
-             * being in the $teacherCollection we presume you're already beyond this situation.
-             *
-                if (!$teacher->getRole()->getViewStudentGrades()) {
-                    continue;
-                }
-             */
-
-            /* Slide that $instance into the $envelope so we can send it to recipient teacher(s)
-             * Note that targetToUser() accepts multiple input datatypes
-             */
-            $envelope->targetToUser($teacher, $instance);
-        }
+        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $instance);
 
         return $envelope;
     }
