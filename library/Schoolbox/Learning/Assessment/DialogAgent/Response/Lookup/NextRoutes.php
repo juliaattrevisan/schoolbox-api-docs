@@ -66,51 +66,31 @@ class NextRoutes
             ];
         }
 
-        // TODO: deal with duration eventually. still allow SOBO from staff
-
-        /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
-         * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
-         *
-         * If assistance was requested and the response is still in progress, send a special status
-         */
-        if (null !== $authoritativeResponse->getAssistanceRequestedAt()) {
-            return [
-                self::ACTION_VIEW => true,
-                self::ACTION_MESSAGE => true,
-                // TODO: A student could request assistance prior to having a session ID,
-                // which would then turn ON the SUBMIT/RESET options... I doubt we want that...
-                self::ACTION_SUBMIT => true,
-                self::ACTION_RESET => true,
-                self::ACTION_REOPEN => false,
-                self::ACTION_ASSISTANCE_REQUEST => false,
-                self::ACTION_ASSISTANCE_RESOLVE => true,
-            ];
-        }
-
-        /* No session identifier yet; a draft exists but the participant hasn't sent their first message to ai services
-         */
-        if (null === $authoritativeResponse->getSessionId()) {
-            return [
-                self::ACTION_VIEW => true,
-                self::ACTION_MESSAGE => true,
-                self::ACTION_SUBMIT => false,
-                self::ACTION_RESET => false,
-                self::ACTION_REOPEN => false,
-                self::ACTION_ASSISTANCE_REQUEST => true,
-                self::ACTION_ASSISTANCE_RESOLVE => false,
-            ];
-        }
-
-        /* Otherwise we're just doing the stuff
+        /* The response is in progress
          */
         return [
             self::ACTION_VIEW => true,
-            self::ACTION_MESSAGE => true,
-            self::ACTION_SUBMIT => true,
-            self::ACTION_RESET => true,
+            /* You can keep sending messages until the duration has been exceeded (if any),
+             * after that, the response is either submitted, or about to be submitted by the frontend/SOBO/the cron later on
+             */
+            self::ACTION_MESSAGE => true, // TODO duration
+            /* You can submit or reset only once the attempt has actually started
+             * (student sent the first message to AI so a session id exists).
+             *
+             * Duration does not block these as to ensure a delayed submission is always possible
+             * (SOBO/the student left the page/the browser was slow at submitting/etc).
+             */
+            self::ACTION_SUBMIT => null !== $authoritativeResponse->getSessionId(),
+            self::ACTION_RESET => null !== $authoritativeResponse->getSessionId(),
+            /* reopen is only possible whilst in progress */
             self::ACTION_REOPEN => false,
-            self::ACTION_ASSISTANCE_REQUEST => true,
-            self::ACTION_ASSISTANCE_RESOLVE => false,
+            /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
+             * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
+             *
+             * If assistance was requested and the response is still in progress, send a special status
+             */
+            self::ACTION_ASSISTANCE_REQUEST => null === $authoritativeResponse->getAssistanceRequestedAt(),
+            self::ACTION_ASSISTANCE_RESOLVE => null !== $authoritativeResponse->getAssistanceRequestedAt(),
         ];
     }
 }
