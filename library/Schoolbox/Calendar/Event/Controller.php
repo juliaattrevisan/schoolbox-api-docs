@@ -809,11 +809,15 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
+        // TODO: Remove linked resource bookings for any resources removed from this event.
+
         $bookingErrors = [];
         if ($existingEvent) {
             // Move any resource bookings attached to this event
             $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
         }
+
+        // TODO: Create linked resource bookings for any new resources added to this event.
 
         if ($this->isJsonRequest()) {
             $this->eventMapper->populateGuests($event); // Reload guests to ensure the response matches the database representation.
@@ -858,6 +862,7 @@ class Controller extends Base
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees(),
                     'bookingErrors' => $bookingErrors,
+                    // TODO: Add 'bookings' to this response.
                 ]
             );
         } else {
