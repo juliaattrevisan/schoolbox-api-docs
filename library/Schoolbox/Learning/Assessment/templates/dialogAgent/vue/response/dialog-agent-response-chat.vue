@@ -38,12 +38,17 @@ window.Vue.onMounted(() => {
 
 const currentTimestamp = useTimestamp({ interval: 500 });
 
-/** How long since the response was started (in seconds) */
-const timeTaken = window.Vue.computed<number | null>(() => {
-    if (currentResponse.value.startedAt === null) return null;
+/** How long until the response must be submitted(in seconds) */
+const timeLeft = window.Vue.computed<number>(() => {
+    const startedAt = currentResponse.value.startedAt ? new Date(currentResponse.value.startedAt).getTime() : null;
 
-    const startedAt = new Date(currentResponse.value.startedAt);
-    return Math.floor((currentTimestamp.value - startedAt.getTime()) / 1000);
+    /** Duration is only relevant after starting and if it's set */
+    const durationFinishAt = startedAt !== null && props.duration !== null ? startedAt + props.duration * 1000 : null;
+    const closeAt = new Date(props.closeAt).getTime() - CLOSE_DATE_BUFFER_MS;
+
+    /** The earlier of the two possible end times is the actual end time */
+    const endAt = durationFinishAt !== null && durationFinishAt < closeAt ? durationFinishAt : closeAt;
+    return Math.ceil((endAt - currentTimestamp.value) / 1000);
 });
 
 /** As soon as the first message has been sent, update startedAt so the duration timer will work */
@@ -107,6 +112,13 @@ const isSubmitting = window.Vue.ref(false);
 const submitError = window.Vue.ref<string | null>(null);
 
 /**
+ * After submission, redirect to the return URL
+ */
+function redirectAfterSubmit(): void {
+    window.location.href = props.returnUrl;
+}
+
+/**
  * When a learner or instructor clicks the submit button inside the modal
  */
 async function submitResponse(): Promise<void> {
@@ -128,7 +140,7 @@ async function submitResponse(): Promise<void> {
     }
 
     /** If successful, redirect to the return URL - keep isSubmitting as true as the page will soon unload */
-    window.location.href = props.returnUrl;
+    redirectAfterSubmit();
 }
 
 /**
@@ -230,29 +242,26 @@ window.Vue.onUnmounted(() => {
 });
 
 /** As soon as duration is exceeded, submit the response (no more messages can be sent at this point) */
-const durationExceeded = window.Vue.computed<boolean>(() => {
-    if (props.duration === null) return false; // unlimited time
-    if (timeTaken.value === null) return false; // not started yet
-
-    /** Past the close date? treat as exceeded */
-    if (currentTimestamp.value >= new Date(props.closeAt).getTime() - CLOSE_DATE_BUFFER_MS) {
-        return true;
-    }
-
-    return timeTaken.value > props.duration;
-});
-
+const durationExceeded = window.Vue.computed<boolean>(() => timeLeft.value <= 0);
 window.Vue.watch(
     durationExceeded,
     async (exceeded) => {
-        if (exceeded && !isSubmitting.value) {
+        if (exceeded && !isSubmitting.value && !isLoading.value) {
             /**
              * Open the modal first to show that time is up
              * and also to make sure the submit route exists (it might not if you have only sent messages)
              */
             await openSubmitModal();
-            /** Force the submission to occur immediately */
-            await submitResponse();
+            /**
+             * Force the submission to occur immediately,
+             * if the route doesn't exist then the close date likely passed before sending a message
+             */
+            if (currentResponse.value._routes.submit) {
+                await submitResponse();
+            } else {
+                isSubmitting.value = true;
+                redirectAfterSubmit();
+            }
         }
     },
     { immediate: true },
