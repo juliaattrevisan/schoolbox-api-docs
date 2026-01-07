@@ -42,6 +42,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\DialogAgent\ValidDialogAgentEnabled;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
@@ -276,6 +277,23 @@ class Controller extends Base
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, ?Response $response): void
     {
+        /**
+         * If you can access the submit form, and dialog agent is enabled, the learner has
+         * likely ended up on this page by mistake (instructor sent a link, or learner refreshed an outdated page)
+         *
+         * Redirect them to the create form instead as long as dialog agent is enabled (due to the extra check at the start of getCreateResponseForm)
+         */
+        $createFormRoute = $this->getRouteIfAuthorized('learningAssessment.getCreateResponseForm', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+            'student' => $student,
+            'studentId' => $student->getId(),
+        ]);
+        if ($createFormRoute && new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied()) {
+            $this->response = $this->redirectTemporary($createFormRoute);
+            return;
+        }
+
         $participant = $assessment->getParticipant($student);
 
         /* Prepare a redirection url if one was provided
