@@ -126,6 +126,9 @@ class Notifier extends AbstractModuleNotifier
      * Notify students when a response was put into Reopened state:
      *     - submitted_at is null now, but previously wasn't
      *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
+     *
      * @param ResponseDataModel $model
      * @param User $effector
      * @param array|null $diff
@@ -214,6 +217,9 @@ class Notifier extends AbstractModuleNotifier
      * Notify students when a response was reset:
      *     - authoritative is 0 now, but previously wasn't
      *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
+     *
      * @param ResponseDataModel $model
      * @param User $effector
      * @param array|null $diff
@@ -286,6 +292,9 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Notify staff when a response was submitted:
      *      - submitted_at is meaningful now, but previously wasn't
+     *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
      *
      * @param Model $model
      * @param User $effector
