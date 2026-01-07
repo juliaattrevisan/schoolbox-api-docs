@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Display a student and access to select linked records and generate with AI
+ * Display a student and access to select linked records and extract with AI
  */
 
 import { sbProps } from "@js/util/sbx/pageUtils";
@@ -28,7 +28,7 @@ function onLinkedRecordsSelected(): void {
 }
 
 /**
- * When the generate with AI button is clicked
+ * When the extract with AI button is clicked
  */
 function onGenerateSelected(): void {
     void genAiStore.prompt(props.profile);
@@ -62,7 +62,7 @@ function onGenerateSelected(): void {
             class="button icon-ai f-no-margins"
             @click="onGenerateSelected"
         >
-            Generate with AI
+            Extract with AI
         </button>
     </div>
 </template>
