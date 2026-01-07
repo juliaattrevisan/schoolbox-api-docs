@@ -66,7 +66,7 @@ class Decorator implements DecoratorInterface
         /* Use unlimited duration if a specific duration isn't provided
          */
         if (!$hours && !$minutes) {
-            return \Schoolbox\Learning\Assessment\Quiz\Model::DURATION_UNLIMITED;
+            return Model::DURATION_UNLIMITED;
         }
 
         return (3600 * $hours) + (60 * $minutes);
