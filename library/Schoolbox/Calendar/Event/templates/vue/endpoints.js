@@ -175,7 +175,7 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     addBookingsPath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, null, btoa(window.location.pathname));
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, null, null);
     },
 
     /**
@@ -196,12 +196,7 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     editBookingPath: function (eventId, bookingId) {
-        return this.generateUrlFromConst(
-            ENDPOINTS.URL_BOOKING_EDIT,
-            eventId,
-            bookingId,
-            btoa(window.location.pathname),
-        );
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKING_EDIT, eventId, bookingId, null);
     },
 
     /**
@@ -212,12 +207,7 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     deleteBookingPath: function (eventId, bookingId) {
-        return this.generateUrlFromConst(
-            ENDPOINTS.URL_BOOKING_DELETE,
-            eventId,
-            bookingId,
-            btoa(window.location.pathname),
-        );
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKING_DELETE, eventId, bookingId, null);
     },
 
     /**
