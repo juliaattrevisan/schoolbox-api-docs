@@ -327,6 +327,10 @@ window.Vue.watch(
         <template v-if="durationExceeded">
             <h2>Time's Up</h2>
             <p>Please wait while your response is submitted.</p>
+            <div v-if="submitError" class="alert-box alert">
+                <span>{{ submitError }}</span>
+                <a href="#" class="close" @click.prevent="submitError = null">×</a>
+            </div>
         </template>
         <div v-else-if="isLoading" class="loader"></div>
         <template v-else-if="currentResponse._routes.submit">
