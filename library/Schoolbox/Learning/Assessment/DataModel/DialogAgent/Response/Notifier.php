@@ -67,6 +67,12 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * A link to the status screen, for now
+     */
+    private const PATTERN_STAFF_HREF = '/learning/assessments/%d/status';
+
+
+    /**
      * @var RosettaStone $l10n
      */
     private RosettaStone $l10n;
@@ -295,57 +301,68 @@ class Notifier extends AbstractModuleNotifier
         /** @var ResponseDataModel $response */
         $response = $this->mapper->findById($model->getId());
 
-        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
-         * You can refetch using a mapper to get more hydrated parts if you needed them.
+        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        /** @var ResponseDataModel $response */
-        $response = $this->mapper->findById($model->getId());
+        $href = sprintf(self::PATTERN_STAFF_HREF, $response->getDialogAgent()->getAssessmentModel()->getId());
+
+        /* Basically string replacements to compose the message in the notification
+         */
+        $bob = (new Builder())
+            ->setTitle(self::PATTERN_SOMEONE_SUBMITTED_TITLE)
+            ->setIcon($this->getUserIcon($effector))
+            ->setHref($href)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
+            /* Basically string replacements to compose the message in the notification
+             */
+            ->setParams([
+                'action' => new Param(sprintf(
+                    '%s %s',
+                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $this->l10n->translate('dialogAgent')
+                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+                'effector' => new UserParam($effector)
+            ]);
+
+        /* Craft the message we're gonna send
+         */
+        $instance = $bob->build();
+
+        /* This is the student who submitted the response. Arguably it's a more-hydrated version of $effector
+         */
+        $student = $response->getLearner();
 
         /* Define the recipient; all we need is their id.
          *
-         * TODO For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
-         *  and make an $instance for each. There has to be a precedent for this mass-notification idea.
+         * For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
+         * and make an $instance for each.
+         *
+         * First find the teachers of a student...
          */
+        $this->externalUser->loadTeachers([$student]);
 
-        /* TODO Otherwise each $bob is probably the same.
-         */
-
-
-//        $recipientId = $response->getLearner()->getId();
-//
-//        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
-//         */
-//        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
-//
-//        /* Basically string replacements to compose the message in the notification
-//         */
-//        $bob = (new Builder())
-//            ->setTitle(self::PATTERN_SOMEONE_SUBMITTED_TITLE)
-//            ->setIcon($this->getUserIcon($effector))
-//            ->setHref($href)
-//            ->setNamespace($this->getSlug())
-//            ->setSeverity(Logger::INFO)
-//            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
-//            ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
-//            /* Basically string replacements to compose the message in the notification
-//             */
-//            ->setParams([
-//                'action' => new Param(sprintf(
-//                    '%s %s',
-//                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
-//                    $this->l10n->translate('dialogAgent')
-//                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
-//                'effector' => new UserParam($effector)
-//            ]);
-//
-//        /* Craft the message we're gonna send
-//         */
-//        $instance = $bob->build();
-
-        /* Slide that $instance into the $envelope and send it to recipients
+        /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
          */
         $envelope = new Envelope();
-//        $envelope->targetToUser($recipientId, $instance);
+
+        /** @var User $teacher */
+        foreach ($student->getTeacherCollection() as $teacher) {
+            /* I _suppose_ this might be desired? It'd prevent non-academic staff members associated with a homepage from
+             * doing academic-related stuff, though I'm not certain whether that's something experienced by schools. By
+             * being in the $teacherCollection we presume you're already beyond this situation.
+             *
+                if (!$teacher->getRole()->getViewStudentGrades()) {
+                    continue;
+                }
+             */
+
+            /* Slide that $instance into the $envelope so we can send it to recipient teacher(s)
+             * Note that targetToUser() accepts multiple input datatypes
+             */
+            $envelope->targetToUser($teacher, $instance);
+        }
 
         return $envelope;
     }
