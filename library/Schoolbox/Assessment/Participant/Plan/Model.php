@@ -34,7 +34,7 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
  * Every learning activity will always have at least one Plan for it.
  *
  * By default, this will be a "Dynamic Plan"; this means two things will be presumed by the system.
- *  *
+ *
  *     - the enrolled students (as defined by the sis) will use this "default plan" to inform them of their title,
  *       description and dates. Initially, everyone will use the title/description/dates as defined by the learning
  *       activity and will change whenever the settings of the learning activity changes (and/or when the students
