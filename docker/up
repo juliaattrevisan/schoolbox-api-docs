@@ -250,8 +250,8 @@ function build_docker_compose_args() {
 }
 
 function start_containers() {
-    # Build base PHP and schoolbox-cli images locally if required before
-    # starting the default env, as containers rely upon them.
+    # Build base PHP image locally if required before starting the default env,
+    # as containers rely upon it.
     case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
             docker build --progress=plain \
@@ -259,18 +259,6 @@ function start_containers() {
                 --build-arg "ENV=dev" \
                 --build-arg "PHP_MAJOR_VERSION=${PHP_MAJOR_VERSION}" \
                 "docker/base-images/php-frankenphp/"
-            ;;
-        *)
-            ;;
-    esac
-
-    case "${SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL}" in
-        1 | true | yes | on)
-            docker build --progress=plain \
-                -t "${schoolbox_cli_image}" \
-                --build-arg "ENV=dev" \
-                --build-arg "PHP_MAJOR_VERSION=${PHP_MAJOR_VERSION}" \
-                "docker/schoolbox-cli/"
             ;;
         *)
             ;;
