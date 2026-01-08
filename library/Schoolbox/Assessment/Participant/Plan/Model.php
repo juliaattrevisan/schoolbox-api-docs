@@ -39,7 +39,8 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
  *       description and dates. Initially, everyone will use the title/description/dates as defined by the learning
  *       activity and will change whenever the settings of the learning activity changes (and/or when the students
  *       change in the sis). This is why it's called a "Dynamic Plan" - it defers (and refers) to whatever the default
- *       behaviour would be without any person-specific customisations.
+ *       behaviour would be without any person-specific customisations and will update with the assessment's settings
+ *       whenever (if ever) they were to change.
  *
  *     - a "static plan" is a customised version of the Dynamic Plan and overrides (replaces) whatever the learning
  *       activity's settings are. This allows everyone else on the assessment's Dynamic Plan to be managed together
