@@ -10,8 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 
+use Schoolbox\Assessment\Participant;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * @method Model createModel($idValue = null)
@@ -22,6 +24,12 @@ use Schoolbox\Mapper\Exception;
  */
 class Mapper extends \Schoolbox\Mapper
 {
+    /**
+     * @var Participant\Plan\InteractionIntegrityChecker
+     */
+    private Participant\Plan\InteractionIntegrityChecker $interactionChecker;
+
+
     /**
      * @inheritDoc
      */
@@ -127,6 +135,19 @@ class Mapper extends \Schoolbox\Mapper
 //            'deletedBy',
 //            'deletedBy',
 //        );
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
+    }
+
+
+    public function __construct() {
+        parent::__construct();
+
+        $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
+            Participant\Plan\Mapper::getInstance(),
+            Participant\Mapper::getInstance()
+        );
     }
 
 
@@ -192,5 +213,30 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $stack;
+    }
+
+
+    /* Callback implementations
+     */
+
+    /**
+     * @param Model $object
+     * @param Model|null $previous
+     * @return bool
+     * @throws Exception
+     * @throws Deleted
+     */
+    public function insertParticipation(Model $object, ?Model $previous = null): bool
+    {
+        if ($previous) {
+            // If an update, assume the participation record already exists
+            return true;
+        }
+
+        $assessment = $this->getJoinMapper('dialogAgent')
+            ->findById($object->getDialogAgent()->getId())
+            ->getAssessmentModel();
+
+        return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $assessment);
     }
 }
