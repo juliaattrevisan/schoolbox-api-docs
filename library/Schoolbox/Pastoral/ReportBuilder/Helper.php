@@ -642,26 +642,36 @@ class Helper
         return $orderParts;
     }
 
+    /**
+     * @return Alaress_Date_Format|null
+     */
     public function getStartDate(): ?Alaress_Date_Format
     {
         return $this->report['afterDate'] ?? null;
     }
 
+    /**
+     * @return Alaress_Date_Format|null
+     */
     public function getEndDate(): ?Alaress_Date_Format
     {
-        return $this->report['beforeDate'] ?? null;
+        /* Default end date as a sane value (now), this is likely to happen
+         * when the report is generated with `this term`, as the current term
+         * there are no "end date" until the term actually ends.
+         */
+        return $this->report['beforeDate'] ?? Alaress_Date_Format::now();
     }
 
     /**
      * @param Alaress_Date_Format|null $startDate start of the date range
-     * @param Alaress_Date_Format|null $endDate end of the date range
+     * @param Alaress_Date_Format      $endDate end of the date range
      * @param string                   $format format the month string will be returned in
      * @param Alaress_Date_Format|null $now if not set it will be defaulted to now
      * @return Collection
      */
     public function getMonthsInRange(
         ?Alaress_Date_Format $startDate,
-        ?Alaress_Date_Format $endDate,
+        Alaress_Date_Format $endDate,
         string $format,
         ?Alaress_Date_Format $now = null,
     ): Collection {
@@ -671,10 +681,10 @@ class Helper
             $now = Alaress_Date_Format::now();
         };
 
-        /* Return empty collection if either date is null.
+        /* Start date is required to build the months range
          */
-        if (null === $startDate || null === $endDate) {
-            return new Collection();
+        if (null === $startDate) {
+            throw new \DateRangeError('Timeframe is invalid. No start date provided.');
         }
 
         $start = (clone $startDate)->startOfMonth();
@@ -698,14 +708,14 @@ class Helper
 
     /**
      * @param Alaress_Date_Format|null $startDate start of the date range
-     * @param Alaress_Date_Format|null $endDate end of the date range
+     * @param Alaress_Date_Format      $endDate end of the date range
      * @param string                   $format format the week string will be returned in
      * @param Alaress_Date_Format|null $now if not set it will be defaulted to now
      * @return Collection
      */
     public function getWeeksInRange(
         ?Alaress_Date_Format $startDate,
-        ?Alaress_Date_Format $endDate,
+        Alaress_Date_Format $endDate,
         string $format,
         ?Alaress_Date_Format $now = null,
     ): Collection {
@@ -714,10 +724,11 @@ class Helper
         if (null === $now) {
             $now = Alaress_Date_Format::now();
         };
-        /* Return empty collection if either date is null.
+
+        /* Start date is required to build the months range
          */
-        if (null === $startDate || null === $endDate) {
-            return new Collection();
+        if (null === $startDate) {
+            throw new \DateRangeError('Timeframe is invalid. No start date provided.');
         }
         $weekStartDayOfWeek = $this->configLoader->get('calendar_start_day');
 
