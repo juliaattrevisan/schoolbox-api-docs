@@ -53,6 +53,8 @@ class Javascript extends Base
         // Modify butonye
         $returnUrl = !empty($_GET[Redirect::RETURN_URL]) ? '?' . Redirect::queryStringEncodedParam($_GET[Redirect::RETURN_URL]) : '';
 
+        // Bookings linked to events of variant 'event' must be managed via the 'Modify Event' page.
+        // The 'Modify Booking' page is only for bookings linked to events of variant 'booking'.
         if ($this->getEvent()->getEventVariant() === Event::VARIANT_BOOKING) {
             $editUrl = $this->getEditURL();
             if ($editUrl !== false) {
