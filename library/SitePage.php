@@ -402,8 +402,12 @@ class SitePage
         // If we've fallen through to this point, the user must be logged in.
         // Is this a URL in the form of /?page=urlencode($url)?
         // If so, redirect to $url.
-        $url  = parse_url($_SERVER['REQUEST_URI']);
-        $path = $url['path'] ?? '';
+        $url  = parse_url($_SERVER['REQUEST_URI'] ?? '');
+        $path = $url['path'] ?? null;
+        if ($path === false || $path === null || $path === '') {
+            $path = '/';
+        }
+
         if ($path === '/login' || $path === '/login/') {
             parse_str($url['query'] ?? '', $query);
             if (count($query) === 1 && isset($query['page']) && preg_match('|^/|', $query['page'])) {
