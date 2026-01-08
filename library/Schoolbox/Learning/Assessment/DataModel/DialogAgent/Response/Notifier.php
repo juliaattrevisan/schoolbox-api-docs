@@ -212,7 +212,7 @@ class Notifier extends AbstractModuleNotifier
             ->setParams([
                 'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
-                    'your %s %s. You can now resume your %s.',
+                    '%s %s. You can now resume your %s.',
                     $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
