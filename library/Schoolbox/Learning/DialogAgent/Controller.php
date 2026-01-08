@@ -291,6 +291,53 @@ class Controller extends Base
 
 
     /**
+     * Request AI for an initial field configuration for a dialog agent activity to be generated
+     *
+     * @param DialogAgent $assessment
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws Deleted
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public function getGenerateConfigurationFields(DialogAgent $assessment): void
+    {
+        $scenario = $this->scenarioMapper->findById($assessment->getScenarioId());
+
+        $aiConfig = new \Schoolbox\Admin\OpenAI\Config();
+        $agentConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_AI_DIALOGAGENT));
+
+        $agent = new OpenAI\Agent\DialogAgentConfigureFields(
+            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $agentConfig,
+        );
+
+        /* Each feedback generation gets its own session ID */
+        $aiSessionId = Uuid::uuid4()->toString();
+
+        try {
+            $fieldsData = $agent->request(
+                $this->getUser(),
+                $aiSessionId,
+                $scenario,
+                $assessment,
+            );
+        } catch (SchoolboxException $e) {
+            $problem = new ApiProblem($e->getMessage())
+                ->setStatus($e->getCode())
+                ->asArray();
+
+            $this->response = $this
+                ->responseAsJson($problem)
+                ->withStatus($e->getCode());
+            return;
+        }
+
+        $this->response = $this->responseAsJson($fieldsData);
+    }
+
+
+    /**
      * View a response's chat log in a readonly mode
      *
      * @param DialogAgent $assessment
