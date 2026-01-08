@@ -77,7 +77,7 @@ export default {
         returnUrl: {},
     },
 
-    emits: ["eventModified"],
+    emits: ["eventModified", "viewEventLinkedFromBooking"],
 
     data() {
         return {
