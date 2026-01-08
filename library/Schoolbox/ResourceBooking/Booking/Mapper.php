@@ -270,7 +270,7 @@ class Mapper extends BaseMapper
                 . $this->getArrayPlaceholders($allowedEventTypes, 'type');
         }
 
-        $query .= ' ORDER BY e.start_datetime ASC';
+        $query .= ' ORDER BY COALESCE(b.start_datetime, e.start_datetime) ASC';
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
