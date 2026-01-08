@@ -136,8 +136,20 @@ class Mapper extends \Schoolbox\Mapper
 //            'deletedBy',
 //        );
 
+        /* Add participation records whenever someone creates a new object via this mapper
+         *
+         * Note this method typically assumes participation to exist when updating a record; this might have implications
+         * for multiplayer schoolbox but we haven't encountered that yet.
+         */
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
+
+        /* Un-inset a participation whenever all the responses made by a student are deleted; this makes them no longer
+         * an official participant of this assessment. When (if) they ever make a Response, insertParticipation will
+         * once again restore their participation status.
+         */
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
+
     }
 
 
@@ -216,10 +228,55 @@ class Mapper extends \Schoolbox\Mapper
     }
 
 
+    /**
+     * Find then quantity of non-deleted Responses for a given student doing a particular discussion activity
+     * This custom query skips unneeded hydration
+     *
+     * @param int $dialogAgentId
+     * @param int $learnerId
+     * @return int
+     */
+    public function findResponseCount(int $dialogAgentId, int $learnerId): int
+    {
+        $query = "
+            SELECT COUNT(*) AS numResponses
+            FROM {$this->getTable()}
+            WHERE dialog_agent_id = :dialogAgentId
+            AND learner_id = :learnerId
+            AND deleted_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        /* You could have used ->bindValue(..., \PDO::PARAM_INT) but I don't think it really matters for ids
+         * It only matters when you're using LIMIT, OFFSET, etc.
+         */
+        $statement->execute([
+            'dialogAgentId' => $dialogAgentId,
+            'learnerId' => $learnerId,
+        ]);
+
+        /* At least one row existed
+         */
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            return (int)$row['numResponses'];
+        }
+
+        /* Found nothing
+         */
+        return 0;
+    }
+
+
     /* Callback implementations
      */
 
     /**
+     * Add a participation record for a given $learner if a response is being created
+     *
+     * Updates to existing responses _presume_ a participation record already existed (created earlier) which maybe has
+     * some implications for multiplayer schoolbox in a timing scenario
+     *
      * @param Model $object
      * @param Model|null $previous
      * @return bool
@@ -238,5 +295,28 @@ class Mapper extends \Schoolbox\Mapper
             ->getAssessmentModel();
 
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getLearner(), $assessment);
+    }
+
+
+    /**
+     * Remove the $learner's participant row if $learner should no longer be a participant in $assessment.
+     *
+     * @param Model $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     * @throws Deleted
+     * @throws Exception
+     */
+    public function removeParticipationIfNecessary(Model $object): bool
+    {
+        if ($this->findResponseCount($object->getDialogAgent()->getId(), $object->getLearner()->getId())) {
+            $assessment = $this->getJoinMapper('dialogAgent')
+                ->findById($object->getDialogAgent()->getId())
+                ->getAssessmentModel();
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan($object->getLearner(), $assessment);
+        }
+
+        return true;
     }
 }
