@@ -149,10 +149,12 @@ class Mapper extends \Schoolbox\Mapper
          * once again restore their participation status.
          */
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
-
     }
 
 
+    /**
+     *
+     */
     public function __construct() {
         parent::__construct();
 
