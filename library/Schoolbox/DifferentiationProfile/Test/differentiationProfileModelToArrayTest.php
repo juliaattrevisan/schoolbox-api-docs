@@ -129,6 +129,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => null,
                     'strategies_adjustments' => null,
                     'goals'                  => null,
+                    'status'                 => ['unpopulated'],
                     'created_at'             => null,
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -168,6 +169,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => 'Needs and challenges details.',
                     'strategies_adjustments' => 'Strategies and adjustments details.',
                     'goals'                  => 'Goals details.',
+                    'status'                 => [],
                     'created_at'             => 'Jan 1, 2024 12:00am',
                     'updated_at'             => 'Jan 2, 2024 1:00am',
                     'deleted_at'             => null,
@@ -199,6 +201,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => null,
                     'strategies_adjustments' => null,
                     'goals'                  => null,
+                    'status'                 => ['unpopulated'],
                     'created_at'             => null,
                     'updated_at'             => null,
                     'deleted_at'             => 'Mar 1, 2024 12:00am',
@@ -230,6 +233,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'adjustment_category'    => [1, 2],
                     'adjustment_level'       => [2, 4],
+                    'status'                 => [],
                     'created_at'             => 'Feb 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -265,6 +269,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'overview'               => 'Visible overview.',
                     'goals'                  => 'Visible goals.',
+                    'status'                 => [],
                     'created_at'             => 'Mar 15, 2024 12:00am',
                     'updated_at'             => 'Mar 20, 2024 12:00am',
                     'deleted_at'             => null,
@@ -299,6 +304,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'adjustment_category'    => [4, 1],
                     'adjustment_level'       => [4, 3],
+                    'status'                 => [],
                     'created_at'             => 'Apr 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -328,6 +334,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 6,
                     'student'                => $userResponse,
+                    'status'                 => [],
                     'created_at'             => 'May 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -365,6 +372,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'interests_strengths'    => 'Visible interests and strengths.',
                     'needs_challenges'       => 'Visible needs and challenges.',
                     'strategies_adjustments' => 'Visible strategies and adjustments.',
+                    'status'                 => [],
                     'created_at'             => 'Jun 1, 2024 12:00am',
                     'updated_at'             => 'Jun 15, 2024 12:00am',
                     'deleted_at'             => null,
@@ -397,6 +405,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'id'                     => 8,
                     'student'                => $userResponse,
                     'overview'               => 'Only this overview is visible.',
+                    'status'                 => [],
                     'created_at'             => 'Jul 1, 2024 12:00am',
                     'updated_at'             => null,
                     'deleted_at'             => null,
@@ -435,8 +444,118 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'overview'               => 'Visible overview.',
                     'needs_challenges'       => 'Visible needs.',
                     'goals'                  => 'Visible goals.',
+                    'status'                 => [],
                     'created_at'             => 'Aug 1, 2024 12:00am',
                     'updated_at'             => 'Aug 10, 2024 12:00am',
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ],
+            ],
+            'Expired Profile' => [
+                // Test case 11: Profile marked as expired
+                new Model()
+                    ->setId(10)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                    ]))
+                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)
+                    ]))
+                    ->setOverview('This profile has expired.')
+                    ->setExpired(true)
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-06-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 10,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [1],
+                    'adjustment_level'       => [1],
+                    'overview'               => 'This profile has expired.',
+                    'status'                 => ['expired'],
+                    'created_at'             => 'Jan 1, 2023 12:00am',
+                    'updated_at'             => 'Jun 1, 2023 12:00am',
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ],
+            ],
+            'Out of Date Profile' => [
+                // Test case 12: Profile marked as out of date
+                new Model()
+                    ->setId(11)
+                    ->setStudent($student)
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                    ]))
+                    ->setGoals('This is an overview.')
+                    ->setOutOfDate(true)
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-03-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-09-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('goals')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 11,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [2],
+                    'goals'                  => 'This is an overview.',
+                    'status'                 => ['outOfDate'],
+                    'created_at'             => 'Mar 1, 2023 12:00am',
+                    'updated_at'             => 'Sep 1, 2023 12:00am',
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ],
+            ],
+            'Expired and Out of Date Profile' => [
+                // Test case 13: Profile marked as both expired and out of date
+                new Model()
+                    ->setId(12)
+                    ->setStudent($student)
+                    ->setOverview('This is an overview.')
+                    ->setExpired(true)
+                    ->setOutOfDate(true)
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2022-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2022-12-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 12,
+                    'student'                => $userResponse,
+                    'overview'               => 'This is an overview.',
+                    'status'                 => ['expired', 'outOfDate'],
+                    'created_at'             => 'Jan 1, 2022 12:00am',
+                    'updated_at'             => 'Dec 1, 2022 12:00am',
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ],
+            ],
+            'Expired, Out of Date, and Unpopulated Profile' => [
+                // Test case 14: Profile with all status flags
+                new Model()
+                    ->setId(13)
+                    ->setStudent($student)
+                    ->setExpired(true)
+                    ->setOutOfDate(true)
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                    new ProfileConfig()->setName('goals')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 13,
+                    'student'                => $userResponse,
+                    'overview'               => null,
+                    'goals'                  => null,
+                    'status'                 => ['expired', 'outOfDate', 'unpopulated'],
+                    'created_at'             => 'Jan 1, 2021 12:00am',
+                    'updated_at'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],

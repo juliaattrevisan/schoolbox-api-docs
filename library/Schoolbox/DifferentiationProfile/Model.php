@@ -12,6 +12,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\User;
+use Schoolbox\DifferentiationProfile\Mapper as DPMapper;
 
 class Model implements ISoftDeletable
 {
@@ -30,6 +31,8 @@ class Model implements ISoftDeletable
     private ?string $needs_challenges = null;
     private ?string $strategies_adjustments = null;
     private ?string $goals = null;
+    private ?bool $expired = null;
+    private ?bool $out_of_date = null;
 
     /** @var User $student */
     protected User $student;
@@ -250,5 +253,80 @@ class Model implements ISoftDeletable
     {
         $this->goals = $goals;
         return $this;
+    }
+
+    /**
+     * Set expired
+     *
+     * @param bool|null $expired
+     * @return self
+     */
+    public function setExpired(?bool $expired): self
+    {
+        $this->expired = $expired;
+        return $this;
+    }
+
+    /**
+     * Get expired
+     *
+     * @return bool|null
+     */
+    public function getExpired(): ?bool
+    {
+        return $this->expired;
+    }
+
+    /**
+     * Set out of date
+     *
+     * @param bool|null $out_of_date
+     * @return self
+     */
+    public function setOutOfDate(?bool $out_of_date): self
+    {
+        $this->out_of_date = $out_of_date;
+        return $this;
+    }
+
+    /**
+     * Get out of date
+     *
+     * @return bool|null
+     */
+    public function getOutOfDate(): ?bool
+    {
+        return $this->out_of_date;
+    }
+
+    /**
+     * Check if the differentiation profile is populated
+     *
+     * @return bool
+     */
+    public function isPopulated(): bool
+    {
+        /* Checking if any of the configuration fields have been populated
+         */
+        foreach (DPMapper::CONFIG_METHOD_MAPPING as $getMethod) {
+            $value = call_user_func([$this, $getMethod]);
+            if ($value instanceof GenericCollection) {
+                $value = $value->getAll();
+            }
+            if (!empty($value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the differentiation profile is active
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return !$this->getExpired() && !$this->getOutOfDate() && $this->isPopulated() && !$this->isDeleted();
     }
 }

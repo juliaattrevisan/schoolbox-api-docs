@@ -40,6 +40,8 @@ class Mapper extends BaseMapper
     ];
 
     public const int DEFAULT_LIMIT = 20;
+
+    public const string FAR_FAR_AWAY_FULL_DATE = '9999-12-31';
     /**
      * Setup mapper
      */
@@ -303,36 +305,18 @@ class Mapper extends BaseMapper
         ?array $campusIds,
         ?array $adjustmentCategories,
         ?array $adjustmentLevels,
+        ?array $status,
         ?array $cursorParams = null,
         ?array $order = null,
         ?int $limit = null
     ): GenericCollection {
         $pb = $this->getPredicateBuilder();
         if (!empty($nameSearch)) {
-            // Just use the first one, and split it into tokens
-            foreach ($nameSearch as $nameSearchString => $_) {
-                $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
-                foreach ($names as $name) {
-                    if (strlen($name) > 0 && $name !== Definition::KEY_ALL) {
-                        $pb = $pb->any(
-                            $this->getPredicateBuilder()->like(
-                                's.chosen_name',
-                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
-                            )->like(
-                                's.lastname',
-                                '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
-                            )
-                        );
-                    }
-                }
-            }
+            $pb = $this->buildNameSearchPredicate($pb, $nameSearch);
         }
 
         if (!empty($yearLevelIds)) {
-            $yearLevels = implode(',', $yearLevelIds);
-            $pb = $pb->rawWhere("COALESCE(s.year_id, :year_levels_none_key) IN ( $yearLevels )", [
-                'year_levels_none_key' => DifferentiationProfile\YearLevel\KeyConverter::NONE_KEY_VALUE,
-            ]);
+            $pb = $this->buildYearLevelPredicate($pb, $yearLevelIds);
         }
 
         if (!empty($campusIds)) {
@@ -340,26 +324,28 @@ class Mapper extends BaseMapper
         }
 
         if (!empty($adjustmentCategories)) {
-            $categories = implode(',', $adjustmentCategories);
-            $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN ( $categories )", [
+            $categoriesPlaceholders = Builder::getArrayPlaceholders($adjustmentCategories, 'adjustmentCategory');
+            $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN $categoriesPlaceholders", [
                 'adjustment_categories_none_key' => DifferentiationProfile\AdjustmentCategory\KeyConverter::NONE_KEY_VALUE,
+                ...Builder::getArrayParameters($adjustmentCategories, 'adjustmentCategory')
             ]);
         }
 
         if (!empty($adjustmentLevels)) {
-            $levels = implode(',', $adjustmentLevels);
-            $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN ( $levels )", [
+            $levelsPlaceholders = Builder::getArrayPlaceholders($adjustmentLevels, 'adjustmentLevel');
+            $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN $levelsPlaceholders", [
                 'adjustment_levels_none_key' => DifferentiationProfile\AdjustmentLevel\KeyConverter::NONE_KEY_VALUE,
+                ...Builder::getArrayParameters($adjustmentLevels, 'adjustmentLevel')
             ]);
         }
 
-        $pb->isNull('differentiation_profiles.deleted_at');
+        $statusSubquery = $statusSelect = "";
+        $statusParam = [];
+        if (!empty($status)) {
+            [$pb, $statusSelect, $statusSubquery, $statusParam] = $this->buildStatusConditions($pb, $status);
+        }
 
-        $pb->any(
-            $this->getPredicateBuilder()
-                 ->isNull('p.expires_at')
-                 ->greaterThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
-        );
+        $pb->isNull('differentiation_profiles.deleted_at');
 
         $pb = $this->filterByPermission($pb, $viewer);
 
@@ -371,7 +357,7 @@ class Mapper extends BaseMapper
             );
         }
 
-        $where = implode(' AND ', $pb->getWhere());
+        $where = !empty($pb->getWhere()) ? 'AND ' . implode(' AND ', $pb->getWhere()) : '';
 
         /* Ensure viewer has access to view differentiation profiles
          */
@@ -384,7 +370,8 @@ class Mapper extends BaseMapper
                 'service'     => $service,
                 'accessLevel' => $accessLevel,
                 'viewerId'    => $viewer->getId(),
-            ]
+            ],
+            $statusParam,
         );
 
         $limit = null === $limit ? '' : "LIMIT {$limit}";
@@ -394,14 +381,15 @@ class Mapper extends BaseMapper
             $order,
         )) . ',') . ' p.student_id asc';
 
-        $query = "{$this->getSelectString()}
+        $query = "{$this->getSelectString()}{$statusSelect}
                 {$this->getFromString()}
                 INNER JOIN userCampus sc ON s.id = sc.uid
                 INNER JOIN userAccess ua ON sc.campus = ua.sid AND ua.service = :service AND ua.type >= :accessLevel AND ua.uid = :viewerId
                 LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
                 LEFT JOIN differentiation_profiles_adjustment_level al ON FIND_IN_SET(al.id, differentiation_profiles.adjustment_level)
+                {$statusSubquery}
                 WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
-                AND {$where}
+                {$where}
                 GROUP BY p.student_id, s.lastname, s.chosen_name
                 {$orderBy}
                 {$limit}
@@ -424,10 +412,188 @@ class Mapper extends BaseMapper
             $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
             $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
             $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
+            $model->setOutOfDate(isset($row['is_out_of_date']) && (bool)$row['is_out_of_date']);
+            $model->setExpired(isset($row['is_expired']) && (bool)$row['is_expired']);
             $collection->add($model);
         }
 
         return $collection;
+    }
+
+    /**
+     * Build name search predicate
+     * @param Builder $pb
+     * @param array $nameSearch
+     * @return Builder
+     */
+    private function buildNameSearchPredicate(Builder $pb, array $nameSearch): Builder
+    {
+        // Just use the first one, and split it into tokens
+        foreach ($nameSearch as $nameSearchString => $_) {
+            $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
+            foreach ($names as $name) {
+                if (strlen($name) > 0 && $name !== Definition::KEY_ALL) {
+                    $pb = $pb->any(
+                        $this->getPredicateBuilder()->like(
+                            's.chosen_name',
+                            '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                        )->like(
+                            's.lastname',
+                            '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                        )
+                    );
+                }
+            }
+        }
+        return $pb;
+    }
+
+    /**
+     * Build year level predicate
+     * @param Builder $pb
+     * @param array $yearLevelIds
+     * @return Builder
+     */
+    private function buildYearLevelPredicate(Builder $pb, array $yearLevelIds): Builder
+    {
+        $yearlevelPlaceholders = Builder::getArrayPlaceholders($yearLevelIds, 'yearLevelId');
+        $pb = $pb->rawWhere("COALESCE(s.year_id, :year_levels_none_key) IN $yearlevelPlaceholders", [
+            'year_levels_none_key' => DifferentiationProfile\YearLevel\KeyConverter::NONE_KEY_VALUE,
+            ...Builder::getArrayParameters($yearLevelIds, 'yearLevelId')
+        ]);
+        return $pb;
+    }
+
+    /**
+     * Build status flags subquery
+     *
+     * @param string $isPopulated
+     * @return array
+     */
+    private function buildStatusFlagsSubquery(string $isPopulated): array
+    {
+        /* Build status flags as a derived table to avoid duplication
+         */
+        $statusFlagsSubquery = [
+            "is_out_of_date" => "
+                CASE
+                    /* Out of date records
+                     */
+                    WHEN MAX(p.updated_at) > COALESCE(differentiation_profiles.updated_at, :farfaraway)
+                    THEN 1 ELSE 0
+                END as is_out_of_date
+            ",
+            "is_unpopulated" => "
+                CASE
+                    /* Differentiation profile has no fields populated
+                     */
+                    WHEN (NOT ({$isPopulated}))
+                    THEN 1 ELSE 0
+                END as is_unpopulated
+            ",
+            "is_expired" => "
+                CASE
+                    /* All pastoral records are expired
+                     */
+                    WHEN p.student_id NOT IN (
+                        SELECT DISTINCT p2.student_id
+                        FROM pastoral p2
+                        LEFT JOIN lu_pastoral_type lpt2 ON p2.type_id = lpt2.id
+                        LEFT JOIN lu_pastoral_subtype lps2 ON p2.subtype_id = lps2.id
+                        WHERE p2.deleted_at IS NULL
+                        AND (lpt2.contribute_differentiation_profile OR lps2.contribute_differentiation_profile)
+                        AND COALESCE(p2.expires_at, :farfaraway) >= :today
+                    )
+                    THEN 1 ELSE 0
+                END as is_expired
+            "
+        ];
+        return $statusFlagsSubquery;
+    }
+
+    /**
+     * Build status conditions
+     *
+     * @param Builder $pb
+     * @param array $status
+     * @return array
+     */
+    private function buildStatusConditions(Builder $pb, array $status): array
+    {
+        /* Build conditions for each status type using the computed status flags
+    */
+        $statusConditions = $this->getPredicateBuilder();
+
+        /* Active records
+         */
+        if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_ACTIVE_RECORDS, $status)) {
+            /* if not out of date, not unpopulated, not all linked pastoral have expired then it is considered as active
+             */
+            $statusConditions->all(
+                $this->getPredicateBuilder()
+                     ->notEquals('status_flags.is_out_of_date', 1)
+                     ->notEquals('status_flags.is_unpopulated', 1)
+                     ->notEquals('status_flags.is_expired', 1)
+            );
+        }
+
+        /* Out of date records
+         */
+        if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_OUT_OF_DATE_RECORDS, $status)) {
+            $statusConditions->equals('status_flags.is_out_of_date', 1);
+        }
+
+        /* Unpopulated records
+         */
+        if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_UNPOPULATED_RECORDS, $status)) {
+            $statusConditions->equals('status_flags.is_unpopulated', 1);
+        }
+
+        /* Expired records
+         */
+        if (array_key_exists(DifferentiationProfile\Status\Definition::KEY_INCLUDE_EXPIRED_RECORDS, $status)) {
+            $statusConditions->equals('status_flags.is_expired', 1);
+        }
+
+        if (!empty($statusConditions->getWhere())) {
+            $pb->any($statusConditions);
+        }
+
+        $today = \Alaress_Date_Format::now()->getDatabaseDate();
+
+        $tempPb = $this->getPredicateBuilder();
+
+        foreach (self::CONFIG_METHOD_MAPPING as $configKey => $methodName) {
+            $key = "differentiation_profiles.$configKey";
+            $tempPb = $tempPb->All(
+                $this->getPredicateBuilder()->notNull($key)
+                     ->notEquals($key, '')
+            );
+        }
+        $isPouplated = implode(' OR ', $tempPb->getWhere());
+
+        $statusFlagsSubquery = $this->buildStatusFlagsSubquery($isPouplated);
+
+        $statusFlagsSubquerySelect = "
+                SELECT
+                    p.student_id,
+                    " . implode(", ", $statusFlagsSubquery) . "
+                FROM differentiation_profiles
+                RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
+                LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+                LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
+                WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+                GROUP BY p.student_id
+            ";
+
+        $statusSelect = ", status_flags.*";
+        $statusSubquery = "LEFT JOIN ({$statusFlagsSubquerySelect}) status_flags ON status_flags.student_id = p.student_id";
+        $statusParam = [
+            'farfaraway' => self::FAR_FAR_AWAY_FULL_DATE,
+            'today'     => $today,
+            ...$tempPb->getParams(),
+        ];
+        return [$pb, $statusSelect, $statusSubquery, $statusParam];
     }
 
     private function applyCursor(Builder $pb, $cursorParams, $order): Builder
@@ -471,11 +637,17 @@ class Mapper extends BaseMapper
         return $pb;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getSelectString(): string
     {
         return "SELECT {$this->getColumnString()}, {$this->getJoinColumnString('student', 's')}";
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getFromString(): string
     {
         return "
@@ -488,6 +660,9 @@ class Mapper extends BaseMapper
         ";
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getDefaultOrderByParams(): array
     {
         return [

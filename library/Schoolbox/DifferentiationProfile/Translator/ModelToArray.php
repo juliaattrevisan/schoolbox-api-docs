@@ -58,9 +58,10 @@ class ModelToArray
                     ],
                 ),
             ],
-            'created_at'            => $model->getCreatedAt()?->getShort(),
-            'updated_at'            => $model->getUpdatedAt()?->getShort(),
-            'deleted_at'            => $model->getDeletedAt()?->getShort(),
+            'status'  => $this->getStatus($model),
+            'created_at' => $model->getCreatedAt()?->getShort(),
+            'updated_at' => $model->getUpdatedAt()?->getShort(),
+            'deleted_at' => $model->getDeletedAt()?->getShort(),
         ];
 
         $configKey = Mapper::CONFIG_METHOD_MAPPING;
@@ -85,5 +86,29 @@ class ModelToArray
             return $carry;
         }, []);
         return array_merge($return, $config);
+    }
+
+    /**
+     * Get status array for the given differentiation profile
+     *
+     * @param Model $model
+     * @return array
+     */
+    private function getStatus(Model $model): array
+    {
+        $status = [];
+
+        if ($model->getExpired()) {
+            $status[] = 'expired';
+        }
+        if ($model->getOutOfDate()) {
+            $status[] = 'outOfDate';
+        }
+
+        if (!$model->isPopulated()) {
+            $status[] = 'unpopulated';
+        }
+
+        return $status;
     }
 }

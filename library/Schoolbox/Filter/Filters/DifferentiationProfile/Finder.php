@@ -79,6 +79,8 @@ class Finder extends AbstractIdFinder
 
         $diffProfileAdjustmentLevels = $completeFilters[AdjustmentLevel\Definition::class]?->getAll();
 
+        $diffProfileStatus = $completeFilters[Status\Definition::class]?->getAll();
+
         /** @var Mapper $mapper */
         $mapper = $this->getMapper();
         return $mapper->findByFilters(
@@ -88,6 +90,7 @@ class Finder extends AbstractIdFinder
             $diffProfileCampuses,
             $diffProfileAdjustmentCategories,
             $diffProfileAdjustmentLevels,
+            $diffProfileStatus,
             $cursor,
             $order,
             $limit

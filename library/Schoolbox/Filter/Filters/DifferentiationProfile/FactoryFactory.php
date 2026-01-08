@@ -69,6 +69,12 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper(),
                     $this->getYearLevelMapper()
                 );
+            case Status\Definition::class:
+                return new Status\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
