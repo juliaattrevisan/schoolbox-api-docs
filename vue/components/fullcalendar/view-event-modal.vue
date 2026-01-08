@@ -1133,7 +1133,7 @@ export default {
                                     eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.BOOKING
                                 "
                             >
-                                <button @click.prevent="addEventToCalendar">Add to Calendar</button>
+                                <button @click.prevent="addEventToCalendar">Add Event to Calendar</button>
                             </span>
                             <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.EVENT... -->
                             <span
