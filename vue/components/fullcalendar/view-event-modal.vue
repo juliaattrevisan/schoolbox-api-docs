@@ -12,6 +12,7 @@ import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullC
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
  */
 import { EFFICACY_SELF, EFFICACY_SERIES } from "@schoolboxCalendarEvent/eventTypes";
+import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
@@ -92,6 +93,10 @@ export default {
     },
 
     computed: {
+        // This allows EVENT_VARIANTS to be used in template code.
+        EVENT_VARIANTS() {
+            return EVENT_VARIANTS;
+        },
         window: () => window,
         jQuery: () => window.jQuery,
 
@@ -428,7 +433,7 @@ export default {
 
         /**
          * Send a request to the server to add an event to the calendar.
-         * This is done by updating event.variant in the database to 'event'.
+         * This is done by updating event.variant in the database to EVENT_VARIANTS.EVENT.
          * If the request is successful, emit an EVENT_MODIFIED event.  This will cause sb-full-calendar.vue to reload events.
          */
         async addEventToCalendar() {
@@ -1119,12 +1124,18 @@ export default {
                                     >Go to homepage</a
                                 >
                             </span>
-                            <!-- If the modal represents a booking, and the linked event's variant is 'booking'... -->
-                            <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'booking'">
+                            <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.BOOKING... -->
+                            <span
+                                v-if="
+                                    eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.BOOKING
+                                "
+                            >
                                 <button @click.prevent="addEventToCalendar">Add to Calendar</button>
                             </span>
-                            <!-- If the modal represents a booking, and the linked event's variant is 'event'... -->
-                            <span v-if="eventExtendedProps.booking && eventExtendedProps.variant === 'event'">
+                            <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.EVENT... -->
+                            <span
+                                v-if="eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.EVENT"
+                            >
                                 <button @click.prevent="viewEventLinkedFromBooking">View Event</button>
                             </span>
                             <span v-if="eventExtendedProps.links.view">
