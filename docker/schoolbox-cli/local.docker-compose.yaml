@@ -1,0 +1,57 @@
+# This schoolbox-cli container image is built locally: this should be used only
+# when the pull request being made changes the container's image definition.
+
+# The schoolbox-cli container is intended for running command-line processes:
+# * command-line tools
+# * updates
+# * cron tasks
+#
+# Basically, anything which we haven't yet figured out how to migrate into its
+# own container will go here for now.
+
+services:
+  schoolbox-cli:
+    container_name: schoolbox-cli
+    pull_policy: never
+    restart: always
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_CREDENTIAL_EXPIRATION: ${AWS_CREDENTIAL_EXPIRATION:-}
+      INSTANCE_ID: ${INSTANCE_ID}
+      HOST_TYPE: docker
+      XDEBUG_CONFIG: "idekey=PHPSTORM"
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-cli
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+        BASE_BRANCH: ${BASE_BRANCH}
+    tty: true
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
+      - schoolbox-config:/etc/schoolbox
+      - caddy-ssl:/etc/nginx/certs/
+      - aws-config:/root/.aws
+    # Add host.docker.internal as an alias back to the host machine, so that
+    # the host can debug
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    # After building: create data dirs, start cron
+    post_start:
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+        user: root
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker2/
+        user: root
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
+        user: root
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker2/ www-data
+        user: root
+      - command : /etc/init.d/cron start
+        user: root

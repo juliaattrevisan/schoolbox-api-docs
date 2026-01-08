@@ -188,6 +188,7 @@ function build_docker_compose_env() {
     USER_ID=\"${SUDO_UID:-$(id -u)}\"
     GROUP_ID=\"${SUDO_GID:-$(id -g)}\"
     BASE_PHP_IMAGE=\"${base_php_image}\"
+    SCHOOLBOX_CLI_IMAGE=\"${schoolbox_cli_image}\"
     BASE_BRANCH=\"${base_branch}\"
     LTI_DEVKIT_PUBLISHED_PORT=\"${LTI_DEVKIT_PUBLISHED_PORT}\"
     MAILCATCHER_UI_PUBLISHED_PORT=\"${MAILCATCHER_UI_PUBLISHED_PORT}\"
