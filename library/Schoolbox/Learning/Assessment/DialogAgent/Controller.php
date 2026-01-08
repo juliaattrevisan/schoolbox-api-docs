@@ -540,10 +540,6 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
-        /* TODO Pretty sure there are some conditionals about when someone can make a Dialog Agent
-         *  response such as the Duration hasn't elapsed; that it's published+open; etc.
-         *  Not sure atm if that idea overlaps whatever this meant
-         */
         return [
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
