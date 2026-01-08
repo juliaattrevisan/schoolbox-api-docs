@@ -21,6 +21,7 @@ use External_UserInterface;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\DifferentiationProfile\Model as DifferentiationProfileModel;
 use Schoolbox\Geosnapshot\ValidPhotosAvailable;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
@@ -223,7 +224,8 @@ class Controller extends BaseController
                     /* Return null if no differentiation profile exists for this student
                      */
                     try {
-                        $this->differentiationProfileMapper->findOneByColumn(
+                        /** @var DifferentiationProfileModel $profile */
+                        $profile = $this->differentiationProfileMapper->findOneByColumn(
                             'student_id',
                             $viewee->getId(),
                             [
@@ -231,6 +233,12 @@ class Controller extends BaseController
                             ]
                         );
                     } catch (MapperException\NotFound $e) {
+                        return null;
+                    }
+
+                    /* Return null if the differentiation profile is not populated
+                     */
+                    if (!$profile->isPopulated()) {
                         return null;
                     }
 

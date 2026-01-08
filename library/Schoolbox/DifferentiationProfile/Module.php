@@ -88,10 +88,16 @@ class Module extends BaseModule
             $staffWithFeatureEnabled,
             new Rule\Callback(function (array $params): void {
                 try {
-                    $this->getMapperFactory()->get(DifferentiationProfileMapper::class)
+                    /** @var Model $profile */
+                    $profile = $this->getMapperFactory()->get(DifferentiationProfileMapper::class)
                         ->findOneByColumn('student_id', $params['studentId']);
                 } catch (\Exception $e) {
                     throw new Unauthorized('Differentiation profile does not exist.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                }
+                /* Profile must be populated to be viewed
+                 */
+                if (!$profile->isPopulated()) {
+                    throw new Unauthorized('Differentiation profile is not populated.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
                 }
             }),
         );
