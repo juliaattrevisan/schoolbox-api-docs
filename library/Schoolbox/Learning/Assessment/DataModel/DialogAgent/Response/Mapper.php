@@ -166,25 +166,9 @@ class Mapper extends \Schoolbox\Mapper
             /* The dialog agent needs an assessmentModel's id to associate responses with an assessment.
              * Eventually this gets hydrated into Participant, which gives you access to each student's
              * IResponse collections in the business logic as a convenience.
-             *
-             * To do it we re-commit the sins of the past for lack of a more convenient way, purely for the sake of
-             * notifications where you need to know a folder's WRITE access users so you can treat them like a set
-             * of teachers who must receive a notif. Disgusting but necessary.
              */
             /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessmentModel */
-            try {
-                /* Have a fully hydrated assessment instance, with contexts, for notifiers.
-                 *
-                 *     "I despise the necessity of this" -- Mr Matt, 8/12/16
-                 */
-                $assessmentModel = $this->getJoinMapper('dialogAgent.assessmentModel')->findById($row['dialogAgent.assessment_id']); // I despise the necessity of this
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                /* If it was deleted, join the deleted instance
-                 *
-                 *     "I also am not thrilled :)" -- Andy, 28/3/18 via SubmissionBoxMapper
-                 */
-                $assessmentModel = $e->getDeletedObject();
-            }
+            $assessmentModel = $this->createJoinModel('dialogAgent.assessmentModel', $row['dialogAgent.assessment_id']);
 
             /** @var \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model $dialogAgent */
             $dialogAgent = $this->createJoinModel('dialogAgent', $row['dialogAgent.id']);

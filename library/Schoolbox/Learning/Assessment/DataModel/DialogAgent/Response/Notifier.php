@@ -17,6 +17,7 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\UserAccess;
@@ -80,6 +81,12 @@ class Notifier extends AbstractModuleNotifier
 
 
     /**
+     * @var AssessmentMapper $assessmentMapper
+     */
+    private AssessmentMapper $assessmentMapper;
+
+
+    /**
      * Add some extra doodads for you to use, such as a RosettaStone for localisation/Terminology replacements.
      *
      * @param array $dependencies
@@ -89,6 +96,14 @@ class Notifier extends AbstractModuleNotifier
         if (empty($dependencies['l10n'])) {
             $stoneFactory = new RosettaStoneFactory();
             $dependencies['l10n'] = $stoneFactory->build(L10nMapper::getInstance());
+        }
+
+        /* This is used to fully hydrate an IAssessable instance so we can get its context folder;
+         * this is how we can find WRITE access users that we consider to be the teachers of this dialog agent.
+         * I could have used the AssessmentMapperProxy but that does way more than I needed.
+         */
+        if (empty($dependencies['assessmentMapper'])) {
+            $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
         }
 
         parent::loadDependencies($dependencies);
@@ -366,7 +381,8 @@ class Notifier extends AbstractModuleNotifier
          * For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
          * and make an $instance for each. To do that we can send it to the WRITE access users of the assessment's folder.
          */
-        $folder = $response->getDialogAgent()->getAssessmentModel()->getAssessmentContext()->getFolder();
+        $assessment = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+        $folder = $assessment->getContextFolder();
 
         /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
          */
@@ -387,6 +403,17 @@ class Notifier extends AbstractModuleNotifier
     public function setL10n(RosettaStone $l10n): self
     {
         $this->l10n = $l10n;
+        return $this;
+    }
+
+
+    /**
+     * @param AssessmentMapper $assessmentMapper
+     * @return $this
+     */
+    public function setAssessmentMapper(AssessmentMapper $assessmentMapper): self
+    {
+        $this->assessmentMapper = $assessmentMapper;
         return $this;
     }
 }
