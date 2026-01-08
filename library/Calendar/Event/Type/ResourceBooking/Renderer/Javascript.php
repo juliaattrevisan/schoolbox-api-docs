@@ -13,6 +13,7 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
+use Schoolbox\Calendar\Event;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\User;
@@ -50,16 +51,18 @@ class Javascript extends Base
         $bookingButtons = [];
 
         // Modify butonye
-        $editUrl = $this->getEditURL();
         $returnUrl = !empty($_GET[Redirect::RETURN_URL]) ? '?' . Redirect::queryStringEncodedParam($_GET[Redirect::RETURN_URL]) : '';
 
-        if ($editUrl !== false) {
-            $bookingButtons[] = [
-                'label'  => 'Modify',
-                'class'  => 'icon-modify',
-                'href'   => $editUrl . $returnUrl,
-                'action' => 'modify',
-            ];
+        if ($this->getEvent()->getEventVariant() === Event::VARIANT_BOOKING) {
+            $editUrl = $this->getEditURL();
+            if ($editUrl !== false) {
+                $bookingButtons[] = [
+                    'label'  => 'Modify',
+                    'class'  => 'icon-modify',
+                    'href'   => $editUrl . $returnUrl,
+                    'action' => 'modify',
+                ];
+            }
         }
 
         // Cancel butonye
