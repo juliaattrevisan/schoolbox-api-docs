@@ -131,6 +131,9 @@ export default {
             // Modify/delete links
             if (metadata?.editable) {
                 let returnUrl = btoa(window.location.pathname);
+                // Note data.custom is used by:
+                //  * Calendar\Event\Type\Submission\Renderer\Javascript
+                //  * Calendar\Event\Type\EOTC\Renderer\Javascript
                 if (data?.custom?.modifyLink) {
                     // Inject a return URL:
                     // maybe the destination will understand it, maybe it won't
