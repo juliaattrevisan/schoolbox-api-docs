@@ -248,7 +248,7 @@ class Mapper extends BaseMapper
             LEFT  JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
             WHERE b.deleted_at IS NULL
             AND   " . ((count($statusIds) === 0) ? 'FALSE' : "s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}") . "
-            AND NOT (e.end_datetime < :startWindow OR e.start_datetime > :endWindow)
+            AND NOT (COALESCE(b.end_datetime, e.end_datetime) < :startWindow OR COALESCE(b.start_datetime, e.start_datetime) > :endWindow)
         ";
         if (!empty($extra['resource_id'])) {
             $query .= ' AND b.resource_id IN '
