@@ -21,6 +21,40 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
  * This distinction between 'domain object' and 'data model' plan is that:
  * - a 'domain object' plan is composed of an IAssessable and collection of 'domain object' Participants.
  * - a 'data model' plan is composed of a DataModel\Assessment and collection of DataModel\Participants.
+ *
+ *
+ * Steve Notes
+ * -----------
+ * There's been a long-running mystery about what a "Dynamic Plan" means vs a "Static Plan". There have been no formal
+ * definitions nor a traceable history of its meaning, but after __six gruelling years__ I've finally figured it out.
+ * Elucidation follows.
+ *
+ *
+ * Every time a learning activity IAssessable is created, a Plan is spawned for it.
+ * Every learning activity will always have at least one Plan for it.
+ *
+ * By default, this will be a "Dynamic Plan"; this means two things will be presumed by the system.
+ *  *
+ *     - the enrolled students (as defined by the sis) will use this "default plan" to inform them of their title,
+ *       description and dates. Initially, everyone will use the title/description/dates as defined by the learning
+ *       activity and will change whenever the settings of the learning activity changes (and/or when the students
+ *       change in the sis). This is why it's called a "Dynamic Plan" - it defers (and refers) to whatever the default
+ *       behaviour would be without any person-specific customisations.
+ *
+ *     - a "static plan" is a customised version of the Dynamic Plan and overrides (replaces) whatever the learning
+ *       activity's settings are. This allows everyone else on the assessment's Dynamic Plan to be managed together
+ *       while letting the special students have their own special requirements via their customised version of the
+ *       Dynamic Plan.
+ *
+ * Therefore, whenever you see the idea of a "Dynamic Plan" being thrown around, you can know that it means "do whatever
+ * the assessment's default behaviour is w.r.t. title/description/dates" and that a "Static Plan" means that it's been
+ * overridden for a particular person(s).
+ *
+ *                         THIS IS WHY WE START WITH A GLOSSARY, GUYS.
+ *
+ *
+ * A better naming would have been ->isCustomised() so you'd know whether a Plan instance was going to do something
+ * other than the default, rather than have two undefined words "Dynamic" and "Static"..............
  */
 class Model implements ISoftDeletable
 {
