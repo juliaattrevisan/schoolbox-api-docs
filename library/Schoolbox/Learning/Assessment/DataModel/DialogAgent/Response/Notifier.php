@@ -184,9 +184,13 @@ class Notifier extends AbstractModuleNotifier
          */
         $recipientId = $response->getLearner()->getId();
 
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_STUDENT_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_STUDENT_HREF, $assessmentDataModel->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -209,7 +213,7 @@ class Notifier extends AbstractModuleNotifier
                 'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     'your %s %s. You can now resume your %s.',
-                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
@@ -260,9 +264,13 @@ class Notifier extends AbstractModuleNotifier
          */
         $recipientId = $response->getLearner()->getId();
 
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_STUDENT_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_STUDENT_HREF, $assessmentDataModel->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -285,7 +293,7 @@ class Notifier extends AbstractModuleNotifier
                 'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     'your %s %s. You can now restart your %s.',
-                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
@@ -342,9 +350,13 @@ class Notifier extends AbstractModuleNotifier
         /** @var ResponseDataModel $response */
         $response = $this->mapper->findById($model->getId());
 
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_STAFF_HREF, $response->getDialogAgent()->getAssessmentModel()->getId());
+        $href = sprintf(self::PATTERN_STAFF_HREF, $assessmentDataModel->getId());
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -367,7 +379,7 @@ class Notifier extends AbstractModuleNotifier
                 'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     '%s %s',
-                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
             ]);
