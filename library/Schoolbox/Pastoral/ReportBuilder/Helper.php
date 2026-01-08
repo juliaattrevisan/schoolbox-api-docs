@@ -172,11 +172,19 @@ class Helper
     private function getStudents(): void
     {
         if ($this->report['students']->count() > 0) {
-            $this->filters[] = "pastoral.student_id IN (" .
-                implode(
-                    ',',
-                    $this->report['students']->getPropertyValues('id')
-                ) . ")";
+            $studentIds = $this->report['students']->getPropertyValues('id');
+            $studentPlaceholders = Builder::getArrayPlaceholders(
+                $studentIds,
+                'reportStudentId',
+            );
+            $this->filters[] = "pastoral.student_id IN {$studentPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $studentIds,
+                    'reportStudentId',
+                )
+            );
         }
     }
 
@@ -192,9 +200,19 @@ class Helper
         }
 
         if ($this->report['years']->count() > 0) {
-            $filters[] = '`s`.`year_id` IN (' .
-                implode(',', $this->report['years']->getPropertyValues('id')) .
-                ')';
+            $yearIds = $this->report['years']->getPropertyValues('id');
+            $yearPlacesholders = Builder::getArrayPlaceholders(
+                $yearIds,
+                'reportYearId',
+            );
+            $filters[] = "`s`.`year_id` IN {$yearPlacesholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $yearIds,
+                    'reportYearId',
+                )
+            );
         }
 
         $query = implode(' OR ', array_filter($filters ?? []));
@@ -216,9 +234,19 @@ class Helper
         }
 
         if ($this->report['houses']->count() > 0) {
-            $filters[] = '`s`.`house` IN (' .
-                implode(',', $this->report['houses']->getPropertyValues('id')) .
-                ')';
+            $houseIds = $this->report['houses']->getPropertyValues('id');
+            $housePlacesholders = Builder::getArrayPlaceholders(
+                $houseIds,
+                'reportHouseId',
+            );
+            $filters[] = "`s`.`house` IN {$housePlacesholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $houseIds,
+                    'reportHouseId',
+                )
+            );
         }
 
         $query = implode(' OR ', array_filter($filters ?? []));
@@ -236,9 +264,19 @@ class Helper
     private function getCampuses(): void
     {
         if ($this->report['campuses']->count() > 0) {
-            $this->filters[] = '`v_sc`.`campus` IN (' .
-                implode(',', $this->report['campuses']->getPropertyValues('id')) .
-                ')';
+            $campusesIds = $this->report['campuses']->getPropertyValues('id');
+            $campusPlaceholders = Builder::getArrayPlaceholders(
+                $campusesIds,
+                'reportCampusId',
+            );
+            $this->filters[] = "`v_sc`.`campus` IN {$campusPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $campusesIds,
+                    'reportCampusId',
+                )
+            );
         }
     }
 
@@ -250,9 +288,19 @@ class Helper
     private function getAuthors(): void
     {
         if ($this->report['authors']->count() > 0) {
-            $this->filters[] = "pastoral.owner_id IN (" .
-                implode(',', $this->report['authors']->getPropertyValues('id')) .
-                ")";
+            $authorIds = $this->report['authors']->getPropertyValues('id');
+            $ownerIdsPlaceholders = Builder::getArrayPlaceholders(
+                $authorIds,
+                'reportAuthorId',
+            );
+            $this->filters[] = "pastoral.owner_id IN {$ownerIdsPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $authorIds,
+                    'reportAuthorId',
+                )
+            );
         }
     }
 
@@ -283,9 +331,19 @@ class Helper
         $subFilter = [];
         $value = null;
         if ($this->report['actions']->count() > 0) {
-            $subFilter[] = '`a`.`action_id` IN (' .
-                implode(',', $this->report['actions']->getPropertyValues('id')) .
-                ')';
+            $actionIds = $this->report['actions']->getPropertyValues('id');
+            $actionsPlaceholders = Builder::getArrayPlaceholders(
+                $actionIds,
+                'reportActionId',
+            );
+            $subFilter[] = "`a`.`action_id` IN {$actionsPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $actionIds,
+                    'reportActionId',
+                )
+            );
         }
 
         if ($this->report['actions']->count() > 0 || !$this->report['includeRecordsWithoutAction']) {
@@ -366,9 +424,19 @@ class Helper
     private function getTags(): void
     {
         if ($this->report['tags']->count() > 0) {
-            $this->filters[] = '`g`.`tag_id` IN (' .
-                implode(',', $this->report['tags']->getPropertyValues('id')) .
-                ')';
+            $tagIds = $this->report['tags']->getPropertyValues('id');
+            $tagsPlaceholders = Builder::getArrayPlaceholders(
+                $tagIds,
+                'reportTagId',
+            );
+            $this->filters[] = "`g`.`tag_id` IN {$tagsPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $tagIds,
+                    'reportTagId',
+                )
+            );
         }
     }
 
@@ -437,16 +505,26 @@ class Helper
              * only the ones they have access to
              */
             (new \Schoolbox\External\User())->loadChildren([$viewer]);
-            $childrenIds = implode(
-                ',',
-                $viewer->getChildren()->getPropertyValues('id')
-            );
-            $filters[] = "
-            (
-                (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
-                `pastoral`.`student_id` IN ($childrenIds) AND
-                `pa`.`access` > :accessDeny
-            )";
+            $childrenIds = $viewer->getChildren()?->getPropertyValues('id') ?? [];
+            if (!empty($childrenIds)) {
+                $childrenPlaceholders = Builder::getArrayPlaceholders(
+                    $childrenIds,
+                    'reportPermChildId',
+                );
+                $filters[] = "
+                (
+                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                    `pastoral`.`student_id` IN {$childrenPlaceholders} AND
+                    `pa`.`access` > :accessDeny
+                )";
+                $this->params = array_merge(
+                    $this->params,
+                    Builder::getArrayParameters(
+                        $childrenIds,
+                        'reportPermChildId',
+                    )
+                );
+            }
         }
 
         /* Checking group-based permission
@@ -467,6 +545,10 @@ class Helper
         /* Same campus validation
          */
         $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
+        $campusPlaceholders = Builder::getArrayPlaceholders(
+            $campusIds,
+            'viewerCampusId',
+        );
         $sameCampus = "(
             `pa`.`match_campus` = 0 OR
             (
@@ -474,10 +556,17 @@ class Helper
             `pastoral`.`student_id` IN (
                 SELECT `userCampus`.`uid`
                 FROM `userCampus`
-                WHERE `userCampus`.`campus` IN (" . implode(',', $campusIds) . ")
+                WHERE `userCampus`.`campus` IN {$campusPlaceholders}
                 )
             )
         )";
+        $this->params = array_merge(
+            $this->params,
+            Builder::getArrayParameters(
+                $campusIds,
+                'viewerCampusId',
+            )
+        );
 
         $this->params['viewerId'] = $viewer->getId();
         $this->params['accessDeny'] = PastoralAccessMapper::ACCESS_DENY;
