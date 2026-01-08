@@ -153,9 +153,10 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     *
+     * Adds some dependencies arbitrarily
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->interactionChecker = new Participant\Plan\InteractionIntegrityChecker(
