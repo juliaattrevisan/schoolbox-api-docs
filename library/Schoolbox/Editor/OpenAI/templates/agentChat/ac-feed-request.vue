@@ -12,7 +12,7 @@ const props = defineProps<Props>();
 
 <template>
     <div class="ac-feed-request">
-        <div class="ac-feed-message-container snow l-pad-s" :class="{ 'l-mar-s--right': props.message.user }">
+        <div class="ac-feed-message-container snow l-pad-s">
             <file-drop
                 v-if="props.message.file"
                 :id="`ig-message-file-drop-${props.message.entryKey}`"
@@ -21,13 +21,9 @@ const props = defineProps<Props>();
             />
             <p class="ac-feed-message-content">{{ props.message.payload.userPrompt }}</p>
         </div>
-        <user-photo
-            v-if="props.message.user"
-            :user="props.message.user"
-            render="xsmall"
-            :description="null"
-            rounded-corners
-        />
+        <div v-if="props.message.user" class="ac-feed-message-portrait l-mar-s--left">
+            <user-photo :user="props.message.user" render="xsmall" :description="null" rounded-corners />
+        </div>
     </div>
 </template>
 
@@ -45,6 +41,10 @@ const props = defineProps<Props>();
 
     .ac-feed-message-content {
         white-space: pre-wrap;
+    }
+
+    .ac-feed-message-portrait {
+        align-self: end;
     }
 }
 </style>
