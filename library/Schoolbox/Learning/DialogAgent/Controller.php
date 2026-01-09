@@ -348,7 +348,7 @@ class Controller extends Base
                 'status' => 'success',
                 'responseId' => null,
                 'image' => null,
-                'message' => $assessment->getOpeningMessage()
+                'message' => \Scrub::markdown($assessment->getOpeningMessage()),
             ],
             'createdAt' => $assessment->getCreatedAt(), // this message should always appear first
         ]);

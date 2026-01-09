@@ -454,7 +454,7 @@ class Controller extends Assessment\Controller
                 'status' => 'success',
                 'responseId' => null,
                 'image' => null,
-                'message' => $assessment->getOpeningMessage()
+                'message' => \Scrub::markdown($assessment->getOpeningMessage()),
             ],
             'createdAt' => $assessment->getCreatedAt(),
         ]);
