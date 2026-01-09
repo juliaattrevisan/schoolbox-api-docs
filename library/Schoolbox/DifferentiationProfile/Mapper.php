@@ -29,7 +29,7 @@ class Mapper extends BaseMapper
     /**
      * Configuration mapping between config keys and corresponding model getter methods
      */
-    public const CONFIG_METHOD_MAPPING = [
+    public const array CONFIG_METHOD_MAPPING = [
         'adjustment_category' => 'getAdjustmentCategory',
         'adjustment_level' => 'getAdjustmentLevel',
         'overview' => 'getOverview',
@@ -40,8 +40,8 @@ class Mapper extends BaseMapper
     ];
 
     public const int DEFAULT_LIMIT = 20;
-
     public const string FAR_FAR_AWAY_FULL_DATE = '9999-12-31';
+    public const string FAR_FAR_AWAY_PAST = '1970-01-01 00:00:00';
     /**
      * Setup mapper
      */
@@ -605,14 +605,25 @@ class Mapper extends BaseMapper
         $previousColumnBuilders = [];
         foreach ($order as $column => $direction) {
             $value = $cursorParams[$column] ?? null;
-            if (!isset($value)) {
-                continue;
-            }
+            $parameterisedValue = ":cursor_" . str_replace('.', '_', $column);
+            $coalesceValue = $this->getCoalesceValueForColumn($column);
 
             if ($direction === self::SORT_ORDER_ASC) {
-                $thisBuilder = $pb->emptyClone()->greaterThan($column, $value);
+                $thisBuilder = $pb->emptyClone()->rawWhere(
+                    "COALESCE({$column}, :coalesceValue) > COALESCE($parameterisedValue, :coalesceValue)",
+                    [
+                        $parameterisedValue => $value,
+                        "coalesceValue"   => $coalesceValue
+                    ]
+                );
             } else if ($direction === self::SORT_ORDER_DESC) {
-                $thisBuilder = $pb->emptyClone()->lessThan($column, $value);
+                $thisBuilder = $pb->emptyClone()->rawWhere(
+                    "COALESCE({$column}, :coalesceValue) < COALESCE($parameterisedValue, :coalesceValue)",
+                    [
+                        $parameterisedValue => $value,
+                        "coalesceValue"   => $coalesceValue
+                    ]
+                );
             } else {
                 continue;
             }
@@ -623,7 +634,13 @@ class Mapper extends BaseMapper
             }
             $columnBuilders[] = $columnBuilder->all($thisBuilder);
 
-            $previousColumnBuilders[] = $pb->emptyClone()->equals($column, $value);
+            $previousColumnBuilders[] = $pb->emptyClone()->rawWhere(
+                "COALESCE({$column}, :coalesceValue) = COALESCE($parameterisedValue, :coalesceValue)",
+                [
+                    $parameterisedValue => $value,
+                    "coalesceValue"   => $coalesceValue
+                ]
+            );
         }
 
         // Put each column builder into the main predicate builder
@@ -635,6 +652,21 @@ class Mapper extends BaseMapper
         // Any of the column builders may match
         $pb = $pb->any($subBuilder);
         return $pb;
+    }
+
+    /**
+     * Get coalesce value for a given column
+     *
+     * @param string $column
+     * @return string|int
+     */
+    private function getCoalesceValueForColumn(string $column): string|int
+    {
+        return match ($column) {
+            Cursor::CURSOR_ORDER_BY_UPDATED_AT_COLUMN => self::FAR_FAR_AWAY_PAST,
+            Cursor::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => 0,
+            default => "",
+        };
     }
 
     /**

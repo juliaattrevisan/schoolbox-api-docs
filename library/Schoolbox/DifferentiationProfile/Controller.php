@@ -148,15 +148,29 @@ class Controller extends Base
         /** @var Filter\Filters\DifferentiationProfile\Finder $finder */
         $finder = Filter\Filters\DifferentiationProfile\Finder::getInstance($this->filterMapper, $this->mapper);
 
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            Cursor::CURSOR_ORDER_BY_UPDATED_AT => [
+                'differentiation_profiles.updated_at' => $order,
+                'differentiation_profiles.student_id'  => $order,
+            ],
+            /* Default to sorting by student name
+             */
+            default => [
+                's.lastname'    => $order,
+                's.chosen_name' => $order,
+                'differentiation_profiles.student_id'  => $order,
+            ]
+        };
+
         $cursor = new Cursor(
             $this->getUser(),
             $finder,
             $dynamicFilters,
-            [
-                's.lastname'    => $this->mapper::SORT_ORDER_ASC,
-                's.chosen_name' => $this->mapper::SORT_ORDER_ASC,
-                'p.student_id'  => $this->mapper::SORT_ORDER_ASC,
-            ],
+            $orderBy,
+            $sortOrder,
             $limit,
         );
 
