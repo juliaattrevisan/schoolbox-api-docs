@@ -265,6 +265,7 @@ window.Vue.onUnmounted(() => {
                 requireImage: false,
             }"
             prompt-placeholder="Type a response here..."
+            prompt-button-title="Send message"
             :prompt-attributes="[]"
             :disabled="isSubmitting"
         />
