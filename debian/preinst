@@ -50,7 +50,7 @@ send_slack_alert() {
   local instance_id=$1
   local log_file="/var/log/schoolbox/${instance_id}/upgrade.log"
   local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-  local webhook_url="https://hooks.slack.com/services/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"
+  local webhook_url="https://hooks.slack.com/services/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"
 
   local message="*[ALERT] Schoolbox database backup failed for ${instance_id}*
 
