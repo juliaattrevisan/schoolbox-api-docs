@@ -1,12 +1,15 @@
 <script lang="ts" setup>
-import { useMousePressed } from "@vueuse/core";
+import { useEventBus, useMousePressed, useTimestamp } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
+import { getRfc3339String } from "@js/util/dateUtils";
+import type { DateRFC3339 } from "@js/util/dateUtils";
 import { apiRequest, getApiProblemStatus } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import { acPromptEventKey } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatSymbols";
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { DialogAgentResponseAction } from "@schoolboxAssessment/Types/dialogAgent";
 import type { ApiDialogAgentActionResponse, DialogAgentResponse } from "../status/dialogAgentStatusTypes"; // TODO: make this type central
@@ -15,17 +18,51 @@ interface Props {
     feed: AgentChatLogEntry[];
     response: DialogAgentResponse;
     student: UserAuthor;
+    duration: number | null;
+    closeAt: DateRFC3339;
     returnUrl: string;
 }
 
+/**
+ * When the time's up modal is triggered, delay the redirect slightly so the user sees it
+ * so that they aren't confused about what just happened
+ */
+const REDIRECT_DELAY_MS = 3000;
+
+/* students can't submit after the close date, so trigger that kind of submission slightly earlier */
+const CLOSE_DATE_BUFFER_MS = 5000;
+
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
+const acPromptEventBus = useEventBus(acPromptEventKey);
 
 const currentResponse = window.Vue.ref<DialogAgentResponse>(props.response);
 
 window.Vue.onMounted(() => {
     currentResponse.value = props.response;
     acStore.importFeed(acStore.parseFeed(props.feed, props.student));
+});
+
+const currentTimestamp = useTimestamp({ interval: 500 });
+
+/** How long until the response must be submitted(in seconds) */
+const timeLeft = window.Vue.computed<number>(() => {
+    const startedAt = currentResponse.value.startedAt ? new Date(currentResponse.value.startedAt).getTime() : null;
+
+    /** Duration is only relevant after starting and if it's set */
+    const durationFinishAt = startedAt !== null && props.duration !== null ? startedAt + props.duration * 1000 : null;
+    const closeAt = new Date(props.closeAt).getTime() - CLOSE_DATE_BUFFER_MS;
+
+    /** The earlier of the two possible end times is the actual end time */
+    const endAt = durationFinishAt !== null && durationFinishAt < closeAt ? durationFinishAt : closeAt;
+    return Math.ceil((endAt - currentTimestamp.value) / 1000);
+});
+
+/** As soon as the first message has been sent, update startedAt so the duration timer will work */
+acPromptEventBus.on(() => {
+    if (currentResponse.value.startedAt === null) {
+        currentResponse.value.startedAt = getRfc3339String(window.dayjs.unix(currentTimestamp.value / 1000));
+    }
 });
 
 const isLoading = window.Vue.ref(false);
@@ -82,9 +119,24 @@ const isSubmitting = window.Vue.ref(false);
 const submitError = window.Vue.ref<string | null>(null);
 
 /**
- * When a learner or instructor clicks the submit button inside the modal
+ * After submission, redirect to the return URL
+ * @param delayRedirect - If true, will delay the redirect slightly (this is so that the "Time's Up" modal
+ * doesn't flash before redirecting, leaving the user confused as to what just happened)
  */
-async function submitResponse(): Promise<void> {
+function redirectAfterSubmit(delayRedirect: boolean): void {
+    setTimeout(
+        () => {
+            window.location.href = props.returnUrl;
+        },
+        delayRedirect ? REDIRECT_DELAY_MS : 0,
+    );
+}
+
+/**
+ * When a learner or instructor clicks the submit button inside the modal
+ * @param delayRedirect - see redirectAfterSubmit
+ */
+async function submitResponse(delayRedirect: boolean): Promise<void> {
     if (!currentResponse.value._routes.submit) {
         throw new Error("unable to submit, missing submit route"); // shouldn't get here
     }
@@ -103,13 +155,15 @@ async function submitResponse(): Promise<void> {
     }
 
     /** If successful, redirect to the return URL - keep isSubmitting as true as the page will soon unload */
-    window.location.href = props.returnUrl;
+    redirectAfterSubmit(delayRedirect);
 }
 
 /**
  * Open the submit confirmation modal
  */
 async function openSubmitModal(): Promise<void> {
+    isSubmitModalOpen.value = true;
+
     /** If the feed isn't empty and we don't have a submit route yet, we might be out of date... try refetch first */
     if (acStore.feed.length > 0 && !currentResponse.value._routes.submit && currentResponse.value._routes.status) {
         isLoading.value = true;
@@ -123,8 +177,6 @@ async function openSubmitModal(): Promise<void> {
             currentResponse.value = statusResponse.data.response;
         }
     }
-
-    isSubmitModalOpen.value = true;
 }
 
 /**
@@ -203,6 +255,32 @@ window.Vue.onUnmounted(() => {
     window.removeEventListener("DOMContentLoaded", updateFeedHeight);
     document.removeEventListener("mouseup", onMouseUp);
 });
+
+/** As soon as duration is exceeded, submit the response (no more messages can be sent at this point) */
+const durationExceeded = window.Vue.computed<boolean>(() => timeLeft.value <= 0);
+window.Vue.watch(
+    durationExceeded,
+    async (exceeded) => {
+        if (exceeded && !isSubmitting.value && !isLoading.value) {
+            /**
+             * Open the modal first to show that time is up
+             * and also to make sure the submit route exists (it might not if you have only sent messages)
+             */
+            await openSubmitModal();
+            /**
+             * Force the submission to occur immediately,
+             * if the route doesn't exist then the close date likely passed before sending a message
+             */
+            if (currentResponse.value._routes.submit) {
+                await submitResponse(true);
+            } else {
+                isSubmitting.value = true;
+                redirectAfterSubmit(true);
+            }
+        }
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
@@ -272,7 +350,15 @@ window.Vue.onUnmounted(() => {
     <span class="meta">AI sometimes gets things wrong — please check important details.</span>
 
     <basic-modal v-model:is-open="isSubmitModalOpen" has-background-click :is-close-disabled="isSubmitting">
-        <div v-if="isLoading" class="loader"></div>
+        <template v-if="durationExceeded">
+            <h2>Time's Up</h2>
+            <p>Please wait while your response is submitted.</p>
+            <div v-if="submitError" class="alert-box alert">
+                <span>{{ submitError }}</span>
+                <a href="#" class="close" @click.prevent="submitError = null">×</a>
+            </div>
+        </template>
+        <div v-else-if="isLoading" class="loader"></div>
         <template v-else-if="currentResponse._routes.submit">
             <h2>Confirm Submission</h2>
             <p>
@@ -285,7 +371,11 @@ window.Vue.onUnmounted(() => {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
+                    <button
+                        class="button submit"
+                        :disabled="isSubmitting || undefined"
+                        @click="() => submitResponse(false)"
+                    >
                         {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
                     </button>
                 </li>

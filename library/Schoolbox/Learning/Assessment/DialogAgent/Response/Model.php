@@ -228,4 +228,25 @@ class Model extends AbstractResponse
 
         return $endedAt->diffInSeconds($startedAt);
     }
+
+    /**
+     * Determine if the duration limit has been exceeded for this response.
+     * 'duration' starts from when the response was started (when the first message to the AI was sent)
+     *
+     * @return bool
+     */
+    public function isDurationExceeded(): bool
+    {
+        if (null === $this->getStartedAt()) {
+            return false;
+        }
+
+        /** @var \Schoolbox\Learning\Assessment\DialogAgent\Model $assessment */
+        $assessment = $this->getAssessable();
+        if ($assessment->isDurationUnlimited()) {
+            return false;
+        }
+
+        return $this->getTimeTaken() > $assessment->getDuration();
+    }
 }

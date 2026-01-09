@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup;
 
 /**
  * Translator for converting Dialog Agent Response to an array representation, for
@@ -40,6 +39,7 @@ class ModelToArray
             'status' => $response->getCurrentStatus(),
             'assistanceRequestedAt' => $response->getAssistanceRequestedAt()?->toRfc3339String(),
             'submittedAt' => $response->getSubmittedAt()?->toRfc3339String(),
+            'startedAt' => $response->getStartedAt()?->toRfc3339String(),
             '_routes' => $routes,
         ];
     }

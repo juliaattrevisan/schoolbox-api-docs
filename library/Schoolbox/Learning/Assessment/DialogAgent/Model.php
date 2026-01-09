@@ -30,7 +30,15 @@ class Model extends AbstractAssessment
      *
      * TODO Rename to whatever this is canonically called
      */
-    private const DEFAULT_TYPE_NAME = 'Dialog Agent';
+    private const string DEFAULT_TYPE_NAME = 'Dialog Agent';
+
+
+    /**
+     * Possible value for `$this->duration`.
+     *
+     * This value specifies that a participant may take an unlimited amount of time to complete this activity.
+     */
+    public const int DURATION_UNLIMITED = 0;
 
 
     /**
@@ -575,6 +583,17 @@ class Model extends AbstractAssessment
     {
         $this->duration = $duration;
         return $this;
+    }
+
+
+    /**
+     * Does this activity have unlimited duration?
+     *
+     * @return bool
+     */
+    public function isDurationUnlimited(): bool
+    {
+        return $this->duration === self::DURATION_UNLIMITED;
     }
 
 
