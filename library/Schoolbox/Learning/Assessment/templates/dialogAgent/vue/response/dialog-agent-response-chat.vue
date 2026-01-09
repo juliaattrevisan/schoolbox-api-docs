@@ -23,7 +23,14 @@ interface Props {
     returnUrl: string;
 }
 
-const CLOSE_DATE_BUFFER_MS = 5000; // students can't submit after the close date, so trigger that kind of submission slightly earlier
+/**
+ * When the time's up modal is triggered, delay the redirect slightly so the user sees it
+ * so that they aren't confused about what just happened
+ */
+const REDIRECT_DELAY_MS = 3000;
+
+/* students can't submit after the close date, so trigger that kind of submission slightly earlier */
+const CLOSE_DATE_BUFFER_MS = 5000;
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
@@ -113,15 +120,23 @@ const submitError = window.Vue.ref<string | null>(null);
 
 /**
  * After submission, redirect to the return URL
+ * @param delayRedirect - If true, will delay the redirect slightly (this is so that the "Time's Up" modal
+ * doesn't flash before redirecting, leaving the user confused as to what just happened)
  */
-function redirectAfterSubmit(): void {
-    window.location.href = props.returnUrl;
+function redirectAfterSubmit(delayRedirect: boolean): void {
+    setTimeout(
+        () => {
+            window.location.href = props.returnUrl;
+        },
+        delayRedirect ? REDIRECT_DELAY_MS : 0,
+    );
 }
 
 /**
  * When a learner or instructor clicks the submit button inside the modal
+ * @param delayRedirect - see redirectAfterSubmit
  */
-async function submitResponse(): Promise<void> {
+async function submitResponse(delayRedirect: boolean): Promise<void> {
     if (!currentResponse.value._routes.submit) {
         throw new Error("unable to submit, missing submit route"); // shouldn't get here
     }
@@ -140,7 +155,7 @@ async function submitResponse(): Promise<void> {
     }
 
     /** If successful, redirect to the return URL - keep isSubmitting as true as the page will soon unload */
-    redirectAfterSubmit();
+    redirectAfterSubmit(delayRedirect);
 }
 
 /**
@@ -257,10 +272,10 @@ window.Vue.watch(
              * if the route doesn't exist then the close date likely passed before sending a message
              */
             if (currentResponse.value._routes.submit) {
-                await submitResponse();
+                await submitResponse(true);
             } else {
                 isSubmitting.value = true;
-                redirectAfterSubmit();
+                redirectAfterSubmit(true);
             }
         }
     },
@@ -356,7 +371,11 @@ window.Vue.watch(
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <button class="button submit" :disabled="isSubmitting || undefined" @click="submitResponse">
+                    <button
+                        class="button submit"
+                        :disabled="isSubmitting || undefined"
+                        @click="() => submitResponse(false)"
+                    >
                         {{ isSubmitting ? "Submitting... please wait" : "Submit" }}
                     </button>
                 </li>
