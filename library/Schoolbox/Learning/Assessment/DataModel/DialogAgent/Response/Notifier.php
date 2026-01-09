@@ -17,8 +17,10 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -48,26 +50,40 @@ class Notifier extends AbstractModuleNotifier
      * e.g. Trigger for 'Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model:1 reopen' has no callbacks
      *
      */
-    public const TRIGGER_REOPENED = 'reopened';
-    public const TRIGGER_RESET = 'reset';
+    public const string TRIGGER_REOPENED = 'reopened';
+    public const string TRIGGER_RESET = 'reset';
+    public const string TRIGGER_SUBMITTED = 'submitted';
 
 
     /** Text for each notification
      */
-    private const PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
-    private const PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
+    private const string PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
+    private const string PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
+    private const string PATTERN_SOMEONE_SUBMITTED_TITLE = ':effector has submitted their :action for review.';
 
 
     /**
      * A link to the summary screen, for now
      */
-    private const PATTERN_HREF = '/learning/assessments/%d/%d';
+    private const string PATTERN_STUDENT_HREF = '/learning/assessments/%d/%d';
+
+
+    /**
+     * A link to the status screen, for now
+     */
+    private const string PATTERN_STAFF_HREF = '/learning/assessments/%d/status';
 
 
     /**
      * @var RosettaStone $l10n
      */
     private RosettaStone $l10n;
+
+
+    /**
+     * @var AssessmentMapper $assessmentMapper
+     */
+    private AssessmentMapper $assessmentMapper;
 
 
     /**
@@ -80,6 +96,14 @@ class Notifier extends AbstractModuleNotifier
         if (empty($dependencies['l10n'])) {
             $stoneFactory = new RosettaStoneFactory();
             $dependencies['l10n'] = $stoneFactory->build(L10nMapper::getInstance());
+        }
+
+        /* This is used to fully hydrate an IAssessable instance so we can get its context folder;
+         * this is how we can find WRITE access users that we consider to be the teachers of this dialog agent.
+         * I could have used the AssessmentMapperProxy but that does way more than I needed.
+         */
+        if (empty($dependencies['assessmentMapper'])) {
+            $dependencies['assessmentMapper'] = AssessmentMapper::getInstance();
         }
 
         parent::loadDependencies($dependencies);
@@ -108,6 +132,7 @@ class Notifier extends AbstractModuleNotifier
         if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
             $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         }
     }
 
@@ -115,6 +140,9 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Notify students when a response was put into Reopened state:
      *     - submitted_at is null now, but previously wasn't
+     *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
      *
      * @param ResponseDataModel $model
      * @param User $effector
@@ -138,8 +166,11 @@ class Notifier extends AbstractModuleNotifier
          *     - changing submittedAt from a NULLish value to a meaningful value equates to a SOBO
          *
          * Note: this might be a reason you get strange notifs about reopening when you shouldn't.
+         *
+         * Note that $diff[0] is "the current state of the object"
+         * Note that $diff[1] is "the previous state of the object"
          */
-        if ('' === trim((string)$diff['submittedAt'][1])) {
+        if ('' !== trim((string)$diff['submittedAt'][0])) {
             return new Envelope();
         }
 
@@ -153,9 +184,13 @@ class Notifier extends AbstractModuleNotifier
          */
         $recipientId = $response->getLearner()->getId();
 
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_STUDENT_HREF, $assessmentDataModel->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -165,18 +200,23 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_REOPENED
+            ))
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
             /* Basically string replacements to compose the message in the notification
              */
             ->setParams([
+                'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
-                    'your %s %s. You can now resume your %s.',
-                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    '%s %s. You can now resume your %s.',
+                    $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
-                'effector' => new UserParam($effector)
             ]);
 
         /* Craft the message we're gonna send
@@ -195,6 +235,9 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Notify students when a response was reset:
      *     - authoritative is 0 now, but previously wasn't
+     *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
      *
      * @param ResponseDataModel $model
      * @param User $effector
@@ -221,9 +264,13 @@ class Notifier extends AbstractModuleNotifier
          */
         $recipientId = $response->getLearner()->getId();
 
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
         /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
          */
-        $href = sprintf(self::PATTERN_HREF, $response->getDialogAgent()->getAssessmentModel()->getId(), $recipientId);
+        $href = sprintf(self::PATTERN_STUDENT_HREF, $assessmentDataModel->getId(), $recipientId);
 
         /* Basically string replacements to compose the message in the notification
          */
@@ -233,18 +280,23 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$response->getId()}." . self::TRIGGER_REOPENED)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_RESET
+            ))
             ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
             /* Basically string replacements to compose the message in the notification
              */
             ->setParams([
+                'effector' => new UserParam($effector),
                 'action' => new Param(sprintf(
                     'your %s %s. You can now restart your %s.',
-                    $response->getDialogAgent()->getAssessmentModel()->getTitle(),
+                    $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent'),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
-                'effector' => new UserParam($effector)
             ]);
 
         /* Craft the message we're gonna send
@@ -260,6 +312,99 @@ class Notifier extends AbstractModuleNotifier
     }
 
 
+    /**
+     * Notify staff when a response was submitted:
+     *      - submitted_at is meaningful now, but previously wasn't
+     *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
+     *
+     * @param Model $model
+     * @param User $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws Deleted
+     * @throws Exception
+     */
+    public function notifyStaffSubmitted(ResponseDataModel $model, User $effector, ?array $diff): Envelope
+    {
+        /* submitted_at stayed the same: this wasn't reopened
+         */
+        if (!isset($diff['submittedAt'])) {
+            return new Envelope();
+        }
+
+        /* If staff was doing a sobo, ignore it: they don't need to be notified about something they did.
+         * This is implicit if the $effector is the same as the guy who's logged in and is already dismissed.
+         *
+         * Note that $diff[0] is "the current state of the object"
+         * Note that $diff[1] is "the previous state of the object"
+         */
+        if ('' === trim((string)$diff['submittedAt'][0])) {
+            return new Envelope();
+        }
+
+        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
+         * You can refetch using a mapper to get more hydrated parts if you needed them.
+         */
+        /** @var ResponseDataModel $response */
+        $response = $this->mapper->findById($model->getId());
+
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
+        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
+         */
+        $href = sprintf(self::PATTERN_STAFF_HREF, $assessmentDataModel->getId());
+
+        /* Basically string replacements to compose the message in the notification
+         */
+        $bob = (new Builder())
+            ->setTitle(self::PATTERN_SOMEONE_SUBMITTED_TITLE)
+            ->setIcon($this->getUserIcon($effector))
+            ->setHref($href)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_SUBMITTED
+            ))
+            ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
+            /* Basically string replacements to compose the message in the notification
+             */
+            ->setParams([
+                'effector' => new UserParam($effector),
+                'action' => new Param(sprintf(
+                    '%s %s',
+                    $assessmentDataModel->getTitle(),
+                    $this->l10n->translate('dialogAgent')
+                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+            ]);
+
+        /* Craft the message we're gonna send
+         */
+        $instance = $bob->build();
+
+        /* Define the recipient; all we need is their id.
+         *
+         * For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
+         * and make an $instance for each. To do that we can send it to the WRITE access users of the assessment's folder.
+         */
+        $assessment = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+        $folder = $assessment->getAssessmentContext()->getFolder();
+
+        /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
+         */
+        $envelope = new Envelope();
+        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $instance);
+
+        return $envelope;
+    }
+
+
     /* Getters/Setters
      */
 
@@ -270,6 +415,17 @@ class Notifier extends AbstractModuleNotifier
     public function setL10n(RosettaStone $l10n): self
     {
         $this->l10n = $l10n;
+        return $this;
+    }
+
+
+    /**
+     * @param AssessmentMapper $assessmentMapper
+     * @return $this
+     */
+    public function setAssessmentMapper(AssessmentMapper $assessmentMapper): self
+    {
+        $this->assessmentMapper = $assessmentMapper;
         return $this;
     }
 }
