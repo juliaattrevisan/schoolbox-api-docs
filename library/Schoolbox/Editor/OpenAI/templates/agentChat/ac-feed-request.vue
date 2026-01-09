@@ -19,7 +19,7 @@ const props = defineProps<Props>();
                 :current-file="props.message.file"
                 disabled
             />
-            <p class="ac-feed-message-content">{{ props.message.payload.userPrompt }}</p>
+            <p class="ac-feed-message-content l-mar--0">{{ props.message.payload.userPrompt }}</p>
         </div>
         <div v-if="props.message.user" class="ac-feed-message-portrait l-mar-s--left">
             <user-photo :user="props.message.user" render="xsmall" :description="null" rounded-corners />
