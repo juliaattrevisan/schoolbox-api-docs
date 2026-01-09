@@ -14,6 +14,8 @@ interface Props {
     allowFileDrop?: boolean;
     /** The placeholder text for the prompt textarea */
     promptPlaceholder?: string;
+    /** The title attribute for the prompt submit button */
+    promptButtonTitle?: string;
     /** The extra attributes to show in the prompt (dropdowns) */
     promptAttributes: AgentChatPromptAttribute[];
 }
@@ -69,12 +71,16 @@ const isFormDisabled = window.Vue.computed(() => {
     return false;
 });
 
+const isGenerating = window.Vue.ref<boolean>(false);
+
 /**
  * The submit button is disabled if:
  * - the form is disabled
  * - there is an active generation in progress
  */
-const isSubmitDisabled = window.Vue.computed(() => isFormDisabled.value || acStore.activeGeneration !== null);
+const isSubmitDisabled = window.Vue.computed(
+    () => isFormDisabled.value || acStore.activeGeneration !== null || isGenerating.value,
+);
 
 /**
  * Send the current prompt to the AI
@@ -94,6 +100,13 @@ async function sendRequest(): Promise<void> {
     if (attributeEls.value.some((el) => !el.reportValidity())) {
         return; // some attributes are required and not set yet, can't send the request
     }
+
+    /** somehow steve was sending two requests at once, I can't do it but in theory this should stop it? */
+    await window.Vue.nextTick();
+    if (isGenerating.value) {
+        return;
+    }
+    isGenerating.value = true;
 
     const userPrompt = prompt.value.trim();
     const currentFileValue = currentFile.value;
@@ -121,6 +134,8 @@ async function sendRequest(): Promise<void> {
         },
         currentFileValue,
     );
+
+    isGenerating.value = false;
 }
 
 acPromptEventBus.on(({ retryRequest }) => {
@@ -195,7 +210,7 @@ acPromptEventBus.on(({ retryRequest }) => {
             <a
                 class="icon-send"
                 href="#"
-                title="Generate Image"
+                :title="props.promptButtonTitle"
                 :disabled="isSubmitDisabled || undefined"
                 @click.prevent="sendRequest"
             ></a>

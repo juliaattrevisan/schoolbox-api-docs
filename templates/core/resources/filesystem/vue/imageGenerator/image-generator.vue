@@ -63,6 +63,7 @@ const uploadError = window.Vue.ref<string | null>(null);
                 requireImage: true,
             }"
             prompt-placeholder="Describe or refine the image you want to generate"
+            prompt-button-title="Generate Image"
             :allow-file-drop="acStore.feed.length === 0"
             :prompt-attributes="props.promptAttributes"
         />
