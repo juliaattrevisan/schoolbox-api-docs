@@ -130,7 +130,6 @@ function retryResponse(): void {
 
     .ac-feed-message-container {
         background-color: #e4e4e4;
-        border: 1px solid #b3b3b3;
         // flex-grow: 1;
     }
 

@@ -12,7 +12,7 @@ const props = defineProps<Props>();
 
 <template>
     <div class="ac-feed-request">
-        <div class="ac-feed-message-container snow l-pad-s">
+        <div class="ac-feed-message-container l-pad-s">
             <file-drop
                 v-if="props.message.file"
                 :id="`ig-message-file-drop-${props.message.entryKey}`"
@@ -35,7 +35,7 @@ const props = defineProps<Props>();
     width: 80%;
 
     .ac-feed-message-container {
-        border: 1px solid #b3b3b3;
+        background-color: #c7dbff;
         flex-grow: 1;
     }
 
