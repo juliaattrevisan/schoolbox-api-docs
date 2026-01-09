@@ -62,11 +62,9 @@ function retryResponse(): void {
         <div>
             <img v-if="imageSrc" :src="imageSrc" />
 
-            <div
-                class="ac-feed-message-container l-pad-s"
-                :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }"
-            >
-                <p class="l-mar--0 ac-feed-message-content">
+            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
+                <p class="ac-feed-message-content">
+                    <!-- Usually the AI responds with a <p> tag in it's response, mimic that here... -->
                     {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
                 </p>
             </div>
@@ -113,10 +111,8 @@ function retryResponse(): void {
                 class="ac-feed-message-container l-pad-s"
                 :class="{ 'l-mar-s--top': imageSrc }"
             >
-                <p class="l-mar--0 ac-feed-message-content">
-                    <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
-                    <span v-html="props.message.message"></span>
-                </p>
+                <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
+                <p class="ac-feed-message-content" v-html="props.message.message"></p>
             </div>
         </div>
     </div>
@@ -136,6 +132,15 @@ function retryResponse(): void {
         background-color: #e4e4e4;
         border: 1px solid #b3b3b3;
         // flex-grow: 1;
+    }
+
+    /**
+     * we don't want margins at the end of the content but since <p> tags can be given
+     * to us from the AI, we have to target them specifically
+     */
+    .ac-feed-message-content,
+    .ac-feed-message-content :deep(p:last-child) {
+        margin: 0;
     }
 
     /**
@@ -179,10 +184,6 @@ function retryResponse(): void {
         width: 1.5rem;
         height: 1.5rem;
         margin: 0.5rem 0.5rem 0 0;
-    }
-
-    .ac-feed-message-loading {
-        margin-top: 0.125rem;
     }
 }
 </style>
