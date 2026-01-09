@@ -2,6 +2,18 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
+/**
+ * Convert a data structure returned by ResourceBooking/Booking/Validation->validateBookingFromPostData() into a string.
+ */
+function convertErrorsDataStructureToString(errorsByDateByKey) {
+    let allErrorStrings = [];
+    for (const [key, errorsByDate] of Object.entries(errorsByDateByKey)) {
+        for (const [date, errors] of Object.entries(errorsByDate)) {
+            allErrorStrings = allErrorStrings.concat(errors);
+        }
+    }
+    return allErrorStrings.join(', ');
+}
 
 $(function() {
     // A global variable
@@ -170,7 +182,13 @@ $(function() {
         };
         var ajaxFail = function (jqXHR) {
             const toast = window.sbProps.toastActivate();
-            toast.timeout({ text: jqXHR?.responseJSON?.message || "Unable to update booking", isSuccess: false });
+            let errorMsg = null;
+            if (jqXHR?.responseJSON?.errors) {
+                errorMsg = convertErrorsDataStructureToString(jqXHR?.responseJSON?.errors);
+            } else if (jqXHR?.responseJSON?.message) {
+                errorMsg = jqXHR?.responseJSON?.message;
+            }
+            toast.timeout({ text: errorMsg || "Unable to update booking", isSuccess: false });
             form.valid()
         };
 
