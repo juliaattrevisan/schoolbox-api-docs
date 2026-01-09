@@ -223,7 +223,7 @@ class DialogAgentConfigureFields
         /* Include the activity context */
         $payload['input'][] = [
             'role' => 'user',
-            'content' => $this->formatActivityContextPrompt($assessment),
+            'content' => $this->formatActivityContextPrompt($scenario, $assessment),
         ];
 
         return $payload;
