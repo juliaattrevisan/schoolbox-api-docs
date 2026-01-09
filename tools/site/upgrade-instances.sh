@@ -74,28 +74,34 @@ function trigger_instance_circuit_breaker() {
   send_slack_alert "$instance_id"
 }
 
-# Send Slack alert via email
+# Send Slack alert via webhook
 function send_slack_alert() {
   local instance_id=$1
   local log_file="/var/log/schoolbox/${instance_id}/upgrade.log"
   local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-  local email="operations-aaaaaxwus43lmb5z5amyxounpy@alaress.slack.com" # address for #operations in Slack
+  local webhook_url="https://hooks.slack.com/services/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"
 
-  local subject="[ALERT] Schoolbox upgrade failed for ${instance_id}"
-  local body="Schoolbox upgrade failed and circuit breaker activated.
+  local message="*[ALERT] Schoolbox upgrade failed for ${instance_id}*
 
-Instance: ${instance_id}
-Timestamp: ${timestamp}
-Log file: ${log_file}
+Schoolbox upgrade failed and circuit breaker activated.
+
+*Instance:* ${instance_id}
+*Timestamp:* ${timestamp}
+*Log file:* ${log_file}
 
 The upgrade script will not run again for this instance for 24 hours.
 Manual intervention required.
 
 To manually reset the circuit breaker:
-  rm /var/lock/schoolbox-upgrade/${instance_id}.lock
+\`\`\`
+rm /var/lock/schoolbox-upgrade/${instance_id}.lock
+\`\`\`
 "
 
-  echo "$body" | mail -aFrom:ist@schoolbox.com.au -s "$subject" "$email"
+  # Send to Slack webhook
+  curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"${message}\"}" \
+    "$webhook_url" 2>&1 | $LOG $L_INFO
 }
 
 # Clear circuit breaker for a specific instance
