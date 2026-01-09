@@ -153,7 +153,7 @@ class Controller extends Base
                 'useDifferentiationProfile' => $assessment->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
-                    'body' => $fieldContext->getBody(),
+                    'body' => $fieldContext->getBody() ?? '',
                     'field' => [
                         'id' => $fieldContext->getField()->getId(),
                         'title' => $fieldContext->getField()->getTitle(),

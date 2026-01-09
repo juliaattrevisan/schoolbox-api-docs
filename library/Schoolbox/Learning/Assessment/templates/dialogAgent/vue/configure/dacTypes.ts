@@ -3,14 +3,16 @@ export type DialogAgentScenario = {
     description: string;
 };
 
+export type DialogAgentScenarioField = {
+    id: number;
+    title: string;
+    meta: string | null;
+};
+
 type DialogAgentFieldContext = {
     id: number;
     body: string;
-    field: {
-        id: number;
-        title: string;
-        meta: string | null;
-    };
+    field: DialogAgentScenarioField;
 };
 
 /** @see /library/Schoolbox/Learning/Assessment/DialogAgent/Lookup/Helpfulness.php */

@@ -40,6 +40,11 @@
     { assessmentId: assessment.id, assessment: assessment }
 ) %}
 
+{% set generateFieldsRoute = routeLookupIfAuthorized(
+    'learningDialogAgent.getGenerateConfigurationFields',
+    { assessmentId: assessment.id, assessment: assessment }
+) %}
+
 <div id="dialog-agent-configure-container">
     <dialog-agent-configure
         :scenario="{{ scenario |json_encode }}"
@@ -47,6 +52,7 @@
         :helpfulness-options="{{ helpfulnessOptions |json_encode }}"
         :language-options="{{ languageOptions |json_encode }}"
         post-update="{{ updateRoute }}"
+        get-generate-fields="{{ generateFieldsRoute }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/dialogAgentConfigure.js?v={{ config.site_version }}"></script>

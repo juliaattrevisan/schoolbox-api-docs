@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { cloneDeep } from "lodash";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import { sbProps } from "@js/util/sbx/pageUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DacForm from "./dac-form.vue";
 import DacSandbox from "./dac-sandbox.vue";
-import type { DialogAgentAssessmentConfig, DialogAgentHelpfulness, DialogAgentScenario } from "./dacTypes";
+import type {
+    DialogAgentAssessmentConfig,
+    DialogAgentHelpfulness,
+    DialogAgentScenario,
+    DialogAgentScenarioField,
+} from "./dacTypes";
 
 interface Props {
     scenario: DialogAgentScenario;
@@ -12,6 +18,7 @@ interface Props {
     helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
     postUpdate: string | null;
+    getGenerateFields: string | null;
 }
 
 const props = defineProps<Props>();
@@ -56,10 +63,66 @@ function onFormSaved(): void {
     updateSandbox();
     isPromptModalOpen.value = true;
 }
+
+const isGeneratingFields = window.Vue.ref<boolean>(false);
+const generateFieldsError = window.Vue.ref<string | null>(null);
+
+/**
+ * Request AI for an initial field configuration for a dialog agent activity to be generated
+ */
+async function generateFields(): Promise<void> {
+    if (!props.getGenerateFields) {
+        throw new Error("missing getGenerateFields route"); // shouldn't get here
+    }
+
+    generateFieldsError.value = null;
+    isGeneratingFields.value = true;
+    const response = await apiRequest<Record<DialogAgentScenarioField["id"], string>>({
+        method: "GET",
+        url: props.getGenerateFields,
+    });
+    isGeneratingFields.value = false;
+
+    if (!response.success) {
+        generateFieldsError.value = response.message;
+        return;
+    }
+
+    /** Update all the fields if they actually changed */
+    assessmentConfigInfo.value.fieldContexts.forEach((fieldContext) => {
+        const generatedContent = response.data[fieldContext.field.id] || null;
+        if (generatedContent === null) {
+            console.warn(`Missing content for field context ${fieldContext.id} (field ${fieldContext.field.id})`);
+            return;
+        }
+
+        fieldContext.body = generatedContent;
+    });
+}
+
+window.Vue.onMounted(async () => {
+    /**
+     * On initial load, if there aren't values for the fields yet then request AI to generate them
+     * This only happens if the scenario fields are all empty
+     *
+     * "Rules" is prefilled by the scenario's default
+     * "Opening Message" is left empty for now
+     */
+    if (props.getGenerateFields && assessmentConfigInfo.value.fieldContexts.every((fc) => fc.body.trim() === "")) {
+        await generateFields();
+    }
+});
 </script>
 
 <template>
-    <div class="row">
+    <div v-if="isGeneratingFields" class="row">
+        <div class="small-12 island">
+            <section>
+                <div class="loader"></div>
+            </section>
+        </div>
+    </div>
+    <div v-else class="row">
         <div class="small-12 island" :class="{ 'large-6': sandboxVisible }">
             <h2 class="subheader">Settings</h2>
             <dac-form
