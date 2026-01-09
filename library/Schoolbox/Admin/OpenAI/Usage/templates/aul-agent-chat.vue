@@ -2,9 +2,11 @@
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import type { AgentChatFeedMessage } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import { AiFeature } from "./payload";
 import type { AiLogFormat, AiSessionLogApiResponse } from "./payload";
 
 interface Props {
+    feature: AiFeature;
     sessionLog: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT>;
 }
 
@@ -22,10 +24,23 @@ const sessionFeed = window.Vue.computed<AgentChatFeedMessage[]>(() => {
         firstLog.createdBy,
     );
 });
+
+const agentIcon = window.Vue.computed(() => {
+    if (props.feature === AiFeature.DIALOG_AGENT) {
+        return "dialog-agent";
+    }
+
+    return "ai";
+});
 </script>
 
 <template>
-    <ac-feed :feed="sessionFeed" :allow-selection="false" error-prefix="There was a problem retrieving the response." />
+    <ac-feed
+        :feed="sessionFeed"
+        :allow-selection="false"
+        error-prefix="There was a problem retrieving the response."
+        :agent-icon="agentIcon"
+    />
 </template>
 
 <style scoped></style>

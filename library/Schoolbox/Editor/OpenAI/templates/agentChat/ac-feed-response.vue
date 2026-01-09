@@ -14,9 +14,14 @@ interface Props {
     allowRetry?: boolean;
     /** Whether the user can select this response */
     allowSelection: boolean;
+    /** The icon to use for the agent's portrait in responses, default is 'ai' */
+    icon?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    errorPrefix: undefined,
+    icon: "ai",
+});
 const acStore = useAgentChatStore();
 const acPromptEventBus = useEventBus(acPromptEventKey);
 
@@ -92,7 +97,7 @@ function retryResponse(): void {
             <div class="ac-feed-message-portrait l-mar-s--right">
                 <div class="c-img c-img--round c-img--xs">
                     <div class="c-img__wrapper">
-                        <div class="icon icon-ai"></div>
+                        <div class="icon" :class="`icon-${props.icon}`"></div>
                     </div>
                 </div>
             </div>

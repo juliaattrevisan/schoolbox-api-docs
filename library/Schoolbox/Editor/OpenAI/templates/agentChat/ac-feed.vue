@@ -21,6 +21,8 @@ interface Props {
     minHeight?: string;
     /** Should the feed be initially scrolled to the bottom? */
     initiallyScrolled?: boolean;
+    /** The icon to use for the agent's portrait in responses */
+    agentIcon?: string;
 }
 const props = defineProps<Props>();
 const acPromptEventBus = useEventBus(acPromptEventKey);
@@ -78,6 +80,7 @@ defineExpose({ feedEl });
                         :error-prefix="props.errorPrefix"
                         :allow-retry="props.allowRetry"
                         :allow-selection="props.allowSelection"
+                        :agent-icon="props.agentIcon"
                     />
                 </template>
 

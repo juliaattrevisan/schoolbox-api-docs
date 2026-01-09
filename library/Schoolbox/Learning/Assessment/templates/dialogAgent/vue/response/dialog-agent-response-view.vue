@@ -62,6 +62,7 @@ function onAction(): void {
             :max-height="undefined"
             :feed="acStore.fullFeed"
             error-prefix="There was a problem retrieving the response."
+            agent-icon="dialog-agent"
         />
         <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </section>
