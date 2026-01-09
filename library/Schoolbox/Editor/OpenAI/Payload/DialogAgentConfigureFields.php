@@ -43,6 +43,8 @@ class DialogAgentConfigureFields
             •	Course / Class context
             •	Activity title
             •	Activity description
+            •	Scenario title
+            •	Scenario details
             •	Curriculum codes
             •	Scenario fields, each with:
                 •	Field name
@@ -97,6 +99,10 @@ class DialogAgentConfigureFields
             Course Name: [COURSE_NAME]
             Unit Name: [UNIT_NAME]
             Curriculum: [CURRICULUM_CONTENT]
+            Activity Title: [ACTIVITY_TITLE]
+            Activity Description: [ACTIVITY_DESCRIPTION]
+            Scenario Title: [SCENARIO_TITLE]
+            Scenario Description: [SCENARIO_DESCRIPTION]
     ";
 
 
@@ -260,10 +266,11 @@ class DialogAgentConfigureFields
 
     /**
      * Generate the system prompt for the activity context
+     * @param Scenario $scenario
      * @param DialogAgent $assessment
      * @return string
      */
-    private function formatActivityContextPrompt(DialogAgent $assessment): string
+    private function formatActivityContextPrompt(Scenario $scenario, DialogAgent $assessment): string
     {
         $baseContext = $assessment->getContext()->getBaseContext();
         $unit = $baseContext instanceof UnitImplementation ? $baseContext : null;
@@ -284,6 +291,8 @@ class DialogAgentConfigureFields
                 '[CURRICULUM_CONTENT]' => json_encode($curriculumNodes, JSON_PRETTY_PRINT),
                 '[ACTIVITY_TITLE]' => $assessment->getTitle(),
                 '[ACTIVITY_DESCRIPTION]' => \Scrub::html2text($assessment->getDescription()),
+                '[SCENARIO_TITLE]' => $scenario->getTitle(),
+                '[SCENARIO_DESCRIPTION]' => \Scrub::html2text($scenario->getDescription()),
             ]
         );
     }
