@@ -8,6 +8,73 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+# Circuit breaker configuration
+readonly CIRCUIT_BREAKER_DIR="/var/lock/schoolbox-upgrade"
+readonly CIRCUIT_BREAKER_TIMEOUT=86400  # 24 hours in seconds
+
+# Circuit breaker helpers
+# Check if circuit breaker is active for a specific instance
+check_instance_circuit_breaker() {
+  local instance_id=$1
+  local breaker_file="${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
+
+  if [ -f "$breaker_file" ]; then
+    local last_failure=$(cat "$breaker_file")
+    local current_time=$(date +%s)
+    local time_diff=$((current_time - last_failure))
+
+    if [ $time_diff -lt $CIRCUIT_BREAKER_TIMEOUT ]; then
+      local hours_remaining=$(( (CIRCUIT_BREAKER_TIMEOUT - time_diff) / 3600 ))
+      echo "Circuit breaker active for instance '$instance_id'. Last failure was ${time_diff}s ago. Skipping backup (retry in ${hours_remaining}h)." | tee -a /var/log/schoolbox/upgrade.log
+      return 1  # Circuit breaker is active
+    else
+      echo "Circuit breaker timeout expired for instance '$instance_id'. Removing lock and proceeding..." | tee -a /var/log/schoolbox/upgrade.log
+      clear_instance_circuit_breaker "$instance_id"
+      return 0  # Circuit breaker expired, can proceed
+    fi
+  fi
+  return 0  # No circuit breaker, can proceed
+}
+
+# Trigger circuit breaker for a specific instance
+trigger_instance_circuit_breaker() {
+  local instance_id=$1
+  mkdir -p "$CIRCUIT_BREAKER_DIR"
+  date +%s > "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
+  echo "Circuit breaker triggered for instance '$instance_id'. Backup/upgrade will not run again for 24 hours." | tee -a /var/log/schoolbox/upgrade.log
+  send_slack_alert "$instance_id"
+}
+
+# Send Slack alert via email
+send_slack_alert() {
+  local instance_id=$1
+  local log_file="/var/log/schoolbox/${instance_id}/upgrade.log"
+  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local email="operations-aaaaaxwus43lmb5z5amyxounpy@alaress.slack.com" # address for #operations in Slack
+
+  local subject="[ALERT] Schoolbox database backup failed for ${instance_id}"
+  local body="Schoolbox database backup failed during package upgrade and circuit breaker activated.
+
+Instance: ${instance_id}
+Timestamp: ${timestamp}
+Log file: ${log_file}
+
+The backup/upgrade will not run again for this instance for 24 hours.
+Manual intervention required.
+
+To manually reset the circuit breaker:
+  rm /var/lock/schoolbox-upgrade/${instance_id}.lock
+"
+
+  echo "$body" | mail -aFrom:ist@schoolbox.com.au -s "$subject" "$email"
+}
+
+# Clear circuit breaker for a specific instance
+clear_instance_circuit_breaker() {
+  local instance_id=$1
+  rm -f "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
+}
+
 case "$1" in
     install)
     ;;
@@ -20,6 +87,12 @@ case "$1" in
 
             instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
             for instance_id in $instance_list; do
+                # Check circuit breaker FIRST for this instance
+                if ! check_instance_circuit_breaker "$instance_id"; then
+                    # Circuit breaker is active, skip this instance
+                    continue
+                fi
+
                 instance_log_file=/var/log/schoolbox/"$instance_id"/upgrade.log
                 echo "Backing up instance ${instance_id}. Logging to $instance_log_file" | tee -a /var/log/schoolbox/upgrade.log
                 mkdir -p /var/log/schoolbox/"$instance_id" 2>&1 | tee -a /var/log/schoolbox/upgrade.log
@@ -33,9 +106,11 @@ case "$1" in
                 instance_id=$(echo "$group" | cut -d '-' -f2)
                 if ! wait "$pid"; then
                     echo "Error: Failed to backup instance $instance_id" | tee -a /var/log/schoolbox/upgrade.log
+                    trigger_instance_circuit_breaker "$instance_id"
                     any_failures=1
                 else
                     echo "Backup complete for $instance_id" | tee -a /var/log/schoolbox/upgrade.log
+                    clear_instance_circuit_breaker "$instance_id"
                 fi
             done
 
