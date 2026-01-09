@@ -80,7 +80,7 @@ function onFormSaved(): void {
                 <div class="loader"></div>
             </section>
             <div
-                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessage"
+                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessageScrubbed"
                 class="empty-state"
             >
                 <i class="icon-dialog-agent"></i>
@@ -89,7 +89,7 @@ function onFormSaved(): void {
             <section v-else>
                 <dac-sandbox
                     ref="sandboxRef"
-                    :opening-message="sandboxDataCache.openingMessage"
+                    :opening-message-scrubbed="sandboxDataCache.openingMessageScrubbed"
                     :post-message="sandboxDataCache._routes.postSandboxMessage"
                     :is-dirty="isSandboxDirty"
                 />

@@ -149,6 +149,7 @@ class Controller extends Base
                 'helpfulness' => $assessment->getHelpfulness() ?? Helpfulness::DEFAULT,
                 'language' => $assessment->getLanguage() ?? Language::DEFAULT,
                 'openingMessage' => $assessment->getOpeningMessage(),
+                'openingMessageScrubbed' => \Scrub::markdown($assessment->getOpeningMessage()),
                 'rules' => $assessment->getRules() ?: $scenario->getDefaultRules(),
                 'useDifferentiationProfile' => $assessment->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
@@ -280,6 +281,7 @@ class Controller extends Base
 
         $this->response = $this->responseAsJson([
             'prompt' => $assessment->getPrompt(),
+            'openingMessageScrubbed' => \Scrub::markdown($assessment->getOpeningMessage()),
             '_routes' => [
                 'postSandboxMessage' => $this->getRouteIfAuthorized('learningDialogAgent.postSandboxMessage', [
                     'assessmentId' => $assessment->getId(),
@@ -348,7 +350,7 @@ class Controller extends Base
                 'status' => 'success',
                 'responseId' => null,
                 'image' => null,
-                'message' => $assessment->getOpeningMessage()
+                'message' => \Scrub::markdown($assessment->getOpeningMessage()),
             ],
             'createdAt' => $assessment->getCreatedAt(), // this message should always appear first
         ]);

@@ -48,7 +48,10 @@ type AgentChatResponseSuccess = {
      * - otherwise `null` if no image was generated
      */
     image: AgentChatImage | false | null;
-    /* a message from the AI, if any */
+    /**
+     * A message from the AI, if any
+     * WARNING: Response messages can be rendered with v-html, so must be properly purified with Scrub before being sent to the frontend
+     */
     message: string;
 };
 
@@ -57,6 +60,9 @@ type AgentChatResponseError = {
     status: "error";
     entryKey: number;
     responseId: string | null;
+    /**
+     * WARNING: Response messages can be rendered with v-html, so must be properly purified with Scrub before being sent to the frontend
+     */
     message: string;
 };
 
@@ -66,6 +72,9 @@ export type AgentChatResponseInProgress = {
     entryKey: `loading-${number}`;
     responseId: string | null;
     image: AgentChatImage | null;
+    /**
+     * WARNING: Response messages can be rendered with v-html, so must be properly purified with Scrub before being sent to the frontend
+     */
     message: string;
 };
 
