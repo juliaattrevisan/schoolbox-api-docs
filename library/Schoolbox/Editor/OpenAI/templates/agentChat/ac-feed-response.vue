@@ -71,18 +71,32 @@ function retryResponse(): void {
         </div>
     </div>
 
-    <div v-else class="ac-feed-response ac-feed-response-success" :class="{ radiolist: props.allowSelection }">
-        <template v-if="props.allowSelection">
-            <input
-                :id="radioId"
-                v-model="acStore.selectedFeedEntry"
-                type="radio"
-                :name="radioId"
-                :value="props.message.entryKey"
-                :disabled="props.message.status !== 'success' || undefined"
-            />
-            <label :for="radioId"> </label>
-        </template>
+    <div
+        v-else
+        class="ac-feed-response ac-feed-response-success"
+        :class="{ radiolist: props.allowSelection && imageSrc }"
+    >
+        <div class="ac-feed-side l-flex-row">
+            <div v-if="props.allowSelection && imageSrc" class="ac-feed-select l-mar-s--left l-mar--auto-horiz">
+                <input
+                    :id="radioId"
+                    v-model="acStore.selectedFeedEntry"
+                    type="radio"
+                    :name="radioId"
+                    :value="props.message.entryKey"
+                    :disabled="props.message.status !== 'success' || undefined"
+                />
+                <label :for="radioId"> </label>
+            </div>
+
+            <div class="ac-feed-message-portrait l-mar-s--right">
+                <div class="c-img c-img--round c-img--xs">
+                    <div class="c-img__wrapper">
+                        <div class="icon icon-ai"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <template v-if="props.message.status === 'error'">
             <p class="alert-box alert l-mar--0 l-pad-s">
@@ -120,8 +134,11 @@ function retryResponse(): void {
 
 <style scoped lang="scss">
 .ac-feed-response {
-    width: 80%;
+    align-items: flex-start;
     display: flex;
+    justify-content: flex-start;
+    margin-right: 20%;
+    width: 80%;
 
     img {
         max-width: 200px;
@@ -130,7 +147,26 @@ function retryResponse(): void {
 
     .ac-feed-message-container {
         background-color: #e4e4e4;
-        // flex-grow: 1;
+    }
+
+    .ac-feed-select {
+        align-self: start;
+    }
+
+    .ac-feed-side {
+        // allows the input/portrait to be aligned to the top/bottom correctly
+        align-self: stretch;
+        flex-basis: min-content;
+    }
+
+    .ac-feed-message-portrait {
+        align-self: end;
+
+        .c-img__wrapper {
+            width: 100%;
+            height: 100%;
+            background-color: #e4e4e4;
+        }
     }
 
     /**
