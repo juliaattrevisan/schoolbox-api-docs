@@ -111,7 +111,7 @@ class DialogAgentConfigureFields
             'properties' => [
                 'fields' => [
                     'type' => 'object',
-                    'description' => 'A map of field ID to the value for that field, do not include the field titles or descriptions in the values',
+                    'description' => 'A map of field ID to the value for that field, respond with only the value for each field, do not include the field name or description',
                     'properties' => [],
                     'required' => [],
                     'additionalProperties' => false,
