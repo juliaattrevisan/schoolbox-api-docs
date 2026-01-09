@@ -84,7 +84,7 @@ class DialogAgentConfigureFields
      * [FIELD_TITLE]
      * [FIELD_META]
      */
-    private const string PROMPT_SYSTEM_FIELD_CONTEXT = "[FIELD_TITLE]: [FIELD_META]";
+    private const string PROMPT_SYSTEM_FIELD_CONTEXT = "FIELD TITLE: [FIELD_TITLE]\nFIELD DESCRIPTION:[FIELD_META]";
 
 
     /**
@@ -111,6 +111,7 @@ class DialogAgentConfigureFields
             'properties' => [
                 'fields' => [
                     'type' => 'object',
+                    'description' => 'A map of field ID to the value for that field, do not include the field titles or descriptions in the values',
                     'properties' => [],
                     'required' => [],
                     'additionalProperties' => false,
