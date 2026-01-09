@@ -394,7 +394,7 @@ class Notifier extends AbstractModuleNotifier
          * and make an $instance for each. To do that we can send it to the WRITE access users of the assessment's folder.
          */
         $assessment = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
-        $folder = $assessment->getContextFolder();
+        $folder = $assessment->getAssessmentContext()->getFolder();
 
         /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
          */
