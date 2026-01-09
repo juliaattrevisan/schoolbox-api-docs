@@ -70,6 +70,7 @@ defineExpose({ resetFeed });
             prompt-placeholder="Type a response here..."
             :prompt-attributes="[]"
         />
+        <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
 
     <div class="component-action">
