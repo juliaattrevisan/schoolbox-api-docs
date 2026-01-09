@@ -108,8 +108,19 @@ class DialogAgentConfigureFields
         'name' => 'fields_format',
         'schema' => [
             'type' => 'object',
-            'properties' => [],
-            'required' => [],
+            'properties' => [
+                'fields' => [
+                    'type' => 'object',
+                    'properties' => [],
+                    'required' => [],
+                    'additionalProperties' => false,
+                ],
+                'openingMessage' => [
+                    'type' => 'string',
+                    'description' => 'An opening message to start the discussion with the student',
+                ],
+            ],
+            'required' => ['fields', 'openingMessage'],
             'additionalProperties' => false,
         ],
         'strict' => true
@@ -226,7 +237,7 @@ class DialogAgentConfigureFields
              * We don't use or support anything but textarea in 26.0, but the schema exists for them to be added in the future...
              */
 
-            $responseFormat['schema']['properties'][$key] = [
+            $responseFormat['schema']['properties']['fields']['properties'][$key] = [
                 'type' => 'string',
                 'description' => strtr(self::PROMPT_SYSTEM_FIELD_CONTEXT, [
                     '[FIELD_TITLE]' => $field->getTitle(),
@@ -235,7 +246,7 @@ class DialogAgentConfigureFields
             ];
 
             /* strict mode, so all property keys must be required  */
-            $responseFormat['schema']['required'][] = $key;
+            $responseFormat['schema']['properties']['fields']['required'][] = $key;
         }
 
         return $responseFormat;

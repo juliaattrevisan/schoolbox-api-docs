@@ -67,6 +67,11 @@ function onFormSaved(): void {
 const isGeneratingFields = window.Vue.ref<boolean>(false);
 const generateFieldsError = window.Vue.ref<string | null>(null);
 
+type ApiGenerateConfigurationFieldsResponse = {
+    openingMessage: string | null;
+    fields: Record<DialogAgentScenarioField["id"], string | null>;
+};
+
 /**
  * Request AI for an initial field configuration for a dialog agent activity to be generated
  */
@@ -77,7 +82,7 @@ async function generateFields(): Promise<void> {
 
     generateFieldsError.value = null;
     isGeneratingFields.value = true;
-    const response = await apiRequest<Record<DialogAgentScenarioField["id"], string>>({
+    const response = await apiRequest<ApiGenerateConfigurationFieldsResponse>({
         method: "GET",
         url: props.getGenerateFields,
     });
@@ -88,9 +93,9 @@ async function generateFields(): Promise<void> {
         return;
     }
 
-    /** Update all the fields if they actually changed */
+    /** Update all the fields if there's relevant data for them */
     assessmentConfigInfo.value.fieldContexts.forEach((fieldContext) => {
-        const generatedContent = response.data[fieldContext.field.id] || null;
+        const generatedContent = response.data.fields[fieldContext.field.id] || null;
         if (generatedContent === null) {
             console.warn(`Missing content for field context ${fieldContext.id} (field ${fieldContext.field.id})`);
             return;
@@ -98,6 +103,11 @@ async function generateFields(): Promise<void> {
 
         fieldContext.body = generatedContent;
     });
+
+    /** Update the opening message if there's relevant data for it */
+    if (response.data.openingMessage !== null) {
+        assessmentConfigInfo.value.openingMessage = response.data.openingMessage;
+    }
 }
 
 window.Vue.onMounted(async () => {
@@ -125,6 +135,10 @@ window.Vue.onMounted(async () => {
     <div v-else class="row">
         <div class="small-12 island" :class="{ 'large-6': sandboxVisible }">
             <h2 class="subheader">Settings</h2>
+            <div v-if="generateFieldsError" data-alert class="alert-box warning">
+                Unable to generate initial field configuration: {{ generateFieldsError }}
+                <a href="" class="close" @click.prevent="generateFieldsError = null">×</a>
+            </div>
             <dac-form
                 v-model:assessment-config="assessmentConfigInfo"
                 v-model:is-submitting="isSubmitting"

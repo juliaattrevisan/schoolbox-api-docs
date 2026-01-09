@@ -47,7 +47,7 @@ class DialogAgentConfigureFields
      * @param string   $sessionId The session ID against which this request should be logged.
      * @param Scenario $scenario
      * @param DialogAgent $assessment
-     * @return Collection<int,string|null> Map of scenario field ID to generated field value
+     * @return array{openingMessage:string|null,fields:Collection<int,string|null>} Response data, fields are a map of field ID to generated value
      * @throws ClientExceptionInterface
      * @throws SchoolboxException
      */
@@ -56,7 +56,7 @@ class DialogAgentConfigureFields
         string $sessionId,
         Scenario $scenario,
         DialogAgent $assessment,
-    ): Collection {
+    ): array {
         $payload = new PayloadGenerator(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
@@ -83,10 +83,10 @@ class DialogAgentConfigureFields
      * Handle the response from the AI for a request
      * @param Scenario $scenario
      * @param string $feedbackResponseData
-     * @return Collection<int,string|null> Map of scenario field ID to generated field value
+     * @return array{openingMessage:string|null,fields:Collection<int,string|null>} Response data, fields are a map of field ID to generated value
      * @throws SchoolboxException
      */
-    private function parseResponse(Scenario $scenario, string $feedbackResponseData): Collection
+    private function parseResponse(Scenario $scenario, string $feedbackResponseData): array
     {
         $data = json_decode($feedbackResponseData, true);
 
@@ -111,14 +111,17 @@ class DialogAgentConfigureFields
         }
 
         /* Retrieve the output for each field that was requested */
-        $fields = new Collection();
+        $resultData = [
+            'openingMessage' => $fieldsData['openingMessage'] ?? null,
+            'fields' => new Collection(),
+        ];
 
         foreach ($scenario->getFields() as $field) {
             // maybe the AI didn't return stuff for this field... ignore if so
-            $body = $fieldsData[PayloadGenerator::getPayloadFieldKey($field)] ?? null;
-            $fields->setOffset($field->getId(), $body);
+            $body = $fieldsData['fields'][PayloadGenerator::getPayloadFieldKey($field)] ?? null;
+            $resultData['fields']->setOffset($field->getId(), $body);
         }
 
-        return $fields;
+        return $resultData;
     }
 }
