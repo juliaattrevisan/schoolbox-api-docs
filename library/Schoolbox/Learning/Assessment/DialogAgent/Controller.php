@@ -488,7 +488,7 @@ class Controller extends Assessment\Controller
             'feed' => $feed,
             'student' => $userTranslator->__invoke($student),
             'responseData' => $responseTranslator->__invoke($response),
-            'duration' => $assessment->getDuration(),
+            'duration' => $assessment->isDurationUnlimited() ? null : $assessment->getDuration(),
             'returnUrl' => $returnUrl,
         ];
 
