@@ -62,9 +62,12 @@ function retryResponse(): void {
         <div>
             <img v-if="imageSrc" :src="imageSrc" />
 
-            <p class="l-mar--0-bottom" :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }">
-                {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
-            </p>
+            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
+                <p class="ac-feed-message-content">
+                    <!-- Usually the AI responds with a <p> tag in it's response, mimic that here... -->
+                    {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
+                </p>
+            </div>
         </div>
     </div>
 
@@ -103,10 +106,14 @@ function retryResponse(): void {
             <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar--0">
                 <i class="icon-image"></i>
             </div>
-            <p class="l-mar--0-bottom ac-feed-message-content" :class="{ 'l-mar-s--top': imageSrc !== null }">
+            <div
+                v-if="props.message.message.length"
+                class="ac-feed-message-container l-pad-s"
+                :class="{ 'l-mar-s--top': imageSrc }"
+            >
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
-                <span v-html="props.message.message"></span>
-            </p>
+                <p class="ac-feed-message-content" v-html="props.message.message"></p>
+            </div>
         </div>
     </div>
 </template>
@@ -119,6 +126,21 @@ function retryResponse(): void {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    .ac-feed-message-container {
+        background-color: #e4e4e4;
+        border: 1px solid #b3b3b3;
+        // flex-grow: 1;
+    }
+
+    /**
+     * we don't want margins at the end of the content but since <p> tags can be given
+     * to us from the AI, we have to target them specifically
+     */
+    .ac-feed-message-content,
+    .ac-feed-message-content :deep(p:last-child) {
+        margin: 0;
     }
 
     /**
@@ -161,11 +183,7 @@ function retryResponse(): void {
         min-height: 1.5rem;
         width: 1.5rem;
         height: 1.5rem;
-        margin: 0 0.5rem 0 0;
-    }
-
-    .ac-feed-message-loading {
-        margin-top: 0.125rem;
+        margin: 0.5rem 0.5rem 0 0;
     }
 }
 </style>
