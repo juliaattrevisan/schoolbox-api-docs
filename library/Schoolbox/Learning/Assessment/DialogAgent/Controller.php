@@ -306,25 +306,6 @@ class Controller extends Assessment\Controller
 
         $participant = $assessment->getParticipantIfExtant($student);
 
-        /* Decide if this $student can create a response to this learning activity
-         */
-        $canRespond = false;
-
-        try {
-            $assessment->assertCanRespond($participant);
-
-            /* The total time spent in this learning activity must not exceed the total allowed duration,
-             * if set; not sure how we're gonna calculate that atm
-             *
-             * TODO figure out how to aggregate total time spent in a chat
-             *  $assessment->assertDuration($participant); ...?
-             */
-
-            $canRespond = true;
-        } catch (\DomainException $e) {
-            // noop
-        }
-
         /* Find out if there's an unsubmitted dialog agent linked to a session (Resume) and create a
          * button which goes to that particular response so students can continue it.
          *
@@ -351,7 +332,6 @@ class Controller extends Assessment\Controller
             'returnUrlEncoded'  => Redirect::encode($returnUrl),
             'courseAssessments' => $courseAssessments,
             'participant'       => $participant,
-            'canRespond'        => $canRespond,
             /* An array representing a call to action
              */
             'button' => (new Button($this->routeGenerator, $this->authorizer, $this->getAccess()))->generate($assessment, $participant, $this->getUser()),
@@ -560,10 +540,6 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
-        /* TODO Pretty sure there are some conditionals about when someone can make a Dialog Agent
-         *  response such as the Duration hasn't elapsed; that it's published+open; etc.
-         *  Not sure atm if that idea overlaps whatever this meant
-         */
         return [
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];

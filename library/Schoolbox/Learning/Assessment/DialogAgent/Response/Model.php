@@ -71,8 +71,6 @@ class Model extends AbstractResponse
             return Status::SUBMITTED;
         }
 
-        // TODO: deal with duration eventually. still allow SOBO from staff
-
         /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
          * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
          *
