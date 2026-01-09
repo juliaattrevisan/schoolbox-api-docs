@@ -168,9 +168,9 @@ $(function() {
                 window.location.href = $('#resource-booking-back').attr('href')+dateQuery;
             }
         };
-        var ajaxFail = function() {
+        var ajaxFail = function (jqXHR) {
             const toast = window.sbProps.toastActivate();
-            toast.timeout({ text: "Unable to update booking", isSuccess: false });
+            toast.timeout({ text: jqXHR?.responseJSON?.message || "Unable to update booking", isSuccess: false });
             form.valid()
         };
 
