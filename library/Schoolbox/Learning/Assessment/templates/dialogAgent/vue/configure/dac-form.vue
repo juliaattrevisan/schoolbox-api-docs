@@ -189,14 +189,14 @@ async function onSubmit(): Promise<void> {
                     :key="fieldContext.id"
                     class="small-12 columns"
                 >
-                    <label :for="`field-${fieldContext.field.id}`" class="required">
+                    <label :for="`fieldContext-${fieldContext.id}`" class="required">
                         {{ fieldContext.field.title }}
                     </label>
                     <p v-if="fieldContext.field.meta" class="meta">
                         {{ fieldContext.field.meta }}
                     </p>
                     <textarea
-                        :id="`fieldcontext-${fieldContext.id}`"
+                        :id="`fieldContext-${fieldContext.id}`"
                         v-model.trim="fieldContext.body"
                         :name="`fieldContexts[${fieldContext.id}]`"
                         style="resize: vertical"
