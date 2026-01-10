@@ -779,4 +779,23 @@ class Mapper extends BaseMapper
 
         return $periodsByResourceId;
     }
+
+    /**
+     * @param int $bookingId
+     * @return bool
+     */
+    public function isForEotcEvent(int $bookingId): bool
+    {
+        $query = "
+            SELECT EXISTS(
+                SELECT *
+                FROM eotc_metadata_resourcebooking
+                WHERE booking_id = :bookingId
+            ) AS `exists`
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(['bookingId' => $bookingId]);
+        $rows = $statement->fetchAll(PDO::FETCH_COLUMN);
+        return (bool)$rows[0];
+    }
 }

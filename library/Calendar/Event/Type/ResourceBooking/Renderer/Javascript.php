@@ -16,6 +16,7 @@ namespace Calendar\Event\Type\ResourceBooking\Renderer;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\User;
 use Scrub;
 
@@ -210,6 +211,7 @@ class Javascript extends Base
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
                     'related'  => $relatedBookings,
+                    'isForEotcEvent' => ResourceBookingMapper::getInstance()->isForEotcEvent($this->getEvent()->getBooking()->getId()),
                 ],
             ],
         ];

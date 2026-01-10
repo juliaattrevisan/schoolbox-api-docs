@@ -158,6 +158,7 @@ export default {
             const extendedProps = {
                 id: event.id, // This is a unique composite id for the FullCalendar event, set in the Calendar/Event/Type/{eventType}/Renderer/Javascript.php files.
                 eventId: metadata?.eventId,
+                eventConnectorClass: metadata?.eventConnectorClass,
                 seriesId: metadata?.seriesId,
                 editable: metadata?.editable,
                 detail: metadata?.detail,
@@ -217,6 +218,7 @@ export default {
                     status: data?.booking?.status,
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
+                    isForEotcEvent: data?.booking?.isForEotcEvent,
                 };
             } else {
                 // The modal is for an event item (representing a row of the event table).
@@ -1130,7 +1132,9 @@ export default {
                             <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.BOOKING... -->
                             <span
                                 v-if="
-                                    eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.BOOKING
+                                    eventExtendedProps.booking &&
+                                    eventExtendedProps.variant === EVENT_VARIANTS.BOOKING &&
+                                    !eventExtendedProps.booking.isForEotcEvent // EOTC events are always on the calendar so do not need to be added.
                                 "
                             >
                                 <button @click.prevent="addEventToCalendar">Add Event to Calendar</button>
