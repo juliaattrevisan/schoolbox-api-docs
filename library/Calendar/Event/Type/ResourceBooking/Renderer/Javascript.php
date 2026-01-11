@@ -139,6 +139,38 @@ class Javascript extends Base
             ];
         }
 
+        // For 'EOTC' bookings, the source event is defined in the `eotc_event` table.
+        // This event links to the `resource_booking` row via `eotc_metadata_resourcebooking.bookingId`.
+        // Each EOTC booking also links to an `event` row via `resource_booking.event_id`.  That seems unnecessary
+        // because start/end times are already defined in the eotc_event table.
+        // TODO: Find whether `event` rows linked from `resource_booking` rows linked to `eotc_metadata_resourcebooking`
+        //       are used.  If not, consider removing them and allowing null values on `resource_booking.event_id`.
+        $resourceBookingMapper = ResourceBookingMapper::getInstance();
+        $eotcEventId = $resourceBookingMapper->getEotcEventId($booking->getId()); // TODO: Implement this.
+
+        // This is the type of event to which the resource booking is linked.
+        // The linked event will either be:
+        //  * an 'EOTC' event, referring to library/Calendar/Event/Type/EOTC/Event.php
+        //  * a 'Day' event, referring to library/Calendar/Event/Type/Day/Event.php
+        $linkedEventType = (
+            $eotcEventId === null
+            ? 'Day'
+            : 'EOTC'
+        );
+
+        // This is the id to use with FullCalendar.getEventById() (reference:
+        $linkedEventFullCalendarEventId = match ($linkedEventType) {
+            'EOTC' => "$linkedEventType-" . $eotcEventId,
+            'Day' => (
+                $this->getEvent()->getEventVariant() === Event::VARIANT_EVENT
+                ? "$linkedEventType-" . $this->getEvent()->getEventId()
+                : null // Events of variant 'booking' do not appear on the calendar, so do not have a FullCalendar id.
+                       // To get this event to appear on the calendar, the user must click 'Add Event to Calendar'
+                       // (see view-event-modal.vue).
+            ),
+            default => throw new \LogicException("Unexpected linked event type '$linkedEventType'."),
+        };
+
         // Set title from resource name, and code and booking name
         // if either are there.
 
@@ -211,7 +243,11 @@ class Javascript extends Base
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
                     'related'  => $relatedBookings,
-                    'isForEotcEvent' => ResourceBookingMapper::getInstance()->isForEotcEvent($this->getEvent()->getBooking()->getId()),
+                    'linkedEventType' => $linkedEventType,
+
+                    // This is the id by which the FullCalendar item pertaining to the linked event may be looked up
+                    // using FullCalendar.getEventById() (https://fullcalendar.io/docs/Calendar-getEventById).
+                    'linkedEventFullCalendarEventId' => $linkedEventFullCalendarEventId,
                 ],
             ],
         ];

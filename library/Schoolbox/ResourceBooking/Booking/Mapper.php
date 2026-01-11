@@ -781,21 +781,28 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Return the id of an etoc_event row linked to the given resource_booking.id, or null if no such row exists.
+     * Use this function either to get the linked EOTC event id, or to check whether one exists.
+     *
      * @param int $bookingId
-     * @return bool
+     * @return null | int
      */
-    public function isForEotcEvent(int $bookingId): bool
+    public function getEotcEventId(int $bookingId): ?int
     {
         $query = "
-            SELECT EXISTS(
-                SELECT *
-                FROM eotc_metadata_resourcebooking
-                WHERE booking_id = :bookingId
-            ) AS `exists`
+            SELECT eotc_e_m.event_id
+            FROM eotc_metadata_resourcebooking eotc_m_rb
+            JOIN eotc_event_metadata eotc_e_m ON eotc_m_rb.metadata_id = eotc_e_m.metadata_id
+            WHERE eotc_m_rb.booking_id = :bookingId
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(['bookingId' => $bookingId]);
-        $rows = $statement->fetchAll(PDO::FETCH_COLUMN);
-        return (bool)$rows[0];
+        $rows = $statement->fetchAll();
+
+        if (count($rows) === 0) {
+            return null;
+        }
+
+        return (int)$rows[0]['event_id'];
     }
 }

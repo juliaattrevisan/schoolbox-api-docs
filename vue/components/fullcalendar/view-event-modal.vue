@@ -218,7 +218,8 @@ export default {
                     status: data?.booking?.status,
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
-                    isForEotcEvent: data?.booking?.isForEotcEvent,
+                    linkedEventType: data?.booking?.linkedEventType,
+                    linkedEventFullCalendarEventId: data?.booking?.linkedEventFullCalendarEventId,
                 };
             } else {
                 // The modal is for an event item (representing a row of the event table).
@@ -464,7 +465,7 @@ export default {
          * Emit an event to tell any listening component that the user has requested the opening of an event modal.
          */
         viewEventLinkedFromBooking() {
-            this.$emit("viewEventLinkedFromBooking", this.eventExtendedProps.eventId);
+            this.$emit("viewEventLinkedFromBooking", this.eventExtendedProps.booking.linkedEventFullCalendarEventId);
         },
 
         /**
@@ -1134,14 +1135,19 @@ export default {
                                 v-if="
                                     eventExtendedProps.booking &&
                                     eventExtendedProps.variant === EVENT_VARIANTS.BOOKING &&
-                                    !eventExtendedProps.booking.isForEotcEvent // EOTC events are always on the calendar so do not need to be added.
+                                    eventExtendedProps.booking.linkedEventType === 'Day'
+                                    // Note bookings with linkedEventType 'EOTC' do not need this button, because
+                                    // linked events for EOTC bookings are always displayed on the calendar
                                 "
                             >
                                 <button @click.prevent="addEventToCalendar">Add Event to Calendar</button>
                             </span>
                             <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.EVENT... -->
                             <span
-                                v-if="eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.EVENT"
+                                v-if="
+                                    eventExtendedProps.booking &&
+                                    eventExtendedProps.booking.linkedEventFullCalendarEventId !== null
+                                "
                             >
                                 <button @click.prevent="viewEventLinkedFromBooking">View Event</button>
                             </span>

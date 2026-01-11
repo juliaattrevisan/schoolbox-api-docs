@@ -792,12 +792,11 @@ export default {
 
         /**
          * Close any currently open event/booking modal, and open the modal pertaining to the given eventId.
+         * @param fullCalendarEventId - This must match the id set in Day/Renderer/Javascript.php.
          */
-        onViewEventLinkedFromBooking(eventId) {
-            const eventIdWithSourceName = "Day-" + eventId; // This must match the id set in Day/Renderer/Javascript.php.
-
+        onViewEventLinkedFromBooking(fullCalendarEventId) {
             // Find the linked event.
-            const event = this.calendarApi.getEventById(eventIdWithSourceName);
+            const event = this.calendarApi.getEventById(fullCalendarEventId);
 
             if (event) {
                 const modalElement = this.$refs.event.$refs.modal.$el;
