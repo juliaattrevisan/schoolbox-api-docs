@@ -48,6 +48,7 @@ class Javascript extends Base
 
         $event = [
             // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
+            // Reference: https://fullcalendar.io/docs/event-parsing
             'id'         => 'Day-' . $this->event->getEventId(),
             'resourceId' => $this->getEvent()->getResourceId(),
             'title'      => $this->getEvent()->getTitle(),
