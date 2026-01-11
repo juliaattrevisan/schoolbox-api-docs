@@ -1142,7 +1142,7 @@ export default {
                             >
                                 <button @click.prevent="addEventToCalendar">Add Event to Calendar</button>
                             </span>
-                            <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.EVENT... -->
+                            <!-- If the modal represents a booking, and the linked event is visible on the calendar... -->
                             <span
                                 v-if="
                                     eventExtendedProps.booking &&
