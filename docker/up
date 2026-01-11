@@ -16,6 +16,7 @@ declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
 declare RABBITMQ_MANAGEMENT_PUBLISHED_PORT
 declare BASE_PHP_IMAGE_BUILD_FROM_LOCAL
+declare SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
@@ -38,6 +39,7 @@ declare SECOND_INSTANCE_ENABLE
 declare private_container_registry
 declare base_php_image
 declare base_branch
+declare schoolbox_cli_image
 declare docker_compose_args
 
 function verify_executables() {
@@ -100,7 +102,7 @@ function login_to_aws() {
 
     [sso-session ${aws_profile}]
     sso_region = ${AWS_REGION}
-    sso_start_url = ${AWS_START_URL}" > .aws/config
+    sso_start_url = ${AWS_START_URL}"  | sed -e 's/^[ \t]*//' > .aws/config
 
     # Then log in to AWS, if not already logged in
     log "Testing if logged in to AWS (region: ${AWS_REGION})..."
@@ -156,30 +158,6 @@ function login_to_container_registry() {
             exit 1
             ;;
     esac
-
-    # Also determine base image
-    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
-        1 | true | yes | on)
-            base_branch="master"
-            base_php_image="php-frankenphp"
-            ;;
-        *)
-            # Determine base image tag from current branch:
-            # assume master if nothing better known.
-            # Possibly, if the current branch is very old then the current
-            # master-tagged image won't work: in that case, must use
-            # BASE_PHP_IMAGE_BUILD_FROM_LOCAL=1.
-
-            # Anyway, what's the branch name?
-            branch_name=$(git rev-parse --abbrev-ref HEAD 2> /dev/null) || exit
-            base_branch="master"
-            if [[ $branch_name =~ develop ]]; then
-                base_branch="develop"
-            fi
-
-            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
-            ;;
-    esac
 }
 
 function build_docker_compose_env() {
@@ -210,6 +188,7 @@ function build_docker_compose_env() {
     USER_ID=\"${SUDO_UID:-$(id -u)}\"
     GROUP_ID=\"${SUDO_GID:-$(id -g)}\"
     BASE_PHP_IMAGE=\"${base_php_image}\"
+    SCHOOLBOX_CLI_IMAGE=\"${schoolbox_cli_image}\"
     BASE_BRANCH=\"${base_branch}\"
     LTI_DEVKIT_PUBLISHED_PORT=\"${LTI_DEVKIT_PUBLISHED_PORT}\"
     MAILCATCHER_UI_PUBLISHED_PORT=\"${MAILCATCHER_UI_PUBLISHED_PORT}\"
@@ -226,6 +205,44 @@ function build_schoolbox_config_ini() {
     SENTRY_PROFILE_SAMPLE_RATE     = ${SENTRY_PROFILE_SAMPLE_RATE}" | sed -e 's/^[ \t]*//' > ./docker/schoolbox/config/config.ini
 }
 
+function build_image_names() {
+    # Determine base image tag from current branch:
+    # assume master if nothing better known.
+    # Possibly, if the current branch is very old then the current master-tagged
+    # image won't work:
+    # in that case, must use BASE_PHP_IMAGE_BUILD_FROM_LOCAL=1.
+    # Anyway, what's the branch name?
+    branch_name=$(git rev-parse --abbrev-ref HEAD 2> /dev/null) || exit
+    base_branch="master"
+    if [[ $branch_name =~ develop ]]; then
+        base_branch="develop"
+    fi
+
+    # determine base images for PHP and schoolbox-cli:
+    # note that if the base image is built locally, then the schoolbox-cli image
+    # is as well.
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL=1
+            base_branch="master"
+            base_php_image="php-frankenphp"
+            ;;
+        *)
+            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
+            ;;
+    esac
+
+    case "${SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            base_branch="master"
+            schoolbox_cli_image="schoolbox-cli"
+            ;;
+        *)
+            schoolbox_cli_image="${private_container_registry}/schoolbox-cli:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
+            ;;
+    esac
+}
+
 function build_docker_compose_args() {
     # Currently, this is simply the list of parameters from the CLI:
     # future versions may be more sophisticated in what they allow.
@@ -233,11 +250,10 @@ function build_docker_compose_args() {
 }
 
 function start_containers() {
-    # Build base image locally if required
+    # Build base PHP image locally if required before starting the default env,
+    # as containers rely upon it.
     case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
-            # Build frankenphp image before starting default env,
-            # as containers now rely upon it
             docker build --progress=plain \
                 -t "${base_php_image}" \
                 --build-arg "ENV=dev" \
@@ -295,6 +311,7 @@ function main() {
     load_config
     login_to_aws
     login_to_container_registry
+    build_image_names
     build_docker_compose_args "$@"
     build_docker_compose_env
     build_schoolbox_config_ini

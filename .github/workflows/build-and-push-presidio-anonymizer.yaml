@@ -9,6 +9,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  BASE_BRANCH: ${{ github.head_ref || github.ref_name }}
+
 jobs:
   build-and-push-anonymizer:
     env:
@@ -143,15 +146,12 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/presidio-anonymizer@sha256:$file")
           done
 
-          # Extract branch name from GITHUB_REF
-          BRANCH_NAME=${GITHUB_REF/refs\/heads\//}
-
           # Build tag arguments based on branch
           DOCKERHUB_TAGS="-t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${{ needs.build-and-push-anonymizer.outputs.presidio_hash }}"
-          DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${BRANCH_NAME}"
+          DOCKERHUB_TAGS="$DOCKERHUB_TAGS -t ${{ vars.DOCKERHUB_NAMESPACE }}/presidio-anonymizer:${BASE_BRANCH}"
 
           ECR_TAGS="-t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${{ needs.build-and-push-anonymizer.outputs.presidio_hash }}"
-          ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${BRANCH_NAME}"
+          ECR_TAGS="$ECR_TAGS -t ${{ vars.ECR_NAMESPACE }}/presidio-anonymizer:${BASE_BRANCH}"
 
           # Add latest/testing tag based on branch
           if [ "${{ github.ref }}" == "refs/heads/master" ]; then
