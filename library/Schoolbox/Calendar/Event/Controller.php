@@ -1399,27 +1399,32 @@ class Controller extends Base
 
 
     /*
-     * Change the variant of the given event to 'event'.
+     * Change the variant of the given event from 'booking' to 'event'.
+     * If the given event does not have variant 'booking', do nothing.
      *
      * @param Event $event
      * @return void
      */
     public function addToCalendar(Event $event): void
     {
-        $event->setVariant(Event::VARIANT_EVENT);
+        if ($event->getVariant() === Event::VARIANT_BOOKING) {
+            $event->setVariant(Event::VARIANT_EVENT);
 
-        try {
-            $this->eventMapper->save($event);
-        } catch (MapperException) {
-            $problem = new ApiProblem('Could not save event.')
-                ->setStatus(self::HTTP_STATUS_CODE_SERVER_ERROR)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_SERVER_ERROR);
-            return;
+            try {
+                $this->eventMapper->save($event);
+            } catch (MapperException) {
+                $problem = new ApiProblem('Could not save event.')
+                    ->setStatus(self::HTTP_STATUS_CODE_SERVER_ERROR)
+                    ->asArray();
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus(self::HTTP_STATUS_CODE_SERVER_ERROR);
+                return;
+            }
+
+            $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
+        } else {
+            $this->response = $this->responseAsJson(['success' => false])->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
         }
-
-        $this->response = $this->responseAsJson(['success' => true])->withStatus(self::HTTP_STATUS_CODE_OK);
     }
 
 
