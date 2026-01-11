@@ -4,8 +4,6 @@ ARG BASE_BRANCH=master
 ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
 ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
 ARG TAG=latest-php${PHP_MAJOR_VERSION}-${ENV}-${BASE_BRANCH}
-ARG USER_ID
-ARG GROUP_ID
 ARG BASE_PHP_IMAGE=${IMAGE}:${TAG}
 
 FROM ${BASE_PHP_IMAGE}
@@ -13,8 +11,6 @@ FROM ${BASE_PHP_IMAGE}
 ARG NVM_VERSION='0.40.3'
 ARG AWS_CLI_VERSION='2.27.55'
 ARG NODE_VERSION=20
-ARG USER_ID
-ARG GROUP_ID
 
 # Install tools required by cron tasks and CLI:
 # * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq

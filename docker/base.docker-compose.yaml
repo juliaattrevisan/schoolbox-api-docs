@@ -53,8 +53,6 @@ services:
 #      args:
 #        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
 #        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
-#        USER_ID: ${USER_ID}
-#        GROUP_ID: ${GROUP_ID}
 #        BASE_BRANCH: ${BASE_BRANCH}
 #    tty: true
 #    volumes:
