@@ -146,30 +146,29 @@ class Javascript extends Base
         // TODO: Find whether `event` rows linked from `resource_booking` rows linked to `eotc_metadata_resourcebooking`
         //       are used.  If not, consider removing them and allowing null values on `resource_booking.event_id`.
         $resourceBookingMapper = ResourceBookingMapper::getInstance();
-        $eotcEventId = $resourceBookingMapper->getEotcEventId($booking->getId()); // TODO: Implement this.
+        $eotcEventId = $resourceBookingMapper->getEotcEventId($booking->getId());
 
-        // This is the type of event to which the resource booking is linked.
-        // The linked event will either be:
-        //  * an 'EOTC' event, referring to library/Calendar/Event/Type/EOTC/Event.php
-        //  * a 'Day' event, referring to library/Calendar/Event/Type/Day/Event.php
-        $linkedEventType = (
-            $eotcEventId === null
-            ? 'Day'
-            : 'EOTC'
-        );
+        if ($eotcEventId !== null) {
+            // The event linked to this booking is an 'EOTC' event, referring to library/Calendar/Event/Type/EOTC/Event.php
+            $linkedEventType = 'EOTC';
 
-        // This is the id to use with FullCalendar.getEventById() (reference:
-        $linkedEventFullCalendarEventId = match ($linkedEventType) {
-            'EOTC' => "$linkedEventType-" . $eotcEventId,
-            'Day' => (
+            // This is the id to use on the client-side with FullCalendar.getEventById().
+            // Reference: https://fullcalendar.io/docs/Calendar-getEventById
+            $linkedEventFullCalendarEventId = "$linkedEventType-" . $eotcEventId;
+        } else {
+            // The event linked to this booking is a 'Day' event, referring to library/Calendar/Event/Type/Day/Event.php
+            $linkedEventType = 'Day';
+
+            // This is the id to use on the client-side with FullCalendar.getEventById().
+            // Reference: https://fullcalendar.io/docs/Calendar-getEventById
+            $linkedEventFullCalendarEventId = (
                 $this->getEvent()->getEventVariant() === Event::VARIANT_EVENT
                 ? "$linkedEventType-" . $this->getEvent()->getEventId()
                 : null // Events of variant 'booking' do not appear on the calendar, so do not have a FullCalendar id.
                        // To get this event to appear on the calendar, the user must click 'Add Event to Calendar'
-                       // (see view-event-modal.vue).
-            ),
-            default => throw new \LogicException("Unexpected linked event type '$linkedEventType'."),
-        };
+                       // (view-event-modal.vue).
+            );
+        }
 
         // Set title from resource name, and code and booking name
         // if either are there.
