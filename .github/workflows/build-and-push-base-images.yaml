@@ -187,6 +187,8 @@ jobs:
         env:
           - prod
           - dev
+    needs:
+      - join-frankenphp
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
