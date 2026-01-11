@@ -114,8 +114,8 @@ WORKDIR /usr/share/schoolbox
 
 # Create users and groups, and set default user
 RUN <<EOF
-addgroup --gid ${GROUP_ID} schoolboxsuper
-useradd -m -g schoolboxsuper -G adm,sudo,www-data -s /bin/bash -u ${USER_ID} schoolboxsuper
+addgroup schoolboxsuper
+useradd -m -g schoolboxsuper -G adm,sudo,www-data -s /bin/bash schoolboxsuper
 chown -R schoolboxsuper:schoolboxsuper /config/caddy /data/caddy;
 EOF
 
