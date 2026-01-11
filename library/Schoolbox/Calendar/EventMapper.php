@@ -231,7 +231,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
-        $pronounMapper = $this->getJoinMapper('owner.pronoun');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
         $folderMapper = $this->getJoinMapper('event_folder');
