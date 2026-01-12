@@ -908,7 +908,7 @@ class Controller extends Base
                     ),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees(),
-                    'bookingErrors' => array_merge($bookingErrorsDelete, $bookingErrorsMove, $bookingErrorsAdd),
+                    'bookingErrors' => array_merge($bookingErrorsDelete, $bookingErrorsMove, $bookingErrorsAdd), // TODO: Ensure all these errors are in a format matching $bookingErrorsMove.
                     // TODO: Add 'bookings' to this response.
                 ]
             );
