@@ -63,6 +63,11 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
                 $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
                 $this->ltiAssessment->getTitle(),
                 $url->getPath(),
+                null,
+                null,
+                null,
+                $this->ltiAssessment->getOpenAt()?->getDateTimeObject(),
+                $this->ltiAssessment->getCloseAt()?->getDateTimeObject(),
             );
         }
         $this->logger->debug(
