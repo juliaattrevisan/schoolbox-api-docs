@@ -70,7 +70,8 @@ class SaveMessageLogListener implements IListener
 
         // Try to find the message with this ai_response_id, and update it if it
         // exists: otherwise create a new one.
-        $aiResponseId = $outputMessage->getDataAsArray()['responseId'] ?? null;
+        $messageData  = $outputMessage->getDataAsArray();
+        $aiResponseId = $messageData['responseId'] ?? null;
         if (isset($aiResponseId)) {
             // TODO index ai_response_id?
             $responseMessageModel = $this->responseMessageMapper
@@ -85,7 +86,7 @@ class SaveMessageLogListener implements IListener
             ->setAiResponseId($aiResponseId)
             ->setRole(Response\Message\Role::Assistant->value)
             ->setStatus($responseStatus->value)
-            ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
+            ->setContent($messageData['message'] ?? '')
             // Set the creation time to the current time,
             // instead of the request time:
             // this more accurately reflects when the response was received.
