@@ -150,7 +150,16 @@ $app = new class extends CliTool\App {
             'plan_participants'  => 'SELECT count(*) FROM participant JOIN participant_plan ON participant.participant_plan_id = participant_plan.id WHERE excluded_at is null AND is_dynamic = 0 AND participant_plan.deleted_at is null',
             'plan_excluded'  => 'SELECT count(*) FROM participant WHERE excluded_at is not null',
             'assessment_differentiated' => 'SELECT count(*) FROM assessment WHERE original_assessment_id is not null AND deleted_at is null',
-
+            'dialog_agent' => 'SELECT count(*) FROM dialog_agent WHERE deleted_at is null',
+            'dialog_agent_interview' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
+                                          WHERE das.title = "Character Interview" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_project' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
+                                          WHERE das.title = "Project Ideation" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_self_reflection' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
+                                          WHERE das.title = "Self-Reflection" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_tutor' => 'SELECT count(*) FROM dialog_agent da JOIN dialog_agent_scenario das ON da.scenario_id = das.id
+                                          WHERE das.title = "Socratic Tutor" AND type="system" AND da.deleted_at is null',
+            'dialog_agent_attempt' => 'SELECT count(*) FROM dialog_agent_response WHERE deleted_at is null',
 
             // More quiz info:
             // Quizzes which for some reason have no Learnosity reference
@@ -276,6 +285,7 @@ $app = new class extends CliTool\App {
             'pastoral_points'           => 'SELECT count(*) FROM pastoral WHERE points IS NOT NULL and points != 0 and deleted_at IS NULL',
             'pastoral_attachments'      => 'SELECT count(*) FROM pastoral_attachment WHERE deleted_at IS NULL',
             'pastoral_attachment_size' => 'SELECT SUM(filesize) FROM pastoral_attachment JOIN storage ON pastoral_attachment.hash = storage.hash',
+            'differentiation_profiles'      => 'SELECT count(*) FROM differentiation_profiles WHERE deleted_at IS NULL',
 
 
 
@@ -421,6 +431,9 @@ $app = new class extends CliTool\App {
             'openai_chat' => "SELECT count(*) FROM openai_log WHERE feature = 'chat'",
             'openai_lessonplan' => "SELECT count(*) FROM openai_log WHERE feature = 'lessonplan'",
             'openai_image' => "SELECT count(*) FROM openai_log WHERE feature = 'image'",
+            'openai_differentiation' => "SELECT count(*) FROM openai_log WHERE feature = 'differentiation'",
+            'openai_dialogagent' => "SELECT count(*) FROM openai_log WHERE feature = 'dialogagent'",
+            'openai_learning_customisation' => "SELECT count(*) FROM openai_log WHERE feature = 'learningactivitycustomisation'",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
