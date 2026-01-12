@@ -49,6 +49,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Item\Mapper as ResourceItemMapper;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -323,6 +324,9 @@ class Controller extends Base
          */
         $folders = $this->getSelectableFolders($event);
 
+        $resourceIds = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId());
+        $resourceItemMapper = ResourceItemMapper::getInstance();
+
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
         $selectedUser = $this->getSelectedUser();
@@ -355,6 +359,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'resources' => $resourceItemMapper->findByColumn('id', $resourceIds),
 
             /* The available attendance levels which can be chosen
              */

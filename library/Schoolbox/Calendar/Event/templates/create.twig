@@ -203,6 +203,13 @@
                     </div>
                     <div class="small-12 column">
                         <label for="resourceIds">Resources</label>
+                        {% if resources %}
+                            <ul>
+                            {% for resource in resources %}
+                                <li><a href="/resource-booking/item/{{ resource.id }}">{{ resource.name }}</a></li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
                         <select id="resourceIds" data-resourcebookingsuggest name="resourceIds[]" multiple placeholder="Start typing the name of a resource"></select>
                     </div>
                 </fieldset>
