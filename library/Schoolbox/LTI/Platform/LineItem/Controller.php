@@ -74,12 +74,6 @@ class Controller extends BaseController
         $repository     = $this->createRepository($assessment);
         $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
         $this->response = $this->createResponse($handler);
-
-        $this->logger->error(
-            __METHOD__ . ': not implemented',
-            ['assessmentId' => $assessment->getId()],
-        );
-        throw new NotFound();
     }
 
     /**
