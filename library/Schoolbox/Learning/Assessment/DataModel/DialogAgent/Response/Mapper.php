@@ -136,6 +136,10 @@ class Mapper extends \Schoolbox\Mapper
 //            'deletedBy',
 //        );
 
+        /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
+         */
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
+
         /* Add participation records whenever someone creates a new object via this mapper
          *
          * Note this method typically assumes participation to exist when updating a record; this might have implications
@@ -318,5 +322,21 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return true;
+    }
+
+
+    /**
+     * Prefill deleter fields (the Swamp shouldn't need to know about this)
+     *
+     * @param Model $response
+     * @return void
+     * @throws Exception
+     */
+    protected function deleterFields(Model $response): void
+    {
+        /* Remember who deleted this thing, in a dirty doubletap
+         */
+        $response->setDeletedBy($this->getSessionUser()->getId());
+        $this->save($response);
     }
 }
