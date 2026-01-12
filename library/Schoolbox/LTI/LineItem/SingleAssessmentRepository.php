@@ -102,7 +102,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function save(LineItemInterface $lineItem): LineItemInterface
     {
-        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext());
+        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext($lineItem->getIdentifier()));
         throw new BadMethodCallException('save() method not implemented');
     }
 
@@ -114,7 +114,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function delete(string $lineItemIdentifier): void
     {
-        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext());
+        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext($lineItemIdentifier));
         throw new BadMethodCallException('delete() method not implemented');
     }
 
