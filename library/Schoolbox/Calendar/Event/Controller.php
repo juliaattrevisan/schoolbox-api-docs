@@ -326,7 +326,8 @@ class Controller extends Base
          */
         $folders = $this->getSelectableFolders($event);
 
-        $resourceIds = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId());
+        $existingBookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
+        $resourceIds = $existingBookings->map(fn ($booking) => $booking->getResource()->getId());
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
@@ -566,7 +567,6 @@ class Controller extends Base
         $event = new Event();
         $event->setOwner($this->userMapper->createModel()->setId($userId));
         $event->setAuthor($this->userMapper->createModel()->setId($authorId));
-        $event->setBookingCollection(new GenericCollection(ResourceBookingModel::class));
 
         $this->postModify($event);
     }
@@ -821,7 +821,8 @@ class Controller extends Base
         //       operations to ensure the save succeeds entirely or not at all.
 
         // Find resources to add/remove by comparing existing resources to resources from form submission.
-        $resourceIdsExisting = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId())->getAll();
+        $existingBookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
+        $resourceIdsExisting = $existingBookings->map(fn ($booking) => $booking->getResource()->getId())->getAll();
         $resourceIdsFromForm = (
             array_key_exists('resources', (array)$validRequestPost)
             ? array_map(fn ($resource) => $resource['id'], $validRequestPost['resources'])
@@ -838,7 +839,7 @@ class Controller extends Base
         // Delete bookings if necessary.
         if (count($resourceIdsToRemove) > 0) {
             $bookingIdsToRemove = [];
-            foreach ($event->getBookingCollection() as $booking) {
+            foreach ($existingBookings as $booking) {
                 if (in_array($booking->getResource()->getId(), $resourceIdsToRemove, false)) {
                     $bookingIdsToRemove[] = $booking->getId();
                 }
@@ -1145,7 +1146,7 @@ class Controller extends Base
         $nBookingsCreatedWithClash = 0;
 
         // Note we are not only interested in resources booked in the future here.
-        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the future.
+        // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the past.
         $bookedResourceIdsByEventId = $this->bookingMapper->getBookedResourceIdsByEventId($eventById->keys());
 
         // Create a list of booking models to be persisted depending on:
