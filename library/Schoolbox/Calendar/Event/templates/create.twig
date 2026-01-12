@@ -52,7 +52,12 @@
                 type: 'GET',
                 dataType: 'json'
             },
-            multiple: true
+            multiple: true,
+            value: [
+                {% for resource in resources %}
+                    {'id': '{{ resource.id }}', 'name': '{{ resource.name }}'},
+                {% endfor %}
+            ],
         });
     });
 </script>
@@ -203,16 +208,6 @@
                     </div>
                     <div class="small-12 column">
                         <label for="resourceIds">Resources</label>
-                        {% if resources %}
-                            <ul>
-                            {% for resource in resources %}
-                                <li>
-                                    <input type="hidden" name="resourceIds[]" value="{{ resource.id }}"/>
-                                    <a href="/resource-booking/item/{{ resource.id }}">{{ resource.name }}</a>
-                                </li>
-                            {% endfor %}
-                            </ul>
-                        {% endif %}
                         <select id="resourceIds" data-resourcebookingsuggest name="resourceIds[]" multiple placeholder="Start typing the name of a resource"></select>
                     </div>
                 </fieldset>
