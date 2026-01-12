@@ -263,6 +263,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'resources' => [],
 
             /* The available attendance levels which can be chosen
              */
