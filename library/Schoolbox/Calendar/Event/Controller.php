@@ -824,11 +824,15 @@ class Controller extends Base
         $resourceIdsToRemove = array_diff($resourceIdsExisting, $resourceIdsFromForm);
         $bookingIdsToRemove = [];
         foreach ($event->getBookingCollection() as $booking) {
-            if (in_array($booking->getResource()->getId(), $resourceIdsToRemove)) {
-                $bookingIdsToRemove[] = $booking->getResource()->getId();
+            if (in_array($booking->getResource()->getId(), $resourceIdsToRemove, false)) {
+                $bookingIdsToRemove[] = $booking->getId();
             }
         }
-        $this->bookingMapper->deleteByColumn('id', $bookingIdsToRemove);
+        try {
+            $this->bookingMapper->deleteByColumn('id', $bookingIdsToRemove);
+        } catch (MapperException) {
+            throw new SchoolboxException('Could not delete booking.');
+        }
 
         $bookingErrors = [];
         if ($existingEvent) {
