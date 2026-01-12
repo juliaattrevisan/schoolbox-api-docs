@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\ResourceLink;
 
 use Aura\Router\Generator;
+use OAT\Library\Lti1p3Ags\Service\LineItem\LineItemServiceInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -212,11 +213,12 @@ class LaunchFactory
             $additionalClaims[] = $customClaim;
         }
 
-        // AGS claims:
-        // if a line item is provided, send that
-        // (Currently, score is the only service Schoolbox provides)
+        // AGS claims: if a line item is provided, send that
         $additionalClaims[] = new AgsClaim(
-            [ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE],
+            [
+                ScoreServiceInterface::AUTHORIZATION_SCOPE_SCORE,
+                LineItemServiceInterface::AUTHORIZATION_SCOPE_LINE_ITEM,
+            ],
             null,
             (string)(clone $baseUrl)
                 ->withPath(
