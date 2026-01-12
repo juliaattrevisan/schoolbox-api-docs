@@ -130,7 +130,6 @@ class RecursiveUndeleter
      * If joined via simple FK, and FK is named parentTable_parentIdentifier, then you can just list the Mapper (with implicit numeric key).
      * If non-standard naming (eg assess_*), or if joined via join table, then list the join column (string) as value, keyed by mapperClass
      *
-     * @var string[]|string[][]|IMapper[]|IMapper[][]
      * @todo Ideally this would be dynamically determined by inspecting the post-soft-delete hooks,
      *       but I'd have to parse the mapper's file's text :(
      *
