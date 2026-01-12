@@ -139,7 +139,7 @@ class RecursiveUndeleter
      *       timestamps. That relies on us updating the delete cascade to not increment deleted timestamp
      *       of already deleted items.
      */
-    private static $softDeleteRegistry = [
+    private const array SOFT_DELETE_REGISTRY = [
         /**
          * Folders, Folder Codes, Files, etc.
          */
@@ -442,13 +442,13 @@ class RecursiveUndeleter
     private function checkRegistry($mapperClass): void
     {
         // check this mapper is in our registry
-        if (!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
+        if (!array_key_exists($mapperClass, self::SOFT_DELETE_REGISTRY)) {
             $this->logger->error("Mapper {$mapperClass} is not registered in soft-delete registry. Unable to un-delete children");
             throw new OutOfBoundsException('Mapper is not registered in soft-delete registry. Unable to un-delete children');
         }
         $this->logger->debug(sprintf("Mapper '%s' found in registry", $mapperClass));
 
-        $childMappers = self::$softDeleteRegistry[$mapperClass];
+        $childMappers = self::SOFT_DELETE_REGISTRY[$mapperClass];
 
         // check this mapper is defined properly in our registry
         if (!is_array($childMappers)) {
@@ -470,7 +470,7 @@ class RecursiveUndeleter
         $results = [];
 
         // Use the specified root table to find the root mapper
-        foreach (self::$softDeleteRegistry as $mapperClass => $children) {
+        foreach (self::SOFT_DELETE_REGISTRY as $mapperClass => $children) {
             // A bit of housekeeping to try to keep things in order
             if (!class_exists($mapperClass)) {
                 $this->logger->warning("Registry corruption detected. Mapper class does not exist: {$mapperClass}");
@@ -565,7 +565,7 @@ class RecursiveUndeleter
         $this->checkRegistry($childMapperClass);
 
         // Ensure registry defines no child classes
-        if (count(self::$softDeleteRegistry[$childMapperClass])) {
+        if (count(self::SOFT_DELETE_REGISTRY[$childMapperClass])) {
             $this->logger->error(sprintf("Mapper '%s' does not have identifier, but has child mappers registered", $childMapperClass));
             exit(1);
         }
@@ -715,7 +715,7 @@ class RecursiveUndeleter
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
 
-        $childMappers = self::$softDeleteRegistry[$mapperClass];
+        $childMappers = self::SOFT_DELETE_REGISTRY[$mapperClass];
         $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
         $this->logger->debug("Finding children using mapper '$mapperClass' and parentIds " . $this->getIdsString($parentIds));
 
