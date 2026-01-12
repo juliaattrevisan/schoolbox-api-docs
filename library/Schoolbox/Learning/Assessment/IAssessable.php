@@ -877,6 +877,20 @@ interface IAssessable extends ISoftDeletable
     public function getCustomisedAssessments(): GenericCollection;
 
     /**
+     * Returns whether custom participation for this assessment can be modified
+     *
+     * @return bool
+     */
+    public function isCustomParticipationModifiable(): bool;
+
+    /**
+     * Returns whether custom participation for this assessment can be copied to a new assessment
+     *
+     * @return bool
+     */
+    public function isCustomParticipationCopyable(): bool;
+
+    /**
      * Returns whether this assessment has a dynamic plan
      *
      * @return bool

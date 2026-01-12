@@ -456,6 +456,19 @@ class Model extends AbstractAssessment
         return false;
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function isCustomParticipationCopyable(): bool
+    {
+        /* At the moment, we want to restrict the copying of custom participation
+         * for quizzes, which will be handled in the future, so for the time being, we will leave it out.
+         */
+        return false;
+    }
+
+
     /* Getters/Setters
      */
 

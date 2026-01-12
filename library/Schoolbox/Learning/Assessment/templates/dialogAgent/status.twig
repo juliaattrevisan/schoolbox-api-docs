@@ -42,7 +42,7 @@
             assessment: assessment
         }) %}
 
-        {% if not assessment.isSpecification and viewCustomParticipationRoute %}
+        {% if viewCustomParticipationRoute %}
             <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
         {% endif %}
     </ul>
