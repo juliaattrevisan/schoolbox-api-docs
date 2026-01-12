@@ -566,6 +566,7 @@ class Controller extends Base
         $event = new Event();
         $event->setOwner($this->userMapper->createModel()->setId($userId));
         $event->setAuthor($this->userMapper->createModel()->setId($authorId));
+        $event->setBookingCollection(new GenericCollection(ResourceBookingModel::class));
 
         $this->postModify($event);
     }
