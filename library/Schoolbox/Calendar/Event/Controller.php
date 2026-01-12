@@ -851,9 +851,8 @@ class Controller extends Base
 
         // Move bookings if necessary.
         if ($existingEvent) {
-            // Move any resource bookings attached to this event
-            // TODO: Add efficacy parameter to moveBookings() function.
-            $bookingErrorsMove = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+            // Move any resource bookings attached to this event.
+            $bookingErrorsMove = $this->moveBookings($event, $oldStart, $oldEnd, $efficacy);
         }
 
         // Add bookings if necessary.
@@ -970,7 +969,7 @@ class Controller extends Base
         );
 
         // Move any resource bookings attached to this event
-        $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+        $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, EventRecurrenceMapper::EFFICACY_SELF);
 
         // If there were booking errors, return them
         if (count($bookingErrors)) {
@@ -1744,11 +1743,13 @@ class Controller extends Base
      * @param Event $event
      * @param ?Alaress_Date_Format $oldStartDateTime
      * @param ?Alaress_Date_Format $oldEndDateTime
-     * @param User $user
+     * @param string $efficacy
      * @return array
      * @throws MapperException
      */
-    private function moveBookings(Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, User $user): array
+    private function moveBookings(
+        Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, string $efficacy
+    ): array
     {
         // can't work out the diff if there is no past...
         if (!$oldStartDateTime || !$oldEndDateTime) {
@@ -1763,7 +1764,7 @@ class Controller extends Base
 
         // clashes?
         $validation = new Validation(
-            $user,
+            $this->getUser(),
             $this->bookingMapper,
             $this->bookingStatusMapper,
             $this->termMapper,
@@ -1802,8 +1803,8 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId = $booking->getStatus()->getId();
                 if (
-                    $booking->getResource()->isUserModerator($user)
-                    && (int)$event->getAuthor()->getId() === (int)$user->getId()
+                    $booking->getResource()->isUserModerator($this->getUser())
+                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
                 ) {
                     /* If you're a Moderator and can moderate this request,
                      * and you created the booking in the first place,
