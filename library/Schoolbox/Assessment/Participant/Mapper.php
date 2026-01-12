@@ -246,21 +246,53 @@ class Mapper extends BaseMapper
              */
         } elseif ($assessment->getDialogAgent() instanceof \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model) {
             /* If this assessment's subobject is a Dialog Agent, restore responses and feedbacks with corresponding
-             * data model mappers
+             * data model mappers via their restoreSoftDeleted() methods which implicitly executes all PRE and POSTRESTORE
+             * callback methods by default via the base mapper.
              */
 
-            /*  - suppress notifs
-             *  - restore responses made by students
-             *  - restore notifs
+            /* Find all soft deleted responses and restore them to an active state
+             * However, this won't change any authoritative response settings, and you'll still have to micromanage
+             * all the stuff you intentionally deleted. You'll have to delete those all over again anyways.
              */
+            $dialogAgentResponseMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::getInstance();
 
-            /*  - suppress notifs
-             *  - restore corresponding feedbacks given to students
-             *  - restore notifs
-             */
+            $responses = $dialogAgentResponseMapper->findByColumnList([
+                'dialog_agent_id' => $assessment->getDialogAgent()->getId(),
+                'learner_id' => $participant->getUser()->getId(),
+            ], [
+                /* Obviously need to include soft-deleted items
+                 */
+                'deleted' => true
+            ]);
 
-            /*  - return a count of total affected rows from both tables
+            /* Suppress and re-enable notifications so people aren't bombarded during the Restoration
              */
+            $dialogAgentResponseMapper->suppressNotification();
+            $dialogAgentResponseMapper->restoreSoftDeleted($responses);
+            $dialogAgentResponseMapper->restoreNotification();
+
+            /* Find all soft deleted feedbacks and restore them to an active state
+             */
+            $dialogAgentFeedbackMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::getInstance();
+
+            $feedbacks = $dialogAgentFeedbackMapper->findByColumnList([
+                'dialog_agent_id' => $assessment->getDialogAgent()->getId(),
+                'learner_id' => $participant->getUser()->getId(),
+            ], [
+                /* Obviously need to include soft-deleted items
+                 */
+                'deleted' => true
+            ]);
+
+            /* Suppress and re-enable notifications so people aren't bombarded during the Restoration
+             */
+            $dialogAgentFeedbackMapper->suppressNotification();
+            $dialogAgentFeedbackMapper->restoreSoftDeleted($feedbacks);
+            $dialogAgentFeedbackMapper->restoreNotification();
+
+            /* Return a count of total affected rows from both tables, assuming everything went according to plan
+             */
+            return $responses->count() + $feedbacks->count();
         }
 
         // should not get here, but.
