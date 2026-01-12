@@ -141,7 +141,9 @@ class RecursiveUndeleter
      */
     private const array SOFT_DELETE_REGISTRY = [
         /**
-         * Folders, Folder Codes, Files, etc.
+         * Resources
+         */
+        /* Folders, Folder Codes, Files, etc.
          */
         Folder\Mapper::class => [
             Folder\Mapper::class => 'parent',   // yes, recursive tables are supported! :)
