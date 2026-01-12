@@ -15,12 +15,12 @@ interface Props {
     /** Whether the user can select this response */
     allowSelection: boolean;
     /** The icon to use for the agent's portrait in responses, default is 'ai' */
-    icon?: string;
+    agentIcon?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     errorPrefix: undefined,
-    icon: "ai",
+    agentIcon: "ai",
 });
 const acStore = useAgentChatStore();
 const acPromptEventBus = useEventBus(acPromptEventKey);
@@ -63,7 +63,9 @@ function retryResponse(): void {
 
 <template>
     <div v-if="props.message.status === 'in_progress'" class="ac-feed-response">
-        <div class="loader"></div>
+        <div class="ac-feed-side l-flex-row l-mar-s--right">
+            <div class="loader"></div>
+        </div>
         <div>
             <img v-if="imageSrc" :src="imageSrc" />
 
@@ -81,8 +83,8 @@ function retryResponse(): void {
         class="ac-feed-response ac-feed-response-success"
         :class="{ radiolist: props.allowSelection && imageSrc }"
     >
-        <div class="ac-feed-side l-flex-row">
-            <div v-if="props.allowSelection && imageSrc" class="ac-feed-select l-mar-s--left l-mar--auto-horiz">
+        <div class="ac-feed-side l-flex-row l-mar-s--right">
+            <div v-if="props.allowSelection && imageSrc" class="ac-feed-select">
                 <input
                     :id="radioId"
                     v-model="acStore.selectedFeedEntry"
@@ -94,10 +96,10 @@ function retryResponse(): void {
                 <label :for="radioId"> </label>
             </div>
 
-            <div class="ac-feed-message-portrait l-mar-s--right">
+            <div class="ac-feed-message-portrait">
                 <div class="c-img c-img--round c-img--xs">
                     <div class="c-img__wrapper">
-                        <div class="icon" :class="`icon-${props.icon}`"></div>
+                        <div class="icon" :class="`icon-${props.agentIcon}`"></div>
                     </div>
                 </div>
             </div>
@@ -156,12 +158,20 @@ function retryResponse(): void {
 
     .ac-feed-select {
         align-self: start;
+
+        label {
+            padding: 0 0 0 1.5rem; // padding-right same width as the radio button
+        }
     }
 
     .ac-feed-side {
         // allows the input/portrait to be aligned to the top/bottom correctly
         align-self: stretch;
         flex-basis: min-content;
+        justify-content: center;
+
+        // since portraits can appear, keep all entries consistent when there isn't one (like when loading)
+        min-width: 40px;
     }
 
     .ac-feed-message-portrait {
@@ -223,7 +233,7 @@ function retryResponse(): void {
         min-height: 1.5rem;
         width: 1.5rem;
         height: 1.5rem;
-        margin: 0.5rem 0.5rem 0 0;
+        margin: 0.5rem 0;
     }
 }
 </style>
