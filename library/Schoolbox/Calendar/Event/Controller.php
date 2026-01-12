@@ -1754,8 +1754,7 @@ class Controller extends Base
         ?Alaress_Date_Format $oldStartDateTime,
         ?Alaress_Date_Format $oldEndDateTime,
         string $efficacy
-    ): array
-    {
+    ): array {
         // can't work out the diff if there is no past...
         if (!$oldStartDateTime || !$oldEndDateTime) {
             return []; // No bookings to move if we don't have old times
