@@ -169,9 +169,15 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param Model $dialogAgent
      * @return void
+     * @throws Exception
      */
     public function softDeleteResponses(Model $dialogAgent): void
     {
+        $mapper = $this->getJoinMapper('responses');
+
+        $mapper->suppressNotification();
+        $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());
+        $mapper->restoreNotification();
     }
 
 
@@ -180,9 +186,14 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param Model $dialogAgent
      * @return void
+     * @throws Exception
      */
     public function softDeleteFeedbacks(Model $dialogAgent): void
     {
+        $mapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::getInstance();
 
+        $mapper->suppressNotification();
+        $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());
+        $mapper->restoreNotification();
     }
 }
