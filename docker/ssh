@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
         --help | -h )
             echo "Usage:  docker/ssh [OPTIONS] CONTAINER
 
-Open a shell in a running container.
+Open a shell in a running container: defaults to \`schoolbox-cli\`.
 
 Containers may be listed with \`docker/compose ps\`.
 
