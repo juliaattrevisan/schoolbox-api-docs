@@ -244,6 +244,23 @@ class Mapper extends BaseMapper
              *
              *      return $ltiScoreMapper->count();
              */
+        } elseif ($assessment->getDialogAgent() instanceof \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model) {
+            /* If this assessment's subobject is a Dialog Agent, restore responses and feedbacks with corresponding
+             * data model mappers
+             */
+
+            /*  - suppress notifs
+             *  - restore responses made by students
+             *  - restore notifs
+             */
+
+            /*  - suppress notifs
+             *  - restore corresponding feedbacks given to students
+             *  - restore notifs
+             */
+
+            /*  - return a count of total affected rows from both tables
+             */
         }
 
         // should not get here, but.
