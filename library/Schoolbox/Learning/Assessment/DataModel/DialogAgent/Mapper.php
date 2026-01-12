@@ -65,8 +65,15 @@ class Mapper extends \Schoolbox\Mapper
             'other_key' => 'dialog_agent_id',
         ));
 
+        /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
+         */
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
+
+        /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
+         */
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteResponses']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbacks']);
     }
 
 
@@ -154,5 +161,28 @@ class Mapper extends \Schoolbox\Mapper
 
         /* TODO remove scenario context stuff specifically related to this instance
          */
+    }
+
+
+    /**
+     * Soft deletes all responses for this dialog agent
+     *
+     * @param Model $dialogAgent
+     * @return void
+     */
+    public function softDeleteResponses(Model $dialogAgent): void
+    {
+    }
+
+
+    /**
+     * Soft deletes all feedbacks for this dialog agent
+     *
+     * @param Model $dialogAgent
+     * @return void
+     */
+    public function softDeleteFeedbacks(Model $dialogAgent): void
+    {
+
     }
 }
