@@ -172,7 +172,7 @@ class EventNotifier extends AbstractModuleNotifier
         $object = $event->getObject();
 
         // Clone to avoid mutating the event.
-        $clonedStartDateTime = $object->getStartDateTime();
+        $clonedStartDateTime = clone $object->getStartDateTime();
 
         try {
             $next = $this->mapper->findNextInSeries($object->getSeriesId(), $clonedStartDateTime?->addMinutes(1));
