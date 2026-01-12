@@ -325,7 +325,6 @@ class Controller extends Base
         $folders = $this->getSelectableFolders($event);
 
         $resourceIds = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId());
-        $resourceItemMapper = ResourceItemMapper::getInstance();
 
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
@@ -359,7 +358,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'resources' => $resourceItemMapper->findByColumn('id', $resourceIds),
+            'resources' => $this->bookingItemMapper->findByColumn('id', $resourceIds),
 
             /* The available attendance levels which can be chosen
              */
