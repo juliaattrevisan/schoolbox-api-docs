@@ -15,6 +15,7 @@ use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Status;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as ResponseMessageMapper;
@@ -87,7 +88,7 @@ class DialogAgentChat
             $responseMessageModel = $this->responseMessageMapper->createModel()
                 ->setDialogAgentResponse(new ResponseDataModel()->setId($responseModel->getId()))
                 ->setRole(Role::User->value)
-                ->setStatus(null)
+                ->setStatus(Status::Pending->value)
                 ->setContent($userPrompt);
             $this->responseMessageMapper->save($responseMessageModel);
 

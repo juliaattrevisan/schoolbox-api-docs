@@ -30,9 +30,9 @@ enum Status: string
      * * all other types map to `Status::Pending`
      *
      * @param MessageEventType $messageEventType
-     * @return self|null
+     * @return self
      */
-    public static function fromMessageEventType(MessageEventType $messageEventType): ?self
+    public static function fromMessageEventType(MessageEventType $messageEventType): self
     {
         return match ($messageEventType) {
             MessageEventType::COMPLETE                                                          => self::Ok,

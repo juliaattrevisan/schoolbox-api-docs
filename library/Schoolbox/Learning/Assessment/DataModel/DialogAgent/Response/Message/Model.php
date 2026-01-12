@@ -31,7 +31,7 @@ class Model
     /**
      * The OpenAI response ID, if this message is from OpenAI.
      */
-    private ?string $openaiResponseId = null;
+    private ?string $aiResponseId = null;
 
     /**
      * The role with which this is associated.
@@ -75,18 +75,18 @@ class Model
     /**
      * @return string|null
      */
-    public function getOpenaiResponseId(): ?string
+    public function getAiResponseId(): ?string
     {
-        return $this->openaiResponseId;
+        return $this->aiResponseId;
     }
 
     /**
-     * @param string|null $openaiResponseId
+     * @param string|null $aiResponseId
      * @return $this
      */
-    public function setOpenaiResponseId(?string $openaiResponseId): self
+    public function setAiResponseId(?string $aiResponseId): self
     {
-        $this->openaiResponseId = $openaiResponseId;
+        $this->aiResponseId = $aiResponseId;
         return $this;
     }
 

@@ -54,9 +54,9 @@ class SaveMessageLogListener implements IListener
         if ($outputMessage->eventType === MessageEventType::COMPLETE->value) {
             $responseMessageModel = $this->responseMessageMapper->createModel()
                 ->setDialogAgentResponse(new ResponseDataModel()->setId($this->responseModel->getId()))
-                ->setOpenaiResponseId($outputMessage->getDataAsArray()['responseId'] ?? null)
+                ->setAiResponseId($outputMessage->getDataAsArray()['responseId'] ?? null)
                 ->setRole(Role::Assistant->value)
-                ->setStatus(Status::fromMessageEventType(MessageEventType::COMPLETE)?->value)
+                ->setStatus(Status::fromMessageEventType(MessageEventType::COMPLETE)->value)
                 ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
                 // Set the creation time to the current time,
                 // instead of the request time:
