@@ -813,7 +813,21 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
-        // TODO: Remove linked resource bookings for any resources removed from this event.
+        // Remove linked resource bookings for any resources removed from this event.
+        $resourceIdsExisting = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId())->getAll();
+        $resourceIdsFromForm = (
+            array_key_exists('resources', (array)$validRequestPost)
+            ? array_map(fn ($resource) => $resource['id'], $validRequestPost['resources'])
+            : []
+        );
+        $resourceIdsToRemove = array_diff($resourceIdsExisting, $resourceIdsFromForm);
+        $bookingIdsToRemove = [];
+        foreach ($event->getBookingCollection() as $booking) {
+            if (in_array($booking->getResource()->getId(), $resourceIdsToRemove)) {
+                $bookingIdsToRemove[] = $booking->getResource()->getId();
+            }
+        }
+        $this->bookingMapper->deleteByColumn('id', $bookingIdsToRemove);
 
         $bookingErrors = [];
         if ($existingEvent) {
