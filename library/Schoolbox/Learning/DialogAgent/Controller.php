@@ -589,7 +589,7 @@ class Controller extends Base
                 );
 
                 $differentiationProfilePrompt = json_encode(
-                    $differentiationProfileTranslator($differentiationProfile),
+                    $differentiationProfileTranslator($differentiationProfile, includeEmptyFields: false),
                     JSON_THROW_ON_ERROR
                 );
             }

@@ -14,7 +14,14 @@ class ProfileToArray
     ) {
     }
 
-    public function __invoke(Model $model): array
+    /**
+     * Translate a differentiation profile
+     * Currently only used to translate into a format ready to be used inside a prompt with AI
+     * @param Model $model
+     * @param bool $includeEmptyFields Whether fields that are empty should be included
+     * @return array
+     */
+    public function __invoke(Model $model, bool $includeEmptyFields = true): array
     {
         $profile = [
             'adjustment_level' => $model->getAdjustmentLevel()?->getPropertyValues('name') ?? '',
@@ -26,10 +33,10 @@ class ProfileToArray
             'strategies_adjustments' => $model->getStrategiesAdjustments() ?? '',
         ];
 
-        return $this->profileConfig->reduce(function ($return, \Schoolbox\Admin\DifferentiationProfiles\Model $config) use ($profile) {
+        return $this->profileConfig->reduce(function ($return, \Schoolbox\Admin\DifferentiationProfiles\Model $config) use ($profile, $includeEmptyFields) {
             $key = $config->getName();
             $description = $config->getDescription();
-            if (array_key_exists($key, $profile)) {
+            if (\array_key_exists($key, $profile) && ($includeEmptyFields || !empty($profile[$key]))) {
                 $return['field'][$key] = [
                     'field_description' => $description,
                     'field_value' => $profile[$key]
