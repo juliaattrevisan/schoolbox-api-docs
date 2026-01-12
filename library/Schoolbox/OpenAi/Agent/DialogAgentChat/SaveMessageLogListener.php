@@ -49,7 +49,7 @@ class SaveMessageLogListener implements IListener
     public function handleMessage(Message $outputMessage, Message $rawMessage, Log\Model $log): Log\Model
     {
         $responseMessageModel = null;
-        $aiResponseId  = $outputMessage->getDataAsArray()['responseId'] ?? null;
+        $aiResponseId         = $outputMessage->getDataAsArray()['responseId'] ?? null;
         if (isset($aiResponseId)) {
             // Find the response: if none found, use a new one
             // TODO index ai_response_id?
@@ -60,22 +60,19 @@ class SaveMessageLogListener implements IListener
         }
         $responseMessageModel ??= $this->responseMessageMapper->createModel();
 
-        $responseStatus = MessageEventType::tryFrom($outputMessage->eventType) ?? Response\Message\Status::Pending;
-//        if ($outputMessage->eventType === MessageEventType::COMPLETE->value) {
-            $responseMessageModel = $responseMessageModel
-                ->setDialogAgentResponse(new Response\Model()->setId($this->responseModel->getId()))
-                ->setAiResponseId($aiResponseId)
-                ->setRole(Response\Message\Role::Assistant->value)
-                ->setStatus($responseStatus->value)
-                ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
-                // Set the creation time to the current time,
-                // instead of the request time:
-                // this more accurately reflects when the response was received.
-                ->setCreatedAt(Alaress_Date_Format::newFromTimestamp(time()))
-            ;
-            // TODO set created at as exact time, not request time
-            $this->responseMessageMapper->save($responseMessageModel);
-//        }
+        $responseStatus       = MessageEventType::tryFrom($outputMessage->eventType) ?? MessageEventType::CREATED;
+        $responseMessageModel = $responseMessageModel
+            ->setDialogAgentResponse(new Response\Model()->setId($this->responseModel->getId()))
+            ->setAiResponseId($aiResponseId)
+            ->setRole(Response\Message\Role::Assistant->value)
+            ->setStatus(Response\Message\Status::fromMessageEventType($responseStatus)->value)
+            ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
+            // Set the creation time to the current time,
+            // instead of the request time:
+            // this more accurately reflects when the response was received.
+            ->setCreatedAt(Alaress_Date_Format::newFromTimestamp(time()))
+        ;
+        $this->responseMessageMapper->save($responseMessageModel);
         return $log;
     }
 
