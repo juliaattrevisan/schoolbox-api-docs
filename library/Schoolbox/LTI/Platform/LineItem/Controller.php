@@ -10,13 +10,18 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\LineItem;
 
 use Alaress\Web\Controller\Base as BaseController;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\GetLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
+use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
@@ -24,7 +29,6 @@ use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
-use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 
@@ -67,6 +71,10 @@ class Controller extends BaseController
      */
     public function getLineItemForAssessment(Model $assessment): void
     {
+        $repository     = $this->createRepository($assessment);
+        $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
+        $this->response = $this->createResponse($handler);
+
         $this->logger->error(
             __METHOD__ . ': not implemented',
             ['assessmentId' => $assessment->getId()],
@@ -131,5 +139,26 @@ class Controller extends BaseController
     private function createRepository(Model $assessment): LineItemRepositoryInterface
     {
         return new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
+    }
+
+    /**
+     * Create a response for this controller's request.
+     *
+     * @param LtiServiceServerRequestHandlerInterface $handler The handler for the incoming request.
+     * @return ResponseInterface
+     * @throws OAuthServerException if the request is invalid.
+     */
+    private function createResponse(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
+    {
+        // Validate access token
+        $validator      = new RequestAccessTokenValidator($this->registrations, $this->logger);
+        $resourceServer = new ResourceServer(
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+        );
+
+        // Handle the request
+        return new LtiServiceServer($validator, $handler, $this->logger)
+            ->handle($resourceServer->validateAuthenticatedRequest($this->request));
     }
 }
