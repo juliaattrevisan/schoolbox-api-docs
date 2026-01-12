@@ -115,7 +115,7 @@ VALUES (
 ), (
     'canvas_sissourceid_template',
     'SIS Source ID Template',
-    '',
+    '{folderCode}{parentCode}',
     'TBA',
     (
          SELECT `id`
@@ -262,7 +262,7 @@ VALUES (
            'course code:subject code:subject code from section',
            'true',
            'false',
-           'true',
+           'false',
            'settings',
            (
                SELECT MAX(sequence) + 1
