@@ -131,7 +131,7 @@ function retryResponse(): void {
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
-            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar--0">
+            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar-s--bottom">
                 <i class="icon-image"></i>
             </div>
             <div
