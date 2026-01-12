@@ -102,7 +102,17 @@ $app = new class extends CliTool\App
                 ]);
                 break;
             default:
-                $this->getLogger()->notice("No specific canvas settings for this school code. Applying nothing");
+                // check if we are a canvas plan (generic)
+                if (
+                    $this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_CANVAS_ENABLED) ||
+                    strtolower($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_SITE_PLAN)) === 'canvas-elite' || // canvas plan, if the flag is not set for some reason
+                    strtolower($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_SITE_PLAN)) === 'canvas-enhanced' // other canvas plan, if the flag is not set for some reason
+                ) {
+                    $this->getLogger()->notice("Generic Canvas school, applying default settings.");
+                    $newSettings = $defaultOptions;
+                } else {
+                    $this->getLogger()->notice("No specific canvas settings for this school code. Applying nothing");
+                }
         }
 
         // update the settings
