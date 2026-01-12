@@ -140,6 +140,9 @@ class RecursiveUndeleter
      *       of already deleted items.
      */
     private static $softDeleteRegistry = [
+        /**
+         * Folders, Folder Codes, Files, etc.
+         */
         Folder\Mapper::class => [
             Folder\Mapper::class => 'parent',   // yes, recursive tables are supported! :)
             FolderCode\Mapper::class,
@@ -151,6 +154,31 @@ class RecursiveUndeleter
             Assessment\Mapper::class => 'v_f.folder_id',
         ],
         FolderCode\Mapper::class => [],
+        File\Mapper::class => [],
+        LinkMapper::class => [],
+        MyFile\Mapper::class => [
+            ComponentEportfolio\FileListMapper::class => 'file_id',
+        ],
+
+        /**
+         * Users and their various doodads
+         */
+        UserMapper::class => [
+            Pastoral\Access\Mapper::class,
+            Pastoral\Audience\Mapper::class,
+            \Schoolbox\User\Token\Mapper::class => 'user_id',
+        ],
+        RoleMapper::class => [
+            Pastoral\Access\Mapper::class => 'role_id',
+            Pastoral\Audience\Mapper::class => 'role_id',
+        ],
+        \Schoolbox\User\Token\Mapper::class => [],
+
+        /**
+         * LMS-specific stuffs
+         */
+        /* Courses, specs, implementations, curriculae doodads, etc.
+         */
         CourseSpec\Mapper::class => [
             UnitSpec\Mapper::class,
         ],
@@ -160,8 +188,15 @@ class RecursiveUndeleter
         CourseImpl\Mapper::class => [
             UnitImpl\Mapper::class,
         ],
-        File\Mapper::class => [],
-        LinkMapper::class => [],
+        UnitImpl\Mapper::class => [
+            Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
+        ],
+        Curriculum\Node\Mapper::class => [
+            Curriculum\Node\Mapper::class => 'curriculum_node_parent_id',
+        ],
+
+        /* Assessments.
+         */
         Assessment\Mapper::class => [
             Quiz\Mapper::class,
             SubmissionBoxMapper::class,
@@ -170,7 +205,91 @@ class RecursiveUndeleter
             Assessment\LessonPlan\Mapper::class,
             \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class,
         ],
-        /* Dialog Agent's subobject relates to its responses and feedbacks
+
+        /* Projects. Note that despite being a container of activities, they are also considered an activity.
+         * Essentially, a composite class.
+         */
+        Project\Mapper::class => [
+            Assessment\Mapper::class => 'v_pa.project_id',
+        ],
+
+        /* Due Work.
+         */
+        SubmissionBoxMapper::class => [
+            SubmissionMapper::class    => 'box_id',
+            ReturnedWorkMapper::class  => 'box_id',
+            RubricLevelMapper::class   => 'box_id',
+            TurnitinGroupMapper::class => 'submission_box_id',
+            Eportfolio\ShowcaseMapper::class,
+        ],
+        SubmissionMapper::class => [
+            StudentSubmissionFile\Mapper::class,
+        ],
+        ReturnedWorkMapper::class => [
+            ReturnedWorkFile\Mapper::class,
+        ],
+        RubricLevelMapper::class => [
+            RubricDescriptorMapper::class => 'rubric_descriptor.level_id',
+        ],
+        StudentSubmissionFile\Mapper::class => [
+            Plagscan\Mapper::class,
+            Kami\Mapper::class,
+        ],
+        ReturnedWorkFile\Mapper::class => [],
+        RubricDescriptorMapper::class => [],
+        RubricIndicatorMapper::class => [
+            RubricDescriptorMapper::class => 'rubric_descriptor.rubric_indicator_id',
+        ],
+        /* Inline Grading annotator doodad
+         */
+        Kami\Mapper::class => [],
+        /* Note that plag has been replaced by turnitin.
+         */
+        Plagscan\Mapper::class => [],
+        TurnitinGroupMapper::class => [],
+
+        /* Tasks.
+         */
+        TaskMapper::class => [
+            Task\CompletionMapper::class,
+        ],
+        Task\CompletionMapper::class => [],
+
+        /* Quizzes have sections, questions, answers and attempts. Not sure exactly what QuizSolution was meant to mean
+         * but this corresponds to "the correct answer for a quiz question" in legacy quiz.
+         */
+        Quiz\Mapper::class => [
+            QuizSection\Mapper::class => 'assess_id',
+            QuizAttempt\Mapper::class => 'assess_id',
+        ],
+        QuizSection\Mapper::class => [
+            QuizQuestion\Mapper::class => 'section_id',
+        ],
+        QuizAttempt\Mapper::class => [
+            QuizAnswer\Mapper::class => 'attempt_id',
+        ],
+        QuizQuestion\Mapper::class => [
+            QuizSolution\Mapper::class => 'question_id',
+        ],
+        QuizAnswer\Mapper::class => [],
+        QuizSolution\Mapper::class => [],
+
+        /* Lesson Plans.
+         */
+        Assessment\LessonPlan\Mapper::class => [
+            Assessment\LessonPlan\File\Mapper::class  => 'lesson_plan_id',
+            Assessment\LessonPlan\Field\Mapper::class => 'lesson_plan_id',
+        ],
+        Assessment\LessonPlan\File\Mapper::class => [],
+        Assessment\LessonPlan\Field\Mapper::class => [],
+
+        /* Learning Moments.
+         * TODO probably look at its attached files and evidence etc. cos they're not mentioned here, but maybe should
+         */
+        \Schoolbox\Learning\Moment\Mapper::class => [],
+
+        /* Dialog Agents.
+         * Dialog Agent's subobject relates to its responses and feedbacks
          */
         \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class => [
             \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::class => 'dialog_agent_id',
@@ -184,82 +303,9 @@ class RecursiveUndeleter
         \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::class => [],
         \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class => [],
 
-        UnitImpl\Mapper::class => [
-            Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
-        ],
-        Quiz\Mapper::class => [
-            QuizSection\Mapper::class => 'assess_id',
-            QuizAttempt\Mapper::class => 'assess_id',
-        ],
-        \Schoolbox\Survey\Mapper::class => [
-            QuizSection\Mapper::class => 'assess_id',
-            \Schoolbox\Survey\Attempt\Mapper::class => 'assess_id',
-        ],
-        SubmissionBoxMapper::class => [
-            SubmissionMapper::class    => 'box_id',
-            ReturnedWorkMapper::class  => 'box_id',
-            RubricLevelMapper::class   => 'box_id',
-            TurnitinGroupMapper::class => 'submission_box_id',
-            Eportfolio\ShowcaseMapper::class,
-        ],
-        TurnitinGroupMapper::class => [],
-        TaskMapper::class => [
-            Task\CompletionMapper::class,
-        ],
-        Task\CompletionMapper::class => [],
-        Project\Mapper::class => [
-            Assessment\Mapper::class => 'v_pa.project_id',
-        ],
-        Assessment\LessonPlan\Mapper::class => [
-            Assessment\LessonPlan\File\Mapper::class  => 'lesson_plan_id',
-            Assessment\LessonPlan\Field\Mapper::class => 'lesson_plan_id',
-        ],
-        Assessment\LessonPlan\File\Mapper::class => [],
-        Assessment\LessonPlan\Field\Mapper::class => [],
-        QuizSection\Mapper::class => [
-            QuizQuestion\Mapper::class => 'section_id',
-        ],
-        QuizAttempt\Mapper::class => [
-            QuizAnswer\Mapper::class => 'attempt_id',
-        ],
-        \Schoolbox\Survey\Attempt\Mapper::class => [
-            QuizAnswer\Mapper::class => 'attempt_id',
-        ],
-        SubmissionMapper::class => [
-            StudentSubmissionFile\Mapper::class,
-        ],
-        ReturnedWorkMapper::class => [
-            ReturnedWorkFile\Mapper::class,
-        ],
-        RubricLevelMapper::class => [
-            RubricDescriptorMapper::class => 'rubric_descriptor.level_id',
-        ],
-        Eportfolio\ShowcaseMapper::class => [],
-        QuizQuestion\Mapper::class => [
-            QuizSolution\Mapper::class => 'question_id',
-        ],
-        QuizAnswer\Mapper::class => [],
-        QuizSolution\Mapper::class => [],
-        StudentSubmissionFile\Mapper::class => [
-            Plagscan\Mapper::class,
-            Kami\Mapper::class,
-        ],
-        ReturnedWorkFile\Mapper::class => [],
-        RubricDescriptorMapper::class => [],
-        Plagscan\Mapper::class => [],
-        Kami\Mapper::class => [],
-        RubricIndicatorMapper::class => [
-            RubricDescriptorMapper::class => 'rubric_descriptor.rubric_indicator_id',
-        ],
-        UserMapper::class => [
-            Pastoral\Access\Mapper::class,
-            Pastoral\Audience\Mapper::class,
-            \Schoolbox\User\Token\Mapper::class => 'user_id',
-        ],
-        RoleMapper::class => [
-            Pastoral\Access\Mapper::class => 'role_id',
-            Pastoral\Audience\Mapper::class => 'role_id',
-        ],
+        /**
+         * Pastoral Care.
+         */
         Pastoral\Mapper::class => [
             Pastoral\Comment\Mapper::class,
             Pastoral\Attachment\Mapper::class,
@@ -278,25 +324,15 @@ class RecursiveUndeleter
             Pastoral\Audience\Mapper::class => 'subtype_id',
         ],
         Pastoral\Access\Mapper::class => [],
-        Pastoral\Audience\Mapper::class => [],
-        Pastoral\Group\Member\Mapper::class => [],
         Pastoral\Attachment\Mapper::class => [],
+        Pastoral\Audience\Mapper::class => [],
+        Pastoral\Comment\Mapper::class => [],
+        Pastoral\Group\Member\Mapper::class => [],
         Pastoral\UploadQueue\Mapper::class => [],
-        Discussion\Thread\Mapper::class => [
-            Discussion\Comment\Mapper::class => 'discussion_thread_id',
-        ],
-        Discussion\Comment\Mapper::class => [],
-        Eportfolio\PageMapper::class => [],
-        \Schoolbox\Learning\Moment\Mapper::class => [],
-        Blog\Homepage\Post\Mapper::class => [
-            Blog\Homepage\Comment\Mapper::class,
-            Blog\Homepage\Image\Mapper::class,
-        ],
-        Blog\Homepage\Comment\Mapper::class => [],
-        Blog\Homepage\Image\Mapper::class => [],
-        Curriculum\Node\Mapper::class => [
-            Curriculum\Node\Mapper::class => 'curriculum_node_parent_id',
-        ],
+
+        /**
+         * (Sports) Fixtures
+         */
         Fixtures\Division\Mapper::class => [
             Fixtures\Team\Mapper::class          => 'division_id',
             Fixtures\Division\User\Mapper::class => 'division_id',
@@ -321,24 +357,71 @@ class RecursiveUndeleter
             Fixtures\Team\Player\Mapper::class => 'team_id',
         ],
         Fixtures\Team\Player\Mapper::class => [],
-        MyFile\Mapper::class => [
-            ComponentEportfolio\FileListMapper::class => 'file_id',
+
+        /**
+         * Discussion Threads
+         */
+        /* These are universally shared among multiple concepts, like news and blogs and so on
+         */
+        Discussion\Thread\Mapper::class => [
+            Discussion\Comment\Mapper::class => 'discussion_thread_id',
         ],
-        ComponentEportfolio\FileListMapper::class => [],
+        Discussion\Comment\Mapper::class => [],
+
+        /**
+         * Resource Booking
+         */
         ResourceBooking\Item\Mapper::class => [
             ResourceBooking\Booking\Mapper::class,
         ],
         ResourceBooking\Booking\Mapper::class => [],
-        Pastoral\Comment\Mapper::class => [],
+
+        /**
+         * News
+         */
+        News\Mapper::class => [],
+
+        /**
+         * Misc homepage contents
+         */
+        /* Eportfolio.
+         */
+        ComponentEportfolio\FileListMapper::class => [],
+        Eportfolio\ShowcaseMapper::class => [],
+        Eportfolio\PageMapper::class => [],
+
+        /* Blogs
+         */
+        Blog\Homepage\Post\Mapper::class => [
+            Blog\Homepage\Comment\Mapper::class,
+            Blog\Homepage\Image\Mapper::class,
+        ],
+        Blog\Homepage\Comment\Mapper::class => [],
+        Blog\Homepage\Image\Mapper::class => [],
+
+        /* Forums.
+         */
         Forum\ThreadMapper::class => [
             Forum\PostMapper::class => 'threadID',
         ],
         Forum\PostMapper::class => [],
-        News\Mapper::class => [],
-        \Schoolbox\User\Token\Mapper::class => [],
+
+        /* Socialstreams
+         */
         PostMapper::class => [
             PostMapper::class => 'parent_id'
-        ]
+        ],
+
+        /* Surveys are a subclass of legacy quiz, but since learnosity, now stands somewhat alone
+         * They are homepage content
+         */
+        \Schoolbox\Survey\Mapper::class => [
+            QuizSection\Mapper::class => 'assess_id',
+            \Schoolbox\Survey\Attempt\Mapper::class => 'assess_id',
+        ],
+        \Schoolbox\Survey\Attempt\Mapper::class => [
+            QuizAnswer\Mapper::class => 'attempt_id',
+        ],
     ];
 
 
