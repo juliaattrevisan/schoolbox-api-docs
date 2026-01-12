@@ -142,7 +142,7 @@ class RecursiveUndeleter
      *       of already deleted items.
      */
     private static $softDeleteRegistry = [
-        Folder\Mapper::class            => [
+        Folder\Mapper::class => [
             Folder\Mapper::class => 'parent',   // yes, recursive tables are supported! :)
             FolderCode\Mapper::class,
             CourseSpec\Mapper::class,
@@ -152,29 +152,29 @@ class RecursiveUndeleter
             LinkMapper::class  => 'category',
             Assessment\Mapper::class => 'v_f.folder_id',
         ],
-        FolderCode\Mapper::class        => [],
-        CourseSpec\Mapper::class        => [
+        FolderCode\Mapper::class => [],
+        CourseSpec\Mapper::class => [
             UnitSpec\Mapper::class,
         ],
-        UnitSpec\Mapper::class          => [
+        UnitSpec\Mapper::class => [
             Assessment\Mapper::class => 'v_us.course_unit_specification_id',
         ],
-        CourseImpl\Mapper::class        => [
+        CourseImpl\Mapper::class => [
             UnitImpl\Mapper::class,
         ],
-        File\Mapper::class              => [],
-        LinkMapper::class               => [],
-        Assessment\Mapper::class            => [
+        File\Mapper::class => [],
+        LinkMapper::class => [],
+        Assessment\Mapper::class => [
             Quiz\Mapper::class,
             SubmissionBoxMapper::class,
             TaskMapper::class,
             Project\Mapper::class,
             Assessment\LessonPlan\Mapper::class,
         ],
-        UnitImpl\Mapper::class              => [
+        UnitImpl\Mapper::class => [
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
         ],
-        Quiz\Mapper::class                  => [
+        Quiz\Mapper::class => [
             QuizSection\Mapper::class => 'assess_id',
             QuizAttempt\Mapper::class => 'assess_id',
         ],
@@ -182,7 +182,7 @@ class RecursiveUndeleter
             QuizSection\Mapper::class => 'assess_id',
             \Schoolbox\Survey\Attempt\Mapper::class => 'assess_id',
         ],
-        SubmissionBoxMapper::class          => [
+        SubmissionBoxMapper::class => [
             SubmissionMapper::class    => 'box_id',
             ReturnedWorkMapper::class  => 'box_id',
             RubricLevelMapper::class   => 'box_id',
@@ -190,138 +190,138 @@ class RecursiveUndeleter
             Eportfolio\ShowcaseMapper::class,
         ],
         TurnitinGroupMapper::class => [],
-        TaskMapper::class                   => [
+        TaskMapper::class => [
             Task\CompletionMapper::class,
         ],
-        Task\CompletionMapper::class        => [],
-        Project\Mapper::class               => [
+        Task\CompletionMapper::class => [],
+        Project\Mapper::class => [
             Assessment\Mapper::class => 'v_pa.project_id',
         ],
         Assessment\LessonPlan\Mapper::class => [
             Assessment\LessonPlan\File\Mapper::class  => 'lesson_plan_id',
             Assessment\LessonPlan\Field\Mapper::class => 'lesson_plan_id',
         ],
-        Assessment\LessonPlan\File\Mapper::class  => [],
+        Assessment\LessonPlan\File\Mapper::class => [],
         Assessment\LessonPlan\Field\Mapper::class => [],
-        QuizSection\Mapper::class           => [
+        QuizSection\Mapper::class => [
             QuizQuestion\Mapper::class => 'section_id',
         ],
-        QuizAttempt\Mapper::class           => [
+        QuizAttempt\Mapper::class => [
             QuizAnswer\Mapper::class => 'attempt_id',
         ],
         \Schoolbox\Survey\Attempt\Mapper::class => [
             QuizAnswer\Mapper::class => 'attempt_id',
         ],
-        SubmissionMapper::class             => [
+        SubmissionMapper::class => [
             StudentSubmissionFile\Mapper::class,
         ],
-        ReturnedWorkMapper::class           => [
+        ReturnedWorkMapper::class => [
             ReturnedWorkFile\Mapper::class,
         ],
-        RubricLevelMapper::class            => [
+        RubricLevelMapper::class => [
             RubricDescriptorMapper::class => 'rubric_descriptor.level_id',
         ],
-        Eportfolio\ShowcaseMapper::class    => [],
-        QuizQuestion\Mapper::class          => [
+        Eportfolio\ShowcaseMapper::class => [],
+        QuizQuestion\Mapper::class => [
             QuizSolution\Mapper::class => 'question_id',
         ],
-        QuizAnswer\Mapper::class            => [],
-        QuizSolution\Mapper::class          => [],
+        QuizAnswer\Mapper::class => [],
+        QuizSolution\Mapper::class => [],
         StudentSubmissionFile\Mapper::class => [
             Plagscan\Mapper::class,
             Kami\Mapper::class,
         ],
-        ReturnedWorkFile\Mapper::class      => [],
-        RubricDescriptorMapper::class       => [],
-        Plagscan\Mapper::class              => [],
-        Kami\Mapper::class                  => [],
-        RubricIndicatorMapper::class        => [
+        ReturnedWorkFile\Mapper::class => [],
+        RubricDescriptorMapper::class => [],
+        Plagscan\Mapper::class => [],
+        Kami\Mapper::class => [],
+        RubricIndicatorMapper::class => [
             RubricDescriptorMapper::class => 'rubric_descriptor.rubric_indicator_id',
         ],
-        UserMapper::class                   => [
+        UserMapper::class => [
             Pastoral\Access\Mapper::class,
             Pastoral\Audience\Mapper::class,
             \Schoolbox\User\Token\Mapper::class => 'user_id',
         ],
-        RoleMapper::class                   => [
+        RoleMapper::class => [
             Pastoral\Access\Mapper::class => 'role_id',
             Pastoral\Audience\Mapper::class => 'role_id',
         ],
-        Pastoral\Mapper::class          => [
+        Pastoral\Mapper::class => [
             Pastoral\Comment\Mapper::class,
             Pastoral\Attachment\Mapper::class,
             Pastoral\Access\Mapper::class,
             Pastoral\UploadQueue\Mapper::class,
         ],
-        Pastoral\Group\Mapper::class        => [
+        Pastoral\Group\Mapper::class => [
             Pastoral\Access\Mapper::class => 'group_id',
             Pastoral\Audience\Mapper::class => 'group_id',
             Pastoral\Group\Member\Mapper::class => 'group_id',
         ],
-        Pastoral\Type\Mapper::class         => [
+        Pastoral\Type\Mapper::class => [
             Pastoral\Audience\Mapper::class => 'type_id',
         ],
-        Pastoral\SubType\Mapper::class      => [
+        Pastoral\SubType\Mapper::class => [
             Pastoral\Audience\Mapper::class => 'subtype_id',
         ],
-        Pastoral\Access\Mapper::class       => [],
-        Pastoral\Audience\Mapper::class     => [],
+        Pastoral\Access\Mapper::class => [],
+        Pastoral\Audience\Mapper::class => [],
         Pastoral\Group\Member\Mapper::class => [],
-        Pastoral\Attachment\Mapper::class   => [],
-        Pastoral\UploadQueue\Mapper::class  => [],
-        Discussion\Thread\Mapper::class     => [
+        Pastoral\Attachment\Mapper::class => [],
+        Pastoral\UploadQueue\Mapper::class => [],
+        Discussion\Thread\Mapper::class => [
             Discussion\Comment\Mapper::class => 'discussion_thread_id',
         ],
-        Discussion\Comment\Mapper::class    => [],
-        Eportfolio\PageMapper::class        => [],
-        \Schoolbox\Learning\Moment\Mapper::class              => [],
-        Blog\Homepage\Post\Mapper::class                => [
+        Discussion\Comment\Mapper::class => [],
+        Eportfolio\PageMapper::class => [],
+        \Schoolbox\Learning\Moment\Mapper::class => [],
+        Blog\Homepage\Post\Mapper::class => [
             Blog\Homepage\Comment\Mapper::class,
             Blog\Homepage\Image\Mapper::class,
         ],
-        Blog\Homepage\Comment\Mapper::class             => [],
-        Blog\Homepage\Image\Mapper::class               => [],
-        Curriculum\Node\Mapper::class                   => [
+        Blog\Homepage\Comment\Mapper::class => [],
+        Blog\Homepage\Image\Mapper::class => [],
+        Curriculum\Node\Mapper::class => [
             Curriculum\Node\Mapper::class => 'curriculum_node_parent_id',
         ],
-        Fixtures\Division\Mapper::class                 => [
+        Fixtures\Division\Mapper::class => [
             Fixtures\Team\Mapper::class          => 'division_id',
             Fixtures\Division\User\Mapper::class => 'division_id',
         ],
-        Fixtures\Division\User\Mapper::class            => [],
-        Fixtures\Matchup\Mapper::class                    => [
+        Fixtures\Division\User\Mapper::class => [],
+        Fixtures\Matchup\Mapper::class => [
             Fixtures\ItineraryItem\Mapper::class => 'match_id',
             Fixtures\Result\Mapper::class        => 'match_id',
         ],
-        Fixtures\ItineraryItem\Mapper::class            => [],
-        Fixtures\Result\Mapper::class                   => [],
-        Fixtures\Season\Mapper::class                   => [
+        Fixtures\ItineraryItem\Mapper::class => [],
+        Fixtures\Result\Mapper::class => [],
+        Fixtures\Season\Mapper::class => [
             Fixtures\Division\Mapper::class => 'season_id',
             Fixtures\Matchup\Mapper::class    => 'season_id',
         ],
-        Fixtures\Sport\Mapper::class                    => [
+        Fixtures\Sport\Mapper::class => [
             Fixtures\Division\Mapper::class => 'sport_id',
             Fixtures\Position\Mapper::class => 'sport_id',
         ],
-        Fixtures\Position\Mapper::class                 => [],
-        Fixtures\Team\Mapper::class                     => [
+        Fixtures\Position\Mapper::class => [],
+        Fixtures\Team\Mapper::class => [
             Fixtures\Team\Player\Mapper::class => 'team_id',
         ],
-        Fixtures\Team\Player\Mapper::class              => [],
-        MyFile\Mapper::class                            => [
+        Fixtures\Team\Player\Mapper::class => [],
+        MyFile\Mapper::class => [
             ComponentEportfolio\FileListMapper::class => 'file_id',
         ],
-        ComponentEportfolio\FileListMapper::class       => [],
-        ResourceBooking\Item\Mapper::class              => [
+        ComponentEportfolio\FileListMapper::class => [],
+        ResourceBooking\Item\Mapper::class => [
             ResourceBooking\Booking\Mapper::class,
         ],
-        ResourceBooking\Booking\Mapper::class           => [],
-        Pastoral\Comment\Mapper::class                  => [],
-        Forum\ThreadMapper::class                       => [
+        ResourceBooking\Booking\Mapper::class => [],
+        Pastoral\Comment\Mapper::class => [],
+        Forum\ThreadMapper::class => [
             Forum\PostMapper::class => 'threadID',
         ],
-        Forum\PostMapper::class                         => [],
-        News\Mapper::class                              => [],
+        Forum\PostMapper::class => [],
+        News\Mapper::class => [],
         \Schoolbox\User\Token\Mapper::class => [],
         PostMapper::class => [
             PostMapper::class => 'parent_id'
