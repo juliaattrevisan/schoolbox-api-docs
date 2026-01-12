@@ -139,6 +139,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
          */
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreDeleterFields']);
 
         /* Add participation records whenever someone creates a new object via this mapper
          *
@@ -337,6 +338,22 @@ class Mapper extends \Schoolbox\Mapper
         /* Remember who deleted this thing, in a dirty doubletap
          */
         $response->setDeletedBy($this->getSessionUser()->getId());
+        $this->save($response);
+    }
+
+
+    /**
+     * Forget who deleted this. Used when undeleting
+     *
+     * @param Model $response
+     * @return void
+     * @throws Exception
+     */
+    public function restoreDeleterFields(Model $response): void
+    {
+        /* Forget who deleted this thing, in a dirty doubletap
+         */
+        $response->setDeletedBy(null);
         $this->save($response);
     }
 }
