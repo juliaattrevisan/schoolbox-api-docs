@@ -8,5 +8,6 @@ CREATE TABLE dialog_agent_response_message
     content                  TEXT                            NULL,
     created_at               DATETIME                        NOT NULL,
     CONSTRAINT dialog_agent_response_message_dialog_agent_response_id_fk
-        FOREIGN KEY (dialog_agent_response_id) REFERENCES schoolbox.dialog_agent_response (id)
+        FOREIGN KEY (dialog_agent_response_id) REFERENCES dialog_agent_response (id),
+    INDEX dialog_agent_response_message_ai_response_id_index (ai_response_id)
 );
