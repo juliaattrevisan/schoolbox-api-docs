@@ -481,7 +481,7 @@ class RecursiveUndeleter
             }
 
             try {
-                /** @var IMapper $mapperClass */
+                /** @var IMapper $mapperInstance */
                 $mapperInstance = $mapperClass::getInstance();
                 if ($mapperInstance->getTable() === $table) {
                     $results[] = $mapperInstance;
