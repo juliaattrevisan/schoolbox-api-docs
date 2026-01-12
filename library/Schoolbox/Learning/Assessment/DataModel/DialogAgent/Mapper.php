@@ -75,6 +75,11 @@ class Mapper extends \Schoolbox\Mapper
          */
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteResponses']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbacks']);
+
+        /* Recursive Undeleter callbacks: deleting a dialog agent also deletes the scenario field contexts that users
+         * have lovingly crafted; these are used to make prompts so people can make responses.
+         */
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCriteriaContext']);
     }
 
 
@@ -208,6 +213,21 @@ class Mapper extends \Schoolbox\Mapper
     public function softDeleteFeedbacks(Model $dialogAgent): void
     {
         $mapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::getInstance();
+
+        $mapper->suppressNotification();
+        $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());
+        $mapper->restoreNotification();
+    }
+
+
+    /**
+     * @param Model $dialogAgent
+     * @return void
+     * @throws Exception
+     */
+    public function softDeleteCriteriaContext(Model $dialogAgent): void
+    {
+        $mapper = \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::getInstance();
 
         $mapper->suppressNotification();
         $mapper->deleteByColumn('dialog_agent_id', $dialogAgent->getId());

@@ -177,12 +177,14 @@ class RecursiveUndeleter
         \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class => [
             \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::class => 'dialog_agent_id',
             \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::class => 'dialog_agent_id',
+            \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class => 'dialog_agent_id',
         ],
         /* You need to specify these explicitly else you'll die with an inconclusive error (I reverse-engineered it)
          * Related mappers need to have a base case, which is this => [] assignation.
          */
         \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::class => [],
         \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::class => [],
+        \Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper::class => [],
 
         UnitImpl\Mapper::class => [
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
