@@ -61,6 +61,32 @@ class Controller extends BaseController
     }
 
     /**
+     * LTI get line items service endpoint: currently not implemented.
+     *
+     * @api   GET /lti-platform/line-item/assessment/
+     * @since 26.0
+     * @return void
+     */
+    public function getLineItems(): void
+    {
+        $this->logger->error(__METHOD__ . ': not implemented');
+        throw new NotFound();
+    }
+
+    /**
+     * LTI post line item service endpoint: currently not implemented.
+     *
+     * @api   POST /lti-platform/line-item/assessment/
+     * @since 26.0
+     * @return void
+     */
+    public function postLineItem(): void
+    {
+        $this->logger->error(__METHOD__ . ': not implemented');
+        throw new NotFound();
+    }
+
+    /**
      * LTI line item service endpoint.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *

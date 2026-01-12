@@ -49,6 +49,19 @@ class Module extends BaseModule
             ];
         };
 
+        // Unimplemented methods for working with line items container
+        $this->register(
+            self::METHOD_GET,
+            '/assessment',
+            'getLineItems',
+        );
+        $this->register(
+            self::METHOD_POST,
+            '/assessment',
+            'postLineItems',
+        );
+
+        // Methods for get and put of a line item
         $this->register(
             self::METHOD_GET,
             '/assessment/{assessmentId}',
@@ -57,6 +70,7 @@ class Module extends BaseModule
             $preloadAssessment,
         );
 
+        // Method for posting scores
         $this->register(
             self::METHOD_POST,
             '/assessment/{assessmentId}/scores',
