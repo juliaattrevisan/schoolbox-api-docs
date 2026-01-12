@@ -1126,7 +1126,7 @@ class Controller extends Base
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
             $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)
-                                           ->indexBy('id');
+                ->indexBy('id');
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
