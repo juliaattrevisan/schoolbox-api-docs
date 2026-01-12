@@ -40,6 +40,14 @@ $app = new class extends CliTool\App
                 // NEWIC canvas settings
                 $newSettings = [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
+                    'canvas_redirect_assessments' => 1, // enable assessment redirection
+                    'canvas_sissourceid_template' => '{folderCode}{parentCode}',
+                    'canvas_import_quiz' => 1, // import quizzes
+                    'canvas_quiz_worktype' => '', // quiz work type (deleted back in 2021-12-12 15:58:18, we are apparently setting it to NULL now... which is wrong...)
+                    'canvas_sync_news' => 1, // enable news sync
+                    'canvas_news_topic' => 8, // as specified in puppet
+                    'canvas_news_author' => 7166, // as specified in puppet
+                    'canvas_import_grades' => 1, // import grades
                 ];
                 break;
             case 'staloy':
