@@ -39,13 +39,13 @@ $app = new class extends CliTool\App
             case 'newic':
                 // NEWIC canvas settings
                 $newSettings = [
-
+                    'canvas_redirect_homepages' => 1, // enable homepage redirection
                 ];
                 break;
             case 'staloy':
                 // Staloy canvas settings
                 $newSettings = [
-
+                    'canvas_redirect_homepages' => 0, // disable homepage redirection
                 ];
                 break;
             case 'tasfg':
@@ -62,10 +62,16 @@ $app = new class extends CliTool\App
                     'canvas_code_redirect_homepages' => 'subject_code_section',
                 ];
                 break;
+            case 'trigs':
+                // TRIGS canvas settings
+                $newSettings = [
+                    'canvas_redirect_homepages' => 1, // enable homepage redirection
+                ];
+                break;
             case 'yvgs':
                 // YVGS canvas settings
                 $newSettings = [
-
+                    'canvas_redirect_homepages' => 0, // disable homepage redirection
                 ];
                 break;
         }
