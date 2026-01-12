@@ -108,18 +108,9 @@ RUN \
 
 WORKDIR /usr/share/schoolbox
 
-## Create users and groups, and set default user
-#RUN <<EOF
-#addgroup schoolboxsuper
-#useradd -m -g schoolboxsuper -G adm,sudo,www-data -s /bin/bash schoolboxsuper
-#chown -R schoolboxsuper:schoolboxsuper /config/caddy /data/caddy;
-#EOF
-
 # Create /var/log/schoolbox folder, writable by www-data and its group
 # (to which schoolboxsuper belongs)
 RUN <<EOF
 mkdir -m 0775 /var/log/schoolbox
 chown www-data:www-data /var/log/schoolbox
 EOF
-
-#USER schoolboxsuper
