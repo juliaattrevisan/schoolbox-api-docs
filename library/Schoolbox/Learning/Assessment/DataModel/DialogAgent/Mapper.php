@@ -69,6 +69,7 @@ class Mapper extends \Schoolbox\Mapper
          */
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreDeleterFields']);
 
         /* Recursive Undeleter callbacks: deleting a dialog agent also deletes all students' responses and feedbacks
          */
@@ -161,6 +162,22 @@ class Mapper extends \Schoolbox\Mapper
 
         /* TODO remove scenario context stuff specifically related to this instance
          */
+    }
+
+
+    /**
+     * Forget who deleted this. Used when undeleting
+     *
+     * @param Model $dialogAgent
+     * @return void
+     * @throws Exception
+     */
+    public function restoreDeleterFields(Model $dialogAgent): void
+    {
+        /* Forget who deleted this thing, in a dirty doubletap
+         */
+        $dialogAgent->setDeletedBy(null);
+        $this->save($dialogAgent);
     }
 
 
