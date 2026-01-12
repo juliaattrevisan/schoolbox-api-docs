@@ -131,6 +131,14 @@ HELP;
             printf("%s\n", $deploymentId);
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
+
+        /**
+         * This tool may be run as root.
+         */
+        public function runAsRoot(): ?bool
+        {
+            return null;
+        }
     },
     [
         CliKernelAbstract::OPTION_ERRORS => E_ALL,
