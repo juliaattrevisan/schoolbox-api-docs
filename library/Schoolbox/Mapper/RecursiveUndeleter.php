@@ -150,7 +150,7 @@ class RecursiveUndeleter
             UnitSpec\Mapper::class,
             CourseImpl\Mapper::class,
             File\Mapper::class => 'category',
-            LinkMapper::class  => 'category',
+            LinkMapper::class => 'category',
             Assessment\Mapper::class => 'v_f.folder_id',
         ],
         FolderCode\Mapper::class => [],
@@ -216,9 +216,9 @@ class RecursiveUndeleter
         /* Due Work.
          */
         SubmissionBoxMapper::class => [
-            SubmissionMapper::class    => 'box_id',
-            ReturnedWorkMapper::class  => 'box_id',
-            RubricLevelMapper::class   => 'box_id',
+            SubmissionMapper::class => 'box_id',
+            ReturnedWorkMapper::class => 'box_id',
+            RubricLevelMapper::class => 'box_id',
             TurnitinGroupMapper::class => 'submission_box_id',
             Eportfolio\ShowcaseMapper::class,
         ],
@@ -256,7 +256,8 @@ class RecursiveUndeleter
         Task\CompletionMapper::class => [],
 
         /* Quizzes have sections, questions, answers and attempts. Not sure exactly what QuizSolution was meant to mean
-         * but this corresponds to "the correct answer for a quiz question" in legacy quiz.
+         * but this corresponds to "the correct answer for a quiz question" in legacy quiz. Note that Attempts is still
+         * pertinent in Learnosity-era quizzes.
          */
         Quiz\Mapper::class => [
             QuizSection\Mapper::class => 'assess_id',
@@ -277,7 +278,7 @@ class RecursiveUndeleter
         /* Lesson Plans.
          */
         Assessment\LessonPlan\Mapper::class => [
-            Assessment\LessonPlan\File\Mapper::class  => 'lesson_plan_id',
+            Assessment\LessonPlan\File\Mapper::class => 'lesson_plan_id',
             Assessment\LessonPlan\Field\Mapper::class => 'lesson_plan_id',
         ],
         Assessment\LessonPlan\File\Mapper::class => [],
@@ -333,25 +334,25 @@ class RecursiveUndeleter
         /**
          * (Sports) Fixtures
          */
+        Fixtures\Sport\Mapper::class => [
+            Fixtures\Division\Mapper::class => 'sport_id',
+            Fixtures\Position\Mapper::class => 'sport_id',
+        ],
+        Fixtures\Season\Mapper::class => [
+            Fixtures\Division\Mapper::class => 'season_id',
+            Fixtures\Matchup\Mapper::class => 'season_id',
+        ],
         Fixtures\Division\Mapper::class => [
-            Fixtures\Team\Mapper::class          => 'division_id',
+            Fixtures\Team\Mapper::class => 'division_id',
             Fixtures\Division\User\Mapper::class => 'division_id',
         ],
         Fixtures\Division\User\Mapper::class => [],
         Fixtures\Matchup\Mapper::class => [
             Fixtures\ItineraryItem\Mapper::class => 'match_id',
-            Fixtures\Result\Mapper::class        => 'match_id',
+            Fixtures\Result\Mapper::class => 'match_id',
         ],
         Fixtures\ItineraryItem\Mapper::class => [],
         Fixtures\Result\Mapper::class => [],
-        Fixtures\Season\Mapper::class => [
-            Fixtures\Division\Mapper::class => 'season_id',
-            Fixtures\Matchup\Mapper::class    => 'season_id',
-        ],
-        Fixtures\Sport\Mapper::class => [
-            Fixtures\Division\Mapper::class => 'sport_id',
-            Fixtures\Position\Mapper::class => 'sport_id',
-        ],
         Fixtures\Position\Mapper::class => [],
         Fixtures\Team\Mapper::class => [
             Fixtures\Team\Player\Mapper::class => 'team_id',
