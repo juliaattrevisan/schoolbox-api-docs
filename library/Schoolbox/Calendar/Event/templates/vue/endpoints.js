@@ -11,6 +11,7 @@ export const ENDPOINTS = Object.freeze({
      */
     URL_EVENT_MODIFY_FORM: "/calendar/event/{eventId}/modify",
     URL_EVENT_MODIFY_FORM_ACTION: "/calendar/modifyForm.php",
+    URL_EVENT_ADD_TO_CALENDAR: "/calendar/event/{eventId}/addToCalendar",
 
     /* Attendance Payload for data about a given event
      */
@@ -98,16 +99,6 @@ export const ENDPOINTS = Object.freeze({
     },
 
     /**
-     * Get some payload data about a given event
-     *
-     * @param eventId
-     * @return string
-     */
-    payloadPath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_PAYLOAD, eventId, null);
-    },
-
-    /**
      * Onwards to the modify screen
      *
      * @param eventId
@@ -120,6 +111,62 @@ export const ENDPOINTS = Object.freeze({
             null,
             btoa(window.location.pathname),
         );
+    },
+
+    /**
+     * Add bookings
+     *
+     * @param eventId
+     * @return string
+     */
+    addBookingsPath: function (eventId) {
+        // No returnUrl is required here because endpoint does not perform a server-side redirect.
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, null, null);
+    },
+
+    /**
+     * Add event to calendar
+     *
+     * @param eventId
+     * @return string
+     */
+    addEventToCalendarPath: function (eventId) {
+        // No returnUrl is required here because endpoint does not perform a server-side redirect.
+        return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_ADD_TO_CALENDAR, eventId, null, null);
+    },
+
+    /**
+     * Edit booking
+     *
+     * @param eventId
+     * @param bookingId
+     * @return string
+     */
+    editBookingPath: function (eventId, bookingId) {
+        // No returnUrl is required here because endpoint does not perform a server-side redirect.
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKING_EDIT, eventId, bookingId, null);
+    },
+
+    /**
+     * Delete booking
+     *
+     * @param eventId
+     * @param bookingId
+     * @return string
+     */
+    deleteBookingPath: function (eventId, bookingId) {
+        // No returnUrl is required here because endpoint does not perform a server-side redirect.
+        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKING_DELETE, eventId, bookingId, null);
+    },
+
+    /**
+     * Get some payload data about a given event
+     *
+     * @param eventId
+     * @return string
+     */
+    payloadPath: function (eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_ATTENDANCE_PAYLOAD, eventId, null);
     },
 
     /**
@@ -163,48 +210,6 @@ export const ENDPOINTS = Object.freeze({
             ENDPOINTS.URL_ATTENDANCE_RSVP_ACCEPT,
             eventId,
             null,
-            btoa(window.location.pathname),
-        );
-    },
-
-    /**
-     * Add bookings
-     *
-     * @param eventId
-     * @return string
-     */
-    addBookingsPath: function (eventId) {
-        return this.generateUrlFromConst(ENDPOINTS.URL_BOOKINGS_ADD, eventId, null, btoa(window.location.pathname));
-    },
-
-    /**
-     * Edit booking
-     *
-     * @param eventId
-     * @param bookingId
-     * @return string
-     */
-    editBookingPath: function (eventId, bookingId) {
-        return this.generateUrlFromConst(
-            ENDPOINTS.URL_BOOKING_EDIT,
-            eventId,
-            bookingId,
-            btoa(window.location.pathname),
-        );
-    },
-
-    /**
-     * Delete booking
-     *
-     * @param eventId
-     * @param bookingId
-     * @return string
-     */
-    deleteBookingPath: function (eventId, bookingId) {
-        return this.generateUrlFromConst(
-            ENDPOINTS.URL_BOOKING_DELETE,
-            eventId,
-            bookingId,
             btoa(window.location.pathname),
         );
     },

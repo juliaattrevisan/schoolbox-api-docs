@@ -789,6 +789,36 @@ export default {
 
             this.updateListViewDateRangeField(value.selectedDate, value.selectedDate);
         },
+
+        /**
+         * Close any currently open event/booking modal, and open the modal pertaining to the given eventId.
+         * @param fullCalendarEventId - This must match the id set in Day/Renderer/Javascript.php.
+         */
+        onViewEventLinkedFromBooking(fullCalendarEventId) {
+            // Find the linked event.
+            const event = this.calendarApi.getEventById(fullCalendarEventId);
+
+            if (event) {
+                const modalElement = this.$refs.event.$refs.modal.$el;
+
+                // Define a handler that will run when the Foundation modal closes.
+                const handleModalClosed = (foundationEvent) => {
+                    // Ensure the event modal is the one we want.
+                    if (foundationEvent.target === modalElement) {
+                        // Remove the event listener.
+                        $(document).off("closed.fndtn.reveal", handleModalClosed);
+                        // Open the new modal.
+                        this.$refs.event.open(event);
+                    }
+                };
+
+                // Listen for Foundation's reveal close event.
+                $(document).on("closed.fndtn.reveal", "[data-reveal]", handleModalClosed);
+
+                // Close the modal.
+                this.$refs.event.$refs.modal.close();
+            }
+        },
     },
 };
 </script>
@@ -846,6 +876,7 @@ export default {
             :return-url="returnUrl()"
             @eventModified="reloadEvents"
             @eventDeleted="reloadEvents"
+            @viewEventLinkedFromBooking="onViewEventLinkedFromBooking"
         />
 
         <full-calendar ref="fullCalendar" :options="calendarOptions">

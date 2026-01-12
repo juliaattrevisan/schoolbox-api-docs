@@ -12,12 +12,14 @@ import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullC
 /* Path aliases like @schoolboxCalendarEvent are defined in rspack.common.js
  */
 import { EFFICACY_SELF, EFFICACY_SERIES } from "@schoolboxCalendarEvent/eventTypes";
+import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
 import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 
 const EVENT_MODIFIED = "eventModified";
 const EVENT_DELETED = "eventDeleted";
@@ -75,7 +77,7 @@ export default {
         returnUrl: {},
     },
 
-    emits: ["eventModified"],
+    emits: ["eventModified", "viewEventLinkedFromBooking"],
 
     data() {
         return {
@@ -91,6 +93,10 @@ export default {
     },
 
     computed: {
+        // This allows EVENT_VARIANTS to be used in template code.
+        EVENT_VARIANTS() {
+            return EVENT_VARIANTS;
+        },
         window: () => window,
         jQuery: () => window.jQuery,
 
@@ -125,6 +131,9 @@ export default {
             // Modify/delete links
             if (metadata?.editable) {
                 let returnUrl = btoa(window.location.pathname);
+                // Note data.custom is used by:
+                //  * Calendar\Event\Type\Submission\Renderer\Javascript
+                //  * Calendar\Event\Type\EOTC\Renderer\Javascript
                 if (data?.custom?.modifyLink) {
                     // Inject a return URL:
                     // maybe the destination will understand it, maybe it won't
@@ -146,12 +155,8 @@ export default {
                 }
             }
 
-            // Sanity check.
-            if (data?.booking && data?.bookings) {
-                console.error("Only one of {'data.booking', 'data.bookings'} should be filled.");
-            }
-
-            return {
+            const extendedProps = {
+                id: event.id, // This is a unique composite id for the FullCalendar event, set in the Calendar/Event/Type/{eventType}/Renderer/Javascript.php files.
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
                 editable: metadata?.editable,
@@ -170,17 +175,6 @@ export default {
                     id: Math.max(0, data?.links?.category?.id || 0),
                 },
                 dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
-                // If the modal is for a booking item (representing a row of the resource_booking table),
-                // there will be one booking, so 'booking' will be filled, and 'bookings' will not be filled.
-                booking: {
-                    isBooking: (data?.booking?.status || "").length,
-                    status: data?.booking?.status,
-                    related: data?.booking?.related || [],
-                    actions: (data?.booking?.buttons || []).filter((button) => button?.href),
-                },
-                // If the modal is for an event item (representing a row of the event table),
-                // there may be zero or multiple bookings, so 'booking' will not be filled, but 'bookings' may be filled.
-                bookings: data?.bookings || [],
                 timetable: {
                     code: data?.timetable?.code,
                     staff: data?.timetable?.staff,
@@ -201,6 +195,7 @@ export default {
                     numStudents: data?.custom?.numStudents,
                     numStaff: data?.custom?.numStaff,
                 },
+                variant: metadata?.variant,
                 links: {
                     view: data?.custom?.moreDetailsLink,
                     modify: modifyLink,
@@ -208,6 +203,35 @@ export default {
                     path: data?.links?.path,
                 },
             };
+
+            // Sanity check.
+            if (data?.booking && data?.bookings) {
+                console.error("Only one of {'data.booking', 'data.bookings'} should be filled.");
+            }
+
+            if (data?.booking) {
+                // The modal is for a booking item (representing a row of the resource_booking table).
+                // There will be one booking, so data.booking will be filled, and data.bookings will not be filled.
+                extendedProps.bookings = [];
+                extendedProps.booking = {
+                    status: data?.booking?.status,
+                    related: data?.booking?.related || [],
+                    actions: (data?.booking?.buttons || []).filter((button) => button?.href),
+                    linkedEventType: data?.booking?.linkedEventType,
+                    linkedEventFullCalendarEventId: data?.booking?.linkedEventFullCalendarEventId,
+                };
+            } else {
+                // The modal is for an event item (representing a row of the event table).
+                // There may be zero or multiple bookings, so data.booking will not be filled, but data.bookings may be filled.
+                extendedProps.bookings = data?.bookings || [];
+                extendedProps.booking = null;
+            }
+
+            // IMPORTANT NOTE:
+            // If eventExtendedProps.booking is non-null, the modal represents a row of the `resource_booking` table.
+            // If eventExtendedProps.booking is     null, the modal represents a row of the `event`            table.
+
+            return extendedProps;
         },
     },
 
@@ -242,7 +266,7 @@ export default {
                 this.eventExtendedProps.links.modify ||
                 this.eventExtendedProps.links.delete ||
                 this.eventExtendedProps.classAttendance.url ||
-                this.eventExtendedProps.booking.actions.length > 0 ||
+                this.eventExtendedProps.booking?.actions.length > 0 ||
                 this.canRsvp(
                     this.eventExtendedProps.attendance.payload.level,
                     this.eventExtendedProps.attendance.payload.attendees.guests,
@@ -410,6 +434,37 @@ export default {
                 });
                 submit.prop("disabled", false);
             }
+        },
+
+        /**
+         * Send a request to the server to add an event to the calendar.
+         * This is done by updating event.variant in the database to EVENT_VARIANTS.EVENT.
+         * If the request is successful, emit an EVENT_MODIFIED event.  This will cause sb-full-calendar.vue to reload events.
+         */
+        async addEventToCalendar() {
+            const toast = window.sbProps.toastActivate("Adding event to calendar...");
+            const response = await apiRequest({
+                method: "POST",
+                url: ENDPOINTS.addEventToCalendarPath(this.eventExtendedProps.eventId),
+            });
+
+            if (!response.success) {
+                toast.timeout({ text: response.message || "Unable to add event to calendar", isSuccess: false });
+                return;
+            }
+
+            toast.timeout({ text: "Event added to calendar", isSuccess: true });
+            this.$refs.modal.close(); // Close modal only on success.
+
+            // Notify listening components that an event has been modified (this will cause the calendar to reload events).
+            this.$emit(EVENT_MODIFIED, this.event);
+        },
+
+        /**
+         * Emit an event to tell any listening component that the user has requested the opening of an event modal.
+         */
+        viewEventLinkedFromBooking() {
+            this.$emit("viewEventLinkedFromBooking", this.eventExtendedProps.booking.linkedEventFullCalendarEventId);
         },
 
         /**
@@ -708,7 +763,7 @@ export default {
             let data = new URLSearchParams({
                     efficacy: efficacy,
                 }),
-                cancelActionUrl = this.eventExtendedProps.booking.actions.find(
+                cancelActionUrl = this.eventExtendedProps.booking?.actions.find(
                     (action) => action.action === "cancel",
                 ).href;
             return fetch(cancelActionUrl, {
@@ -745,7 +800,7 @@ export default {
             let data = new URLSearchParams({
                     efficacy: efficacy,
                 }),
-                approveActionUrl = this.eventExtendedProps.booking.actions.find(
+                approveActionUrl = this.eventExtendedProps.booking?.actions.find(
                     (action) => action.action === "approve",
                 ).href;
             return fetch(approveActionUrl, {
@@ -782,7 +837,7 @@ export default {
             let data = new URLSearchParams({
                     efficacy: efficacy,
                 }),
-                rejectActionUrl = this.eventExtendedProps.booking.actions.find(
+                rejectActionUrl = this.eventExtendedProps.booking?.actions.find(
                     (action) => action.action === "reject",
                 ).href;
             fetch(rejectActionUrl, {
@@ -869,8 +924,8 @@ export default {
                         <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
                             <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
                         </template>
-                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{
-                            eventExtendedProps.booking.status.name
+                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking?.status">{{
+                            eventExtendedProps.booking?.status.name
                         }}</meta-item>
                         <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{
                             eventExtendedProps.dateSpan
@@ -954,11 +1009,11 @@ export default {
                     <media-article :content="eventExtendedProps.detail"></media-article>
                 </div>
                 <div class="medium-4 small-12">
-                    <template v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking?.related.length">
                         <h3>Related Bookings</h3>
                         <meta-list>
                             <meta-item
-                                v-for="booking in eventExtendedProps.booking.related"
+                                v-for="booking in eventExtendedProps.booking?.related"
                                 :key="booking.id"
                                 :class="{
                                     'icon-approve': booking.status.isApproved,
@@ -1074,6 +1129,27 @@ export default {
                                     >Go to homepage</a
                                 >
                             </span>
+                            <!-- If the modal represents a booking, and the linked event's variant is EVENT_VARIANTS.BOOKING... -->
+                            <span
+                                v-if="
+                                    eventExtendedProps.booking &&
+                                    eventExtendedProps.variant === EVENT_VARIANTS.BOOKING &&
+                                    eventExtendedProps.booking.linkedEventType === 'Day'
+                                    // Note bookings with linkedEventType 'EOTC' do not need this button, because
+                                    // linked events for EOTC bookings are always displayed on the calendar
+                                "
+                            >
+                                <button @click.prevent="addEventToCalendar">Add Event to Calendar</button>
+                            </span>
+                            <!-- If the modal represents a booking, and the linked event is visible on the calendar... -->
+                            <span
+                                v-if="
+                                    eventExtendedProps.booking &&
+                                    eventExtendedProps.booking.linkedEventFullCalendarEventId !== null
+                                "
+                            >
+                                <button @click.prevent="viewEventLinkedFromBooking">View Event</button>
+                            </span>
                             <span v-if="eventExtendedProps.links.view">
                                 <a
                                     class="button"
@@ -1108,7 +1184,7 @@ export default {
                                 >
                             </span>
                             <!-- Booking buttons: handle random events -->
-                            <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
+                            <span v-for="(action, index) in eventExtendedProps.booking?.actions" :key="index">
                                 <a
                                     class="button"
                                     :data-booking-action="String(action.action)"
@@ -1183,7 +1259,7 @@ export default {
                 <h2>This booking is part of a recurring series</h2>
                 <p>
                     Would you like to delete only this booking, or all recurrences in the series?
-                    <template v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking?.related.length">
                         (All bookings for related resources for any deleted bookings will also be deleted.)
                     </template>
                 </p>
@@ -1201,7 +1277,7 @@ export default {
                 <h2>Please confirm</h2>
                 <p>
                     Are you sure you wish to delete this booking?
-                    <template v-if="eventExtendedProps.booking.related.length">
+                    <template v-if="eventExtendedProps.booking?.related.length">
                         (All bookings for related resources will also be deleted.)
                     </template>
                 </p>

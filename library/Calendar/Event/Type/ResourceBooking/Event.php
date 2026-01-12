@@ -56,11 +56,11 @@ class Event extends Day\Event
 
     public function getLocation()
     {
-        $location = $this->getBooking()->getResource()->getName();
+        $location = $this->getBooking()->getEvent()->getLocation();
         if ($this->getBooking()->getResource()->getRoomCode()) {
             $location .= ' [' . $this->getBooking()->getResource()->getRoomCode() . ']';
         }
-        return $location;
+        return trim($location);
     }
 
     public function getCategory()

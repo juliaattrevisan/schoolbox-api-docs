@@ -20,6 +20,7 @@ use DateTime;
 use External_Timetable;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Calendar;
+use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\Event\Mapper;
@@ -308,6 +309,12 @@ class Controller extends Base
      */
     public function update(Model $item)
     {
+        // Bookings linked to events of variant self::VARIANT_EVENT should be managed via the 'Modify Event' page.
+        // Also note this function modifies the parent event in ways that may be inappropriate for those events.
+        if ($item->getEvent()->getVariant() === Event::VARIANT_EVENT) {
+            throw new SchoolboxException("Bookings linked to events cannot be updated by this method.");
+        }
+
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
 
@@ -407,7 +414,7 @@ class Controller extends Base
 
         /* Append the booking's id to the url, for the calling module to
          * process in whatever way it needs. This allows a decoupling between
-         * Resource Booking any any modules that use it.
+         * Resource Booking and any modules that use it.
          *
          * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
          * (name/startdate/enddate/details)
@@ -760,6 +767,12 @@ class Controller extends Base
      */
     public function edit(Model $item)
     {
+        // Bookings linked to events of variant self::VARIANT_EVENT should be managed via the 'Modify Event' page.
+        // Also note this function modifies the parent event in ways that may be inappropriate for those events.
+        if ($item->getEvent()->getVariant() === Event::VARIANT_EVENT) {
+            throw new SchoolboxException("Bookings linked to events cannot be updated by this method.");
+        }
+
         $item->setRelatedBookingList($this->getBookingMapper()->findRelatedBookings($item->getId()));
         // Set start and end date
         $event = $item->getEvent();

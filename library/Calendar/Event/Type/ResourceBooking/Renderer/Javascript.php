@@ -13,8 +13,10 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
+use Schoolbox\Calendar\Event;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Booking;
+use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
 use Schoolbox\User;
 use Scrub;
 
@@ -50,16 +52,20 @@ class Javascript extends Base
         $bookingButtons = [];
 
         // Modify butonye
-        $editUrl = $this->getEditURL();
         $returnUrl = !empty($_GET[Redirect::RETURN_URL]) ? '?' . Redirect::queryStringEncodedParam($_GET[Redirect::RETURN_URL]) : '';
 
-        if ($editUrl !== false) {
-            $bookingButtons[] = [
-                'label'  => 'Modify',
-                'class'  => 'icon-modify',
-                'href'   => $editUrl . $returnUrl,
-                'action' => 'modify',
-            ];
+        // Bookings linked to events of variant 'event' must be managed via the 'Modify Event' page.
+        // The 'Modify Booking' page is only for bookings linked to events of variant 'booking'.
+        if ($this->getEvent()->getEventVariant() === Event::VARIANT_BOOKING) {
+            $editUrl = $this->getEditURL();
+            if ($editUrl !== false) {
+                $bookingButtons[] = [
+                    'label'  => 'Modify',
+                    'class'  => 'icon-modify',
+                    'href'   => $editUrl . $returnUrl,
+                    'action' => 'modify',
+                ];
+            }
         }
 
         // Cancel butonye
@@ -133,11 +139,47 @@ class Javascript extends Base
             ];
         }
 
+        // For 'EOTC' bookings, the source event is defined in the `eotc_event` table.
+        // This event links to the `resource_booking` row via `eotc_metadata_resourcebooking.bookingId`.
+        // Each EOTC booking also links to an `event` row via `resource_booking.event_id`.  That seems unnecessary
+        // because start/end times are already defined in the eotc_event table.
+        // TODO: Find whether `event` rows linked from `resource_booking` rows linked to `eotc_metadata_resourcebooking`
+        //       are used.  If not, consider removing them and allowing null values on `resource_booking.event_id`.
+        $resourceBookingMapper = ResourceBookingMapper::getInstance();
+        $eotcEventId = $resourceBookingMapper->getEotcEventId($booking->getId());
+
+        if ($eotcEventId !== null) {
+            // The event linked to this booking is an 'EOTC' event, referring to library/Calendar/Event/Type/EOTC/Event.php
+            $linkedEventType = 'EOTC';
+
+            // This is the id to use on the client-side with FullCalendar.getEventById().
+            // Reference: https://fullcalendar.io/docs/Calendar-getEventById
+            $linkedEventFullCalendarEventId = "$linkedEventType-" . $eotcEventId;
+        } else {
+            // The event linked to this booking is a 'Day' event, referring to library/Calendar/Event/Type/Day/Event.php
+            $linkedEventType = 'Day';
+
+            // This is the id to use on the client-side with FullCalendar.getEventById().
+            // Reference: https://fullcalendar.io/docs/Calendar-getEventById
+            $linkedEventFullCalendarEventId = (
+                $this->getEvent()->getEventVariant() === Event::VARIANT_EVENT
+                ? "$linkedEventType-" . $this->getEvent()->getEventId()
+                : null // Events of variant 'booking' do not appear on the calendar, so do not have a FullCalendar id.
+                       // To get this event to appear on the calendar, the user must click 'Add Event to Calendar'
+                       // (view-event-modal.vue).
+            );
+        }
+
         // Set title from resource name, and code and booking name
         // if either are there.
 
         $detail = $this->getEvent()->getDetail();
         $event  = [
+            // IMPORTANT: Each event of the type rendered here represents a row of the resource_booking table.
+            //            So its unique id must be resource_booking.id.
+            // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
+            // Reference: https://fullcalendar.io/docs/event-parsing
+            'id'         => 'ResourceBooking-' . $booking->getId(),
             'resourceId' => $booking->getResource()->getId(),
             'title'      => $this->getEvent()->getTitle(),
             'start'      => $start,
@@ -201,6 +243,11 @@ class Javascript extends Base
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
                     'related'  => $relatedBookings,
+                    'linkedEventType' => $linkedEventType,
+
+                    // This is the id by which the FullCalendar item pertaining to the linked event may be looked up
+                    // using FullCalendar.getEventById() (https://fullcalendar.io/docs/Calendar-getEventById).
+                    'linkedEventFullCalendarEventId' => $linkedEventFullCalendarEventId,
                 ],
             ],
         ];

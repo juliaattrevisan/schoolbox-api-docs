@@ -248,7 +248,7 @@ class Mapper extends BaseMapper
             LEFT  JOIN {$this->getJoinSql('resource.image',    'i', 'im')}
             WHERE b.deleted_at IS NULL
             AND   " . ((count($statusIds) === 0) ? 'FALSE' : "s.id IN {$this->getArrayPlaceholders($statusIds, 'status')}") . "
-            AND NOT (e.end_datetime < :startWindow OR e.start_datetime > :endWindow)
+            AND NOT (COALESCE(b.end_datetime, e.end_datetime) < :startWindow OR COALESCE(b.start_datetime, e.start_datetime) > :endWindow)
         ";
         if (!empty($extra['resource_id'])) {
             $query .= ' AND b.resource_id IN '
@@ -270,7 +270,7 @@ class Mapper extends BaseMapper
                 . $this->getArrayPlaceholders($allowedEventTypes, 'type');
         }
 
-        $query .= ' ORDER BY e.start_datetime ASC';
+        $query .= ' ORDER BY COALESCE(b.start_datetime, e.start_datetime) ASC';
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
@@ -778,5 +778,31 @@ class Mapper extends BaseMapper
         }
 
         return $periodsByResourceId;
+    }
+
+    /**
+     * Return the id of an etoc_event row linked to the given resource_booking.id, or null if no such row exists.
+     * Use this function either to get the linked EOTC event id, or to check whether one exists.
+     *
+     * @param int $bookingId
+     * @return null | int
+     */
+    public function getEotcEventId(int $bookingId): ?int
+    {
+        $query = "
+            SELECT eotc_e_m.event_id
+            FROM eotc_metadata_resourcebooking eotc_m_rb
+            JOIN eotc_event_metadata eotc_e_m ON eotc_m_rb.metadata_id = eotc_e_m.metadata_id
+            WHERE eotc_m_rb.booking_id = :bookingId
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(['bookingId' => $bookingId]);
+        $rows = $statement->fetchAll();
+
+        if (count($rows) === 0) {
+            return null;
+        }
+
+        return (int)$rows[0]['event_id'];
     }
 }

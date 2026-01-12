@@ -75,6 +75,11 @@ class EventConverter
         // Resource booking events: not editable in the conventional way
 
         $event->setIsEditable(false);
+
+        // This is the variant of the event row to which the resource_booking row is linked.
+        // Resource_booking rows can be linked to event rows whose variant is either 'event' or 'booking'.
+        $event->setEventVariant($eventItem->getVariant());
+
         return $event;
     }
 
