@@ -11,10 +11,7 @@ namespace Schoolbox\OpenAi\Agent\DialogAgentChat;
 
 use Alaress_Date_Format;
 use Schoolbox\Editor\OpenAI\Log;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as ResponseMessageMapper;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Status;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as ResponseDataModel;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\OpenAi\AgentChat\MessageEventType;
@@ -30,11 +27,11 @@ class SaveMessageLogListener implements IListener
     /**
      * Constructor
      *
-     * @param ResponseMessageMapper $responseMessageMapper Mapper for saving messages.
-     * @param ResponseModel         $responseModel         The actual response to associate messages to.
+     * @param Response\Message\Mapper $responseMessageMapper Mapper for saving messages.
+     * @param ResponseModel           $responseModel         The actual response to associate messages to.
      */
     public function __construct(
-        private ResponseMessageMapper $responseMessageMapper,
+        private Response\Message\Mapper $responseMessageMapper,
         private ResponseModel $responseModel,
     ) {
     }
@@ -51,12 +48,25 @@ class SaveMessageLogListener implements IListener
      */
     public function handleMessage(Message $outputMessage, Message $rawMessage, Log\Model $log): Log\Model
     {
-        if ($outputMessage->eventType === MessageEventType::COMPLETE->value) {
-            $responseMessageModel = $this->responseMessageMapper->createModel()
-                ->setDialogAgentResponse(new ResponseDataModel()->setId($this->responseModel->getId()))
-                ->setAiResponseId($outputMessage->getDataAsArray()['responseId'] ?? null)
-                ->setRole(Role::Assistant->value)
-                ->setStatus(Status::fromMessageEventType(MessageEventType::COMPLETE)->value)
+        $responseMessageModel = null;
+        $aiResponseId  = $outputMessage->getDataAsArray()['responseId'] ?? null;
+        if (isset($aiResponseId)) {
+            // Find the response: if none found, use a new one
+            // TODO index ai_response_id?
+            /** @var Response\Message\Model $responseMessageModel */
+            $responseMessageModel = $this->responseMessageMapper
+                ->findByColumn('ai_response_id', $aiResponseId)
+                ->first();
+        }
+        $responseMessageModel ??= $this->responseMessageMapper->createModel();
+
+        $responseStatus = MessageEventType::tryFrom($outputMessage->eventType) ?? Response\Message\Status::Pending;
+//        if ($outputMessage->eventType === MessageEventType::COMPLETE->value) {
+            $responseMessageModel = $responseMessageModel
+                ->setDialogAgentResponse(new Response\Model()->setId($this->responseModel->getId()))
+                ->setAiResponseId($aiResponseId)
+                ->setRole(Response\Message\Role::Assistant->value)
+                ->setStatus($responseStatus->value)
                 ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
                 // Set the creation time to the current time,
                 // instead of the request time:
@@ -65,7 +75,7 @@ class SaveMessageLogListener implements IListener
             ;
             // TODO set created at as exact time, not request time
             $this->responseMessageMapper->save($responseMessageModel);
-        }
+//        }
         return $log;
     }
 
