@@ -157,12 +157,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             'other_key' => 'event_id',
         ));
 
-        $this->hasJoin('booking', array(
-            'mapper'    => ResourceBookingMapper::class,
-            'this_key'  => 'id',
-            'other_key' => 'event_id',
-        ));
-
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -188,7 +182,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $campusMapper = $this->getJoinMapper('event_campus');
         $roleMapper = $this->getJoinMapper('role');
         $userRoleMapper = $this->getJoinMapper('owner.role');
-        $bookingMapper = $this->getJoinMapper('booking');
 
         return "
             SELECT
@@ -203,8 +196,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                 {$personalMapper->getColumnString('p')},
                 {$folderMapper->getColumnString('f')},
                 {$campusMapper->getColumnString('ca')},
-                {$roleMapper->getColumnString('r')},
-                {$bookingMapper->getColumnString('rb')}
+                {$roleMapper->getColumnString('r')}
         ";
     }
 
@@ -226,7 +218,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             LEFT JOIN {$this->getJoinSql('event_folder', '', 'f')}
             LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
             LEFT JOIN {$this->getJoinSql('role', '', 'r')}
-            LEFT JOIN {$this->getJoinSql('booking', '', 'rb')}
         ";
     }
 
@@ -248,7 +239,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $roleMapper = $this->getJoinMapper('role');
         /** @var Schoolbox\RoleMapper $userRoleMapper */
         $userRoleMapper = $this->getJoinMapper('owner.role');
-        $bookingMapper = $this->getJoinMapper('booking');
 
         /* Hydrate or die
          */
@@ -264,7 +254,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                 $allEvents[$row['id']]->setFolderCollection(new Collection());
                 $allEvents[$row['id']]->setCampusCollection(new Collection());
                 $allEvents[$row['id']]->setRoleCollection(new Collection());
-                $allEvents[$row['id']]->setBookingCollection(new GenericCollection(ResourceBookingBookingModel::class));
             }
 
             $eventItem = $allEvents[$row['id']];
@@ -321,14 +310,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
             if ($role instanceof Relation\Role && $role->getRoleId()) {
                 $eventItem->getRoleCollection()->setOffset($role->getRoleId(), $role);
-            }
-
-            /* Booking de-dupe
-             */
-            $booking = $bookingMapper->hydrate($row, 'rb');
-
-            if ($booking instanceof ResourceBookingBookingModel && $booking->getId()) {
-                $eventItem->getBookingCollection()->setOffset($booking->getId(), $booking);
             }
         }
 

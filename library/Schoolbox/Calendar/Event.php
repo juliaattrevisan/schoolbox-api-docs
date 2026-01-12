@@ -229,13 +229,6 @@ class Event implements ISoftDeletable
     protected $campusCollection;
 
     /**
-     * Associated resource bookings
-     *
-     * @var GenericCollection<ResourceBookingModel>
-     */
-    protected GenericCollection $bookingCollection;
-
-    /**
      * Associated guests
      *
      * @var Collection|int[]
@@ -924,26 +917,6 @@ class Event implements ISoftDeletable
     public function getRoleCollection()
     {
         return $this->roleCollection;
-    }
-
-    /**
-     * Set bookings collection
-     *
-     * @param GenericCollection<ResourceBookingModel> $bookingCollection
-     */
-    public function setBookingCollection(GenericCollection $bookingCollection): void
-    {
-        $this->bookingCollection = $bookingCollection;
-    }
-
-    /**
-     * Get bookings collection
-     *
-     * @return GenericCollection<ResourceBookingModel>
-     */
-    public function getBookingCollection(): GenericCollection
-    {
-        return $this->bookingCollection;
     }
 
     /**
