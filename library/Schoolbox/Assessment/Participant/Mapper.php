@@ -155,6 +155,44 @@ class Mapper extends BaseMapper
                 ]);
             $ltiScoreMapper->suppressNotification();
             $ltiScoreMapper->restoreNotification();
+        } elseif ($assessment->getDialogAgent() instanceof \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model) {
+            /* Soft-delete all responses made by a student
+             */
+            $dialogAgentResponseMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::getInstance();
+
+            /* Suppress and re-enable notifications so people aren't bombarded during the deletion
+             */
+            $dialogAgentResponseMapper->suppressNotification();
+
+            $dialogAgentResponseMapper->deleteByColumnList([
+                'dialog_agent_id' => $assessment->getDialogAgent()->getId(),
+                'learner_id' => $participant->getUser()->getId(),
+            ], [
+                /* Obviously need to include soft-deleted items
+                 */
+                'deleted' => true
+            ]);
+
+            $dialogAgentResponseMapper->restoreNotification();
+
+            /* Soft-delete all feedbacks given to a student
+             */
+            $dialogAgentFeedbackMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Feedback\Mapper::getInstance();
+
+            /* Suppress and re-enable notifications so people aren't bombarded during the deletion
+             */
+            $dialogAgentFeedbackMapper->suppressNotification();
+
+            $dialogAgentFeedbackMapper->deleteByColumnList([
+                'dialog_agent_id' => $assessment->getDialogAgent()->getId(),
+                'learner_id' => $participant->getUser()->getId(),
+            ], [
+                /* Obviously need to include soft-deleted items
+                 */
+                'deleted' => true
+            ]);
+
+            $dialogAgentFeedbackMapper->restoreNotification();
         }
     }
 
