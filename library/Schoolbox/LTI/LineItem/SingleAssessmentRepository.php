@@ -12,12 +12,15 @@ namespace Schoolbox\LTI\LineItem;
 use Aura\Router\Generator;
 use BadMethodCallException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Uri;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItem;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemCollectionInterface;
 use OAT\Library\Lti1p3Ags\Model\LineItem\LineItemInterface;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\User;
 
 /**
  * A line item repository which stores only a single LTI assessment.
@@ -27,12 +30,15 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
     /**
      * Constructor
      *
-     * @param LtiAssessment   $ltiAssessment  The LTI assessment in this repository.
-     * @param Generator       $routeGenerator Router, used to generate the line item route for the assessment.
-     * @param LoggerInterface $logger         Logger for what this repository does.
+     * @param LtiAssessment   $ltiAssessment        The LTI assessment in this repository.
+     * @param MapperProxy     $assessmentDataSource Data source for assessment objects: used for saving
+     *                                              `$ltiAssessment`.
+     * @param Generator       $routeGenerator       Router, used to generate the line item route for the assessment.
+     * @param LoggerInterface $logger               Logger for what this repository does.
      */
     public function __construct(
         private LtiAssessment $ltiAssessment,
+        private MapperProxy $assessmentDataSource,
         private Generator $routeGenerator,
         private LoggerInterface $logger,
     ) {
@@ -62,8 +68,8 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
             return new LineItem(
                 $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
                 $this->ltiAssessment->getTitle(),
-                $url->getPath(),
-                null,
+                $lineItemIdentifier,
+                $this->ltiAssessment->getLineItemResourceId(),
                 null,
                 null,
                 $this->ltiAssessment->getOpenAt()?->getDateTimeObject(),
@@ -102,8 +108,32 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function save(LineItemInterface $lineItem): LineItemInterface
     {
-        $this->logger->error(__METHOD__ . ': not implemented', $this->generateLogContext($lineItem->getIdentifier()));
-        throw new BadMethodCallException('save() method not implemented');
+        // Find this item by its identifier:
+        // currently, lti_assessment records do not have identifier columns, so
+        // extract it out: `$lineItem->getIdentifier` will be the URL of the
+        // line item.
+        // This doesn't even have a mapper so it can't really update anything?
+        $this->ltiAssessment
+            ->setLineItemScoreMaximum($lineItem->getScoreMaximum())
+            ->setTitle($lineItem->getLabel())
+            ->setLineItemResourceId($lineItem->getResourceIdentifier());
+
+        try {
+            // No user exists for this setting:
+            // thus need to fall back to assessment mapper
+            $this->assessmentDataSource->save($this->ltiAssessment, new User());
+        } catch (MapperException $e) {
+            $this->logger->error(
+                __METHOD__ . ' error: line item not saved',
+//                $this->generateLogContext(),
+            );
+            throw $e;
+        }
+        $this->logger->debug(
+            __METHOD__ . ': line item saved',
+//            $this->generateLogContext(lineItemModel: $lineItemModel),
+        );
+        return $lineItem;
     }
 
     /**

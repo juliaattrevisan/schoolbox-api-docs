@@ -102,6 +102,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(LtiAssessmentMapper::class),
             $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
+            $this->injector->get('assessmentDataSource'),
             $this->injector->get('lti.registrations'),
             $this->injector->get('lti.userCodec'),
             $this->injector->get('lti.accessTokenCache'),

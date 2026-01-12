@@ -26,6 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
@@ -45,6 +46,7 @@ class Controller extends BaseController
      *                                                                  assessment's details.
      * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper LTI score mapper, for writing a mark for the
      *                                                                  assessment.
+     * @param MapperProxy                     $assessmentDataSource     Data source for assessment objects.
      * @param RegistrationRepositoryInterface $registrations            Repository of tool+platform registrations.
      * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
      *                                                                  score publish request into an actual user.
@@ -54,6 +56,7 @@ class Controller extends BaseController
     public function __construct(
         private LtiAssessment\Mapper $ltiAssessmentMapper,
         private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
+        private MapperProxy $assessmentDataSource,
         private RegistrationRepositoryInterface $registrations,
         private UserCodec $userCodec,
         private CacheItemPoolInterface $accessTokenCache,
@@ -178,7 +181,12 @@ class Controller extends BaseController
      */
     private function createRepository(Model $assessment): LineItemRepositoryInterface
     {
-        return new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
+        return new SingleAssessmentRepository(
+            $assessment,
+            $this->assessmentDataSource,
+            $this->routeGenerator,
+            $this->logger,
+        );
     }
 
     /**
