@@ -60,8 +60,13 @@ class Propagator implements IPropagator
      */
     public function propagate(User $subject, $verb, $object, $mapper, ?array $diff = null)
     {
+echo "Schedule\Trigger\Propagator->propagate() e \$event->getStartDateTime()->getDatabase(): " . $object->getStartDateTime()?->getDatabase() . "\n";
         // this event generation *should* be in a factory, but... ¯\_(ツ)_/¯
-        return $this->propagateEvent(new Event($subject, $verb, $object, $mapper, $diff));
+        $newEvent = new Event($subject, $verb, $object, $mapper, $diff);
+echo "Schedule\Trigger\Propagator->propagate() 1 \$event->getStartDateTime()->getDatabase(): " . $object->getStartDateTime()?->getDatabase() . "\n";
+        $returnValue = $this->propagateEvent($newEvent);
+echo "Schedule\Trigger\Propagator->propagate() x \$event->getStartDateTime()->getDatabase(): " . $object->getStartDateTime()?->getDatabase() . "\n";
+        return $returnValue;
     }
 
 
@@ -74,15 +79,20 @@ class Propagator implements IPropagator
      */
     public function propagateEvent(CrudEventInterface $event)
     {
+echo "Schedule\Trigger\Propagator->propagateEvent() e \$event->getStartDateTime()->getDatabase(): " . $event->getObject()->getStartDateTime()?->getDatabase() . "\n";
         $namespace = "msg:{$this->instanceId}:";
 
         // drop event serial into redis (commented out because this will eat all the memory)
         //$redisKey = $this->toRedis($event, "{$namespace}e");
         foreach ($this->splitter->generateTriggers($event) as $trigger) {
+echo "Schedule\Trigger\Propagator->propagateEvent() 1 \$event->getStartDateTime()->getDatabase(): " . $event->getObject()->getStartDateTime()?->getDatabase() . "\n";
             $diff = \Alaress_Date_Format::now()->diffInSeconds(new \Alaress_Date_Format($trigger->getTimestamp(), 'U'));
+echo "Schedule\Trigger\Propagator->propagateEvent() 2 \$event->getStartDateTime()->getDatabase(): " . $event->getObject()->getStartDateTime()?->getDatabase() . "\n";
             $ttl = ($diff < 0) ? Instance::DEFAULT_TTL : ($diff + Instance::DEFAULT_TTL);
+echo "Schedule\Trigger\Propagator->propagateEvent() 3 \$event->getStartDateTime()->getDatabase(): " . $event->getObject()->getStartDateTime()?->getDatabase() . "\n";
             $this->broker->publish($trigger, [$namespace], $ttl);
         }
+echo "Schedule\Trigger\Propagator->propagateEvent() x \$event->getStartDateTime()->getDatabase(): " . $event->getObject()->getStartDateTime()?->getDatabase() . "\n";
 
         return null;
     }
