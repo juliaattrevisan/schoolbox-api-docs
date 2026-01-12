@@ -41,6 +41,8 @@ const imageSrc = window.Vue.computed(() => {
     return null;
 });
 
+const isResponseComplete = window.Vue.computed(() => props.message.status !== "in_progress");
+
 /** Whether this is the most recent message of any type */
 const isLatestMessage = window.Vue.computed(() => {
     const latestResponse = acStore.getLatestFeedEntry(null);
@@ -62,29 +64,19 @@ function retryResponse(): void {
 </script>
 
 <template>
-    <div v-if="props.message.status === 'in_progress'" class="ac-feed-response">
-        <div class="ac-feed-side l-flex-row l-mar-s--right">
-            <div class="loader"></div>
-        </div>
-        <div>
-            <img v-if="imageSrc" :src="imageSrc" />
-
-            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
-                <p class="ac-feed-message-content">
-                    <!-- Usually the AI responds with a <p> tag in it's response, mimic that here... -->
-                    {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
-                </p>
-            </div>
-        </div>
-    </div>
-
     <div
-        v-else
-        class="ac-feed-response ac-feed-response-success"
-        :class="{ radiolist: props.allowSelection && imageSrc }"
+        class="ac-feed-response"
+        :class="{
+            'ac-feed-response-success': isResponseComplete,
+            radiolist: props.allowSelection && imageSrc && isResponseComplete,
+        }"
     >
         <div class="ac-feed-side l-flex-row l-mar-s--right">
-            <div v-if="props.allowSelection && imageSrc" class="ac-feed-select">
+            <!-- When loading -->
+            <div v-if="!isResponseComplete" class="loader"></div>
+
+            <!-- When not loading, show a radio button to select this response -->
+            <div v-if="isResponseComplete && props.allowSelection && imageSrc" class="ac-feed-select">
                 <input
                     :id="radioId"
                     v-model="acStore.selectedFeedEntry"
@@ -96,7 +88,8 @@ function retryResponse(): void {
                 <label :for="radioId"> </label>
             </div>
 
-            <div class="ac-feed-message-portrait">
+            <!-- When not loading, show the agent's portrait -->
+            <div v-if="isResponseComplete" class="ac-feed-message-portrait">
                 <div class="c-img c-img--round c-img--xs">
                     <div class="c-img__wrapper">
                         <div class="icon" :class="`icon-${props.agentIcon}`"></div>
@@ -105,6 +98,7 @@ function retryResponse(): void {
             </div>
         </div>
 
+        <!-- response errored -->
         <template v-if="props.message.status === 'error'">
             <p class="alert-box alert l-mar--0 l-pad-s">
                 <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
@@ -117,6 +111,19 @@ function retryResponse(): void {
             </div>
         </template>
 
+        <!-- response still loading -->
+        <div v-else-if="!isResponseComplete">
+            <img v-if="imageSrc" :src="imageSrc" />
+
+            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
+                <!-- we don't render the in progress message as HTML as it may be malformed -->
+                <p class="ac-feed-message-content">
+                    {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
+                </p>
+            </div>
+        </div>
+
+        <!-- successful response -->
         <div v-else>
             <div v-if="imageSrc" class="actions-small-1">
                 <nav>
