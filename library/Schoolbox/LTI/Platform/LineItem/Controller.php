@@ -128,6 +128,8 @@ class Controller extends BaseController
     /**
      * Create a response for this controller's request.
      *
+     * TODO this is a copypaste from the other controller
+     *
      * @param LtiServiceServerRequestHandlerInterface $handler The handler for the incoming request.
      * @return ResponseInterface
      * @throws OAuthServerException if the request is invalid.
