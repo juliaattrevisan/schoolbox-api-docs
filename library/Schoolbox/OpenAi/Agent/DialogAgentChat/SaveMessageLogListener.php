@@ -48,19 +48,25 @@ class SaveMessageLogListener implements IListener
      */
     public function handleMessage(Message $outputMessage, Message $rawMessage, Log\Model $log): Log\Model
     {
-        $responseMessageModel = null;
-        $aiResponseId         = $outputMessage->getDataAsArray()['responseId'] ?? null;
+        // Don't bother logging if a partial response: only if the response was
+        // that something was created, completed or an error.
+        $responseStatus = MessageEventType::tryFrom($outputMessage->eventType) ?? MessageEventType::CREATED;
+        if (in_array($responseStatus, [MessageEventType::PARTIAL_IMAGE, MessageEventType::DELTA])) {
+            return $log;
+        }
+
+        // Try to find the message with this ai_response_id, and update it if it
+        // exists: otherwise create a new one.
+        $aiResponseId = $outputMessage->getDataAsArray()['responseId'] ?? null;
         if (isset($aiResponseId)) {
-            // Find the response: if none found, use a new one
             // TODO index ai_response_id?
-            /** @var Response\Message\Model $responseMessageModel */
             $responseMessageModel = $this->responseMessageMapper
                 ->findByColumn('ai_response_id', $aiResponseId)
                 ->first();
         }
-        $responseMessageModel ??= $this->responseMessageMapper->createModel();
 
-        $responseStatus       = MessageEventType::tryFrom($outputMessage->eventType) ?? MessageEventType::CREATED;
+        // Set whatever fields on the response message, and save.
+        $responseMessageModel ??= $this->responseMessageMapper->createModel();
         $responseMessageModel = $responseMessageModel
             ->setDialogAgentResponse(new Response\Model()->setId($this->responseModel->getId()))
             ->setAiResponseId($aiResponseId)
