@@ -171,10 +171,6 @@ class Mapper extends BaseMapper
             $dialogAgentResponseMapper->deleteByColumnList([
                 'dialog_agent_id' => $assessment->getDialogAgent()->getId(),
                 'learner_id' => $participant->getUser()->getId(),
-            ], [
-                /* Obviously need to include soft-deleted items
-                 */
-                'deleted' => true
             ]);
 
             $dialogAgentResponseMapper->restoreNotification();
@@ -190,10 +186,6 @@ class Mapper extends BaseMapper
             $dialogAgentFeedbackMapper->deleteByColumnList([
                 'dialog_agent_id' => $assessment->getDialogAgent()->getId(),
                 'learner_id' => $participant->getUser()->getId(),
-            ], [
-                /* Obviously need to include soft-deleted items
-                 */
-                'deleted' => true
             ]);
 
             $dialogAgentFeedbackMapper->restoreNotification();
