@@ -1750,7 +1750,10 @@ class Controller extends Base
      * @throws MapperException
      */
     private function moveBookings(
-        Event $event, ?Alaress_Date_Format $oldStartDateTime, ?Alaress_Date_Format $oldEndDateTime, string $efficacy
+        Event $event,
+        ?Alaress_Date_Format $oldStartDateTime,
+        ?Alaress_Date_Format $oldEndDateTime,
+        string $efficacy
     ): array
     {
         // can't work out the diff if there is no past...
