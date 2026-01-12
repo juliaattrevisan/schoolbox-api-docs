@@ -32,6 +32,23 @@ $app = new class extends CliTool\App
     {
         $db = $this->getDatabaseInternal();
 
+        // default options
+        $options = [
+            'canvas_import_quiz' => 1,
+            'canvas_quiz_worktype' => '', // school requires to set this
+            'canvas_import_grades' => 1,
+            'canvas_grade_groups' => '', // school requires to set this
+            'canvas_sissourceid_template' => '{folderCode}{parentCode}',
+
+            'canvas_sync_news' => 0,
+            'canvas_news_topic' => '', // school requires to set this
+            'canvas_news_author' => '', // school requires to set this
+
+            'canvas_redirect_assessments' => 0,
+            'canvas_redirect_homepages' => 0,
+            'canvas_code_redirect_homepages' => 'course_code',
+        ];
+
         $newSettings = [];
         $statement = $db->prepare("UPDATE settings SET value = :value WHERE name = :name");
         // get the school code from config
