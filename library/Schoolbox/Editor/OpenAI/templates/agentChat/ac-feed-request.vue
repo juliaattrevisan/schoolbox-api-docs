@@ -31,6 +31,7 @@ const props = defineProps<Props>();
 .ac-feed-request {
     align-items: flex-start;
     display: flex;
+    justify-content: flex-end;
     margin-left: 20%;
     width: 80%;
 

@@ -308,6 +308,7 @@ window.Vue.watch(
         error-prefix="There was a problem retrieving the response."
         :allow-retry="!!currentResponse._routes.message"
         initially-scrolled
+        agent-icon="dialog-agent"
     >
         <template #header>
             <div

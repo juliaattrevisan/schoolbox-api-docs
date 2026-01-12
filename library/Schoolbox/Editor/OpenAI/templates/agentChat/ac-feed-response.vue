@@ -14,9 +14,14 @@ interface Props {
     allowRetry?: boolean;
     /** Whether the user can select this response */
     allowSelection: boolean;
+    /** The icon to use for the agent's portrait in responses, default is 'ai' */
+    agentIcon?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    errorPrefix: undefined,
+    agentIcon: "ai",
+});
 const acStore = useAgentChatStore();
 const acPromptEventBus = useEventBus(acPromptEventKey);
 
@@ -35,6 +40,8 @@ const imageSrc = window.Vue.computed(() => {
     }
     return null;
 });
+
+const isResponseComplete = window.Vue.computed(() => props.message.status !== "in_progress");
 
 /** Whether this is the most recent message of any type */
 const isLatestMessage = window.Vue.computed(() => {
@@ -57,33 +64,41 @@ function retryResponse(): void {
 </script>
 
 <template>
-    <div v-if="props.message.status === 'in_progress'" class="ac-feed-response">
-        <div class="loader"></div>
-        <div>
-            <img v-if="imageSrc" :src="imageSrc" />
+    <div
+        class="ac-feed-response"
+        :class="{
+            'ac-feed-response-success': isResponseComplete,
+            radiolist: props.allowSelection && imageSrc && isResponseComplete,
+        }"
+    >
+        <div class="ac-feed-side l-flex-row l-mar-s--right">
+            <!-- When loading -->
+            <div v-if="!isResponseComplete" class="loader"></div>
 
-            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
-                <p class="ac-feed-message-content">
-                    <!-- Usually the AI responds with a <p> tag in it's response, mimic that here... -->
-                    {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
-                </p>
+            <!-- When not loading, show a radio button to select this response -->
+            <div v-if="isResponseComplete && props.allowSelection && imageSrc" class="ac-feed-select">
+                <input
+                    :id="radioId"
+                    v-model="acStore.selectedFeedEntry"
+                    type="radio"
+                    :name="radioId"
+                    :value="props.message.entryKey"
+                    :disabled="props.message.status !== 'success' || undefined"
+                />
+                <label :for="radioId"> </label>
+            </div>
+
+            <!-- When not loading, show the agent's portrait -->
+            <div v-if="isResponseComplete" class="ac-feed-message-portrait">
+                <div class="c-img c-img--round c-img--xs">
+                    <div class="c-img__wrapper">
+                        <div class="icon" :class="`icon-${props.agentIcon}`"></div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div v-else class="ac-feed-response ac-feed-response-success" :class="{ radiolist: props.allowSelection }">
-        <template v-if="props.allowSelection">
-            <input
-                :id="radioId"
-                v-model="acStore.selectedFeedEntry"
-                type="radio"
-                :name="radioId"
-                :value="props.message.entryKey"
-                :disabled="props.message.status !== 'success' || undefined"
-            />
-            <label :for="radioId"> </label>
-        </template>
-
+        <!-- response errored -->
         <template v-if="props.message.status === 'error'">
             <p class="alert-box alert l-mar--0 l-pad-s">
                 <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
@@ -96,6 +111,19 @@ function retryResponse(): void {
             </div>
         </template>
 
+        <!-- response still loading -->
+        <div v-else-if="!isResponseComplete">
+            <img v-if="imageSrc" :src="imageSrc" />
+
+            <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
+                <!-- we don't render the in progress message as HTML as it may be malformed -->
+                <p class="ac-feed-message-content">
+                    {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
+                </p>
+            </div>
+        </div>
+
+        <!-- successful response -->
         <div v-else>
             <div v-if="imageSrc" class="actions-small-1">
                 <nav>
@@ -103,13 +131,13 @@ function retryResponse(): void {
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
-            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar--0">
-                <i class="icon-image"></i>
+            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state no-margin">
+                <i class="icon-image no-margin"></i>
             </div>
             <div
                 v-if="props.message.message.length"
                 class="ac-feed-message-container l-pad-s"
-                :class="{ 'l-mar-s--top': imageSrc }"
+                :class="{ 'l-mar-s--top': imageSrc !== null }"
             >
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
                 <p class="ac-feed-message-content" v-html="props.message.message"></p>
@@ -120,8 +148,11 @@ function retryResponse(): void {
 
 <style scoped lang="scss">
 .ac-feed-response {
-    width: 80%;
+    align-items: flex-start;
     display: flex;
+    justify-content: flex-start;
+    margin-right: 20%;
+    width: 80%;
 
     img {
         max-width: 200px;
@@ -130,7 +161,34 @@ function retryResponse(): void {
 
     .ac-feed-message-container {
         background-color: #e4e4e4;
-        // flex-grow: 1;
+    }
+
+    .ac-feed-select {
+        align-self: start;
+
+        label {
+            padding: 0 0 0 1.5rem; // padding-right same width as the radio button
+        }
+    }
+
+    .ac-feed-side {
+        // allows the input/portrait to be aligned to the top/bottom correctly
+        align-self: stretch;
+        flex-basis: min-content;
+        justify-content: center;
+
+        // since portraits can appear, keep all entries consistent when there isn't one (like when loading)
+        min-width: 40px;
+    }
+
+    .ac-feed-message-portrait {
+        align-self: end;
+
+        .c-img__wrapper {
+            width: 100%;
+            height: 100%;
+            background-color: #e4e4e4;
+        }
     }
 
     /**
@@ -155,8 +213,7 @@ function retryResponse(): void {
     }
 
     .ac-img-omitted {
-        max-width: 200px;
-        width: 100%;
+        width: 200px;
     }
 
     &.ac-feed-response-success img {
@@ -182,7 +239,7 @@ function retryResponse(): void {
         min-height: 1.5rem;
         width: 1.5rem;
         height: 1.5rem;
-        margin: 0.5rem 0.5rem 0 0;
+        margin: 0.5rem 0;
     }
 }
 </style>

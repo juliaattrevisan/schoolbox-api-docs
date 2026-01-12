@@ -343,6 +343,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 <div v-else class="l-mar-m">
                     <aul-agent-chat
                         v-if="selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT"
+                        :feature="selectedSessionInfo.session.feature"
                         :session-log="selectedSessionInfo.log"
                     />
                     <div v-else class="empty-state">
