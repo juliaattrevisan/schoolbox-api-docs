@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge\Staloy;
 
+use External\Canvas\Importer\CanvasDb;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 
@@ -17,9 +18,9 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
     /**
      * @inheritDoc
      */
-    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
+    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes, CanvasDb $canvasDb)
     {
-        parent::__construct($markTypes, $workTypes);
+        parent::__construct($markTypes, $workTypes, $canvasDb);
         // reorder $workTypes
         $this->workTypes->indexBy('id');
     }

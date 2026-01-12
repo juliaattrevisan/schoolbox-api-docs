@@ -47,9 +47,6 @@ use UnexpectedValueException;
  */
 class DataSync
 {
-    /** @var string */
-    private string $siteSchoolCode;
-
     private string $schoolboxTimezone;
 
     /**
@@ -116,7 +113,6 @@ class DataSync
         private bool $persist,
         private LoggerInterface $log
     ) {
-        $this->siteSchoolCode         = strtolower($config->get('site_school_code'));
         $this->schoolboxTimezone      = $config->get('date_timezone');
     }
 

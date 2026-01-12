@@ -66,7 +66,6 @@ class BridgeFactory
 
     /**
      * Gets class for course section
-     * @param CanvasDb        $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param Course          $courseBridge
