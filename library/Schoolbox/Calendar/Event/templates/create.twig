@@ -206,7 +206,10 @@
                         {% if resources %}
                             <ul>
                             {% for resource in resources %}
-                                <li><a href="/resource-booking/item/{{ resource.id }}">{{ resource.name }}</a></li>
+                                <li>
+                                    <input type="hidden" name="resourceIds[]" value="{{ resource.id }}"/>
+                                    <a href="/resource-booking/item/{{ resource.id }}">{{ resource.name }}</a>
+                                </li>
                             {% endfor %}
                             </ul>
                         {% endif %}
