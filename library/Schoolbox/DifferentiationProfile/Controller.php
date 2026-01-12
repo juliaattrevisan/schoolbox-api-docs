@@ -103,7 +103,7 @@ class Controller extends Base
                     fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
                 ),
                 'routes' => [
-                    'getData' => $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData'),
+                    'getData' => $this->getRouteIfAuthorized('differentiationProfiles.getAllDifferentiationProfileData'),
                     'genAi' => $this->getRouteIfAuthorized('openai.postDifferentiation'),
                 ]
             ],
@@ -111,7 +111,7 @@ class Controller extends Base
         );
     }
 
-    public function getDifferentiationProfileData(): void
+    public function getAllDifferentiationProfileData(): void
     {
         $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
 
@@ -442,5 +442,38 @@ class Controller extends Base
                 return $carry;
             }, [])
         );
+    }
+
+    /**
+     * Get differentiation profile data for a student
+     *
+     * @param User $student
+     * @return void
+     * @throws Exception
+     */
+    public function getDifferentiationProfileData(User $student): void
+    {
+        try {
+            $profile = $this->mapper->findOneByColumn(
+                'student_id',
+                $student->getId(),
+                [
+                    'order' => ['updated_at' => DifferentiationProfileMapper::SORT_ORDER_DESC],
+                ]
+            );
+
+            $profileTranslator = new ModelToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1),
+            );
+            $data = call_user_func($profileTranslator, $profile);
+            $this->response = $this->responseAsJson($data);
+            return;
+        } catch (Exception\NotFound $e) {
+            $this->sendJsonError('Differentiation profile record not found for the student.', 404);
+            return;
+        }
     }
 }

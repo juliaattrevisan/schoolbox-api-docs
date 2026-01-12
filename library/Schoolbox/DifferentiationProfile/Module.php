@@ -63,6 +63,8 @@ class Module extends BaseModule
             ),
         );
 
+        /* Checking if the user has WRITE service permission that matches the campus of the student being accessed
+         */
         $hasCampusPerms =  new Rule\HasServicePermission(
             UserAccess::SERVICE_DIFFERENTIATION,
             UserAccess::ACCESS_WRITE,
@@ -82,9 +84,9 @@ class Module extends BaseModule
             $hasCampusPerms
         );
 
-        /* Only staff can view differentiation profiles when the feature is enabled
+        /* Only allow access if feature is enabled, user is staff, profile exists and is populated
          */
-        $getProfilePerms = new Rule\All(
+        $viewProfilePerms = new Rule\All(
             $staffWithFeatureEnabled,
             new Rule\Callback(function (array $params): void {
                 try {
@@ -110,7 +112,7 @@ class Module extends BaseModule
         );
 
         $this->register(self::METHOD_GET, '/manage', 'manageDifferentiationProfiles', $getPerms);
-        $this->register(self::METHOD_GET, '/list', 'getDifferentiationProfileData', $getPerms);
+        $this->register(self::METHOD_GET, '/list', 'getAllDifferentiationProfileData', $getPerms);
         $this->register(
             self::METHOD_GET,
             '/linkedRecords/{studentId}',
@@ -129,7 +131,15 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/view/{studentId}',
             'viewDifferentiationProfileData',
-            $getProfilePerms,
+            $viewProfilePerms,
+            \Closure::fromCallable([$this, 'preloadStudent'])
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/student/{studentId}',
+            'getDifferentiationProfileData',
+            $getPerms,
             \Closure::fromCallable([$this, 'preloadStudent'])
         );
     }
