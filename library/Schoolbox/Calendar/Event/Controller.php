@@ -838,7 +838,11 @@ class Controller extends Base
                     $bookingIdsToRemove[] = $booking->getId();
                 }
             }
-            $bookingErrorsDelete = $this->deleteBookingsSlave($event, $bookingIdsToRemove, $efficacy);
+            try {
+                $this->deleteBookingsSlave($event, $bookingIdsToRemove, $efficacy);
+            } catch (NotFound | Forbidden $e) {
+                $bookingErrorsDelete[] = $e->getMessage();
+            }
         }
 
         // Move bookings if necessary.
