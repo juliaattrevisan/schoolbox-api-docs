@@ -1381,12 +1381,6 @@ parameters:
 			path: library/Evaluation/Question/Bank.php
 
 		-
-			message: '#^PHPDoc tag @var with type Custom\\Newic\\Redirect|Custom\\Tasfg\\Redirect|Custom\\Trigs\\Redirect is not subtype of native type class\-string\.$#'
-			identifier: varTag.nativeType
-			count: 1
-			path: library/External/Canvas/Redirect/RedirectFactory.php
-
-		-
 			message: '#^Ternary operator condition is always true\.$#'
 			identifier: ternary.alwaysTrue
 			count: 1
