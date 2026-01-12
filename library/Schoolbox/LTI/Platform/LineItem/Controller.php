@@ -93,21 +93,6 @@ class Controller extends BaseController
      */
     public function postScorePublishForAssessment(Model $assessment): void
     {
-        // Build and validate score publish request
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-ags/doc/score/platform/
-
-        // Access token sanity checker:
-        // validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
-
-        // Access token validity checker
-        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
-        $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache, $this->logger),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-        );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
-
         // Line item repository: consists only of a single assessment
         $lineItemRepository = $this->createRepository($assessment);
 
@@ -126,8 +111,7 @@ class Controller extends BaseController
             $scoreRepository,
             logger: $this->logger,
         );
-        $server         = new ServiceServer($validator, $handler, logger: $this->logger);
-        $this->response = $server->handle($request);
+        $this->response = $this->createResponse($handler);
     }
 
     /**
