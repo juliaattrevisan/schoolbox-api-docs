@@ -451,13 +451,15 @@ class RecursiveUndeleter
         }
         $this->logger->debug(sprintf("Mapper '%s' found in registry", $mapperClass));
 
-        $childMappers = self::SOFT_DELETE_REGISTRY[$mapperClass];
-
         // check this mapper is defined properly in our registry
-        if (!is_array($childMappers)) {
-            $this->logger->error('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
-            throw new OutOfBoundsException('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
-        }
+        // This is hardcoded and is always true.
+//        $childMappers = self::SOFT_DELETE_REGISTRY[$mapperClass];
+//
+//        if (!is_array($childMappers)) {
+//            $this->logger->error('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
+//            throw new OutOfBoundsException('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
+//        }
+
         $this->logger->debug(sprintf("Mapper '%s' has child mappers defined in registry", $mapperClass));
     }
 
