@@ -153,6 +153,10 @@ class Mapper extends BaseMapper
                     'lti_assessment_id' => $assessment->getLtiAssessment()->getId(),
                     'student_id'        => $participant->getUser()->getId(),
                 ]);
+
+            /* TODO SURELY you're meant to suppress notifs, do an action, then restore notifs...
+             *  what's the point of suppressing then immediately restoring?
+             */
             $ltiScoreMapper->suppressNotification();
             $ltiScoreMapper->restoreNotification();
         } elseif ($assessment->getDialogAgent() instanceof \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model) {
