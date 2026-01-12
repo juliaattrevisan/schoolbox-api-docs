@@ -32,7 +32,6 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private \External\Canvas\Log\Mapper $importLogMapper,
-
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -60,7 +59,8 @@ class Controller extends ConfigController
                 'importLogs' => $this->importLogMapper->findLogsWithDuration(),
             ],
             'School Data Import'
-        );    }
+        );
+    }
 
 
     /**
@@ -89,5 +89,4 @@ class Controller extends ConfigController
     {
         return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_TYPE, 24);
     }
-
 }
