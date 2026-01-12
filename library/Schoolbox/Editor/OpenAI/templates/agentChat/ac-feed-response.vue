@@ -131,13 +131,13 @@ function retryResponse(): void {
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
-            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state l-mar-s--bottom">
-                <i class="icon-image"></i>
+            <div v-else-if="imageSrc === false" class="ac-img-omitted empty-state no-margin">
+                <i class="icon-image no-margin"></i>
             </div>
             <div
                 v-if="props.message.message.length"
                 class="ac-feed-message-container l-pad-s"
-                :class="{ 'l-mar-s--top': imageSrc }"
+                :class="{ 'l-mar-s--top': imageSrc !== null }"
             >
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
                 <p class="ac-feed-message-content" v-html="props.message.message"></p>
@@ -213,8 +213,7 @@ function retryResponse(): void {
     }
 
     .ac-img-omitted {
-        max-width: 200px;
-        width: 100%;
+        width: 200px;
     }
 
     &.ac-feed-response-success img {
