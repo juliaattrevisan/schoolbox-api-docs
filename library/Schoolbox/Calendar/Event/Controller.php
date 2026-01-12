@@ -814,7 +814,7 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
-        // Remove linked resource bookings for any resources removed from this event.
+        // Find resources to add/remove by comparing existing resources to resources from form submission.
         $resourceIdsExisting = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId())->getAll();
         $resourceIdsFromForm = (
             array_key_exists('resources', (array)$validRequestPost)
@@ -822,25 +822,37 @@ class Controller extends Base
             : []
         );
         $resourceIdsToRemove = array_diff($resourceIdsExisting, $resourceIdsFromForm);
-        $bookingIdsToRemove = [];
-        foreach ($event->getBookingCollection() as $booking) {
-            if (in_array($booking->getResource()->getId(), $resourceIdsToRemove, false)) {
-                $bookingIdsToRemove[] = $booking->getId();
+        $resourceIdsToAdd = array_diff($resourceIdsFromForm, $resourceIdsExisting);
+
+        // Initialise booking error arrays.
+        $bookingErrorsDelete = [];
+        $bookingErrorsMove = [];
+        $bookingErrorsAdd = [];
+
+        // Delete bookings if necessary.
+        if (count($resourceIdsToRemove) > 0) {
+            $bookingIdsToRemove = [];
+            foreach ($event->getBookingCollection() as $booking) {
+                if (in_array($booking->getResource()->getId(), $resourceIdsToRemove, false)) {
+                    $bookingIdsToRemove[] = $booking->getId();
+                }
             }
-        }
-        try {
-            $this->bookingMapper->deleteByColumn('id', $bookingIdsToRemove);
-        } catch (MapperException) {
-            throw new SchoolboxException('Could not delete booking.');
+// TODO: Implement this.
+//            $bookingErrorsDelete = $this->deleteBookingsSlave($event, $bookingIdsToRemove, $efficacy);
         }
 
-        $bookingErrors = [];
+        // Move bookings if necessary.
         if ($existingEvent) {
             // Move any resource bookings attached to this event
-            $bookingErrors = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
+            // TODO: Add efficacy parameter to moveBookings() function.
+            $bookingErrorsMove = $this->moveBookings($event, $oldStart, $oldEnd, $this->getUser());
         }
 
-        // TODO: Create linked resource bookings for any new resources added to this event.
+        // Add bookings if necessary.
+        if (count($resourceIdsToAdd) > 0) {
+// TODO: Implement this.
+//            $bookingErrorsAdd = $this->addBookingsSlave($event, $resourceIdsToAdd, $efficacy);
+        }
 
         if ($this->isJsonRequest()) {
             $this->eventMapper->populateGuests($event); // Reload guests to ensure the response matches the database representation.
@@ -884,7 +896,7 @@ class Controller extends Base
                     ),
                     'maxAttendees' => $event->getMaxAttendees(),
                     'showAttendees' => $event->getShowAttendees(),
-                    'bookingErrors' => $bookingErrors,
+                    'bookingErrors' => array_merge($bookingErrorsDelete, $bookingErrorsMove, $bookingErrorsAdd),
                     // TODO: Add 'bookings' to this response.
                 ]
             );
