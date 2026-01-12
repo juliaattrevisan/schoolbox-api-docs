@@ -815,6 +815,10 @@ class Controller extends Base
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
+        // Save changes to the linked resource bookings in a separate step, after the event has been saved.
+        // TODO: Consider adding a database transaction encompassing all database
+        //       operations to ensure the save succeeds entirely or not at all.
+
         // Find resources to add/remove by comparing existing resources to resources from form submission.
         $resourceIdsExisting = $event->getBookingCollection()->map(fn ($booking) => $booking->getResource()->getId())->getAll();
         $resourceIdsFromForm = (
