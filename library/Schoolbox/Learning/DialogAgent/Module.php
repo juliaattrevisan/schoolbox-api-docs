@@ -606,6 +606,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper::class),
             $this->injector->get('dialogAgentFeedbackDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\DifferentiationProfile\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\DifferentiationProfiles\Mapper::class),
         );
     }
 

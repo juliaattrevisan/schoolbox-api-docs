@@ -25,7 +25,10 @@ use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Model as ScenarioFieldContext;
 use Schoolbox\Admin\DialogAgent\Scenario\Field\Context\Mapper as FieldContextMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Criterion\Mapper as CriterionMapper;
+use Schoolbox\Admin\DifferentiationProfiles\Mapper as DifferentiationProfileAdminMapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
+use Schoolbox\DifferentiationProfile\Translator\ProfileToArray as DifferentiationProfileTranslator;
 use Schoolbox\Editor\OpenAI\Log\LogFormat as AiLogFormat;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
@@ -83,7 +86,9 @@ class Controller extends Base
      * @param FieldContextMapper $fieldContextMapper
      * @param CriterionMapper $criterionMapper,
      * @param \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource
-     * @param DialogAgentResponseMessageMapper                                $dialogAgentResponseMessageMapper
+     * @param DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper
+     * @param DifferentiationProfileMapper $differentiationProfileMapper
+     * @param DifferentiationProfileAdminMapper $differentiationProfileAdminMapper
      */
     public function __construct(
         private Access $access,
@@ -106,6 +111,8 @@ class Controller extends Base
         private CriterionMapper $criterionMapper,
         private \Schoolbox\Learning\Assessment\DialogAgent\Feedback\MapperProxy $feedbackDataSource,
         private DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper,
+        private DifferentiationProfileMapper $differentiationProfileMapper,
+        private DifferentiationProfileAdminMapper $differentiationProfileAdminMapper,
     ) {
     }
 
@@ -552,6 +559,42 @@ class Controller extends Base
             $response->setStartedAt(\Alaress_Date_Format::now());
         }
 
+        /**
+         * If differentiation profiles are enabled, and the assessment is set to use them,
+         * Try to find the differentiation profile for the learner and add it to the prompt if found
+         */
+        $differentiationProfilePrompt = null;
+        if (
+            $assessment->getUseDifferentiationProfile() &&
+            $this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED)
+        ) {
+            $learner = $response->getSubmittedOnBehalfOf();
+            $differentiationProfile = null;
+            try {
+                $differentiationProfile = $this->differentiationProfileMapper->findOneByColumn(
+                    'student_id',
+                    $learner->getId(),
+                    [
+                        'order' => ['updated_at' => \Schoolbox\Mapper::SORT_ORDER_DESC],
+                    ]
+                );
+            } catch (\Schoolbox\Mapper\Exception\NotFound) {
+                // noop
+            }
+
+            if (null !== $differentiationProfile) {
+                $differentiationProfileTranslator = new DifferentiationProfileTranslator(
+                    $learner,
+                    $this->differentiationProfileAdminMapper->findByColumn('is_enabled', 1),
+                );
+
+                $differentiationProfilePrompt = json_encode(
+                    $differentiationProfileTranslator($differentiationProfile),
+                    JSON_THROW_ON_ERROR
+                );
+            }
+        }
+
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $agentConfig,
@@ -563,6 +606,7 @@ class Controller extends Base
                 $this->getUser(),
                 $assessment,
                 $this->requestPost->get('userPrompt'),
+                $differentiationProfilePrompt,
                 $aiSessionId,
                 previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
                 responseModel: $response,
@@ -643,6 +687,7 @@ class Controller extends Base
                 $this->getUser(),
                 $assessment,
                 $this->requestPost->get('userPrompt'),
+                null, // no differentiation profile in the sandbox
                 $aiSessionId,
                 previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
             );
