@@ -33,7 +33,7 @@ $app = new class extends CliTool\App
         $db = $this->getDatabaseInternal();
 
         // default options
-        $options = [
+        $defaultOptions = [
             'canvas_import_quiz' => 1,
             'canvas_quiz_worktype' => '', // school requires to set this
             'canvas_import_grades' => 1,
@@ -55,31 +55,25 @@ $app = new class extends CliTool\App
         switch (strtolower($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_SITE_SCHOOL_CODE))){
             case 'newic':
                 // NEWIC canvas settings
-                $newSettings = [
+                $newSettings = $defaultOptions + [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
                     'canvas_redirect_assessments' => 1, // enable assessment redirection
-                    'canvas_sissourceid_template' => '{folderCode}{parentCode}',
-                    'canvas_import_quiz' => 1, // import quizzes
                     'canvas_quiz_worktype' => '', // quiz work type (deleted back in 2021-12-12 15:58:18, we are apparently setting it to NULL now... which is wrong...)
                     'canvas_sync_news' => 1, // enable news sync
                     'canvas_news_topic' => 8, // as specified in puppet
                     'canvas_news_author' => 7166, // as specified in puppet
-                    'canvas_import_grades' => 1, // import grades
                 ];
                 break;
             case 'staloy':
                 // Staloy canvas settings
-                $newSettings = [
-                    'canvas_redirect_homepages' => 0, // disable homepage redirection
-                    'canvas_sync_news' => 0, // disable news sync
-                    'canvas_redirect_assessments' => 0, // disable assessment redirection
+                $newSettings = $defaultOptions + [
                     'canvas_import_quiz' => 0, // don't import quizzes
                     'canvas_import_grades' => 0, // don't import grades
                 ];
                 break;
             case 'tasfg':
                 // TASFG canvas settings
-                $newSettings = [
+                $newSettings = $defaultOptions + [
                     'canvas_import_quiz' => 0, // don't import quizzes
                     'canvas_import_grades' => 0, // don't import grades
                     'canvas_sync_news' => 1, // enable news sync
@@ -93,18 +87,13 @@ $app = new class extends CliTool\App
                 break;
             case 'trigs':
                 // TRIGS canvas settings
-                $newSettings = [
+                $newSettings = $defaultOptions + [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
-                    'canvas_sync_news' => 0, // disable news sync
-                    'canvas_redirect_assessments' => 0, // disable assessment redirection
                 ];
                 break;
             case 'yvgs':
                 // YVGS canvas settings
-                $newSettings = [
-                    'canvas_redirect_homepages' => 0, // disable homepage redirection
-                    'canvas_sync_news' => 0, // disable news sync
-                    'canvas_redirect_assessments' => 0, // disable assessment redirection
+                $newSettings = $defaultOptions + [
                 ];
                 break;
         }
