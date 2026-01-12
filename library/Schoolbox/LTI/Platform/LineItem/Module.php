@@ -61,11 +61,25 @@ class Module extends BaseModule
             'postLineItems',
         );
 
-        // Methods for get and put of a line item
+        // Methods for get, put and delete (not implemented) of a line item
         $this->register(
             self::METHOD_GET,
             '/assessment/{assessmentId}',
             'getLineItemForAssessment',
+            null,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_PUT,
+            '/assessment/{assessmentId}',
+            'putLineItemForAssessment',
+            null,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_DELETE,
+            '/assessment/{assessmentId}',
+            'deleteLineItemForAssessment',
             null,
             $preloadAssessment,
         );

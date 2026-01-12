@@ -14,6 +14,7 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\GetLineItemServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\UpdateLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -87,7 +88,7 @@ class Controller extends BaseController
     }
 
     /**
-     * LTI line item service endpoint.
+     * LTI get line item service endpoint.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
      * @api   GET /lti-platform/line-item/assessment/{assessmentId}
@@ -97,9 +98,44 @@ class Controller extends BaseController
      */
     public function getLineItemForAssessment(Model $assessment): void
     {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
         $repository     = $this->createRepository($assessment);
         $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
         $this->response = $this->createResponse($handler);
+    }
+
+    /**
+     * LTI put line item service endpoint
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     *
+     * @api   PUT /lti-platform/line-item/assessment/{assessmentId}
+     * @since 26.0
+     *
+     * @param Model $assessment
+     */
+    public function putLineItemForAssessment(Model $assessment): void
+    {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
+        $repository     = $this->createRepository($assessment);
+        $handler        = new UpdateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
+        $this->response = $this->createResponse($handler);
+    }
+
+    /**
+     * LTI delete line item service endpoint: currently not implemented.
+     *
+     * @api   DELETE /lti-platform/line-item/assessment/{assessmentId}
+     * @since 26.0
+     *
+     * @param Model $assessment
+     */
+    public function deleteLineItemForAssessment(Model $assessment): void
+    {
+        $this->logger->error(
+            __METHOD__ . ': not implemented',
+            ['assessmentId' => $assessment->getId()],
+        );
+        throw new NotFound();
     }
 
     /**
