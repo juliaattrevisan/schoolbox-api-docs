@@ -10,7 +10,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
-require_once __DIR__ . '/../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
  * CLI Tool
@@ -50,30 +50,33 @@ $app = new class extends CliTool\App
         ];
 
         $newSettings = [];
-        $statement = $db->prepare("UPDATE settings SET value = :value WHERE name = :name");
+        $statement = $db->prepare("UPDATE config SET value = :value WHERE name = :name");
         // get the school code from config
         switch (strtolower($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_SITE_SCHOOL_CODE))) {
             case 'newic':
+                $this->getLogger()->notice("Found NEWIC school code, applying specific canvas settings.");
                 // NEWIC canvas settings
-                $newSettings = $defaultOptions + [
+                $newSettings = array_merge($defaultOptions, [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
                     'canvas_redirect_assessments' => 1, // enable assessment redirection
                     'canvas_quiz_worktype' => '', // quiz work type (deleted back in 2021-12-12 15:58:18, we are apparently setting it to NULL now... which is wrong...)
                     'canvas_sync_news' => 1, // enable news sync
                     'canvas_news_topic' => 8, // as specified in puppet
                     'canvas_news_author' => 7166, // as specified in puppet
-                ];
+                ]);
                 break;
             case 'staloy':
+                $this->getLogger()->notice("Found STALOY school code, applying specific canvas settings.");
                 // Staloy canvas settings
-                $newSettings = $defaultOptions + [
+                $newSettings = array_merge($defaultOptions, [
                     'canvas_import_quiz' => 0, // don't import quizzes
                     'canvas_import_grades' => 0, // don't import grades
-                ];
+                ]);
                 break;
             case 'tasfg':
                 // TASFG canvas settings
-                $newSettings = $defaultOptions + [
+                $this->getLogger()->notice("Found TASFG school code, applying specific canvas settings.");
+                $newSettings = array_merge($defaultOptions, [
                     'canvas_import_quiz' => 0, // don't import quizzes
                     'canvas_import_grades' => 0, // don't import grades
                     'canvas_sync_news' => 1, // enable news sync
@@ -83,23 +86,28 @@ $app = new class extends CliTool\App
                     'canvas_redirect_assessments' => 0, // no assessment redirection yet
                     'canvas_sissourceid_template' => '{parentCode} {folderCode}',
                     'canvas_code_redirect_homepages' => 'subject_code_section',
-                ];
+                ]);
                 break;
             case 'trigs':
                 // TRIGS canvas settings
-                $newSettings = $defaultOptions + [
+                $this->getLogger()->notice("Found TRIGS school code, applying specific canvas settings.");
+                $newSettings = array_merge($defaultOptions, [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
-                ];
+                ]);
                 break;
             case 'yvgs':
                 // YVGS canvas settings
-                $newSettings = $defaultOptions + [
-                ];
+                $this->getLogger()->notice("Found YVGS school code, applying specific canvas settings.");
+                $newSettings = array_merge($defaultOptions, [
+                ]);
                 break;
+            default:
+                $this->getLogger()->notice("No specific canvas settings for this school code. Applying nothing");
         }
 
         // update the settings
         foreach ($newSettings as $key => $value) {
+            $this->getLogger()->debug("Setting {$key}: {$value}");
             $statement->execute([':name' => $key, ':value' => $value]);
         }
     }
