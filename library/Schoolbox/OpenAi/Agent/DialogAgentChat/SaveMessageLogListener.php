@@ -68,19 +68,22 @@ class SaveMessageLogListener implements IListener
             MessageEventType::tryFrom($outputMessage->eventType) ?? MessageEventType::CREATED,
         );
 
-        // Try to find the message with this ai_response_id, and update it if it
-        // exists: otherwise create a new one.
+        // If there is no ai_response_id, don't log anything: there's no way to
+        // associate this to any previous log.
         $messageData  = $outputMessage->getDataAsArray();
         $aiResponseId = $messageData['responseId'] ?? null;
-        if (isset($aiResponseId)) {
-            // TODO index ai_response_id?
-            $responseMessageModel = $this->responseMessageMapper
-                ->findByColumn('ai_response_id', $aiResponseId)
-                ->first();
+        if (!isset($aiResponseId)) {
+            return $log;
         }
 
-        // Set whatever fields on the response message, and save.
+        // Try to find the message with this ai_response_id, and update it if it
+        // exists: otherwise create a new one.
+        $responseMessageModel = $this->responseMessageMapper
+            ->findByColumn('ai_response_id', $aiResponseId)
+            ->first();
         $responseMessageModel ??= $this->responseMessageMapper->createModel();
+
+        // Set whatever fields on the response message, and save.
         $responseMessageModel = $responseMessageModel
             ->setDialogAgentResponse(new Response\Model()->setId($this->responseModel->getId()))
             ->setAiResponseId($aiResponseId)
