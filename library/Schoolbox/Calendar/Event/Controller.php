@@ -858,8 +858,11 @@ class Controller extends Base
 
         // Add bookings if necessary.
         if (count($resourceIdsToAdd) > 0) {
-// TODO: Implement this.
-//            $bookingErrorsAdd = $this->addBookingsSlave($event, $resourceIdsToAdd, $efficacy);
+            try {
+                $this->addBookingsSlave($event, $resourceIdsToAdd, $efficacy);
+            } catch (NotFound | Forbidden $e) {
+                $bookingErrorsAdd[] = $e->getMessage();
+            }
         }
 
         if ($this->isJsonRequest()) {
@@ -1054,8 +1057,51 @@ class Controller extends Base
         );
         $resourceIds = array_map(static fn ($resourceId) => (int)$resourceId, $resourceIdStrings);
 
+        try {
+            $results = $this->addBookingsSlave($event, $resourceIds, $efficacy);
+        } catch (NotFound $e) {
+            $this->response = $this->responseAsJson(
+                new ApiProblem($e->getMessage())->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            return;
+        } catch (Forbidden $e) {
+            $this->response = $this->responseAsJson(
+                new ApiProblem($e->getMessage())->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            return;
+        }
+
+        // Only unexpected errors require non-success code.
+        // It is expected that some or all attempts to book resources may fail for validation reasons.
+        $this->response = $this->responseAsJson(
+            // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
+            [
+                'nBookingsAttempted' => $results['nBookingsAttempted'],
+                'nBookingsCreatedWithClash' => $results['nBookingsCreatedWithClash'],
+                'nBookingsCreatedWithoutClash' => $results['nBookingsCreatedWithoutClash'],
+            ]
+        )->withStatus($results['httpStatusCode']);
+    }
+
+
+    /**
+     * @param Event  $event
+     * @param array  $resourceIds
+     * @param string $efficacy
+     * @return array
+     * @throws MapperException
+     * @throws Forbidden
+     * @throws NotFound
+     * @throws SchoolboxException
+     */
+    private function addBookingsSlave(Event $event, array $resourceIds, string $efficacy): array
+    {
         /** @var GenericCollection<BookingItemModel> $resourceById */
         $resourceById = $this->bookingItemMapper->findByColumn('id', $resourceIds)->indexBy('id');
+
+        if (count($resourceById) === 0) {
+            throw new NotFound('Resource' . (count($resourceIds) > 1 ? 's' : '') . ' not found.');
+        }
 
         // Check whether the user has permission to book the selected resources.
         // Note the 'calendarEvent.addBookings' permission will have been checked in Calendar/Event/Module.php.
@@ -1071,7 +1117,7 @@ class Controller extends Base
                     $this->user
                 )
             ) {
-                throw new SchoolboxException(
+                throw new Forbidden(
                     "You do not have permission to create bookings for resource '{$resource->getName()}'."
                 );
             }
@@ -1080,7 +1126,7 @@ class Controller extends Base
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
             $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)
-                ->indexBy('id');
+                                           ->indexBy('id');
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
@@ -1155,16 +1201,12 @@ class Controller extends Base
             $nBookingsCreatedWithoutClash = 0;
         }
 
-        // Only unexpected errors require non-success code.
-        // It is expected that some or all attempts to book resources may fail for validation reasons.
-        $this->response = $this->responseAsJson(
-            // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
-            [
-                'nBookingsAttempted' => $nBookingsAttempted,
-                'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
-                'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
-            ]
-        )->withStatus($httpStatusCode);
+        return [
+            'nBookingsAttempted' => $nBookingsAttempted,
+            'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
+            'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
+            'httpStatusCode' => $httpStatusCode,
+        ];
     }
 
 
@@ -1387,6 +1429,9 @@ class Controller extends Base
      * @param array<int> $bookingIds
      * @param string $efficacy
      * @return int - The number of bookings deleted.
+     * @throws Forbidden
+     * @throws NotFound
+     * @throws SchoolboxException
      */
     private function deleteBookingsSlave(Event $event, array $bookingIds, string $efficacy): int
     {
