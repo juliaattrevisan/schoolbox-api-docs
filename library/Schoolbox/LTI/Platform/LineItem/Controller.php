@@ -11,6 +11,7 @@ namespace Schoolbox\LTI\Platform\LineItem;
 
 use Alaress\Web\Controller\Base as BaseController;
 use League\OAuth2\Server\ResourceServer;
+use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
@@ -59,12 +60,6 @@ class Controller extends BaseController
      * LTI line item service endpoint.
      * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
      *
-     * Currently, this does nothing: however it must exist so that the resource
-     * link launch request can generate a score publish service endpoint.
-     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#service-endpoint:
-     * > The scores service endpoint MUST be the line item resource URL with the
-     * > path appended with '/scores'.
-     *
      * @api   GET /lti-platform/line-item/assessment/{assessmentId}
      * @since 21.1.0
      *
@@ -106,7 +101,7 @@ class Controller extends BaseController
         $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
 
         // Line item repository: consists only of a single assessment
-        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
+        $lineItemRepository = $this->createRepository($assessment);
 
         // Score repository: consists only of a single assessment, and its scores
         $scoreRepository = new SingleAssessmentScoreRepository(
@@ -125,5 +120,16 @@ class Controller extends BaseController
         );
         $server         = new ServiceServer($validator, $handler, logger: $this->logger);
         $this->response = $server->handle($request);
+    }
+
+    /**
+     * Create a repository for line items for the given assessment.
+     *
+     * @param Model $assessment
+     * @return LineItemRepositoryInterface
+     */
+    private function createRepository(Model $assessment): LineItemRepositoryInterface
+    {
+        return new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
     }
 }
