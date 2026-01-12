@@ -25,6 +25,17 @@ use Schoolbox\OpenAi\EventStream\Message;
 class SaveMessageLogListener implements IListener
 {
     /**
+     * The following event types are handled by this listener:
+     * * start of a response
+     * * end of a response
+     */
+    private const array EVENT_TYPES_HANDLED = [
+        MessageEventType::CREATED->value,
+        MessageEventType::COMPLETE->value,
+        MessageEventType::ERROR->value,
+    ];
+
+    /**
      * Constructor
      *
      * @param Response\Message\Mapper $responseMessageMapper Mapper for saving messages.
@@ -50,10 +61,12 @@ class SaveMessageLogListener implements IListener
     {
         // Don't bother logging if a partial response: only if the response was
         // that something was created, completed or an error.
-        $responseStatus = MessageEventType::tryFrom($outputMessage->eventType) ?? MessageEventType::CREATED;
-        if (in_array($responseStatus, [MessageEventType::PARTIAL_IMAGE, MessageEventType::DELTA])) {
+        if (!in_array($outputMessage->eventType, self::EVENT_TYPES_HANDLED, true)) {
             return $log;
         }
+        $responseStatus = Response\Message\Status::fromMessageEventType(
+            MessageEventType::tryFrom($outputMessage->eventType) ?? MessageEventType::CREATED,
+        );
 
         // Try to find the message with this ai_response_id, and update it if it
         // exists: otherwise create a new one.
@@ -71,7 +84,7 @@ class SaveMessageLogListener implements IListener
             ->setDialogAgentResponse(new Response\Model()->setId($this->responseModel->getId()))
             ->setAiResponseId($aiResponseId)
             ->setRole(Response\Message\Role::Assistant->value)
-            ->setStatus(Response\Message\Status::fromMessageEventType($responseStatus)->value)
+            ->setStatus($responseStatus->value)
             ->setContent($outputMessage->getDataAsArray()['message'] ?? '')
             // Set the creation time to the current time,
             // instead of the request time:
