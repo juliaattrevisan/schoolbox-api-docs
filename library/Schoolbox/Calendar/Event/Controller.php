@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Alaress_Date_Locale_Config;
@@ -20,6 +21,7 @@ use LogicException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Attendance\Payload;
 use Schoolbox\Calendar\EventLevelCollection;
@@ -837,8 +839,7 @@ class Controller extends Base
                     $bookingIdsToRemove[] = $booking->getId();
                 }
             }
-// TODO: Implement this.
-//            $bookingErrorsDelete = $this->deleteBookingsSlave($event, $bookingIdsToRemove, $efficacy);
+            $bookingErrorsDelete = $this->deleteBookingsSlave($event, $bookingIdsToRemove, $efficacy);
         }
 
         // Move bookings if necessary.
@@ -1357,43 +1358,71 @@ class Controller extends Base
         }
 
         try {
-            $booking = $this->bookingMapper->findById($bookingId);
-        } catch (MapperException) {
-            // This will occur if the booking has been deleted since the form page was generated.
-            $problem = new ApiProblem('Booking not found.')
+            $nBookingsDeleted = $this->deleteBookingsSlave($event, [$bookingId], $efficacy);
+        } catch (NotFound $e) {
+            $problem = new ApiProblem($e->getMessage())
                 ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)
                 ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
-        }
-
-        // Check that $bookingId is linked to $event.
-        if ($booking->getEvent()->getId() !== $event->getId()) {
-            throw new SchoolboxException('Booking/event mismatch when deleting booking.');
-        }
-
-        // Check whether the user has permission to delete the booking.
-        // Note the 'calendarEvent.deleteBooking' permission will have been checked in Calendar/Event/Module.php.
-        // A user can delete a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
-        if (
-            !$this->authorizer->isPathAuthorizedForUser(
-                'resourceBooking.edit',
-                [
-                    'id' => $booking->getResource()->getId(),
-                    'item' => $booking->getResource(),
-                ],
-                $this->user
-            )
-        ) {
-            // This will occur if permissions have changed since the form page was generated.
-            $problem = new ApiProblem("You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'.")
+        } catch (Forbidden $e) {
+            $problem = new ApiProblem($e->getMessage())
                 ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)
                 ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
+
+        $responseData['success'] = true;
+        $responseData['nRowsAffected'] = $nBookingsDeleted;
+        $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+    }
+
+
+    /**
+     * @param Event $event
+     * @param array<int> $bookingIds
+     * @param string $efficacy
+     * @return int - The number of bookings deleted.
+     */
+    private function deleteBookingsSlave(Event $event, array $bookingIds, string $efficacy): int
+    {
+        $bookings = $this->bookingMapper->findByColumnList(['id' => $bookingIds, 'event_id' => $event->getId()]);
+
+        if (count($bookings) === 0) {
+            // This will occur if the bookings have been deleted since the form page was generated.
+            throw new NotFound('Booking' . (count($bookingIds) > 1 ? 's' : '') . ' not found.');
+        }
+
+        $resourceIds = []; // Remember the set of resourceIds to be booked.  It will be used below.
+        foreach ($bookings as $booking) {
+            $resourceId = $booking->getResource()->getId();
+            $resourceIds[] = $resourceId;
+
+            // Check whether the user has permission to delete the booking.
+            // Note the 'calendarEvent.deleteBooking' permission will have been checked in Calendar/Event/Module.php.
+            // A user can delete a booking in the resource booking section if they can access the 'resourceBooking.edit'
+            // route.  If the permission check fails for any resource, stop the operation.  The user can remove the
+            // offending resource from the list if he/she wants to continue.
+            if (
+                !$this->authorizer->isPathAuthorizedForUser(
+                    'resourceBooking.edit',
+                    [
+                        'id' => $booking->getResource()->getId(),
+                        'item' => $booking->getResource(),
+                    ],
+                    $this->user
+                )
+            ) {
+                // This will occur if permissions have changed since the form page was generated.
+                throw new Forbidden(
+                    "You do not have permission to delete bookings for resource '{$booking->getResource()->getName()}'."
+                );
+            }
+        }
+        $resourceIds = array_unique($resourceIds); // Uniquify the array just in case duplicate values were present.
 
         $isDeleteFromSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
 
@@ -1407,34 +1436,37 @@ class Controller extends Base
         }
 
         // Find all bookings to delete in one query.
+        // Note there is no need to repeat the permission checks for each booking, because permission depends only on
+        // the resource to be booked, and the resources booked will be the same for each event in the series.
         $eventIds = $events->map(fn ($loopEvent) => $loopEvent->getId(), $events);
-        $bookingIdsToDelete = $this->bookingMapper->findIdsByResourceIdForEvents(
-            $booking->getResource()->getId(),
-            $eventIds->getAll(),
-            futureBookingsOnly: $isDeleteFromSeries // Only allow delete of past bookings if updating a single booking.
-        );
+        $bookingIdsArrays = [];
+        foreach ($resourceIds as $resourceId) {
+            $bookingIdsToDeleteForThisResource = $this->bookingMapper->findIdsByResourceIdForEvents(
+                $resourceId,
+                $eventIds->getAll(),
+                futureBookingsOnly: $isDeleteFromSeries // Only allow deletion of past bookings if updating a single booking.
+            );
+            $bookingIdsArrays[] = $bookingIdsToDeleteForThisResource;
+        }
+        // Building the array this way is more efficient than using array_merge() inside the loop above.
+        $bookingIdsToDeleteForAllResources = array_merge([], ...$bookingIdsArrays);
 
-        if (count($bookingIdsToDelete) === 0) {
+        if (count($bookingIdsToDeleteForAllResources) === 0) {
             // This will occur if the user attempts to delete a series consisting of past bookings.
-            $problem = new ApiProblem('No deletable bookings found.  Note past bookings are not deletable as part of a series.')
-                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
-            return;
+            throw new NotFound(
+                'No deletable bookings found.  Note past bookings are not deletable as part of a series.'
+            );
         }
 
         try {
-            $this->bookingMapper->deleteByColumn('id', $bookingIdsToDelete);
+            $this->bookingMapper->deleteByColumn('id', $bookingIdsToDeleteForAllResources);
         } catch (MapperException) {
             throw new SchoolboxException(
                 'Could not delete booking' . ($isDeleteFromSeries ? 's from series of events' : '') . '.'
             );
         }
 
-        $responseData['success'] = true;
-        $responseData['nRowsAffected'] = count($bookingIdsToDelete);
-        $this->response = $this->responseAsJson($responseData)->withStatus(self::HTTP_STATUS_CODE_OK);
+        return count($bookingIdsToDeleteForAllResources); // Return the number of bookings deleted.
     }
 
 
