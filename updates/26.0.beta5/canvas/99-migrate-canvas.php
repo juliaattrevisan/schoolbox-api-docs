@@ -56,6 +56,8 @@ $app = new class extends CliTool\App
                     'canvas_redirect_homepages' => 0, // disable homepage redirection
                     'canvas_sync_news' => 0, // disable news sync
                     'canvas_redirect_assessments' => 0, // disable assessment redirection
+                    'canvas_import_quiz' => 0, // don't import quizzes
+                    'canvas_import_grades' => 0, // don't import grades
                 ];
                 break;
             case 'tasfg':
