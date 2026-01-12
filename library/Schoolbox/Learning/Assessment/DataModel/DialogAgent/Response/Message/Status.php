@@ -20,13 +20,14 @@ use Schoolbox\OpenAi\AgentChat\MessageEventType;
 enum Status: string
 {
     case Ok = 'ok';
+    case Pending = 'pending';
     case Error = 'error';
 
     /**
      * Create a status from a message's event type:
      * * `MessageEventType::COMPLETE` maps to `Status::Ok`
      * * `MessageEventType::ERROR` maps to `Status::Error`
-     * * other types don't map
+     * * all other types map to `Status::Pending`
      *
      * @param MessageEventType $messageEventType
      * @return self|null
@@ -34,9 +35,9 @@ enum Status: string
     public static function fromMessageEventType(MessageEventType $messageEventType): ?self
     {
         return match ($messageEventType) {
-            MessageEventType::COMPLETE => self::Ok,
-            MessageEventType::ERROR    => self::Error,
-            default                    => null,
+            MessageEventType::COMPLETE                                                          => self::Ok,
+            MessageEventType::CREATED, MessageEventType::PARTIAL_IMAGE, MessageEventType::DELTA => self::Pending,
+            MessageEventType::ERROR                                                             => self::Error,
         };
     }
 }
