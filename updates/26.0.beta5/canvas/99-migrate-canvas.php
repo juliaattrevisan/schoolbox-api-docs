@@ -54,6 +54,8 @@ $app = new class extends CliTool\App
                 // Staloy canvas settings
                 $newSettings = [
                     'canvas_redirect_homepages' => 0, // disable homepage redirection
+                    'canvas_sync_news' => 0, // disable news sync
+                    'canvas_redirect_assessments' => 0, // disable assessment redirection
                 ];
                 break;
             case 'tasfg':
@@ -74,12 +76,16 @@ $app = new class extends CliTool\App
                 // TRIGS canvas settings
                 $newSettings = [
                     'canvas_redirect_homepages' => 1, // enable homepage redirection
+                    'canvas_sync_news' => 0, // disable news sync
+                    'canvas_redirect_assessments' => 0, // disable assessment redirection
                 ];
                 break;
             case 'yvgs':
                 // YVGS canvas settings
                 $newSettings = [
                     'canvas_redirect_homepages' => 0, // disable homepage redirection
+                    'canvas_sync_news' => 0, // disable news sync
+                    'canvas_redirect_assessments' => 0, // disable assessment redirection
                 ];
                 break;
         }
