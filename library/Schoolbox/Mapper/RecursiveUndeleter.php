@@ -291,6 +291,7 @@ class RecursiveUndeleter
 
         /* Dialog Agents.
          * Dialog Agent's subobject relates to its responses and feedbacks
+         * Note that feedback criteria are specially micromanaged in the feedback mapper callbacks atm.
          */
         \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class => [
             \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::class => 'dialog_agent_id',
