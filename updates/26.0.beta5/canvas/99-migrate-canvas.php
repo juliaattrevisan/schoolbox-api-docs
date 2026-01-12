@@ -52,7 +52,7 @@ $app = new class extends CliTool\App
         $newSettings = [];
         $statement = $db->prepare("UPDATE settings SET value = :value WHERE name = :name");
         // get the school code from config
-        switch (strtolower($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_SITE_SCHOOL_CODE))){
+        switch (strtolower($this->getConfig()->get(\Schoolbox\Config\ConfigMapper::NAME_SITE_SCHOOL_CODE))) {
             case 'newic':
                 // NEWIC canvas settings
                 $newSettings = $defaultOptions + [
@@ -122,4 +122,3 @@ $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();
-

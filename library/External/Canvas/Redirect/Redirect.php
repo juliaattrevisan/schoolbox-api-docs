@@ -12,5 +12,4 @@ namespace External\Canvas\Redirect;
 
 class Redirect extends AbstractRedirect
 {
-
 }

@@ -60,8 +60,7 @@ class Assignment
         GenericCollection $markTypes,
         GenericCollection $workTypes,
         private CanvasDb $canvasDb,
-    )
-    {
+    ) {
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
         $this->workTypes    = $workTypes->indexBy('id');
     }
