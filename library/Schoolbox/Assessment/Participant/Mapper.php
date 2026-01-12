@@ -238,6 +238,12 @@ class Mapper extends BaseMapper
             $scores = $ltiScoreMapper->findByColumnList($params, ['deleted' => true]);
             $ltiScoreMapper->restoreSoftDeleted($scores);
             $ltiScoreMapper->restoreNotification();
+
+            /* TODO SURELY this was meant to return a value here? That would have enforced "should not get here, but"
+             *  but there must have been a reason for its omission.
+             *
+             *      return $ltiScoreMapper->count();
+             */
         }
 
         // should not get here, but.
