@@ -1195,11 +1195,9 @@ class Controller extends Base
             $booking = $this->bookingMapper->findById($bookingId);
         } catch (MapperException) {
             // This will occur if the booking has been deleted since the form page was generated.
-            $problem = new ApiProblem('Booking not found.')
-                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $this->response = $this->responseAsJson(
+                new ApiProblem('Booking not found.')->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1228,11 +1226,11 @@ class Controller extends Base
             )
         ) {
             // This will occur if permissions have changed since the form page was generated.
-            $problem = new ApiProblem("You do not have permission to edit bookings for resource '{$resource->getName()}'.")
-                ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            $this->response = $this->responseAsJson(
+                new ApiProblem("You do not have permission to edit bookings for resource '{$resource->getName()}'.")
+                    ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
+                    ->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
 
@@ -1256,11 +1254,11 @@ class Controller extends Base
 
         if (count($bookingIdsToUpdate) === 0) {
             // This will occur if the user attempts to edit a series consisting of past bookings.
-            $problem = new ApiProblem('No editable bookings found.  Note past bookings are not editable as part of a series.')
-                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $this->response = $this->responseAsJson(
+                new ApiProblem('No editable bookings found.  Note past bookings are not editable as part of a series.')
+                    ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
+                    ->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         }
 
@@ -1360,18 +1358,14 @@ class Controller extends Base
         try {
             $nBookingsDeleted = $this->deleteBookingsSlave($event, [$bookingId], $efficacy);
         } catch (NotFound $e) {
-            $problem = new ApiProblem($e->getMessage())
-                ->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
+            $this->response = $this->responseAsJson(
+                new ApiProblem($e->getMessage())->setStatus(self::HTTP_STATUS_CODE_NOT_FOUND)->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
             return;
         } catch (Forbidden $e) {
-            $problem = new ApiProblem($e->getMessage())
-                ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                ->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
+            $this->response = $this->responseAsJson(
+                new ApiProblem($e->getMessage())->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)->asArray()
+            )->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
             return;
         }
 
