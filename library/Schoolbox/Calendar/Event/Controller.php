@@ -51,7 +51,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
-use Schoolbox\ResourceBooking\Item\Mapper as ResourceItemMapper;
 use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as ResourceBookingStatusMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
