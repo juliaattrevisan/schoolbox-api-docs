@@ -4,11 +4,11 @@ import AcFeedAlert from "./ac-feed-alert.vue";
 import AcFeedRequest from "./ac-feed-request.vue";
 import AcFeedResponse from "./ac-feed-response.vue";
 import { AgentChatMessageType } from "./agentChatTypes";
-import type { AgentChatFeedMessage } from "./agentChatTypes";
+import type { AnyAgentChatFeedMessage } from "./agentChatTypes";
 import { acPromptEventKey } from "./agentChatSymbols";
 
 interface Props {
-    feed: AgentChatFeedMessage[];
+    feed: AnyAgentChatFeedMessage[];
     /** A message to display before the actual error message when generation fails */
     errorPrefix?: string;
     /** Whether failed responses can be retried */

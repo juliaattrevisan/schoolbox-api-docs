@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import FileDrop from "@js/resource/file-drop.vue";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import type { AgentChatRequest } from "./agentChatTypes";
+import type { AgentChatFeedMessage, AgentChatMessageType } from "./agentChatTypes";
 
 interface Props {
-    message: AgentChatRequest;
+    message: AgentChatFeedMessage<AgentChatMessageType.REQUEST>;
 }
 
 const props = defineProps<Props>();
@@ -14,15 +14,15 @@ const props = defineProps<Props>();
     <div class="ac-feed-request">
         <div class="ac-feed-message-container l-pad-s">
             <file-drop
-                v-if="props.message.file"
+                v-if="props.message.meta.file"
                 :id="`ig-message-file-drop-${props.message.entryKey}`"
-                :current-file="props.message.file"
+                :current-file="props.message.meta.file"
                 disabled
             />
-            <p class="ac-feed-message-content l-mar--0">{{ props.message.payload.userPrompt }}</p>
+            <p class="ac-feed-message-content l-mar--0">{{ props.message.data }}</p>
         </div>
-        <div v-if="props.message.user" class="ac-feed-message-portrait l-mar-s--left">
-            <user-photo :user="props.message.user" render="xsmall" :description="null" rounded-corners />
+        <div v-if="props.message.meta.user" class="ac-feed-message-portrait l-mar-s--left">
+            <user-photo :user="props.message.meta.user" render="xsmall" :description="null" rounded-corners />
         </div>
     </div>
 </template>

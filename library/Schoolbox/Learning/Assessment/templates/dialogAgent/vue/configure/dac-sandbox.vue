@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getRfc3339String } from "@js/util/dateUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { AgentChatMessageType } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
@@ -29,11 +30,14 @@ function resetFeed(): void {
 
     acStore.feed.push({
         type: AgentChatMessageType.RESPONSE,
-        status: "success",
+        data: {
+            status: "success",
+            responseId: null,
+            message: props.openingMessageScrubbed,
+        },
+        meta: null,
         entryKey: acStore.getNextEntryKey(),
-        message: props.openingMessageScrubbed,
-        responseId: null,
-        image: null,
+        createdAt: getRfc3339String(new Date()),
     });
 
     isConfirmModalOpen.value = false;

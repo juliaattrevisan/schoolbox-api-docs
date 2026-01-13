@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-import type { AgentChatAlert } from "./agentChatTypes";
+import type { AgentChatFeedMessage, AgentChatMessageType } from "./agentChatTypes";
 
 interface Props {
     /**
      * The message to display
      */
-    message: AgentChatAlert;
+    message: AgentChatFeedMessage<AgentChatMessageType.ALERT>;
 }
 
 const props = defineProps<Props>();
 </script>
 
 <template>
-    <div class="ac-feed-alert" :class="`ac-feed-alert--${props.message.side}`">
-        <p class="alert-box l-mar--0 l-pad-s" :class="props.message.severity">
-            {{ props.message.message }}
+    <div class="ac-feed-alert" :class="`ac-feed-alert--${props.message.data.side}`">
+        <p class="alert-box l-mar--0 l-pad-s" :class="props.message.data.severity">
+            {{ props.message.data.message }}
         </p>
     </div>
 </template>

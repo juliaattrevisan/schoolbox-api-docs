@@ -1,17 +1,12 @@
 import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
+import { getRfc3339String } from "@js/util/dateUtils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSessionId } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { AgentChatMessageType } from "../agentChatTypes";
-import type {
-    AgentChatFeedMessage,
-    AgentChatRequest,
-    AgentChatResponse,
-    AgentChatResponseInProgress,
-    AgentChatLogEntry,
-} from "../agentChatTypes";
+import type { AgentChatFeedMessage, AnyAgentChatFeedMessage, AgentChatLogEntry } from "../agentChatTypes";
 import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
 
@@ -28,20 +23,20 @@ export type AgentChatRequestConfig = {
 };
 
 export const useAgentChatStore = defineStore("agentChat", () => {
-    const feed = window.Vue.ref<AgentChatFeedMessage[]>([]);
+    const feed = window.Vue.ref<AnyAgentChatFeedMessage[]>([]);
 
     const activeGeneration = window.Vue.ref<{
-        response: AgentChatResponseInProgress;
+        response: AgentChatFeedMessage<AgentChatMessageType.RESPONSE>;
         abortController: AbortController;
     } | null>(null);
 
     /** When allowing selection of a particular entry (such as in the image generator), the selected entry */
-    const selectedFeedEntry = window.Vue.ref<AgentChatFeedMessage["entryKey"] | null>(null);
+    const selectedFeedEntry = window.Vue.ref<AnyAgentChatFeedMessage["entryKey"] | null>(null);
 
     /**
      * @returns The full feed of messages (includes the partial entry at the end if currently generating)
      */
-    const fullFeed = window.Vue.computed((): AgentChatFeedMessage[] => {
+    const fullFeed = window.Vue.computed((): AnyAgentChatFeedMessage[] => {
         if (activeGeneration.value === null) {
             return feed.value;
         }
@@ -53,11 +48,21 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      * @returns The previous response ID from the feed if it exists
      */
     function getPreviousResponseId(): string | null {
-        const responses = feed.value.filter((item) => "responseId" in item).filter((item) => item.responseId !== null);
-        if (responses.length === 0) {
+        const responseIds = feed.value
+            .map((item) => {
+                if (typeof item.data !== "object" || item.data === null) {
+                    return null; // likely a request, as .data is a string there
+                }
+
+                return "responseId" in item.data ? item.data.responseId : null;
+            })
+            .filter((id) => id !== null);
+
+        if (responseIds.length === 0) {
             return null;
         }
-        return responses[responses.length - 1].responseId;
+
+        return responseIds[responseIds.length - 1];
     }
 
     const currentEntryKey = window.Vue.ref<number>(0);
@@ -73,26 +78,22 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     /**
-     * Parse a previous feed from the log format
-     * The results from this can then be used to populate the feed in the store or directly to <ac-feed>
-     * @param logEntries - The log entries to import
-     * @param user - The user who made the requests
-     * @returns The parsed feed messages
+     * Parse a log entry into the format of a feed message
+     * @param logEntry - The log entry to parse
+     * @param user - The user who made the request
+     * @template TType - The type of message being parsed
+     * @returns The entry, converted into a message to use in the feed
      */
-    function parseFeed(logEntries: AgentChatLogEntry[], user: AgentChatRequest["user"]): AgentChatFeedMessage[] {
-        const parsedFeed: AgentChatFeedMessage[] = [];
+    function parseFeedEntry(
+        logEntry: AgentChatLogEntry,
+        user: AgentChatFeedMessage<AgentChatMessageType.REQUEST>["meta"]["user"],
+    ): AnyAgentChatFeedMessage {
+        const message = { ...logEntry, entryKey: getNextEntryKey() };
 
-        const messages = [...logEntries].sort((a, b) => {
-            const dateA = new Date(a.createdAt).getTime();
-            const dateB = new Date(b.createdAt).getTime();
-            return dateA - dateB;
-        });
-
-        for (const message of messages) {
-            if (message.type === AgentChatMessageType.REQUEST) {
-                parsedFeed.push({
-                    type: AgentChatMessageType.REQUEST,
-                    entryKey: getNextEntryKey(),
+        if (message.type === AgentChatMessageType.REQUEST) {
+            return {
+                ...message,
+                meta: {
                     user,
                     payload: {
                         userPrompt: message.data,
@@ -102,31 +103,54 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                         aiSessionId: null, // not currently stored in logs
                     },
                     file: null, // not currently stored in logs
-                } satisfies AgentChatRequest);
-            } else if (message.type === AgentChatMessageType.RESPONSE) {
-                parsedFeed.push({
-                    ...message.data,
-                    type: AgentChatMessageType.RESPONSE,
-                    entryKey: getNextEntryKey(),
-                } satisfies AgentChatResponse);
-            } else if (message.type === AgentChatMessageType.ALERT) {
-                parsedFeed.push({
-                    type: AgentChatMessageType.ALERT,
-                    entryKey: getNextEntryKey(),
-                    ...message.data,
-                });
-            } else {
-                assertUnreachable(message);
-            }
+                },
+            } satisfies AgentChatFeedMessage<AgentChatMessageType.REQUEST>;
         }
-        return parsedFeed;
+
+        if (message.type === AgentChatMessageType.RESPONSE) {
+            return {
+                ...message,
+                meta: null,
+            } satisfies AgentChatFeedMessage<AgentChatMessageType.RESPONSE>;
+        }
+
+        if (message.type === AgentChatMessageType.ALERT) {
+            return {
+                ...message,
+                meta: null,
+            } satisfies AgentChatFeedMessage<AgentChatMessageType.ALERT>;
+        }
+
+        return assertUnreachable(message);
+    }
+
+    /**
+     * Parse a previous feed from the log format
+     * The results from this can then be used to populate the feed in the store or directly to <ac-feed>
+     * @param logEntries - The log entries to import
+     * @param user - The user who made the requests
+     * @returns The parsed feed messages
+     */
+    function parseFeed(
+        logEntries: AgentChatLogEntry[],
+        user: AgentChatFeedMessage<AgentChatMessageType.REQUEST>["meta"]["user"],
+    ): AnyAgentChatFeedMessage[] {
+        // const parsedFeed: AgentChatFeedMessage[] = [];
+
+        const messages = [...logEntries].sort((a, b) => {
+            const dateA = new Date(a.createdAt).getTime();
+            const dateB = new Date(b.createdAt).getTime();
+            return dateA - dateB;
+        });
+
+        return messages.map((logEntry) => parseFeedEntry(logEntry, user));
     }
 
     /**
      * Import a previous feed into the store
      * @param messages - Messages to add to the feed
      */
-    function importFeed(messages: AgentChatFeedMessage[]): void {
+    function importFeed(messages: AnyAgentChatFeedMessage[]): void {
         for (const message of messages) {
             feed.value.push(message);
         }
@@ -144,21 +168,21 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         selectedFeedEntry.value = null;
     }
 
+    // overloads for getLatestFeedEntry
+    function getLatestFeedEntry(type: null): AnyAgentChatFeedMessage | null;
+    function getLatestFeedEntry<TType extends AgentChatMessageType>(type: TType): AgentChatFeedMessage<TType> | null;
+
     /**
      * Retrieve the latest feed entry with a given type
      * @param type - The type of message to find
      * @template TType - To derive the actual return type based on the input type, if any
      * @returns The latest message with the given type, or null if none found
      */
-    function getLatestFeedEntry<TType extends AgentChatMessageType | null>(
-        type: TType,
-    ): (TType extends null ? AgentChatFeedMessage : Extract<AgentChatFeedMessage, { type: TType }>) | null {
+    function getLatestFeedEntry(type: AgentChatMessageType | null): AnyAgentChatFeedMessage | null {
         for (let i = feed.value.length - 1; i >= 0; i -= 1) {
             const message = feed.value[i];
-            if (type === null || message.type === type) {
-                return message as TType extends null
-                    ? AgentChatFeedMessage
-                    : Extract<AgentChatFeedMessage, { type: TType }>;
+            if (type === null || type === message.type) {
+                return message;
             }
         }
 
@@ -181,29 +205,35 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             return false;
         }
 
+        const authorInfo = {
+            id: window.schoolboxUser.id,
+            fullName: window.schoolboxUser.name,
+            _links: {
+                profile: `/search/user/${window.schoolboxUser.id}`,
+                avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
+            },
+        };
+
         feed.value.push({
             type: AgentChatMessageType.REQUEST,
+            data: payload.userPrompt,
+            meta: { user: authorInfo, payload, file },
             entryKey: getNextEntryKey(),
-            user: {
-                id: window.schoolboxUser.id,
-                fullName: window.schoolboxUser.name,
-                _links: {
-                    profile: `/search/user/${window.schoolboxUser.id}`,
-                    avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
-                },
-            },
-            payload,
-            file,
+            createdAt: getRfc3339String(new Date()),
         });
 
         activeGeneration.value = {
             response: {
                 type: AgentChatMessageType.RESPONSE,
-                status: "in_progress",
-                entryKey: `loading-${getNextEntryKey()}`,
-                responseId: null,
-                image: null,
-                message: "",
+                data: {
+                    status: "in_progress",
+                    responseId: null,
+                    image: null,
+                    message: "",
+                },
+                meta: null,
+                entryKey: getNextEntryKey(),
+                createdAt: getRfc3339String(new Date()),
             },
             abortController: new AbortController(),
         };
@@ -219,10 +249,14 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                     hasErrored = true;
                     feed.value.push({
                         type: AgentChatMessageType.RESPONSE,
-                        status: "error",
+                        data: {
+                            status: "error",
+                            responseId: activeGeneration.value?.response.data.responseId ?? null,
+                            message: event.data.message,
+                        },
+                        meta: null,
                         entryKey: getNextEntryKey(),
-                        responseId: activeGeneration.value?.response.responseId ?? null,
-                        message: event.data.message,
+                        createdAt: getRfc3339String(new Date()),
                     });
                     activeGeneration.value?.abortController.abort();
                     activeGeneration.value = null;
@@ -236,13 +270,13 @@ export const useAgentChatStore = defineStore("agentChat", () => {
 
                 if (event.eventType === AgentChatMessageEventType.CREATED) {
                     /** Usually the first message we will receive from the AI, take note of the response ID so we can re-use it later */
-                    activeGeneration.value.response.responseId = event.data.data.responseId;
+                    activeGeneration.value.response.data.responseId = event.data.data.responseId;
                 } else if (event.eventType === AgentChatMessageEventType.PARTIAL_IMAGE) {
                     /** A partial image has been generated by the AI, show it! */
-                    activeGeneration.value.response.image = event.data.data.image;
+                    activeGeneration.value.response.data.image = event.data.data.image;
                 } else if (event.eventType === AgentChatMessageEventType.DELTA) {
                     /** A delta of text output from the AI, append it to the current message to show the user that something is happening */
-                    activeGeneration.value.response.message += event.data.data.delta;
+                    activeGeneration.value.response.data.message += event.data.data.delta;
                 }
 
                 /** Ignore any other message types, we don't need them (except for the final event, but apiUtils handles that) */
@@ -255,7 +289,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             return false;
         }
 
-        const responseId = activeGeneration.value?.response.responseId ?? null;
+        const responseId = activeGeneration.value?.response.data.responseId ?? null;
 
         activeGeneration.value.abortController.abort();
         activeGeneration.value = null;
@@ -275,10 +309,14 @@ export const useAgentChatStore = defineStore("agentChat", () => {
              */
             feed.value.push({
                 type: AgentChatMessageType.RESPONSE,
-                status: "error",
+                data: {
+                    status: "error",
+                    responseId,
+                    message: response.message,
+                },
+                meta: null,
                 entryKey: getNextEntryKey(),
-                responseId,
-                message: response.message,
+                createdAt: getRfc3339String(new Date()),
             });
             return false;
         }
@@ -291,10 +329,14 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         if (config.requireImage && response.data.image === null) {
             feed.value.push({
                 type: AgentChatMessageType.RESPONSE,
-                status: "error",
+                data: {
+                    status: "error",
+                    responseId: response.data.responseId,
+                    message: response.data.message,
+                },
+                meta: null,
                 entryKey: getNextEntryKey(),
-                responseId: response.data.responseId,
-                message: response.data.message,
+                createdAt: getRfc3339String(new Date()),
             });
             return false;
         }
@@ -302,11 +344,15 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         /** All good at this point, persist the final response in the feed */
         feed.value.push({
             type: AgentChatMessageType.RESPONSE,
-            status: "success",
+            data: {
+                status: "success",
+                responseId: response.data.responseId,
+                image: response.data.image,
+                message: response.data.message,
+            },
+            meta: null,
             entryKey: getNextEntryKey(),
-            responseId: response.data.responseId,
-            image: response.data.image,
-            message: response.data.message,
+            createdAt: getRfc3339String(new Date()),
         });
 
         /** Update the selected feed entry to the latest one, doesn't do anything if the implementation doesn't use this function */
@@ -319,18 +365,18 @@ export const useAgentChatStore = defineStore("agentChat", () => {
      * Show a lightbox with all the images in the feed
      * @param entryKey - The entry key that should be selected initially
      */
-    async function spawnLightbox(entryKey: AgentChatFeedMessage["entryKey"]): Promise<void> {
+    async function spawnLightbox(entryKey: AnyAgentChatFeedMessage["entryKey"]): Promise<void> {
         // only show successful responses that contain images
-        const finalFeedItems = feed.value.filter(
-            (item) => item.type === AgentChatMessageType.RESPONSE && item.status === "success",
-        );
+        const finalFeedItems = feed.value
+            .filter((item) => item.type === AgentChatMessageType.RESPONSE)
+            .filter((item) => item.data.status === "success");
 
         const slides: GalleryItem[] = [];
         let selectedIndex = 0;
 
         for (const item of finalFeedItems) {
-            if (item.image) {
-                slides.push({ src: `data:${item.image.mime};base64,${item.image.b64}` });
+            if (item.data.image) {
+                slides.push({ src: `data:${item.data.image.mime};base64,${item.data.image.b64}` });
 
                 if (item.entryKey === entryKey) {
                     selectedIndex = slides.length - 1;

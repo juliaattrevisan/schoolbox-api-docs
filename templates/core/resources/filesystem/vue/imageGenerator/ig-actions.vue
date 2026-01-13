@@ -38,20 +38,24 @@ async function uploadImage(): Promise<void> {
         throw new Error("Unable to find selected feed item");
     }
 
-    if (!("image" in selectedFeedItem) || !selectedFeedItem.image) {
+    if (
+        typeof selectedFeedItem.data !== "object" ||
+        !("image" in selectedFeedItem.data) ||
+        !selectedFeedItem.data.image
+    ) {
         throw new Error("Selected feed item does not have a valid image");
     }
 
     uploadLoading.value = true;
     uploadError.value = null;
 
-    const bstr = atob(selectedFeedItem.image.b64);
+    const bstr = atob(selectedFeedItem.data.image.b64);
     const bytes = new Uint8Array(bstr.length);
     for (let i = 0; i < bstr.length; i += 1) {
         bytes[i] = bstr.charCodeAt(i);
     }
 
-    const file = new File([bytes], selectedFeedItem.image.name, { type: selectedFeedItem.image.mime });
+    const file = new File([bytes], selectedFeedItem.data.image.name, { type: selectedFeedItem.data.image.mime });
     const resource = await uploadFileToStorage(file);
 
     uploadLoading.value = false;
