@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for dialog agent response messages.
  * @method Model createModel($idValue = null)
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
