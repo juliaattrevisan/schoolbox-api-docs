@@ -74,6 +74,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Soft-delete feedback criteria if a feedback is deleted
          */
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteFeedbackCriteria']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreFeedbackCriteria']);
     }
 
 
@@ -186,5 +187,21 @@ class Mapper extends \Schoolbox\Mapper
         $mapper = $this->getJoinMapper('feedbackCriterion');
 
         $mapper->softDelete($mapper->findByColumn('feedback_id', $model->getId()));
+    }
+
+
+    /**
+     * Restore all the criteria used to spawn feedbacks. Wild
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function restoreFeedbackCriteria(Model $model): void
+    {
+        $mapper = $this->getJoinMapper('feedbackCriterion');
+
+        $models = $mapper->findByColumn('feedback_id', $model->getId(), ['deleted' => true]);
+
+        $mapper->restoreSoftDeleted($models);
     }
 }
