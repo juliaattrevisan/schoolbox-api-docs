@@ -105,7 +105,7 @@ jobs:
       - name: Upload ${{ vars.FRANKENPHP_IMAGE_NAME }} artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: digest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ matrix.build.arch }}
+          name: digest-${{ vars.FRANKENPHP_IMAGE_NAME }}-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}/*
           if-no-files-found: 'error'
           retention-days: 1
@@ -147,7 +147,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}
-          pattern: digest-php${{ matrix.phpVersion }}-${{ matrix.env }}-*
+          pattern: digest-${{ vars.FRANKENPHP_IMAGE_NAME }}-php${{ matrix.phpVersion }}-${{ matrix.env }}-*
           merge-multiple: 'true'
 
       - name: Join ${{ vars.FRANKENPHP_IMAGE_NAME }} images
@@ -254,7 +254,7 @@ jobs:
       - name: Upload ${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }} artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: digest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ matrix.build.arch }}
+          name: digest-${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}/*
           if-no-files-found: 'error'
           retention-days: 1
@@ -296,7 +296,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}
-          pattern: digest-php${{ matrix.phpVersion }}-${{ matrix.env }}-*
+          pattern: digest-${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }}-php${{ matrix.phpVersion }}-${{ matrix.env }}-*
           merge-multiple: 'true'
 
       - name: Join ${{ vars.SCHOOLBOX_CLI_IMAGE_NAME }} images
