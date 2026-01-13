@@ -1783,6 +1783,13 @@ class Controller extends Base
 
         // If the user requested the bookings be moved for all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
+            // TODO: A problem here is that the events have already been moved (due to the event rows already having
+            //       been saved).  We want to move the bookings linked to events that were in the future at the time
+            //       the form was submitted.  Probably we will need to save the ids of those events, and pass that
+            //       set of ids to this function.
+            //       Otherwise, when an event series is moved so that some events end up in the past, the events will
+            //       move to the past but the linked bookings will remain in the future.  Bookings must always move
+            //       with events.
             $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)
                 ->indexBy('id');
         } else {
