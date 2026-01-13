@@ -159,7 +159,7 @@ async function onSubmit(): Promise<void> {
                             data-tooltip
                             class="hint has-tip tip-top"
                             data-width="200"
-                            title="Enable this to use the learner's differentiation profile to provide agent with more context."
+                            title="Enable this to use the learner's differentiation profile to provide the agent with more context."
                         >
                             ?
                         </span>

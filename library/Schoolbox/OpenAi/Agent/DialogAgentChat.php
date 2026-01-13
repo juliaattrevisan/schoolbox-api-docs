@@ -51,12 +51,13 @@ class DialogAgentChat
     /**
      * Streams a dialog agent chat.
      *
-     * @param User               $user               The user making the request.
-     * @param DialogAgent $assessment         The dialog agent activity.
-     * @param string             $userPrompt         The user's input prompt.
-     * @param string             $sessionId          The session ID against which this request should be logged.
-     * @param string|null        $previousResponseId If provided: the ID of a previous request made to OpenAI.
-     * @param ResponseModel|null $responseModel      If provided: store messages sent and received in this response.
+     * @param User               $user                   The user making the request.
+     * @param DialogAgent        $assessment             The dialog agent activity.
+     * @param string|null        $differentiationProfile The learner's differentiation profile, ready to be used in the prompt directly.
+     * @param string             $userPrompt             The user's input prompt.
+     * @param string             $sessionId              The session ID against which this request should be logged.
+     * @param string|null        $previousResponseId     If provided: the ID of a previous request made to OpenAI.
+     * @param ResponseModel|null $responseModel          If provided: store messages sent and received in this response.
      * @return iterable<string>
      * @throws ClientExceptionInterface
      */
@@ -64,6 +65,7 @@ class DialogAgentChat
         User $user,
         DialogAgent $assessment,
         string $userPrompt,
+        ?string $differentiationProfile,
         string $sessionId,
         ?string $previousResponseId = null,
         ?ResponseModel $responseModel = null,
@@ -76,7 +78,8 @@ class DialogAgentChat
         )->generate(
             $assessment,
             $userPrompt,
-            $previousResponseId
+            $previousResponseId,
+            $differentiationProfile,
         );
 
         $logListener = new LogOutputText();
