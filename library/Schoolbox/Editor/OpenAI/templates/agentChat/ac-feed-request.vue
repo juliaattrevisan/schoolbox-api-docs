@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import FileDrop from "@js/resource/file-drop.vue";
+import { getDayjsDatetimeLong } from "@js/util/dateUtils";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { AgentChatFeedMessage, AgentChatMessageType } from "./agentChatTypes";
+import { formatTimestamp } from "./agentChatUtils";
 
 interface Props {
     message: AgentChatFeedMessage<AgentChatMessageType.REQUEST>;
@@ -20,6 +22,11 @@ const props = defineProps<Props>();
                 disabled
             />
             <p class="ac-feed-message-content l-mar--0">{{ props.message.data }}</p>
+            <p class="meta">
+                <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
+                    {{ formatTimestamp(props.message) }}
+                </time>
+            </p>
         </div>
         <div v-if="props.message.meta.user" class="ac-feed-message-portrait l-mar-s--left">
             <user-photo :user="props.message.meta.user" render="xsmall" :description="null" rounded-corners />
