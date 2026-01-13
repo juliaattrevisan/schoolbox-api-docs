@@ -579,10 +579,10 @@ class Mapper extends BaseMapper
                     p.student_id,
                     " . implode(", ", $statusFlagsSubquery) . "
                 FROM differentiation_profiles
-                RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
+                RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL
                 LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
                 LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
-                WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+                WHERE (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile) AND p.deleted_at IS NULL
                 GROUP BY p.student_id
             ";
 
