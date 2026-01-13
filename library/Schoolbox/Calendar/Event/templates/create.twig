@@ -319,7 +319,7 @@
                                             multiple: true,
                                             value: [
                                                 {% for resource in resources %}
-                                                {'id': '{{ resource.id }}', 'name': '{{ resource.name }}'},
+                                                {'id': '{{ resource.id|e('js') }}', 'name': '{{ resource.name|e('js') }}'},
                                                 {% endfor %}
                                             ],
                                         });
@@ -330,7 +330,7 @@
                                                 },
                                                 value: [
                                                     {% for guest in guests %}
-                                                    {'id': '{{ guest.id }}', 'name': '{{ guest.name | escape('js') }}'},
+                                                    {id: '{{ guest.id|e('js') }}', name: '{{ guest.name|e('js') }}'},
                                                     {% endfor %}
                                                 ],
                                                 multiple: true
