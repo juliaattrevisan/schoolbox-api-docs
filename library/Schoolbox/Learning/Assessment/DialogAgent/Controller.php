@@ -17,9 +17,6 @@ use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Misconfigured;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Assessment\Term\Mapper;
-use Schoolbox\Editor\OpenAI\Log\LogFormat as AILogFormat;
-use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
-use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
@@ -29,6 +26,8 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentDataModelMapper;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as DialogAgentResponseMessageMapper;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Translator\ModelToArray as DialogAgentResponseMessageTranslator;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
@@ -93,10 +92,10 @@ class Controller extends Assessment\Controller
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param AILogMapper $aiLogMapper
      * @param DialogAgentDataModelMapper $dialogAgentDataModelMapper
      * @param DialogAgentScenarioMapper $dialogAgentScenarioMapper
      * @param DialogAgentResponseMapper $dialogAgentResponseMapper
+     * @param DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper
      * @param IdFinder $filtersAssessmentIdFinder
      * @param CompositeFactoryFactory $filtersFactoryFactory
      * @param Filter\Mapper $filterMapper
@@ -123,10 +122,10 @@ class Controller extends Assessment\Controller
         Project\ResultCache\Mapper $projectResultCacheMapper,
         LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        private AILogMapper $aiLogMapper,
         protected DialogAgentDataModelMapper $dialogAgentDataModelMapper,
         protected DialogAgentScenarioMapper $dialogAgentScenarioMapper,
         private DialogAgentResponseMapper $dialogAgentResponseMapper,
+        private DialogAgentResponseMessageMapper $dialogAgentResponseMessageMapper,
         protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
         protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
         protected Filter\Mapper $filterMapper,
@@ -439,21 +438,15 @@ class Controller extends Assessment\Controller
             'createdAt' => $assessment->getCreatedAt(),
         ]);
 
-        if ($response->getSessionId()) {
-            $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
-                'order' => [ 'created_at' => 'ASC' ]
-            ]);
+        $responseMessageTranslator = new DialogAgentResponseMessageTranslator();
+        $responseMessages = $this->dialogAgentResponseMessageMapper->findByColumn(
+            'dialog_agent_response_id',
+            $response->getId(),
+            [ 'order' => [ 'created_at' => 'ASC' ] ]
+        );
 
-            /** The strategy should always be AgentChat for each log */
-            $logStrategyFactory = new AILogTranslator\Format\StrategyFactory();
-            foreach ($logEntries as $log) {
-                $logFormat = AILogFormat::from($log->getLogFormat());
-                $strategy = $logStrategyFactory->makeStrategy($logFormat);
-                $feed->add($strategy->translateInput($log));
-                $feed->add($strategy->translateOutput($log));
-            }
-
-            // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+        foreach ($responseMessages as $message) {
+            $feed->add($responseMessageTranslator->__invoke($message));
         }
 
         $userTranslator = new User\Translator\Author\ModelToArray();
