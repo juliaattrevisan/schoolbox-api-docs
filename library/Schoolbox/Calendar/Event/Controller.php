@@ -1487,10 +1487,8 @@ class Controller extends Base
         }
         $resourceIds = array_unique($resourceIds); // Uniquify the array just in case duplicate values were present.
 
-        $isDeleteFromSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
-
         // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
-        if ($isDeleteFromSeries) {
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
             // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
             $events = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: false);
         } else {
@@ -1508,7 +1506,8 @@ class Controller extends Base
             $bookingIdsToDeleteForThisResource = $this->bookingMapper->findIdsByResourceIdForEvents(
                 $resourceId,
                 $eventIds->getAll(),
-                futureBookingsOnly: $isDeleteFromSeries // Only allow deletion of past bookings if updating a single booking.
+                // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
+                futureBookingsOnly: false
             );
             $bookingIdsArrays[] = $bookingIdsToDeleteForThisResource;
         }
