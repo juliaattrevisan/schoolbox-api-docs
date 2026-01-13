@@ -1086,6 +1086,9 @@ class Controller extends Base
 
 
     /**
+     * This function was added so that bookings could be added to an event from
+     * multiple places, with each calling function handling errors in different ways.
+     *
      * @param Event  $event
      * @param array  $resourceIds
      * @param string $efficacy
@@ -1426,6 +1429,9 @@ class Controller extends Base
 
 
     /**
+     * This function was added so that bookings could be deleted from an event from
+     * multiple places, with each calling function handling errors in different ways.
+     *
      * @param Event $event
      * @param array<int> $bookingIds
      * @param string $efficacy
