@@ -1864,6 +1864,7 @@ class Controller extends Base
                 // if not moderated or managed, keep approved status
             }
 
+            // TODO: Only set start/end times if they differ from the parent event's start/end times.
             $booking->setBookingStartAt($newStart);
             $booking->setBookingEndAt($newEnd);
         }
