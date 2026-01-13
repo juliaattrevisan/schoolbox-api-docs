@@ -94,6 +94,7 @@ class ConfigMapper extends Mapper
     public const TYPE_DOC_MANAGE    = 20;
     public const TYPE_SAML          = 21;
     public const TYPE_AI            = 22;
+    public const TYPE_CANVAS        = 23;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const _GLOBAL_MODERATION              = 'global_moderation';
@@ -129,6 +130,8 @@ class ConfigMapper extends Mapper
     public const NAME_OAUTH_SCOPES                       = 'oauth_scopes';
     public const NAME_OAUTH_DEBUG_MODE                   = 'oauth_debug_mode';
 
+    // Canvas Settings
+    public const NAME_CANVAS_ENABLED     = 'canvas_enabled';
     public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
     public const _CANVAS_URL             = 'canvas_url';
