@@ -3,18 +3,23 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Application\CliTool;
-
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
  * Soft deletes old release tours
  */
-$app = new class extends CliTool\App {
-    public function run(): void
-    {
-        $titles = [
-            '23.0 Release',
+$app = new class extends \Schoolbox\Tour\Prepare
+{
+    /**
+     * The feature tours that are obsolete and scheduled for soft-deletion
+     * This is just going keep on growing, but ok
+     *
+     * Add more dead tours here as you go
+     *
+     * @var array|string[]
+     */
+    protected array $obsoleteTitles = [
+        '23.0 Release',
             '23.1 Release',
             '24.0 Release',
             '24.1 Release',
@@ -22,55 +27,8 @@ $app = new class extends CliTool\App {
             '25.0 LMS and Pastoral Care Enhancements',
             '25.1 Release Course Markbook Enhancements',
             '25.1 Release General Enhancements',
-            '25.1 Release Pastoral Enhancements'
-        ];
-
-        $now = (\Alaress_Date_Format::now())->getDatabase();
-        foreach ($titles as $title) {
-            $tourUuids = $this->getDatabaseInternal()->executeQuery(
-                "SELECT uuid FROM tour WHERE title = :title",
-                ['title' => $title]
-            )->fetchAll(PDO::FETCH_COLUMN);
-
-            foreach ($tourUuids as $tourUuid) {
-                // 'UPDATE SET deleted_at' commands for all tour tables containing deleted_at columns.
-                $sqlCommands = [
-                    "UPDATE tour_step
-                     SET deleted_at = :now
-                     WHERE tour_uuid = :uuid",
-                    "UPDATE tour_step_event
-                     SET deleted_at = :now
-                     WHERE tour_step_uuid IN (
-                         SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
-                     )",
-                    "UPDATE tour_step_modal
-                     SET deleted_at = :now
-                     WHERE tour_step_uuid IN (
-                         SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
-                     )",
-                    "UPDATE tour_step_tooltip
-                     SET deleted_at = :now
-                     WHERE tour_step_uuid IN (
-                         SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
-                     )",
-                    "UPDATE tour_trigger
-                     SET deleted_at = :now
-                     WHERE tour_uuid = :uuid",
-                    "UPDATE tour
-                     SET deleted_at = :now
-                     WHERE uuid = :uuid",
-                ];
-
-                foreach ($sqlCommands as $sqlCommand) {
-                    $this->getDatabaseInternal()->prepareQuery($sqlCommand)->execute(['uuid' => $tourUuid, 'now' => $now]);
-                }
-            }
-        }
-    }
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
+            '25.1 Release Pastoral Enhancements',
+    ];
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
