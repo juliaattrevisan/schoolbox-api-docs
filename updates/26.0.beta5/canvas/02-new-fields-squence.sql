@@ -25,7 +25,7 @@ VALUES (
     'canvas_import_quiz',
     'Import Basic Quiz Data From Canvas',
     false,
-    'TBA',
+    'If toggled to ''ON'', the system will attempt to import quiz data from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -48,7 +48,7 @@ VALUES (
     'canvas_quiz_worktype',
     'Imported Quiz Default Work Type',
     '',
-    'TBA',
+    'The Schoolbox work type attributed to any imported quizzes from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -71,7 +71,7 @@ VALUES (
     'canvas_import_grades',
     'Import Grades From Canvas',
     false,
-    'TBA',
+    'If toggled to ''ON'', the system will attempt to import grades from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -92,9 +92,9 @@ VALUES (
     )
 ), (
     'canvas_grade_groups',
-    'Schoolbox Grade Groups That Canvas letter Grades Are Mapped To',
+    'Schoolbox Grade Group That Canvas Letter Grades Are Mapped To',
     '',
-    'TBA',
+    'The Schoolbox grade group used for mapping Canvas grades.',
     (
         SELECT `id`
         FROM `lu_config_field`
@@ -116,7 +116,7 @@ VALUES (
     'canvas_sissourceid_template',
     'SIS Source ID Template',
     '{folderCode}{parentCode}',
-    'TBA',
+    'Template Schoolbox uses to map Canvas data to Schoolbox data.',
     (
          SELECT `id`
          FROM `lu_config_field`
@@ -136,9 +136,9 @@ VALUES (
     )
 ), (
     'canvas_sync_news',
-    'Sync News Items From Canvas',
+    'Sync News',
     false,
-    'TBA',
+    'If toggled to ''ON'', the system will attempt to import news from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -159,9 +159,9 @@ VALUES (
     )
 ), (
     'canvas_news_topic',
-    'Schoolbox News Topic For Canvas News Items',
+    'Schoolbox News Topic',
     '',
-    'TBA',
+    'The Schoolbox news topic attributed to any imported news from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -182,9 +182,9 @@ VALUES (
     )
 ), (
     'canvas_news_author',
-    'Schoolbox User To Attribute As Author For Canvas News Items',
+    'Schoolbox News Owner',
     '',
-    'TBA',
+    'The Schoolbox user attributed to any imported news from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -205,9 +205,9 @@ VALUES (
     )
 ), (
     'canvas_redirect_assessments',
-    'Redirect to Canvas for Assessments',
+    'Redirect from Assessments',
     false,
-    'TBA',
+    'If toggled to ''ON'', the system will redirect users to the Canvas assessments when accessing the Schoolbox learning activity.',
     (
         SELECT id
         FROM lu_config_field
@@ -228,9 +228,9 @@ VALUES (
     )
 ), (
     'canvas_redirect_homepages',
-    'Redirect to Canvas for Homepages',
+    'Redirect from Homepages',
     false,
-    'TBA',
+    'If toggled to ''ON'', the system will redirect users to the Canvas page when accessing the Schoolbox homepage.',
     (
         SELECT id
         FROM lu_config_field
@@ -255,9 +255,9 @@ VALUES (
 INSERT INTO config (`name`, `title`, `description`, `field_id`,  `type_id`, `options`, `editable`, `hidden`, `required`, `module`, sequence)
 VALUES (
            'canvas_code_redirect_homepages',
-           'Canvas Code to Redirect to Homepages',
-           'TBA',
-           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
+           'Redirect homepage to',
+           'The Canvas object used for redirection.',
+           (SELECT id FROM lu_config_field WHERE field = 'select'),
            @canvas_config_id,
            'course_code;course code:subject_code;subject code:subject_code_section;subject code from section',
            'true',
