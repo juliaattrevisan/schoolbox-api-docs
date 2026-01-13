@@ -1821,11 +1821,16 @@ class Controller extends Base
             }
         }
 
+        // Not all bookings will need to be saved.
+        $bookingsToSave = new GenericCollection(ResourceBookingModel::class);
+
         // collect errors
         $errors = [];
 
         // update each booking, and check for clashes
         foreach ($allBookings as $booking) {
+            $bookingIsUpdated = false;
+
             /** @var ResourceBookingModel $booking */
 
             // booking dates may be null, so fall back to event dates
@@ -1845,6 +1850,7 @@ class Controller extends Base
                 $errors[] = $clashErrors;
                 // set status to pending if there are clashes (even if the resource can NOT have clashes...)
                 $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
+                $bookingIsUpdated = true;
             } else {
                 // If booking is managed or moderated, and was previously approved, set status
                 // back to pending so it can be re-approved by a moderator if the time has changed.
@@ -1859,6 +1865,7 @@ class Controller extends Base
                      * set it to Approved - otherwise you'll end up approving your own request anyway
                      */
                     $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_APPROVED));
+                    $bookingIsUpdated = true;
                 } elseif (
                     (
                         $moderationId === ResourceBookingModerationTypeModel::TYPE_MODERATED ||
@@ -1867,6 +1874,7 @@ class Controller extends Base
                     $statusId === BookingStatusModel::STATUS_APPROVED
                 ) {
                     $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
+                    $bookingIsUpdated = true;
                 }
                 // if not moderated or managed, keep approved status
             }
@@ -1877,14 +1885,20 @@ class Controller extends Base
             // and modify the booking status is still necessary, because the bookings are still moving.
             if ($booking->getBookingStartAt() !== null) {
                 $booking->setBookingStartAt($newStart);
+                $bookingIsUpdated = true;
             }
             if ($booking->getBookingEndAt() !== null) {
                 $booking->setBookingEndAt($newEnd);
+                $bookingIsUpdated = true;
+            }
+
+            if ($bookingIsUpdated) {
+                $bookingsToSave->add($booking);
             }
         }
 
         // Save the lot.
-        $this->bookingMapper->save(new Collection($allBookings));
+        $this->bookingMapper->save($bookingsToSave);
 
         return $errors;
     }
