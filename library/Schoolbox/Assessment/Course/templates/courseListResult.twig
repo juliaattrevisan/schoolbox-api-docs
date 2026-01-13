@@ -34,9 +34,11 @@ Usage:
     {% endif %}
 {% endif %}
 
+{% set unitPlannerUrl = routeLookupIfAuthorized('coursePlan.getPlan', {id: courseSpec.id, course: courseSpec }) %}
+
 {# Where should CourseSpec title link point ? #}
 {% set titleUrl = linkToUnits
-        ? routeLookup('coursePlan.getPlan', { id: courseSpec.id })
+        ? unitPlannerUrl
         : importUrl
 %}
 
@@ -48,16 +50,15 @@ Usage:
 {% endif %}
     <div class="list-item">
         <div class="card small-12">
-            {% if not hasTot or (folderAccess[courseSpec.folder.id] ?? false) %}
-                {# Importing a course (no Tot) or You have WRITE permission in the Course Folder homepage
-                 # Course title links to modify scren; you have a tot option to do the same
+            {% if titleUrl %}
+                {# Importing a course (no Tot) or You have READ permission in the Unit Planner page
                  #}
                 <a href="{{ titleUrl }}" data-course-link data-course-id="{{ courseSpec.id }}" data-course-name="{{ courseSpec.folder.name }}" data-component-id="{{ component ? component.id : 0 }}">
                     <div class="icon-course"></div>
                     <h3>{{ courseSpec.folder.name }}</h3>
                 </a>
             {% else %}
-                {# You don't have WRITE permission in the Course Folder homepage
+                {# You don't have permission to the unit planner or import course page
                  # Just show a readonly representation of the course so you know it exists
                  # and hide the tot menu option
                  #}
@@ -124,7 +125,6 @@ Usage:
             </li>
         {% endif %}
 
-        {% set unitPlannerUrl = routeLookupIfAuthorized('coursePlan.getPlan', {id: courseSpec.id, course: courseSpec }) %}
         {% if unitPlannerUrl %}
             <li><a href="{{ unitPlannerUrl }}" class="icon-project">Unit Planner</a></li>
         {% endif %}
