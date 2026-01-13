@@ -154,14 +154,14 @@ class Controller extends Base
         $sortOrder = match ($orderBy) {
             Cursor::CURSOR_ORDER_BY_UPDATED_AT => [
                 'differentiation_profiles.updated_at' => $order,
-                'differentiation_profiles.student_id'  => $order,
+                'p.student_id'  => $order,
             ],
             /* Default to sorting by student name
              */
             default => [
                 's.lastname'    => $order,
                 's.chosen_name' => $order,
-                'differentiation_profiles.student_id'  => $order,
+                'p.student_id'  => $order,
             ]
         };
 

@@ -14,7 +14,7 @@ class Cursor implements ICursor
     public const string CURSOR_DEFAULT_ORDER_BY = 'student';
     public const string CURSOR_ORDER_BY_UPDATED_AT = 'updated_at';
 
-    public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'differentiation_profiles.student_id';
+    public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'p.student_id';
     public const string CURSOR_ORDER_BY_UPDATED_AT_COLUMN = 'differentiation_profiles.updated_at';
 
     public function __construct(
