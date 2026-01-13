@@ -41,6 +41,24 @@ class CanvasDb
      */
     public bool $isCanvasData2 = false;
 
+    // Product-ise/productize configs
+    public readonly bool $import_quiz;
+    public readonly ?int $quiz_worktype;
+    public readonly bool $import_grades;
+    public readonly ?int $grade_groups;
+    public readonly string $sissourceid_template;
+    public readonly bool $sync_news;
+    public readonly ?int $news_topic;
+    public readonly ?int $news_author;
+    public readonly bool $redirect_assessments;
+    public readonly bool $redirect_homepages;
+    public readonly string $code_redirect_homepages;
+    // options
+    // course code:subject code:subject code from section
+    public const REDIRECT_COURSE_CODE = 'course_code';
+    public const REDIRECT_SUBJECT_CODE = 'subject_code';
+    public const REDIRECT_SUBJECT_CODE_SECTION = 'subject_code_section';
+
     /**
      * @param IConfigLoader $config
      */
@@ -48,6 +66,18 @@ class CanvasDb
     {
         $this->isCanvasData2 = $config->get(ConfigMapper::_CANVAS_DATA2_SECRET)
             && $config->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID);
+
+        $this->import_quiz = (bool)$config->get(ConfigMapper::NAME_CANVAS_IMPORT_QUIZ);
+        $this->quiz_worktype = (int)$config->get(ConfigMapper::NAME_CANVAS_QUIZ_WORKTYPE);
+        $this->import_grades = (bool)$config->get(ConfigMapper::NAME_CANVAS_IMPORT_GRADES);
+        $this->grade_groups = (int)$config->get(ConfigMapper::NAME_CANVAS_GRADE_GROUPS);
+        $this->sissourceid_template = $config->get(ConfigMapper::NAME_CANVAS_SISSOURCEID_TEMPLATE);
+        $this->sync_news = (bool)$config->get(ConfigMapper::NAME_CANVAS_SYNC_NEWS);
+        $this->news_topic = (int)$config->get(ConfigMapper::NAME_CANVAS_NEWS_TOPIC);
+        $this->news_author = (int)$config->get(ConfigMapper::NAME_CANVAS_NEWS_AUTHOR);
+        $this->redirect_assessments = (bool)$config->get(ConfigMapper::NAME_CANVAS_REDIRECT_ASSESSMENTS);
+        $this->redirect_homepages = (bool)$config->get(ConfigMapper::NAME_CANVAS_REDIRECT_HOMEPAGES);
+        $this->code_redirect_homepages = $config->get(ConfigMapper::NAME_CANVAS_CODE_REDIRECT_HOMEPAGES);
     }
 
     /**

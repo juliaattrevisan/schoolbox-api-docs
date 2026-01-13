@@ -128,7 +128,7 @@ class CourseSection
      */
     public function syncCanvasMarks(): bool
     {
-        return true;
+        return $this->canvasDb->import_grades;
     }
 
     /**
@@ -525,8 +525,23 @@ class CourseSection
      */
     public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year, ?string $termSisSourceId): ?string
     {
+        // using the sprintf structure from $this->canvasDb->sissourceid_template extract the subject code {folderCode} from $sisSourceId
+        $template = $this->canvasDb->sissourceid_template ?? '';
+        if ($template === '') {
+            return null;
+        }
+
+        // If template contains an explicit placeholder-like token, support it
+        if (strpos($template, '{folderCode}') !== false) {
+            $pattern = '#^' . str_replace('\{folderCode\}', '(.+?)', preg_quote($template, '#')) . '$#';
+            if (preg_match($pattern, $sisSourceId, $m)) {
+                return preg_replace("#^[^/]+/#", '', $m[1]);
+            }
+            return null;
+        }
         return $sisSourceId;
     }
+
 
     /**
      * Load and return Canvas Section student data from canvas DB in a nested array

@@ -24,5 +24,10 @@ class Canvas implements ModuleConfigInterface
 
         $module = new Module($di);
         $module->registerModule("/{$namespace}");
+
+        /* Canvas Admin
+         */
+        new \Schoolbox\Admin\Canvas\Module($di)
+            ->registerModule("/adminv2/{$namespace}");
     }
 }

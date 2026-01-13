@@ -12,9 +12,11 @@ namespace External\Canvas\Sync\Bridge;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
+use External\Canvas\Importer\CanvasDb;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeLevelGroupModel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
@@ -40,7 +42,8 @@ class Assignment
     public const MARK_COMPLETE = 'complete';
     public const MARK_INCOMPLETE = 'incomplete';
 
-    protected array $gradeGroups = [];
+    /** @var GenericCollection|GradeLevelGroupModel[] */
+    protected $gradeGroups;
 
     /** @var GenericCollection|SubmissionBox\MarkType[] */
     protected $markTypes;
@@ -51,11 +54,15 @@ class Assignment
     /**
      * @param GenericCollection|SubmissionBox\MarkType[] $markTypes
      * @param GenericCollection|WorkType\Model[]         $workTypes
+     * @param CanvasDb                                 $canvasDb
      */
-    public function __construct(GenericCollection $markTypes, GenericCollection $workTypes)
-    {
+    public function __construct(
+        GenericCollection $markTypes,
+        GenericCollection $workTypes,
+        private CanvasDb $canvasDb,
+    ) {
         $this->markTypes    = $markTypes->shallowClone()->indexBy('slug');
-        $this->workTypes    = $workTypes->shallowClone()->indexBy('name');
+        $this->workTypes    = $workTypes->indexBy('id');
     }
 
     /**
@@ -94,7 +101,7 @@ class Assignment
      */
     public function prepareLetterGrades(GradeLevelGroupMapper $gradeLevelGroupMapper, GradeLevelMapper $gradeLevelMapper, UserMapper $userMapper): void
     {
-        // do nothing
+        $this->gradeGroups = $gradeLevelGroupMapper->findAll()->indexBy('id');
     }
 
     /**
@@ -180,22 +187,7 @@ class Assignment
      */
     public function getQuizWorkType(string $quizType): ?WorkType\Model
     {
-        $config = [
-            self::QUIZ_TYPE_PRACTICE      => 11,
-            self::QUIZ_TYPE_ASSIGNMENT    => 11,
-            self::QUIZ_TYPE_SURVEY        => 11,
-            self::QUIZ_TYPE_GRADED_SURVEY => 11,
-        ];
-        if (!array_key_exists($quizType, $config)) {
-            return null;
-        }
-        $workTypeId = $config[$quizType];
-        foreach ($this->workTypes as $workType) {
-            if ($workType->getId() === $workTypeId) {
-                return $workType;
-            }
-        }
-        return null;
+        return $this->workTypes[$this->canvasDb->quiz_worktype] ?? null;
     }
 
     /**
@@ -262,7 +254,7 @@ class Assignment
      */
     public function getGradeGroup(?string $gradingType): ?SubmissionBox\GradeLevel\Group\Model
     {
-        return null;
+        return $this->gradeGroups[$this->canvasDb->grade_groups] ?? null;
     }
 
     /**

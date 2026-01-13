@@ -110,7 +110,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      */
     public function synchronise(): void
     {
-        if (!$this->assignmentBridge->syncCanvasQuizzes()) {
+        if (!$this->canvasDb->import_quiz) {
             $this->log->info('Skipping syncing course quizzes');
             return;
         }

@@ -47,9 +47,6 @@ use UnexpectedValueException;
  */
 class DataSync
 {
-    /** @var string */
-    private string $siteSchoolCode;
-
     private string $schoolboxTimezone;
 
     /**
@@ -116,7 +113,6 @@ class DataSync
         private bool $persist,
         private LoggerInterface $log
     ) {
-        $this->siteSchoolCode         = strtolower($config->get('site_school_code'));
         $this->schoolboxTimezone      = $config->get('date_timezone');
     }
 
@@ -142,18 +138,14 @@ class DataSync
             $this->schoolboxDb->beginTransaction();
         }
         try {
-            $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
-
             $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
             $accountBridge    = new Bridge\Account($this->schoolboxDb);
-            $assignmentBridge = $bridgeFactory->getAssignment(
-                $this->markTypeMapper->findAll(),
-                $this->workTypeMapper->findAll()
-            );
+            $assignmentBridge = new Bridge\Assignment($this->markTypeMapper->findAll(), $this->workTypeMapper->findAll(), $this->canvasDb);
+
             $assignmentBridge->prepareLetterGrades($this->gradeLevelGroupMapper, $this->gradeLevelMapper, $this->userMapper);
-            $courseBridge             = $bridgeFactory->getCourse($this->canvasDb, $this->schoolboxDb);
+            $courseBridge             = new Bridge\Course($this->canvasDb, $this->schoolboxDb);
             $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
-            $assignmentDatesBridge    = $bridgeFactory->getAssignmentDates();
+            $assignmentDatesBridge    = new Bridge\AssignmentDates();
             $assignmentOverrideBridge = new Bridge\AssignmentOverride($this->schoolboxDb);
 
             $this->syncAccounts($accountBridge);
@@ -161,13 +153,7 @@ class DataSync
             $this->syncCourseAssignments($assignmentBridge, $courseBridge);
             $this->syncCourseQuiz($assignmentBridge, $courseBridge);
             // Defer building this one till as late as possible (it can take a while)
-            $sectionBridge = $bridgeFactory->getCourseSection(
-                $this->canvasDb,
-                $this->schoolboxDb,
-                $this->folderMapper,
-                $courseBridge,
-                $this->log
-            );
+            $sectionBridge = new Bridge\CourseSection($this->canvasDb, $this->schoolboxDb, $this->folderMapper, $courseBridge, $this->log);
             $sectionBridge->execute();
 
             $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);

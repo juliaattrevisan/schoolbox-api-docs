@@ -20,36 +20,17 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 
 /**
+ * @deprecated, not overloading for each school now...
  * Creates a bridge class for a canvas entity
  */
 class BridgeFactory
 {
-    /** @var string */
-    private string $siteSchoolCode;
-
-    private const BASE = "External\\Canvas\\Sync\\Bridge\\";
-
     /**
      * Constructor
-     * @param string $siteSchoolCode
+     * @param CanvasDb $canvasDb
      */
-    public function __construct(string $siteSchoolCode)
+    public function __construct(private CanvasDb $canvasDb)
     {
-        $this->siteSchoolCode = ucfirst($siteSchoolCode);
-    }
-
-    /**
-     * Generates class name depending on the site location
-     * @param string $filename
-     * @return string
-     */
-    private function getClassName(string $filename): string
-    {
-        $className = self::BASE . $this->siteSchoolCode . '\\' . $filename;
-        if (!class_exists($className)) {
-            $className = self::BASE . $filename;
-        }
-        return $className;
     }
 
     /**
@@ -60,8 +41,7 @@ class BridgeFactory
      */
     public function getAssignment(GenericCollection $markTypes, GenericCollection $workTypes): Assignment
     {
-        $className = $this->getClassName('Assignment');
-        return new $className($markTypes, $workTypes);
+        return new Bridge\Assignment($markTypes, $workTypes, $this->canvasDb);
     }
 
     /**
@@ -70,8 +50,7 @@ class BridgeFactory
      */
     public function getAssignmentDates(): AssignmentDates
     {
-        $className = $this->getClassName('AssignmentDates');
-        return new $className();
+        return new Bridge\AssignmentDates();
     }
 
     /**
@@ -82,13 +61,11 @@ class BridgeFactory
      */
     public function getCourse(CanvasDb $canvasDb, IConnector $schoolboxDb): Course
     {
-        $className = $this->getClassName('Course');
-        return new $className($canvasDb, $schoolboxDb);
+        return new Bridge\Course($canvasDb, $schoolboxDb);
     }
 
     /**
      * Gets class for course section
-     * @param CanvasDb        $canvasDb
      * @param IConnector      $schoolboxDb
      * @param Folder\Mapper   $folderMapper
      * @param Course          $courseBridge
@@ -96,13 +73,11 @@ class BridgeFactory
      * @return CourseSection
      */
     public function getCourseSection(
-        CanvasDb $canvasDb,
         IConnector $schoolboxDb,
         Folder\Mapper $folderMapper,
         Course $courseBridge,
         LoggerInterface $log
     ): CourseSection {
-        $className = $this->getClassName('CourseSection');
-        return new $className($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
+        return new Bridge\CourseSection($this->canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
     }
 }

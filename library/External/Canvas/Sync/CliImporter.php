@@ -14,12 +14,14 @@ use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
 use Alaress_Byte_Format;
 use External\Canvas\Importer\CanvasDb;
+use External\Canvas\Log\Mapper as CanvasLogMapper;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
@@ -66,6 +68,19 @@ use function sprintf;
  */
 class CliImporter extends CliTool\App
 {
+    /**
+     * This script name appears in the import log
+     *
+     * canvas/import.php is a two-part system, the first downloads the canvas data files
+     * and imports them into the staging database - this manifests as "Canvas Importer (Download Canvas Data)"
+     *
+     * We then sync the canvas data into the schoolbox database - this manifests as "Canvas Importer (Sync Canvas Data)"
+     *
+     * These names mean it was run normally as part of the scheduled cron task
+     */
+    public const CANVAS_IMPORTER_DOWNLOAD_SCRIPT_NAME = 'Canvas Importer (Download Canvas Data)';
+    public const CANVAS_IMPORTER_SYNC_SCRIPT_NAME = 'Canvas Importer (Sync Canvas Data)';
+
     private const OPT_SHORT_HELP       = 'h';           // print help
     private const OPT_LONG_HELP        = 'help';        // print help
     private const OPT_LONG_SKIP_FETCH  = 'skip-fetch';  // Don't re-fetch files from Canvas API, use previously downloaded
@@ -193,6 +208,12 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        // only run if canvas integration is enabled
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CANVAS_ENABLED)) {
+            $this->getLogger()->debug('Not running on a canvas plan. Exiting.');
+            exit();
+        }
+
         if ($this->perform()) {
             $this->getLogger()->notice('Running in perform mode (-p): changes will be written to database');
         } else {
@@ -206,6 +227,12 @@ class CliImporter extends CliTool\App
 
         // Ensure we can connect to canvas API + staging DB prior to executing any actions.
         $canvasDb = $this->buildCanvasDbConnectionOrExit();
+
+        // log this to keep track of things
+        $runId = (string)Uuid::uuid4();
+        $canvasLogMapper = CanvasLogMapper::getInstance();
+        $importLog = $canvasLogMapper->start($runId, self::CANVAS_IMPORTER_DOWNLOAD_SCRIPT_NAME);
+
         // Check api config
         if (
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA2_SECRET)
@@ -223,7 +250,13 @@ class CliImporter extends CliTool\App
             } else {
                 // Clear the old files before downloading new ones to avoid data duplication
                 $this->cleanupTempDir($tempDir);
-                $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
+                try {
+                    $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
+                } catch (\Throwable $e) {
+                    // log error
+                    $canvasLogMapper->error($importLog, $e->getMessage());
+                    throw $e;
+                }
             }
             $dataRestorer = new Data2Restorer(
                 $canvasDb,
@@ -235,10 +268,22 @@ class CliImporter extends CliTool\App
             );
             if (!$this->getOpt(self::OPT_LONG_SKIP_IMPORT)) {
                 $this->getLogger()->notice("Importing schema from json file.");
-                $dataRestorer->restoreSchema();
+                try {
+                    $dataRestorer->restoreSchema();
+                } catch (\Throwable $e) {
+                    // log error
+                    $canvasLogMapper->error($importLog, $e->getMessage());
+                    throw $e;
+                }
             }
 
-            $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT, true);
+            try {
+                $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT, true);
+            } catch (\Throwable $e) {
+                // log error
+                $canvasLogMapper->error($importLog, $e->getMessage());
+                throw $e;
+            }
         } elseif (
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY)
             && $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
@@ -287,7 +332,20 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        $this->syncStagingDataWithSchoolbox($canvasDb);
+        // log import  completion
+        $canvasLogMapper->finish($importLog);
+
+        $syncLog = $canvasLogMapper->start($runId, self::CANVAS_IMPORTER_SYNC_SCRIPT_NAME);
+
+        try {
+            $this->syncStagingDataWithSchoolbox($canvasDb);
+            // log sync completion
+            $canvasLogMapper->finish($syncLog);
+        } catch (\Throwable $e) {
+            // log error
+            $canvasLogMapper->error($syncLog, $e->getMessage());
+            throw $e;
+        }
         $this->logStats();
 
         $this->getLogger()->notice('Canvas data import complete.');
@@ -299,6 +357,10 @@ class CliImporter extends CliTool\App
         $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
         (new CliTool\Kernel($app, $options))->runApp();
+
+        /* Trim away ancient logs
+         */
+        $canvasLogMapper->prune();
     }
 
 

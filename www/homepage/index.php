@@ -91,17 +91,17 @@ if (
     !empty($canvasUrl) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_CLIENT_ID)) &&
     !empty($this->getDi()->get('config')->get(ConfigMapper::_CANVAS_DATA2_SECRET)) &&
-    '' !== $folder->getCodeString()
+    '' !== $folder->getCodeString() &&
+    $this->getDi()->get('config')->get(ConfigMapper::NAME_CANVAS_REDIRECT_HOMEPAGES)
 ) {
-    $redirect    = (new \External\Canvas\Redirect\RedirectFactory(
-        (string)$this->getDi()->get('config')->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+    $redirect = (new \External\Canvas\Redirect\Redirect(
         (string)$canvasUrl,
         new CanvasDb($this->getDi()->get('config')),
         $folderMapper
-    ))->produce();
+    ));
 
     try {
-        $redirectUrl = $redirect?->generateRedirect($folder);
+        $redirectUrl = $redirect->generateRedirect($folder);
     } catch (\Alaress\Database\Exception $e) {
         // Don't know where to go: just go to Canvas
         // Log first I guess
