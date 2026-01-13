@@ -190,6 +190,8 @@ class EventRecurrenceMapper
             );
         }
 
+        $event->setSeriesId($eventRecurrence->getSeriesId());
+
         $action = $previous ? Schoolbox\Mapper::METHOD_UPDATE : Schoolbox\Mapper::METHOD_CREATE;
 
         // generate the notification on behalf of the EventMapper that was suppressed

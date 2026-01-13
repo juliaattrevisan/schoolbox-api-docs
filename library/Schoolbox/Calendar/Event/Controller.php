@@ -820,6 +820,13 @@ class Controller extends Base
         // TODO: Consider adding a database transaction encompassing all database
         //       operations to ensure the save succeeds entirely or not at all.
 
+        // If a series of events has been created, $efficacy will be set to EventRecurrenceMapper::EFFICACY_SELF.
+        // In order for bookings to be added below to each event in the series just created, $efficacy must be set
+        // to EventRecurrenceMapper::EFFICACY_SERIES.
+        if ($event->getSeriesId() !== null) {
+            $efficacy = EventRecurrenceMapper::EFFICACY_SERIES;
+        }
+
         // Find resources to add/remove by comparing existing resources to resources from form submission.
         $existingBookings = $this->bookingMapper->findByColumn('event_id', $event->getId());
         $resourceIdsExisting = $existingBookings->map(fn ($booking) => $booking->getResource()->getId())->getAll();
