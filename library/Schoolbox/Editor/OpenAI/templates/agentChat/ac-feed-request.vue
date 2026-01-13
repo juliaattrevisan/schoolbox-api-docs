@@ -24,7 +24,7 @@ const props = defineProps<Props>();
                 disabled
             />
             <p class="ac-feed-message-content l-mar--0">{{ props.message.data }}</p>
-            <p v-if="props.showTimestamps" class="meta">
+            <p v-if="props.showTimestamps" class="meta l-mar--0">
                 <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                     {{ formatTimestamp(props.message) }}
                 </time>

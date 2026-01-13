@@ -149,7 +149,7 @@ function retryResponse(): void {
             >
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
                 <p class="ac-feed-message-content" v-html="props.message.data.message"></p>
-                <p v-if="props.showTimestamps" class="meta">
+                <p v-if="props.showTimestamps" class="meta l-mar--0">
                     <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                         {{ formatTimestamp(props.message) }}
                     </time>
