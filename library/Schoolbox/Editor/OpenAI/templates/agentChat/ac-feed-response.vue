@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { useEventBus } from "@vueuse/core";
+import { getDayjsDatetimeLong } from "@js/util/dateUtils";
 import { useAgentChatStore } from "./store/agentChatStore";
 import { AgentChatMessageType } from "./agentChatTypes";
 import type { AgentChatFeedMessage } from "./agentChatTypes";
 import { acPromptEventKey } from "./agentChatSymbols";
+import { formatTimestamp } from "./agentChatUtils";
 
 interface Props {
     /** The message to display */
@@ -112,7 +114,7 @@ function retryResponse(): void {
         </template>
 
         <!-- response still loading -->
-        <div v-else-if="!isResponseComplete">
+        <div v-else-if="!isResponseComplete" class="ac-feed-response-container">
             <img v-if="imageSrc" :src="imageSrc" />
 
             <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
@@ -128,7 +130,7 @@ function retryResponse(): void {
         </div>
 
         <!-- successful response -->
-        <div v-else>
+        <div v-else class="ac-feed-response-container">
             <div v-if="imageSrc" class="actions-small-1">
                 <nav>
                     <a :href="imageSrc" class="icon-download" title="Download" download></a>
@@ -166,6 +168,10 @@ function retryResponse(): void {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    .ac-feed-response-container {
+        min-width: 20%;
     }
 
     .ac-feed-message-container {

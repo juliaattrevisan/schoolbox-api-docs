@@ -44,7 +44,7 @@ const props = defineProps<Props>();
 
     .ac-feed-message-container {
         background-color: #c7dbff;
-        flex-grow: 1;
+        min-width: 20%;
     }
 
     .ac-feed-message-content {
