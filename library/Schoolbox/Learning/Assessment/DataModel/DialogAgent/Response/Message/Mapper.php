@@ -55,4 +55,21 @@ class Mapper extends BaseMapper
         $this->uses('content', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
+
+    /**
+     * Find all messages for a given dialog agent response, in order of creation time (ASC)
+     *
+     * @param int $dialogAgentResponseId
+     * @return GenericCollection<Model>
+     */
+    public function findForResponse(int $dialogAgentResponseId): GenericCollection
+    {
+        return $this->findByColumn(
+            'dialog_agent_response_id',
+            $dialogAgentResponseId,
+            [
+                'order' => [ 'created_at' => BaseMapper::SORT_ORDER_ASC ]
+            ]
+        );
+    }
 }

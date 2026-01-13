@@ -439,12 +439,7 @@ class Controller extends Assessment\Controller
         ]);
 
         $responseMessageTranslator = new DialogAgentResponseMessageTranslator();
-        $responseMessages = $this->dialogAgentResponseMessageMapper->findByColumn(
-            'dialog_agent_response_id',
-            $response->getId(),
-            [ 'order' => [ 'created_at' => 'ASC' ] ]
-        );
-
+        $responseMessages = $this->dialogAgentResponseMessageMapper->findForResponse($response->getId());
         foreach ($responseMessages as $message) {
             $feed->add($responseMessageTranslator->__invoke($message));
         }

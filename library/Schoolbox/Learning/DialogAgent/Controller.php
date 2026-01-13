@@ -386,10 +386,7 @@ class Controller extends Base
             // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
 
             $responseMessageTranslator = new DialogAgentResponseMessageTranslator();
-            $responseMessages = $this->dialogAgentResponseMessageMapper->findByColumn('dialog_agent_response_id', $response->getId(), [
-                'order' => [ 'created_at' => 'ASC' ]
-            ]);
-
+            $responseMessages = $this->dialogAgentResponseMessageMapper->findForResponse($response->getId());
             foreach ($responseMessages as $message) {
                 $feed->add($responseMessageTranslator->__invoke($message));
             }
