@@ -27,6 +27,7 @@ env:
 
 jobs:
   build-and-push-frankenphp-to-dockerhub:
+    if: github.repository == 'alaress/schoolbox'
     env:
       AWS_REGION: ap-southeast-2
     timeout-minutes: 60
@@ -110,6 +111,9 @@ jobs:
           retention-days: 1
 
   join-frankenphp:
+    if: github.repository == 'alaress/schoolbox'
+    needs:
+      - build-and-push-frankenphp-to-dockerhub
     env:
       AWS_REGION: ap-southeast-2
     timeout-minutes: 15
@@ -120,8 +124,6 @@ jobs:
         env:
           - prod
           - dev
-    needs:
-      - build-and-push-frankenphp-to-dockerhub
     runs-on: onprem-k3s
     steps:
       - name: Set up Docker Buildx
@@ -170,6 +172,9 @@ jobs:
             "${ECR_IMAGES[@]}"
 
   build-and-push-schoolbox-cli-to-dockerhub:
+    if: github.repository == 'alaress/schoolbox'
+    needs:
+      - join-frankenphp
     env:
       AWS_REGION: ap-southeast-2
     timeout-minutes: 60
@@ -187,8 +192,6 @@ jobs:
         env:
           - prod
           - dev
-    needs:
-      - join-frankenphp
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
@@ -257,6 +260,9 @@ jobs:
           retention-days: 1
 
   join-schoolbox-cli:
+    if: github.repository == 'alaress/schoolbox'
+    needs:
+      - build-and-push-schoolbox-cli-to-dockerhub
     env:
       AWS_REGION: ap-southeast-2
     timeout-minutes: 15
@@ -267,8 +273,6 @@ jobs:
         env:
           - prod
           - dev
-    needs:
-      - build-and-push-schoolbox-cli-to-dockerhub
     runs-on: onprem-k3s
     steps:
       - name: Set up Docker Buildx
