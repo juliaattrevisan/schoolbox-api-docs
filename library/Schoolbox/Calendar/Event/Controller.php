@@ -1059,7 +1059,7 @@ class Controller extends Base
      */
     public function addBookings(Event $event): void
     {
-        $efficacy = $this->requestPost->get('efficacy');
+        $efficacy = $this->requestPost->get('efficacy', EventRecurrenceMapper::EFFICACY_SELF);
         $resourceBookingIdsCommaSeparated = trim($this->requestPost->get('resourceIds', ''));
         $resourceIdStrings = (
             $resourceBookingIdsCommaSeparated === '' ? [] : explode(',', $resourceBookingIdsCommaSeparated)
