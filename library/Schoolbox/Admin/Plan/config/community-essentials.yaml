@@ -109,7 +109,8 @@ config:
   canvas_data2_secret : { value : '', hide : true }
   canvas_data2_client_id : { value : '', hide : true }
   canvas_url : { value : '', hide : true }
-  canvas_data_api_key : { value : '', hide : true }
+  canvas_data_api_key : { value : '', hide : true } # this was canvas CD1, not used now
+  canvas_bearer_token : { value : '', hide : true } # used for news and announcements (component)
 
 topMenu:
   hide:
