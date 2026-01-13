@@ -63,6 +63,7 @@ function onAction(): void {
             :feed="acStore.fullFeed"
             error-prefix="There was a problem retrieving the response."
             agent-icon="dialog-agent"
+            show-timestamps
         />
         <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </section>

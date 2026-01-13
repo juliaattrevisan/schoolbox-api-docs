@@ -23,6 +23,8 @@ interface Props {
     initiallyScrolled?: boolean;
     /** The icon to use for the agent's portrait in responses */
     agentIcon?: string;
+    /** If timestamps should be shown for each message */
+    showTimestamps?: boolean;
 }
 const props = defineProps<Props>();
 const acPromptEventBus = useEventBus(acPromptEventKey);
@@ -73,7 +75,11 @@ defineExpose({ feedEl });
                     <br v-if="index > 0" />
 
                     <ac-feed-alert v-if="message.type === AgentChatMessageType.ALERT" :message="message" />
-                    <ac-feed-request v-else-if="message.type === AgentChatMessageType.REQUEST" :message="message" />
+                    <ac-feed-request
+                        v-else-if="message.type === AgentChatMessageType.REQUEST"
+                        :message="message"
+                        :show-timestamps="props.showTimestamps"
+                    />
                     <ac-feed-response
                         v-else
                         :message="message"
@@ -81,6 +87,7 @@ defineExpose({ feedEl });
                         :allow-retry="props.allowRetry"
                         :allow-selection="props.allowSelection"
                         :agent-icon="props.agentIcon"
+                        :show-timestamps="props.showTimestamps"
                     />
                 </template>
 

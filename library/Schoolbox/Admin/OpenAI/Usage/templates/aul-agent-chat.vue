@@ -40,6 +40,7 @@ const agentIcon = window.Vue.computed(() => {
         :allow-selection="false"
         error-prefix="There was a problem retrieving the response."
         :agent-icon="agentIcon"
+        show-timestamps
     />
 </template>
 

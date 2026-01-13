@@ -64,6 +64,7 @@ defineExpose({ resetFeed });
             :allow-retry="!!props.postMessage"
             error-prefix="There was a problem retrieving the response."
             agent-icon="dialog-agent"
+            show-timestamps
         />
 
         <ac-prompt

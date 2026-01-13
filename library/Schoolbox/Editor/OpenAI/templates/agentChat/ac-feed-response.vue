@@ -18,6 +18,8 @@ interface Props {
     allowSelection: boolean;
     /** The icon to use for the agent's portrait in responses, default is 'ai' */
     agentIcon?: string;
+    /** If timestamps should be shown for each message */
+    showTimestamps?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -147,7 +149,7 @@ function retryResponse(): void {
             >
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
                 <p class="ac-feed-message-content" v-html="props.message.data.message"></p>
-                <p class="meta">
+                <p v-if="props.showTimestamps" class="meta">
                     <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                         {{ formatTimestamp(props.message) }}
                     </time>

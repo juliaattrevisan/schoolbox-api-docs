@@ -7,6 +7,8 @@ import { formatTimestamp } from "./agentChatUtils";
 
 interface Props {
     message: AgentChatFeedMessage<AgentChatMessageType.REQUEST>;
+    /** If timestamps should be shown for each message */
+    showTimestamps?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -22,7 +24,7 @@ const props = defineProps<Props>();
                 disabled
             />
             <p class="ac-feed-message-content l-mar--0">{{ props.message.data }}</p>
-            <p class="meta">
+            <p v-if="props.showTimestamps" class="meta">
                 <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
                     {{ formatTimestamp(props.message) }}
                 </time>
