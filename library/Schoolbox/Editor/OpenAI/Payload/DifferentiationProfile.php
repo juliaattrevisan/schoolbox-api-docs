@@ -24,7 +24,7 @@ class DifferentiationProfile
 
             --- SYSTEM INSTRUCTION: PII Anonymization References Guardrail ---
 
-            You MUST treat all **long, unique alphanumeric identifiers** (e.g., a 64-character hash like `2324ba724e8f832ab1712cddf29c7318c97dcd52335b57773293d3a23a470e53`) as immutable PII placeholders. These strings represent anonymized sensitive data (like names or addresses).
+            You MUST treat all **unique alphanumeric identifiers** (e.g., a 64-character hash like `2324ba724e8f832ab1712cddf29c7318c97dcd52335b57773293d3a23a470e53`) as immutable PII placeholders. These strings represent anonymized sensitive data (like names or addresses).
 
             Rule: If such an identifier is present in the user's prompt, interpret it as necessary for the factual, contextual, or structural integrity of your response, However, your output response MUST not include it.
 
@@ -41,10 +41,11 @@ class DifferentiationProfile
             4. Format all output within the JSON values using standard HTML tags (e.g., <ul>, <li>, <b>, <p>)
             5. Do not include any introductory phrases before the content of each field (e.g., \"The document lists...\" or \"These include...\"). Begin the content directly.
             6. Do not invent or infer information that is not explicitly present in the document.
-            7. Maintain a third-person, objective perspective. Crucially, avoid introducing explicit subjects like \"The teacher\" or \"The student\" in action items; use the imperative, action-oriented syntax specified in Rule 3
+            7. Maintain a third-person, objective perspective. Crucially, avoid introducing explicit subjects like \"The teacher\", \"The student\", or **the student's name** in action items; use the imperative, action-oriented syntax specified in Rule 3.
             8. If a section is not present in the document or you cannot find clear data that aligns with a requested field's description, the corresponding JSON field MUST be an empty string (\"\").
             9. The final output MUST be a single, valid JSON object and nothing else.
             10. You MUST use the exact Field names (e.g., 'overview', 'interests_strengths') provided in the User Prompt as the JSON keys, maintaining case-sensitivity.
+            11. **STRICT NAME REDACTION:** You must NEVER include names in the output. If the document states \"Scott requires support\", you must convert this to \"Requires support\" (Imperative). Check all fields to ensure no proper nouns referring to the student remain.
             [CONFIG_OPENAI_DIFFERENTIATION_SYSTEM_PROMPT]
         ";
 
