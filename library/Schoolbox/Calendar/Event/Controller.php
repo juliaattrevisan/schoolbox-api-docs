@@ -1006,7 +1006,8 @@ class Controller extends Base
         if ($event->getSeriesId() !== null) {
             $efficacy = $this->requestPost->get('efficacy', EventRecurrenceMapper::EFFICACY_SELF);
             if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES) {
-                $allEvents = $this->eventMapper->getAllInSeries($event->getSeriesId());
+                // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
+                $allEvents = $this->eventMapper->getAllInSeries($event->getSeriesId(), false);
 
                 foreach ($allEvents as $currentEvent) {
                     $this->eventMapper->delete($currentEvent);
@@ -1136,7 +1137,8 @@ class Controller extends Base
 
         // If the user requested the booking be added to all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
-            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)
+            // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
+            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: false)
                 ->indexBy('id');
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
@@ -1296,9 +1298,10 @@ class Controller extends Base
 
         $isEditOfSeries = ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null);
 
-        // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
+        // If the user requested the booking be updated for all events in the series (and the event is part of a series)...
         if ($isEditOfSeries) {
-            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)->indexBy('id');
+            // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
+            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: false)->indexBy('id');
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
@@ -1488,7 +1491,8 @@ class Controller extends Base
 
         // If the user requested the booking be deleted from all events in the series (and the event is part of a series)...
         if ($isDeleteFromSeries) {
-            $events = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true);
+            // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
+            $events = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: false);
         } else {
             // The event is not in a series, but treat it as a series containing one event so we don't have to deal
             // with single events separately below.
@@ -1783,17 +1787,7 @@ class Controller extends Base
 
         // If the user requested the bookings be moved for all events in the series (and the event is part of a series)...
         if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
-            // Note regarding future events
-            // ----------------------------
-            // The number of bookings to be updated could be greatly reduced in some situations if we only moved events
-            // and bookings scheduled in the future.
-            //    A problem with that idea is that at code location, events have already been moved (due to the event
-            // rows already having been saved in postModify()).  We want to move the bookings linked to events that
-            // were in the future at the time the form was submitted.  One way to achieve that would be to save the ids
-            // of those events, and pass that set of ids to this function.
-            //    Another problem with that idea is that when a user updates an event series, currently all events in
-            // the series are updated - not just future events.  Bookings linked to events must move when the events
-            // move.  So for now, we move all bookings, not just bookings on future events.
+            // There is no efficacy option for 'future events', so this operation must apply to all events in the series.
             $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: false)
                 ->indexBy('id');
         } else {
