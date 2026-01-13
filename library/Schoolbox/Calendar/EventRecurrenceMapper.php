@@ -190,7 +190,10 @@ class EventRecurrenceMapper
             );
         }
 
-        $event->setSeriesId($eventRecurrence->getSeriesId());
+        // If a new event series has been created, the $event->seriesId must be updated.
+        if ($previous === null) {
+            $event->setSeriesId($eventRecurrence->getSeriesId());
+        }
 
         $action = $previous ? Schoolbox\Mapper::METHOD_UPDATE : Schoolbox\Mapper::METHOD_CREATE;
 
