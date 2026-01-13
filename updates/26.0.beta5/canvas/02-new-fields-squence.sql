@@ -25,7 +25,7 @@ VALUES (
     'canvas_import_quiz',
     'Import Basic Quiz Data From Canvas',
     false,
-    'If toggled to ‘ON’, the system will attempt to import quiz data from Canvas.',
+    'If toggled to ''ON'', the system will attempt to import quiz data from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -71,7 +71,7 @@ VALUES (
     'canvas_import_grades',
     'Import Grades From Canvas',
     false,
-    'If toggled to ‘ON’, the system will attempt to import grades from Canvas.',
+    'If toggled to ''ON'', the system will attempt to import grades from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -138,7 +138,7 @@ VALUES (
     'canvas_sync_news',
     'Sync News',
     false,
-    'If toggled to ‘ON’, the system will attempt to import news from Canvas.',
+    'If toggled to ''ON'', the system will attempt to import news from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -207,7 +207,7 @@ VALUES (
     'canvas_redirect_assessments',
     'Redirect from Assessments',
     false,
-    'If toggled to ‘ON’, the system will redirect users to the Canvas assessments when accessing the Schoolbox learning activity.',
+    'If toggled to ''ON'', the system will redirect users to the Canvas assessments when accessing the Schoolbox learning activity.',
     (
         SELECT id
         FROM lu_config_field
@@ -230,7 +230,7 @@ VALUES (
     'canvas_redirect_homepages',
     'Redirect from Homepages',
     false,
-    'If toggled to ‘ON’, the system will redirect users to the Canvas page when accessing the Schoolbox homepage.',
+    'If toggled to ''ON'', the system will redirect users to the Canvas page when accessing the Schoolbox homepage.',
     (
         SELECT id
         FROM lu_config_field
