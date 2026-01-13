@@ -823,7 +823,7 @@ class Controller extends Base
         // If a series of events has been created, $efficacy will be set to EventRecurrenceMapper::EFFICACY_SELF.
         // In order for bookings to be added below to each event in the series just created, $efficacy must be set
         // to EventRecurrenceMapper::EFFICACY_SERIES.
-        if (!$existingEvent && $event->getSeriesId() !== null) {
+        if (!$existingEvent && !empty($repeat) && $event->getSeriesId() !== null) {
             $efficacy = EventRecurrenceMapper::EFFICACY_SERIES;
         }
 
