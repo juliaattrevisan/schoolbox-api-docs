@@ -1761,16 +1761,28 @@ class Controller extends Base
         ?Alaress_Date_Format $oldEndDateTime,
         string $efficacy
     ): array {
-        // can't work out the diff if there is no past...
+        // Can't work out the diff if there is no past...
         if (!$oldStartDateTime || !$oldEndDateTime) {
-            return []; // No bookings to move if we don't have old times
+            return []; // No bookings to move if we don't have old times.
         }
-        // get the time diff in minutes
+
+        // Get the time diff in minutes.
         $startDiff = $oldStartDateTime->diffInMinutes($event->getStartDateTime(), false);
         $endDiff = $oldEndDateTime->diffInMinutes($event->getEndDateTime(), false);
 
-        // get all bookings for this event
-        $bookings = $this->bookingMapper->getForAllEventIds([$event->getId()]);
+        if ($startDiff === 0 && $endDiff === 0) {
+            return []; // Nothing to do if the event hasn't moved.
+        }
+
+        // If the user requested the bookings be moved for all events in the series (and the event is part of a series)...
+        if ($efficacy === EventRecurrenceMapper::EFFICACY_SERIES && $event->getSeriesId() !== null) {
+            $eventById = $this->eventMapper->getAllInSeries($event->getSeriesId(), futureEventsOnly: true)
+                ->indexBy('id');
+        } else {
+            // The event is not in a series, but treat it as a series containing one event so we don't have to deal
+            // with single events separately below.
+            $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
+        }
 
         // clashes?
         $validation = new Validation(
@@ -1784,11 +1796,22 @@ class Controller extends Base
             $this->externalEventMapper,
         );
 
+        // Get all bookings for all events.
+        $bookingsByEventId = $this->bookingMapper->getForAllEventIds($eventById->keys());
+
+        // Flatten array.
+        $allBookings = [];
+        foreach ($bookingsByEventId as $bookings) {
+            foreach ($bookings as $booking) {
+                $allBookings[] = $booking;
+            }
+        }
+
         // collect errors
         $errors = [];
 
         // update each booking, and check for clashes
-        foreach ($bookings[$event->getId()] as $booking) {
+        foreach ($allBookings as $booking) {
             /** @var ResourceBookingModel $booking */
 
             // booking dates may be null, so fall back to event dates
@@ -1807,9 +1830,10 @@ class Controller extends Base
             if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
                 $errors[] = $clashErrors;
                 // set status to pending if there are clashes (even if the resource can NOT have clashes...)
-                $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+                $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
             } else {
-                // If booking is managed or moderated, and was previously approved, set status back to pending so it can be re-approved by a moderator if the time has changed.
+                // If booking is managed or moderated, and was previously approved, set status
+                // back to pending so it can be re-approved by a moderator if the time has changed.
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId = $booking->getStatus()->getId();
                 if (
@@ -1820,12 +1844,15 @@ class Controller extends Base
                      * and you created the booking in the first place,
                      * set it to Approved - otherwise you'll end up approving your own request anyway
                      */
-                    $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_APPROVED));
+                    $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_APPROVED));
                 } elseif (
-                    ($moderationId === ResourceBookingModerationTypeModel::TYPE_MODERATED || $moderationId === ResourceBookingModerationTypeModel::TYPE_MANAGED) &&
-                    $statusId === \Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_APPROVED
+                    (
+                        $moderationId === ResourceBookingModerationTypeModel::TYPE_MODERATED ||
+                        $moderationId === ResourceBookingModerationTypeModel::TYPE_MANAGED
+                    ) &&
+                    $statusId === BookingStatusModel::STATUS_APPROVED
                 ) {
-                    $booking->setStatus($this->bookingStatusMapper->createModel(\Schoolbox\ResourceBooking\Booking\Status\Model::STATUS_PENDING));
+                    $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
                 }
                 // if not moderated or managed, keep approved status
             }
@@ -1834,8 +1861,8 @@ class Controller extends Base
             $booking->setBookingEndAt($newEnd);
         }
 
-        // save the lot
-        $this->bookingMapper->save($bookings[$event->getId()]);
+        // Save the lot.
+        $this->bookingMapper->save(new Collection($allBookings));
 
         return $errors;
     }
