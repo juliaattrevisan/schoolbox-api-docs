@@ -1836,8 +1836,15 @@ class Controller extends Base
             // booking dates may be null, so fall back to event dates
             $bookingStart = $booking->getBookingStartAt() ?? $bookingEvent->getStartDateTime();
             $bookingEnd = $booking->getBookingEndAt() ?? $bookingEvent->getEndDateTime();
-            $newStart = $bookingStart?->addMinutes($startDiff);
-            $newEnd = $bookingEnd?->addMinutes($endDiff);
+
+            if ($bookingStart === null || $bookingEnd === null) {
+                // This should never happen since we are falling back on event start/end datetimes.
+                // But skip this booking to avoid later errors if it does happen.
+                continue;
+            }
+
+            $newStart = $bookingStart->addMinutes($startDiff);
+            $newEnd = $bookingEnd->addMinutes($endDiff);
 
             $clashErrors = $validation->validateForClashes(
                 $booking->getResource(),
