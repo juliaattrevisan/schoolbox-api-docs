@@ -15,6 +15,7 @@ interface Props {
     routeImportIntoClasses: string | null;
     routeNewUnits: string | null;
     routeModifyCourse: string | null;
+    routeCourseMarkbook: string | null;
 }
 const props = defineProps<Props>();
 
@@ -67,8 +68,8 @@ function onPrintSelected(): void {
                 >Assessment Calendar</a
             >
         </li>
-        <li>
-            <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
+        <li v-if="routeCourseMarkbook">
+            <a :href="`${props.routeCourseMarkbook}`" class="icon-curriculum">Course Markbook</a>
         </li>
         <li v-if="routeCurriculumCoverage">
             <a :href="`${props.routeCurriculumCoverage}?courseId=${props.courseId}`" class="icon-report"

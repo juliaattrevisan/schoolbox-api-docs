@@ -29,6 +29,7 @@ interface Props {
     editorTemplates: EditorTemplate[]; // the editor templates available for insertion into textboxes
     routeNewUnits: string | null;
     routeModifyCourse: string | null;
+    routeCourseMarkbook: string | null;
 }
 
 const props = defineProps<Props>();
@@ -163,6 +164,7 @@ window.Vue.onUnmounted(() => {
         :route-import-into-classes="props.routeImportIntoClasses"
         :route-new-units="props.routeNewUnits"
         :route-modify-course="props.routeModifyCourse"
+        :route-course-markbook="props.routeCourseMarkbook"
     />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
