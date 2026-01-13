@@ -188,10 +188,9 @@ class EventRecurrenceMapper
                 $eventRelations,
                 $access
             );
-        }
 
-        // If a new event series has been created, the $event->seriesId must be updated.
-        if ($previous === null) {
+            // Event is now part of a series, so set its seriesId.
+            // Note $this->persist() above will leave $event->seriesId as null.
             $event->setSeriesId($eventRecurrence->getSeriesId());
         }
 
