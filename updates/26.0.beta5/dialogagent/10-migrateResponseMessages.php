@@ -9,7 +9,6 @@
 declare(strict_types=1);
 
 use Alaress\Database\Statement\Query\Base as Query;
-use Alaress\Database\Statement\Query\IQuery;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response as Response;
@@ -49,15 +48,20 @@ $app = new class extends CliTool\App
 
 
     /**
+     * @var Query
+     */
+    private Query $insertStatement;
+
+
+    /**
      * Parse and insert a row for the user's input message
      *
-     * @param Query|IQuery $insertStatement
      * @param int $dialogAgentResponseId
      * @param array $logData
      */
-    private function insertUserMessage(Query|IQuery $insertStatement, int $dialogAgentResponseId, array $logData): void
+    private function insertUserMessage(int $dialogAgentResponseId, array $logData): void
     {
-        $insertStatement->execute([
+        $this->insertStatement->execute([
             'dialogAgentResponseId' => $dialogAgentResponseId,
             'aiResponseId' => null,
             'role' => Response\Message\Role::User->value,
@@ -71,12 +75,11 @@ $app = new class extends CliTool\App
     /**
      * Parse and insert a row for the assistant's response message
      *
-     * @param Query|IQuery $insertStatement
      * @param int $dialogAgentResponseId
      * @param array $logData
      * @throws SchoolboxException
      */
-    private function insertAssistantMessage(Query|IQuery $insertStatement, int $dialogAgentResponseId, array $logData): void
+    private function insertAssistantMessage(int $dialogAgentResponseId, array $logData): void
     {
         try {
             $responseData = json_decode($logData['output_text'], true, 512, JSON_THROW_ON_ERROR);
@@ -84,7 +87,7 @@ $app = new class extends CliTool\App
             throw new SchoolboxException('Unable to decode response data', 0, $e);
         }
 
-        $insertStatement->execute([
+        $this->insertStatement->execute([
             'dialogAgentResponseId' => $dialogAgentResponseId,
             'aiResponseId' => $responseData['responseId'] ?? null,
             'role' => Response\Message\Role::Assistant->value,
@@ -120,7 +123,7 @@ HELP;
         $db = $this->getDatabaseInternal();
 
         /* We're going be doing this more than a few times: prepare it only once, for speed */
-        $insertStatement = $db->prepareQuery(
+        $this->insertStatement = $db->prepareQuery(
             "INSERT INTO dialog_agent_response_message
             (dialog_agent_response_id, ai_response_id, role, status, content, created_at)
             VALUES
@@ -152,12 +155,12 @@ HELP;
             $dialogAgentResponseId = $logData['dialog_agent_response_id'];
 
             /* Handle the user message, it will always be present */
-            $this->insertUserMessage($insertStatement, $dialogAgentResponseId, $logData);
+            $this->insertUserMessage($dialogAgentResponseId, $logData);
             $stats['user'] += 1;
 
             /* Handle the assistant's response, if able */
             try {
-                $this->insertAssistantMessage($insertStatement, $dialogAgentResponseId, $logData);
+                $this->insertAssistantMessage($dialogAgentResponseId, $logData);
                 $stats['assistant'] += 1;
             } catch (SchoolboxException $e) {
                 $this->getLogger()->warning(sprintf(
