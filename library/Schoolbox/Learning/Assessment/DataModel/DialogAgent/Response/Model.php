@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\CreatedBy;
@@ -90,6 +91,10 @@ class Model implements ISoftDeletable
      */
     private ?\Alaress_Date_Format $assistanceRequestedAt = null;
 
+    /**
+     * @var GenericCollection<Message\Model>|null
+     */
+    private ?GenericCollection $messages = null;
 
     /**
      * @return \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model|null
@@ -247,6 +252,26 @@ class Model implements ISoftDeletable
     public function setAssistanceRequestedAt(?\Alaress_Date_Format $assistanceRequestedAt): self
     {
         $this->assistanceRequestedAt = $assistanceRequestedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection<Message\Model>|null
+     */
+    public function getMessages(): ?GenericCollection
+    {
+        return $this->messages;
+    }
+
+
+    /**
+     * @param GenericCollection<Message\Model>|null $messages
+     * @return $this
+     */
+    public function setMessages(?GenericCollection $messages): self
+    {
+        $this->messages = $messages;
         return $this;
     }
 }

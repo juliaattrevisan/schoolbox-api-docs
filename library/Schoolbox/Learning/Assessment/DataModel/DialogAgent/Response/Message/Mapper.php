@@ -54,6 +54,7 @@ class Mapper extends BaseMapper
         );
         $this->uses('content', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -68,7 +69,15 @@ class Mapper extends BaseMapper
             'dialog_agent_response_id',
             $dialogAgentResponseId,
             [
-                'order' => [ 'created_at' => BaseMapper::SORT_ORDER_ASC ]
+                'order' => [
+                    'created_at' => BaseMapper::SORT_ORDER_ASC,
+                    /**
+                     * In theory (especially due to legacy logs) the created_at could be identical for
+                     * both the request and response. In that case, fall back to ID as they should have
+                     * been inserted in the right order to begin with...
+                     */
+                    'id' => BaseMapper::SORT_ORDER_ASC,
+                ]
             ]
         );
     }
