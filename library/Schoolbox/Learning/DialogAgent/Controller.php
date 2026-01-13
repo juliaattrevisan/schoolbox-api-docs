@@ -562,6 +562,10 @@ class Controller extends Base
         /**
          * If differentiation profiles are enabled, and the assessment is set to use them,
          * Try to find the differentiation profile for the learner and add it to the prompt if found
+         *
+         * Note that the AI feature of differentiation profiles is optional and isn't what we're doing here,
+         * as such the AI settings of diff profiles are not checked. Differentiation profiles allow for users
+         * to fully create the profiles themselves so long as the feature is enabled.
          */
         $differentiationProfilePrompt = null;
         if (
