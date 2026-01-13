@@ -68,7 +68,7 @@ class Model implements ISoftDeletable
     /**
      * A set of scenario fields gets put here
      *
-     * @var \Schoolbox\GenericCollection|null
+     * @var \Schoolbox\GenericCollection<Field\Model>|null
      */
     private ?\Schoolbox\GenericCollection $fields = null;
 
@@ -76,7 +76,7 @@ class Model implements ISoftDeletable
     /**
      * A set of scenario criteria gets put here
      *
-     * @var \Schoolbox\GenericCollection|null
+     * @var \Schoolbox\GenericCollection<Criterion\Model>|null
      */
     private ?\Schoolbox\GenericCollection $criteria = null;
 
@@ -211,7 +211,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Schoolbox\GenericCollection|null
+     * @return \Schoolbox\GenericCollection<Field\Model>|null
      */
     public function getFields(): ?\Schoolbox\GenericCollection
     {
@@ -220,7 +220,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param \Schoolbox\GenericCollection|null $fields
+     * @param \Schoolbox\GenericCollection<Field\Model>|null $fields
      * @return $this
      */
     public function setFields(?\Schoolbox\GenericCollection $fields): self

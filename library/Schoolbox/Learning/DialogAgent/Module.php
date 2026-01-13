@@ -193,6 +193,13 @@ class Module extends BaseModule
             $canModify,
         ), $preloadAssessment);
 
+        /* Instructor requests AI to generate initial field configuration
+         */
+        $this->register('GET', "{$assRoute}/configure/generateFields", 'getGenerateConfigurationFields', new Rule\All(
+            $isFeatureEnabled,
+            $canModify,
+        ), $preloadAssessment);
+
         /* Instructor sends a message to the chat agent sandbox
          */
         $this->register('POST', "{$assRoute}/configure/message", 'postSandboxMessage', new Rule\All(

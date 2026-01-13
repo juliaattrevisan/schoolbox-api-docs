@@ -72,6 +72,7 @@ defineExpose({ resetFeed });
             prompt-button-title="Send message"
             :prompt-attributes="[]"
         />
+        <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
 
     <div class="component-action">

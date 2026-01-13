@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { cloneDeep } from "lodash";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import { sbProps } from "@js/util/sbx/pageUtils";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DacForm from "./dac-form.vue";
 import DacSandbox from "./dac-sandbox.vue";
-import type { DialogAgentAssessmentConfig, DialogAgentHelpfulness, DialogAgentScenario } from "./dacTypes";
+import type {
+    DialogAgentAssessmentConfig,
+    DialogAgentHelpfulness,
+    DialogAgentScenario,
+    DialogAgentScenarioField,
+} from "./dacTypes";
 
 interface Props {
     scenario: DialogAgentScenario;
@@ -12,6 +18,7 @@ interface Props {
     helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
     postUpdate: string | null;
+    getGenerateFields: string | null;
 }
 
 const props = defineProps<Props>();
@@ -56,12 +63,86 @@ function onFormSaved(): void {
     updateSandbox();
     isPromptModalOpen.value = true;
 }
+
+const isGeneratingFields = window.Vue.ref<boolean>(false);
+const generateFieldsError = window.Vue.ref<string | null>(null);
+
+type ApiGenerateConfigurationFieldsResponse = {
+    /**
+     * NOTE: openingMessage won't actually be generated at the moment, but I expect we'll want it at some point
+     * @see /library/Schoolbox/Editor/OpenAI/Payload/DialogAgentConfigureFields.php
+     */
+    openingMessage: string | null;
+    fields: Record<DialogAgentScenarioField["id"], string | null>;
+};
+
+/**
+ * Request AI for an initial field configuration for a dialog agent activity to be generated
+ */
+async function generateFields(): Promise<void> {
+    if (!props.getGenerateFields) {
+        throw new Error("missing getGenerateFields route"); // shouldn't get here
+    }
+
+    generateFieldsError.value = null;
+    isGeneratingFields.value = true;
+    const response = await apiRequest<ApiGenerateConfigurationFieldsResponse>({
+        method: "GET",
+        url: props.getGenerateFields,
+    });
+    isGeneratingFields.value = false;
+
+    if (!response.success) {
+        generateFieldsError.value = response.message;
+        return;
+    }
+
+    /** Update all the fields if there's relevant data for them */
+    assessmentConfigInfo.value.fieldContexts.forEach((fieldContext) => {
+        const generatedContent = response.data.fields[fieldContext.field.id] || null;
+        if (generatedContent === null) {
+            console.warn(`Missing content for field context ${fieldContext.id} (field ${fieldContext.field.id})`);
+            return;
+        }
+
+        fieldContext.body = generatedContent;
+    });
+
+    /** Update the opening message if there's relevant data for it */
+    if (response.data.openingMessage !== null) {
+        assessmentConfigInfo.value.openingMessage = response.data.openingMessage;
+    }
+}
+
+window.Vue.onMounted(async () => {
+    /**
+     * On initial load, if there aren't values for the fields yet then request AI to generate them
+     * This only happens if the scenario fields are all empty
+     *
+     * "Rules" is prefilled by the scenario's default
+     * "Opening Message" is left empty for now
+     */
+    if (props.getGenerateFields && assessmentConfigInfo.value.fieldContexts.every((fc) => fc.body.trim() === "")) {
+        await generateFields();
+    }
+});
 </script>
 
 <template>
-    <div class="row">
+    <div v-if="isGeneratingFields" class="row">
+        <div class="small-12 island">
+            <section>
+                <div class="loader"></div>
+            </section>
+        </div>
+    </div>
+    <div v-else class="row">
         <div class="small-12 island" :class="{ 'large-6': sandboxVisible }">
             <h2 class="subheader">Settings</h2>
+            <div v-if="generateFieldsError" data-alert class="alert-box warning">
+                Unable to generate initial field configuration: {{ generateFieldsError }}
+                <a href="" class="close" @click.prevent="generateFieldsError = null">×</a>
+            </div>
             <dac-form
                 v-model:assessment-config="assessmentConfigInfo"
                 v-model:is-submitting="isSubmitting"
