@@ -375,11 +375,11 @@ class Mapper extends BaseMapper
         );
 
         $limit = null === $limit ? '' : "LIMIT {$limit}";
-        $orderBy = "ORDER BY " . ((null === $order) ? '' : implode(', ', array_map(
+        $orderBy = ((null === $order) ? '' : "ORDER BY " . implode(', ', array_map(
             fn($col, $dir) => "{$col} {$dir}",
             array_keys($order),
             $order,
-        )) . ',') . ' p.student_id asc';
+        )));
 
         $query = "{$this->getSelectString()}{$statusSelect}
                 {$this->getFromString()}
