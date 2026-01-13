@@ -48,7 +48,7 @@ VALUES (
     'canvas_quiz_worktype',
     'Imported Quiz Default Work Type',
     '',
-    'Work type attributed to any imported quizzes from Canvas.',
+    'The Schoolbox work type attributed to any imported quizzes from Canvas.',
     (
         SELECT id
         FROM lu_config_field
@@ -94,7 +94,7 @@ VALUES (
     'canvas_grade_groups',
     'Schoolbox Grade Group That Canvas Letter Grades Are Mapped To',
     '',
-    'Grade group used for mapping Canvas grades.',
+    'The Schoolbox grade group used for mapping Canvas grades.',
     (
         SELECT `id`
         FROM `lu_config_field`
@@ -161,7 +161,7 @@ VALUES (
     'canvas_news_topic',
     'Schoolbox News Topic',
     '',
-    'News topic attributed to any imported news from Canvas.',
+    'The Schoolbox news topic attributed to any imported news from Canvas.',
     (
         SELECT id
         FROM lu_config_field
