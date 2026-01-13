@@ -9,20 +9,28 @@ import { existsSync } from "fs";
 export default class BaseTester {
     /**
      * Executes a shell command and returns the result.
-     * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command via `vagrant ssh -c '...'`
+     * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command within a Docker or
+     * Vagrant environment.
      * @param command - The command to execute.
      * @returns The stdout from the command.
      * @throws { Error } If the command fails.
      */
+    // eslint-disable-next-line class-methods-use-this -- this method makes sense as non-static despite not using this
     async runShellCommand(command: string): Promise<string> {
-        // Try to run in vagrant if the schoolbox directory does not exist
-        if (!existsSync("/usr/share/schoolbox") && !command.startsWith("vagrant ssh -c ")) {
-            const vagrantCommand = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
-            return this.runShellCommand(vagrantCommand);
+        // If the schoolbox directory does not exist:
+        // this command is running on the host, instead of in Docker (or Vagrant),
+        // thus it needs to be passed through.
+        let actualCommand = command;
+        if (!existsSync("/usr/share/schoolbox")) {
+            if (process.env.DOCKER === "1") {
+                actualCommand = `docker/exec ${command}`;
+            } else {
+                actualCommand = `vagrant ssh -c "${command.replace(/"/g, '\\"')}"`;
+            }
         }
 
         return new Promise((resolve, reject) => {
-            const parts = command.split(" ");
+            const parts = actualCommand.split(" ");
             const cmd = parts[0];
             const args = parts.slice(1);
 
