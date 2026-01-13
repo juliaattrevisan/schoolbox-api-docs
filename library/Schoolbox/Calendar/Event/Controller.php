@@ -1829,12 +1829,13 @@ class Controller extends Base
         // update each booking, and check for clashes
         foreach ($allBookings as $booking) {
             $bookingIsUpdated = false;
+            $bookingEvent = $booking->getEvent();
 
             /** @var ResourceBookingModel $booking */
 
             // booking dates may be null, so fall back to event dates
-            $bookingStart = $booking->getBookingStartAt() ?? $event->getStartDateTime();
-            $bookingEnd = $booking->getBookingEndAt() ?? $event->getEndDateTime();
+            $bookingStart = $booking->getBookingStartAt() ?? $bookingEvent->getStartDateTime();
+            $bookingEnd = $booking->getBookingEndAt() ?? $bookingEvent->getEndDateTime();
             $newStart = $bookingStart?->addMinutes($startDiff);
             $newEnd = $bookingEnd?->addMinutes($endDiff);
 
@@ -1857,7 +1858,7 @@ class Controller extends Base
                 $statusId = $booking->getStatus()->getId();
                 if (
                     $booking->getResource()->isUserModerator($this->getUser())
-                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                    && (int)$bookingEvent->getAuthor()->getId() === (int)$this->getUser()->getId()
                 ) {
                     /* If you're a Moderator and can moderate this request,
                      * and you created the booking in the first place,
