@@ -24,10 +24,6 @@ declare site_root              # No trailing slash, eg '/usr/share/schoolbox'
 declare is_primary_host        # One of [0|1]
 declare instance_list          # Set of instances for this host
 
-# Circuit breaker configuration
-readonly CIRCUIT_BREAKER_DIR="/var/lock/schoolbox-upgrade"
-readonly CIRCUIT_BREAKER_TIMEOUT=86400  # 24 hours in seconds
-
 # Logging helpers
 function debug(){
   if [[ $verbose == '1' ]]; then
@@ -39,75 +35,6 @@ function log(){
 }
 function error(){
   $LOG $L_ERROR "$1"
-}
-
-# Circuit breaker helpers
-# Check if circuit breaker is active for a specific instance
-function check_instance_circuit_breaker() {
-  local instance_id=$1
-  local breaker_file="${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
-
-  if [[ -f "$breaker_file" ]]; then
-    local last_failure=$(cat "$breaker_file")
-    local current_time=$(date +%s)
-    local time_diff=$((current_time - last_failure))
-
-    if [[ $time_diff -lt $CIRCUIT_BREAKER_TIMEOUT ]]; then
-      local hours_remaining=$(( (CIRCUIT_BREAKER_TIMEOUT - time_diff) / 3600 ))
-      error "Circuit breaker active for instance '$instance_id'. Last failure was ${time_diff}s ago. Skipping upgrade (retry in ${hours_remaining}h)."
-      return 1  # Circuit breaker is active
-    else
-      log "Circuit breaker timeout expired for instance '$instance_id'. Removing lock and proceeding..."
-      clear_instance_circuit_breaker "$instance_id"
-      return 0  # Circuit breaker expired, can proceed
-    fi
-  fi
-  return 0  # No circuit breaker, can proceed
-}
-
-# Trigger circuit breaker for a specific instance
-function trigger_instance_circuit_breaker() {
-  local instance_id=$1
-  mkdir -p "$CIRCUIT_BREAKER_DIR"
-  date +%s > "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
-  error "Circuit breaker triggered for instance '$instance_id'. Upgrade will not run again for 24 hours."
-  send_slack_alert "$instance_id"
-}
-
-# Send Slack alert via webhook
-function send_slack_alert() {
-  local instance_id=$1
-  local log_file="/var/log/schoolbox/${instance_id}/upgrade.log"
-  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-  local webhook_url="https://hooks.slack.com/services/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"
-
-  local message="*[ALERT] Schoolbox upgrade failed for ${instance_id}*
-
-Schoolbox upgrade failed and circuit breaker activated.
-
-*Instance:* ${instance_id}
-*Timestamp:* ${timestamp}
-*Log file:* ${log_file}
-
-The upgrade script will not run again for this instance for 24 hours.
-Manual intervention required.
-
-To manually reset the circuit breaker:
-\`\`\`
-rm /var/lock/schoolbox-upgrade/${instance_id}.lock
-\`\`\`
-"
-
-  # Send to Slack webhook
-  curl -X POST -H 'Content-type: application/json' \
-    --data "{\"text\":\"${message}\"}" \
-    "$webhook_url" 2>&1 | $LOG $L_INFO
-}
-
-# Clear circuit breaker for a specific instance
-function clear_instance_circuit_breaker() {
-  local instance_id=$1
-  rm -f "${CIRCUIT_BREAKER_DIR}/${instance_id}.lock"
 }
 
 # Renders the help message
@@ -265,18 +192,10 @@ function upgrade_instances(){
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
   {
-    # Check circuit breaker FIRST for this instance
-    if ! check_instance_circuit_breaker "$i"; then
-      continue
-    fi
-
     # Ensure instance's log file's directory exists
     mkdir -p /var/log/schoolbox/"$i"
     instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
     log "Upgrade starting for instance '$i' - logging to $instance_log_file";
-
-    # Track if instance upgrade fails
-    instance_failed=0
 
     # TODO, consider case where:
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
@@ -286,12 +205,12 @@ function upgrade_instances(){
     if [[ $verbose == 1 ]]; then
       args+=(--verbose)
     fi
-    "$site_root"/tools/site/create-data-dirs.sh "${args[@]}" >> "$instance_log_file" 2>&1 || instance_failed=1
+    "$site_root"/tools/site/create-data-dirs.sh "${args[@]}" >> "$instance_log_file" 2>&1
 
-    if [[ $is_primary_host == '1' && $instance_failed == 0 ]]; then
+    if [[ $is_primary_host == '1' ]]; then
     {
       echo "Running update scripts."
-      INSTANCE_ID="$i" "$site_root"/tools/update-sql.sh || instance_failed=1
+      INSTANCE_ID="$i" "$site_root"/tools/update-sql.sh
       # Ensure instance has JWT keys deployed. TODO, should be run once only on install, not on upgrade
       INSTANCE_ID="$i" php "$site_root"/tools/token/generateKeyPair.php --quiet
     } >> "$instance_log_file" 2>&1
@@ -325,14 +244,7 @@ function upgrade_instances(){
         fi
       fi
     fi
-    # Check if instance upgrade succeeded or failed
-    if [[ $instance_failed == 1 ]]; then
-      error "Upgrade failed for instance '$i'"
-      trigger_instance_circuit_breaker "$i"
-    else
-      log "Upgrade complete for instance '$i'"
-      clear_instance_circuit_breaker "$i"
-    fi
+    log "Upgrade complete for instance '$i'";
 
     # Bring instance back online.
     # Note site_up runs an SQL UPDATE, so it only makes sense to call site_up on the primary host (only primary hosts have databases).
