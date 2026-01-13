@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for dialog agent response messages.
  * @method Model createModel($idValue = null)
+ * @method GenericCollection<Model> findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -52,5 +54,31 @@ class Mapper extends BaseMapper
         );
         $this->uses('content', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Find all messages for a given dialog agent response, in order of creation time (ASC)
+     *
+     * @param int $dialogAgentResponseId
+     * @return GenericCollection<Model>
+     */
+    public function findForResponse(int $dialogAgentResponseId): GenericCollection
+    {
+        return $this->findByColumn(
+            'dialog_agent_response_id',
+            $dialogAgentResponseId,
+            [
+                'order' => [
+                    'created_at' => BaseMapper::SORT_ORDER_ASC,
+                    /**
+                     * In theory (especially due to legacy logs) the created_at could be identical for
+                     * both the request and response. In that case, fall back to ID as they should have
+                     * been inserted in the right order to begin with...
+                     */
+                    'id' => BaseMapper::SORT_ORDER_ASC,
+                ]
+            ]
+        );
     }
 }

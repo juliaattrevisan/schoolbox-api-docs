@@ -136,6 +136,8 @@ class Mapper extends \Schoolbox\Mapper
 //            'deletedBy',
 //        );
 
+        $this->joinsReverseMulti('dialog_agent_response_id', Message\Mapper::class, 'messages', 'responseMessages');
+
         /* Created/Updated/Deleted By fields need special treatment due to swampy reasons
          */
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleterFields']);
@@ -154,6 +156,11 @@ class Mapper extends \Schoolbox\Mapper
          * once again restore their participation status.
          */
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
+
+        /* Soft-delete response messages if a response is deleted
+         */
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteResponseMessages']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreResponseMessages']);
     }
 
 
@@ -355,5 +362,35 @@ class Mapper extends \Schoolbox\Mapper
          */
         $response->setDeletedBy(null);
         $this->save($response);
+    }
+
+
+    /**
+     * Soft deletes all response messages associated with this response
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function softDeleteResponseMessages(Model $model): void
+    {
+        $mapper = $this->getJoinMapper('responseMessages');
+
+        $mapper->softDelete($mapper->findByColumn('dialog_agent_response_id', $model->getId()));
+    }
+
+
+    /**
+     * Restore all the response messages associated with this response
+     *
+     * @param Model $model
+     * @return void
+     */
+    public function restoreResponseMessages(Model $model): void
+    {
+        $mapper = $this->getJoinMapper('responseMessages');
+
+        $models = $mapper->findByColumn('dialog_agent_response_id', $model->getId(), ['deleted' => true]);
+
+        $mapper->restoreSoftDeleted($models);
     }
 }

@@ -29,12 +29,11 @@ use Schoolbox\Admin\DifferentiationProfiles\Mapper as DifferentiationProfileAdmi
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
 use Schoolbox\DifferentiationProfile\Translator\ProfileToArray as DifferentiationProfileTranslator;
-use Schoolbox\Editor\OpenAI\Log\LogFormat as AiLogFormat;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
-use Schoolbox\Editor\OpenAI\Log\Translator as AILogTranslator;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper as DialogAgentResponseMessageMapper;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Translator\ModelToArray as DialogAgentResponseMessageTranslator;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Helpfulness;
 use Schoolbox\Learning\Assessment\DialogAgent\Lookup\Language;
@@ -386,21 +385,10 @@ class Controller extends Base
 
             // TODO: Inject the guardrails warning in the middle of that where appropriate and if the user has access to see it
 
-            if ($response->getSessionId()) {
-                $logEntries = $this->aiLogMapper->findByColumn('session_id', $response->getSessionId(), [
-                    'order' => [ 'created_at' => 'ASC' ]
-                ]);
-
-                /** The strategy should always be AgentChat for each log */
-                $logStrategyFactory = new AILogTranslator\Format\StrategyFactory();
-                foreach ($logEntries as $log) {
-                    $logFormat = AILogFormat::from($log->getLogFormat());
-                    $strategy = $logStrategyFactory->makeStrategy($logFormat);
-                    $feed->add($strategy->translateInput($log));
-                    $feed->add($strategy->translateOutput($log));
-                }
-
-                // TODO: assessment data shouldn't be log data. There's a task to pull that apart somewhere
+            $responseMessageTranslator = new DialogAgentResponseMessageTranslator();
+            $responseMessages = $this->dialogAgentResponseMessageMapper->findForResponse($response->getId());
+            foreach ($responseMessages as $message) {
+                $feed->add($responseMessageTranslator->__invoke($message));
             }
         }
 
