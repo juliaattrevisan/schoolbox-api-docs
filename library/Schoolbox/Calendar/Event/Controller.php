@@ -1881,7 +1881,7 @@ class Controller extends Base
 
             // If the booking start/time is null, no change is needed.  This is because the booking start/end times
             // default to the parent event's start/end times, so the bookings move with the events automatically.
-            // Note that event if the booking start and end times are both null, the work above to check for clashes
+            // Note that even if the booking start and end times are both null, the work above to check for clashes
             // and modify the booking status is still necessary, because the bookings are still moving.
             if ($booking->getBookingStartAt() !== null) {
                 $booking->setBookingStartAt($newStart);
