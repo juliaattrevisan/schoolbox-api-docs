@@ -156,7 +156,7 @@ async function onSubmit(): Promise<void> {
 
                 <div v-if="differentiationProfilesEnabled" class="small-12 columns">
                     <label for="dac-differentiation-profile">
-                        Use differentiation profile?
+                        Use {{ locale.differentiationProfile.singular() }}?
                         <span
                             data-tooltip
                             class="hint has-tip tip-top"
