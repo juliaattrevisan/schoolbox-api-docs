@@ -12,7 +12,7 @@ use Schoolbox\Admin\Package;
 /**
  * Script for installing a curriculum CSV file into the curriculum_node table
  */
-class Installer extends Package\IBCurriculum
+class Installer extends Package\BaseCurriculum
 {
     /**
      * @inheritdoc
