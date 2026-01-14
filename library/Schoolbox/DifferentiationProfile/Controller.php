@@ -372,7 +372,9 @@ class Controller extends Base
                 ->setGoals($post->get('goals'))
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))
                 ->setNeedsChallenges($post->get('needs_challenges'))
-                ->setInterestsStrengths($post->get('interests_strengths'));
+                ->setInterestsStrengths($post->get('interests_strengths'))
+                ->setCreatedBy($this->getUser())
+                ->setUpdatedBy($this->getUser());
 
             $this->mapper->save($model);
 

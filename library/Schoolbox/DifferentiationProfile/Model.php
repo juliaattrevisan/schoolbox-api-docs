@@ -34,6 +34,10 @@ class Model implements ISoftDeletable
     private ?bool $expired = null;
     private ?bool $out_of_date = null;
 
+    /** @var User|null $created_by */
+    private ?User $created_by = null;
+    /** @var User|null $updated_by */
+    private ?User $updated_by = null;
     /** @var User $student */
     protected User $student;
 
@@ -253,6 +257,50 @@ class Model implements ISoftDeletable
     {
         $this->goals = $goals;
         return $this;
+    }
+
+    /**
+     * Set created by
+     *
+     * @param User|null $created_by
+     * @return self
+     */
+    public function setCreatedBy(?User $created_by): self
+    {
+        $this->created_by = $created_by;
+        return $this;
+    }
+
+    /**
+     * Get created by
+     *
+     * @return User|null
+     */
+    public function getCreatedBy(): ?User
+    {
+        return $this->created_by;
+    }
+
+    /**
+     * Set updated by
+     *
+     * @param User|null $updated_by
+     * @return self
+     */
+    public function setUpdatedBy(?User $updated_by): self
+    {
+        $this->updated_by = $updated_by;
+        return $this;
+    }
+
+    /**
+     * Get updated by
+     *
+     * @return User|null
+     */
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updated_by;
     }
 
     /**

@@ -78,6 +78,8 @@ class Mapper extends BaseMapper
             /** @var Model $model */
             $model = $this->hydrate($row);
             $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
+            $model->setCreatedBy($this->hydrateJoin($row, 'createdBy', 'createdBy'));
+            $model->setUpdatedBy($this->hydrateJoin($row, 'updatedBy', 'updatedBy'));
             $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
             $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
             $collection->add($model);
