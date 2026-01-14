@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\LineItem;
 
+use Alaress_Date_Format;
 use Aura\Router\Generator;
 use BadMethodCallException;
 use Psr\Log\LoggerInterface;
@@ -67,16 +68,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
                 __METHOD__ . ': line item found',
                 $this->generateLogContext($lineItemIdentifier),
             );
-            return new LineItem(
-                $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
-                $this->ltiAssessment->getTitle(),
-                $lineItemIdentifier,
-                $this->ltiAssessment->getLineItemResourceId(),
-                null,
-                null,
-                $this->ltiAssessment->getOpenAt()?->getDateTimeObject(),
-                $this->ltiAssessment->getCloseAt()?->getDateTimeObject(),
-            );
+            return $this->convertModelToLineItem($lineItemIdentifier);
         }
         $this->logger->debug(
             __METHOD__ . ': line item not found',
@@ -111,12 +103,29 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function save(LineItemInterface $lineItem): LineItemInterface
     {
-        $this->ltiAssessment
+        $this->ltiAssessment = $this->ltiAssessment
             ->setLineItemScoreMaximum($lineItem->getScoreMaximum())
             ->setTitle($lineItem->getLabel())
             ->setLineItemResourceId($lineItem->getResourceIdentifier());
 
-        // Also consider whether the dates can be set here?
+        // Also set dates here, respecting ordering of dates which have no
+        // parallel in LTI: publish <= open, due <= close
+        $startTime = $lineItem->getStartDateTime();
+        if ($startTime) {
+            $startTimeAdf = new Alaress_Date_Format($startTime);
+            $this->ltiAssessment = $this->ltiAssessment->setOpenAt($startTimeAdf);
+            if ($this->ltiAssessment->getPublishAt()?->gt($startTimeAdf)) {
+                $this->ltiAssessment = $this->ltiAssessment->setPublishAt(clone $startTimeAdf);
+            }
+        }
+        $endTime = $lineItem->getEndDateTime();
+        if ($endTime) {
+            $endTimeAdf = new Alaress_Date_Format($endTime);
+            $this->ltiAssessment = $this->ltiAssessment->setDueAt($endTimeAdf);
+            if ($this->ltiAssessment->getCloseAt()?->lt($endTimeAdf)) {
+                $this->ltiAssessment = $this->ltiAssessment->setCloseAt(clone $endTimeAdf);
+            }
+        }
 
         try {
             // No user exists for this setting:
@@ -133,7 +142,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
             __METHOD__ . ': line item saved',
             $this->generateLogContext(),
         );
-        return $lineItem;
+        return $this->convertModelToLineItem($lineItem->getIdentifier());
     }
 
     /**
@@ -162,5 +171,27 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
             $context['identifier'] = $lineItemIdentifier;
         }
         return $context;
+    }
+
+
+    /**
+     * Helper function for converting this repository's assessment to the LTI
+     * library's format.
+     *
+     * @param string $lineItemIdentifier
+     * @return LineItemInterface
+     */
+    private function convertModelToLineItem(string $lineItemIdentifier): LineItemInterface
+    {
+        return new LineItem(
+            $this->ltiAssessment->getLineItemScoreMaximum() ?? 0,
+            $this->ltiAssessment->getTitle(),
+            $lineItemIdentifier,
+            $this->ltiAssessment->getLineItemResourceId(),
+            null,
+            null,
+            $this->ltiAssessment->getOpenAt()?->getDateTimeObject(),
+            $this->ltiAssessment->getCloseAt()?->getDateTimeObject(),
+        );
     }
 }
