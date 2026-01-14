@@ -18,7 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\DataModel\Validator\DateOrder;
 
 #[CoversMethod(DateOrder::class, 'validate')]
-class DateOrderValidator extends TestCase
+class DateOrderValidatorTest extends TestCase
 {
     #[DataProvider('getTestValidDateOrderData')]
     public function testValidDateOrder(Model $assessment): void
