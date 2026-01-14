@@ -193,23 +193,19 @@ class Controller extends BaseController
     /**
      * Create a response for this controller's request.
      *
-     * TODO this is a copypaste from the other controller
-     *
      * @param LtiServiceServerRequestHandlerInterface $handler The handler for the incoming request.
      * @return ResponseInterface
      * @throws OAuthServerException if the request is invalid.
      */
     private function createResponse(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
     {
-        // Validate access token
-        $validator      = new RequestAccessTokenValidator($this->registrations, $this->logger);
-        $resourceServer = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache, $this->logger),
+        $requestHandler = new RequestHandler(
+            $this->request,
+            $this->registrations,
+            $this->accessTokenCache,
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+            $this->logger,
         );
-
-        // Handle the request
-        return new LtiServiceServer($validator, $handler, $this->logger)
-            ->handle($resourceServer->validateAuthenticatedRequest($this->request));
+        return $requestHandler->handleRequest($handler);
     }
 }

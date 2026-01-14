@@ -54,7 +54,7 @@ class RequestHandler
      * @return ResponseInterface
      * @throws OAuthServerException if the request is invalid.
      */
-    protected function handleRequest(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
+    public function handleRequest(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
     {
         // Validate access token
         $validator      = new RequestAccessTokenValidator($this->registrations, $this->logger);

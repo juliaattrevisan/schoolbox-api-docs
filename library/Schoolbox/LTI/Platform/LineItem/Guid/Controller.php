@@ -35,6 +35,7 @@ use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\LineItem as LtiAssessmentLineItem;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\GuidRepository;
+use Schoolbox\LTI\Platform\LineItem\RequestHandler;
 use Schoolbox\LTI\Score\LineItemGuidScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Url\Factory;
@@ -234,15 +235,13 @@ class Controller extends BaseController
      */
     private function createResponse(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
     {
-        // Validate access token
-        $validator      = new RequestAccessTokenValidator($this->registrations, $this->logger);
-        $resourceServer = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache, $this->logger),
+        $requestHandler = new RequestHandler(
+            $this->request,
+            $this->registrations,
+            $this->accessTokenCache,
             $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+            $this->logger,
         );
-
-        // Handle the request
-        return new LtiServiceServer($validator, $handler, $this->logger)
-            ->handle($resourceServer->validateAuthenticatedRequest($this->request));
+        return $requestHandler->handleRequest($handler);
     }
 }
