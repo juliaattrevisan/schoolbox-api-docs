@@ -23,6 +23,7 @@ use Schoolbox\Calendar\Relation\Campus as RelationCampus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
+use Schoolbox\ResourceBooking\Booking\Model as ResourceBookingBookingModel;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -231,7 +232,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     {
         $ownerMapper = $this->getJoinMapper('owner');
         $authorMapper = $this->getJoinMapper('author');
-        $pronounMapper = $this->getJoinMapper('owner.pronoun');
         $eventTypeMapper = $this->getJoinMapper('eventType');
         $personalMapper = $this->getJoinMapper('personal');
         $folderMapper = $this->getJoinMapper('event_folder');

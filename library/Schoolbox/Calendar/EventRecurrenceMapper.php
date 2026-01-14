@@ -188,6 +188,10 @@ class EventRecurrenceMapper
                 $eventRelations,
                 $access
             );
+
+            // Event is now part of a series, so set its seriesId.
+            // Note $this->persist() above will leave $event->seriesId as null.
+            $event->setSeriesId($eventRecurrence->getSeriesId());
         }
 
         $action = $previous ? Schoolbox\Mapper::METHOD_UPDATE : Schoolbox\Mapper::METHOD_CREATE;

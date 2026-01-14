@@ -171,8 +171,18 @@ class EventNotifier extends AbstractModuleNotifier
         /** @var Event $object */
         $object = $event->getObject();
 
+        $startDateTime = $object->getStartDateTime();
+
+        // Check for null before cloning.
+        if ($startDateTime === null) {
+            return -1;
+        }
+
+        // Clone to avoid mutating the event.
+        $clonedStartDateTime = clone $startDateTime;
+
         try {
-            $next = $this->mapper->findNextInSeries($object->getSeriesId(), $object->getStartDateTime()->addMinutes(1));
+            $next = $this->mapper->findNextInSeries($object->getSeriesId(), $clonedStartDateTime->addMinutes(1));
         } catch (MapperException $e) {
             // this event is not part of a series, don't try to reschedule
             return -1;

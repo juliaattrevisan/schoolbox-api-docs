@@ -76,7 +76,7 @@ class Event extends EventBase
      *
      * @var null|GenericCollection<ResourceBookingModel>
      */
-    protected ?GenericCollection $bookingsCollection = null;
+    protected ?GenericCollection $bookingCollection = null;
 
     /**
      * Whether or not this Task has been completed
@@ -362,11 +362,11 @@ class Event extends EventBase
     /**
      * Set bookings collection
      *
-     * @param GenericCollection<ResourceBookingModel> $bookingsCollection
+     * @param GenericCollection<ResourceBookingModel> $bookingCollection
      */
-    public function setBookingsCollection(GenericCollection $bookingsCollection): void
+    public function setBookingCollection(GenericCollection $bookingCollection): void
     {
-        $this->bookingsCollection = $bookingsCollection;
+        $this->bookingCollection = $bookingCollection;
     }
 
     /**
@@ -374,9 +374,9 @@ class Event extends EventBase
      *
      * @return null|GenericCollection<ResourceBookingModel>
      */
-    public function getBookingsCollection(): ?GenericCollection
+    public function getBookingCollection(): ?GenericCollection
     {
-        return $this->bookingsCollection;
+        return $this->bookingCollection;
     }
 
     /**

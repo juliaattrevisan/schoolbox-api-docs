@@ -53,12 +53,10 @@ class Event implements ISoftDeletable
     public const ACCESS_GROUP = 2;
     public const ACCESS_CAMPUS = 3;
 
-
     /**
      * Int corresponding to All Day setting set to on
      */
     public const ALL_DAY = 1;
-
 
     /**
      * Event id
@@ -67,14 +65,12 @@ class Event implements ISoftDeletable
      */
     protected $id;
 
-
     /**
      * Series Id for recurring events, I think
      *
      * @var int
      */
     protected $seriesId;
-
 
     /**
      * The person who spawned the event in the first place
@@ -83,7 +79,6 @@ class Event implements ISoftDeletable
      */
     protected $author;
 
-
     /**
      * This denotes to whom the event is relevant for a particular
      * combination of sid and access (I don't remember/understand which)
@@ -91,7 +86,6 @@ class Event implements ISoftDeletable
      * @var User
      */
     protected $owner;
-
 
     /**
      * @var Folder
@@ -161,7 +155,6 @@ class Event implements ISoftDeletable
      */
     protected $attendance = 0;
 
-
     /**
      * Maximum number of people who can be invited to this event
      *
@@ -171,14 +164,12 @@ class Event implements ISoftDeletable
      */
     protected $maxAttendees;
 
-
     /**
      * Whether to show the attendance guest list
      *
      * @var bool
      */
     protected $showAttendees = false;
-
 
     /**
      * Determine whether the attendance state changed prior to saving
@@ -235,14 +226,12 @@ class Event implements ISoftDeletable
      */
     protected $campusCollection;
 
-
     /**
      * Associated guests
      *
      * @var Collection|int[]
      */
     protected $guests;
-
 
     /**
      * The date when the event was published (made visible to users)
@@ -282,7 +271,6 @@ class Event implements ISoftDeletable
      */
     protected $source;
 
-
     /**
      * Constructor
      */
@@ -295,14 +283,12 @@ class Event implements ISoftDeletable
         $this->setup();
     }
 
-
     /**
      * Hook method
      */
     protected function setup()
     {
     }
-
 
     /**
      * Is this event a personal-accesslevel instance?
@@ -314,7 +300,6 @@ class Event implements ISoftDeletable
         return $this->getAccess() === self::ACCESS_PERSONAL;
     }
 
-
     /**
      * Is this event a group-accesslevel instance?
      *
@@ -325,7 +310,6 @@ class Event implements ISoftDeletable
         return $this->getAccess() === self::ACCESS_GROUP;
     }
 
-
     /**
      * Is this event a campus-accesslevel instance?
      *
@@ -335,7 +319,6 @@ class Event implements ISoftDeletable
     {
         return $this->getAccess() === self::ACCESS_CAMPUS;
     }
-
 
     /**
      * Is this event published as of `$date`?
@@ -386,7 +369,6 @@ class Event implements ISoftDeletable
         $this->setStartDateTime($selectedDate);
         $this->setEndDateTime(clone $selectedDate); // Clone so that start and end do not refer to the same date object.
     }
-
 
     /* Getters/Setters
      */
@@ -784,7 +766,6 @@ class Event implements ISoftDeletable
         return $this->type;
     }
 
-
     /**
      * @return string
      */
@@ -792,7 +773,6 @@ class Event implements ISoftDeletable
     {
         return $this->variant;
     }
-
 
     /**
      * @param string|null $variant
@@ -811,7 +791,6 @@ class Event implements ISoftDeletable
         return $this;
     }
 
-
     /**
      * Set end date
      *
@@ -828,7 +807,6 @@ class Event implements ISoftDeletable
         return $this;
     }
 
-
     /**
      * Set end time
      *
@@ -843,7 +821,6 @@ class Event implements ISoftDeletable
 
         return $this;
     }
-
 
     /**
      * Set start date
@@ -1026,7 +1003,6 @@ class Event implements ISoftDeletable
         return $this->source;
     }
 
-
     /**
      * @param string $source
      * @return $this
@@ -1037,7 +1013,6 @@ class Event implements ISoftDeletable
         return $this;
     }
 
-
     /**
      * @return int|null
      */
@@ -1045,7 +1020,6 @@ class Event implements ISoftDeletable
     {
         return $this->maxAttendees;
     }
-
 
     /**
      * @param int|null $maxAttendees
@@ -1057,7 +1031,6 @@ class Event implements ISoftDeletable
         return $this;
     }
 
-
     /**
      * @return bool|null
      */
@@ -1065,7 +1038,6 @@ class Event implements ISoftDeletable
     {
         return $this->showAttendees;
     }
-
 
     /**
      * @param bool|null $showAttendees
