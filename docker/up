@@ -282,6 +282,17 @@ function start_containers() {
     # made locally are available immediately within the container.
     "$(dirname "$0")/compose" up -d $docker_compose_args
 
+    # if using a remote schoolbox-cli image is built:
+    # tag the remote image with the "docker-schoolbox-cli" tag, so that there is
+    # a local image with a consistent name for running scripts.
+    case "${SCHOOLBOX_CLI_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            ;;
+        *)
+            docker tag "${schoolbox_cli_image}" "docker-schoolbox-cli"
+            ;;
+    esac
+
     # start cron in schoolbox-cli container, so that cron tasks actually run:
     # even though this is in a post_start in docker/base.docker-compose.yaml,
     # it is not guaranteed to run on docker/up
