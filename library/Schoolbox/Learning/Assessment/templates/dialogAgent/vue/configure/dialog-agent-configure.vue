@@ -133,6 +133,8 @@ window.Vue.onMounted(async () => {
         <div class="small-12 island">
             <section>
                 <div class="loader"></div>
+
+                <p class="text-center">Setting up scenario content...</p>
             </section>
         </div>
     </div>
