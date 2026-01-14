@@ -373,8 +373,13 @@ class Controller extends Base
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))
                 ->setNeedsChallenges($post->get('needs_challenges'))
                 ->setInterestsStrengths($post->get('interests_strengths'))
-                ->setCreatedBy($this->getUser())
                 ->setUpdatedBy($this->getUser());
+
+            /* Set created_by only if it's a new record
+             */
+            if (null === $id) {
+                $model->setCreatedBy($this->getUser());
+            }
 
             $this->mapper->save($model);
 
