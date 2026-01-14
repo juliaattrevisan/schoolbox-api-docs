@@ -365,14 +365,14 @@ class Controller extends Base
          * If you can access the submit form, and dialog agent is enabled, the learner has
          * likely ended up on this page by mistake (instructor sent a link, or learner refreshed an outdated page)
          *
+         * If $response isn't the current authoritative response, this submit route will take you to the wrong place.
+         *
          * Redirect them to the create form instead as long as dialog agent is enabled (due to the extra check at the start of getCreateResponseForm)
          */
-        $createFormRoute = $this->getRouteIfAuthorized('learningAssessment.getCreateResponseForm', [
-            'assessment' => $assessment,
-            'assessmentId' => $assessment->getId(),
+        $createFormRoute = $response?->getAuthoritative() ? $this->getRouteIfAuthorized('learningAssessment.getCreateResponseForm', [
             'student' => $student,
             'studentId' => $student->getId(),
-        ]);
+        ]) : null;
         if ($createFormRoute && new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied()) {
             $this->response = $this->redirectTemporary($createFormRoute);
             return;
