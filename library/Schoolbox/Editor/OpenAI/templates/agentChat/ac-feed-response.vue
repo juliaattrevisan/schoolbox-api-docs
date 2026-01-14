@@ -1,13 +1,15 @@
 <script lang="ts" setup>
 import { useEventBus } from "@vueuse/core";
+import { getDayjsDatetimeLong } from "@js/util/dateUtils";
 import { useAgentChatStore } from "./store/agentChatStore";
 import { AgentChatMessageType } from "./agentChatTypes";
-import type { AgentChatResponse } from "./agentChatTypes";
+import type { AgentChatFeedMessage } from "./agentChatTypes";
 import { acPromptEventKey } from "./agentChatSymbols";
+import { formatTimestamp } from "./agentChatUtils";
 
 interface Props {
     /** The message to display */
-    message: AgentChatResponse;
+    message: AgentChatFeedMessage<AgentChatMessageType.RESPONSE>;
     /** A message to display before the actual error message when generation fails */
     errorPrefix?: string;
     /** Whether failed responses can be retried */
@@ -16,6 +18,8 @@ interface Props {
     allowSelection: boolean;
     /** The icon to use for the agent's portrait in responses, default is 'ai' */
     agentIcon?: string;
+    /** If timestamps should be shown for each message */
+    showTimestamps?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -30,18 +34,18 @@ const radioId = window.Vue.computed(() => {
 });
 
 const imageSrc = window.Vue.computed(() => {
-    if ("image" in props.message && props.message.image !== null) {
-        if (props.message.image === false) {
+    if ("image" in props.message.data && props.message.data.image !== null && props.message.data.image !== undefined) {
+        if (props.message.data.image === false) {
             /** an image was generated, but this is a restored AI log where it was omitted */
             return false;
         }
 
-        return `data:${props.message.image.mime};base64,${props.message.image.b64}`;
+        return `data:${props.message.data.image.mime};base64,${props.message.data.image.b64}`;
     }
     return null;
 });
 
-const isResponseComplete = window.Vue.computed(() => props.message.status !== "in_progress");
+const isResponseComplete = window.Vue.computed(() => props.message.data.status !== "in_progress");
 
 /** Whether this is the most recent message of any type */
 const isLatestMessage = window.Vue.computed(() => {
@@ -83,7 +87,7 @@ function retryResponse(): void {
                     type="radio"
                     :name="radioId"
                     :value="props.message.entryKey"
-                    :disabled="props.message.status !== 'success' || undefined"
+                    :disabled="props.message.data.status !== 'success' || undefined"
                 />
                 <label :for="radioId"> </label>
             </div>
@@ -99,10 +103,10 @@ function retryResponse(): void {
         </div>
 
         <!-- response errored -->
-        <template v-if="props.message.status === 'error'">
+        <template v-if="props.message.data.status === 'error'">
             <p class="alert-box alert l-mar--0 l-pad-s">
                 <b v-if="props.errorPrefix">{{ props.errorPrefix }}</b>
-                {{ props.message.message }}
+                {{ props.message.data.message }}
             </p>
             <div v-if="props.allowRetry && isLatestMessage" class="l-mar-xs--left">
                 <button class="button f-no-icon-button" type="button" title="Retry" data-tooltip @click="retryResponse">
@@ -112,19 +116,23 @@ function retryResponse(): void {
         </template>
 
         <!-- response still loading -->
-        <div v-else-if="!isResponseComplete">
+        <div v-else-if="!isResponseComplete" class="ac-feed-response-container">
             <img v-if="imageSrc" :src="imageSrc" />
 
             <div class="ac-feed-message-container l-pad-s" :class="{ 'l-mar-s--top': imageSrc }">
                 <!-- we don't render the in progress message as HTML as it may be malformed -->
                 <p class="ac-feed-message-content">
-                    {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
+                    {{
+                        props.message.data.message.length === 0
+                            ? "Generating... Please wait"
+                            : props.message.data.message
+                    }}
                 </p>
             </div>
         </div>
 
         <!-- successful response -->
-        <div v-else>
+        <div v-else class="ac-feed-response-container">
             <div v-if="imageSrc" class="actions-small-1">
                 <nav>
                     <a :href="imageSrc" class="icon-download" title="Download" download></a>
@@ -135,12 +143,17 @@ function retryResponse(): void {
                 <i class="icon-image no-margin"></i>
             </div>
             <div
-                v-if="props.message.message.length"
+                v-if="props.message.data.message.length"
                 class="ac-feed-message-container l-pad-s"
                 :class="{ 'l-mar-s--top': imageSrc !== null }"
             >
                 <!-- eslint-disable-next-line vue/no-v-html -- scrubbed in the backend -->
-                <p class="ac-feed-message-content" v-html="props.message.message"></p>
+                <p class="ac-feed-message-content" v-html="props.message.data.message"></p>
+                <p v-if="props.showTimestamps" class="meta l-mar--0">
+                    <time :datetime="props.message.createdAt" :title="getDayjsDatetimeLong(props.message.createdAt)">
+                        {{ formatTimestamp(props.message) }}
+                    </time>
+                </p>
             </div>
         </div>
     </div>
@@ -157,6 +170,10 @@ function retryResponse(): void {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    .ac-feed-response-container {
+        min-width: 20%;
     }
 
     .ac-feed-message-container {

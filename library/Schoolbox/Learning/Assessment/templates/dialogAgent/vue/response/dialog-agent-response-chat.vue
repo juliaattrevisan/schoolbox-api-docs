@@ -309,6 +309,7 @@ window.Vue.watch(
         :allow-retry="!!currentResponse._routes.message"
         initially-scrolled
         agent-icon="dialog-agent"
+        show-timestamps
     >
         <template #header>
             <div

@@ -29,6 +29,18 @@ export function getDayjsDatetime(date: string): string {
 }
 
 /**
+ * Formats a date string using Day.js in the format configured in config
+ * Uses both dayjsDateLong and dayjsTime formats
+ * @param date - The date to format
+ * @returns - The formatted date
+ */
+export function getDayjsDatetimeLong(date: string): string {
+    return window
+        .dayjs(date)
+        .format(`${window.dateDisplayFormats.dayjsDateLong} ${window.dateDisplayFormats.dayjsTime}`);
+}
+
+/**
  * Format a date string as a relative time (e.g., "3 days ago")
  * @param datetime - The date-time to display in this relative time input
  * @param fullDiff - Is a full diff (e.g. the most significant component) displayed? If not: show diff as days only

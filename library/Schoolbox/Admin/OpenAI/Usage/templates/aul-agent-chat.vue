@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-import type { AgentChatFeedMessage } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AnyAgentChatFeedMessage } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import { AiFeature } from "./payload";
 import type { AiLogFormat, AiSessionLogApiResponse } from "./payload";
 
@@ -13,7 +13,7 @@ interface Props {
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
-const sessionFeed = window.Vue.computed<AgentChatFeedMessage[]>(() => {
+const sessionFeed = window.Vue.computed<AnyAgentChatFeedMessage[]>(() => {
     const firstLog = props.sessionLog[0];
     if (firstLog === undefined) {
         return [];
@@ -40,6 +40,7 @@ const agentIcon = window.Vue.computed(() => {
         :allow-selection="false"
         error-prefix="There was a problem retrieving the response."
         :agent-icon="agentIcon"
+        show-timestamps
     />
 </template>
 

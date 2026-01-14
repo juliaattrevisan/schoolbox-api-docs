@@ -150,10 +150,10 @@ acPromptEventBus.on(({ retryRequest }) => {
         void acStore.sendRequest(
             props.requestConfig,
             {
-                ...retryRequest.payload,
+                ...retryRequest.meta.payload,
                 previousResponseId: acStore.getPreviousResponseId(),
             },
-            retryRequest.file,
+            retryRequest.meta.file,
         );
     }
 });
