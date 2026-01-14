@@ -53,6 +53,8 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
+        // TODO consider whether identifier should be in the object, like
+        //      lti_line_item.identifier_url
         // Line item identifier: the line item request URI
         $url          = new Uri($lineItemIdentifier);
         $assessmentId = $this->ltiAssessment->getId();
@@ -101,22 +103,20 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
     }
 
     /**
-     * This method is not implemented: it's not possible to save the LTI
-     * assessment with this repository.
+     * Update `$this->assessment` with the fields from `$lineItem`.
      *
-     * @throws BadMethodCallException
+     * @param LineItemInterface $lineItem
+     * @return LineItemInterface
+     * @throws MapperException if the item couldn't be saved
      */
     public function save(LineItemInterface $lineItem): LineItemInterface
     {
-        // Find this item by its identifier:
-        // currently, lti_assessment records do not have identifier columns, so
-        // extract it out: `$lineItem->getIdentifier` will be the URL of the
-        // line item.
-        // This doesn't even have a mapper so it can't really update anything?
         $this->ltiAssessment
             ->setLineItemScoreMaximum($lineItem->getScoreMaximum())
             ->setTitle($lineItem->getLabel())
             ->setLineItemResourceId($lineItem->getResourceIdentifier());
+
+        // Also consider whether the dates can be set here?
 
         try {
             // No user exists for this setting:

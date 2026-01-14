@@ -46,7 +46,8 @@ class Controller extends BaseController
      *                                                                  assessment's details.
      * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper LTI score mapper, for writing a mark for the
      *                                                                  assessment.
-     * @param MapperProxy                     $assessmentDataSource     Data source for assessment objects.
+     * @param MapperProxy                     $assessmentDataSource     Data source for assessment objects: used by the
+     *                                                                  LTI library for modifying LTI assessments.
      * @param RegistrationRepositoryInterface $registrations            Repository of tool+platform registrations.
      * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
      *                                                                  score publish request into an actual user.
