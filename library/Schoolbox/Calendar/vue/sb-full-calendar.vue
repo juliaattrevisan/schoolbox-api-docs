@@ -846,6 +846,10 @@ export default {
             @filterChanged="updateSelectedFilters"
         />
 
+        <!--
+            On @eventCreated reloadEvents() is called instead of addEvent().  This is because the
+            event might have associated bookings that would not be added if only addEvent() was called.
+        -->
         <create-event-modal
             ref="createEvent"
             :user-id="config.userId"
@@ -859,7 +863,7 @@ export default {
             :format-form-datetime="formats.formDatetime"
             :format-display-date="formats.displayDate"
             :format-display-datetime="formats.displayDatetime"
-            @eventCreated="addEvent"
+            @eventCreated="reloadEvents"
         />
 
         <view-event-modal
