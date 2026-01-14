@@ -112,21 +112,22 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
         // parallel in LTI: publish <= open, due <= close.
         // The assessment validator prevents assessments from being saved if
         // their start date is before their close date.
-        $startTime = $lineItem->getStartDateTime();
-        if ($startTime) {
-            $startTimeAdf = new Alaress_Date_Format($startTime);
-            $this->ltiAssessment = $this->ltiAssessment->setOpenAt($startTimeAdf);
-            if ($this->ltiAssessment->getPublishAt()?->gt($startTimeAdf)) {
-                $this->ltiAssessment = $this->ltiAssessment->setPublishAt(clone $startTimeAdf);
-            }
+        // It will also prevent the line item from being saved if the start and
+        // end dates are not passed.
+        $startTime = $lineItem->getStartDateTime()
+            ? new Alaress_Date_Format($lineItem->getStartDateTime())
+            : null;
+        $endTime = $lineItem->getEndDateTime()
+            ? new Alaress_Date_Format($lineItem->getEndDateTime())
+            : null;
+        $this->ltiAssessment = $this->ltiAssessment
+            ->setOpenAt($startTime)
+            ->setDueAt($endTime);
+        if ($startTime && $this->ltiAssessment->getPublishAt()?->gt($startTime)) {
+            $this->ltiAssessment = $this->ltiAssessment->setPublishAt(clone $startTime);
         }
-        $endTime = $lineItem->getEndDateTime();
-        if ($endTime) {
-            $endTimeAdf = new Alaress_Date_Format($endTime);
-            $this->ltiAssessment = $this->ltiAssessment->setDueAt($endTimeAdf);
-            if ($this->ltiAssessment->getCloseAt()?->lt($endTimeAdf)) {
-                $this->ltiAssessment = $this->ltiAssessment->setCloseAt(clone $endTimeAdf);
-            }
+        if ($endTime && $this->ltiAssessment->getCloseAt()?->lt($endTime)) {
+            $this->ltiAssessment = $this->ltiAssessment->setCloseAt(clone $endTime);
         }
 
         try {
