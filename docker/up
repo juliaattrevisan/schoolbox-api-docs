@@ -237,6 +237,15 @@ function build_image_names() {
             ;;
         *)
             schoolbox_cli_image="${private_container_registry}/schoolbox-cli:latest-php${PHP_MAJOR_VERSION}-dev-${base_branch}"
+
+            # Also:
+            # build an image named "docker-schoolbox-cli" based off this image,
+            # so that PHP commands can be run
+            docker build --progress=plain \
+                -t "docker-schoolbox-cli" \
+                --build-arg "BASE_PHP_IMAGE=${schoolbox_cli_image}" \
+                -f "docker/schoolbox-cli/prebuilt.Dockerfile" \
+                .
             ;;
     esac
 }
