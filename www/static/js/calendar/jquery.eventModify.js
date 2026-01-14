@@ -197,6 +197,8 @@
                 return false;
             };
 
+            let startDate = $('input[name="startDate"]');
+
             $(config.element).alaressValidate({
                 rules: {
                     "campuses[]": {
@@ -233,6 +235,10 @@
                     endDate: {
                         required: true,
                         datepickerDate: true,
+                        timepickerNotBefore: startDate,
+                        messages: {
+                            timepickerNotBefore: "An event cannot end before it starts.",
+                        },
                     },
                     repeat_until: {
                         datepickerDate: {
