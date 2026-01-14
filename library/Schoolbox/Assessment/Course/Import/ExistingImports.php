@@ -58,43 +58,19 @@ class ExistingImports
     {
         $queryParts = [];
 
-        /* Find all folder ids which have a Course Outline component
-         * with this course specification id imported
+        /* Find all the Course implementation which have previously been imported but archived
+         * as well as active ones
          */
-        $queryParts[] = "
-            SELECT DISTINCT
-                ci.identifier AS folder_id,
-                course_implementation.course_specification_id
-            FROM component_definition cd
-            INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
-            INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
-            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-            INNER JOIN course_implementation ON cci.value = course_implementation.id
-            INNER JOIN folder f ON ci.identifier = f.id
-            WHERE cd.class = :controller
-            AND ccd.key = :key
-            AND course_specification_id = :courseSpecificationId
-            AND f.deleted_at IS NULL
-        ";
-
-        /* Find all the Course implementation which have previously been imported but
-         * the Course Outline component was removed (ie in archived state)
-         */
-        $queryParts[] = "
+        $query = "
             SELECT DISTINCT course_implementation.folder_id,
                             course_implementation.course_specification_id
             FROM course_implementation
             WHERE course_specification_id = :courseSpecificationId
-              AND course_implementation.deleted_at IS NULL
+            AND course_implementation.deleted_at IS NULL
+            ORDER BY folder_id ASC
         ";
 
-        $query = implode(' UNION ', $queryParts);
-
-        $query .= " ORDER BY folder_id ASC ";
-
         $result = $this->database->executeQuery($query, [
-            'controller' => self::COMPONENT_CONTROLLER,
-            'key' => self::COMPONENT_KEY,
             'courseSpecificationId' => $courseSpecificationId
         ]);
 
