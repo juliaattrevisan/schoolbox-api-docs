@@ -414,6 +414,8 @@ class Mapper extends BaseMapper
                 $model = $this->createModel();
             }
             $model->setStudent($this->getJoinMapper('student')->hydrate($row, 's'));
+            $model->setCreatedBy($this->getJoinMapper('createdBy')->hydrate($row, 'createdBy'));
+            $model->setUpdatedBy($this->getJoinMapper('updatedBy')->hydrate($row, 'updatedBy'));
             $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
             $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
             $model->setOutOfDate(isset($row['is_out_of_date']) && (bool)$row['is_out_of_date']);
@@ -678,7 +680,11 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
-        return "SELECT {$this->getColumnString()}, {$this->getJoinColumnString('student', 's')}";
+        return "SELECT {$this->getColumnString()},
+                {$this->getJoinColumnString('student', 's')},
+                {$this->getJoinColumnString('createdBy', 'createdBy')},
+                {$this->getJoinColumnString('updatedBy', 'updatedBy')}
+        ";
     }
 
     /**
@@ -688,6 +694,8 @@ class Mapper extends BaseMapper
     {
         return "
             FROM differentiation_profiles
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
+            INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
             RIGHT JOIN pastoral p ON differentiation_profiles.student_id = p.student_id AND differentiation_profiles.deleted_at IS NULL AND p.deleted_at IS NULL
             LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
             INNER JOIN user s ON p.student_id = s.id AND s.deleted_at IS NULL
