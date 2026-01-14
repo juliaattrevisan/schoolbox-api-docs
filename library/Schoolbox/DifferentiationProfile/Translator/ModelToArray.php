@@ -27,42 +27,6 @@ class ModelToArray
     public function __invoke(Model $model): array
     {
         $student = $model->getStudent();
-        $return = [
-            'id'          => $model->getId(),
-            'student' => [
-                'id' => $student->getId(),
-                'fullName' => $student->getFullName(),
-                'givenName' => $student->getGivenName(),
-                'lastName' => $student->getLastName(),
-                'yearLevel' => $student->getYear() ? [
-                    'id' => $student->getYear()->getId(),
-                    'name' => $student->getYear()->getName(),
-                ] : null,
-                '_links' => [
-                    'profile' => $this->getRouteIfAuthorized(
-                        'searchUser.getProfile',
-                        ['userId' => $student->getId()],
-                    ),
-                ],
-            ],
-            '_routes' => [
-                'linkedRecords' => $this->getRouteIfAuthorized(
-                    'differentiationProfiles.getLinkedPastoralRecords',
-                    ['studentId' => $student->getId()],
-                ),
-                'edit' => $this->getRouteIfAuthorized(
-                    'differentiationProfiles.postDifferentiationProfileData',
-                    [
-                        'student' => $student,
-                        'studentId' => $student->getId()
-                    ],
-                ),
-            ],
-            'status'  => $this->getStatus($model),
-            'created_at' => $model->getCreatedAt()?->getShort(),
-            'updated_at' => $model->getUpdatedAt()?->getShort(),
-            'deleted_at' => $model->getDeletedAt()?->getShort(),
-        ];
 
         $configKey = Mapper::CONFIG_METHOD_MAPPING;
 
@@ -85,7 +49,54 @@ class ModelToArray
             }
             return $carry;
         }, []);
-        return array_merge($return, $config);
+
+        return [
+            'id'         => $model->getId(),
+            'status'     => $this->getStatus($model),
+            'student'    => [
+                'id'        => $student->getId(),
+                'fullName'  => $student->getFullName(),
+                'givenName' => $student->getGivenName(),
+                'lastName'  => $student->getLastName(),
+                'yearLevel' => $student->getYear() ? [
+                    'id'   => $student->getYear()->getId(),
+                    'name' => $student->getYear()->getName(),
+                ] : null,
+                '_links'    => [
+                    'profile' => $this->getRouteIfAuthorized(
+                        'searchUser.getProfile',
+                        ['userId' => $student->getId()],
+                    ),
+                ],
+            ],
+            ...$config,
+            '_routes'    => [
+                'linkedRecords' => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.getLinkedPastoralRecords',
+                    ['studentId' => $student->getId()],
+                ),
+                'edit'          => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.postDifferentiationProfileData',
+                    [
+                        'student'   => $student,
+                        'studentId' => $student->getId()
+                    ],
+                ),
+            ],
+            'created_at' => $model->getCreatedAt()?->getShort(),
+            /* Have not decided to include created_by full details
+             * so just returning the full name for now
+             * TODO: update if needed
+             */
+            'created_by' => $model->getCreatedBy()?->getFullName(),
+            'updated_at' => $model->getUpdatedAt()?->getShort(),
+            /* Have not decided to include updated_by full details
+             * so just returning the full name for now
+             * TODO: update if needed
+             */
+            'updated_by' => $model->getUpdatedBy()?->getFullName(),
+            'deleted_at' => $model->getDeletedAt()?->getShort(),
+        ];
     }
 
     /**
@@ -104,7 +115,6 @@ class ModelToArray
         if ($model->getOutOfDate()) {
             $status[] = 'outOfDate';
         }
-
         if (!$model->isPopulated()) {
             $status[] = 'unpopulated';
         }

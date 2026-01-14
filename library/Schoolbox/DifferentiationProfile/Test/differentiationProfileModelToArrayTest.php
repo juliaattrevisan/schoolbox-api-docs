@@ -101,6 +101,20 @@ class differentiationProfileModelToArrayTest extends TestCase
             ],
         ];
 
+        $staff1 = new User()
+            ->setId(3)
+            ->setLastname('Staff')
+            ->setFirstname('Thor')
+            ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT));
+        $staffResponse1 = 'Thor Staff';
+
+        $staff2 = new User()
+            ->setId(4)
+            ->setLastname('Staff')
+            ->setFirstname('Odin')
+            ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT));
+        $staffResponse2 = 'Odin Staff';
+
         $routes = [
             'linkedRecords' => null,
             'edit' => null,
@@ -131,7 +145,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => null,
                     'status'                 => ['unpopulated'],
                     'created_at'             => null,
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -171,7 +187,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => 'Goals details.',
                     'status'                 => [],
                     'created_at'             => 'Jan 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Jan 2, 2024 1:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -203,7 +221,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => null,
                     'status'                 => ['unpopulated'],
                     'created_at'             => null,
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => 'Mar 1, 2024 12:00am',
                     '_routes'                => $routes,
                 ],
@@ -235,7 +255,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'adjustment_level'       => [2, 4],
                     'status'                 => [],
                     'created_at'             => 'Feb 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -271,7 +293,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => 'Visible goals.',
                     'status'                 => [],
                     'created_at'             => 'Mar 15, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Mar 20, 2024 12:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -306,7 +330,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'adjustment_level'       => [4, 3],
                     'status'                 => [],
                     'created_at'             => 'Apr 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -336,7 +362,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'student'                => $userResponse,
                     'status'                 => [],
                     'created_at'             => 'May 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -374,7 +402,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'strategies_adjustments' => 'Visible strategies and adjustments.',
                     'status'                 => [],
                     'created_at'             => 'Jun 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Jun 15, 2024 12:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -407,7 +437,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'overview'               => 'Only this overview is visible.',
                     'status'                 => [],
                     'created_at'             => 'Jul 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -446,7 +478,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => 'Visible goals.',
                     'status'                 => [],
                     'created_at'             => 'Aug 1, 2024 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Aug 10, 2024 12:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -479,7 +513,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'overview'               => 'This profile has expired.',
                     'status'                 => ['expired'],
                     'created_at'             => 'Jan 1, 2023 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Jun 1, 2023 12:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -507,7 +543,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => 'This is an overview.',
                     'status'                 => ['outOfDate'],
                     'created_at'             => 'Mar 1, 2023 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Sep 1, 2023 12:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -531,7 +569,9 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'overview'               => 'This is an overview.',
                     'status'                 => ['expired', 'outOfDate'],
                     'created_at'             => 'Jan 1, 2022 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => 'Dec 1, 2022 12:00am',
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
@@ -555,11 +595,253 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'goals'                  => null,
                     'status'                 => ['expired', 'outOfDate', 'unpopulated'],
                     'created_at'             => 'Jan 1, 2021 12:00am',
+                    'created_by'             => null,
                     'updated_at'             => null,
+                    'updated_by'             => null,
                     'deleted_at'             => null,
                     '_routes'                => $routes,
                 ],
             ],
+            'Newly created profile' => [
+                // Test case 15: Newly created profile with no data
+                new Model()
+                    ->setStudent($student)
+                    ->setCreatedBy($staff1)
+                    ->setUpdatedBy($staff1)
+                ,
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                    new ProfileConfig()->setName('interests_strengths')->setModule('details'),
+                    new ProfileConfig()->setName('needs_challenges')->setModule('details'),
+                    new ProfileConfig()->setName('strategies_adjustments')->setModule('details'),
+                    new ProfileConfig()->setName('goals')->setModule('details'),
+                ]),
+                [
+                    'id'                     => null,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => null,
+                    'adjustment_level'       => null,
+                    'overview'               => null,
+                    'interests_strengths'    => null,
+                    'needs_challenges'       => null,
+                    'strategies_adjustments' => null,
+                    'goals'                  => null,
+                    'status'                 => ['unpopulated'],
+                    'created_at'             => null,
+                    'created_by'             => $staffResponse1,
+                    'updated_at'             => null,
+                    'updated_by'             => $staffResponse1,
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ]
+            ],
+            'Profile is updated by another staff' => [
+                // Test case 16: Profile created by one staff and updated by another
+                new Model()
+                    ->setId(14)
+                    ->setStudent($student)
+                    ->setCreatedBy($staff1)
+                    ->setUpdatedBy($staff2)
+                    ->setOverview('This is an overview.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-10 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-15 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                    new ProfileConfig()->setName('interests_strengths')->setModule('details'),
+                    new ProfileConfig()->setName('needs_challenges')->setModule('details'),
+                    new ProfileConfig()->setName('strategies_adjustments')->setModule('details'),
+                    new ProfileConfig()->setName('goals')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 14,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => null,
+                    'adjustment_level'       => null,
+                    'overview'               => 'This is an overview.',
+                    'interests_strengths'    => null,
+                    'needs_challenges'       => null,
+                    'strategies_adjustments' => null,
+                    'goals'                  => null,
+                    'status'                 => [],
+                    'created_at'             => 'Jan 10, 2024 12:00am',
+                    'created_by'             => $staffResponse1,
+                    'updated_at'             => 'Feb 15, 2024 12:00am',
+                    'updated_by'             => $staffResponse2,
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ]
+            ],
+            'Profile with only created_by set' => [
+                // Test case 17: Profile with only creator information (never updated)
+                new Model()
+                    ->setId(15)
+                    ->setStudent($student)
+                    ->setCreatedBy($staff1)
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                    ]))
+                    ->setOverview('Profile with creator only.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 15,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [1],
+                    'overview'               => 'Profile with creator only.',
+                    'status'                 => [],
+                    'created_at'             => 'Mar 1, 2024 12:00am',
+                    'created_by'             => $staffResponse1,
+                    'updated_at'             => null,
+                    'updated_by'             => null,
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ]
+            ],
+            'Profile with only updated_by set' => [
+                // Test case 18: Edge case - Profile with only updater info (unusual but possible)
+                new Model()
+                    ->setId(16)
+                    ->setStudent($student)
+                    ->setUpdatedBy($staff2)
+                    ->setGoals('Profile with updater only.')
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-04-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('goals')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 16,
+                    'student'                => $userResponse,
+                    'goals'                  => 'Profile with updater only.',
+                    'status'                 => [],
+                    'created_at'             => null,
+                    'created_by'             => null,
+                    'updated_at'             => 'Apr 1, 2024 12:00am',
+                    'updated_by'             => $staffResponse2,
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ]
+            ],
+            'Deleted profile with creator and updater' => [
+                // Test case 19: Deleted profile retains creator and updater information
+                new Model()
+                    ->setId(17)
+                    ->setStudent($student)
+                    ->setCreatedBy($staff1)
+                    ->setUpdatedBy($staff2)
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                    ]))
+                    ->setOverview('This profile was deleted.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-15 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setDeletedAt(Alaress_Date_Format::newDatabaseDate('2024-06-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 17,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [2],
+                    'overview'               => 'This profile was deleted.',
+                    'status'                 => [],
+                    'created_at'             => 'May 1, 2024 12:00am',
+                    'created_by'             => $staffResponse1,
+                    'updated_at'             => 'May 15, 2024 12:00am',
+                    'updated_by'             => $staffResponse2,
+                    'deleted_at'             => 'Jun 1, 2024 12:00am',
+                    '_routes'                => $routes,
+                ]
+            ],
+            'Expired profile with full audit trail' => [
+                // Test case 20: Expired profile with complete creator/updater information
+                new Model()
+                    ->setId(18)
+                    ->setStudent($student)
+                    ->setCreatedBy($staff2)
+                    ->setUpdatedBy($staff1)
+                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)
+                    ]))
+                    ->setInterestsStrengths('Expired profile with audit.')
+                    ->setExpired(true)
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-07-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-12-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
+                    new ProfileConfig()->setName('interests_strengths')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 18,
+                    'student'                => $userResponse,
+                    'adjustment_level'       => [3],
+                    'interests_strengths'    => 'Expired profile with audit.',
+                    'status'                 => ['expired'],
+                    'created_at'             => 'Jul 1, 2023 12:00am',
+                    'created_by'             => $staffResponse2,
+                    'updated_at'             => 'Dec 1, 2023 12:00am',
+                    'updated_by'             => $staffResponse1,
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ]
+            ],
+            'Complete profile with same creator and updater' => [
+                // Test case 21: Fully populated profile updated by the same person who created it
+                new Model()
+                    ->setId(19)
+                    ->setStudent($student)
+                    ->setCreatedBy($staff2)
+                    ->setUpdatedBy($staff2)
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)
+                    ]))
+                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)
+                    ]))
+                    ->setOverview('Complete profile.')
+                    ->setInterestsStrengths('Interests.')
+                    ->setNeedsChallenges('Needs.')
+                    ->setStrategiesAdjustments('Strategies.')
+                    ->setGoals('Goals.')
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-20 00:00:00', new DateTimeZone('UTC'), $locale)),
+                new GenericCollection(ProfileConfig::class, [
+                    new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
+                    new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
+                    new ProfileConfig()->setName('overview')->setModule('details'),
+                    new ProfileConfig()->setName('interests_strengths')->setModule('details'),
+                    new ProfileConfig()->setName('needs_challenges')->setModule('details'),
+                    new ProfileConfig()->setName('strategies_adjustments')->setModule('details'),
+                    new ProfileConfig()->setName('goals')->setModule('details'),
+                ]),
+                [
+                    'id'                     => 19,
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [3, 4],
+                    'adjustment_level'       => [1, 2],
+                    'overview'               => 'Complete profile.',
+                    'interests_strengths'    => 'Interests.',
+                    'needs_challenges'       => 'Needs.',
+                    'strategies_adjustments' => 'Strategies.',
+                    'goals'                  => 'Goals.',
+                    'status'                 => [],
+                    'created_at'             => 'Jul 1, 2024 12:00am',
+                    'created_by'             => $staffResponse2,
+                    'updated_at'             => 'Jul 20, 2024 12:00am',
+                    'updated_by'             => $staffResponse2,
+                    'deleted_at'             => null,
+                    '_routes'                => $routes,
+                ]
+            ]
         ];
     }
 }
