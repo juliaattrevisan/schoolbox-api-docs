@@ -224,7 +224,7 @@ class Controller extends Base
             // Build the booking
             $booking = $this->getBookingFromEvent($item, $event); // Booking status is set here.
             $booking
-                ->setName(substr($this->requestPost['name'], 0, 255)) // Ensure name will fit in dababase field.
+                ->setName($this->requestPost['name'])
                 ->setNotes($this->requestPost['notes']);
             $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
             if (
