@@ -24,38 +24,47 @@ use Psr\Log\LoggerInterface;
 /**
  * Common method for handling requests to an LTI service.
  */
-trait RequestHandler
+class RequestHandler
 {
+    /**
+     * Constructor
+     *
+     * @param ServerRequestInterface          $request          The incoming HTTP request.
+     * @param RegistrationRepositoryInterface $registrations    Repository of LTI tool+platform registrations:
+     *                                                          used for determining if the requester is valid.
+     * @param CacheItemPoolInterface          $accessTokenCache Cache for OIDC access tokens: used to persist these
+     *                                                          tokens, and to verify if they are still valid.
+     * @param string                          $publicKey        The public key used to decode the request's JWT.
+     * @param LoggerInterface                 $logger           Logger: the LTI service may write log messages.
+     */
+    public function __construct(
+        private ServerRequestInterface $request,
+        private RegistrationRepositoryInterface $registrations,
+        private CacheItemPoolInterface $accessTokenCache,
+        private string $publicKey,
+        private LoggerInterface $logger,
+    ) {
+    }
+
     /**
      * Create a response for this controller's request.
      *
-     * @param ServerRequestInterface                  $request          The incoming HTTP request.
-     * @param LtiServiceServerRequestHandlerInterface $handler          The handler for the incoming request:
-     *                                                                  does something with an LTI object.
-     * @param RegistrationRepositoryInterface         $registrations    Repository of LTI tool+platform registrations:
-     *                                                                  used for determining if the requester is valid.
-     * @param CacheItemPoolInterface                  $accessTokenCache Cache for OIDC access tokens: used to persist
-     *                                                                  these tokens, and to verify if they are still
-     *                                                                  valid.
-     * @param string                                  $publicKey        The public key used to decode the request's JWT.
-     * @param LoggerInterface                         $logger           Logger: the LTI service may write log messages.
+     * @param LtiServiceServerRequestHandlerInterface $handler The handler for the incoming request:
+     *                                                         does something with an LTI object.
      * @return ResponseInterface
      * @throws OAuthServerException if the request is invalid.
      */
-    protected function handleRequest(
-        ServerRequestInterface $request,
-        LtiServiceServerRequestHandlerInterface $handler,
-        RegistrationRepositoryInterface $registrations,
-        CacheItemPoolInterface $accessTokenCache,
-        string $publicKey,
-        LoggerInterface $logger,
-    ): ResponseInterface {
+    protected function handleRequest(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
+    {
         // Validate access token
-        $validator      = new RequestAccessTokenValidator($registrations, $logger);
-        $resourceServer = new ResourceServer(new AccessTokenRepository($accessTokenCache, $logger), $publicKey);
+        $validator      = new RequestAccessTokenValidator($this->registrations, $this->logger);
+        $resourceServer = new ResourceServer(
+            new AccessTokenRepository($this->accessTokenCache, $this->logger),
+            $this->publicKey,
+        );
 
         // Handle the request
-        return new LtiServiceServer($validator, $handler, $logger)
-            ->handle($resourceServer->validateAuthenticatedRequest($request));
+        return new LtiServiceServer($validator, $handler, $this->logger)
+            ->handle($resourceServer->validateAuthenticatedRequest($this->request));
     }
 }
