@@ -100,22 +100,32 @@
                     </fieldset>
                     {% if config.differentiation_profiles_enabled ?? false %}
                         <fieldset class="content">
-                            <div class="small-12 columns checklist">
-                                 <ul class="option-list">
-                                    <li>
-                                        {% set currentContribute = (subtype ? subtype.contributeDifferentiationProfile : type.contributeDifferentiationProfile) %}
-                                        <input
-                                            id="contributeDifferentiationProfile"
-                                            name="contributeDifferentiationProfile"
-                                            type="checkbox"
-                                            value="1"
-                                            {% if currentContribute %}checked="checked"{% endif %}
-                                        >
-                                        <label for="contributeDifferentiationProfile" data-test="audiences-modify-contribute-differentiation-profile">Contributes to Differentiation Profile
-                                            <p class="meta">When checked, records of this type will be linked to students Differentiation Profiles.</p>
-                                        </label>
-                                    </li>
-                                </ul>
+                            <div class="small-12 columns">
+                                {% set currentContribute = (subtype ? subtype.contributeDifferentiationProfile : type.contributeDifferentiationProfile) %}
+
+                                <label for="contributeDifferentiationProfile">
+                                    Contributes to Differentiation Profile
+                                </label>
+                                <p class="meta">
+                                    When enabled, records of this type will be linked to students' Differentiation Profiles.
+                                </p>
+
+                                <div class="switch">
+                                    <input
+                                        id="contributeDifferentiationProfile"
+                                        name="contributeDifferentiationProfile"
+                                        type="checkbox"
+                                        value="1"
+                                        {% if currentContribute %}checked="checked"{% endif %}
+                                    />
+                                    <label
+                                        for="contributeDifferentiationProfile"
+                                        data-test="audiences-modify-contribute-differentiation-profile"
+                                    >
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
                             </div>
                         </fieldset>
                     {% endif %}
