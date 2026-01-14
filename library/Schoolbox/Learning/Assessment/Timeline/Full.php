@@ -235,7 +235,6 @@ class Full
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
                 if ($currentResponse instanceof DueWork\Response\Model) {
                     // Exclude feedback which doesn't match the filter
-                    /** @var Duework\Feedback\Model[] $includedFeedback */
                     $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
 
                     /* Maintain a list of all the Feedbacks that were discovered
@@ -349,6 +348,12 @@ class Full
         if ($interaction instanceof IResponse) {
             if ($interaction->getSubmittedAt()) {
                 return $interaction->getSubmittedAt();
+            }
+            /* If a submission is a draft, fall back to updatedAt if possible
+             * as there could be multiple drafts to sort (such as in DialogAgent)
+             */
+            if ($interaction->getUpdatedAt()) {
+                return $interaction->getUpdatedAt();
             }
         } elseif ($interaction instanceof IFeedback) {
             if ($interaction->getPublishedAt()) {
