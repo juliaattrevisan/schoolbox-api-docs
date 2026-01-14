@@ -54,8 +54,8 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
      */
     public function find(string $lineItemIdentifier): ?LineItemInterface
     {
-        // TODO consider whether identifier should be in the object, like
-        //      lti_line_item.identifier_url
+        // TODO consider whether identifier should be stored in a db column,
+        //      akin to `lti_line_item.identifier_url`
         // Line item identifier: the line item request URI
         $url          = new Uri($lineItemIdentifier);
         $assessmentId = $this->ltiAssessment->getId();
@@ -109,7 +109,9 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
             ->setLineItemResourceId($lineItem->getResourceIdentifier());
 
         // Also set dates here, respecting ordering of dates which have no
-        // parallel in LTI: publish <= open, due <= close
+        // parallel in LTI: publish <= open, due <= close.
+        // The assessment validator prevents assessments from being saved if
+        // their start date is before their close date.
         $startTime = $lineItem->getStartDateTime();
         if ($startTime) {
             $startTimeAdf = new Alaress_Date_Format($startTime);
