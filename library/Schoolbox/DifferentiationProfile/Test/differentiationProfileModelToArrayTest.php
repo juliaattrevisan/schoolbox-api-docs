@@ -109,7 +109,7 @@ class differentiationProfileModelToArrayTest extends TestCase
         $staffResponse1 = 'Thor Staff';
 
         $staff2 = new User()
-            ->setId(3)
+            ->setId(4)
             ->setLastname('Staff')
             ->setFirstname('Odin')
             ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT));
