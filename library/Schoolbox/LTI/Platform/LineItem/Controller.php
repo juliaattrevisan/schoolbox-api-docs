@@ -93,7 +93,7 @@ class Controller extends BaseController
 
     /**
      * LTI get line item service endpoint.
-     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#example-getting-a-single-line-item
      *
      * @api   GET /lti-platform/line-item/assessment/{assessmentId}
      * @since 21.1.0
@@ -110,7 +110,7 @@ class Controller extends BaseController
 
     /**
      * LTI put line item service endpoint
-     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#updating-a-line-item
      *
      * @api   PUT /lti-platform/line-item/assessment/{assessmentId}
      * @since 26.0
