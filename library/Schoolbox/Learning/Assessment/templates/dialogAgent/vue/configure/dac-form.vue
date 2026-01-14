@@ -14,6 +14,7 @@ interface Props {
     scenario: DialogAgentScenario;
     helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
+    differentiationProfilesEnabled: boolean;
     postUpdate: string | null;
 }
 
@@ -153,7 +154,7 @@ async function onSubmit(): Promise<void> {
                     </select>
                 </div>
 
-                <div class="small-12 columns">
+                <div v-if="differentiationProfilesEnabled" class="small-12 columns">
                     <label for="dac-differentiation-profile">
                         Use differentiation profile?
                         <span

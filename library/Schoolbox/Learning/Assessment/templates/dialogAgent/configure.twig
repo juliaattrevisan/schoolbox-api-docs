@@ -51,6 +51,7 @@
         :assessment-config="{{ assessmentConfig |json_encode }}"
         :helpfulness-options="{{ helpfulnessOptions |json_encode }}"
         :language-options="{{ languageOptions |json_encode }}"
+        {% if config.differentiation_profiles_enabled ?? false %}differentiation-profiles-enabled{% endif %}
         post-update="{{ updateRoute }}"
         get-generate-fields="{{ generateFieldsRoute }}"
     />
