@@ -286,8 +286,9 @@ $app = new class extends CliTool\App {
             'pastoral_attachments'      => 'SELECT count(*) FROM pastoral_attachment WHERE deleted_at IS NULL',
             'pastoral_attachment_size' => 'SELECT SUM(filesize) FROM pastoral_attachment JOIN storage ON pastoral_attachment.hash = storage.hash',
             'differentiation_profiles'      => 'SELECT count(*) FROM differentiation_profiles WHERE deleted_at IS NULL',
-
-
+            'differentation_types'      => 'SELECT
+                                            (SELECT COUNT(*) FROM lu_pastoral_type WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL) +
+                                            (SELECT COUNT(*) FROM lu_pastoral_subtype WHERE contribute_differentiation_profile = 1 AND deleted_at IS NULL)',
 
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
@@ -437,6 +438,9 @@ $app = new class extends CliTool\App {
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
+
+            //UI Themes
+            'sonar_ui'  => "SELECT COUNT(*) FROM config WHERE name = 'advanced_ui_enabled' AND value = 1",
         ];
 
         $result['instance_id'] = INSTANCE_ID;
