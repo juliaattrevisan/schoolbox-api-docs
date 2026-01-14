@@ -190,6 +190,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateOpenSpan']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'validateDatePresence']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->validateDateOrder(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateAssessmentRelationView']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'reorderSequenceIfCustomised']);
 
@@ -2278,6 +2279,49 @@ class Mapper extends BaseMapper
         return true;
     }
 
+    /**
+     * Validate that the given dates are in order, if they are set:
+     * * publish
+     * * open
+     * * due
+     * * close
+     *
+     * @param Model $assessment
+     * @return bool
+     * @throws \InvalidArgumentException if dates are out of order
+     */
+    protected function validateDateOrder(Model $assessment): bool
+    {
+        /** @var array<array{0: string, 1: Alaress_Date_Format|null}> $dates */
+        $dates = [
+            ['publish', $assessment->getPublishDate()],
+            ['open', $assessment->getOpenDate()],
+            ['due', $assessment->getDueDate()],
+            ['close', $assessment->getCloseDate()],
+        ];
+        /** @var array{0: string, 1: Alaress_Date_Format|null}|null $previousDateTuple */
+        $previousDateTuple = null;
+        foreach ($dates as $dateTuple) {
+            [$type, $date] = $dateTuple;
+            if (!$date) {
+                continue;
+            }
+            if ($previousDateTuple) {
+                [$previousType, $previousDate] = $previousDateTuple;
+            }
+            if (isset($previousType, $previousDate) && $previousDate->gt($date)) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Assessment dates are out of order: %s date must be before or equal to %s date',
+                        $previousType,
+                        $type,
+                    )
+                );
+            }
+            $previousDateTuple = $dateTuple;
+        }
+        return true;
+    }
 
     /**
      * Update the materialized view table `mv_assessment_relation`.
