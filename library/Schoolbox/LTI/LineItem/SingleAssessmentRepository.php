@@ -125,13 +125,13 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
         } catch (MapperException $e) {
             $this->logger->error(
                 __METHOD__ . ' error: line item not saved',
-//                $this->generateLogContext(),
+                $this->generateLogContext(),
             );
             throw $e;
         }
         $this->logger->debug(
             __METHOD__ . ': line item saved',
-//            $this->generateLogContext(lineItemModel: $lineItemModel),
+            $this->generateLogContext(),
         );
         return $lineItem;
     }
