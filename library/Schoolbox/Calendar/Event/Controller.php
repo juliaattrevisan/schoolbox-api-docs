@@ -1829,7 +1829,7 @@ class Controller extends Base
         // update each booking, and check for clashes
         foreach ($allBookings as $booking) {
             $bookingIsUpdated = false;
-            $bookingEvent = $booking->getEvent();
+            $bookingEvent = $eventById[$booking->getEvent()->getId()]; // Get hydrated booking. $booking->getEvent() will not be hydrated.
 
             /** @var ResourceBookingModel $booking */
 
