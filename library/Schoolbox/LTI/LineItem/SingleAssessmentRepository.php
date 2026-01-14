@@ -129,7 +129,8 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
 
         try {
             // No user exists for this setting:
-            // thus need to fall back to assessment mapper
+            // just use an empty user, because LTI assessments don't care what
+            // user is used to save them.
             $this->assessmentDataSource->save($this->ltiAssessment, new User());
         } catch (MapperException $e) {
             $this->logger->error(
