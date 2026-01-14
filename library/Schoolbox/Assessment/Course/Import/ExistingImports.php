@@ -19,18 +19,6 @@ use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller;
 class ExistingImports
 {
     /**
-     * Course Outline Component controller
-     */
-    private const COMPONENT_CONTROLLER = Controller::class;
-
-
-    /**
-     * Component configuration key - course spec ids live in this config instance
-     */
-    private const COMPONENT_KEY = 'importedCourse';
-
-
-    /**
      * @var IConnector
      */
     private IConnector $database;
@@ -56,8 +44,6 @@ class ExistingImports
      */
     public function generate(int $courseSpecificationId): array
     {
-        $queryParts = [];
-
         /* Find all the Course implementation which have previously been imported but archived
          * as well as active ones
          */
