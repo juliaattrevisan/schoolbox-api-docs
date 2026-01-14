@@ -73,6 +73,22 @@ class DateOrderValidator extends TestCase
                 ->setDueDate(self::createDate())
                 ->setCloseDate(self::createDate())
         ];
+
+        yield 'all dates equal' => [
+            new Model()
+                ->setPublishDate(self::createDate())
+                ->setOpenDate(self::createDate())
+                ->setDueDate(self::createDate())
+                ->setCloseDate(self::createDate())
+        ];
+
+        yield 'all dates in order' => [
+            new Model()
+                ->setPublishDate(self::createDate('-1 day'))
+                ->setOpenDate(self::createDate('-1 day'))
+                ->setDueDate(self::createDate('+1 day'))
+                ->setCloseDate(self::createDate('+1 day'))
+        ];
     }
 
     #[DataProvider('getTestInvalidDateOrderData')]
@@ -94,11 +110,6 @@ class DateOrderValidator extends TestCase
                 ->setPublishDate(self::createDate('+1 day'))
                 ->setOpenDate(self::createDate())
         ];
-        yield 'publish date > close date' => [
-            new Model()
-                ->setPublishDate(self::createDate('+1 day'))
-                ->setCloseDate(self::createDate())
-        ];
         yield 'open date > due date' => [
             new Model()
                 ->setOpenDate(self::createDate('+1 day'))
@@ -108,6 +119,32 @@ class DateOrderValidator extends TestCase
             new Model()
                 ->setDueDate(self::createDate('+1 day'))
                 ->setCloseDate(self::createDate())
+        ];
+
+        yield 'incomplete dates: publish date > due date' => [
+            new Model()
+                ->setPublishDate(self::createDate('+1 day'))
+                ->setDueDate(self::createDate())
+        ];
+
+        yield 'incomplete dates: publish date > close date' => [
+            new Model()
+                ->setPublishDate(self::createDate('+1 day'))
+                ->setCloseDate(self::createDate())
+        ];
+
+        yield 'incomplete dates: open date > close date' => [
+            new Model()
+                ->setOpenDate(self::createDate('+1 day'))
+                ->setCloseDate(self::createDate())
+        ];
+
+        yield 'all dates out of order' => [
+            new Model()
+                ->setPublishDate(self::createDate('+1 day'))
+                ->setOpenDate(self::createDate('+1 day'))
+                ->setDueDate(self::createDate('-1 day'))
+                ->setCloseDate(self::createDate('-1 day'))
         ];
     }
 
