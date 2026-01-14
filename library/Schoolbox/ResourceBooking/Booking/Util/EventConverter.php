@@ -16,6 +16,7 @@ namespace Schoolbox\ResourceBooking\Booking\Util;
 use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter
@@ -80,7 +81,12 @@ class EventConverter
         // Resource_booking rows can be linked to event rows whose variant is either 'event' or 'booking'.
         $event->setEventVariant($eventItem->getVariant());
 
-        $event->setCategoryCollection(new \Schoolbox\GenericCollection(\Schoolbox\ResourceBooking\Category\Model::class));
+        // If the event belongs to a group, it must have a category collection set.
+        // A category in this context refers to a folder linked to the event via db table `event_folder`.
+        // @see library/Calendar->getDayEvents() where this is also done.
+        $mapper = new CategoryMapper();
+        $allRelations = $mapper->findByColumn('event_id', $event->getEventId());
+        $event->setCategoryCollection($allRelations);
 
         return $event;
     }
