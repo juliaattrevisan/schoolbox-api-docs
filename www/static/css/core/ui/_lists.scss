@@ -430,7 +430,7 @@ ul.meta {
         $meta-indent: 1rem + $meta-icon-margin;
         text-indent: -1 * $meta-indent;
         padding-left: $meta-indent;
-        &[class^="icon-"]:before {
+        &[class^="icon-"]:before, &[class*=" icon-"]:before {
             padding-right: $meta-icon-margin;
         }
     }
