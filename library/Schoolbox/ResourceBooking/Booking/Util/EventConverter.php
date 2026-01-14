@@ -80,6 +80,8 @@ class EventConverter
         // Resource_booking rows can be linked to event rows whose variant is either 'event' or 'booking'.
         $event->setEventVariant($eventItem->getVariant());
 
+        $event->setCategoryCollection(new \Schoolbox\GenericCollection(\Schoolbox\ResourceBooking\Category\Model::class));
+
         return $event;
     }
 
