@@ -110,10 +110,15 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
 
         // Also set dates here, respecting ordering of dates which have no
         // parallel in LTI: publish <= open, due <= close.
-        // The assessment validator prevents assessments from being saved if
-        // their start date is before their close date.
-        // It will also prevent the line item from being saved if the start and
-        // end dates are not passed.
+        // Always set date values, even if they are null: as per
+        // https://www.imsglobal.org/spec/lti-ags/v2p0#updating-a-line-item,
+        // the passed line item will be saved as-is, unset fields will be set to
+        // null.
+        // Note that the assessment validator prevents assessments from being
+        // saved if:
+        // * their start date is before their end date
+        // * there is no start or end date
+        //   (and it's an implementation, which it will always be)
         $startTime = $lineItem->getStartDateTime()
             ? new Alaress_Date_Format($lineItem->getStartDateTime())
             : null;
