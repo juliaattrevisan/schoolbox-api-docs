@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
 import type {
@@ -13,6 +14,7 @@ interface Props {
     scenario: DialogAgentScenario;
     helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
+    differentiationProfilesEnabled: boolean;
     postUpdate: string | null;
 }
 
@@ -152,14 +154,14 @@ async function onSubmit(): Promise<void> {
                     </select>
                 </div>
 
-                <div class="small-12 columns">
+                <div v-if="differentiationProfilesEnabled" class="small-12 columns">
                     <label for="dac-differentiation-profile">
-                        Use differentiation profile?
+                        Use {{ locale.differentiationProfile.singular() }}?
                         <span
                             data-tooltip
                             class="hint has-tip tip-top"
                             data-width="200"
-                            title="Enable this to use the learner's differentiation profile to provide the agent with more context."
+                            :title="`If enabled, the AI agent will be able to access a student's ${locale.differentiationProfile.proper()} to inform its responses.`"
                         >
                             ?
                         </span>

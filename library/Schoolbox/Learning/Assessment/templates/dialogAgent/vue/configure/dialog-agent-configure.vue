@@ -17,6 +17,7 @@ interface Props {
     assessmentConfig: DialogAgentAssessmentConfig;
     helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
+    differentiationProfilesEnabled?: boolean;
     postUpdate: string | null;
     getGenerateFields: string | null;
 }
@@ -151,6 +152,7 @@ window.Vue.onMounted(async () => {
                 :scenario="props.scenario"
                 :helpfulness-options="props.helpfulnessOptions"
                 :language-options="props.languageOptions"
+                :differentiation-profiles-enabled="props.differentiationProfilesEnabled"
                 :post-update="props.postUpdate"
                 @saved="onFormSaved"
             />

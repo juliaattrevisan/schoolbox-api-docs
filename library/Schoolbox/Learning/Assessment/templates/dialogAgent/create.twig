@@ -52,7 +52,7 @@
 
     {# Curriculum #}
     {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-        entityType: locale.dueWork.proper,
+        entityType: locale.dialogAgent.proper,
         courseManagedReadonly: courseManaged.isReadonly,
         excludeLegend: true,
         hasTabs: true,
@@ -74,7 +74,10 @@
     {# Allowed Time #}
     <div class="row">
         <div class="small-5 medium-2 columns">
-            <label for="hasDuration" class="inline-block">Allowed Time<span class="hint has-tip tip-top" data-tooltip title="After starting, students will have this much time to complete this activity. Switch off for no limit.">?</span></label>
+            <label for="hasDuration" class="inline-block">
+                Allowed Time
+                <span class="hint has-tip tip-top" data-tooltip title="Specify an amount of time to limit the duration that the student can interact with the AI agent after their first response.">?</span>
+            </label>
             <div class="switch">
                 <input name="hasDuration" id="hasDuration" type="checkbox" {% if assessment.duration %}checked="checked"{% endif %} />
                 <label for="hasDuration">
