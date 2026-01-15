@@ -128,11 +128,27 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
         $this->ltiAssessment = $this->ltiAssessment
             ->setOpenAt($startTime)
             ->setDueAt($endTime);
-        if ($startTime && $this->ltiAssessment->getPublishAt()?->gt($startTime)) {
-            $this->ltiAssessment = $this->ltiAssessment->setPublishAt(clone $startTime);
+
+        // Null start or end time? Set null publish or close time respectively.
+        // Otherwise:
+        // * existing publish/close time null? set to start/end respectively
+        // * publish > start? set publish = start
+        // * close < end? set close = end
+        if (!$startTime) {
+            $this->ltiAssessment = $this->ltiAssessment->setPublishAt(null);
+        } else {
+            $publishTime = $this->ltiAssessment->getPublishAt();
+            if (!$publishTime || $publishTime->gt($startTime)) {
+                $this->ltiAssessment = $this->ltiAssessment->setPublishAt(clone $startTime);
+            }
         }
-        if ($endTime && $this->ltiAssessment->getCloseAt()?->lt($endTime)) {
-            $this->ltiAssessment = $this->ltiAssessment->setCloseAt(clone $endTime);
+        if (!$endTime) {
+            $this->ltiAssessment = $this->ltiAssessment->setCloseAt(null);
+        } else {
+            $closeTime = $this->ltiAssessment->getCloseAt();
+            if (!$closeTime || $closeTime->lt($endTime)) {
+                $this->ltiAssessment = $this->ltiAssessment->setCloseAt(clone $endTime);
+            }
         }
 
         try {
