@@ -353,6 +353,25 @@ class Validator
             }
         }
 
+        // check if start/end dates are logical (when we are not looking at all day events)
+        if (!$allDayBool) {
+            // grab dates, either from post, or from existing event
+            $startDateTime = $requestPost['startDate'] ?
+                new Alaress_Date_Format($requestPost['startDate'], $this->getValidFormatsForDateField('startDate', $allDayBool)) :
+                $event->getStartDateTime();
+            $endDateTime = $requestPost['endDate'] ?
+                new Alaress_Date_Format($requestPost['endDate'], $this->getValidFormatsForDateField('endDate', $allDayBool)) :
+                $event->getEndDateTime();
+            // compare start/end dates
+            if (null === $startDateTime || null === $endDateTime) {
+                throw new SchoolboxException("Both startDate and endDate must be provided.");
+            }
+            if ($startDateTime->gte($endDateTime)) {
+                throw new SchoolboxException("The endDate must be after the startDate.");
+            }
+        }
+
+
         // Check the values of 'folders' and 'campuses', taking into account the new or existing value of 'level'.
         $accessLevel = $requestPost['level'] ?? $event->getAccess();
         $campuses = $requestPost['campuses'] ?? $event->getCampusCollection();
