@@ -11,29 +11,10 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-<div class="row actions-small-1">
-    <div class="small-12 columns">
-        <h1>Configure {{ assessment.title }}</h1>
-    </div>
-    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {
-        assessmentId: assessment.id,
-        assessment: assessment
-    }) %}
-
-    {% if modifyRoute %}
-        <nav>
-            <sbx-pop-out content-id="header-options"></sbx-pop-out>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content aria-hidden="true">
-            <li>
-                <a
-                    class="icon-modify"
-                    href="{{ modifyRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}"
-                >Modify Settings</a>
-            </li>
-        </ul>
-    {% endif %}
-</div>
+{% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {
+    assessmentId: assessment.id,
+    assessment: assessment
+}) %}
 
 {% set updateRoute = routeLookupIfAuthorized(
     'learningDialogAgent.postUpdate',
@@ -47,11 +28,17 @@
 
 <div id="dialog-agent-configure-container">
     <dialog-agent-configure
+        :assessment-title="{{ assessment.title |json_encode }}"
         :scenario="{{ scenario |json_encode }}"
         :assessment-config="{{ assessmentConfig |json_encode }}"
         :helpfulness-options="{{ helpfulnessOptions |json_encode }}"
         :language-options="{{ languageOptions |json_encode }}"
         {% if config.differentiation_profiles_enabled ?? false %}differentiation-profiles-enabled{% endif %}
+        {% if modifyRoute %}
+            modify-route="{{ modifyRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}"
+        {% else %}
+            :modify-route="null"
+        {% endif %}
         post-update="{{ updateRoute }}"
         get-generate-fields="{{ generateFieldsRoute }}"
     />
