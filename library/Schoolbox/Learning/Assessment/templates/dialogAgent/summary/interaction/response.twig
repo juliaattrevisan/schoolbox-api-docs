@@ -46,7 +46,8 @@
         <ul class="action-list">
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="card small-12 {% if not currentInteraction.isSubmitted %}draftSubmission{% endif %}">
+                    {# anything that isn't the authoritative response should also be styled as a draft to avoid confusion #}
+                    <div class="card small-12 {% if not currentInteraction.isSubmitted or not currentInteraction.authoritative %}draftSubmission{% endif %}">
                         {% if url %}
                         <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
@@ -55,9 +56,7 @@
                                 {% if currentInteraction.isSubmitted %}
                                     Response
                                 {% else %}
-                                    {% if currentInteraction.authoritative %}
-                                        Current
-                                    {% endif %}
+                                    {% if currentInteraction.authoritative %}Current{% endif %}
                                     Draft Response
                                 {% endif %}
                                 by {{ participant.user.fullname }}
