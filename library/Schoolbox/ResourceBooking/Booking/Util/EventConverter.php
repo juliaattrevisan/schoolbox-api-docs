@@ -28,6 +28,8 @@ class EventConverter
      */
     protected $bookingEventType;
 
+    protected CategoryMapper $categoryMapper;
+
     /**
      * Converts an instance of Schoolbox\Calendar\Event into an EventInterface descendant
      *
@@ -38,7 +40,6 @@ class EventConverter
      */
     public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking)
     {
-
         /* Translate a \Schoolbox\Event type into an EventInterface descendant */
 
         $event = new ResourceBookingEvent();
@@ -84,8 +85,7 @@ class EventConverter
         // If the event belongs to a group, it must have a category collection set.
         // A category in this context refers to a folder linked to the event via db table `event_folder`.
         // @see library/Calendar->getDayEvents() where this is also done.
-        $mapper = new CategoryMapper();
-        $allRelations = $mapper->findByColumn('event_id', $event->getEventId());
+        $allRelations = $this->categoryMapper->findByColumn('event_id', $event->getEventId());
         $event->setCategoryCollection($allRelations);
 
         return $event;
@@ -107,5 +107,23 @@ class EventConverter
     public function getBookingEventType()
     {
         return $this->bookingEventType;
+    }
+
+    /**
+     * @param  CategoryMapper $categoryMapper
+     * @return $this
+     */
+    public function setCategoryMapper(CategoryMapper $categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+    /**
+     * @return EventType
+     */
+    public function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
