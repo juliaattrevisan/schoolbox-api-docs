@@ -11,7 +11,7 @@
 
     <script type="text/javascript">
         $(function() {
-            let $history = $('[data-discussion-history]');
+            let $history = $('[data-submission-history]');
 
             $history.find('[data-collapser]').collapsable();
 
@@ -53,7 +53,7 @@
         <div class="small-12 island">
             <h2 class="subheader">{{ locale.dialogAgent.proper }} History</h2>
                 {% for currentInteraction in timeline %}
-                    <section class="discussion-history" data-discussion-history data-test="assessment-discussion-history">
+                    <section data-submission-history data-test="assessment-submission-history">
                         {# There aren't supposed to be any Feedbacks in this stack #}
                         {% if currentInteraction is response %}
                             {% include '@learningAssessment/dialogAgent/summary/interaction/response.twig' with {

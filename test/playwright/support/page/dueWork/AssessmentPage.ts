@@ -20,6 +20,8 @@ export default class AssessmentPage {
 
     static readonly DATA_TEST_ASSESSMENT_SUMMARY_SELF_ACKNOWLEDGE_BUTTON = "assessment-summary-self-acknowledge-button";
 
+    static readonly DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY = "assessment-submission-history";
+
     static readonly SELECTOR_RETURN_BUTTON = 'a:has-text("Return")';
 
     constructor(tester: AcceptanceTester, page: Page) {
@@ -56,7 +58,7 @@ export default class AssessmentPage {
      */
     async openInlineGrader(student: string, title: string): Promise<void> {
         await this.page
-            .locator('#content section[class="submission-history"]')
+            .getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY)
             .getByText(`Submission by ${student}`)
             .click();
         await this.page.waitForSelector(`text=Grading ${title}`);
