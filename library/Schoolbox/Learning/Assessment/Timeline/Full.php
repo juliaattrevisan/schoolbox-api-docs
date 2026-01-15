@@ -349,8 +349,12 @@ class Full
         if ($interaction instanceof IResponse) {
             /* Dialog agent responses prioritise the authoritative response first */
             if ($interaction instanceof DialogAgent\Response\Model && $interaction->getAuthoritative()) {
-                /* Have to add some arbitrary amount of time as otherwise
-                 * the updatedAt could collide with "now" when you just changed the authoritative response
+                /* In order to force an authoritative interaction to the top of the stack,
+                 * we must add some arbitrary amount of time or otherwise the updatedAt
+                 * could collide with "now" when you just changed what the authoritative response is
+                 *
+                 * by intentionally forging an impossible date in the future, we can trick the comparison into
+                 * putting an object at the top of the list to save us a post-sort manipulation after the fact
                  */
                 return Alaress_Date_Format::now()->addHours(1);
             }
