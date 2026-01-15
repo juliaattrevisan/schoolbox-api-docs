@@ -20,6 +20,7 @@ use Schoolbox\Pastoral\SubType\Model as SubType;
 
 class Helper
 {
+    private const int NO_CAMPUS_ID = -1;
     private array $filters = ['pastoral.deleted_at IS NULL'];
     private array $params = [];
 
@@ -544,7 +545,15 @@ class Helper
 
         /* Same campus validation
          */
-        $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
+        $campusIds = $viewer->getCampusCollection()?->getPropertyValues('id') ?? [];
+
+        if (empty($campusIds)) {
+            /* Unlikely that the user has no campus assigned, but just in case
+             * If the viewer has no campus assigned, they should not see any records with campus restriction
+             */
+            $campusIds = [self::NO_CAMPUS_ID];
+        }
+
         $campusPlaceholders = Builder::getArrayPlaceholders(
             $campusIds,
             'viewerCampusId',
