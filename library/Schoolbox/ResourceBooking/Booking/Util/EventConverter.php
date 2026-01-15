@@ -126,7 +126,7 @@ class EventConverter
     }
 
     /**
-     * @return EventType
+     * @return CategoryMapper
      */
     public function getCategoryMapper()
     {
