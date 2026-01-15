@@ -33,7 +33,7 @@
         genAI: routeLookupIfAuthorized('openai.postLearningActivityCustomisation'),
     } | json_encode }}"
     :assessment-id="{{ assessment.id }}"
-    :assessment-type="{{ assessmentType | json_encode }}"
+    assessment-type="{{ assessment.familyName }}"
     :customisations="{{ (customisations ?? []) | json_encode }}"
     />
 </div>
