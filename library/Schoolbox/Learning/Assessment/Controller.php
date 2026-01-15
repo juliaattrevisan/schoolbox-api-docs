@@ -1217,6 +1217,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'assessmentId' => $assessment->getId(),
         ]);
         $data['assessment'] = $assessment;
+        $data['assessmentType'] = $assessment::getFamilyName();
 
         $context = $assessment->getContext();
 

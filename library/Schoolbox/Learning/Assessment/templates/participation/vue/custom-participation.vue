@@ -27,6 +27,7 @@ const props = defineProps<{
     differentiationEnabled: boolean;
     routes: Routes;
     assessmentId: number;
+    assessmentType: string;
     customisations: (Plan | CustomisedPlan)[];
 }>();
 
