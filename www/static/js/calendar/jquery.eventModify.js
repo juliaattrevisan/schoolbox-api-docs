@@ -197,10 +197,6 @@
                 return false;
             };
 
-            var isNotAllDay = function () {
-                return $('input[name="allDay"]').val() === '0';
-            }
-
             $(config.element).alaressValidate({
                 rules: {
                     "campuses[]": {
@@ -233,24 +229,10 @@
                     startDate: {
                         required: true,
                         datepickerDate: true,
-                        timepickerNotAfter: {
-                            param: true,
-                            depends: isNotAllDay,
-                        },
-                        messages: {
-                            timepickerNotBefore: "An event cannot start after it ends.",
-                        },
                     },
                     endDate: {
                         required: true,
                         datepickerDate: true,
-                        timepickerNotBefore: {
-                            param: true,
-                            depends: isNotAllDay,
-                        },
-                        messages: {
-                            timepickerNotBefore: "An event cannot end before it starts.",
-                        },
                     },
                     repeat_until: {
                         datepickerDate: {
