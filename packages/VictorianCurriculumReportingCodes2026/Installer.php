@@ -17,5 +17,5 @@ class Installer extends Package\BaseCurriculum
     /**
      * @inheritdoc
      */
-    protected string $sourceFile = __DIR__ . '/CurriculumExport--Victorian_Curriculum_Progression_Reports__Secondary.csv';
+    protected string $sourceFile = __DIR__ . '/CurriculumExport--Victorian_Curriculum_Progression_Reports__Secondary-withUUID.csv';
 }
