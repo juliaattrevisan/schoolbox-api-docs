@@ -13,11 +13,13 @@ import type {
 } from "./dacTypes";
 
 interface Props {
+    assessmentTitle: string;
     scenario: DialogAgentScenario;
     assessmentConfig: DialogAgentAssessmentConfig;
     helpfulnessOptions: { value: DialogAgentHelpfulness; label: string }[];
     languageOptions: string[];
     differentiationProfilesEnabled?: boolean;
+    modifyRoute: string | null;
     postUpdate: string | null;
     getGenerateFields: string | null;
 }
@@ -55,14 +57,6 @@ const isSandboxDirty = window.Vue.computed(() => {
 function updateSandbox(): void {
     sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
     sandboxRef.value?.resetFeed();
-}
-
-/**
- * Callback when the form has been successfully saved
- */
-function onFormSaved(): void {
-    updateSandbox();
-    isPromptModalOpen.value = true;
 }
 
 const isGeneratingFields = window.Vue.ref<boolean>(false);
@@ -130,6 +124,22 @@ window.Vue.onMounted(async () => {
 </script>
 
 <template>
+    <div class="row actions-small-1">
+        <div class="small-12 columns">
+            <h1>Configure {{ props.assessmentTitle }}</h1>
+        </div>
+        <nav>
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content aria-hidden="true">
+            <li v-if="modifyRoute">
+                <a class="icon-modify" :href="modifyRoute"> Modify Settings </a>
+            </li>
+            <li>
+                <button class="icon-ai" @click="isPromptModalOpen = true">View Agent Prompt</button>
+            </li>
+        </ul>
+    </div>
     <div v-if="isGeneratingFields" class="row">
         <div class="small-12 island">
             <section>
@@ -154,7 +164,7 @@ window.Vue.onMounted(async () => {
                 :language-options="props.languageOptions"
                 :differentiation-profiles-enabled="props.differentiationProfilesEnabled"
                 :post-update="props.postUpdate"
-                @saved="onFormSaved"
+                @saved="updateSandbox"
             />
         </div>
 
@@ -184,8 +194,13 @@ window.Vue.onMounted(async () => {
 
     <basic-modal v-model:is-open="isPromptModalOpen" :has-background-click="true">
         <h2>Agent Prompt</h2>
-        <p>The following prompt has been created for the agent based on your configuration:</p>
-        <blockquote class="dac-prompt-preview">{{ assessmentConfigInfo.prompt }}</blockquote>
+
+        <template v-if="assessmentConfigInfo.prompt">
+            <p>The following prompt has been created for the agent based on the current configuration:</p>
+            <blockquote class="dac-prompt-preview">{{ assessmentConfigInfo.prompt }}</blockquote>
+        </template>
+        <p v-else>No prompt has been created yet, save the configuration first to create one.</p>
+
         <button class="button full-width" @click="isPromptModalOpen = false">Close</button>
     </basic-modal>
 </template>
