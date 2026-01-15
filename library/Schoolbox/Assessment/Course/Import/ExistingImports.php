@@ -18,19 +18,6 @@ use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller;
  */
 class ExistingImports
 {
-
-    /**
-     * Course Outline Component controller
-     */
-    private const COMPONENT_CONTROLLER = Controller::class;
-
-
-    /**
-     * Component configuration key - course spec ids live in this config instance
-     */
-    private const COMPONENT_KEY = 'importedCourse';
-
-
     /**
      * @var IConnector
      */
@@ -57,26 +44,19 @@ class ExistingImports
      */
     public function generate(int $courseSpecificationId): array
     {
+        /* Find all the Course implementation which have previously been imported but archived
+         * as well as active ones
+         */
         $query = "
-            SELECT DISTINCT
-                ci.identifier AS folder_id,
-                course_implementation.course_specification_id
-            FROM component_definition cd
-            INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
-            INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
-            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-            INNER JOIN course_implementation ON cci.value = course_implementation.id
-            INNER JOIN folder f ON ci.identifier = f.id
-            WHERE cd.class = :controller
-            AND ccd.key = :key
-            AND course_specification_id = :courseSpecificationId
-            AND f.deleted_at IS NULL
-            ORDER BY identifier
+            SELECT DISTINCT course_implementation.folder_id,
+                            course_implementation.course_specification_id
+            FROM course_implementation
+            WHERE course_specification_id = :courseSpecificationId
+            AND course_implementation.deleted_at IS NULL
+            ORDER BY folder_id ASC
         ";
 
         $result = $this->database->executeQuery($query, [
-            'controller' => self::COMPONENT_CONTROLLER,
-            'key' => self::COMPONENT_KEY,
             'courseSpecificationId' => $courseSpecificationId
         ]);
 
