@@ -361,6 +361,22 @@ class Controller extends Base
      */
     public function getParticularResponse(DialogAgent $assessment, User $student, ?Response $response): void
     {
+        $participant = $assessment->getParticipant($student);
+
+        /* Prepare a redirection url if one was provided
+         * This will be used after any actions are made (i.e. resetting the chat/submitting the response/etc)
+         * If not provided, no redirection will occur and the page will just reload
+         */
+        $returnUrl = null;
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
+        }
+
+        if (!$response) {
+            /** @var ?Response $response */
+            $response = $participant->getAuthoritativeResponse(false);
+        }
+
         /**
          * If you can access the submit form, and dialog agent is enabled, the learner has
          * likely ended up on this page by mistake (instructor sent a link, or learner refreshed an outdated page)
@@ -378,22 +394,6 @@ class Controller extends Base
         if ($createFormRoute && new ValidDialogAgentEnabled($this->getConfigLoader())->isSatisfied()) {
             $this->response = $this->redirectTemporary($createFormRoute);
             return;
-        }
-
-        $participant = $assessment->getParticipant($student);
-
-        /* Prepare a redirection url if one was provided
-         * This will be used after any actions are made (i.e. resetting the chat/submitting the response/etc)
-         * If not provided, no redirection will occur and the page will just reload
-         */
-        $returnUrl = null;
-        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
-            $returnUrl = Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL));
-        }
-
-        if (!$response) {
-            /** @var ?Response $response */
-            $response = $participant->getAuthoritativeResponse(false);
         }
 
         /**
