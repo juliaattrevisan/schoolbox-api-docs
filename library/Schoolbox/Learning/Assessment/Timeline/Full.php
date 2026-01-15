@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
@@ -346,6 +347,11 @@ class Full
     protected function getDate($interaction)
     {
         if ($interaction instanceof IResponse) {
+            /* Dialog agent responses prioritise the authoritative response first */
+            if ($interaction instanceof DialogAgent\Response\Model && $interaction->getAuthoritative()) {
+                return Alaress_Date_Format::now();
+            }
+
             if ($interaction->getSubmittedAt()) {
                 return $interaction->getSubmittedAt();
             }
