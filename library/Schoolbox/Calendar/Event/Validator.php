@@ -357,9 +357,7 @@ class Validator
         if (!$allDayBool) {
             // grab dates, either from post, or from existing event
             $startDateTime = $requestPost['startDate'] ?
-                new Alaress_Date_Format(
-                    $requestPost['startDate'],
-                    $this->getValidFormatsForDateField('startDate', $allDayBool)) :
+                new Alaress_Date_Format($requestPost['startDate'], $this->getValidFormatsForDateField('startDate', $allDayBool)) :
                 $event->getStartDateTime();
             $endDateTime = $requestPost['endDate'] ?
                 new Alaress_Date_Format($requestPost['endDate'], $this->getValidFormatsForDateField('endDate', $allDayBool)) :
