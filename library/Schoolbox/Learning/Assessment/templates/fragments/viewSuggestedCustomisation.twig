@@ -5,13 +5,15 @@
   Usage:
     participants            array        the participants for whom the customisation is being created/modified
     differentiationEnabled  boolean      whether differentiation is enabled
+    assessment              object       (optional) the original assessment object
     assessmentId            integer      the original assessment id (0 if none)
     editorId                string       the id of the description editor to link to
     isQuiz                  boolean      (optional) whether the assessment is a quiz (default: false)
 #}
 
+{% set isValidAssessmentType = assessment is defined and assessment.familyName is defined and (assessment.familyName == 'dueWork' or assessment.familyName == 'task') %}
 {# Only show generate/view suggested customisation button if there is one participant when creating/modifying a customisation #}
-{% set showSuggestedCustomisation = assessmentId != 0 and participants ?? [] is not empty and participants|length == 1 %}
+{% set showSuggestedCustomisation = assessmentId != 0 and participants ?? [] is not empty and participants|length == 1 and isValidAssessmentType %}
 <div class="l-flex-row l-flex--justify-space l-flex--align-end {% if showSuggestedCustomisation %}l-mar-xs--bottom{% endif %}">
     <label for="{{ editorId }}" class="required">
         Description
