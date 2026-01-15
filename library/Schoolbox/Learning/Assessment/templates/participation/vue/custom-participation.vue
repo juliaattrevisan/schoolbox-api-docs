@@ -38,6 +38,17 @@ const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(allParticipants);
 
 /**
+ * We only want to show the column on certain assessment types and when differentiation and AI features are enabled
+ */
+const canSuggestCustomisation = window.Vue.computed(() => {
+    return (
+        props.differentiationEnabled &&
+        sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
+        (props.assessmentType === "dueWork" || props.assessmentType === "task")
+    );
+});
+
+/**
  * Get student pastoral counts
  */
 const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
@@ -124,14 +135,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                         <th v-if="props.differentiationEnabled">
                             {{ locale.differentiationProfile.translate(false, true) }}
                         </th>
-                        <th
-                            v-if="
-                                props.differentiationEnabled &&
-                                sbProps.aiFeatures.learningactivitycustomisation?.enabled
-                            "
-                        >
-                            Suggested Customisation
-                        </th>
+                        <th v-if="canSuggestCustomisation">Suggested Customisation</th>
                         <th>Customisation</th>
                         <td></td>
                     </tr>
@@ -146,6 +150,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                         :student-pastoral-counts="studentPastoralCounts"
                         :routes="props.routes"
                         :assessment-id="props.assessmentId"
+                        :can-suggest-customisation="canSuggestCustomisation"
                         :customisations="props.customisations"
                         :differentiation-enabled="props.differentiationEnabled"
                         @view-differentiation-profile="onViewDP"
