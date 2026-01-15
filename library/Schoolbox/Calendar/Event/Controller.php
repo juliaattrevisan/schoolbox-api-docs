@@ -1459,6 +1459,14 @@ class Controller extends Base
             throw new NotFound('Booking' . (count($bookingIds) > 1 ? 's' : '') . ' not found.');
         }
 
+        // The $bookings obtained above will not have their event hydrated.  Fix that.
+        // If this step is skipped, the event owner will not be hydrated in UserOwnsBooking,
+        // when permissions for the 'resourceBooking.edit' route are checked below.
+        // @see ResourceBooking/Booking/Auth/UserOwnsBooking->authorize().
+        foreach ($bookings as $booking) {
+            $booking->setEvent($event);
+        }
+
         $resourceIds = []; // Remember the set of resourceIds to be booked.  It will be used below.
         foreach ($bookings as $booking) {
             $resourceId = $booking->getResource()->getId();
