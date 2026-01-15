@@ -49,6 +49,19 @@ class Module extends BaseModule
             ];
         };
 
+        // Unimplemented methods for working with line items container
+        $this->register(
+            self::METHOD_GET,
+            '/assessment',
+            'getLineItems',
+        );
+        $this->register(
+            self::METHOD_POST,
+            '/assessment',
+            'postLineItems',
+        );
+
+        // Methods for get, put and delete (not implemented) of a line item
         $this->register(
             self::METHOD_GET,
             '/assessment/{assessmentId}',
@@ -56,7 +69,22 @@ class Module extends BaseModule
             null,
             $preloadAssessment,
         );
+        $this->register(
+            self::METHOD_PUT,
+            '/assessment/{assessmentId}',
+            'putLineItemForAssessment',
+            null,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_DELETE,
+            '/assessment/{assessmentId}',
+            'deleteLineItemForAssessment',
+            null,
+            $preloadAssessment,
+        );
 
+        // Method for posting scores
         $this->register(
             self::METHOD_POST,
             '/assessment/{assessmentId}/scores',
@@ -74,6 +102,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(LtiAssessmentMapper::class),
             $this->getMapperFactory()->get(LtiAssessmentScoreMapper::class),
+            $this->injector->get('assessmentDataSource'),
             $this->injector->get('lti.registrations'),
             $this->injector->get('lti.userCodec'),
             $this->injector->get('lti.accessTokenCache'),

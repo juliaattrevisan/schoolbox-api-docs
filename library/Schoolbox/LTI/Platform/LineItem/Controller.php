@@ -10,20 +10,27 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Platform\LineItem;
 
 use Alaress\Web\Controller\Base as BaseController;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
+use OAT\Library\Lti1p3Ags\Repository\LineItemRepositoryInterface;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\GetLineItemServiceServerRequestHandler;
+use OAT\Library\Lti1p3Ags\Service\LineItem\Server\Handler\UpdateLineItemServiceServerRequestHandler;
 use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequestHandler;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
+use OAT\Library\Lti1p3Core\Service\Server\Handler\LtiServiceServerRequestHandlerInterface;
+use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
-use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 
@@ -39,6 +46,8 @@ class Controller extends BaseController
      *                                                                  assessment's details.
      * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper LTI score mapper, for writing a mark for the
      *                                                                  assessment.
+     * @param MapperProxy                     $assessmentDataSource     Data source for assessment objects: used by the
+     *                                                                  LTI library for modifying LTI assessments.
      * @param RegistrationRepositoryInterface $registrations            Repository of tool+platform registrations.
      * @param UserCodec                       $userCodec                User codec, used to decode a user ID in the
      *                                                                  score publish request into an actual user.
@@ -48,6 +57,7 @@ class Controller extends BaseController
     public function __construct(
         private LtiAssessment\Mapper $ltiAssessmentMapper,
         private LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper,
+        private MapperProxy $assessmentDataSource,
         private RegistrationRepositoryInterface $registrations,
         private UserCodec $userCodec,
         private CacheItemPoolInterface $accessTokenCache,
@@ -56,14 +66,34 @@ class Controller extends BaseController
     }
 
     /**
-     * LTI line item service endpoint.
-     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#line-item-id-rest-endpoint
+     * LTI get line items service endpoint: currently not implemented.
      *
-     * Currently, this does nothing: however it must exist so that the resource
-     * link launch request can generate a score publish service endpoint.
-     * From https://www.imsglobal.org/spec/lti-ags/v2p0/#service-endpoint:
-     * > The scores service endpoint MUST be the line item resource URL with the
-     * > path appended with '/scores'.
+     * @api   GET /lti-platform/line-item/assessment/
+     * @since 26.0
+     * @return void
+     */
+    public function getLineItems(): void
+    {
+        $this->logger->error(__METHOD__ . ': not implemented');
+        throw new NotFound();
+    }
+
+    /**
+     * LTI post line item service endpoint: currently not implemented.
+     *
+     * @api   POST /lti-platform/line-item/assessment/
+     * @since 26.0
+     * @return void
+     */
+    public function postLineItem(): void
+    {
+        $this->logger->error(__METHOD__ . ': not implemented');
+        throw new NotFound();
+    }
+
+    /**
+     * LTI get line item service endpoint.
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#example-getting-a-single-line-item
      *
      * @api   GET /lti-platform/line-item/assessment/{assessmentId}
      * @since 21.1.0
@@ -71,6 +101,39 @@ class Controller extends BaseController
      * @param Model $assessment
      */
     public function getLineItemForAssessment(Model $assessment): void
+    {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#get-line-item-service-endpoint
+        $repository     = $this->createRepository($assessment);
+        $handler        = new GetLineItemServiceServerRequestHandler($repository, logger: $this->logger);
+        $this->response = $this->createResponse($handler);
+    }
+
+    /**
+     * LTI put line item service endpoint
+     * @see https://www.imsglobal.org/spec/lti-ags/v2p0#updating-a-line-item
+     *
+     * @api   PUT /lti-platform/line-item/assessment/{assessmentId}
+     * @since 26.0
+     *
+     * @param Model $assessment
+     */
+    public function putLineItemForAssessment(Model $assessment): void
+    {
+        // https://github.com/oat-sa/lib-lti1p3-ags/blob/main/doc/lineitem/platform.md#update-line-item-service-endpoint
+        $repository     = $this->createRepository($assessment);
+        $handler        = new UpdateLineItemServiceServerRequestHandler($repository, logger: $this->logger);
+        $this->response = $this->createResponse($handler);
+    }
+
+    /**
+     * LTI delete line item service endpoint: currently not implemented.
+     *
+     * @api   DELETE /lti-platform/line-item/assessment/{assessmentId}
+     * @since 26.0
+     *
+     * @param Model $assessment
+     */
+    public function deleteLineItemForAssessment(Model $assessment): void
     {
         $this->logger->error(
             __METHOD__ . ': not implemented',
@@ -90,23 +153,8 @@ class Controller extends BaseController
      */
     public function postScorePublishForAssessment(Model $assessment): void
     {
-        // Build and validate score publish request
-        // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-ags/doc/score/platform/
-
-        // Access token sanity checker:
-        // validates the request token was created by a tool
-        $validator = new RequestAccessTokenValidator($this->registrations, $this->logger);
-
-        // Access token validity checker
-        // TODO move this into \Schoolbox\Application\WebRequest\Kernel::extractUserFromAuthHeader
-        $resourceServerValidator = new ResourceServer(
-            new AccessTokenRepository($this->accessTokenCache, $this->logger),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
-        );
-        $request = $resourceServerValidator->validateAuthenticatedRequest($this->request);
-
         // Line item repository: consists only of a single assessment
-        $lineItemRepository = new SingleAssessmentRepository($assessment, $this->routeGenerator, $this->logger);
+        $lineItemRepository = $this->createRepository($assessment);
 
         // Score repository: consists only of a single assessment, and its scores
         $scoreRepository = new SingleAssessmentScoreRepository(
@@ -123,7 +171,41 @@ class Controller extends BaseController
             $scoreRepository,
             logger: $this->logger,
         );
-        $server         = new ServiceServer($validator, $handler, logger: $this->logger);
-        $this->response = $server->handle($request);
+        $this->response = $this->createResponse($handler);
+    }
+
+    /**
+     * Create a repository for line items for the given assessment.
+     *
+     * @param Model $assessment
+     * @return LineItemRepositoryInterface
+     */
+    private function createRepository(Model $assessment): LineItemRepositoryInterface
+    {
+        return new SingleAssessmentRepository(
+            $assessment,
+            $this->assessmentDataSource,
+            $this->routeGenerator,
+            $this->logger,
+        );
+    }
+
+    /**
+     * Create a response for this controller's request.
+     *
+     * @param LtiServiceServerRequestHandlerInterface $handler The handler for the incoming request.
+     * @return ResponseInterface
+     * @throws OAuthServerException if the request is invalid.
+     */
+    private function createResponse(LtiServiceServerRequestHandlerInterface $handler): ResponseInterface
+    {
+        $requestHandler = new RequestHandler(
+            $this->request,
+            $this->registrations,
+            $this->accessTokenCache,
+            $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
+            $this->logger,
+        );
+        return $requestHandler->handleRequest($handler);
     }
 }
