@@ -83,6 +83,8 @@ class EventConverter
         $event->setEventVariant($eventItem->getVariant());
 
         // If the event belongs to a group, it must have a category collection set.
+        // Unfortunately we do not know whether the event belongs to a group here without getting the linked categories,
+        // because $eventItem->folderCollection will not be hydrated.
         // A category in this context refers to a folder linked to the event via db table `event_folder`.
         // @see library/Calendar->getDayEvents() where this is also done.
         $allRelations = $this->categoryMapper->findByColumn('event_id', $event->getEventId());
