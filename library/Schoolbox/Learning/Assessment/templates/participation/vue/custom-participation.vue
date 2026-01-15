@@ -9,6 +9,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import type { User } from "@schoolboxLibrary/types/User";
 import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
+import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
@@ -44,7 +45,7 @@ const canSuggestCustomisation = window.Vue.computed(() => {
     return (
         props.differentiationEnabled &&
         sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
-        (props.assessmentType === "dueWork" || props.assessmentType === "task")
+        (props.assessmentType === ACTIVITY_TYPE_DUE_WORK || props.assessmentType === ACTIVITY_TYPE_TASK)
     );
 });
 
