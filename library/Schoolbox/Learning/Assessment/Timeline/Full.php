@@ -349,7 +349,10 @@ class Full
         if ($interaction instanceof IResponse) {
             /* Dialog agent responses prioritise the authoritative response first */
             if ($interaction instanceof DialogAgent\Response\Model && $interaction->getAuthoritative()) {
-                return Alaress_Date_Format::now();
+                /* Have to add some arbitrary amount of time as otherwise
+                 * the updatedAt could collide with "now" when you just changed the authoritative response
+                 */
+                return Alaress_Date_Format::now()->addHours(1);
             }
 
             if ($interaction->getSubmittedAt()) {
