@@ -17,5 +17,5 @@ class Installer extends BaseCurriculum
     /**
      * @inheritdoc
      */
-    protected string $sourceFile = __DIR__ . '/CurriculumExport--QCAA_Syllabus_Objectives.csv';
+    protected string $sourceFile = __DIR__ . '/CurriculumExport--QCAA_Syllabus_Objectives-withUUID.csv';
 }
