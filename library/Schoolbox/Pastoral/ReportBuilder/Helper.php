@@ -740,9 +740,9 @@ class Helper
     }
 
     /**
-     * @return Alaress_Date_Format|null
+     * @return Alaress_Date_Format
      */
-    public function getEndDate(): ?Alaress_Date_Format
+    public function getEndDate(): Alaress_Date_Format
     {
         /* Default end date as a sane value (now), this is likely to happen
          * when the report is generated with `this term`, as the current term
