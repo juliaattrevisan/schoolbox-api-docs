@@ -28,6 +28,10 @@ class EventConverter
      */
     protected $bookingEventType;
 
+    /**
+     * @var CategoryMapper Needed in order to ensure categoryCollection is set on the event,
+     *                     which is needed for the main calendar group filters.
+     */
     protected CategoryMapper $categoryMapper;
 
     /**
