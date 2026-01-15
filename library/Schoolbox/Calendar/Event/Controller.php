@@ -1473,8 +1473,8 @@ class Controller extends Base
                 !$this->authorizer->isPathAuthorizedForUser(
                     'resourceBooking.edit',
                     [
-                        'id' => $booking->getResource()->getId(),
-                        'item' => $booking->getResource(),
+                        'id' => $booking->getId(),
+                        'item' => $booking,
                     ],
                     $this->user
                 )
