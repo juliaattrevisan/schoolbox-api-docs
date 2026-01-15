@@ -301,11 +301,6 @@ class Kernel extends WebKernelAbstract
                 throw new Unauthenticated();
             }
 
-            if (!$session->isSessionIpAddressValid()) {
-                $session->destroy();
-                throw new Unauthenticated();
-            }
-
             // Do authorization here
             // TODO Inject user getter into authorizer, and use it to determine:
             // * if user is there

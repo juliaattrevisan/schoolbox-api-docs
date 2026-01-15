@@ -76,7 +76,7 @@ class Authenticator
             $session->disableLoginLog();
         }
 
-        if (!$session->create($username, $userToken?->getJwtId(), $bypassIpTracking)) {
+        if (!$session->create($username, $userToken?->getJwtId())) {
             throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
         }
 

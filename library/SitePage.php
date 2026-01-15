@@ -353,8 +353,6 @@ class SitePage
      * me cookie for a user, and redirects to the login page if none is found:
      * * the session doesn't contain a logged-in user
      * * the user's login has expired
-     * * the session's IP address doesn't match the current IP address
-     *   (only if IP tracking for sessions is enabled)
      *
      * @deprecated this is definitely not a responsibility of SitePage
      */
@@ -377,8 +375,7 @@ class SitePage
         $sessionUser       = $_SESSION['user'] ?? null;
         $sessionExpired    = !isset($_SESSION['lasttime'])
             || (int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time();
-        $sessionIpMismatch = !($_SESSION[Session::BYPASS_IP_TRACKING] ?? false) && $this->config->get('track_ip') && ($_SESSION['ip'] ?? '') !== Session::getIP();
-        if (!$sessionUser instanceof User || $sessionExpired || $sessionIpMismatch) {
+        if (!$sessionUser instanceof User || $sessionExpired) {
             // Catch users with the remember me cookie
             if ($this->config->get('session_remember')) {
                 /** @var Remember\Remember $rememberer */
