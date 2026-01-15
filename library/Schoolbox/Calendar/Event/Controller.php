@@ -1268,12 +1268,6 @@ class Controller extends Base
             throw new SchoolboxException('Booking/event mismatch when saving booking.');
         }
 
-        try {
-            $resource = $this->bookingItemMapper->findById($booking->getResource()->getId());
-        } catch (MapperException $e) {
-            throw new SchoolboxException('Cannot find the booked resource.');
-        }
-
         // Check whether the user has permission to book the resource.
         // Note the 'calendarEvent.editBooking' permission will have been checked in Calendar/Event/Module.php.
         // A user can edit a booking in the resource booking section if they can access the 'resourceBooking.edit' route.
@@ -1281,15 +1275,15 @@ class Controller extends Base
             !$this->authorizer->isPathAuthorizedForUser(
                 'resourceBooking.edit',
                 [
-                    'id' => $resource->getId(),
-                    'item' => $resource,
+                    'id' => $booking->getId(),
+                    'item' => $booking,
                 ],
                 $this->user
             )
         ) {
             // This will occur if permissions have changed since the form page was generated.
             $this->response = $this->responseAsJson(
-                new ApiProblem("You do not have permission to edit bookings for resource '{$resource->getName()}'.")
+                new ApiProblem('You do not have permission to edit this booking.')
                     ->setStatus(self::HTTP_STATUS_CODE_FORBIDDEN)
                     ->asArray()
             )->withStatus(self::HTTP_STATUS_CODE_FORBIDDEN);
