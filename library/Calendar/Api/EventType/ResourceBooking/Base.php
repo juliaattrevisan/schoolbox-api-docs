@@ -11,6 +11,7 @@
 use Calendar\Event\Type\EventInterface;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -71,6 +72,8 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
     {
         $this->setBookingMapper(BookingMapper::getInstance())
             ->setEventConverter(new EventConverter());
+
+        $this->getEventConverter()->setCategoryMapper(CategoryMapper::getInstance());
 
         try {
             /** @var EventType $eventType */

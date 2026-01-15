@@ -98,7 +98,7 @@ class Calendar_Api_EventType_ResourceBooking_Moderation_Default extends Calendar
             $params,
             $allowedEventTypes
         );
-        $converter = new Booking\Util\EventConverter();
+        $converter = $this->getEventConverter();
         foreach ($bookings as $booking) {
             // Don't add this booking if it's my own, it will show in my
             // resource booking event feed.

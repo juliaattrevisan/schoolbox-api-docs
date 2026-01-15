@@ -16,6 +16,7 @@ namespace Schoolbox\ResourceBooking\Booking\Util;
 use Calendar\Event\Type\ResourceBooking\Event as ResourceBookingEvent;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\ResourceBooking\Booking;
 
 class EventConverter
@@ -28,6 +29,12 @@ class EventConverter
     protected $bookingEventType;
 
     /**
+     * @var CategoryMapper Needed in order to ensure categoryCollection is set on the event,
+     *                     which is needed for the main calendar group filters.
+     */
+    protected CategoryMapper $categoryMapper;
+
+    /**
      * Converts an instance of Schoolbox\Calendar\Event into an EventInterface descendant
      *
      * @param Event $eventItem
@@ -37,7 +44,6 @@ class EventConverter
      */
     public function convertEventToCalendarEvent(Event $eventItem, Booking\Model $booking)
     {
-
         /* Translate a \Schoolbox\Event type into an EventInterface descendant */
 
         $event = new ResourceBookingEvent();
@@ -80,6 +86,14 @@ class EventConverter
         // Resource_booking rows can be linked to event rows whose variant is either 'event' or 'booking'.
         $event->setEventVariant($eventItem->getVariant());
 
+        // If the event belongs to a group, it must have a category collection set.
+        // Unfortunately we do not know whether the event belongs to a group here without getting the linked categories,
+        // because $eventItem->folderCollection will not be hydrated.
+        // A category in this context refers to a folder linked to the event via db table `event_folder`.
+        // @see library/Calendar->getDayEvents() where this is also done.
+        $allRelations = $this->categoryMapper->findByColumn('event_id', $event->getEventId());
+        $event->setCategoryCollection($allRelations);
+
         return $event;
     }
 
@@ -99,5 +113,23 @@ class EventConverter
     public function getBookingEventType()
     {
         return $this->bookingEventType;
+    }
+
+    /**
+     * @param  CategoryMapper $categoryMapper
+     * @return $this
+     */
+    public function setCategoryMapper(CategoryMapper $categoryMapper)
+    {
+        $this->categoryMapper = $categoryMapper;
+        return $this;
+    }
+
+    /**
+     * @return CategoryMapper
+     */
+    public function getCategoryMapper()
+    {
+        return $this->categoryMapper;
     }
 }
