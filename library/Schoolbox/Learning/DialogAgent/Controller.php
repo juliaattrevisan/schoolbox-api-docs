@@ -170,7 +170,7 @@ class Controller extends Base
                         'meta' => $fieldContext->getField()->getMeta(),
                     ],
                 ])->reindex(),
-                'prompt' => null, // always null on load for now, will be populated after save - could be used to preview the prompt at any time later...
+                'prompt' => $assessment->getPrompt(),
                 '_routes' => [
                     'postSandboxMessage' => $this->getRouteIfAuthorized('learningDialogAgent.postSandboxMessage', [
                         'assessmentId' => $assessment->getId(),
