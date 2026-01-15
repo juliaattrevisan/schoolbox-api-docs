@@ -188,9 +188,9 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequence']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateOpenSpan']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateDatePresence']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->validateDateOrder(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'validateDatePresence']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->validateDateOrder(...));
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateAssessmentRelationView']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'reorderSequenceIfCustomised']);
 
