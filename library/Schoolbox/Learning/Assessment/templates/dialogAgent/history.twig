@@ -46,6 +46,24 @@
                     }
                 });
             });
+
+            $history.on('click', '[data-set-authoritative]', async (e) => {
+                e.preventDefault();
+
+                const toast = window.sbProps.toastActivate("Changing authoritative response...");
+                const response = await window.sbProps.apiRequest({
+                    url: e.currentTarget.getAttribute('data-set-authoritative'),
+                    method: 'POST',
+                });
+
+                if (!response.success) {
+                    toast.timeout({ text: "Unable to change authoritative response", isSuccess: false });
+                    return;
+                }
+
+                /* reload the page, as twig needs to re-render the response state */
+                window.location.reload();
+            });
         });
     </script>
 
