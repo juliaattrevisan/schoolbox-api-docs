@@ -10,9 +10,14 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 /**
  * Display the AI toolbar options based on the existence of an sbProp
  * created within templates/core/include/chrome.twig
+ * @param config - the config to use when creating the editor
  * @returns - the toolbar display
  */
-function getToolbarAI(): string[] {
+function getToolbarAI(config: SbxEditorConfig): string[] {
+    if (config.markdown) {
+        // AI features don't work correctly in markdown mode
+        return [];
+    }
     if (window.sbProps.aiFeatures.chat?.enabled) {
         return ["|", "aiCommands", "aiAssistant"];
     }
@@ -38,7 +43,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "strikethrough",
             "removeFormat",
             "|",
-            ...getToolbarAI(),
+            ...getToolbarAI(config),
             "|",
             "link",
             "emoji",
@@ -56,7 +61,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "blockQuote",
             "removeFormat",
             // If using the COMMENT_AI toolbar, add the AI commands and assistant in the right spot
-            ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI() : []),
+            ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI(config) : []),
             "|",
             "link",
             "|",
@@ -97,7 +102,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "style",
             "|",
             "heading",
-            ...getToolbarAI(),
+            ...getToolbarAI(config),
             "|",
             "link",
             "bookmark",
