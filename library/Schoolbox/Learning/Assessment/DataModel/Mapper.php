@@ -186,22 +186,22 @@ class Mapper extends BaseMapper
         );
 
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequence']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateOpenSpan']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateDatePresence']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->setSequence(...));
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->validateOpenSpan(...));
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->validateDatePresence(...));
         $this->registerCallback(self::CALLBACK_PRESAVE, $this->validateDateOrder(...));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateAssessmentRelationView']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'reorderSequenceIfCustomised']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->createDynamicPlanIfNew(...));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->updateAssessmentRelationView(...));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->reorderSequenceIfCustomised(...));
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteQuiz']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTask']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteProject']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLtiAssessment']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLessonPlan']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDialogAgent']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCustomisation']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteQuiz(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteTask(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteProject(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteDueWork(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteLtiAssessment(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteLessonPlan(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteDialogAgent(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->softDeleteCustomisation(...));
 
         $this->registerPersistSearchIndexCallbacks();
     }
