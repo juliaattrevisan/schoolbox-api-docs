@@ -201,11 +201,11 @@ class Helper
 
         if ($this->report['years']->count() > 0) {
             $yearIds = $this->report['years']->getPropertyValues('id');
-            $yearPlacesholders = Builder::getArrayPlaceholders(
+            $yearPlaceholders = Builder::getArrayPlaceholders(
                 $yearIds,
                 'reportYearId',
             );
-            $filters[] = "`s`.`year_id` IN {$yearPlacesholders}";
+            $filters[] = "`s`.`year_id` IN {$yearPlaceholders}";
             $this->params = array_merge(
                 $this->params,
                 Builder::getArrayParameters(
@@ -235,11 +235,11 @@ class Helper
 
         if ($this->report['houses']->count() > 0) {
             $houseIds = $this->report['houses']->getPropertyValues('id');
-            $housePlacesholders = Builder::getArrayPlaceholders(
+            $housePlaceholders = Builder::getArrayPlaceholders(
                 $houseIds,
                 'reportHouseId',
             );
-            $filters[] = "`s`.`house` IN {$housePlacesholders}";
+            $filters[] = "`s`.`house` IN {$housePlaceholders}";
             $this->params = array_merge(
                 $this->params,
                 Builder::getArrayParameters(
@@ -814,7 +814,7 @@ class Helper
             $now = Alaress_Date_Format::now();
         };
 
-        /* Start date is required to build the months range
+        /* Start date is required to build the weeks range
          */
         if (null === $startDate) {
             throw new \DateRangeError('Timeframe is invalid. No start date provided.');
