@@ -197,7 +197,9 @@
                 return false;
             };
 
-            let startDate = $('input[name="startDate"]');
+            var isNotAllDay = function () {
+                return $('input[name="allDay"]').val() === '0';
+            }
 
             $(config.element).alaressValidate({
                 rules: {
@@ -231,11 +233,21 @@
                     startDate: {
                         required: true,
                         datepickerDate: true,
+                        timepickerNotAfter: {
+                            param: true,
+                            depends: isNotAllDay,
+                        },
+                        messages: {
+                            timepickerNotBefore: "An event cannot start after it ends.",
+                        },
                     },
                     endDate: {
                         required: true,
                         datepickerDate: true,
-                        timepickerNotBefore: startDate,
+                        timepickerNotBefore: {
+                            param: true,
+                            depends: isNotAllDay,
+                        },
                         messages: {
                             timepickerNotBefore: "An event cannot end before it starts.",
                         },
