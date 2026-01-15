@@ -6,7 +6,8 @@
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
- # @param array $student                  Array of author info about the student who owns the response
+ # @param User $student                   The student who owns the response
+ # @param array $studentData              Array translation of author info about the student who owns the response
  # @param DialogAgent\Response $response  The response that we are viewing
  # @param array|null $responseData        Array translation of the response to pass to Vue
  # @param bool $interactionLocked         Is the assessment due in an archived term?
@@ -65,13 +66,21 @@
             {% set summaryRoute = routeLookup('learningAssessment.getSummary', {
                 assessmentId: assessment.id,
                 assessment: assessment,
-                studentId: student.id
+                studentId: student.id,
+                student: student
+            }) %}
+            {% set viewAuthoritativeResponseRoute = routeLookupIfAuthorized('learningDialogAgent.getParticularResponse', {
+                assessmentId: assessment.id,
+                assessment: assessment,
+                studentId: student.id,
+                student: student,
             }) %}
             <dialog-agent-response-view
                 :feed="{{ feed |json_encode }}"
                 :response="{{ responseData |json_encode }}"
-                :student="{{ student |json_encode }}"
+                :student="{{ studentData |json_encode }}"
                 summary-route="{{ summaryRoute }}"
+                view-authoritative-response-route="{{ viewAuthoritativeResponseRoute }}"
                 return-url="{{ returnUrl }}"
             />
         </div>

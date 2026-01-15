@@ -509,7 +509,8 @@ class Controller extends Base
             ])->add(['Response']),
             'assessment' => $assessment,
             'feed' => $feed,
-            'student' => $userTranslator->__invoke($student),
+            'student' => $student,
+            'studentData' => $userTranslator->__invoke($student),
             'response' => $response,
             'responseData' => $response ? $responseTranslator->__invoke($response) : null,
             'interactionLocked' => false, // TODO

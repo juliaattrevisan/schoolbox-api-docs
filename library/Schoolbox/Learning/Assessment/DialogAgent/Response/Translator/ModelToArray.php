@@ -36,6 +36,7 @@ class ModelToArray
 
         return [
             'id' => $response->getId(),
+            'authoritative' => $response->getAuthoritative(),
             'status' => $response->getCurrentStatus(),
             'assistanceRequestedAt' => $response->getAssistanceRequestedAt()?->toRfc3339String(),
             'submittedAt' => $response->getSubmittedAt()?->toRfc3339String(),

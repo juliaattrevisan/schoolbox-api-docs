@@ -12,6 +12,7 @@ export type DialogAgentScenarioCriteria = {
 };
 
 export type DialogAgentResponse = {
+    authoritative: boolean;
     status: DialogAgentResponseStatus;
     assistanceRequestedAt: DateRFC3339 | null;
     submittedAt: DateRFC3339 | null;

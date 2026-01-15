@@ -12,6 +12,7 @@ interface Props {
     response: DialogAgentResponse;
     student: UserAuthor;
     summaryRoute?: string | null;
+    viewAuthoritativeResponseRoute?: string | null;
     returnUrl?: string | null;
 }
 
@@ -55,6 +56,17 @@ function onAction(): void {
     </div>
     <!-- Apparently we _really_ want this to be a centered snowflake -->
     <section v-else class="content c-max-width--medium l-mar--auto-horiz">
+        <div v-if="!response.authoritative" class="row">
+            <div class="small-12 columns">
+                <div class="alert-box warning">
+                    This is not the authoritative response for this {{ locale.dialogAgent.singular() }}.
+                    <template v-if="props.viewAuthoritativeResponseRoute">
+                        You should consider viewing
+                        <a :href="props.viewAuthoritativeResponseRoute">the authoritative response</a> instead.
+                    </template>
+                </div>
+            </div>
+        </div>
         <ac-feed
             ref="feedRef"
             class="l-mar-m--bottom ac-feed"
