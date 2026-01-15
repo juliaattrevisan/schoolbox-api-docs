@@ -182,7 +182,6 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
         return $context;
     }
 
-
     /**
      * Helper function for converting this repository's assessment to the LTI
      * library's format.
@@ -200,7 +199,7 @@ class SingleAssessmentRepository implements LineItemRepositoryInterface
             null,
             null,
             $this->ltiAssessment->getOpenAt()?->getDateTimeObject(),
-            $this->ltiAssessment->getCloseAt()?->getDateTimeObject(),
+            $this->ltiAssessment->getDueAt()?->getDateTimeObject(),
         );
     }
 }
