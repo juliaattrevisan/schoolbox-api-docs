@@ -372,7 +372,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
 
-        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+        await expect(page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
             "Submission by Mr Jack Coles",
         );
     });
@@ -393,7 +393,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
 
-        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+        await expect(page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
             "Submission by Schoolbox Admin",
         );
     });
