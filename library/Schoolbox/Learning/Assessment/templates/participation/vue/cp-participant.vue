@@ -4,7 +4,6 @@
  */
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import { sbProps } from "@js/util/sbx/pageUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
@@ -16,6 +15,7 @@ const props = defineProps<{
     studentPastoralCounts: Record<string, StudentPastoralCountBadge[]>;
     routes: Routes;
     assessmentId: number;
+    canSuggestCustomisation: boolean | undefined;
     customisations: (Plan | CustomisedPlan)[];
     differentiationEnabled: boolean;
 }>();
@@ -139,7 +139,7 @@ function onOpenIncludeInExistingModal(): void {
                 View {{ locale.differentiationProfile.translate(false, true) }}
             </button>
         </td>
-        <td v-if="props.differentiationEnabled && sbProps.aiFeatures.learningactivitycustomisation?.enabled">
+        <td v-if="canSuggestCustomisation">
             <button
                 v-if="props.participant._links.differentiationProfile"
                 class="button icon-ai f-no-margins"

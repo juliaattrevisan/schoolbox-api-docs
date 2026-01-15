@@ -9,6 +9,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList";
 import type { User } from "@schoolboxLibrary/types/User";
 import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
+import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
@@ -27,6 +28,7 @@ const props = defineProps<{
     differentiationEnabled: boolean;
     routes: Routes;
     assessmentId: number;
+    assessmentType: string;
     customisations: (Plan | CustomisedPlan)[];
 }>();
 
@@ -35,6 +37,17 @@ const props = defineProps<{
  */
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 const { showCheckboxes, selectedList, allSelected, isIndeterminate } = useSelectedList(allParticipants);
+
+/**
+ * We only want to show the column on certain assessment types and when differentiation and AI features are enabled
+ */
+const canSuggestCustomisation = window.Vue.computed(() => {
+    return (
+        props.differentiationEnabled &&
+        sbProps.aiFeatures.learningactivitycustomisation?.enabled &&
+        (props.assessmentType === ACTIVITY_TYPE_DUE_WORK || props.assessmentType === ACTIVITY_TYPE_TASK)
+    );
+});
 
 /**
  * Get student pastoral counts
@@ -123,14 +136,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                         <th v-if="props.differentiationEnabled">
                             {{ locale.differentiationProfile.translate(false, true) }}
                         </th>
-                        <th
-                            v-if="
-                                props.differentiationEnabled &&
-                                sbProps.aiFeatures.learningactivitycustomisation?.enabled
-                            "
-                        >
-                            Suggested Customisation
-                        </th>
+                        <th v-if="canSuggestCustomisation">Suggested Customisation</th>
                         <th>Customisation</th>
                         <td></td>
                     </tr>
@@ -145,6 +151,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                         :student-pastoral-counts="studentPastoralCounts"
                         :routes="props.routes"
                         :assessment-id="props.assessmentId"
+                        :can-suggest-customisation="canSuggestCustomisation"
                         :customisations="props.customisations"
                         :differentiation-enabled="props.differentiationEnabled"
                         @view-differentiation-profile="onViewDP"
