@@ -370,6 +370,8 @@ class Controller extends Base
          * Redirect them to the create form instead as long as dialog agent is enabled (due to the extra check at the start of getCreateResponseForm)
          */
         $createFormRoute = $response?->getAuthoritative() ? $this->getRouteIfAuthorized('learningAssessment.getCreateResponseForm', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
             'student' => $student,
             'studentId' => $student->getId(),
         ]) : null;
