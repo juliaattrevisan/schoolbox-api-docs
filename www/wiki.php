@@ -4,6 +4,11 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+
 $wikiHandler = new Wiki();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
