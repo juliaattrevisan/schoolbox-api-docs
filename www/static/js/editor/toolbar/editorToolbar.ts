@@ -66,11 +66,50 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "link",
             "|",
             "resource",
-            "mediaEmbed",
+            ...(config.markdown ? [] : ["mediaEmbed"]), // mediaEmbed doesn't work in markdown mode
             "emoji",
             "|",
             "numberedList",
             "bulletedList",
+        ];
+    } else if (config.markdown) {
+        // default toolbar, but markdown mode
+        // a lot of features from the normal default toolbar don't work particularly well with markdown
+        items = [
+            "fullscreen",
+            "|",
+            // if there are templates defined in the config, add the insertTemplate button
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
+            "bold",
+            "italic",
+            "underline",
+            "strikethrough",
+            "subscript",
+            "superscript",
+            "blockQuote",
+            "removeFormat",
+            "|",
+            "heading",
+            "|",
+            "link",
+            "|",
+            "resource",
+            "emoji",
+            "|",
+            "numberedList",
+            "bulletedList",
+            "|",
+            {
+                label: "Other",
+                icon: "threeVerticalDots",
+                items: [
+                    "specialCharacters",
+                    "eqneditor5Button",
+                    "horizontalLine",
+                    "findAndReplace",
+                    "sourceEditingEnhanced",
+                ],
+            },
         ];
     } else {
         items = [
