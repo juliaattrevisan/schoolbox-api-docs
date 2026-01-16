@@ -58,7 +58,7 @@ class CloudWatchMetrics
             ],
             'StartTime'  => $startTime->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
             'EndTime'    => $endTime->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
-            'Period'     => '86400',
+            'Period'     => 86400,
             'Statistics' => ['Average'],
             'Unit'       => 'Bytes',
         ]);
@@ -103,7 +103,7 @@ class CloudWatchMetrics
             ],
             'StartTime'  => $startTime->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
             'EndTime'    => $endTime->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
-            'Period'     => '86400',
+            'Period'     => 86400,
             'Statistics' => ['Average'],
             'Unit'       => 'Count',
         ]);
