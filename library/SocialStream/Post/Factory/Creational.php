@@ -153,6 +153,15 @@ class Creational extends AbstractFactory
                 $url->prependScheme();
                 $this->setUrl($url->getUrl());
 
+                /* Validate that the URL is valid after prepending the scheme
+                 * If not valid, skip curling and treat as plain text
+                 */
+                if (!$url->isUrl()) {
+                    $this->product = $this->constructDefault();
+                    $this->populate($data);
+                    return $this->product;
+                }
+
                 $this->constructFromUrl();
                 $this->populate($data);
 
