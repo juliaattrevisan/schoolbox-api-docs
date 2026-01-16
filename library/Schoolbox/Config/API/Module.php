@@ -114,7 +114,7 @@ class Module extends BaseModule
             $userMapper,
             $config,
             $logger,
-            INSTANCE_ID
+            (string)INSTANCE_ID
         );
     }
 
