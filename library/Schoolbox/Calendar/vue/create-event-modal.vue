@@ -161,6 +161,7 @@ export default {
             const formContent = new FormData(form);
             formContent.set("detail", window.sbProps.editors["detail"].getData());
 
+            const toast = window.sbProps.toastActivate("Saving...");
             try {
                 const response = await fetch(form.action, {
                     method: form.method,
@@ -175,21 +176,20 @@ export default {
                     this.$refs.modal.close();
                     // check if errors exist?
                     if (responseData.errors && responseData.errors.length > 0) {
-                        window.sbProps
-                            .toastActivate(`Event / Task created with some issues: ${responseData.errors.join(", ")}`)
-                            .timeout({ isSuccess: false });
+                        toast.timeout({
+                            text: `Event / Task created with some issues: ${responseData.errors.join(", ")}`,
+                            isSuccess: false,
+                        });
+                    } else {
+                        toast.timeout({ text: "Created", isSuccess: true });
                     }
 
                     this.$emit("eventCreated", responseData.event);
                 } else {
-                    window.sbProps.toastActivate(`Unable to create event / task: ${responseData.message}`).timeout({
-                        isSuccess: false,
-                    });
+                    toast.timeout({ text: `Unable to create event / task: ${responseData.message}`, isSuccess: false });
                 }
             } catch (error) {
-                window.sbProps.toastActivate("Unable to create event / task. " + error.message).timeout({
-                    isSuccess: false,
-                });
+                toast.timeout({ text: "Unable to create event / task. " + error.message, isSuccess: false });
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
