@@ -179,25 +179,7 @@ class helperMethodsTest extends TestCase
                     'dec_2024',
                 ],
             ],
-            'Case 8: Null Start Date' => [
-                null,
-                (clone $now),
-                0,
-                [],
-            ],
-            'Case 9: Null End Date' => [
-                (clone $now)->addMonths(-2),
-                null,
-                0,
-                [],
-            ],
-            'Case 10: Both Dates Null' => [
-                null,
-                null,
-                0,
-                [],
-            ],
-            'Case 11: Same Month (Different Days)' => [
+            'Case 8: Same Month (Different Days)' => [
                 Alaress_Date_Format::newDatabaseDate('2025-03-05 00:00:00', new DateTimeZone('UTC')),
                 Alaress_Date_Format::newDatabaseDate('2025-03-25 23:59:59', new DateTimeZone('UTC')),
                 1,
@@ -205,7 +187,7 @@ class helperMethodsTest extends TestCase
                     'mar_2025',
                 ],
             ],
-            'Case 12: Six Months Range' => [
+            'Case 9: Six Months Range' => [
                 Alaress_Date_Format::newDatabaseDate('2024-08-01 00:00:00', new DateTimeZone('UTC')),
                 Alaress_Date_Format::newDatabaseDate('2025-01-31 23:59:59', new DateTimeZone('UTC')),
                 6,
@@ -218,7 +200,7 @@ class helperMethodsTest extends TestCase
                     'jan_2025',
                 ],
             ],
-            'Case 13: One Month in Past' => [
+            'Case 10: One Month in Past' => [
                 (clone $now)->addMonths(-1)->startOfMonth(),
                 (clone $now)->addMonths(-1)->endOfMonth(),
                 1,
@@ -226,7 +208,7 @@ class helperMethodsTest extends TestCase
                     'feb_2025',
                 ],
             ],
-            'Case 14: Past 12 Months' => [
+            'Case 11: Past 12 Months' => [
                 (clone $now)->addMonths(-12),
                 (clone $now),
                 13,
@@ -246,7 +228,7 @@ class helperMethodsTest extends TestCase
                     'mar_2025',
                 ],
             ],
-            'Case 15: February Leap Year' => [
+            'Case 12: February Leap Year' => [
                 Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC')),
                 Alaress_Date_Format::newDatabaseDate('2024-02-29 23:59:59', new DateTimeZone('UTC')),
                 1,
@@ -254,7 +236,7 @@ class helperMethodsTest extends TestCase
                     'feb_2024',
                 ],
             ],
-            'Case 16: Quarter (Q1)' => [
+            'Case 13: Quarter (Q1)' => [
                 Alaress_Date_Format::newDatabaseDate('2025-01-01 00:00:00', new DateTimeZone('UTC')),
                 Alaress_Date_Format::newDatabaseDate('2025-03-31 23:59:59', new DateTimeZone('UTC')),
                 3,
@@ -264,7 +246,7 @@ class helperMethodsTest extends TestCase
                     'mar_2025',
                 ],
             ],
-            'Case 17: Academic Year (Jul-Jun)' => [
+            'Case 14: Academic Year (Jul-Jun)' => [
                 Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC')),
                 Alaress_Date_Format::newDatabaseDate('2025-06-30 23:59:59', new DateTimeZone('UTC')),
                 12,
@@ -395,27 +377,6 @@ class helperMethodsTest extends TestCase
                 ['key' => 'week_0'],
                 ['key' => 'week_0'],
             ],
-            'Case 6: Null Start Date' => [
-                null,
-                (clone $now),
-                0, // Should return empty collection
-                null,
-                null,
-            ],
-            'Case 7: Null End Date' => [
-                (clone $now)->addWeeks(-2),
-                null,
-                0, // Should return empty collection
-                null,
-                null,
-            ],
-            'Case 8: Both Dates Null' => [
-                null,
-                null,
-                0, // Should return empty collection
-                null,
-                null,
-            ],
             'Case 9: Year to Date' => [
                 (clone $now)->startOfYear(),
                 (clone $now),
@@ -424,6 +385,66 @@ class helperMethodsTest extends TestCase
                 ['key' => 'week_10'],
             ],
         ];
+    }
+
+    /**
+     * Test that getMonthsInRange throws DateRangeError when startDate is null.
+     */
+    public function testMonthsInRangeThrowsExceptionForNullStartDate()
+    {
+        $helper = new Helper(
+            [],
+            $this->createMock(PastoralMapper::class),
+            $this->configLoader,
+            new User(),
+            $this->createMock(AccessLevelCensor::class),
+        );
+
+        $this->expectException(\DateRangeError::class);
+        $this->expectExceptionMessage('Timeframe is invalid. No start date provided.');
+
+        $helper->getMonthsInRange(
+            null,
+            Alaress_Date_Format::newDatabaseDate(
+                '2025-03-15 12:00:00',
+                new DateTimeZone('UTC')
+            ),
+            StudentByMonth::COLUMN_DATE_FORMAT,
+            Alaress_Date_Format::newDatabaseDate(
+                '2025-03-15 12:00:00',
+                new DateTimeZone('UTC')
+            )
+        );
+    }
+
+    /**
+     * Test that getWeeksInRange throws DateRangeError when startDate is null.
+     */
+    public function testWeeksInRangeThrowsExceptionForNullStartDate()
+    {
+        $helper = new Helper(
+            [],
+            $this->createMock(PastoralMapper::class),
+            $this->configLoader,
+            new User(),
+            $this->createMock(AccessLevelCensor::class),
+        );
+
+        $this->expectException(\DateRangeError::class);
+        $this->expectExceptionMessage('Timeframe is invalid. No start date provided.');
+
+        $helper->getWeeksInRange(
+            null,
+            Alaress_Date_Format::newDatabaseDate(
+                '2025-03-15 12:00:00',
+                new DateTimeZone('UTC')
+            ),
+            StudentByWeek::COLUMN_QUERY_KEY,
+            Alaress_Date_Format::newDatabaseDate(
+                '2025-03-15 12:00:00',
+                new DateTimeZone('UTC')
+            )
+        );
     }
 
     /**

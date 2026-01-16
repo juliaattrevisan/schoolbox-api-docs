@@ -20,6 +20,7 @@ use Schoolbox\Pastoral\SubType\Model as SubType;
 
 class Helper
 {
+    private const int NO_CAMPUS_ID = -1;
     private array $filters = ['pastoral.deleted_at IS NULL'];
     private array $params = [];
 
@@ -172,11 +173,19 @@ class Helper
     private function getStudents(): void
     {
         if ($this->report['students']->count() > 0) {
-            $this->filters[] = "pastoral.student_id IN (" .
-                implode(
-                    ',',
-                    $this->report['students']->getPropertyValues('id')
-                ) . ")";
+            $studentIds = $this->report['students']->getPropertyValues('id');
+            $studentPlaceholders = Builder::getArrayPlaceholders(
+                $studentIds,
+                'reportStudentId',
+            );
+            $this->filters[] = "pastoral.student_id IN {$studentPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $studentIds,
+                    'reportStudentId',
+                )
+            );
         }
     }
 
@@ -192,9 +201,19 @@ class Helper
         }
 
         if ($this->report['years']->count() > 0) {
-            $filters[] = '`s`.`year_id` IN (' .
-                implode(',', $this->report['years']->getPropertyValues('id')) .
-                ')';
+            $yearIds = $this->report['years']->getPropertyValues('id');
+            $yearPlaceholders = Builder::getArrayPlaceholders(
+                $yearIds,
+                'reportYearId',
+            );
+            $filters[] = "`s`.`year_id` IN {$yearPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $yearIds,
+                    'reportYearId',
+                )
+            );
         }
 
         $query = implode(' OR ', array_filter($filters ?? []));
@@ -216,9 +235,19 @@ class Helper
         }
 
         if ($this->report['houses']->count() > 0) {
-            $filters[] = '`s`.`house` IN (' .
-                implode(',', $this->report['houses']->getPropertyValues('id')) .
-                ')';
+            $houseIds = $this->report['houses']->getPropertyValues('id');
+            $housePlaceholders = Builder::getArrayPlaceholders(
+                $houseIds,
+                'reportHouseId',
+            );
+            $filters[] = "`s`.`house` IN {$housePlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $houseIds,
+                    'reportHouseId',
+                )
+            );
         }
 
         $query = implode(' OR ', array_filter($filters ?? []));
@@ -236,9 +265,19 @@ class Helper
     private function getCampuses(): void
     {
         if ($this->report['campuses']->count() > 0) {
-            $this->filters[] = '`v_sc`.`campus` IN (' .
-                implode(',', $this->report['campuses']->getPropertyValues('id')) .
-                ')';
+            $campusesIds = $this->report['campuses']->getPropertyValues('id');
+            $campusPlaceholders = Builder::getArrayPlaceholders(
+                $campusesIds,
+                'reportCampusId',
+            );
+            $this->filters[] = "`v_sc`.`campus` IN {$campusPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $campusesIds,
+                    'reportCampusId',
+                )
+            );
         }
     }
 
@@ -250,9 +289,19 @@ class Helper
     private function getAuthors(): void
     {
         if ($this->report['authors']->count() > 0) {
-            $this->filters[] = "pastoral.owner_id IN (" .
-                implode(',', $this->report['authors']->getPropertyValues('id')) .
-                ")";
+            $authorIds = $this->report['authors']->getPropertyValues('id');
+            $ownerIdsPlaceholders = Builder::getArrayPlaceholders(
+                $authorIds,
+                'reportAuthorId',
+            );
+            $this->filters[] = "pastoral.owner_id IN {$ownerIdsPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $authorIds,
+                    'reportAuthorId',
+                )
+            );
         }
     }
 
@@ -283,9 +332,19 @@ class Helper
         $subFilter = [];
         $value = null;
         if ($this->report['actions']->count() > 0) {
-            $subFilter[] = '`a`.`action_id` IN (' .
-                implode(',', $this->report['actions']->getPropertyValues('id')) .
-                ')';
+            $actionIds = $this->report['actions']->getPropertyValues('id');
+            $actionsPlaceholders = Builder::getArrayPlaceholders(
+                $actionIds,
+                'reportActionId',
+            );
+            $subFilter[] = "`a`.`action_id` IN {$actionsPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $actionIds,
+                    'reportActionId',
+                )
+            );
         }
 
         if ($this->report['actions']->count() > 0 || !$this->report['includeRecordsWithoutAction']) {
@@ -366,9 +425,19 @@ class Helper
     private function getTags(): void
     {
         if ($this->report['tags']->count() > 0) {
-            $this->filters[] = '`g`.`tag_id` IN (' .
-                implode(',', $this->report['tags']->getPropertyValues('id')) .
-                ')';
+            $tagIds = $this->report['tags']->getPropertyValues('id');
+            $tagsPlaceholders = Builder::getArrayPlaceholders(
+                $tagIds,
+                'reportTagId',
+            );
+            $this->filters[] = "`g`.`tag_id` IN {$tagsPlaceholders}";
+            $this->params = array_merge(
+                $this->params,
+                Builder::getArrayParameters(
+                    $tagIds,
+                    'reportTagId',
+                )
+            );
         }
     }
 
@@ -437,16 +506,26 @@ class Helper
              * only the ones they have access to
              */
             (new \Schoolbox\External\User())->loadChildren([$viewer]);
-            $childrenIds = implode(
-                ',',
-                $viewer->getChildren()->getPropertyValues('id')
-            );
-            $filters[] = "
-            (
-                (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
-                `pastoral`.`student_id` IN ($childrenIds) AND
-                `pa`.`access` > :accessDeny
-            )";
+            $childrenIds = $viewer->getChildren()?->getPropertyValues('id') ?? [];
+            if (!empty($childrenIds)) {
+                $childrenPlaceholders = Builder::getArrayPlaceholders(
+                    $childrenIds,
+                    'reportPermChildId',
+                );
+                $filters[] = "
+                (
+                    (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                    `pastoral`.`student_id` IN {$childrenPlaceholders} AND
+                    `pa`.`access` > :accessDeny
+                )";
+                $this->params = array_merge(
+                    $this->params,
+                    Builder::getArrayParameters(
+                        $childrenIds,
+                        'reportPermChildId',
+                    )
+                );
+            }
         }
 
         /* Checking group-based permission
@@ -466,7 +545,19 @@ class Helper
 
         /* Same campus validation
          */
-        $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
+        $campusIds = $viewer->getCampusCollection()?->getPropertyValues('id') ?? [];
+
+        if (empty($campusIds)) {
+            /* Unlikely that the user has no campus assigned, but just in case
+             * If the viewer has no campus assigned, they should not see any records with campus restriction
+             */
+            $campusIds = [self::NO_CAMPUS_ID];
+        }
+
+        $campusPlaceholders = Builder::getArrayPlaceholders(
+            $campusIds,
+            'viewerCampusId',
+        );
         $sameCampus = "(
             `pa`.`match_campus` = 0 OR
             (
@@ -474,10 +565,17 @@ class Helper
             `pastoral`.`student_id` IN (
                 SELECT `userCampus`.`uid`
                 FROM `userCampus`
-                WHERE `userCampus`.`campus` IN (" . implode(',', $campusIds) . ")
+                WHERE `userCampus`.`campus` IN {$campusPlaceholders}
                 )
             )
         )";
+        $this->params = array_merge(
+            $this->params,
+            Builder::getArrayParameters(
+                $campusIds,
+                'viewerCampusId',
+            )
+        );
 
         $this->params['viewerId'] = $viewer->getId();
         $this->params['accessDeny'] = PastoralAccessMapper::ACCESS_DENY;
@@ -642,26 +740,36 @@ class Helper
         return $orderParts;
     }
 
+    /**
+     * @return Alaress_Date_Format|null
+     */
     public function getStartDate(): ?Alaress_Date_Format
     {
         return $this->report['afterDate'] ?? null;
     }
 
-    public function getEndDate(): ?Alaress_Date_Format
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getEndDate(): Alaress_Date_Format
     {
-        return $this->report['beforeDate'] ?? null;
+        /* Default end date as a sane value (now), this is likely to happen
+         * when the report is generated with `this term`, as the current term
+         * there are no "end date" until the term actually ends.
+         */
+        return $this->report['beforeDate'] ?? Alaress_Date_Format::now();
     }
 
     /**
      * @param Alaress_Date_Format|null $startDate start of the date range
-     * @param Alaress_Date_Format|null $endDate end of the date range
+     * @param Alaress_Date_Format      $endDate end of the date range
      * @param string                   $format format the month string will be returned in
      * @param Alaress_Date_Format|null $now if not set it will be defaulted to now
      * @return Collection
      */
     public function getMonthsInRange(
         ?Alaress_Date_Format $startDate,
-        ?Alaress_Date_Format $endDate,
+        Alaress_Date_Format $endDate,
         string $format,
         ?Alaress_Date_Format $now = null,
     ): Collection {
@@ -671,10 +779,10 @@ class Helper
             $now = Alaress_Date_Format::now();
         };
 
-        /* Return empty collection if either date is null.
+        /* Start date is required to build the months range
          */
-        if (null === $startDate || null === $endDate) {
-            return new Collection();
+        if (null === $startDate) {
+            throw new \DateRangeError('Timeframe is invalid. No start date provided.');
         }
 
         $start = (clone $startDate)->startOfMonth();
@@ -698,14 +806,14 @@ class Helper
 
     /**
      * @param Alaress_Date_Format|null $startDate start of the date range
-     * @param Alaress_Date_Format|null $endDate end of the date range
+     * @param Alaress_Date_Format      $endDate end of the date range
      * @param string                   $format format the week string will be returned in
      * @param Alaress_Date_Format|null $now if not set it will be defaulted to now
      * @return Collection
      */
     public function getWeeksInRange(
         ?Alaress_Date_Format $startDate,
-        ?Alaress_Date_Format $endDate,
+        Alaress_Date_Format $endDate,
         string $format,
         ?Alaress_Date_Format $now = null,
     ): Collection {
@@ -714,10 +822,11 @@ class Helper
         if (null === $now) {
             $now = Alaress_Date_Format::now();
         };
-        /* Return empty collection if either date is null.
+
+        /* Start date is required to build the weeks range
          */
-        if (null === $startDate || null === $endDate) {
-            return new Collection();
+        if (null === $startDate) {
+            throw new \DateRangeError('Timeframe is invalid. No start date provided.');
         }
         $weekStartDayOfWeek = $this->configLoader->get('calendar_start_day');
 
