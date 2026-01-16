@@ -5,7 +5,6 @@
 /* eslint-enable vue/no-v-html */
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
@@ -16,7 +15,6 @@ export default {
 
     components: {
         RevealModal,
-        Toast,
         SearchSelect,
     },
 
@@ -241,7 +239,6 @@ export default {
 </script>
 
 <template>
-    <toast ref="toast"></toast>
     <reveal-modal ref="modal">
         <!-- create a tab Vue component? Currently they just work magically -->
         <dl class="tabs" data-tab>
