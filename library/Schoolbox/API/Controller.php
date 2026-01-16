@@ -87,6 +87,12 @@ class Controller extends Base
         $sessionUser = $provider === Registry::PROVIDER_FIREBASE
             ? $this->getUser()
             : $this->authenticate(false);
+        
+        // For Firebase provider, verify the user is actually authenticated
+        if ($provider === Registry::PROVIDER_FIREBASE && $sessionUser->getId() === null) {
+            throw new NotAuthenticated('User must be authenticated to register for Firebase provider');
+        }
+        
         if ($sessionUser) {
             // For Digistorm: token is always the user's username
             // Otherwise: token may be absent or blank, in which case we don't
@@ -185,6 +191,12 @@ class Controller extends Base
         $sessionUser = $provider === Registry::PROVIDER_FIREBASE
             ? $this->getUser()
             : $this->authenticate(false);
+        
+        // For Firebase provider, verify the user is actually authenticated
+        if ($provider === Registry::PROVIDER_FIREBASE && $sessionUser->getId() === null) {
+            throw new NotAuthenticated('User must be authenticated to register for Firebase provider');
+        }
+        
         if ($sessionUser) {
             // For Digistorm: token is always the user's username
             // Otherwise: token may be absent or blank, in which case we don't
