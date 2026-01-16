@@ -131,11 +131,24 @@ class Controller extends Base
             $excludeResourceIds = [];
         }
 
-        $data = $this->mapper->search(
+        $resources = $this->mapper->search(
             keyword: $search,
             user: $this->getUser(),
             excludeResourceIds: $excludeResourceIds
-        )->map(function (Model $item) {
+        );
+
+        $resources = $resources->filter(
+            fn ($resource) => $this->authorizer->isPathAuthorizedForUser(
+                'resourceBooking.createBooking',
+                [
+                    'id' => $resource->getId(),
+                    'item' => $resource,
+                ],
+                $this->user
+            )
+        );
+
+        $data = $resources->map(function (Model $item) {
             return [
                 'id'   => $item->getId(),
                 'name' => $item->getName(),
