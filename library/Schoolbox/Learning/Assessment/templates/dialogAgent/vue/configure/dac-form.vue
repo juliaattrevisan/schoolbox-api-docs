@@ -2,6 +2,8 @@
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
 import type {
     DialogAgentScenario,
     DialogAgentAssessmentConfig,
@@ -198,14 +200,13 @@ async function onSubmit(): Promise<void> {
                     <p v-if="fieldContext.field.meta" class="meta">
                         {{ fieldContext.field.meta }}
                     </p>
-                    <textarea
+                    <text-editor
                         :id="`fieldContext-${fieldContext.id}`"
-                        v-model.trim="fieldContext.body"
-                        :name="`fieldContexts[${fieldContext.id}]`"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
+                        v-model:body="fieldContext.body"
+                        :config="{
+                            markdown: true,
+                            toolbar: EditorToolbar.SIMPLE,
+                        }"
                     />
                 </div>
             </fieldset>
@@ -214,14 +215,13 @@ async function onSubmit(): Promise<void> {
                 <div class="small-12 columns">
                     <label for="dac-opening-message" class="required">Opening Message</label>
                     <p class="meta">Used by the AI to start the conversation and frame the learning discussion.</p>
-                    <textarea
-                        id="dac-opening-message"
-                        v-model.trim="assessmentConfig.openingMessage"
-                        name="openingMessage"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
+                    <text-editor
+                        :id="`dac-opening-message`"
+                        v-model:body="assessmentConfig.openingMessage"
+                        :config="{
+                            markdown: true,
+                            toolbar: EditorToolbar.SIMPLE,
+                        }"
                     />
                 </div>
 
@@ -231,14 +231,13 @@ async function onSubmit(): Promise<void> {
                         Sets ongoing guidelines the AI follows to maintain focus, tone, and boundaries during the
                         conversation.
                     </p>
-                    <textarea
-                        id="dac-rules"
-                        v-model.trim="assessmentConfig.rules"
-                        name="rules"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
+                    <text-editor
+                        :id="`dac-rules`"
+                        v-model:body="assessmentConfig.rules"
+                        :config="{
+                            markdown: true,
+                            toolbar: EditorToolbar.SIMPLE,
+                        }"
                     />
                 </div>
             </fieldset>

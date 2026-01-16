@@ -12,7 +12,15 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const body = defineModel<string>("body", { required: true });
+const body = defineModel<string | null>("body", { required: true });
+
+/** Proxy for the body model to handle null values gracefully */
+const bodyProxy = window.Vue.computed({
+    get: () => body.value ?? "",
+    set: (val: string) => {
+        body.value = val;
+    },
+});
 
 const textareaEl = window.Vue.useTemplateRef<HTMLTextAreaElement>("textareaEl");
 
@@ -20,7 +28,7 @@ window.Vue.onMounted(async () => {
     await new Promise((resolve) => {
         if (!textareaEl.value) throw new Error("Unable to initialise <text-editor> without a textarea element");
         useEditor(
-            body,
+            bodyProxy,
             textareaEl.value,
             {
                 targetElements: [textareaEl.value],
@@ -42,5 +50,5 @@ window.Vue.onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <textarea :id="props.id" ref="textareaEl" v-model="body"></textarea>
+    <textarea :id="props.id" ref="textareaEl" v-model="bodyProxy"></textarea>
 </template>
