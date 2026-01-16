@@ -33,8 +33,10 @@ $prefix       = 'code';
 
 /* Retrieve the category ID from the URI, must be an integer and at least 1 character long
  * e.g. /homepage/43
+ *
+ * Check if there are any arguments before attempting to access them
  */
-if (preg_match('/^[0-9]+$/', $this->arg[0])) {
+if (count($this->arg) > 0 && preg_match('/^[0-9]+$/', $this->arg[0])) {
     try {
         $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Schoolbox\Mapper\Exception $e) {
@@ -51,7 +53,7 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
     }
-} elseif (($this->arg[0] === $prefix) && (count($this->arg) > 1)) {
+} elseif (count($this->arg) > 0 && ($this->arg[0] === $prefix) && (count($this->arg) > 1)) {
     /* If a prefixed argument is given, load category code directly
      * e.g. /homepage/$prefix/EN344
      */
@@ -65,7 +67,7 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     } catch (Exception $e) {
         $this->pageNotFound();
     }
-} elseif (!is_numeric($this->arg[0])) {
+} elseif (count($this->arg) > 0 && !is_numeric($this->arg[0])) {
     /* When just an alphabetical category code provided
      * e.g. /homepage/EN344
      */
