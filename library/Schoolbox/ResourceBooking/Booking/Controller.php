@@ -1302,6 +1302,10 @@ class Controller extends Base
 
     /**
      * Validate the booking of a single resource $item, possibly as a recurrence.
+     * If clash bookings are allowed for the resource, do not record clash validation errors.  Remember the dates on
+     * which clashes are found however, and return those in a separate array.  This allows the caller to identify the
+     * bookings that clash for special treatment (e.g. the caller may wish to set the status of those bookings to 'pending').
+     *
      * @param Item\Model $item
      * @param array $bookingDetailsForItem - See docblock on for Validation->validateBookingFromPostData() for details.
      * @param null|Model $existingBooking
