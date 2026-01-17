@@ -47,6 +47,7 @@ use Schoolbox\ResourceBooking\Item\ModerationType\Model as BookingModerationType
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Mapper as BookingStatusMapper;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
+use Schoolbox\ResourceBooking\Booking\Validation as BookingValidation;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderLinkOnlyTranslator;
 use Schoolbox\ResourceBooking\Item\ModerationType\Model as ResourceBookingModerationTypeModel;
@@ -76,6 +77,10 @@ class Controller extends Base
     private const int HTTP_STATUS_CODE_NOT_FOUND = 404;
     private const int HTTP_STATUS_CODE_SERVER_ERROR = 500;
 
+    /**
+     * @var null|BookingValidation
+     */
+    private ?BookingValidation $bookingValidation = null;
 
     /**
      * Controller constructor.
@@ -119,6 +124,27 @@ class Controller extends Base
     ) {
     }
 
+    /**
+     * This function exists because the BookingValidation constructor requires a User object for the logged-in user,
+     * and that User object is not available when this class' constructor runs.
+     * @return Validation
+     */
+    private function getBookingValidation(): BookingValidation
+    {
+        if ($this->bookingValidation === null) {
+            $this->bookingValidation = new BookingValidation(
+                $this->getUser(),
+                $this->bookingMapper,
+                $this->bookingStatusMapper,
+                $this->termMapper,
+                $this->externalTimetable,
+                $this->campusMapper,
+                $this->getConfigLoader(),
+                $this->externalEventMapper,
+            );
+        }
+        return $this->bookingValidation;
+    }
 
     /**
      * View an event's detail screen
@@ -1157,7 +1183,9 @@ class Controller extends Base
         }
 
         // Check whether each hypothetical booking would result in a clash.
-        $isClashByResourceIdByEventId = $this->checkForClashesIfResourceBookingsAddedToEvents($resourceById, $eventById);
+        $isClashByResourceIdByEventId = (
+            $this->getBookingValidation()->checkForClashesIfResourceBookingsAddedToEvents($resourceById, $eventById)
+        );
 
         // This will hold the booking models to be persisted.
         $bookingList = new Collection();
@@ -1370,7 +1398,7 @@ class Controller extends Base
         }
 
         // Check whether each hypothetical moved booking would result in a clash.
-        $isClashByBookingId = $this->checkForClashesIfResourceBookingsMoved(
+        $isClashByBookingId = $this->getBookingValidation()->checkForClashesIfResourceBookingsMoved(
             $bookingsToUpdate,
             new GenericCollection(
                 BookingItemModel::class,
@@ -1576,110 +1604,6 @@ class Controller extends Base
         }
     }
 
-
-    /**
-     * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
-     * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
-     * allowed on the resource.)
-     * TODO: Move this function into ResourceBooking\Booking\Validation
-     *
-     * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
-     * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
-     * @return array
-     */
-    private function checkForClashesIfResourceBookingsAddedToEvents(
-        GenericCollection $resourceById,
-        GenericCollection $eventById
-    ): array {
-        $isClashByResourceIdByEventId = [];
-
-        $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
-            $resourceById->keys(),
-            sortByStartDatetimeAsc: true
-        );
-
-        // For each event in the series, check for clash bookings if each resource is booked at a time matching the event time.
-        /** @var Event $event */
-        foreach ($eventById as $eventId => $event) {
-            // For each resource, check for existing approved bookings of that resource that overlap the event period.
-            foreach ($resourceById as $resourceId => $resource) {
-                $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$resourceId] ?? [];
-                foreach ($periodsOfApprovedBookings as $period) {
-                    if ($period['startDatetime']->gt($event->getEndDatetime())) {
-                        // The $periods are sorted by start datetime ascending, so we can be sure that no other periods will clash with event.
-                        break;
-                    }
-
-                    if (
-                        $period['startDatetime']->lt($event->getEndDatetime()) &&
-                        $period['endDatetime']->gt($event->getStartDatetime())
-                    ) {
-                        if (!array_key_exists($eventId, $isClashByResourceIdByEventId)) {
-                            $isClashByResourceIdByEventId[$eventId] = [];
-                        }
-
-                        // If $resource was booked for $event, that booking would clash with an approved booking for $period.
-                        $isClashByResourceIdByEventId[$eventId][$resourceId] = true;
-                    }
-                }
-            }
-        }
-
-        return $isClashByResourceIdByEventId;
-    }
-
-    /**
-     * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
-     * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
-     * This function can be used to check for clashes efficiently when there is a large set of potential moves.
-     * TODO: Move this function into ResourceBooking\Booking\Validation
-     *
-     * @param GenericCollection<int, BookingModel> $movedBookings
-     *  - Bookings to check for clashes.  This array should contain bookings whose start/end times have been updated
-     *    (so they differ from the values stored in the database).  This function will check for clashes with periods
-     *    of approved bookings fetched from the database.  Note the database fetch query will exclude the periods of
-     *    bookings in the $movedBookings array.
-     * @param GenericCollection<int, BookingItemModel> $resourceById
-     *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
-     * @return array
-     */
-    private function checkForClashesIfResourceBookingsMoved(
-        GenericCollection $movedBookings,
-        GenericCollection $resourceById,
-    ): array {
-        $isClashByBookingId = [];
-
-        $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
-            $resourceById->keys(),
-            sortByStartDatetimeAsc: true,
-            // Exclude the moved bookings themselves when finding periods of approved bookings that potentially clash.
-            bookingIdsToExclude: $movedBookings->map(fn ($movedBooking) => $movedBooking->getId(), $movedBookings)->getAll()
-        );
-
-        // For each booking, check for clashes with existing approved bookings of the same resource.
-        /** @var BookingModel $movedBooking*/
-        foreach ($movedBookings as $movedBooking) {
-            $isClashByBookingId[$movedBooking->getId()] = false; // Assume no clash until a clash is found.
-            $periodsOfApprovedBookings = $periodsOfApprovedBookingsByResourceId[$movedBooking->getResource()->getId()] ?? [];
-            foreach ($periodsOfApprovedBookings as $period) {
-                if ($period['startDatetime']->gt($movedBooking->getBookingEndAt())) {
-                    // The $periods are sorted by start datetime ascending,
-                    // so we can be sure that no other periods will clash with $movedBooking.
-                    break;
-                }
-
-                if (
-                    $period['startDatetime']->lt($movedBooking->getBookingEndAt()) &&
-                    $period['endDatetime']->gt($movedBooking->getBookingStartAt())
-                ) {
-                    // If $movedBooking was persisted, it would clash with an approved booking for $period.
-                    $isClashByBookingId[$movedBooking->getId()] = true;
-                }
-            }
-        }
-
-        return $isClashByBookingId;
-    }
 
     /**
      * Return the status to be set for a new booking that does not clash with any existing booking.
