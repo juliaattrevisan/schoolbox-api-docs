@@ -1581,7 +1581,8 @@ class Controller extends Base
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
      * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
      * allowed on the resource.)
-     * TODO: Move this function into a helper class.
+     * TODO: Move this function into ResourceBooking\Booking\Validation
+     *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
      * @return array
@@ -1630,10 +1631,14 @@ class Controller extends Base
     /**
      * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
      * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
-     * TODO: Move this function into a helper class.
+     * This function can be used to check for clashes efficiently when there is a large set of potential moves.
+     * TODO: Move this function into ResourceBooking\Booking\Validation
      *
      * @param GenericCollection<int, BookingModel> $movedBookings
-     *  - Bookings to check for clashes.  This array should contain all the bookings that are moved in $movedBookings.
+     *  - Bookings to check for clashes.  This array should contain bookings whose start/end times have been updated
+     *    (so they differ from the values stored in the database).  This function will check for clashes with periods
+     *    of approved bookings fetched from the database.  Note the database fetch query will exclude the periods of
+     *    bookings in the $movedBookings array.
      * @param GenericCollection<int, BookingItemModel> $resourceById
      *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
      * @return array
