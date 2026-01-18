@@ -46,8 +46,8 @@ if (isset($_GET['hash'])) {
 // OTFS
 // --------------------------------------------------------------------------------------------------------------------
 
-$type = $_GET['type'];
-$id   = $_GET['id'];
+$type = $_GET['type'] ?? null;
+$id   = $_GET['id'] ?? null;
 
 if (isset($type) && isset($id)) {
     /** @var SitePage $page */
