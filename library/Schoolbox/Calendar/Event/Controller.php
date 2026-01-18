@@ -1212,17 +1212,18 @@ class Controller extends Base
                     continue; // This resource is already booked for this event, so skip.
                 }
 
+                // Build the booking.
+                // Do not set start/end times because these are intended to be the same as in the linked event row.
+                $booking = new BookingModel()
+                    ->setEvent($loopEvent)
+                    ->setResource($resource)
+                    ->setBookingStartAt(null) // Set as null to default to the event's start time.
+                    ->setBookingEndAt(null) // Set as null to default to the event's end time.
+                    ->setName($resource->getName())
+                    ->setNotes('');
+
                 $isClash = $isClashByResourceId[$resourceId] ?? false;
                 if (!$isClash || $resource->getAllowClashBookings()) {
-                    // Build the booking.
-                    // Do not set start/end times because these are intended to be the same as in the linked event row.
-                    $booking = new BookingModel()
-                        ->setEvent($loopEvent)
-                        ->setResource($resource)
-                        ->setBookingStartAt(null) // Set as null to default to the event's start time.
-                        ->setBookingEndAt(null) // Set as null to default to the event's end time.
-                        ->setName($resource->getName())
-                        ->setNotes('');
                     $booking->setStatus(
                         $this->bookingStatusMapper->createModel(
                             $isClash ? BookingStatusModel::STATUS_PENDING : $this->getStatusIdForNonClashBooking($booking)
