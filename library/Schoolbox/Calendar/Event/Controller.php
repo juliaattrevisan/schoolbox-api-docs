@@ -1111,9 +1111,9 @@ class Controller extends Base
         $this->response = $this->responseAsJson(
             // This data structure must match type 'AddBookingsToEventResponse' defined in add-resource-bookings-modal.vue.
             [
-                'nBookingsAttempted' => $results['nBookingsAttempted'],
-                'nBookingsCreatedWithClash' => $results['nBookingsCreatedWithClash'],
-                'nBookingsCreatedWithoutClash' => $results['nBookingsCreatedWithoutClash'],
+                'nBookingsCreatedPending' => $results['nBookingsCreatedPending'],
+                'nBookingsCreatedApproved' => $results['nBookingsCreatedApproved'],
+                'nBookingsCreatedRejected' => $results['nBookingsCreatedRejected'],
             ]
         )->withStatus($results['httpStatusCode']);
     }
@@ -1191,9 +1191,11 @@ class Controller extends Base
         $bookingList = new Collection();
 
         // Counts for results data structure.
-        $nBookingsAttempted = 0;
-        $nBookingsCreatedWithoutClash = 0;
-        $nBookingsCreatedWithClash = 0;
+        $nBookingsCreatedByStatusId = [
+            BookingStatusModel::STATUS_PENDING => 0,
+            BookingStatusModel::STATUS_APPROVED => 0,
+            BookingStatusModel::STATUS_REJECTED => 0,
+        ];
 
         // Note we are not only interested in resources booked in the future here.
         // We cannot allow multiple bookings of the same resource for a single event, even if only one is in the past.
@@ -1227,13 +1229,7 @@ class Controller extends Base
                 $booking->setStatus($this->bookingStatusMapper->createModel($statusId));
                 $bookingList->add($booking);
 
-                if ($isClash) {
-                    ++$nBookingsCreatedWithClash;
-                } else {
-                    ++$nBookingsCreatedWithoutClash;
-                }
-
-                ++$nBookingsAttempted;
+                ++$nBookingsCreatedByStatusId[$statusId];
             }
         }
 
@@ -1244,14 +1240,12 @@ class Controller extends Base
             $this->bookingMapper->save($bookingList);
         } catch (MapperException) {
             $httpStatusCode = self::HTTP_STATUS_CODE_SERVER_ERROR;
-            $nBookingsCreatedWithClash = 0;
-            $nBookingsCreatedWithoutClash = 0;
         }
 
         return [
-            'nBookingsAttempted' => $nBookingsAttempted,
-            'nBookingsCreatedWithClash' => $nBookingsCreatedWithClash,
-            'nBookingsCreatedWithoutClash' => $nBookingsCreatedWithoutClash,
+            'nBookingsCreatedPending' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_PENDING],
+            'nBookingsCreatedApproved' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_APPROVED],
+            'nBookingsCreatedRejected' => $nBookingsCreatedByStatusId[BookingStatusModel::STATUS_REJECTED],
             'httpStatusCode' => $httpStatusCode,
         ];
     }
