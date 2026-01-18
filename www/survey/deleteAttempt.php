@@ -15,7 +15,6 @@ $surveyHandler   = new Survey_Main();
 $attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $groupHandler    = new Group();
-$user_id = $this->arg[1];
 /* Check that you can delete these attempts first
  */
 $allAttempts = array();
