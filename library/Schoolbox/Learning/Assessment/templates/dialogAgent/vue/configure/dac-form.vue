@@ -97,7 +97,7 @@ async function onSubmit(): Promise<void> {
     toast.timeout({ text: "Configuration saved", isSuccess: true });
 
     assessmentConfig.value.prompt = response.data.prompt;
-    assessmentConfig.value.openingMessageScrubbed = response.data.openingMessageScrubbed;
+    assessmentConfig.value.openingMessage = response.data.openingMessage; // Updated in case Scrub modified it
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
     emit("saved");
 }

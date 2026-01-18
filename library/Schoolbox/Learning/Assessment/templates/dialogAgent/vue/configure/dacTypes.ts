@@ -27,7 +27,6 @@ export type DialogAgentAssessmentConfig = {
     language: string | null;
     useDifferentiationProfile: boolean;
     openingMessage: string | null;
-    openingMessageScrubbed: string | null;
     rules: string | null;
     fieldContexts: DialogAgentFieldContext[];
     prompt: string | null;
@@ -38,7 +37,7 @@ export type DialogAgentAssessmentConfig = {
 
 export type DialogAgentConfigureApiResponse = {
     prompt: string | null;
-    openingMessageScrubbed: string | null;
+    openingMessage: string | null;
     _routes: {
         postSandboxMessage: string;
     };
@@ -46,7 +45,7 @@ export type DialogAgentConfigureApiResponse = {
 
 export type DialogAgentConfigureApiRequest = Omit<
     DialogAgentAssessmentConfig,
-    "fieldContexts" | "openingMessageScrubbed" | "prompt" | "_routes"
+    "fieldContexts" | "prompt" | "_routes"
 > & {
     fieldContexts: Record<DialogAgentFieldContext["id"], DialogAgentFieldContext["body"]>;
 };

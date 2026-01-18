@@ -175,7 +175,7 @@ window.Vue.onMounted(async () => {
                 <div class="loader"></div>
             </section>
             <div
-                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessageScrubbed"
+                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessage"
                 class="empty-state"
             >
                 <i class="icon-dialog-agent"></i>
@@ -184,7 +184,7 @@ window.Vue.onMounted(async () => {
             <section v-else>
                 <dac-sandbox
                     ref="sandboxRef"
-                    :opening-message-scrubbed="sandboxDataCache.openingMessageScrubbed"
+                    :opening-message="sandboxDataCache.openingMessage"
                     :post-message="sandboxDataCache._routes.postSandboxMessage"
                     :is-dirty="isSandboxDirty"
                 />
