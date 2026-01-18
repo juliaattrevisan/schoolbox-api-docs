@@ -270,56 +270,6 @@ class Validation
     }
 
     /**
-     * @param Item\Model $resource
-     * @param            $startDate
-     * @param            $endDate
-     * @param            $override
-     * @return array
-     */
-    public function validateSimpleRules(Item\Model $resource, $startDate, $endDate, $override): array
-    {
-        $errors = [];
-
-        // Having a power to override doesn't make you a God. Start comes always before End.
-        $errors = array_merge_recursive($errors, $this->validateBeforeTime($startDate, $endDate));
-
-        // Bypass any other validation if overriding.
-        if ($override) {
-            return $errors;
-        }
-
-        $errors = array_merge_recursive($errors, $this->validatePastTime($startDate));
-        $errors = array_merge_recursive($errors, $this->validateTooShort($resource, $startDate, $endDate));
-        $errors = array_merge_recursive($errors, $this->validateTooLong($resource, $startDate, $endDate));
-        $errors = array_merge_recursive($errors, $this->validateLeadTime($resource, $startDate));
-
-        return $errors;
-    }
-
-    /**
-     * Validates the status change for this booking
-     *
-     * @param Model $booking
-     * @param int   $status
-     *
-     * @return array If not empty, this contains the errors for this change.
-     */
-    public function validateChangeStatus(Model $booking, $status)
-    {
-        switch ($status) {
-            case Status\Model::STATUS_APPROVED:
-                return $this->validateForClashes(
-                    $booking->getResource(),
-                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $booking
-                );
-            default:
-                return [];
-        }
-    }
-
-    /**
      * Validation Methods
      *
      * @param DateTime $startDate
@@ -424,6 +374,56 @@ class Validation
         }
 
         return $errors;
+    }
+
+    /**
+     * @param Item\Model $resource
+     * @param            $startDate
+     * @param            $endDate
+     * @param            $override
+     * @return array
+     */
+    public function validateSimpleRules(Item\Model $resource, $startDate, $endDate, $override): array
+    {
+        $errors = [];
+
+        // Having a power to override doesn't make you a God. Start comes always before End.
+        $errors = array_merge_recursive($errors, $this->validateBeforeTime($startDate, $endDate));
+
+        // Bypass any other validation if overriding.
+        if ($override) {
+            return $errors;
+        }
+
+        $errors = array_merge_recursive($errors, $this->validatePastTime($startDate));
+        $errors = array_merge_recursive($errors, $this->validateTooShort($resource, $startDate, $endDate));
+        $errors = array_merge_recursive($errors, $this->validateTooLong($resource, $startDate, $endDate));
+        $errors = array_merge_recursive($errors, $this->validateLeadTime($resource, $startDate));
+
+        return $errors;
+    }
+
+    /**
+     * Validates the status change for this booking
+     *
+     * @param Model $booking
+     * @param int   $status
+     *
+     * @return array If not empty, this contains the errors for this change.
+     */
+    public function validateChangeStatus(Model $booking, $status)
+    {
+        switch ($status) {
+            case Status\Model::STATUS_APPROVED:
+                return $this->validateForClashes(
+                    $booking->getResource(),
+                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
+                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
+                    $booking
+                );
+            default:
+                return [];
+        }
     }
 
     /**
