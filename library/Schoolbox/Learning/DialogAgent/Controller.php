@@ -158,11 +158,11 @@ class Controller extends Base
                 'helpfulness' => $assessment->getHelpfulness() ?? Helpfulness::DEFAULT,
                 'language' => $assessment->getLanguage() ?? Language::DEFAULT,
                 'openingMessage' => \Scrub::markdown($assessment->getOpeningMessage()),
-                'rules' => $assessment->getRules() ?: $scenario->getDefaultRules(),
+                'rules' => \Scrub::markdown($assessment->getRules() ?: $scenario->getDefaultRules()),
                 'useDifferentiationProfile' => $assessment->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
-                    'body' => $fieldContext->getBody() ?? '',
+                    'body' => \Scrub::markdown($fieldContext->getBody() ?? ''),
                     'field' => [
                         'id' => $fieldContext->getField()->getId(),
                         'title' => $fieldContext->getField()->getTitle(),
