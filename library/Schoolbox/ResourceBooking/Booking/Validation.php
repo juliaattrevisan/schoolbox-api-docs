@@ -377,6 +377,9 @@ class Validation
     }
 
     /**
+     * This function groups the simplest validation rule checks into one function to
+     * avoid repetition when all those functions need to be called from multiple places.
+     *
      * @param Item\Model $resource
      * @param            $startDate
      * @param            $endDate
