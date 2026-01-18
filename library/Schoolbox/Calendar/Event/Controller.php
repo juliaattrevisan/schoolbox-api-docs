@@ -1223,19 +1223,14 @@ class Controller extends Base
                     ->setNotes('');
 
                 $isClash = $isClashByResourceId[$resourceId] ?? false;
-                if (!$isClash || $resource->getAllowClashBookings()) {
-                    $booking->setStatus(
-                        $this->bookingStatusMapper->createModel(
-                            $isClash ? BookingStatusModel::STATUS_PENDING : $this->getStatusIdForNonClashBooking($booking)
-                        )
-                    );
-                    $bookingList->add($booking);
+                $statusId = $this->bookingValidation->getNewStatusIdForBooking($booking, $isClash, $this->getUser());
+                $booking->setStatus($this->bookingStatusMapper->createModel($statusId));
+                $bookingList->add($booking);
 
-                    if ($isClash) {
-                        ++$nBookingsCreatedWithClash;
-                    } else {
-                        ++$nBookingsCreatedWithoutClash;
-                    }
+                if ($isClash) {
+                    ++$nBookingsCreatedWithClash;
+                } else {
+                    ++$nBookingsCreatedWithoutClash;
                 }
 
                 ++$nBookingsAttempted;
@@ -1604,43 +1599,6 @@ class Controller extends Base
             $this->response = $this->responseAsJson(['success' => false])->withStatus(self::HTTP_STATUS_CODE_NOT_FOUND);
         }
     }
-
-
-    /**
-     * Return the status to be set for a new booking that does not clash with any existing booking.
-     * Note bookings that clash with existing bookings should be given status 'pending'.
-     *
-     * TODO: Modify this function so that no database operations are required.
-     *       This should be done because this function is called from within a loop.
-     *
-     * @param BookingModel $booking
-     * @return int
-     */
-    private function getStatusIdForNonClashBooking(BookingModel $booking): int
-    {
-        $resource = $booking->getResource();
-        $event = $booking->getEvent();
-
-        // What about the resource? If it's an open resource, confirm the
-        // booking immediately.
-        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
-            return BookingStatusModel::STATUS_APPROVED;
-        }
-
-        if (
-            $resource->isUserModerator($this->getUser())
-            && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
-        ) {
-            /* If you're a Moderator and can moderate this request,
-             * and you created the booking in the first place,
-             * set it to Approved - otherwise you'll end up approving your own request anyway
-             */
-            return BookingStatusModel::STATUS_APPROVED;
-        }
-
-        return BookingStatusModel::STATUS_PENDING;
-    }
-
 
     /**
      * @param Collection $roles (each element is a \Schoolbox\Role)

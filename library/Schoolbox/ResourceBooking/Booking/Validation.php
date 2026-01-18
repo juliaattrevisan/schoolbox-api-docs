@@ -20,7 +20,9 @@ use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
 use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
+use Schoolbox\ResourceBooking\Item\ModerationType\Model as BookingModerationTypeModel;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\ResourceBooking\Item;
@@ -89,18 +91,15 @@ class Validation
      */
     private $campusMapper;
 
-
     /**
      * @var \Schoolbox\IConfigLoader
      */
     private \Schoolbox\IConfigLoader $configLoader;
 
-
     /**
      * @var \Schoolbox\External\Event\Mapper
      */
     private \Schoolbox\External\Event\Mapper $eventMapper;
-
 
     /**
      * @param User                             $user
@@ -131,7 +130,6 @@ class Validation
         $this->setConfigLoader($configLoader);
         $this->setEventMapper($eventMapper);
     }
-
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
@@ -202,39 +200,7 @@ class Validation
             $errors[self::END_PERIOD_ERRORS][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
-        // Having a power to override doesn't make you a God. Start comes always before End.
-        $errors = array_merge_recursive(
-            $errors,
-            $this->validateBeforeTime($startDate, $endDate)
-        );
-
-        // Bypass any other validation if overriding
-        if ($override) {
-            return $errors;
-        }
-
-        /**
-         * we always want to check the start and end times
-         */
-        $errors = array_merge_recursive(
-            $errors,
-            $this->validatePastTime($startDate)
-        );
-
-        $errors = array_merge_recursive(
-            $errors,
-            $this->validateTooShort($resource, $startDate, $endDate)
-        );
-
-        $errors = array_merge_recursive(
-            $errors,
-            $this->validateTooLong($resource, $startDate, $endDate)
-        );
-
-        $errors = array_merge_recursive(
-            $errors,
-            $this->validateLeadTime($resource, $startDate)
-        );
+        $errors = $this->validateSimpleRules($resource, $startDate, $endDate, $override);
 
         $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
@@ -299,6 +265,33 @@ class Validation
                 );
             }
         }
+
+        return $errors;
+    }
+
+    /**
+     * @param Item\Model $resource
+     * @param            $startDate
+     * @param            $endDate
+     * @param            $override
+     * @return array
+     */
+    public function validateSimpleRules(Item\Model $resource, $startDate, $endDate, $override): array
+    {
+        $errors = [];
+
+        // Having a power to override doesn't make you a God. Start comes always before End.
+        $errors = array_merge_recursive($errors, $this->validateBeforeTime($startDate, $endDate));
+
+        // Bypass any other validation if overriding.
+        if ($override) {
+            return $errors;
+        }
+
+        $errors = array_merge_recursive($errors, $this->validatePastTime($startDate));
+        $errors = array_merge_recursive($errors, $this->validateTooShort($resource, $startDate, $endDate));
+        $errors = array_merge_recursive($errors, $this->validateTooLong($resource, $startDate, $endDate));
+        $errors = array_merge_recursive($errors, $this->validateLeadTime($resource, $startDate));
 
         return $errors;
     }
@@ -386,7 +379,6 @@ class Validation
         return $errors;
     }
 
-
     /**
      * Validate the minimum length of the booking
      *
@@ -409,7 +401,6 @@ class Validation
 
         return $errors;
     }
-
 
     /**
      * Validate the maximum length of the booking
@@ -702,7 +693,6 @@ class Validation
         $this->campusMapper = $campusMapper;
     }
 
-
     /**
      * @return \Schoolbox\IConfigLoader
      */
@@ -710,7 +700,6 @@ class Validation
     {
         return $this->configLoader;
     }
-
 
     /**
      * @param IConfigLoader $configLoader
@@ -722,7 +711,6 @@ class Validation
         return $this;
     }
 
-
     /**
      * @return Mapper
      */
@@ -730,7 +718,6 @@ class Validation
     {
         return $this->eventMapper;
     }
-
 
     /**
      * @param Mapper $eventMapper
@@ -741,7 +728,6 @@ class Validation
         $this->eventMapper = $eventMapper;
         return $this;
     }
-
 
     /**
      * Return true if the given array is non-empty, and all values are either ERROR_CONFLICT or ERROR_TIMETABLED_CLASS.
@@ -760,7 +746,6 @@ class Validation
             static fn ($error) => in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)
         );
     }
-
 
     /**
      * This function was added for backward-compatibility, so the total number of errors can be easily counted.
@@ -784,7 +769,6 @@ class Validation
 
         return $errorsFlattened;
     }
-
 
     /**
      * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
@@ -839,7 +823,6 @@ class Validation
         return $isClashByBookingId;
     }
 
-
     /**
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
      * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
@@ -889,5 +872,83 @@ class Validation
         }
 
         return $isClashByResourceIdByEventId;
+    }
+
+    /**
+     * This function assumes the booking dates are
+     *
+     * @param BookingModel $booking
+     * @param bool  $isClash
+     * @param User $user
+     * @return int
+     */
+    public function getNewStatusIdForBooking(BookingModel $booking, bool $isClash, User $user): int
+    {
+        $resource = $booking->getResource();
+
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDatetime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDatetime();
+
+        if ($bookingStartAt === null || $bookingEndAt === null) {
+            // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
+            return BookingStatusModel::STATUS_REJECTED;
+        }
+
+        $errors = $this->validateSimpleRules(
+            $resource,
+            $bookingStartAt->getDateTimeObject(),
+            $bookingEndAt->getDateTimeObject(),
+            false,
+        );
+
+        if (count($errors) > 0) {
+            return BookingStatusModel::STATUS_REJECTED;
+        }
+
+        if ($isClash) {
+            return (
+                $resource->getAllowClashBookings()
+                ? BookingStatusModel::STATUS_PENDING
+                : BookingStatusModel::STATUS_REJECTED
+            );
+        }
+
+        return $this->getStatusIdForNonClashBooking($booking, $user);
+    }
+
+    /**
+     * Return the status to be set for a new booking that does not clash with any existing booking.
+     * Note bookings that clash with existing bookings should be given status 'pending'.
+     *
+     * TODO: Modify this function so that no database operations are required.
+     *       This should be done because this function is called from within a loop.
+     *
+     * @param BookingModel $booking
+     * @param User $user
+     * @return int
+     */
+    private function getStatusIdForNonClashBooking(BookingModel $booking, User $user): int
+    {
+        $resource = $booking->getResource();
+        $event = $booking->getEvent();
+
+        // What about the resource? If it's an open resource, confirm the
+        // booking immediately.
+        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
+            return BookingStatusModel::STATUS_APPROVED;
+        }
+
+        if (
+            $resource->isUserModerator($user)
+            && (int)$event->getAuthor()->getId() === (int)$user->getId()
+        ) {
+            /* If you're a Moderator and can moderate this request,
+             * and you created the booking in the first place,
+             * set it to Approved - otherwise you'll end up approving your own request anyway
+             */
+            return BookingStatusModel::STATUS_APPROVED;
+        }
+
+        return BookingStatusModel::STATUS_PENDING;
     }
 }
