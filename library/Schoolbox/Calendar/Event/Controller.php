@@ -1404,9 +1404,10 @@ class Controller extends Base
 
         // Set booking status to pending if the booking has a clash.  Otherwise the status can stay as it was.
         foreach ($bookingsToUpdate as $bookingToUpdate) {
-            if ($isClashByBookingId[$bookingToUpdate->getId()]) {
-                $bookingToUpdate->setStatus(BookingStatusModel::STATUS_PENDING);
-            }
+            $statusId = $this->bookingValidation->getNewStatusIdForBooking(
+                $booking, $isClashByBookingId[$bookingToUpdate->getId()], $this->getUser()
+            );
+            $booking->setStatus($this->bookingStatusMapper->createModel($statusId));
         }
 
         try {
