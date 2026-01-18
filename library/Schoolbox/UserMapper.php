@@ -505,7 +505,7 @@ class UserMapper extends Mapper
     public function findByExternalId($id, $roleType = null)
     {
 
-        if (\strlen($id) === 0) {
+        if ($id === null || \strlen($id) === 0) {
             throw new Schoolbox\Mapper\Exception('An ID must be provided');
         }
 
