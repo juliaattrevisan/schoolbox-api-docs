@@ -1124,10 +1124,10 @@ class Controller extends Base
      * multiple places, with each calling function handling errors in different ways.
      *
      * Notes:
-     *  - (TODO) Provided the resource exists and the logged-in user has permission to book the resource, this function will
+     *  - Provided the resource exists and the logged-in user has permission to book the resource, this function will
      *    create a booking for each resource in $resourceIds.
-     *  - (TODO) If a booking created by this function violates the booking rules for that resource (min. lead time, min.
-     *    reservation time, max. reservation time), it will be created with status 'rejected'.
+     *  - If a booking created by this function violates the booking rules for that resource (e.g. min. lead time,
+     *    min. reservation time, max. reservation time, etc.), it will be created with status 'rejected'.
      *  - If a booking created by this function clashes with an already approved booking, its status will depend on
      *    whether clashes are allowed for that resource.  If clashes are not allowed, its status will be 'rejected'.
      *  - If clashes are allowed, its status will either be 'pending' or 'approved' depending on whether the user
