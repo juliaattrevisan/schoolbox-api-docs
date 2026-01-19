@@ -86,6 +86,56 @@ const config = window.Vue.inject<Config>("pastoralConfig");
                         <b class="show-for-print"> {{ tag.name }}</b>
                     </template>
                 </p>
+                <div
+                    v-if="props.record.attachmentsPublic && props.record.attachmentsPublic.length"
+                    id="article-attachments"
+                >
+                    <hr />
+                    <!-- <script type="text/javascript">
+                            $(function () {
+                                $('[data-plugin="preview"]').preview();
+                            });
+                        </script> -->
+                    <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
+                        <li
+                            v-for="attachment in props.record.attachmentsPublic"
+                            :key="attachment.id"
+                            class="actions-small-1"
+                        >
+                            <div class="list-item">
+                                <div class="card attachment small-12">
+                                    <a
+                                        data-plugin="preview"
+                                        :href="attachment.route"
+                                        :title="attachment.storage.filename"
+                                    >
+                                        <img
+                                            v-if="attachment.storage.mimetype.isImage"
+                                            :src="`/storage/image.php?hash=${attachment.storage.hash}&size=square64`"
+                                            alt="Download"
+                                        />
+                                        <img
+                                            v-else
+                                            :src="`/ajax/mime/${attachment.storage.mime}`"
+                                            alt="Attachment"
+                                            class="mime"
+                                        />
+                                        <p>{{ attachment.realname }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a
+                                    :href="attachment.route"
+                                    download
+                                    rel="download"
+                                    title="Download"
+                                    class="icon-download"
+                                ></a>
+                            </nav>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </article>
         <ul v-if="props.record.comments.length" class="information-list reply">
