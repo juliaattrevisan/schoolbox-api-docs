@@ -81,7 +81,14 @@ module.exports = defineConfig([
     tsEslint.configs.recommendedTypeChecked,
     eslintComments.recommended,
     eslintPluginVue.configs["flat/recommended"],
-    jsdoc({ config: "flat/recommended-typescript" }),
+    jsdoc({
+        files: ["**/*.js", "**/*.mjs"],
+        config: "flat/recommended",
+    }),
+    jsdoc({
+        files: ["**/*.ts", "**/*.vue"],
+        config: "flat/recommended-typescript",
+    }),
     // need to force these types for now, see https://github.com/un-ts/eslint-plugin-import-x/issues/439
     importX.flatConfigs.recommended as ConfigWithExtends,
     importX.flatConfigs.typescript as ConfigWithExtends,
