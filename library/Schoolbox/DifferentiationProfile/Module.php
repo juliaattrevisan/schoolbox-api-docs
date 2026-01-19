@@ -20,6 +20,7 @@ use http\Exception\UnexpectedValueException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
+use Schoolbox\Pastoral\Attachment\Translator\ModelToArray as PastoralAttachmentTranslator;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -161,6 +162,12 @@ class Module extends BaseModule
             new ScrubAdapter(),
         );
 
+        $attachmentTranslator = new PastoralAttachmentTranslator(
+            $this->injector->get('router.generator'),
+            $this->injector->get('authorizer'),
+            $this->injector->get('user'),
+        );
+
         return new Controller(
             $this->injector->get('l10n'),
             $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
@@ -178,6 +185,7 @@ class Module extends BaseModule
             new PastoralTranslator(
                 new \Schoolbox\User\Translator\Author\ModelToArray(),
                 $commentTranslator,
+                $attachmentTranslator,
                 $this->getRouter()->getGenerator(),
                 $this->injector->get('authorizer'),
                 $this->injector->get('user'),
