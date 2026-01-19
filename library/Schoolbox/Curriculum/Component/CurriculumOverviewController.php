@@ -123,6 +123,13 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             }
         }
 
+        // Don't render the entire component for readonly users if filters have been applied but the filter would remove all nodes
+        if (!$this->hasContextWriteAccess() && null !== $this->curriculumTreeFilter) {
+            if (!$this->curriculumNodes->getBy('id', $this->curriculumTreeFilter->getId())) {
+                return false;
+            }
+        }
+
         return true;
     }
 
