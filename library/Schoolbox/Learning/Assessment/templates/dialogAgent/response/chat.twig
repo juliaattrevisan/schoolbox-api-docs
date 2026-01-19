@@ -8,7 +8,7 @@
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
  # @param \Schoolbox\User $student        A user instance for the student
- # @param array $studentStruct            Array of author info about the student who owns the response
+ # @param array $studentData              Array of author info about the student who owns the response
  # @param array $responseData             Array translation of the response to pass to Vue
  # @param int|null $duration              The time limit / duration (in seconds)
  # @param string $returnUrl               A redirect destination
@@ -38,7 +38,7 @@
                 <dialog-agent-response-chat
                     :feed="{{ feed |json_encode }}"
                     :response="{{ responseData |json_encode }}"
-                    :student="{{ studentStruct |json_encode }}"
+                    :student="{{ studentData |json_encode }}"
                     :duration="{{ duration ?? 'null' }}"
                     close-at="{{ assessment.closeAt.toRfc3339String }}"
                     return-url="{{ returnUrl }}"
