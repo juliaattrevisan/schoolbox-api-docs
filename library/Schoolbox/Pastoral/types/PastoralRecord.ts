@@ -76,6 +76,23 @@ type PastoralComment = {
 };
 
 /**
+ * Pastoral attachment
+ */
+type PastoralAttachment = {
+    id: number;
+    realname: string;
+    storage: {
+        filename: string;
+        mimetype: {
+            isImage: boolean;
+        };
+        mime: string;
+        hash: string;
+    };
+    route: string;
+};
+
+/**
  * The expected payload for a Pastoral records load.
  */
 export type RecordsPayload = {
@@ -104,4 +121,5 @@ export type PastoralRecord = {
     bodyPublic?: string;
     tags: PastoralTag[];
     comments: PastoralComment[];
+    attachmentsPublic?: PastoralAttachment[];
 };
