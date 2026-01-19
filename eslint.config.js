@@ -5,15 +5,39 @@
  * We are currently using the Airbnb config with TypeScript support, and also adding the additional checks typescript-eslint provides.
  * Prettier is added to the end so eslint doesnt report on formatting issues that prettier will automatically fix.
  */
-module.exports = {
-    // specifies the allowed environments: https://eslint.org/docs/latest/use/configure/language-options#specifying-environments
-    env: {
-        browser: true,
-        commonjs: true,
-        es6: true,
-        jquery: true,
+
+const { defineConfig, globalIgnores } = require("eslint/config");
+const globals = require("globals");
+const vueEslintParser = require("vue-eslint-parser");
+const typescriptEslint = require("@typescript-eslint/eslint-plugin");
+const jsdoc = require("eslint-plugin-jsdoc");
+const eslintComments = require("eslint-plugin-eslint-comments");
+const js = require("@eslint/js");
+
+const { FlatCompat } = require("@eslint/eslintrc");
+
+const compat = new FlatCompat({
+    baseDirectory: __dirname,
+    recommendedConfig: js.configs.recommended,
+    allConfig: js.configs.all,
+});
+
+const mainConfig = defineConfig({
+    languageOptions: {
+        globals: {
+            ...globals.browser,
+            ...globals.commonjs,
+            ...globals.jquery,
+        },
+        parser: vueEslintParser, // to parse .vue files: https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
+        parserOptions: {
+            extraFileExtensions: [".vue"],
+            parser: "@typescript-eslint/parser", // the parser that runs through our ts files
+            project: "./tsconfig.json",
+            tsconfigRootDir: __dirname,
+        },
     },
-    extends: [
+    extends: compat.extends(
         // "airbnb-base",
         // "airbnb-typescript/base",
         "plugin:@typescript-eslint/recommended",
@@ -24,25 +48,12 @@ module.exports = {
         "plugin:import-x/typescript",
         "prettier",
         // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
-    ],
-    parser: "vue-eslint-parser",
-    // to parse .vue files: https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
-    parserOptions: {
-        extraFileExtensions: [".vue"],
-        parser: "@typescript-eslint/parser",
-        // the parser that runs through our ts files
-        project: "./tsconfig.json",
-        tsconfigRootDir: __dirname,
+    ),
+    plugins: {
+        "@typescript-eslint": typescriptEslint,
+        jsdoc,
+        "eslint-comments": eslintComments,
     },
-    plugins: [
-        "@typescript-eslint",
-        // for eslint to be using typescript-eslint
-        "eslint-plugin-jsdoc", // to lint jsdocs
-        "eslint-plugin-eslint-comments", // to avoid unnecessary eslint-disable comments
-    ],
-
-    root: true,
-    // limits ESLint to this folder (wont go up parent folders)
     rules: {
         // customised rules
         "import-x/prefer-default-export": "off",
@@ -54,8 +65,8 @@ module.exports = {
             },
         ],
         // allow modifying props of parameters, especially valid when passing DOM elements, as we don"t really want to be cloning DOM elements
-        "arrow-body-style": "off",
         // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
+        "arrow-body-style": "off",
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
         // allow devDependencies to be imported so that we can use them in our tests
@@ -108,12 +119,7 @@ module.exports = {
          * and our browser targets support them without the need for regenerator-runtime
          * It should also help avoid Promise.all() accidentally being used for operations that must be sequential
          */
-        "no-restricted-syntax": [
-            "error",
-            (({ ForOfStatement, ..._rules }) => _rules)(
-                require("eslint-config-airbnb-base/rules/style").rules["no-restricted-syntax"][1],
-            ),
-        ],
+        "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
         "no-await-in-loop": "off",
     },
     settings: {
@@ -126,4 +132,26 @@ module.exports = {
             },
         },
     },
-};
+});
+
+module.exports = defineConfig([
+    mainConfig,
+    globalIgnores([
+        "**/*.js",
+        "**/.git",
+        "**/.vagrant",
+        "**/conf",
+        "**/debian",
+        "**/docs",
+        "**/debian",
+        "**/node_modules",
+        "**/packages",
+        "**/patches",
+        "**/sql",
+        "**/tools",
+        "**/updates",
+        "**/vagrantcache",
+        "**/vendor",
+        "www/static/js/bundle",
+    ]),
+]);
