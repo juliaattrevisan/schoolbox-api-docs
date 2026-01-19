@@ -68,76 +68,70 @@ const config = window.Vue.inject<Config>("pastoralConfig");
                 </span>
             </p>
         </div>
-        <article>
-            <div class="l-flex-col l-gap-s">
-                <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
-                <div v-if="props.record.tags.length > 0" class="l-flex-row l-gap-xs f-no-margins">
-                    <template v-for="tag in props.record.tags" :key="tag.id">
-                        <a
-                            v-if="routes?.getReportTags"
-                            class="neutral label hide-on-print"
-                            :href="routes?.getReportTags.replace('{tagId}', tag.id.toString())"
-                        >
-                            {{ tag.name }}
-                        </a>
-                        <span v-else class="neutral label hide-on-print">
-                            {{ tag.name }}
-                        </span>
-                        <b class="show-for-print"> {{ tag.name }}</b>
-                    </template>
-                </div>
-                <div
-                    v-if="props.record.attachmentsPublic && props.record.attachmentsPublic.length"
-                    id="article-attachments"
-                >
-                    <hr />
-                    <!-- <script type="text/javascript">
+        <div class="l-flex-col l-gap-s l-pad-s" style="clear: both">
+            <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
+            <div v-if="props.record.tags.length > 0" class="l-flex-row l-gap-xs f-no-margins">
+                <template v-for="tag in props.record.tags" :key="tag.id">
+                    <a
+                        v-if="routes?.getReportTags"
+                        class="neutral label hide-on-print"
+                        :href="routes?.getReportTags.replace('{tagId}', tag.id.toString())"
+                    >
+                        {{ tag.name }}
+                    </a>
+                    <span v-else class="neutral label hide-on-print">
+                        {{ tag.name }}
+                    </span>
+                    <b class="show-for-print"> {{ tag.name }}</b>
+                </template>
+            </div>
+            <div
+                v-if="props.record.attachmentsPublic && props.record.attachmentsPublic.length"
+                id="article-attachments"
+            >
+                <hr />
+                <!-- <script type="text/javascript">
                             $(function () {
                                 $('[data-plugin="preview"]').preview();
                             });
                         </script> -->
-                    <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
-                        <li
-                            v-for="attachment in props.record.attachmentsPublic"
-                            :key="attachment.id"
-                            class="actions-small-1"
-                        >
-                            <div class="list-item">
-                                <div class="card attachment small-12">
-                                    <a
-                                        data-plugin="preview"
-                                        :href="attachment.route"
-                                        :title="attachment.storage.filename"
-                                    >
-                                        <img
-                                            v-if="attachment.storage.mimetype.isImage"
-                                            :src="`/storage/image.php?hash=${attachment.storage.hash}&size=square64`"
-                                            alt="Download"
-                                        />
-                                        <img
-                                            v-else
-                                            :src="`/ajax/mime/${attachment.storage.mime}`"
-                                            alt="Attachment"
-                                            class="mime"
-                                        />
-                                        <p>{{ attachment.realname }}</p>
-                                    </a>
-                                </div>
+                <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
+                    <li
+                        v-for="attachment in props.record.attachmentsPublic"
+                        :key="attachment.id"
+                        class="actions-small-1"
+                    >
+                        <div class="list-item">
+                            <div class="card attachment small-12">
+                                <a data-plugin="preview" :href="attachment.route" :title="attachment.storage.filename">
+                                    <img
+                                        v-if="attachment.storage.mimetype.isImage"
+                                        :src="`/storage/image.php?hash=${attachment.storage.hash}&size=square64`"
+                                        alt="Download"
+                                    />
+                                    <img
+                                        v-else
+                                        :src="`/ajax/mime/${attachment.storage.mime}`"
+                                        alt="Attachment"
+                                        class="mime"
+                                    />
+                                    <p>{{ attachment.realname }}</p>
+                                </a>
                             </div>
-                            <nav>
-                                <a
-                                    :href="attachment.route"
-                                    download
-                                    rel="download"
-                                    title="Download"
-                                    class="icon-download"
-                                ></a>
-                            </nav>
-                        </li>
-                    </ul>
-                </div>
+                        </div>
+                        <nav>
+                            <a
+                                :href="attachment.route"
+                                download
+                                rel="download"
+                                title="Download"
+                                class="icon-download"
+                            ></a>
+                        </nav>
+                    </li>
+                </ul>
             </div>
-        </article>
+        </div>
         <ul v-if="props.record.comments.length" class="information-list reply">
             <li v-for="comment in props.record.comments.filter((c) => !c.private)" :key="comment.owner.id">
                 <div class="card compact small-12">
