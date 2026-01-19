@@ -71,7 +71,7 @@ const config = window.Vue.inject<Config>("pastoralConfig");
         <article>
             <div class="l-flex-col l-gap-s">
                 <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
-                <p v-if="props.record.tags.length > 0" class="spaced">
+                <div v-if="props.record.tags.length > 0" class="l-flex-row l-gap-xs f-no-margins">
                     <template v-for="tag in props.record.tags" :key="tag.id">
                         <a
                             v-if="routes?.getReportTags"
@@ -85,7 +85,7 @@ const config = window.Vue.inject<Config>("pastoralConfig");
                         </span>
                         <b class="show-for-print"> {{ tag.name }}</b>
                     </template>
-                </p>
+                </div>
                 <div
                     v-if="props.record.attachmentsPublic && props.record.attachmentsPublic.length"
                     id="article-attachments"
