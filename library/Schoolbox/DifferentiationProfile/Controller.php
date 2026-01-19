@@ -506,6 +506,7 @@ class Controller extends Base
                 $this->getAuthorizer(),
                 $this->getUser(),
                 $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1),
+                true,
             );
             $data = call_user_func($profileTranslator, $profile);
             $this->response = $this->responseAsJson($data);

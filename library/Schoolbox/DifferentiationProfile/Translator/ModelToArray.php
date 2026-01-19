@@ -16,11 +16,19 @@ class ModelToArray
 {
     use GetRouteIfAuthorized;
 
+    /**
+     * @param Generator  $routeGenerator
+     * @param Authorizer $authorizer
+     * @param User       $currentUser
+     * @param Collection $profileConfig
+     * @param bool       $includeName   whether to include names for adjustments instead of IDs
+     */
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
         private Collection $profileConfig,
+        private bool $includeName = false,
     ) {
     }
 
@@ -41,7 +49,11 @@ class ModelToArray
                     if ($value->count() === 0) {
                         $carry[$config->getName()] = null;
                     } else {
-                        $carry[$config->getName()] = array_map('intval', $value->getPropertyValues('id'));
+                        if ($this->includeName) {
+                            $carry[$config->getName()] = $value->getPropertyValues('name');
+                        } else {
+                            $carry[$config->getName()] = array_map('intval', $value->getPropertyValues('id'));
+                        }
                     }
                 } else {
                     $carry[$config->getName()] = $value;
