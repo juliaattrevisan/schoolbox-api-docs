@@ -11,7 +11,6 @@ namespace Schoolbox\Pastoral\Attachment\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
-use Alaress\HTMLPurifier\IPurifier;
 use Aura\Router\Generator;
 use Schoolbox\Pastoral\Attachment\Model;
 use Schoolbox\User;
