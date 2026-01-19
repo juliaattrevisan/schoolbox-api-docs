@@ -5,7 +5,6 @@
 /* eslint-enable vue/no-v-html */
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import Toast from "@schoolboxVue/components/toast.vue";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
@@ -16,7 +15,6 @@ export default {
 
     components: {
         RevealModal,
-        Toast,
         SearchSelect,
     },
 
@@ -160,8 +158,8 @@ export default {
             this.isProcessing = true;
             const formContent = new FormData(form);
             formContent.set("detail", window.sbProps.editors["detail"].getData());
-            this.$refs.toast.activate("Saving...");
 
+            const toast = window.sbProps.toastActivate("Saving...");
             try {
                 const response = await fetch(form.action, {
                     method: form.method,
@@ -176,20 +174,20 @@ export default {
                     this.$refs.modal.close();
                     // check if errors exist?
                     if (responseData.errors && responseData.errors.length > 0) {
-                        this.$refs.toast.timeout(
-                            "Event / Task created with some issues: " + responseData.errors.join(", "),
-                            false,
-                            4000,
-                        );
+                        toast.timeout({
+                            text: `Event / Task created with some issues: ${responseData.errors.join(", ")}`,
+                            isSuccess: false,
+                        });
                     } else {
-                        this.$refs.toast.timeout("Created", true, 2000);
+                        toast.timeout({ text: "Created", isSuccess: true });
                     }
+
                     this.$emit("eventCreated", responseData.event);
                 } else {
-                    this.$refs.toast.timeout("Unable to create event / task. " + responseData.message, false, 3000);
+                    toast.timeout({ text: `Unable to create event / task: ${responseData.message}`, isSuccess: false });
                 }
             } catch (error) {
-                this.$refs.toast.timeout("Unable to create event / task. " + error.message, false, 3000);
+                toast.timeout({ text: "Unable to create event / task. " + error.message, isSuccess: false });
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
@@ -241,7 +239,6 @@ export default {
 </script>
 
 <template>
-    <toast ref="toast"></toast>
     <reveal-modal ref="modal">
         <!-- create a tab Vue component? Currently they just work magically -->
         <dl class="tabs" data-tab>
