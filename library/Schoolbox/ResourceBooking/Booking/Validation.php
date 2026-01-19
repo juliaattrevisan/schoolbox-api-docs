@@ -200,6 +200,11 @@ class Validation
             $errors[self::END_PERIOD_ERRORS][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
+        // Return early if either date couldn't be parsed.
+        if ($startDate === null || $endDate === null) {
+            return $errors;
+        }
+
         $errors = $this->validateSimpleRules($resource, $startDate, $endDate, $override);
 
         $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
