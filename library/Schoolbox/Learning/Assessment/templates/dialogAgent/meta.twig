@@ -30,7 +30,7 @@
          #
          # needed isNull is same as(false) to test if getExcludedAt() has valid data.
          # I was not able to just test as getExcluedAt() is null, or find a better way
-        #}
+         #}
         <li class="icon-close">Excluded from {{ locale.activity }}</li>
     {% endif %}
 
@@ -48,8 +48,8 @@
     {# (optional) Duration #}
     {% if assessment.duration %}
         <li class="icon-time-value" title="Allowed Time">{% apply spaceless %}
-                You have <time>{{ duration.secondsToHoursAndMinutes(assessment.duration) }}</time> to complete this {{ locale.activity }}
-            {% endapply %}</li>
+            You have <time>{{ duration.secondsToHoursAndMinutes(assessment.duration) }}</time> to complete this {{ locale.activity }}
+        {% endapply %}</li>
     {% endif %}
 
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
