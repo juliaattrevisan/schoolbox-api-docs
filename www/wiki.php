@@ -9,7 +9,7 @@ if (!isset($this)) {
     die('No direct access permitted');
 }
 
-$wikiHandler = new Wiki();
+$wikiHandler  = new Wiki();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 /* Load a past revision
@@ -47,7 +47,7 @@ if ($this->arg[0] == 'revision') {
 
     $this->setTitle('Wiki');
 
-    $userHandler = new User();
+    $userHandler  = new User();
     $modifiedDate = new Alaress_Date_Format($wiki['modified'], 'U');
 
     /* Detect stub links in the wiki body and determine whether the links should
@@ -55,18 +55,18 @@ if ($this->arg[0] == 'revision') {
       *
       * Output wiki contents
       */
-    $output = array(
-        'WIKI_ID' => $wiki['wikiID'],
-        'CATEGORY_ID' => $wiki['categoryID'],
-        'FOLDER_NAME' => Scrub::text($folder->getName()),
-        'HEADING' => Scrub::text($wiki['heading']),
-        'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
-        'MODIFIED' => $modifiedDate->getLong(),
-        'AUTHOR' => $userHandler->formatName($wiki),
-        'AUTHOR_ID' => $wiki['authorID'],
+    $output = [
+        'WIKI_ID'          => $wiki['wikiID'],
+        'CATEGORY_ID'      => $wiki['categoryID'],
+        'FOLDER_NAME'      => Scrub::text($folder->getName()),
+        'HEADING'          => Scrub::text($wiki['heading']),
+        'BODY'             => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
+        'MODIFIED'         => $modifiedDate->getLong(),
+        'AUTHOR'           => $userHandler->formatName($wiki),
+        'AUTHOR_ID'        => $wiki['authorID'],
         'CURRENT_REVISION' => $wiki['revisionID'],
-        'EXPORT' => 'Export',
-    );
+        'EXPORT'           => 'Export',
+    ];
 
     $this->setVar($output);
 
@@ -74,9 +74,9 @@ if ($this->arg[0] == 'revision') {
     if ($locked) {
         $this->parse('wiki_locked_block', 'wiki_locked');
     } else {
-        $this->setVar(array(
-            'wiki_locked_block' => '',
-        ));
+        $this->setVar([
+                          'wiki_locked_block' => '',
+                      ]);
     }
 
     // output revisions
@@ -84,22 +84,22 @@ if ($this->arg[0] == 'revision') {
 
     if (is_array($revisionList)) {
         $userHandler = new User();
-        $i = 0;
+        $i           = 0;
 
         foreach ($revisionList as $revision) {
             $i++;
 
             $revisionDate = new Alaress_Date_Format($revision['created'], 'U');
 
-            $this->setVar(array(
-                'WIKI_ID' => $wiki['wikiID'],
-                'REVISION_ID' => $wiki['revisionID'],
-                'REVISION_COMPARE' => $revision['revisionID'],
-                'REVISION_DATE' => $revisionDate->getDateOnly(),
-                'REVISION_HEADING' => Scrub::text($revision['heading']),
-                'REVISION_AUTHOR' => $userHandler->formatName($revision),
-                'REVISION_CURRENT' => $revision['revisionID'] == $wiki['revisionID'] ? 'revisionCurrent' : '',
-            ));
+            $this->setVar([
+                              'WIKI_ID'          => $wiki['wikiID'],
+                              'REVISION_ID'      => $wiki['revisionID'],
+                              'REVISION_COMPARE' => $revision['revisionID'],
+                              'REVISION_DATE'    => $revisionDate->getDateOnly(),
+                              'REVISION_HEADING' => Scrub::text($revision['heading']),
+                              'REVISION_AUTHOR'  => $userHandler->formatName($revision),
+                              'REVISION_CURRENT' => $revision['revisionID'] == $wiki['revisionID'] ? 'revisionCurrent' : '',
+                          ]);
 
             if ($wiki['revisionID'] == $revision['revisionID']) {
                 $this->setVar('revision_comparison_block');
@@ -152,23 +152,22 @@ if ($this->arg[0] == 'revision') {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $folder->getName(),
-            'href' => "/homepage/{$folder->getId()}",
+            'text'  => $folder->getName(),
+            'href'  => "/homepage/{$folder->getId()}",
             'class' => '',
         ],
         [
-            'text' => 'Wiki',
-            'href' => "/wiki/{$folder->getId()}/$slug",
+            'text'  => 'Wiki',
+            'href'  => "/wiki/{$folder->getId()}/$slug",
             'class' => '',
         ],
         [
-            'text' => 'View Revisions',
-            'href' => '',
+            'text'  => 'View Revisions',
+            'href'  => '',
             'class' => 'active',
-        ]
+        ],
     ]);
-}
-/* Load an existing wiki by its category id and slug
+} /* Load an existing wiki by its category id and slug
  */
 elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
     $wiki = $wikiHandler->getByCategoryAndSlug($this->arg[0], $this->arg[1]);
@@ -179,15 +178,15 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
     if (!$wiki) {
         $this->setFile(TEMPLATE_content, 'wiki/new-wiki.html');
 
-        $this->setVar(array(
-            'WIKI_CATEGORYID' => $this->arg[0],
-            'WIKI_SLUG' => $this->arg[1],
-            'WIKI_COMPONENT_ID' => 0,
-        ));
+        $this->setVar([
+                          'WIKI_CATEGORYID'   => $this->arg[0],
+                          'WIKI_SLUG'         => $this->arg[1],
+                          'WIKI_COMPONENT_ID' => 0,
+                      ]);
 
         try {
             $folderMapper = new FolderMapper();
-            $folder = $folderMapper->findById($this->arg[0]);
+            $folder       = $folderMapper->findById($this->arg[0]);
         } catch (\Schoolbox\Mapper\Exception $e) {
             error(2);
         }
@@ -197,20 +196,18 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $trail = new Breadcrumbs();
         $trail->renderIntoSitePage($this, 'BREADCRUMB', [
             [
-                'text' => $folder->getName(),
-                'href' => "/homepage/{$folder->getId()}",
+                'text'  => $folder->getName(),
+                'href'  => "/homepage/{$folder->getId()}",
                 'class' => '',
             ],
             [
-                'text' => 'New Wiki',
-                'href' => '',
+                'text'  => 'New Wiki',
+                'href'  => '',
                 'class' => 'active',
-            ]
+            ],
         ]);
-    }
-    /* Otherwise load it
-     */
-    else {
+    } else {
+        /* Otherwise load it */
         $this->setFile(TEMPLATE_content, 'wiki.html');
         $this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
         $this->setBlock(TEMPLATE_content, 'delete_link', 'delete_link_block');
@@ -241,7 +238,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 
         $this->setTitle('Wiki');
 
-        $userHandler = new User();
+        $userHandler  = new User();
         $modifiedDate = new Alaress_Date_Format($wiki['modified'], 'U');
 
         /* Detect stub links in the wiki body and determine whether the links should
@@ -249,18 +246,18 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
            *
            * Output wiki contents
            */
-        $output = array(
-            'WIKI_ID' => $wiki['wikiID'],
-            'CATEGORY_ID' => $wiki['categoryID'],
-            'FOLDER_NAME' => Scrub::text($folder->getName()),
-            'HEADING' => Scrub::text($wiki['heading']),
-            'BODY' => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
-            'MODIFIED' => $modifiedDate->getLong(),
-            'AUTHOR' => $userHandler->formatName($wiki),
-            'AUTHOR_ID' => $wiki['authorID'],
+        $output = [
+            'WIKI_ID'          => $wiki['wikiID'],
+            'CATEGORY_ID'      => $wiki['categoryID'],
+            'FOLDER_NAME'      => Scrub::text($folder->getName()),
+            'HEADING'          => Scrub::text($wiki['heading']),
+            'BODY'             => Scrub::html($wikiHandler->activateStubLinks($wiki['body'])),
+            'MODIFIED'         => $modifiedDate->getLong(),
+            'AUTHOR'           => $userHandler->formatName($wiki),
+            'AUTHOR_ID'        => $wiki['authorID'],
             'CURRENT_REVISION' => $wiki['revisionID'],
-            'EXPORT' => 'Export',
-        );
+            'EXPORT'           => 'Export',
+        ];
 
         $this->setVar($output);
 
@@ -268,9 +265,9 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         if ($locked) {
             $this->parse('wiki_locked_block', 'wiki_locked');
         } else {
-            $this->setVar(array(
-                'wiki_locked_block' => '',
-            ));
+            $this->setVar([
+                              'wiki_locked_block' => '',
+                          ]);
         }
 
         // output revisions
@@ -278,22 +275,22 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 
         if (is_array($revisionList)) {
             $userHandler = new User();
-            $i = 0;
+            $i           = 0;
 
             foreach ($revisionList as $revision) {
                 $i++;
 
                 $revisionDate = new Alaress_Date_Format($revision['created'], 'U');
 
-                $this->setVar(array(
-                    'WIKI_ID' => $wiki['wikiID'],
-                    'REVISION_ID' => $wiki['revisionID'],
-                    'REVISION_COMPARE' => $revision['revisionID'],
-                    'REVISION_DATE' => $revisionDate->getDateOnly(),
-                    'REVISION_HEADING' => Scrub::text($revision['heading']),
-                    'REVISION_AUTHOR' => $userHandler->formatName($revision),
-                    'REVISION_CURRENT' => $revision['revisionID'] == $wiki['revisionID'] ? 'revisionCurrent' : '',
-                ));
+                $this->setVar([
+                  'WIKI_ID'          => $wiki['wikiID'],
+                  'REVISION_ID'      => $wiki['revisionID'],
+                  'REVISION_COMPARE' => $revision['revisionID'],
+                  'REVISION_DATE'    => $revisionDate->getDateOnly(),
+                  'REVISION_HEADING' => Scrub::text($revision['heading']),
+                  'REVISION_AUTHOR'  => $userHandler->formatName($revision),
+                  'REVISION_CURRENT' => $revision['revisionID'] == $wiki['revisionID'] ? 'revisionCurrent' : '',
+                ]);
 
                 if ($wiki['revisionID'] == $revision['revisionID']) {
                     $this->setVar('revision_comparison_block');
@@ -349,20 +346,20 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $trail = new Breadcrumbs();
         $trail->renderIntoSitePage($this, 'BREADCRUMB', [
             [
-                'text' => $folder->getName(),
-                'href' => "/homepage/{$folder->getId()}",
+                'text'  => $folder->getName(),
+                'href'  => "/homepage/{$folder->getId()}",
                 'class' => '',
             ],
             [
-                'text' => 'Wiki',
-                'href' => "/wiki/{$folder->getId()}/$slug",
+                'text'  => 'Wiki',
+                'href'  => "/wiki/{$folder->getId()}/$slug",
                 'class' => '',
             ],
             [
-                'text' => 'View',
-                'href' => '',
+                'text'  => 'View',
+                'href'  => '',
                 'class' => 'active',
-            ]
+            ],
         ]);
     }
 } else {
