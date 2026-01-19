@@ -6,7 +6,7 @@
 import { toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import PrRecord from "./pr-record.vue";
+import PastoralRecord from "@schoolboxLibrary/Pastoral/vue/pastoral-record.vue";
 import PrEmpty from "./pr-empty.vue";
 import PrGeneratePrint from "./pr-generate-print.vue";
 import { useLoadRecords } from "./composable/useLoadRecords";
@@ -71,7 +71,7 @@ defineExpose({ printAllRecords });
             <div v-if="payload.data.results.length > 0" class="l-flex-col l-gap-s">
                 <div v-for="record in payload.data.results" :key="record.id" class="c-island">
                     <ul class="information-list threaded">
-                        <pr-record :record="record" />
+                        <pastoral-record :record="record" />
                     </ul>
                 </div>
             </div>

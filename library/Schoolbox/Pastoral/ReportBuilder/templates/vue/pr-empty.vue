@@ -7,7 +7,7 @@
 import type { Routes } from "../js/types/pastoralReportTypes";
 
 const localePastoral = window.Vue.inject<string>("localePastoral");
-const routes = window.Vue.inject<Routes>("routes");
+const routes = window.Vue.inject<Routes>("pastoralRoutes");
 </script>
 
 <template>
