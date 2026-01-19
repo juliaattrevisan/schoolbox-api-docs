@@ -96,7 +96,7 @@ class ModelToArray
             // Text and comments
             'bodyPublic'         => $this->scrubAdapter->purify($model->getBodyPublic()),
 
-            'attachmentsPublic'  => $model->getAttachments()->filterBy('private', false)->map($this->attachmentTranslator),
+            'attachmentsPublic'  => $model->getAttachments()->filterBy('private', false)->map($this->attachmentTranslator)->reindex(),
 
             'comments'            => $model->getComments()->map($this->commentTranslator)
         ];
