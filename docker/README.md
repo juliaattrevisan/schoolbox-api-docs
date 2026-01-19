@@ -24,13 +24,42 @@ In summary:
   containers
 - each container is defined within an image
 
-## Configuration
+## Configuration of the environment
 
 The Docker environment is configured with [docker.env](../docker.env) in the
 root of the Schoolbox folder.
 
 The settings in this file override the defaults in
 [docker.default.env](../docker.default.env).
+
+## Setting up your IDE
+
+The following integrations ought to be set up in your IDE.
+
+### PHPStorm
+
+#### Xdebug
+
+https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/1765507088/PHPStorm#XDebug
+should work for both the Docker and Vagrant environments.
+
+#### Database connection
+
+https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/1765507088/PHPStorm#Database-(docker)
+details how PHPStorm's database client can be set up to connect to the Docker
+environment's database.
+
+#### PHPUnit
+
+https://schoolbox.atlassian.net/wiki/spaces/DEV/pages/1765507088/PHPStorm#PHPUnit
+details how PHPUnit may be set up within PHPStorm.
+
+The instructions are slightly different to Vagrant: note where they diverge.
+The method for running tests remains the same.
+
+### VSCode
+
+> TODO write instructions for setting up VSCode
 
 ### Migration from Vagrant
 
