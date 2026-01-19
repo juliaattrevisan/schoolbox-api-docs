@@ -134,7 +134,7 @@ declare global {
         /**
          * From jpreview.ts - to preview media, opening in a lightbox
          */
-        preview(): JQuery;
+        preview(): void;
         /**
          * From jquery-validation
          */
