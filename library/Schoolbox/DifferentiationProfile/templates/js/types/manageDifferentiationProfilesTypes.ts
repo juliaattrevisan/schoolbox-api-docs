@@ -88,6 +88,7 @@ export type Profile = {
     _routes: {
         linkedRecords?: string;
         edit?: string;
+        create?: string;
     };
 };
 

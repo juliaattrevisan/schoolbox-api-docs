@@ -70,16 +70,23 @@ class ModelToArray
                 ],
             ],
             ...$config,
-            '_routes'    => [
+            '_routes' => [
                 'linkedRecords' => $this->getRouteIfAuthorized(
                     'differentiationProfiles.getLinkedPastoralRecords',
                     ['studentId' => $student->getId()],
                 ),
-                'edit'          => $this->getRouteIfAuthorized(
-                    'differentiationProfiles.postDifferentiationProfileData',
+                'create'        => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.createDifferentiationProfileData',
                     [
                         'student'   => $student,
-                        'studentId' => $student->getId()
+                        'studentId' => $student->getId(),
+                    ],
+                ),
+                'edit'          => $this->getRouteIfAuthorized(
+                    'differentiationProfiles.putDifferentiationProfileData',
+                    [
+                        'student'   => $student,
+                        'studentId' => $student->getId(),
                     ],
                 ),
             ],

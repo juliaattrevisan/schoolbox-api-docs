@@ -119,10 +119,19 @@ class Module extends BaseModule
             'getLinkedPastoralRecords',
             $getPerms,
         );
+
         $this->register(
             self::METHOD_POST,
+            '/create/{studentId}',
+            'createDifferentiationProfileData',
+            $updateProfilePerms,
+            \Closure::fromCallable([$this, 'preloadStudent'])
+        );
+
+        $this->register(
+            self::METHOD_PUT,
             '/edit/{studentId}',
-            'postDifferentiationProfileData',
+            'putDifferentiationProfileData',
             $updateProfilePerms,
             \Closure::fromCallable([$this, 'preloadStudent'])
         );

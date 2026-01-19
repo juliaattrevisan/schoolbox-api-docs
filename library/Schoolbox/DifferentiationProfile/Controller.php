@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
@@ -281,32 +282,58 @@ class Controller extends Base
     }
 
     /**
-     * Save differentiation profile data
+     * Create differentiation profile data
      *
      * @param User $student
      * @return void
      * @throws Exception
      */
-    public function postDifferentiationProfileData(User $student): void
+    public function createDifferentiationProfileData(User $student): void
     {
         $post = $this->requestPost;
 
-        $id = $post->getInt('id');
-
-        /* Look for the existing differentiation profile record if an ID is provided
-         */
-        if (null !== $id) {
-            try {
-                $model = $this->mapper->findById($id);
-            } catch (\Exception $e) {
-                $this->sendJsonError('Differentiation profile record not found.', 404);
-                return;
-            }
-        } else {
+        try {
             $model = $this->mapper->createModel()
                                   ->setStudent($student);
+        } catch (\Exception $e) {
+            $this->sendJsonError('Failed to create differentiation profile record.', 500);
+            return;
         }
 
+        $this->persistDifferentiationProfile($model, $post);
+    }
+
+    /**
+     * Save differentiation profile data
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function putDifferentiationProfileData(User $student): void
+    {
+        $body = new Values($this->request->getParsedBody() ?? []);
+
+        try {
+            /** @var Model $model */
+            $model = $this->mapper->findOneByColumn(
+                'student_id',
+                $student->getId(),
+                [
+                    'order' => [
+                        'updated_at' => DifferentiationProfileMapper::SORT_ORDER_DESC,
+                    ],
+                ]
+            );
+        } catch (\Exception $e) {
+            $this->sendJsonError('Differentiation profile record not found.', 404);
+            return;
+        }
+
+        $this->persistDifferentiationProfile($model, $body);
+    }
+
+    private function persistDifferentiationProfile(Model $model, Values $post): void
+    {
         $adjustment_level = $post->get('adjustment_level');
         if (!is_array($adjustment_level) && null !== $adjustment_level) {
             $this->sendJsonError('Adjustment level must be an array.', 400);
