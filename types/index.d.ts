@@ -7,8 +7,9 @@ import type Vue from "vue";
 import type dayjs from "dayjs";
 import type { lightGallery } from "lightgallery";
 import type { LightGallery } from "lightgallery/lightgallery";
-import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";
 import type { DefineComponent } from "vue";
+import type { apiRequest } from "@js/util/sbx/apiUtils";
+import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
@@ -48,6 +49,7 @@ declare global {
         Dropzone: Dropzone;
         MediaElementPlayer: MediaElementPlayer;
         sbProps: {
+            apiRequest: typeof apiRequest;
             /** Enabled assessment types, mapped to default readable name, translated to match the current terminology */
             assessmentTypes: Record<
                 Partial<ActivityType>,

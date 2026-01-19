@@ -511,7 +511,8 @@ class Controller extends Base
             ])->add(['Response']),
             'assessment' => $assessment,
             'feed' => $feed,
-            'student' => $userTranslator->__invoke($student),
+            'student' => $student,
+            'studentData' => $userTranslator->__invoke($student),
             'response' => $response,
             'responseData' => $response ? $responseTranslator->__invoke($response) : null,
             'interactionLocked' => false, // TODO
@@ -873,17 +874,22 @@ class Controller extends Base
      *
      * @param IAssessable $assessment
      * @param User $student
-     * @param Response $response
      * @return void
      * @throws Deleted
      * @throws Exception
      */
-    public function postReset(IAssessable $assessment, User $student, Response $response): void
+    public function postReset(IAssessable $assessment, User $student): void
     {
-        /* Reset the existing response to be non-authoritative
+        /* Make sure all existing responses for this participant are set to non-authoritative
          */
-        $response->setAuthoritative(false);
-        $this->dialogAgentResponseMapper->save($response);
+        $participant = $assessment->getParticipant($student);
+        foreach ($participant->getAllResponses() as $existingResponse) {
+            /** @var Response $existingResponse */
+            if ($existingResponse->getAuthoritative()) {
+                $existingResponse->setAuthoritative(false);
+                $this->dialogAgentResponseMapper->save($existingResponse);
+            }
+        }
 
         /* Spawn a new one, using the latest dialog agent configuration which may differ to what $response had
          */
@@ -899,6 +905,37 @@ class Controller extends Base
 
         /** Respond as JSON with a consistent translated response data */
         $this->getStatus($newResponse);
+    }
+
+
+    /**
+     * Change a particular response to be the authoritative one for the participant
+     *
+     * @param IAssessable $assessment
+     * @param User $student
+     * @param Response $response
+     * @return void
+     */
+    public function postSetAuthoritative(IAssessable $assessment, User $student, Response $response): void
+    {
+        /* Make sure all existing responses for this participant are set to non-authoritative
+         */
+        $participant = $assessment->getParticipant($student);
+        foreach ($participant->getAllResponses() as $existingResponse) {
+            /** @var Response $existingResponse */
+            if ($existingResponse->getAuthoritative()) {
+                $existingResponse->setAuthoritative(false);
+                $this->dialogAgentResponseMapper->save($existingResponse);
+            }
+        }
+
+        /* Set this one to authoritative
+         */
+        $response->setAuthoritative(true);
+        $this->dialogAgentResponseMapper->save($response);
+
+        /** Respond as JSON with a consistent translated response data */
+        $this->getStatus($response);
     }
 
 

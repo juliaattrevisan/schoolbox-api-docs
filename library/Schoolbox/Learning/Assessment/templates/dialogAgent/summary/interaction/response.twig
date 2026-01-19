@@ -9,53 +9,55 @@
     student: participant.user
 }) %}
 
-{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgent.getParticularResponse', {
+{% set responseRouteData = {
     assessmentId: currentInteraction.assessable.id,
-    studentId:    participant.user.id,
-    responseId:   currentInteraction.id,
-    response:     currentInteraction,
     assessment:   currentInteraction.assessable,
-    student:      participant.user
-}) %}
+    studentId:    participant.user.id,
+    student:      participant.user,
+    responseId:   currentInteraction.id,
+    response:     currentInteraction
+} %}
+
+{% set viewSubmissionRoute = routeLookupIfAuthorized('learningDialogAgent.getParticularResponse', responseRouteData) %}
 
 {% if createSubmissionRoute and currentInteraction.authoritative %}
     {# You only have access to the create route if this is the current auth response and it's a draft #}
+    {% set icon = 'dialogAgent' %}
     {% set url = createSubmissionRoute %}
-    {% set tooltip = 'Resume ' ~ locale.dialogAgent %}
+    {% set tooltip = 'Resume ' ~ locale.dialogAgent.proper %}
 {% elseif viewSubmissionRoute %}
     {# If it's published, provide a link for teachers to view the submission in the inline grader #}
+    {% set icon = 'eye' %}
     {% set url = viewSubmissionRoute %}
-    {% set tooltip = 'View ' ~ locale.dialogAgent %}
+    {% set tooltip = 'View ' ~ locale.dialogAgent.proper %}
 {% else %}
     {# Just link to participant's profile #}
+    {% set icon = 'eye' %}
     {% set url = '/search/user/' ~ participant.user.id %}
     {% set tooltip = 'View Profile' %}
 {% endif %}
 
+{% set setAuthoritativeRoute = routeLookupIfAuthorized('learningDialogAgent.postSetAuthoritative', responseRouteData) %}
+
 {# TODO: implement deleting a particular response #}
-{% set deleteRoute = routeLookupIfAuthorized('learningDialogAgentResponse.deleteParticularResponse', {
-    assessment: currentInteraction.assessable,
-    assessmentId: currentInteraction.assessable.id,
-    participant: participant,
-    studentId: participant.user.id,
-    responseId: currentInteraction.id,
-    response: currentInteraction
-}) %}
+{% set deleteRoute = routeLookupIfAuthorized('learningDialogAgentResponse.deleteParticularResponse', responseRouteData) %}
 <ul class="information-list threaded">
     <li class="actions-small-1">
         <ul class="action-list">
             <li class="actions-small-1">
                 <div class="list-item">
-                    <div class="card small-12 {% if not currentInteraction.isSubmitted %}draftSubmission{% endif %}">
+                    {# anything that isn't the authoritative response should also be styled as a draft to avoid confusion #}
+                    <div class="card small-12 {% if not currentInteraction.isSubmitted or not currentInteraction.authoritative %}draftSubmission{% endif %}">
                         {% if url %}
                         <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
                             {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
                             <p>
                                 {% if currentInteraction.isSubmitted %}
-                                    Submission
+                                    Response
                                 {% else %}
-                                    Draft Submission
+                                    {% if currentInteraction.authoritative %}Current{% endif %}
+                                    Draft Response
                                 {% endif %}
                                 by {{ participant.user.fullname }}
                             </p>
@@ -67,23 +69,32 @@
                         {% if url %}
                         </a>
                         {%  endif %}
-
-                        {# TODO Indicate an authoritative response somehow #}
-{#                        {% if currentInteraction.authoritative %}#}
-{#                            (A)#}
-{#                        {% endif %}#}
                     </div>
                 </div>
-                {% if deleteRoute %}
-                <nav>
-                    <sbx-pop-out content-id="response-options-{{ currentInteraction.id }}"></sbx-pop-out>
-                </nav>
-                <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
-                    {%  if url %}
-                        <li><a href="{{ url }}" class="icon-task" title="{{ tooltip }}" >{{ tooltip }}</a></li>
-                    {% endif %}
-                    <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete response" data-delete="{{ deleteRoute }}">Delete</a></li>
-                </ul>
+
+                {% if setAuthoritativeRoute or deleteRoute %}
+                    <nav>
+                        <sbx-pop-out content-id="response-options-{{ currentInteraction.id }}"></sbx-pop-out>
+                    </nav>
+                    <ul id="response-options-{{ currentInteraction.id }}" class="f-dropdown" data-dropdown-content>
+                        {% if url %}
+                            <li><a href="{{ url }}" class="icon-{{ icon }}" title="{{ tooltip }}">{{ tooltip }}</a></li>
+                        {% endif %}
+
+                        {% if setAuthoritativeRoute %}
+                            <li>
+                                <a
+                                    href="{{ setAuthoritativeRoute }}"
+                                    class="icon-match"
+                                    data-set-authoritative="{{ setAuthoritativeRoute}}"
+                                >Set as Authoritative Response</a>
+                            </li>
+                        {% endif %}
+
+                        {% if deleteRoute %}
+                            <li><a href="{{ viewRoute }}" class="icon-delete" title="Delete response" data-delete="{{ deleteRoute }}">Delete</a></li>
+                        {% endif %}
+                    </ul>
                 {% endif %}
             </li>
         </ul>

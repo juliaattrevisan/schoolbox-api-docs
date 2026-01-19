@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DialogAgent;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
@@ -235,7 +236,6 @@ class Full
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
                 if ($currentResponse instanceof DueWork\Response\Model) {
                     // Exclude feedback which doesn't match the filter
-                    /** @var Duework\Feedback\Model[] $includedFeedback */
                     $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
 
                     /* Maintain a list of all the Feedbacks that were discovered
@@ -347,8 +347,26 @@ class Full
     protected function getDate($interaction)
     {
         if ($interaction instanceof IResponse) {
+            /* Dialog agent responses prioritise the authoritative response first */
+            if ($interaction instanceof DialogAgent\Response\Model && $interaction->getAuthoritative()) {
+                /* In order to force an authoritative interaction to the top of the stack,
+                 * we must add some arbitrary amount of time or otherwise the updatedAt
+                 * could collide with "now" when you just changed what the authoritative response is
+                 *
+                 * by intentionally forging an impossible date in the future, we can trick the comparison into
+                 * putting an object at the top of the list to save us a post-sort manipulation after the fact
+                 */
+                return Alaress_Date_Format::now()->addHours(1);
+            }
+
             if ($interaction->getSubmittedAt()) {
                 return $interaction->getSubmittedAt();
+            }
+            /* If a submission is a draft, fall back to updatedAt if possible
+             * as there could be multiple drafts to sort (such as in DialogAgent)
+             */
+            if ($interaction->getUpdatedAt()) {
+                return $interaction->getUpdatedAt();
             }
         } elseif ($interaction instanceof IFeedback) {
             if ($interaction->getPublishedAt()) {

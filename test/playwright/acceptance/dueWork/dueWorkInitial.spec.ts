@@ -5,6 +5,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import AssessmentPage from "@schoolboxTest/playwright/support/page/dueWork/AssessmentPage";
 import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
 
 // TODO: Move selectors into relevant support page files
@@ -36,7 +37,6 @@ const SELECTOR_ASSESSMENT_STATUS_META_TITLE = "assessment-status-meta-title";
 const SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
 const SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON = "assessment-submission-create-submittedInPerson";
 const SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT = "assessment-submission-create-submit";
-const SELECTOR_ASSESSMENT_SUBMISSION_HISTORY = "assessment-submission-history";
 const SELECTOR_ASSESSMENT_SUBMISSION_INPUT_BODY = "assessment-submission-input-body";
 const SELECTOR_ASSESSMENT_RESPONSE_META_TITLE = "assessment-response-meta-title";
 const SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON = "assessment-feedback-publish-button";
@@ -230,7 +230,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON).check();
         await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
-        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+        await expect(page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
             "Submitted in person by Ms Eden Reed",
         );
     });
@@ -372,7 +372,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
 
-        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+        await expect(page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
             "Submission by Mr Jack Coles",
         );
     });
@@ -393,7 +393,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
 
-        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+        await expect(page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
             "Submission by Schoolbox Admin",
         );
     });

@@ -71,7 +71,7 @@
     {% import _self as dueDate %}
     {% import '@learning/macro/urgency.twig' as urgency %}
     <span class="{{ urgency.datetime(participant) }}" title="{{ participantDueDate.long }}">
-        {{ dueDate.duePrefix(participant.assessable) }}
+        <span>{{ dueDate.duePrefix(participant.assessable) }} </span>
         <time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeDayWithoutMidnight }}</time>
         {% if participantDueDate.isFuture and participantDueDate.diffInDays(NOW) < 7 %}
             (<time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeTime(null, true) }} remaining</time>)
@@ -90,7 +90,7 @@
     {% if dueAt %}
         {% import _self as dueDate %}
         <span title="{{ dueAt.long }}">
-            {{ dueDate.duePrefix(assessment) }}
+            <span>{{ dueDate.duePrefix(assessment) }} </span>
             <time datetime="{{ dueAt }}">{{ dueAt.relativeDayWithoutMidnight }}</time>
             {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
                 (<time datetime="{{ dueAt }}">{{ dueAt.relativeTime(null, true) }} remaining</time>)

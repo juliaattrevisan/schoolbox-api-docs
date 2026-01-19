@@ -332,7 +332,7 @@ test.describe("Due Work - Mark type tests", () => {
             await expect(mainMark).toHaveText("B+");
 
             // we submitted this via the status page, so there'll be two independent submission history items
-            const submissionHistory = page.getByTestId("assessment-submission-history");
+            const submissionHistory = page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY);
             await expect(submissionHistory).toHaveCount(2);
 
             const submissionHistory1Mark = submissionHistory.first().getByTestId("assessment-feedback-mark");
@@ -357,7 +357,7 @@ test.describe("Due Work - Mark type tests", () => {
 
             await expect(mainMark).toHaveText("50 %");
 
-            const submissionHistory = page.getByTestId("assessment-submission-history");
+            const submissionHistory = page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY);
             const submissionHistoryMarks = submissionHistory.getByTestId("assessment-feedback-mark");
 
             await expect(submissionHistoryMarks).toHaveCount(2);
@@ -380,7 +380,7 @@ test.describe("Due Work - Mark type tests", () => {
 
             await expect(mainMark).not.toBeVisible();
 
-            const submissionHistory = page.getByTestId("assessment-submission-history");
+            const submissionHistory = page.getByTestId(AssessmentPage.DATA_TEST_ASSESSMENT_SUBMISSION_HISTORY);
             const submissionHistoryMarks = submissionHistory.getByTestId("assessment-feedback-mark");
 
             await expect(submissionHistoryMarks).toHaveCount(0);

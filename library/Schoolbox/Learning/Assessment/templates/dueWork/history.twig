@@ -32,7 +32,7 @@
                         window.location.reload();
                     })
                     .fail(function () {
-                        {# i'll drink to that! -#}
+                        {# /* i'll drink to that! */ -#}
                         $toast.toastTimeout({
                             text: 'Could not delete this interaction',
                             css: 'pop alert'
@@ -54,7 +54,7 @@
     <div class="small-12 island">
         <h2 class="subheader">{{ locale.submissionHistory.proper }}</h2>
             {% for currentInteraction in timeline %}
-                <section class="submission-history" data-submission-history data-test="assessment-submission-history">
+                <section data-submission-history data-test="assessment-submission-history">
                 {% if currentInteraction is response %}
                     {% include '@learningAssessment/dueWork/summary/interaction/response.twig' with {
                         currentInteraction: currentInteraction,

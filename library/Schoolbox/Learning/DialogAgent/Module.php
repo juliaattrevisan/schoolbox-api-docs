@@ -146,6 +146,14 @@ class Module extends BaseModule
             }
         });
 
+        $isNotAuthoritativeResponse = new Rule\Callback(function (array $params): void {
+            /** @var \Schoolbox\Learning\Assessment\DialogAgent\Response\Model|null $response */
+            $response = $params['response'] ?? null;
+            if (null === $response || $response->getAuthoritative()) {
+                throw new Unauthorized('This action can only be performed on a non-authoritative response');
+            }
+        });
+
         $isFeedbackRequired = new Rule\Callback(function (array $params): void {
             /** @var DialogAgent\Model $assessment */
             $assessment = $params['assessment'];
@@ -292,6 +300,15 @@ class Module extends BaseModule
             $isFeatureEnabled,
             $canWrite,
             $this->buildRuleCanAction(NextRoutes::ACTION_RESET),
+            $this->buildIsConfiguredAuthRule()
+        ), $preloadParticipantAndResponse);
+
+        /* Change a particular response to be the authoritative one for the participant
+         */
+        $this->register('POST', "{$assRoute}/{$studentParam}/setAuthoritative/{$responseParam}", 'postSetAuthoritative', new Rule\All(
+            $isFeatureEnabled,
+            $canWrite,
+            $isNotAuthoritativeResponse,
             $this->buildIsConfiguredAuthRule()
         ), $preloadParticipantAndResponse);
 

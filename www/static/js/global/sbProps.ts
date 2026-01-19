@@ -9,10 +9,12 @@
  */
 
 import { RosettaStone } from "@js/terminology/rosettaStone";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 
 window.sbProps = {
     ...window.sbProps, // keep any existing properties if they exist
+    apiRequest, // so any frontend code (such as in twig outside of bundles) can make use of the apiRequest utility
     editors: {}, // we still need to be able to access our CKEditor instances from outside bundle scope
     MAX_BYTES_MYSQL_MEDIUMTEXT: 16_777_215, // Maximum bytes storable in a MySQL `mediumtext` field.
     MAX_BYTES_MYSQL_TEXT: 65_535, // Maximum bytes storable in a MySQL `text` field.
