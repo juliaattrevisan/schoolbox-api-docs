@@ -21,7 +21,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["saved"]);
+const emit = defineEmits<{
+    (event: "saved", data: DialogAgentConfigureApiResponse): void;
+}>();
 
 const assessmentConfig = defineModel<DialogAgentAssessmentConfig>("assessmentConfig", { required: true });
 const isSubmitting = defineModel<boolean>("isSubmitting", { required: true });
@@ -96,10 +98,13 @@ async function onSubmit(): Promise<void> {
 
     toast.timeout({ text: "Configuration saved", isSuccess: true });
 
+    /**
+     * Update the assessmentConfig with any returned data that changed
+     * Notably don't update openingMessage, only the sandbox needs the HTML version
+     */
     assessmentConfig.value.prompt = response.data.prompt;
-    assessmentConfig.value.openingMessage = response.data.openingMessage; // Updated in case Scrub modified it
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
-    emit("saved");
+    emit("saved", response.data);
 }
 </script>
 

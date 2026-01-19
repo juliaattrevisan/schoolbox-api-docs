@@ -41,6 +41,15 @@ export function useEditor(
 
         let isUpdatingFromEditor = false;
 
+        /**
+         * When using markdown mode, Scrub::markdown() is applied server-side to sanitize the content.
+         * This means the editor will recieve HTML content instead of markdown initially (which is fine, it handles that)
+         * however the value in the ref should be converted to markdown to avoid submitting that HTML back in a form.
+         */
+        if (editorConfig.markdown) {
+            currentValue.value = editor.getData();
+        }
+
         // Sync from editor to ref
         editor.model.document.on("change:data", () => {
             isUpdatingFromEditor = true;
