@@ -14,6 +14,7 @@ use Alaress\Authorizer\GetRouteIfAuthorized;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Aura\Router\Generator;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as CommentTranslator;
+use Schoolbox\Pastoral\Attachment\Translator\ModelToArray as AttachmentTranslator;
 use Schoolbox\Pastoral\Model;
 use Schoolbox\Pastoral\Tag\Model as Tag;
 use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
@@ -27,6 +28,7 @@ class ModelToArray
     public function __construct(
         private UserTranslator $userTranslator,
         private CommentTranslator $commentTranslator,
+        private AttachmentTranslator $attachmentTranslator,
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
@@ -94,7 +96,7 @@ class ModelToArray
             // Text and comments
             'bodyPublic'         => $this->scrubAdapter->purify($model->getBodyPublic()),
 
-            'attachmentsPublic'  => $model->getAttachments()->filterBy('private', false),
+            'attachmentsPublic'  => $model->getAttachments()->filterBy('private', false)->map($this->attachmentTranslator),
 
             'comments'            => $model->getComments()->map($this->commentTranslator)
         ];
