@@ -14,8 +14,8 @@ module.exports = {
         jquery: true,
     },
     extends: [
-        "airbnb-base",
-        "airbnb-typescript/base",
+        // "airbnb-base",
+        // "airbnb-typescript/base",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:jsdoc/recommended",
