@@ -80,7 +80,7 @@ Ideally, only the Docker development environment will need to be set up.
     cd /usr/share/schoolbox
     tools/vagrant-yaml-translate.php > docker.env
     ```
-* start the development environment's containers:
+* start the development environment:
   ```shell
   sudo docker/up
   ```

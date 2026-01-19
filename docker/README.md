@@ -2,7 +2,27 @@
 
 This set of configuration files, as well as
 [docker-compose.yaml](../docker-compose.yaml), define how Schoolbox may run
-within a self-contained development environment.
+within a self-contained development environment running on Docker.
+
+## Containers vs. Images vs. Services
+
+You may see these terms used when discussing the Docker environment.
+
+From https://docs.docker.com/reference/compose-file/services/:
+
+> A service is an abstract definition of a computing resource within an
+> application which can be scaled or replaced independently from other
+> components. Services are backed by a set of containers, run by the platform
+> according to replication requirements and placement constraints. As services
+> are backed by containers, they are defined by a Docker image and set of
+> runtime arguments. All containers within a service are identically created
+> with these arguments.
+
+In summary:
+- services define the components of the application
+- each service may be run on one or more homogenous and interchangeable
+  containers
+- each container is defined within an image
 
 ## Configuration
 
@@ -57,14 +77,14 @@ used to configure it, as per https://github.com/alaress/taskd/blob/master/CONFIG
 The name of these scripts is intended to mirror the Vagrant commands for setting
 up the Vagrant development environment.
 
-- `up`: builds and starts containers for development environment
-- `down`: stops containers
-- `provision`: sets up the Schoolbox instance in the started containers
+- `up`: builds and starts services for development environment
+- `down`: stops services
+- `provision`: sets up the Schoolbox instance in the environment
   (`up` must be run first)
-- `ssh`: create a shell session (in the `schoolbox-cli` container by default),
+- `ssh`: create a shell session (in the `schoolbox-cli` service by default),
   for running commands
-- `exec`: execute a shell session in the `schoolbox-cli` container directly
-- `logs`: view logs for containers in the development environment
+- `exec`: execute a shell session in the `schoolbox-cli` service directly
+- `logs`: view logs for services in the development environment
 - `clean`: cleans up the temporary and cache files which the Docker development
   environment may create
 - `compose`: a helper script which calls `docker compose` with the project's
@@ -73,11 +93,11 @@ up the Vagrant development environment.
 
 `up`, `down` and `logs` also pass through any arguments to their equivalent
 `docker compose` calls. For example:
-- `up --build` builds images before starting containers:
+- `up --build` builds images before starting services:
   useful for when an image definition has changed
-- `down -v` removes volumes (e.g. database data) when stopping containers:
+- `down -v` removes volumes (e.g. database data) when stopping services:
   useful for when testing a new database version
-- `logs rabbitmq -f` shows logs for the RabbitMQ container only, and follows
+- `logs rabbitmq -f` shows logs for the RabbitMQ services only, and follows
   log output
 
 See the documentation for the `docker compose` commands for more information:
@@ -88,13 +108,41 @@ These scripts should all be run with `sudo`, unless your current user has been
 added to the Docker group: see
 https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user.
 
+## Common tasks
+
+### Restarting services
+
+Sometimes, a service may need to be restarted: for example, when a notifier's
+definition changes the `schoolbox-scheduled` service needs to restart in order
+to recognise those changes.
+
+```shell
+# view a list of services
+docker/compose ps
+
+# restart one or more services
+docker/compose restart $service1 ...
+
+```
+
 ## Troubleshooting
 
 ### First, view the logs
 
-`docker/logs` will show the logs for all containers within the Docker
-environment: remember it's possible to filter logs to a single container by
-providing the container name.
+`docker/logs` will show the logs for all services within the Docker environment:
+remember it's possible to filter logs to a single service by providing the
+service's name.
+
+```shell
+# view a list of services:
+# the SERVICE column contains the service's name
+docker/compose ps
+
+# view logs for a single service,
+# viewing only new logs as they arrive
+docker/logs $service -fn0
+
+```
 
 ### Port collisions
 
@@ -122,21 +170,21 @@ In order to fix this:
     - using the TCP protocol
 - determine which service on your host is using the conflicting port:
   - Docker services may be found with:
-    ```
+    ```shell
     docker ps --filter publish=$PORT
     ```
   - non-Docker services may be found with:
-    ```
+    ```shell
     lsof -i :$PORT
     ```
 - once the service is found, either:
   - stop the service:
     - Docker:
-      ```
+      ```shell
       docker stop $SERVICE
       ```
     - non-Docker: consider uninstalling the service, or stopping it manually:
-      ```
+      ```shell
       sudo service $SERVICE stop
       ```
   - change the port which Schoolbox uses in `docker.env`:
@@ -153,18 +201,18 @@ Credentials were refreshed, but the refreshed credentials are still expired.
 
 Try logging out with `aws sso logout` before running `docker/up` again.
 
-### Rebuilding all containers
+### Rebuilding the environment
 
 If the environment gets into a bad state, and it can't be resolved any other
 way, it can be rebuilt like so:
-```bash
+```shell
 # -v removes volumes, including database data
 docker/down -v
 
 # remove all stopped containers
-docker system prune
+docker system prune -a
 
-# restart and rebuild containers
+# restart the environment
 docker/up --build
 ```
 
