@@ -127,7 +127,14 @@ declare global {
          * www/static/js/alaress-datetime-picker/alaress-datetime-picker.js
          */
         alaressDateTimePicker(): JQuery;
+        /**
+         * From jquery.collapsable.js
+         */
         collapsable(): JQuery;
+        /**
+         * From jpreview.ts - to preview media, opening in a lightbox
+         */
+        preview(): JQuery;
         /**
          * From jquery-validation
          */

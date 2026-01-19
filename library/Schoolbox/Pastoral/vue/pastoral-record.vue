@@ -13,6 +13,15 @@ const props = defineProps<{
 
 const routes = window.Vue.inject<Routes>("pastoralRoutes");
 const config = window.Vue.inject<Config>("pastoralConfig");
+
+/**
+ * To allow previewing of attachments in a lightbox
+ */
+window.Vue.onMounted((): void => {
+    if (props.record.attachmentsPublic && props.record.attachmentsPublic.length) {
+        $('[data-plugin="preview"]').preview();
+    }
+});
 </script>
 
 <template>
@@ -90,11 +99,6 @@ const config = window.Vue.inject<Config>("pastoralConfig");
                 id="article-attachments"
             >
                 <hr />
-                <!-- <script type="text/javascript">
-                            $(function () {
-                                $('[data-plugin="preview"]').preview();
-                            });
-                        </script> -->
                 <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
                     <li
                         v-for="attachment in props.record.attachmentsPublic"
