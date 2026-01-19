@@ -129,24 +129,31 @@ class RecordProcessor
             $record->setHeading($partial['heading']);
         }
 
-        /* Points must be within a range of valid values randomly hardcoded here
+
+        /* If a numeric value was provided, check that it's numeric and within the allowed range:
+         *
+         *   - A null or empty input causes points to be cleared back to null;
+         *   - Non-numeric inputs are ignored
+         *   - Numeric inputs are forcibly cast to float and checked for range. Note that 'e' is included here.
          */
-        if ($partial['points'] ?? false) {
-            $points = (float)$partial['points'];
+        if (array_key_exists('points', $partial)) {
+            if (null === $partial['points'] || '' === $partial['points']) {
+                /* Remove points by passing null
+                 */
+                $record->setPoints(null);
+            } elseif (is_numeric($partial['points'])) {
+                $points = (float)$partial['points'];
 
-            /* Assert correct value range
-             */
-            if (!is_numeric($partial['points']) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
-                $db->rollBack();
+                /* Points must be within a range of valid values randomly hardcoded here
+                 */
+                if ($points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+                    $db->rollBack();
 
-                throw new SchoolboxException(sprintf(
-                    'Points must be a float between %s and %s',
-                    self::POINTS_MIN,
-                    self::POINTS_MAX
-                ));
+                    throw new SchoolboxException(sprintf('Points must be a float between %s and %s', self::POINTS_MIN, self::POINTS_MAX));
+                }
+
+                $record->setPoints($partial['points']);
             }
-
-            $record->setPoints($partial['points']);
         }
 
         /* If a type id was specified and it differed to what we already have,
