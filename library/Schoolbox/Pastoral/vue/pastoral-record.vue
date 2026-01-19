@@ -108,12 +108,12 @@ window.Vue.onMounted((): void => {
                                     <img
                                         v-if="attachment.storage.mimetype.isImage"
                                         :src="`/storage/image.php?hash=${attachment.storage.hash}&size=square64`"
-                                        alt="Download"
+                                        :alt="`Download: ${attachment.realname}`"
                                     />
                                     <img
                                         v-else
                                         :src="`/ajax/mime/${attachment.storage.mime}`"
-                                        alt="Attachment"
+                                        :alt="`Attachment: ${attachment.realname}`"
                                         class="mime"
                                     />
                                     <p>{{ attachment.realname }}</p>
