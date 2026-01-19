@@ -307,6 +307,12 @@ class Mapper extends BaseMapper
             ]
         ]));
 
+        $model->setAttachments($this->getJoinMapper('attachments')->findByColumn('pastoral_id', $model->getId(), [
+            'order' => [
+                'created_at' => 'desc'
+            ]
+        ]));
+
         $revisionMapper = PastoralRevisionMapper::getInstance();
         $revisions      = $revisionMapper->findByColumn('root_id', $model->getId());
         $model->setRevisions($revisions);
