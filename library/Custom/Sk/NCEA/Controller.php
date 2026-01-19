@@ -60,7 +60,7 @@ class Controller extends Base
                 'externalId' => $user->getExternalId(),
                 'firstname' => $user->getFirstname(),
                 'fullname' => $user->getFullName(),
-                'tutorGroup' => $externalUser['StudentTutor'],
+                'tutorGroup' => $externalUser['StudentTutorDescription'],
                 'year' => $year,
             ];
         }
