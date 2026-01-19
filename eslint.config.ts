@@ -10,9 +10,12 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import eslintPluginVue from "eslint-plugin-vue";
 import { jsdoc } from "eslint-plugin-jsdoc";
+import { importX } from "eslint-plugin-import-x";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import vueEslintParser from "vue-eslint-parser";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
+import type { ConfigWithExtends } from "@eslint/config-helpers";
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 
@@ -42,8 +45,6 @@ const mainConfig = defineConfig({
         // "airbnb-typescript/base",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:import-x/recommended",
-        "plugin:import-x/typescript",
         "prettier",
         // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
     ),
@@ -52,7 +53,6 @@ const mainConfig = defineConfig({
     },
     rules: {
         // customised rules
-        "import-x/prefer-default-export": "off",
         // as Pinia especially uses single exports
         "no-param-reassign": [
             2,
@@ -65,13 +65,6 @@ const mainConfig = defineConfig({
         "arrow-body-style": "off",
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
-        // allow devDependencies to be imported so that we can use them in our tests
-        "import-x/no-extraneous-dependencies": [
-            "error",
-            {
-                devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
-            },
-        ],
         // Allow console.warn and console.error, but disallow other console methods
         "no-console": [
             "error",
@@ -109,22 +102,36 @@ const mainConfig = defineConfig({
         "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
         "no-await-in-loop": "off",
     },
-    settings: {
-        "import-x/parsers": {
-            "@typescript-eslint/parser": [".ts", ".tsx"],
-        },
-        "import-x/resolver": {
-            typescript: {
-                alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-            },
-        },
-    },
 });
 
 module.exports = defineConfig([
     eslintComments.recommended,
     eslintPluginVue.configs["flat/recommended"],
     jsdoc({ config: "flat/recommended-typescript" }),
+    // need to force these types for now, see https://github.com/un-ts/eslint-plugin-import-x/issues/439
+    importX.flatConfigs.recommended as ConfigWithExtends,
+    importX.flatConfigs.typescript as ConfigWithExtends,
+    {
+        rules: {
+            // allow devDependencies to be imported so that we can use them in our tests
+            "import-x/no-extraneous-dependencies": [
+                "error",
+                {
+                    devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
+                },
+            ],
+        },
+        settings: {
+            "import-x/parsers": {
+                "@typescript-eslint/parser": [".ts", ".tsx"],
+            },
+            "import-x/resolver-next": [
+                createTypeScriptImportResolver({
+                    alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+                }),
+            ],
+        },
+    },
     mainConfig,
     globalIgnores([
         "**/*.js",
