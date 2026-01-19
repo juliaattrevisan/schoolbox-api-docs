@@ -596,7 +596,7 @@ $(function() {
 {# Hidden form for cancelling a booking.
  # This should redirect to the last page I was on.
  #}
-<form id="resource-booking-cancel-form" action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}">
+<form id="resource-booking-cancel-form" method="post" action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}">
     <input type="hidden" name="returnUrl" value="{{ cancelReturnUrl }}" />
 </form>
 
