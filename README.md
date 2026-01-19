@@ -55,9 +55,9 @@ AWS' [Elastic Container Service](https://docs.aws.amazon.com/ecs/).
 Ideally, only the Docker development environment will need to be set up.
 
 * install the required dependencies:
-  * the most recent [Docker Engine](https://docs.docker.com/engine/install/)
-    for your operating system
-    > TODO test Docker Desktop
+  * the most recent [Docker Engine](https://docs.docker.com/engine/install/) or
+    [Docker Desktop](https://docs.docker.com/desktop/) for your operating system
+    * Windows users should use Docker Desktop, and use the WSL backend
   * the most recent [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
     for your operating system
     * if using a recent Ubuntu release, the Snap store contains an up-to-date
@@ -68,13 +68,19 @@ Ideally, only the Docker development environment will need to be set up.
       # outside the snap's sandbox.
       sudo snap install aws-cli --classic
       ```
-  * recommended: a [Docker Credentials Store](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
-    for secure storage of credentials
-* create `docker.env`, and override any configuration in `docker.default.env`
-  if needed:
+* create an empty `docker.env` file
+* read `docker.default.env`, and override any settings from that file you may
+  wish to in `docker.env`
   * the default settings should work for most development requirements, but
     `cdn_bucket_prefix` will need to be set if testing S3 static file hosting
-* start the development environment's containers:
+  * Vagrant users migrating to Docker may auto-convert their existing
+    `vagrant.yaml` to a `docker.env`:
+    ```shell
+    vagrant ssh
+    cd /usr/share/schoolbox
+    tools/vagrant-yaml-translate.php > docker.env
+    ```
+* start the development environment:
   ```shell
   sudo docker/up
   ```
@@ -85,7 +91,7 @@ Ideally, only the Docker development environment will need to be set up.
 * visit https://docker.dev.schoolbox.cloud/
 
 See [docker/README.md](docker/README.md) for more information about the Docker
-development environment, including a migration guide from Vagrant.
+development environment.
 
 ### Set up Vagrant development environment (optional)
 
