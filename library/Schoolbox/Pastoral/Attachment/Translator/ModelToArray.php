@@ -62,29 +62,22 @@ class ModelToArray
         return [
             'id' => $model->getId(),
             'realname' => $model->getRealname(),
-            // 'pastoral'     => [
-            //     'id'      => $model->getPastoral()->getId(),
-            //     'owner'   => call_user_func($this->userTranslator, $model->getPastoral()->getOwner()),
-            //     'student' => call_user_func($this->userTranslator, $model->getPastoral()->getStudent()),
-            // ],
-            // 'owner'        => call_user_func($this->userTranslator, $model->getOwner()),
-            // 'body'         => $this->purifier->purify($model->getBody()),
-            // 'externalCode' => $model->getExternalCode(),
-            // 'createdAt'    => $model->getCreatedAt()->getUsingFormat(DATE_ATOM),
-            // 'updatedAt'    => $model->getUpdatedAt()->getUsingFormat(DATE_ATOM),
-            // 'isDeleted'    => $model->isDeleted(),
-            // 'private'      => $model->getPrivate(),
-            // '_links'       => [
-            //     'delete' => $this->getRouteIfAuthorized(
-            //         'pastoral.postCommentDelete',
-            //         [
-            //             'record'    => $model->getPastoral(),
-            //             'recordId'  => $model->getPastoral()->getId(),
-            //             'comment'   => $model,
-            //             'commentId' => $model->getId(),
-            //         ],
-            //     ),
-            // ],
+            'storage' => [
+                'filename' => $model->getStorage()->getFilename(),
+                'mimetype' => [
+                    'isImage' => $model->getStorage()->getMimetype()->isImage(),
+                ],
+                'mime' => $model->getStorage()->getMime(),
+                'hash' => $model->getStorage()->getHash(),
+            ],
+            'route' => $this->getRouteIfAuthorized(
+                'pastoral.getStudentRecordAttachment',
+                [
+                    'recordId' => $model->getPastoral()->getId(),
+                    'studentId' => $model->getPastoral()->getStudent()->getId(),
+                    'attachmentId' => $model->getId(),
+                ],
+            ),
         ];
     }
 }
