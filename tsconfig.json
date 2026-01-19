@@ -46,5 +46,6 @@
         "www/static/js/**/*",
         "test/playwright/**/*",
         "playwright.config.ts",
+        "eslint.config.ts",
     ]
 }
