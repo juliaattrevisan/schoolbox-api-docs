@@ -93,6 +93,9 @@ export default {
     },
 
     computed: {
+        ENDPOINTS() {
+            return ENDPOINTS;
+        },
         // This allows EVENT_VARIANTS to be used in template code.
         EVENT_VARIANTS() {
             return EVENT_VARIANTS;
@@ -1068,7 +1071,7 @@ export default {
                                 <span :class="'attend-label'">Attending?</span>
                                 <span>
                                     <a
-                                        :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
+                                        :href="ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
                                         @click.prevent="rsvpAccept"
                                         :class="{
                                             button: true,
@@ -1083,7 +1086,7 @@ export default {
                                 </span>
                                 <span>
                                     <a
-                                        :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
+                                        :href="ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
                                         @click.prevent="rsvpDecline"
                                         :class="{
                                             button: true,
