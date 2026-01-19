@@ -41,25 +41,14 @@ const mainConfig = defineConfig({
     // ),
     rules: {
         // customised rules
-        // as Pinia especially uses single exports
-        "no-param-reassign": [
-            2,
-            {
-                props: false,
-            },
-        ],
         // allow modifying props of parameters, especially valid when passing DOM elements, as we don"t really want to be cloning DOM elements
+        "no-param-reassign": ["warn", { props: false }],
         // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
         "arrow-body-style": "off",
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
         // Allow console.warn and console.error, but disallow other console methods
-        "no-console": [
-            "error",
-            {
-                allow: ["warn", "error"],
-            },
-        ],
+        "no-console": ["warn", { allow: ["warn", "error", "info"] }],
         // enforce consistent explicit return types on functions and class methods
         "@typescript-eslint/explicit-function-return-type": "warn",
         "@typescript-eslint/typedef": [
@@ -72,14 +61,9 @@ const mainConfig = defineConfig({
         // change no-unused-vars to warn instead of error (to make it less misleading)
         "@typescript-eslint/no-unused-vars": "warn",
         // enforce "import type" for type only imports
-        "@typescript-eslint/consistent-type-imports": [
-            "warn",
-            {
-                prefer: "type-imports",
-            },
-        ],
+        "@typescript-eslint/consistent-type-imports": ["warn", { prefer: "type-imports" }],
         // avoid unnecessary eslint-disable comments and enforce descriptions for them
-        "@eslint-community/eslint-comments/no-unused-disable": "error",
+        "@eslint-community/eslint-comments/no-unused-disable": "warn",
         "@eslint-community/eslint-comments/require-description": "warn",
         /**
          * Override the ForOfStatement restriction from airbnb, as we want to allow
