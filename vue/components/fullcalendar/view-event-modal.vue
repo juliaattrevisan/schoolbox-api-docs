@@ -1148,7 +1148,10 @@ export default {
                                     eventExtendedProps.booking.linkedEventFullCalendarEventId !== null
                                 "
                             >
-                                <button @click.prevent="viewEventLinkedFromBooking">View Event</button>
+                                <button @click.prevent="viewEventLinkedFromBooking">View Event (modal)</button>
+                                <a class="button" :href="ENDPOINTS.eventDetailsPath(eventExtendedProps.eventId)"
+                                    >View Event Details</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.links.view">
                                 <a

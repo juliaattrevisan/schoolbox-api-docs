@@ -9,6 +9,7 @@ export const ENDPOINTS = Object.freeze({
 
     /* Event Modify screen
      */
+    URL_EVENT_DETAILS: "/calendar/event/{eventId}",
     URL_EVENT_MODIFY_FORM: "/calendar/event/{eventId}/modify",
     URL_EVENT_MODIFY_FORM_ACTION: "/calendar/modifyForm.php",
     URL_EVENT_ADD_TO_CALENDAR: "/calendar/event/{eventId}/addToCalendar",
@@ -111,6 +112,16 @@ export const ENDPOINTS = Object.freeze({
             null,
             btoa(window.location.pathname),
         );
+    },
+
+    /**
+     * Add bookings
+     *
+     * @param eventId
+     * @return string
+     */
+    eventDetailsPath: function (eventId) {
+        return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_DETAILS, eventId, null, null);
     },
 
     /**
