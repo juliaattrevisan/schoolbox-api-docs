@@ -132,5 +132,6 @@ module.exports = defineConfig([
         "**/vagrantcache",
         "**/vendor",
         "www/static/js/bundle",
+        "www/static/js/pdf/pdfjs",
     ]),
 ]);
