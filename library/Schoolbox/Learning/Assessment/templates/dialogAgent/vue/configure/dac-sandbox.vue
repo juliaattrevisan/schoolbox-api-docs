@@ -7,7 +7,7 @@ import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
 
 interface Props {
-    openingMessageScrubbed: string;
+    openingMessage: string;
     postMessage: string;
     isDirty: boolean;
 }
@@ -33,7 +33,7 @@ function resetFeed(): void {
         data: {
             status: "success",
             responseId: null,
-            message: props.openingMessageScrubbed,
+            message: props.openingMessage,
         },
         meta: null,
         entryKey: acStore.getNextEntryKey(),

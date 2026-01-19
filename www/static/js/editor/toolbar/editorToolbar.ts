@@ -10,9 +10,14 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 /**
  * Display the AI toolbar options based on the existence of an sbProp
  * created within templates/core/include/chrome.twig
+ * @param config - the config to use when creating the editor
  * @returns - the toolbar display
  */
-function getToolbarAI(): string[] {
+function getToolbarAI(config: SbxEditorConfig): string[] {
+    if (config.markdown) {
+        // AI features don't work correctly in markdown mode
+        return [];
+    }
     if (window.sbProps.aiFeatures.chat?.enabled) {
         return ["|", "aiCommands", "aiAssistant"];
     }
@@ -38,7 +43,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "strikethrough",
             "removeFormat",
             "|",
-            ...getToolbarAI(),
+            ...getToolbarAI(config),
             "|",
             "link",
             "emoji",
@@ -56,16 +61,55 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "blockQuote",
             "removeFormat",
             // If using the COMMENT_AI toolbar, add the AI commands and assistant in the right spot
-            ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI() : []),
+            ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI(config) : []),
             "|",
             "link",
             "|",
             "resource",
-            "mediaEmbed",
+            ...(config.markdown ? [] : ["mediaEmbed"]), // mediaEmbed doesn't work in markdown mode
             "emoji",
             "|",
             "numberedList",
             "bulletedList",
+        ];
+    } else if (config.markdown) {
+        // default toolbar, but markdown mode
+        // a lot of features from the normal default toolbar don't work particularly well with markdown
+        items = [
+            "fullscreen",
+            "|",
+            // if there are templates defined in the config, add the insertTemplate button
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
+            "bold",
+            "italic",
+            "underline",
+            "strikethrough",
+            "subscript",
+            "superscript",
+            "blockQuote",
+            "removeFormat",
+            "|",
+            "heading",
+            "|",
+            "link",
+            "|",
+            "resource",
+            "emoji",
+            "|",
+            "numberedList",
+            "bulletedList",
+            "|",
+            {
+                label: "Other",
+                icon: "threeVerticalDots",
+                items: [
+                    "specialCharacters",
+                    "eqneditor5Button",
+                    "horizontalLine",
+                    "findAndReplace",
+                    "sourceEditingEnhanced",
+                ],
+            },
         ];
     } else {
         items = [
@@ -97,7 +141,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "style",
             "|",
             "heading",
-            ...getToolbarAI(),
+            ...getToolbarAI(config),
             "|",
             "link",
             "bookmark",

@@ -2,6 +2,8 @@
 import locale from "@js/terminology/rosettaStone";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getPageReturnUrl } from "@js/util/sbx/urlUtils";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
 import type {
     DialogAgentScenario,
     DialogAgentAssessmentConfig,
@@ -19,7 +21,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["saved"]);
+const emit = defineEmits<{
+    (event: "saved", data: DialogAgentConfigureApiResponse): void;
+}>();
 
 const assessmentConfig = defineModel<DialogAgentAssessmentConfig>("assessmentConfig", { required: true });
 const isSubmitting = defineModel<boolean>("isSubmitting", { required: true });
@@ -94,10 +98,13 @@ async function onSubmit(): Promise<void> {
 
     toast.timeout({ text: "Configuration saved", isSuccess: true });
 
+    /**
+     * Update the assessmentConfig with any returned data that changed
+     * Notably don't update openingMessage, only the sandbox needs the HTML version
+     */
     assessmentConfig.value.prompt = response.data.prompt;
-    assessmentConfig.value.openingMessageScrubbed = response.data.openingMessageScrubbed;
     assessmentConfig.value._routes.postSandboxMessage = response.data._routes.postSandboxMessage;
-    emit("saved");
+    emit("saved", response.data);
 }
 </script>
 
@@ -198,14 +205,13 @@ async function onSubmit(): Promise<void> {
                     <p v-if="fieldContext.field.meta" class="meta">
                         {{ fieldContext.field.meta }}
                     </p>
-                    <textarea
+                    <text-editor
                         :id="`fieldContext-${fieldContext.id}`"
-                        v-model.trim="fieldContext.body"
-                        :name="`fieldContexts[${fieldContext.id}]`"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
+                        v-model:body="fieldContext.body"
+                        :config="{
+                            markdown: true,
+                            toolbar: EditorToolbar.SIMPLE,
+                        }"
                     />
                 </div>
             </fieldset>
@@ -214,14 +220,13 @@ async function onSubmit(): Promise<void> {
                 <div class="small-12 columns">
                     <label for="dac-opening-message" class="required">Opening Message</label>
                     <p class="meta">Used by the AI to start the conversation and frame the learning discussion.</p>
-                    <textarea
-                        id="dac-opening-message"
-                        v-model.trim="assessmentConfig.openingMessage"
-                        name="openingMessage"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
+                    <text-editor
+                        :id="`dac-opening-message`"
+                        v-model:body="assessmentConfig.openingMessage"
+                        :config="{
+                            markdown: true,
+                            toolbar: EditorToolbar.SIMPLE,
+                        }"
                     />
                 </div>
 
@@ -231,14 +236,13 @@ async function onSubmit(): Promise<void> {
                         Sets ongoing guidelines the AI follows to maintain focus, tone, and boundaries during the
                         conversation.
                     </p>
-                    <textarea
-                        id="dac-rules"
-                        v-model.trim="assessmentConfig.rules"
-                        name="rules"
-                        style="resize: vertical"
-                        rows="4"
-                        required
-                        :disabled="!props.postUpdate"
+                    <text-editor
+                        :id="`dac-rules`"
+                        v-model:body="assessmentConfig.rules"
+                        :config="{
+                            markdown: true,
+                            toolbar: EditorToolbar.SIMPLE,
+                        }"
                     />
                 </div>
             </fieldset>

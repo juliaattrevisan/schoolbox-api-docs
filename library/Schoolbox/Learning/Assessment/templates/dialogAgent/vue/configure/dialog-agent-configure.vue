@@ -7,6 +7,7 @@ import DacForm from "./dac-form.vue";
 import DacSandbox from "./dac-sandbox.vue";
 import type {
     DialogAgentAssessmentConfig,
+    DialogAgentConfigureApiResponse,
     DialogAgentHelpfulness,
     DialogAgentScenario,
     DialogAgentScenarioField,
@@ -53,9 +54,11 @@ const isSandboxDirty = window.Vue.computed(() => {
 
 /**
  * Update the sandbox cache when the form is successfully submitted
+ * @param data - The data returned from the form submission
  */
-function updateSandbox(): void {
+function updateSandbox(data: DialogAgentConfigureApiResponse): void {
     sandboxDataCache.value = cloneDeep(assessmentConfigInfo.value);
+    sandboxDataCache.value.openingMessage = data.openingMessage;
     sandboxRef.value?.resetFeed();
 }
 
@@ -175,7 +178,7 @@ window.Vue.onMounted(async () => {
                 <div class="loader"></div>
             </section>
             <div
-                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessageScrubbed"
+                v-else-if="!sandboxDataCache._routes.postSandboxMessage || !sandboxDataCache.openingMessage"
                 class="empty-state"
             >
                 <i class="icon-dialog-agent"></i>
@@ -184,7 +187,7 @@ window.Vue.onMounted(async () => {
             <section v-else>
                 <dac-sandbox
                     ref="sandboxRef"
-                    :opening-message-scrubbed="sandboxDataCache.openingMessageScrubbed"
+                    :opening-message="sandboxDataCache.openingMessage"
                     :post-message="sandboxDataCache._routes.postSandboxMessage"
                     :is-dirty="isSandboxDirty"
                 />

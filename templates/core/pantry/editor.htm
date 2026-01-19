@@ -91,6 +91,28 @@
 
 <div class="row">
     <div class="small-12 columns">
+        <h2 class="subheader">Markdown Editor</h2>
+        <p class="meta">
+            This is the <b>markdown</b> usage of our ckeditor, this changes the output from HTML to Markdown and is designed for places
+            that need light formatting without the entire content becoming HTML.
+        </p>
+        <p class="meta">Markdown can be enabled for any of the above toolbars, however some features are unsupported and will not be shown</p>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <textarea id='markdownCKEditor'></textarea>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
         <h2 class="subheader">Inline Editor</h2>
         <p class="meta">
             This is the <b>inline</b> usage of our ckeditor.
@@ -193,6 +215,26 @@
          * - editor.setReadOnly(true) can be replaced with editor.enableReadOnlyMode('my-feature-id')
          * https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editor-Editor.html#function-enableReadOnlyMode
          */
+
+        /**
+         * Demonstrates how the markdown editor instance can be accessed once it's been created
+         */
+        document.getElementById("markdownCKEditor").addEventListener("EDITOR__CREATED", onMarkdownEditorCreated);
+        function onMarkdownEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("Here is some **markdown** text added after the editor is initiated");
+        }
+
+        /**
+         * Initialise the markdown editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#markdownCKEditor'],
+                toolbar: "default",
+                markdown: true,
+            }
+        }));
 
         /**
          * Demonstrates how the comment editor instance can be accessed once it's been created

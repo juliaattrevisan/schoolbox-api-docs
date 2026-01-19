@@ -34,6 +34,7 @@ export interface SbxEditorConfig {
     targetElements: (string | SbxEditorElement)[]; // the elements to target for the editor
     type: EditorType.CLASSIC | EditorType.INLINE; // the type of editor to use
     toolbar: EditorToolbar; // the toolbar to use for the editor
+    markdown?: boolean; // whether markdown mode should be used instead of HTML, this changes the input/output format of the editor and may disable some toolbar features
     hasTokens?: boolean; // whether or not to enable the tokens plugin
     tokenList?: string[]; // the list of tokens to use for the ckeditor
     baseHref?: string; // the base url to be prepended to relative links or assets included in the ckeditor

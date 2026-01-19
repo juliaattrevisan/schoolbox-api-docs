@@ -157,13 +157,12 @@ class Controller extends Base
             'assessmentConfig' => [
                 'helpfulness' => $assessment->getHelpfulness() ?? Helpfulness::DEFAULT,
                 'language' => $assessment->getLanguage() ?? Language::DEFAULT,
-                'openingMessage' => $assessment->getOpeningMessage(),
-                'openingMessageScrubbed' => \Scrub::markdown($assessment->getOpeningMessage()),
-                'rules' => $assessment->getRules() ?: $scenario->getDefaultRules(),
+                'openingMessage' => \Scrub::markdown($assessment->getOpeningMessage()),
+                'rules' => \Scrub::markdown($assessment->getRules() ?: $scenario->getDefaultRules()),
                 'useDifferentiationProfile' => $assessment->getUseDifferentiationProfile(),
                 'fieldContexts' => $fieldContexts->map(fn (ScenarioFieldContext $fieldContext) => [
                     'id' => $fieldContext->getId(),
-                    'body' => $fieldContext->getBody() ?? '',
+                    'body' => \Scrub::markdown($fieldContext->getBody() ?? ''),
                     'field' => [
                         'id' => $fieldContext->getField()->getId(),
                         'title' => $fieldContext->getField()->getTitle(),
@@ -290,7 +289,7 @@ class Controller extends Base
 
         $this->response = $this->responseAsJson([
             'prompt' => $assessment->getPrompt(),
-            'openingMessageScrubbed' => \Scrub::markdown($assessment->getOpeningMessage()),
+            'openingMessage' => \Scrub::markdown($assessment->getOpeningMessage()),
             '_routes' => [
                 'postSandboxMessage' => $this->getRouteIfAuthorized('learningDialogAgent.postSandboxMessage', [
                     'assessmentId' => $assessment->getId(),
