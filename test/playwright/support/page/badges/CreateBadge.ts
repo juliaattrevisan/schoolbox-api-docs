@@ -43,9 +43,7 @@ export default class CreateBadge {
 
     /**
      * wait appearance of the modal dialog
-     * @throws \Exception
      */
-
     async waitModalDialogPresented(): Promise<void> {
         await this.page.waitForSelector(CreateBadge.MODAL);
     }
