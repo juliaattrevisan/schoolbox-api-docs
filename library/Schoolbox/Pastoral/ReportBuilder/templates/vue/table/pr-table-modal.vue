@@ -7,11 +7,11 @@ import { useTemplateRef, toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import PastoralRecord from "@schoolboxLibrary/Pastoral/vue/pastoral-record.vue";
 import type { TableHeader, SelectedCell, Tab } from "../../js/types/pastoralReportTypes";
 import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
 import { usePrintRecords } from "../composable/usePrintRecords";
-import PrRecord from "../pr-record.vue";
 import PrGeneratePrint from "../pr-generate-print.vue";
 
 const props = defineProps<{
@@ -139,7 +139,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
                     <div class="l-flex-col l-gap-s">
                         <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
                             <ul class="information-list threaded">
-                                <pr-record :record="record" />
+                                <pastoral-record :record="record" />
                             </ul>
                         </div>
                     </div>
