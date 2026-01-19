@@ -292,6 +292,17 @@ class Controller extends Base
     {
         $post = $this->requestPost;
 
+        /* Check if a profile already exists for the student
+         */
+        try {
+            $this->mapper->findOneByColumn('student_id', $student->getId());
+            $this->sendJsonError('Profile for student already exists.', 400);
+            return;
+        } catch (Exception\NotFound $e) {
+            /* No existing profile found, proceed to create a new one
+             */
+        }
+
         try {
             $model = $this->mapper->createModel()
                                   ->setStudent($student);
