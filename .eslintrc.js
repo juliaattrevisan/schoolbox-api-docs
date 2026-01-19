@@ -21,7 +21,7 @@ module.exports = {
         "plugin:jsdoc/recommended",
         "plugin:vue/vue3-recommended",
         "prettier",
-        "plugin:storybook/recommended",
+        // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
     ],
     parser: "vue-eslint-parser",
     // to parse .vue files: https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
