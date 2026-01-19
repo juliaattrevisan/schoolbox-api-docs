@@ -118,6 +118,7 @@ class differentiationProfileModelToArrayTest extends TestCase
         $routes = [
             'linkedRecords' => null,
             'edit' => null,
+            'create' => null,
         ];
 
         return [
