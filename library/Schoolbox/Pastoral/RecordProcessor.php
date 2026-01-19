@@ -131,12 +131,12 @@ class RecordProcessor
 
         /* Points must be within a range of valid values randomly hardcoded here
          */
-        if ($partial['points'] ?? false) {
+        if (isset($partial['points']) && is_numeric($partial['points'])) {
             $points = (float)$partial['points'];
 
             /* Assert correct value range
              */
-            if (!is_numeric($partial['points']) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+            if ($points < self::POINTS_MIN || $points > self::POINTS_MAX) {
                 $db->rollBack();
 
                 throw new SchoolboxException(sprintf(
