@@ -170,10 +170,12 @@ abstract class SubmissionAbstract
 
         if ($canvasUser = $statement->fetch()) {
             // Try sis user id
-            try {
-                $this->canvasUserIdUserMap[$canvasUserId] = $this->userMapper->findByExternalId($canvasUser['sis_user_id']);
-                return $this->canvasUserIdUserMap[$canvasUserId];
-            } catch (Mapper\Exception $e) {
+            if ($canvasUser['sis_user_id'] !== null) {
+                try {
+                    $this->canvasUserIdUserMap[$canvasUserId] = $this->userMapper->findByExternalId($canvasUser['sis_user_id']);
+                    return $this->canvasUserIdUserMap[$canvasUserId];
+                } catch (Mapper\Exception $e) {
+                }
             }
 
             // Try email address
