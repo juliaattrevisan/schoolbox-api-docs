@@ -20,6 +20,8 @@ module.exports = {
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "plugin:jsdoc/recommended",
         "plugin:vue/vue3-recommended",
+        "plugin:import-x/recommended",
+        "plugin:import-x/typescript",
         "prettier",
         // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
     ],
@@ -33,7 +35,6 @@ module.exports = {
         tsconfigRootDir: __dirname,
     },
     plugins: [
-        "import", // for eslint to lint imports
         "@typescript-eslint",
         // for eslint to be using typescript-eslint
         "eslint-plugin-jsdoc", // to lint jsdocs
@@ -44,7 +45,7 @@ module.exports = {
     // limits ESLint to this folder (wont go up parent folders)
     rules: {
         // customised rules
-        "import/prefer-default-export": "off",
+        "import-x/prefer-default-export": "off",
         // as Pinia especially uses single exports
         "no-param-reassign": [
             2,
@@ -58,7 +59,7 @@ module.exports = {
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
         // allow devDependencies to be imported so that we can use them in our tests
-        "import/no-extraneous-dependencies": [
+        "import-x/no-extraneous-dependencies": [
             "error",
             {
                 devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
@@ -116,10 +117,10 @@ module.exports = {
         "no-await-in-loop": "off",
     },
     settings: {
-        "import/parsers": {
+        "import-x/parsers": {
             "@typescript-eslint/parser": [".ts", ".tsx"],
         },
-        "import/resolver": {
+        "import-x/resolver": {
             typescript: {
                 alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
             },

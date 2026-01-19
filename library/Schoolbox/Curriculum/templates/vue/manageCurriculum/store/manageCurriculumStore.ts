@@ -4,9 +4,9 @@
 
 import { defineStore } from "pinia";
 import { UNSET_ID, getIdHash, isValidHash } from "@schoolboxCurriculum/js/nodeUtils";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 

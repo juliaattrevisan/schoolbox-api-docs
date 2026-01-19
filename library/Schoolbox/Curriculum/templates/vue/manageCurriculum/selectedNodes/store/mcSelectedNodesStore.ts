@@ -7,10 +7,10 @@
  */
 
 import { defineStore } from "pinia";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { UNSET_ID, findById, getEmptyNode, noChildrenOfNode } from "@schoolboxCurriculum/js/nodeUtils";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useEnableNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcEnableNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 

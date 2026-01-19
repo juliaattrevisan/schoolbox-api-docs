@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useActiveNodeStore } from "./mcActiveNodeStore";
 
 export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
