@@ -24,28 +24,17 @@ class ModelToArray
     use GetRouteIfAuthorized;
 
     /**
-     * User translator, for translating the attachments's owner.
-     *
-     * @var callable
-     */
-    private $userTranslator;
-
-    /**
      * Constructor
      *
-     * @param callable   $userTranslator
      * @param Generator  $routeGenerator
      * @param Authorizer $authorizer
      * @param User       $currentUser
-     * @param IPurifier  $purifier
      */
     public function __construct(
-        callable $userTranslator,
         Generator $routeGenerator,
         Authorizer $authorizer,
         User $currentUser,
     ) {
-        $this->userTranslator = $userTranslator;
         $this->routeGenerator = $routeGenerator;
         $this->authorizer     = $authorizer;
         $this->currentUser    = $currentUser;

@@ -135,7 +135,6 @@ class Module extends BaseModule
         );
 
         $attachmentTranslator = new PastoralAttachmentTranslator(
-            new User\Translator\Author\ModelToArray(),
             $this->injector->get('router.generator'),
             $this->injector->get('authorizer'),
             $this->injector->get('user'),
