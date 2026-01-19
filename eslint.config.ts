@@ -12,12 +12,12 @@ import eslintPluginVue from "eslint-plugin-vue";
 import { jsdoc } from "eslint-plugin-jsdoc";
 import { importX } from "eslint-plugin-import-x";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import tsEslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
 import js from "@eslint/js";
 import { FlatCompat } from "@eslint/eslintrc";
 import type { ConfigWithExtends } from "@eslint/config-helpers";
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
 
 const compat = new FlatCompat({
     baseDirectory: __dirname,
@@ -34,23 +34,18 @@ const mainConfig = defineConfig({
         },
         parser: vueEslintParser, // to parse .vue files: https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
         parserOptions: {
-            extraFileExtensions: [".vue"],
-            parser: "@typescript-eslint/parser", // the parser that runs through our ts files
-            project: "./tsconfig.json",
+            parser: tsEslint.parser, // the parser that runs through our ts files
+            projectService: true,
             tsconfigRootDir: __dirname,
+            extraFileExtensions: [".vue"],
         },
     },
     extends: compat.extends(
         // "airbnb-base",
         // "airbnb-typescript/base",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "prettier",
         // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
     ),
-    plugins: {
-        "@typescript-eslint": typescriptEslint,
-    },
     rules: {
         // customised rules
         // as Pinia especially uses single exports
@@ -105,6 +100,8 @@ const mainConfig = defineConfig({
 });
 
 module.exports = defineConfig([
+    js.configs.recommended,
+    tsEslint.configs.recommendedTypeChecked,
     eslintComments.recommended,
     eslintPluginVue.configs["flat/recommended"],
     jsdoc({ config: "flat/recommended-typescript" }),
