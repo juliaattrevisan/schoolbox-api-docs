@@ -94,10 +94,7 @@ window.Vue.onMounted((): void => {
                     <b class="show-for-print"> {{ tag.name }}</b>
                 </template>
             </div>
-            <div
-                v-if="props.record.attachmentsPublic && props.record.attachmentsPublic.length"
-                id="article-attachments"
-            >
+            <div v-if="props.record.attachmentsPublic && props.record.attachmentsPublic.length">
                 <hr />
                 <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
                     <li
