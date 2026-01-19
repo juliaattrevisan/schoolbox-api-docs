@@ -306,6 +306,7 @@ class Controller extends Base
     /**
      * Save differentiation profile data
      *
+     * @param User $student
      * @return void
      * @throws Exception
      */
@@ -404,7 +405,7 @@ class Controller extends Base
 
             /* Set created_by only if it's a new record
              */
-            if (null === $id) {
+            if (null === $post->getInt('id')) {
                 $model->setCreatedBy($this->getUser());
             }
 
