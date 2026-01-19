@@ -1,32 +1,32 @@
-<script>
-    window.onload = function() {
-        fetch('/pastoral/record/52/update', {
-            method: "PATCH",
-            body: JSON.stringify({
-                id: 56,
-                heading: 'mr meow',
-                typeId: 1,
-                subtypeId: 2,
-                body_public: 'mlem',
-                body_private: 'blep',
-                points: 0,
-                cat: 'meow',
-                horse: 'neigh',
-                /* Why is actions array|null but tags string|null??????????
-                 */
-                actions: [
-                    1, 3, 5
-                ],
-                tags: '1,2,3',
-                tagNames: 'Playground, Commendation, Hadoken',
-            }),
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            }
-        });
-    }
-</script>
+{#<script>#}
+{#    window.onload = function() {#}
+{#        fetch('/pastoral/record/52/update', {#}
+{#            method: "PATCH",#}
+{#            body: JSON.stringify({#}
+{#                id: 56,#}
+{#                heading: 'mr meow',#}
+{#                typeId: 1,#}
+{#                subtypeId: 2,#}
+{#                body_public: 'mlem',#}
+{#                body_private: 'blep',#}
+{#                points: 0,#}
+{#                cat: 'meow',#}
+{#                horse: 'neigh',#}
+{#                /* Why is actions array|null but tags string|null??????????#}
+{#                 */#}
+{#                actions: [#}
+{#                    1, 3, 5#}
+{#                ],#}
+{#                tags: '1,2,3',#}
+{#                tagNames: 'Playground, Commendation, Hadoken',#}
+{#            }),#}
+{#            headers: {#}
+{#                Accept: "application/json",#}
+{#                "Content-Type": "application/json",#}
+{#            }#}
+{#        });#}
+{#    }#}
+{#</script>#}
 
 
 
