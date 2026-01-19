@@ -68,7 +68,7 @@ const config = window.Vue.inject<Config>("pastoralConfig");
                 </span>
             </p>
         </div>
-        <div class="l-flex-col l-gap-s l-pad-s" style="clear: both">
+        <div class="l-flex-col l-gap-s l-pad-m u-clear-both">
             <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
             <div v-if="props.record.tags.length > 0" class="l-flex-row l-gap-xs f-no-margins">
                 <template v-for="tag in props.record.tags" :key="tag.id">
