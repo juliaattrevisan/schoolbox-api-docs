@@ -110,23 +110,21 @@ window.Vue.onUnmounted(async () => {
 </script>
 
 <template>
-    <label>
-        Comment
-        <p v-if="!props.selfAssessment" class="meta">
-            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
-            on creation.
-        </p>
-        <textarea
-            :id="textareaId"
-            ref="textareaRef"
-            name="comment"
-            :data-test="`assessment-feedback-comment-textarea-${participant.user.id}`"
-            :placeholder="placeholder"
-            rows="3"
-            :tabindex="tabIndex || undefined"
-            :readonly="readonly || undefined"
-        ></textarea>
-    </label>
+    <label :for="textareaId"> Comment </label>
+    <p v-if="!props.selfAssessment" class="meta">
+        Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on
+        creation.
+    </p>
+    <textarea
+        :id="textareaId"
+        ref="textareaRef"
+        name="comment"
+        :data-test="`assessment-feedback-comment-textarea-${participant.user.id}`"
+        :placeholder="placeholder"
+        rows="3"
+        :tabindex="tabIndex || undefined"
+        :readonly="readonly || undefined"
+    ></textarea>
 </template>
 
 <style scoped></style>
