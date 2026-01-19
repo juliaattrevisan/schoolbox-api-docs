@@ -167,9 +167,8 @@ if ($this->arg[0] == 'revision') {
             'class' => 'active',
         ],
     ]);
-} /* Load an existing wiki by its category id and slug
- */
-elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
+} elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
+    /* Load an existing wiki by its category id and slug */
     $wiki = $wikiHandler->getByCategoryAndSlug($this->arg[0], $this->arg[1]);
 
     /* If the wiki wasn't found, offer some information and a link
