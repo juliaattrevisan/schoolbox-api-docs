@@ -132,12 +132,12 @@ class RecordProcessor
 
         /* If a numeric value was provided, check that it's numeric and within the allowed range:
          *
-         *   - A null input causes points to be cleared back to null;
+         *   - A null or empty input causes points to be cleared back to null;
          *   - Non-numeric inputs are ignored
          *   - Numeric inputs are forcibly cast to float and checked for range. Note that 'e' is included here.
          */
         if (array_key_exists('points', $partial)) {
-            if (null === $partial['points']) {
+            if (null === $partial['points'] || '' === $partial['points']) {
                 /* Remove points by passing null
                  */
                 $record->setPoints(null);
