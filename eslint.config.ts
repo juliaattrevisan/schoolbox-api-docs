@@ -8,22 +8,16 @@
 
 import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
-import eslintPluginVue from "eslint-plugin-vue";
 import { jsdoc } from "eslint-plugin-jsdoc";
 import { importX } from "eslint-plugin-import-x";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import eslintConfigPrettier from "eslint-config-prettier";
+import eslintPluginVue from "eslint-plugin-vue";
 import tsEslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import eslint from "@eslint/js";
 import type { ConfigWithExtends } from "@eslint/config-helpers";
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
-
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all,
-});
 
 const mainConfig = defineConfig({
     languageOptions: {
@@ -40,12 +34,11 @@ const mainConfig = defineConfig({
             extraFileExtensions: [".vue"],
         },
     },
-    extends: compat.extends(
-        // "airbnb-base",
-        // "airbnb-typescript/base",
-        "prettier",
-        // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
-    ),
+    // extends: compat.extends(
+    // "airbnb-base",
+    // "airbnb-typescript/base",
+    // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
+    // ),
     rules: {
         // customised rules
         // as Pinia especially uses single exports
@@ -100,7 +93,7 @@ const mainConfig = defineConfig({
 });
 
 module.exports = defineConfig([
-    js.configs.recommended,
+    eslint.configs.recommended,
     tsEslint.configs.recommendedTypeChecked,
     eslintComments.recommended,
     eslintPluginVue.configs["flat/recommended"],
@@ -129,6 +122,7 @@ module.exports = defineConfig([
             ],
         },
     },
+    eslintConfigPrettier,
     mainConfig,
     globalIgnores([
         "**/*.js",
