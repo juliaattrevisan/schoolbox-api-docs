@@ -59,6 +59,7 @@
     "vuejs-paginate-next": "~1.0.2"
   },
   "devDependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.6.0",
     "@happy-dom/jest-environment": "~18.0.1",
     "@pinia/testing": "~1.0.2",
     "@playwright/test": "~1.53.1",

@@ -4,8 +4,8 @@
  * but has been moved into a module so we can use the image compression on upload extension.
  */
 
-/* eslint-disable eslint-comments/disable-enable-pair -- see below */
-/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable -- see below */
 /* eslint-disable -- Ignore this file for TypeScript and ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 // @ts-nocheck

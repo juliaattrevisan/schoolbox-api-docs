@@ -11,7 +11,7 @@ const globals = require("globals");
 const vueEslintParser = require("vue-eslint-parser");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
 const jsdoc = require("eslint-plugin-jsdoc");
-const eslintComments = require("eslint-plugin-eslint-comments");
+const eslintComments = require("@eslint-community/eslint-plugin-eslint-comments/configs");
 const js = require("@eslint/js");
 
 const { FlatCompat } = require("@eslint/eslintrc");
@@ -52,7 +52,6 @@ const mainConfig = defineConfig({
     plugins: {
         "@typescript-eslint": typescriptEslint,
         jsdoc,
-        "eslint-comments": eslintComments,
     },
     rules: {
         // customised rules
@@ -106,13 +105,8 @@ const mainConfig = defineConfig({
             },
         ],
         // avoid unnecessary eslint-disable comments and enforce descriptions for them
-        "eslint-comments/disable-enable-pair": "error",
-        "eslint-comments/no-aggregating-enable": "error",
-        "eslint-comments/no-duplicate-disable": "error",
-        "eslint-comments/no-unlimited-disable": "error",
-        "eslint-comments/no-unused-disable": "error",
-        "eslint-comments/no-unused-enable": "error",
-        "eslint-comments/require-description": "warn",
+        "@eslint-community/eslint-comments/no-unused-disable": "error",
+        "@eslint-community/eslint-comments/require-description": "warn",
         /**
          * Override the ForOfStatement restriction from airbnb, as we want to allow
          * for-of loops (including with await) as they are more readable than .forEach or .reduce
@@ -135,6 +129,7 @@ const mainConfig = defineConfig({
 });
 
 module.exports = defineConfig([
+    eslintComments.recommended,
     mainConfig,
     globalIgnores([
         "**/*.js",
