@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Paginator\UrlPaginator;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
