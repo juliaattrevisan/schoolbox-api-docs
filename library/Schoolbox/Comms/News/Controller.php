@@ -1321,12 +1321,16 @@ class Controller extends Base
 
                 // does my child have direct access to this news audience?
                 // intentionally ignoring children could have service perms
-                foreach ($user->getChildren() as $child) {
-                    if (
-                        $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                        $access->getFolderAccess($child, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
-                    ) {
-                        return true;
+                if ($user->getRole()->isParent()) {
+                    // hydrate children for $user
+                    (new \Schoolbox\External\User())->loadChildren([$user]);
+                    foreach ($user->getChildren() as $child) {
+                        if (
+                            $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                            $access->getFolderAccess($child, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
+                        ) {
+                            return true;
+                        }
                     }
                 }
             } catch (MapperException\Deleted) {
