@@ -7,7 +7,8 @@
  # @param Collection $breadcrumbs         A set of key-value tuples for breadcrumb rendering
  # @param DialogAgent\Model $assessment   A Dialog Agent assessment instance (synonymous with Discussion)
  # @param array $feed                     The agent chat feed data current response
- # @param array $student                  Array of author info about the student who owns the response
+ # @param \Schoolbox\User $student        A user instance for the student
+ # @param array $studentStruct            Array of author info about the student who owns the response
  # @param array $responseData             Array translation of the response to pass to Vue
  # @param int|null $duration              The time limit / duration (in seconds)
  # @param string $returnUrl               A redirect destination
@@ -18,6 +19,14 @@
 <div class="actions-small-1 row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
+
+        {% include '@learningAssessment/dialogAgent/meta.twig' with {
+            assessment: assessment,
+            student: student,
+            icon: 'icon-dialog-agent',
+            participant: null,
+            lastViews: null
+        } only %}
     </div>
 </div>
 
@@ -29,7 +38,7 @@
                 <dialog-agent-response-chat
                     :feed="{{ feed |json_encode }}"
                     :response="{{ responseData |json_encode }}"
-                    :student="{{ student |json_encode }}"
+                    :student="{{ studentStruct |json_encode }}"
                     :duration="{{ duration ?? 'null' }}"
                     close-at="{{ assessment.closeAt.toRfc3339String }}"
                     return-url="{{ returnUrl }}"
