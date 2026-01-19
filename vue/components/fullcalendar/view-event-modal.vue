@@ -110,18 +110,6 @@ export default {
          * @return {Object}
          */
         eventExtendedProps() {
-            // Also need to render the event's buttons
-
-            /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
-             *
-             * There's a weird modal overlay that now spawns, which can cause
-             * this.event to be undefined. That leads to subsequent crashes
-             * Therefore we now have to check whether this exists before using it
-             */
-            // if (this.event == undefined) {
-            //     return;
-            // }
-
             let event = this.event,
                 data = event?.extendedProps?.data,
                 metadata = data?.meta,
