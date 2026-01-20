@@ -544,13 +544,24 @@ class Profile implements IStrategy
             return;
         }
 
+        /* Due to some broken data in sentral you might not actually have a meaningful updatedAt timestamp: this means
+         * that it's indeterminate when a person was last changed; this currently exits early without changing anything
+         * to prevent continually/repeatedly downloading the same picture and draining resources.
+         *
+         * Broken data should be fixed in sentral
+         */
+        if ('' === trim($updatedAtTime)) {
+            return;
+        }
+
         /* Does user already have a portrait? If not let's try to find and update
          */
         if ($baseProfile->getPortrait() !== null) {
             /* Check if the user was modified since the last update
              * If yes, the photo could also have been updated, let's grab it
              */
-            $updated_at = $this->findDate($updatedAtTime)?->getDatabase();
+            $updatedAt = $this->findDate($updatedAtTime)?->getDatabase();
+
             $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
                 SELECT updated_at
                 FROM {$this->baseProfileMapper->getBaseTableName()}
@@ -558,7 +569,7 @@ class Profile implements IStrategy
                 AND updated_at < :updatedAt
             ", [
                 'externalId' => $baseProfile->getExternalId(),
-                'updatedAt'  => $updated_at,
+                'updatedAt'  => $updatedAt,
             ]);
 
             if ($stmt->rowCount() === 0) {
@@ -1422,7 +1433,9 @@ class Profile implements IStrategy
                 $this->importPortrait(
                     $staffBaseProfile,
                     sprintf(self::STAFF_PHOTO_ENDPOINT, (string)$staff['id']),
-                    (string)$staff['attributes']['updatedAt']['iso8601']
+                    /* Sentral sometimes has broken data where they unfortunately don't know/supply this value
+                     */
+                    (string)($staff['attributes']['updatedAt']['iso8601'] ?? '')
                 );
 
                 /* Then save it
