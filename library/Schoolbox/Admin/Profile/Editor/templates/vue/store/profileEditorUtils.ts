@@ -50,7 +50,7 @@ export async function fetchProfileEditorEndpoint(
                 delete responseData.message;
             }
         }
-    } catch (e) {
+    } catch {
         responseData.success = false;
         responseData.message = "An unknown error occurred";
     }

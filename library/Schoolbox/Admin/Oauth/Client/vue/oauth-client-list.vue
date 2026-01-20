@@ -44,7 +44,7 @@ async function getData(): Promise<void> {
     try {
         const response = await fetch(props.getListEndpoint);
         clientList.value = (await response.json()) as OAuthClient[];
-    } catch (error) {
+    } catch {
         hasDataLoadError.value = true; // show load error
     } finally {
         isDataLoading.value = false; // update the display to show the list
@@ -128,7 +128,7 @@ async function addClient(): Promise<void> {
             saveError.value = await extractErrorMessage(response);
             toast.timeout({ text: "Client couldn't be added", isSuccess: false });
         }
-    } catch (error) {
+    } catch {
         toast.timeout({ text: "Client couldn't be added", isSuccess: false });
     }
 }
@@ -189,7 +189,7 @@ async function modifyItem(client: OAuthClient): Promise<void> {
             saveError.value = await extractErrorMessage(response);
             toast.timeout({ text: "Client couldn't be modified", isSuccess: false });
         }
-    } catch (error) {
+    } catch {
         toast?.timeout({ text: "Client couldn't be modified", isSuccess: false });
     }
 }
@@ -235,7 +235,7 @@ async function regenerateClient(client: OAuthClient): Promise<void> {
             saveError.value = await extractErrorMessage(response);
             toast.timeout({ text: "Client couldn't be regenerated", isSuccess: false });
         }
-    } catch (error) {
+    } catch {
         toast.timeout({ text: "Client couldn't be regenerated", isSuccess: false });
     }
 }
@@ -277,7 +277,7 @@ async function deleteClient(client: OAuthClient): Promise<void> {
             saveError.value = await extractErrorMessage(response);
             toast.timeout({ text: "Client couldn't be deleted", isSuccess: false });
         }
-    } catch (error) {
+    } catch {
         toast.timeout({ text: "Client couldn't be deleted", isSuccess: false });
     }
 }

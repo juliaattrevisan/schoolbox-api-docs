@@ -67,7 +67,7 @@ export function usePagination(
 
             // If the remaining parameters are different, reset pagination
             return oldParams.toString() !== newParams.toString();
-        } catch (error) {
+        } catch {
             // If URL parsing fails, be safe and reset
             return true;
         }

@@ -51,7 +51,7 @@ async function loadData(): Promise<void> {
     try {
         const response = await fetch(props.endpoint);
         data.value = (await response.json()) as unknown[];
-    } catch (error) {
+    } catch {
         hasLoadError.value = true; // display load error note
     } finally {
         isLoading.value = false; // hide the loading table

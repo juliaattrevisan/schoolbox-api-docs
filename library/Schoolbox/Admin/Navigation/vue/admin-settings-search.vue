@@ -228,7 +228,7 @@ export default window.Vue.defineComponent({
                 const response = await fetch("/adminv2/setting/search");
                 const responseJson = (await response.json()) as SBSettingsListItem[];
                 this.settingsList = responseJson;
-            } catch (error) {
+            } catch {
                 this.hasLoadError = true; // hide search bar in the dom
             } finally {
                 this.isLoaded = true;

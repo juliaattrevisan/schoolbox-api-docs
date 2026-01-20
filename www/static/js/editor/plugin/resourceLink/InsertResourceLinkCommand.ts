@@ -130,7 +130,7 @@ export default class InsertResourceLinkCommand extends Command {
         let message;
         try {
             message = JSON.parse(event.data);
-        } catch (error) {
+        } catch {
             message = event.data;
         }
         if (message.data !== undefined) {

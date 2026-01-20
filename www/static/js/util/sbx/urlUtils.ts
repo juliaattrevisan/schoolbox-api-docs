@@ -73,7 +73,7 @@ export function isSignificantUrlChange(oldUrl: string, newUrl: string, ignorePar
 
         // Check if all parameters and values match
         return oldKeys.some((key) => oldParams.get(key) !== newParams.get(key));
-    } catch (error) {
+    } catch {
         // If URL parsing fails, be safe and assume URLs have changed
         return true;
     }

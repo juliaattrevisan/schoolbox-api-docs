@@ -40,7 +40,7 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
                 resultsStore.hasLoadedAllResults = true;
                 autoClickLoadMoreResults.value = false;
             }
-        } catch (error) {
+        } catch {
             hasLoadError.value = true;
             autoClickLoadMoreResults.value = false;
         } finally {

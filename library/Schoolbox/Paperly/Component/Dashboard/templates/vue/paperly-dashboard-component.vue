@@ -41,7 +41,7 @@ async function loadPayload(): Promise<void> {
         } else {
             hasLoadError.value = true;
         }
-    } catch (error) {
+    } catch {
         hasLoadError.value = true;
     } finally {
         isProcessing.value = false;

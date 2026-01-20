@@ -113,7 +113,7 @@ export default class ResourceEditing extends Plugin {
             const resource = (await loader.upload()) as Resource;
             addResource(this.editor, resource);
             await this.removeUploadProgress(uploadElement);
-        } catch (error) {
+        } catch {
             ResourceUI.showUploadErrorElement(
                 uploadElement,
                 "Sorry, the file could not be uploaded as an unknown error has occurred.",

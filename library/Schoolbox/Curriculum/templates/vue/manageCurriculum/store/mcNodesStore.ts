@@ -187,7 +187,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             } else {
                 store.hasLoadError = true; // show the load error display state
             }
-        } catch (error) {
+        } catch {
             store.hasLoadError = true; // show the load error display state
         } finally {
             store.isLoading = false;
@@ -219,7 +219,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             } else {
                 throw new Error((responseJson as { title: string }).title);
             }
-        } catch (error) {
+        } catch {
             hasLoadError.value = true;
         } finally {
             isLoading.value = false;

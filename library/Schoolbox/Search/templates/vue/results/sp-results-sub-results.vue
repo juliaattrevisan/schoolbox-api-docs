@@ -74,7 +74,7 @@ async function loadMore(): Promise<void> {
                 hasLoadedAllResults.value = true;
             }
         }
-    } catch (error) {
+    } catch {
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;

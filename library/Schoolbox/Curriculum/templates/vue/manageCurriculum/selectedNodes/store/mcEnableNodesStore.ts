@@ -67,21 +67,17 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
      * @returns the success message
      */
     async function enable(): Promise<string> {
-        try {
-            isProcessing.value = true;
-            const nodeEnables = await Promise.all(getFetches());
-            isProcessing.value = false;
+        isProcessing.value = true;
+        const nodeEnables = await Promise.all(getFetches());
+        isProcessing.value = false;
 
-            const enableResponses = nodeEnables.map((response) => response.ok);
-            const isAllResponsesOk = enableResponses.every((response) => response === true);
-            if (isAllResponsesOk) {
-                const successMessage = getSuccessMessage(); // Must get success message before selectedNodesStore is emptied following enableNodes() below.
-                useSelectedNodesStore().enableNodes();
-                cancel();
-                return successMessage;
-            }
-        } catch (error) {
-            throw new Error();
+        const enableResponses = nodeEnables.map((response) => response.ok);
+        const isAllResponsesOk = enableResponses.every((response) => response === true);
+        if (isAllResponsesOk) {
+            const successMessage = getSuccessMessage(); // Must get success message before selectedNodesStore is emptied following enableNodes() below.
+            useSelectedNodesStore().enableNodes();
+            cancel();
+            return successMessage;
         }
 
         // It is expected that the request will be sent, and all responses will be okay.

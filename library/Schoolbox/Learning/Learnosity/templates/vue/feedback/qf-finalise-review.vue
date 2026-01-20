@@ -71,7 +71,7 @@ async function submitFeedback(): Promise<void> {
                 isSuccess: false,
             });
         }
-    } catch (error) {
+    } catch {
         toast.timeout({
             text: "Review could not be finalised, please contact your support if the problem persists",
             isSuccess: false,
