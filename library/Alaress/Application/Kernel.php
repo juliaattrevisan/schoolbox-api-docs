@@ -1478,7 +1478,7 @@ abstract class Kernel
             // first attempt from env vars, then from deployed configuration.
             $key = getenv('SYNERGETIC_PASSWORD_ENCRYPTION_KEY', true) ?: null;
             $iv  = getenv('SYNERGETIC_PASSWORD_ENCRYPTION_IV', true) ?: null;
-            if (!$key && !$iv) {
+            if (!isset($key, $iv)) {
                 $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
                 if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
                     $config = json_decode(file_get_contents($webServicesKeyFile), true);
