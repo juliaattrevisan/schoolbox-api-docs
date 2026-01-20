@@ -539,6 +539,8 @@ export default {
 
                         // If the event has one or more bookings, all calendar items must
                         // be reloaded in order to get linked booking items to move also.
+                        // (Note different event types have different extendedProps, hence all the ?. operations.
+                        // See the various EventType/{eventType}/Renderer/Javascript.php files.)
                         if (event?.extendedProps?.data?.bookings.length > 0) {
                             this.reloadEvents();
                         }
