@@ -328,7 +328,8 @@ class CliImporter extends CliTool\App
 
             $this->loadCanvasDataFilesToStagingDatabase($tempDir, $dataRestorer, self::TABLES_TO_IMPORT_DEPRECATED, false);
         } else {
-            $this->getLogger()->warning('API Key or secret is not set.');
+            $this->getLogger()->warning('Client ID or Secret is not set.');
+            $canvasLogMapper->error($importLog, "Client ID or Secret is not set.");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
