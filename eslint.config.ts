@@ -84,9 +84,7 @@ module.exports = defineConfig([
     // eslintConfigAirbnb.base.es6,
     // eslintConfigAirbnb.base.style,
     // eslintConfigAirbnb.base.stylistic,
-    // eslintConfigAirbnb.base.imports,
     // eslintConfigAirbnb.typescript.base,
-    // eslintConfigAirbnb.typescript.imports,
     // eslintConfigAirbnb.typescript.stylistic,
     // eslintConfigAirbnb.typescript.typescriptEslint,
     {
@@ -128,6 +126,15 @@ module.exports = defineConfig([
                     devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
                 },
             ],
+            "import-x/first": "warn",
+            "import-x/newline-after-import": "warn",
+            "import-x/no-absolute-path": "warn",
+            "import-x/no-amd": "warn",
+            "import-x/no-mutable-exports": "error",
+            "import-x/no-named-default": "error",
+            "import-x/no-relative-packages": "error",
+            "import-x/no-self-import": "error",
+            // "import-x/no-cycle": ["error", { maxDepth:'∞' }], // disabled for now (performance heavy)
             // Disable some rules for performance as per recommendations in https://typescript-eslint.io/troubleshooting/typed-linting/performance/#eslint-plugin-import
             "import-x/named": "off",
             "import-x/namespace": "off",
