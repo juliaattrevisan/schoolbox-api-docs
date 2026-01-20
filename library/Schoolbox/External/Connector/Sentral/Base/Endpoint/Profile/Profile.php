@@ -551,6 +551,13 @@ class Profile implements IStrategy
          * Broken data should be fixed in sentral
          */
         if ('' === trim($updatedAtTime)) {
+            $this->log->debug(sprintf(
+                'Portrait of %s %s (%s) does not have an updatedAt timestamp from sentral. Skipping.',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
             return;
         }
 
