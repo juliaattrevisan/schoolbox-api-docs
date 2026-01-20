@@ -19,7 +19,7 @@ GRANT ALL ON schoolbox2.* to 'schoolboxvagrant'@'localhost';
 GRANT ALL ON schoolbox2.* to 'schoolboxdocker'@'%';
 
 # canvas db rather than fighting tools/canvas/create_database.php
-# drop db if it alredy exists
+# drop db if it already exists
 DROP DATABASE IF EXISTS canvas_data_docker;
 DROP DATABASE IF EXISTS canvas_data2_docker;
 DROP DATABASE IF EXISTS canvas_data_docker2;
