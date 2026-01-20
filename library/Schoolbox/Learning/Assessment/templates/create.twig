@@ -112,7 +112,13 @@
                 beforeAttemptingSubmit: beforeAttemptingSubmit,
                 formWillSubmit: formWillSubmit,
                 onXhrDone: function (data) {
-                    if('string' == typeof data.returnUrl){
+                    // If provided, inject modifyForm into the browser history to replace the current page
+                    if ('string' === typeof data.modifyForm) {
+                        window.history.replaceState({}, '', data.modifyForm);
+                    }
+
+                    // If a returnUrl was provided, go to it
+                    if ('string' === typeof data.returnUrl){
                         window.location.href = data.returnUrl;
                     }
                 }
