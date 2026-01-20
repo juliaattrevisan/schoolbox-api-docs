@@ -79,24 +79,25 @@ const mainConfig = defineConfig({
 module.exports = defineConfig([
     eslint.configs.recommended,
     // TODO: check over old configs with airbnb rules
-    // eslintConfigAirbnb.base.bestPractices,
-    // eslintConfigAirbnb.base.errors,
-    // eslintConfigAirbnb.base.es6,
-    // eslintConfigAirbnb.base.style,
-    // eslintConfigAirbnb.base.stylistic,
-    // eslintConfigAirbnb.typescript.base,
-    // eslintConfigAirbnb.typescript.stylistic,
-    // eslintConfigAirbnb.typescript.typescriptEslint,
+    eslintConfigAirbnb.base.bestPractices,
+    eslintConfigAirbnb.base.errors,
+    eslintConfigAirbnb.base.es6,
+    eslintConfigAirbnb.base.style,
+    eslintConfigAirbnb.base.stylistic,
+    eslintConfigAirbnb.typescript.base,
+    eslintConfigAirbnb.typescript.typescriptEslint,
     {
         rules: {
             /* Selective rules from eslintConfigAirbnb.base.variables */
             "no-restricted-globals": eslintConfigAirbnb.base.variables.rules!["no-restricted-globals"],
-            "no-shadow": "off", // replaced by @typescript-eslint/no-shadow
-            "@typescript-eslint/no-shadow": "error",
             "no-shadow-restricted-names": "error",
-            "no-undef-init": "error",
-            "no-use-before-define": "off", // replaced by @typescript-eslint/no-use-before-define
-            "@typescript-eslint/no-use-before-define": "warn",
+
+            /* other overrides from rules that come from the airbnb configs */
+            "no-await-in-loop": "off",
+            "no-underscore-dangle": "off",
+            "@stylistic/lines-between-class-members": "off",
+            "@typescript-eslint/no-inferrable-types": "off",
+            "@typescript-eslint/consistent-type-definitions": "off",
         },
     },
     tsEslint.configs.recommendedTypeChecked,
