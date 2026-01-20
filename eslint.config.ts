@@ -124,7 +124,12 @@ module.exports = defineConfig([
             "import-x/no-extraneous-dependencies": [
                 "error",
                 {
-                    devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
+                    devDependencies: [
+                        "test/playwright/**/*.ts",
+                        "playwright.config.ts",
+                        "eslint.config.ts",
+                        "stories/**/*.stories.ts",
+                    ],
                 },
             ],
             "import-x/first": "warn",
