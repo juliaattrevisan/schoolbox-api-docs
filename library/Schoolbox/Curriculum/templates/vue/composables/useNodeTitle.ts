@@ -18,7 +18,7 @@ export function useNodeTitle(node: Pick<Node, "name" | "code">): {
      * Add in the code if it's available otherwise just show the title
      * @returns - the title of the node
      */
-    const title = window.Vue.computed(() => (hasCode(node) ? `[${node.code as string}] ${node.name}` : `${node.name}`));
+    const title = window.Vue.computed(() => (hasCode(node) ? `[${node.code as string}] ${node.name}` : node.name));
 
     return { title };
 }

@@ -136,7 +136,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
             await db.updateInDatabase(
                 "submission_return",
                 { deleted_at: "2025-10-01 11:20:13" },
-                { box_id: `${boxId}`, deleted_at: null },
+                { box_id: boxId, deleted_at: null },
             );
 
             await db.updateInDatabase("assessment", { title: "Persuasive Article" }, { id: assessmentId });
@@ -257,7 +257,7 @@ test.describe("Test Due Work options in class and course mark-book", () => {
             await db.updateInDatabase(
                 "submission_return",
                 { deleted_at: "2025-10-01 11:20:13" },
-                { box_id: `${boxId}`, deleted_at: null },
+                { box_id: boxId, deleted_at: null },
             );
             await db.updateInDatabase("assessment", { title: "Persuasive Article" }, { id: assessmentId });
         }
