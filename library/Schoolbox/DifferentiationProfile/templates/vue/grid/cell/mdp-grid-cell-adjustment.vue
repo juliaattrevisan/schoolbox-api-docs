@@ -22,7 +22,7 @@ import { useSaveStore } from "../../store/mdpSaveStore";
 const props = defineProps<{
     profile: Profile;
     headerKey: ProfileAdjustmentKeys;
-    adjustments: number[] | null;
+    adjustments: AdjustmentType[] | null;
     options: AdjustmentType[];
 }>();
 
@@ -47,14 +47,14 @@ const { contentHeight, componentActionHeight } = useContentHeight(
 
 // #region modifying the selected adjustments
 
-const selectedAdjustments = window.Vue.ref<number[]>(
+const selectedAdjustments = window.Vue.ref<AdjustmentType[]>(
     // filter to only the latest available options
-    (props.adjustments ?? []).filter((id) => props.options.some((option) => option.id === id)),
+    (props.adjustments ?? []).filter((adj) => props.options.some((option) => option.id === adj.id)),
 );
 const hasChanged = window.Vue.computed(() => {
     // Compare against the filtered original adjustments (excluding removed options)
-    const filteredOriginalAdjustments = (props.adjustments ?? []).filter((id) =>
-        props.options.some((option) => option.id === id),
+    const filteredOriginalAdjustments = (props.adjustments ?? []).filter((adj) =>
+        props.options.some((option) => option.id === adj.id),
     );
     return selectedAdjustments.value.join(",") !== filteredOriginalAdjustments.join(",");
 });
@@ -91,11 +91,11 @@ function onModify(): void {
  * @param adjustments - the adjustments to sort
  * @returns the sorted adjustments array
  */
-function getSortedAdjustments(adjustments: number[]): number[] {
+function getSortedAdjustments(adjustments: AdjustmentType[]): AdjustmentType[] {
     return adjustments.length > 0
         ? adjustments.sort((a, b) => {
-              const indexA = props.options.findIndex((option) => option.id === a);
-              const indexB = props.options.findIndex((option) => option.id === b);
+              const indexA = props.options.findIndex((option) => option.id === a.id);
+              const indexB = props.options.findIndex((option) => option.id === b.id);
               return indexA - indexB;
           })
         : [];
@@ -145,7 +145,7 @@ async function onSave(): Promise<void> {
                             <input
                                 :id="`checkbox-${option.id}-${headerKey}-${props.profile.student.id}`"
                                 v-model="selectedAdjustments"
-                                :value="option.id"
+                                :value="option"
                                 type="checkbox"
                             /><label :for="`checkbox-${option.id}-${headerKey}-${props.profile.student.id}`">{{
                                 option.name
@@ -159,8 +159,8 @@ async function onSave(): Promise<void> {
             </div>
             <div v-else class="l-pad-s">
                 <ul>
-                    <li v-for="adjustment in selectedAdjustments" :key="adjustment">
-                        {{ options.find((option) => option.id === adjustment)?.name }}
+                    <li v-for="adjustment in selectedAdjustments" :key="adjustment.id">
+                        {{ options.find((option) => option.id === adjustment.id)?.name }}
                     </li>
                 </ul>
             </div>

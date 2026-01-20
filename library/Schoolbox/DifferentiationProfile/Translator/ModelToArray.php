@@ -28,7 +28,6 @@ class ModelToArray
         protected Authorizer $authorizer,
         protected User $currentUser,
         private Collection $profileConfig,
-        private bool $includeName = false,
     ) {
     }
 
@@ -49,11 +48,13 @@ class ModelToArray
                     if ($value->count() === 0) {
                         $carry[$config->getName()] = null;
                     } else {
-                        if ($this->includeName) {
-                            $carry[$config->getName()] = $value->getPropertyValues('name');
-                        } else {
-                            $carry[$config->getName()] = array_map('intval', $value->getPropertyValues('id'));
-                        }
+                        $carry[$config->getName()] = $value->reduce(function (array $arr, $item) {
+                            $arr[] = [
+                                'id'   => $item->getId(),
+                                'name' => $item->getName(),
+                            ];
+                            return $arr;
+                        }, []);
                     }
                 } else {
                     $carry[$config->getName()] = $value;

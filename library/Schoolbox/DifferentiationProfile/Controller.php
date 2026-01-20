@@ -405,8 +405,16 @@ class Controller extends Base
         try {
             /** @var Model $model */
             $model
-                ->setAdjustmentLevelIds($adjustment_level ? implode(',', $adjustment_level) : null)
-                ->setAdjustmentCategoryIds($adjustment_category ? implode(',', $adjustment_category) : null)
+                ->setAdjustmentLevelIds(
+                    $adjustment_level ?
+                        implode(',', array_column($adjustment_level, 'id')) :
+                        null
+                )
+                ->setAdjustmentCategoryIds(
+                    $adjustment_category ?
+                        implode(',', array_column($adjustment_category, 'id')) :
+                        null
+                )
                 ->setOverview($post->get('overview'))
                 ->setGoals($post->get('goals'))
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))
@@ -414,9 +422,10 @@ class Controller extends Base
                 ->setInterestsStrengths($post->get('interests_strengths'))
                 ->setUpdatedBy($this->getUser());
 
+            $isNewRecord = null === $model->getId();
             /* Set created_by only if it's a new record
              */
-            if (null === $post->getInt('id')) {
+            if ($isNewRecord) {
                 $model->setCreatedBy($this->getUser());
             }
 
@@ -427,7 +436,7 @@ class Controller extends Base
                     "id" => $model->getId(),
                     "updated_at" => $model->getUpdatedAt()->getShort(),
                 ]
-            )->withStatus(200);
+            )->withStatus($isNewRecord ? 201 : 200);
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
         }
