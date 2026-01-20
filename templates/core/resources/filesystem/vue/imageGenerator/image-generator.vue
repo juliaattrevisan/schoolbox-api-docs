@@ -73,7 +73,7 @@ const uploadError = window.Vue.ref<string | null>(null);
         </div>
         <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
-    <ig-actions v-model:uploadLoading="uploadLoading" v-model:uploadError="uploadError" />
+    <ig-actions v-model:upload-loading="uploadLoading" v-model:upload-error="uploadError" />
 </template>
 
 <style scoped lang="scss">
