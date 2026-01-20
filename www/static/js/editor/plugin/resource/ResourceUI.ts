@@ -12,11 +12,8 @@ export default class ResourceUI extends Plugin {
 
     /**
      * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
-     * @returns the plugin name
      */
-    static get pluginName(): string {
-        return "ResourceUI";
-    }
+    static readonly pluginName = "ResourceUI";
 
     /**
      * Register the button in the editor's UI component factory.
