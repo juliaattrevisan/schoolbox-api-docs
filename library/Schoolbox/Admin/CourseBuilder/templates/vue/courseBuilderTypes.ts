@@ -24,6 +24,4 @@ export type Role = {
     guest: boolean;
 };
 
-export type Permissions = {
-    [roleId: string]: -1 | 0 | 1 | 2;
-};
+export type Permissions = Record<string, -1 | 0 | 1 | 2>;

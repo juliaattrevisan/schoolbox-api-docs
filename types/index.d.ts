@@ -86,7 +86,7 @@ declare global {
             l10n: RosettaStone;
             firebaseApps: Array<{
                 appIdentifier: string;
-                publicConfiguration: { [key: string]: unknown };
+                publicConfiguration: Record<string, unknown>;
                 webPushPublicKey: string;
             }>;
             // Curriculum nodes global storage

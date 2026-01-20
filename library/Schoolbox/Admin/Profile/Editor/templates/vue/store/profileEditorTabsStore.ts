@@ -38,7 +38,7 @@ export const useProfileEditorTabsStore = defineStore("profileEditorTabsStore", (
     const actionQueue = window.Vue.ref<QueuedTabAction[]>([]);
 
     // A map of tab keys to any errors that occurred while processing actions for that tab
-    const actionErrors = window.Vue.ref<{ [key: string]: string }>({});
+    const actionErrors = window.Vue.ref<Record<string, string>>({});
 
     /**
      * Process updating tab settings for a specific tab after ensuring all prior actions are completed

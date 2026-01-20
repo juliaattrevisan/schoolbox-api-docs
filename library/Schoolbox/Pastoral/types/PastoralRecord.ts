@@ -30,11 +30,7 @@ type Severity = {
 /**
  * Severity colors configuration
  */
-export type SeverityColors = {
-    [severityId: number]: {
-        back: string;
-    };
-};
+export type SeverityColors = Record<number, { back: string }>;
 
 /**
  * Pastoral event type

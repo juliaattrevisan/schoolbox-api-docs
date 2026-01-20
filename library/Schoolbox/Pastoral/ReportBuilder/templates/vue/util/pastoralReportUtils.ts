@@ -10,7 +10,7 @@ import { TabTitle } from "../../js/types/pastoralReportTypes";
  * Returns the row parameters to send to the /scope url
  * @returns - The row parameters for the /scope url.
  */
-export function getRowKeys(rowData: { [key: string]: RowOptions }): RowKeys {
+export function getRowKeys(rowData: Record<string, RowOptions>): RowKeys {
     // check if there's a 'user' key in rowData and return its id if it exists
     const user = rowData.user as User;
     if (user) {
@@ -41,11 +41,7 @@ export function getRowKeys(rowData: { [key: string]: RowOptions }): RowKeys {
  * @param rowData - The data for the current row.s
  * @returns An array of metadata strings.
  */
-export function getMeta(
-    selectedTab: Tab | null,
-    header: TableHeader,
-    rowData?: { [key: string]: RowOptions },
-): string[] {
+export function getMeta(selectedTab: Tab | null, header: TableHeader, rowData?: Record<string, RowOptions>): string[] {
     if (selectedTab === null) {
         return [];
     }
