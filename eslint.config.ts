@@ -85,11 +85,22 @@ module.exports = defineConfig([
     // eslintConfigAirbnb.base.style,
     // eslintConfigAirbnb.base.stylistic,
     // eslintConfigAirbnb.base.imports,
-    // eslintConfigAirbnb.base.variables,
     // eslintConfigAirbnb.typescript.base,
     // eslintConfigAirbnb.typescript.imports,
     // eslintConfigAirbnb.typescript.stylistic,
     // eslintConfigAirbnb.typescript.typescriptEslint,
+    {
+        rules: {
+            /* Selective rules from eslintConfigAirbnb.base.variables */
+            "no-restricted-globals": eslintConfigAirbnb.base.variables.rules!["no-restricted-globals"],
+            "no-shadow": "off", // replaced by @typescript-eslint/no-shadow
+            "@typescript-eslint/no-shadow": "error",
+            "no-shadow-restricted-names": "error",
+            "no-undef-init": "error",
+            "no-use-before-define": "off", // replaced by @typescript-eslint/no-use-before-define
+            "@typescript-eslint/no-use-before-define": "warn",
+        },
+    },
     tsEslint.configs.recommendedTypeChecked,
     eslintPluginVue.configs["flat/recommended"],
     eslintComments.recommended,
