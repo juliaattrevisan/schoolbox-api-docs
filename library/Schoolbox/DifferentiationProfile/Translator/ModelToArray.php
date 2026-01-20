@@ -21,7 +21,6 @@ class ModelToArray
      * @param Authorizer $authorizer
      * @param User       $currentUser
      * @param Collection $profileConfig
-     * @param bool       $includeName   whether to include names for adjustments instead of IDs
      */
     public function __construct(
         protected Generator $routeGenerator,
