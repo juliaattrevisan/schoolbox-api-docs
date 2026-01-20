@@ -5,6 +5,9 @@
 
 services:
   schoolbox-frankenphp:
+    environment:
+      SYNERGETIC_PASSWORD_ENCRYPTION_KEY: ${SYNERGETIC_PASSWORD_ENCRYPTION_KEY:-}
+      SYNERGETIC_PASSWORD_ENCRYPTION_IV: ${SYNERGETIC_PASSWORD_ENCRYPTION_IV:-}
     restart: always
     build:
       context: ./schoolbox-frankenphp

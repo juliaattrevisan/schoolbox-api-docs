@@ -23,6 +23,8 @@ services:
       HOST_TYPE: docker
       XDEBUG_CONFIG: "idekey=PHPSTORM"
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      SYNERGETIC_PASSWORD_ENCRYPTION_KEY: ${SYNERGETIC_PASSWORD_ENCRYPTION_KEY:-}
+      SYNERGETIC_PASSWORD_ENCRYPTION_IV: ${SYNERGETIC_PASSWORD_ENCRYPTION_IV:-}
     build:
       context: ./schoolbox-cli
       args:
