@@ -22,7 +22,8 @@
 .sbx-body .introjs-nextbutton.introjs-fullbutton,
 .sbx-body .introjs-skipbutton,
 .sbx-body .introjs-prevbutton,
-.sbx-body .introjs-button {
+.sbx-body .introjs-button,
+.sbx-body .fc .fc-button {
     background: var(--sbx-color-accent);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);
@@ -131,8 +132,8 @@
  */
 .sbx-body .component-action section {
     background: var(--sbx-color-foreground-primary);
-    gap: var(--sbx-size-s);
     padding: var(--sbx-size-s);
+    gap: var(--sbx-size-s);
     button,
     .button {
         font-weight: normal; // for better readability and consistency with other buttons
@@ -187,4 +188,50 @@
  */
 .sbx-body ul.f-dropdown li button {
     background-color: transparent;
+}
+
+.sbx-body {
+    .flatpickr-current-month {
+        .numInputWrapper {
+            input.numInput {
+                border: 0;
+                outline: none;
+
+                &:focus,
+                &:focus-visible,
+                &:active {
+                    border: 0;
+                    outline: none;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Border radius for sub-nav links
+ */
+.sub-nav {
+    li a,
+    dd a,
+    li.active a,
+    dd.active a {
+        border-radius: var(--sbx-config-field-roundness);
+    }
+}
+
+/**
+ *  notification advanced settings buttons alignment fix
+ */
+.actions-small-6 > nav > [data-perm-container] {
+    display: inline-flex;
+    align-items: center;
+}
+
+/**
+ * FullCalendar button hover border radius fix
+ */
+.fc-event,
+.fc-event:hover {
+    border-radius: var(--sbx-config-field-roundness) !important;
 }

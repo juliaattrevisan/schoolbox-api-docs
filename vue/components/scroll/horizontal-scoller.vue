@@ -260,11 +260,6 @@ export default {
     display: flex;
 }
 
-.scroller__button-container {
-    flex: 0 0 40px;
-    height: 100%;
-}
-
 .button {
     background: none;
     color: #4f4f4f;

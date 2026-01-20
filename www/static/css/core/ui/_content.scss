@@ -177,6 +177,15 @@ $container-bg: white;
     }
 }
 
+// Prevent clearfix pseudo-elements from creating extra flex "items" inside component-action
+.island .component-action {
+    > section::before,
+    > section::after {
+        content: none;
+        display: none;
+    }
+}
+
 // see Labels at: https://vagrant.dev.schoolbox.cloud/pantry
 .label {
     -webkit-print-color-adjust: exact;

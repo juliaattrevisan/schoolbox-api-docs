@@ -855,24 +855,6 @@ input[type="checkbox"]:not(.plain) + label::before {
                 width: 100%;
             }
         }
-
-        &
-            > .fc-button:where(
-                [title="Filters"],
-                [title="List view"],
-                [title="Month view"],
-                [title="Day view"],
-                [title="Export"],
-                [title="Week view"]
-            ) {
-            background-color: transparent !important;
-            border-radius: 0 !important;
-            color: var(--sbx-color-text-primary);
-
-            &:hover {
-                color: var(--sbx-color-text-primary) !important;
-            }
-        }
     }
 
     & .fc-daygrid-day-events {
@@ -966,8 +948,6 @@ input[type="checkbox"]:not(.plain) + label::before {
     transform: translateY(-50%);
     border-radius: var(--sbx-border-radius-normal);
     overflow: hidden;
-    padding: 0.5rem;
-    background-color: #fff;
 
     & img {
         border-radius: var(--sbx-border-radius-normal);
@@ -1074,28 +1054,14 @@ section {
         padding-inline: 0;
 
         & .applied-filter-tab {
-            & .label {
-                margin-bottom: 0.5rem;
-            }
-
             & .label,
             & .selected-item {
                 padding-block: 1rem !important;
             }
 
             & .selected-item {
-                background-color: #f7fafc;
-                border-radius: calc(var(--sbx-border-radius-normal) / 2);
-
-                &:not(:last-child) {
-                    margin-bottom: 0.5rem;
-                }
+                border-radius: calc(var(--sbx-border-radius-normal));
             }
-        }
-
-        & .filter-interaction {
-            border: 0 !important;
-            padding-bottom: 1.5rem;
         }
 
         & .filter-dropdown.flex-list {
@@ -1116,14 +1082,6 @@ section {
             background-color: transparent;
             display: flex;
             flex-direction: column;
-
-            & div:first-child {
-                order: 2;
-            }
-
-            & div:last-child {
-                order: 1;
-            }
 
             & .no-pad {
                 border-bottom: var(--border);
@@ -1178,6 +1136,5 @@ section {
 //added to fix some styling issue
 .f-dropdown li :is(a, button),
 .f-dropdown li :is(a, button)::before {
-    background: var(--sbx-color-foreground-primary);
     color: var(--sbx-color-accent);
 }

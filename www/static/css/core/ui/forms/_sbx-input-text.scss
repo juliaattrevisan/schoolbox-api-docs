@@ -32,7 +32,6 @@
     font-family: inherit;
     height: 2.25rem;
     line-height: 1;
-    padding: var(--sbx-size-s);
     width: 100%;
     -webkit-font-smoothing: antialiased;
 
@@ -47,12 +46,12 @@
     }
 
     &[readonly] {
-        border: none;
-        padding: 0;
+        background-color: var(--sbx-color-foreground-secondary) !important;
+
         &:hover {
-            background-color: inherit; // foundation fix
-            border-color: transparent; // foundation fix
-            color: inherit; // foundation fix
+            background-color: var(--sbx-color-foreground-secondary);
+            color: var(--sbx-color-text-secondary) !important;
+            pointer-events: auto;
         }
         &:focus {
             @include sbx-form.form-input-focus-not-visible;
@@ -72,7 +71,6 @@
 
 // Selectize overrides to match input styles
 .sbx-body .selectize-input {
-    height: auto;
     line-height: 1.875rem;
     padding: 3px 0;
 }
