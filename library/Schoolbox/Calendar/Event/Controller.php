@@ -1670,9 +1670,12 @@ class Controller extends Base
         ?Alaress_Date_Format $oldEndDateTime,
         string $efficacy
     ): array {
-        // Can't work out the diff if there is no past...
         if (!$oldStartDateTime || !$oldEndDateTime) {
-            return []; // No bookings to move if we don't have old times.
+            return []; // Can't move bookings if we don't have old times.
+        }
+
+        if ($event->getStartDateTime() === null || $event->getEndDateTime() === null) {
+            return []; // Can't move bookings if we don't have new times.
         }
 
         // Get the time diff in minutes.
@@ -1694,7 +1697,7 @@ class Controller extends Base
             $eventById = new GenericCollection(Event::class, [$event->getId() => $event]);
         }
 
-        // clashes?
+        // Get a Validation object for the purpose of checking for clashes.
         $validation = new Validation(
             $this->getUser(),
             $this->bookingMapper,
@@ -1720,39 +1723,44 @@ class Controller extends Base
         // Not all bookings will need to be saved.
         $bookingsToSave = new GenericCollection(ResourceBookingModel::class);
 
-        // collect errors
+        // Collect errors.
         $errors = [];
 
-        // update each booking, and check for clashes
+        // Update each booking, and check for clashes.
+        /** @var ResourceBookingModel $booking */
         foreach ($allBookings as $booking) {
             $bookingIsUpdated = false;
             $bookingEvent = $eventById[$booking->getEvent()->getId()]; // Get hydrated booking. $booking->getEvent() will not be hydrated.
 
-            /** @var ResourceBookingModel $booking */
-
-            // booking dates may be null, so fall back to event dates
-            $bookingStart = $booking->getBookingStartAt() ?? $bookingEvent->getStartDateTime();
-            $bookingEnd = $booking->getBookingEndAt() ?? $bookingEvent->getEndDateTime();
-
-            if ($bookingStart === null || $bookingEnd === null) {
-                // This should never happen since we are falling back on event start/end datetimes.
-                // But skip this booking to avoid later errors if it does happen.
+            if ($bookingEvent->getStartDateTime() === null || $bookingEvent->getEndDateTime() === null) {
+                // This should never happen, but skip this booking to avoid later errors if it does happen.
                 continue;
             }
 
-            $newStart = $bookingStart->addMinutes($startDiff);
-            $newEnd = $bookingEnd->addMinutes($endDiff);
+            // If the booking start/end datetime is null, there is no need to update it, because it will default to the
+            // event start/end datetime, which has already moved by the exact amount we would like the booking to move.
+            $newBookingStart = (
+                ($booking->getBookingStartAt() === null)
+                ? $bookingEvent->getStartDateTime() // Leave booking start time as null, and use event start time for clash detection.
+                : $booking->getBookingStartAt()->addMinutes($startDiff) // Update booking start time, and use it for clash detection.
+            );
+            $newBookingEnd = (
+                ($booking->getBookingEndAt() === null)
+                ? $bookingEvent->getEndDateTime() // Leave booking end time as null, and use event end time for clash detection.
+                : $booking->getBookingEndAt()->addMinutes($endDiff) // Update booking end time, and use it for clash detection.
+            );
 
             $clashErrors = $validation->validateForClashes(
                 $booking->getResource(),
-                $newStart->getDateTimeObject(), // We need a different kind of date object.
-                $newEnd->getDateTimeObject(), // We need a different kind of date object.
+                $newBookingStart->getDateTimeObject(), // We need a different kind of date object.
+                $newBookingEnd->getDateTimeObject(), // We need a different kind of date object.
                 $booking
             );
 
+            // Update the booking's status depending on whether a clash with other approved bookings is detected.
             if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
                 $errors[] = $clashErrors;
-                // set status to pending if there are clashes (even if the resource can NOT have clashes...)
+                // Set status to pending if there are clashes (even if the resource can NOT have clashes).
                 $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
                 $bookingIsUpdated = true;
             } else {
@@ -1788,11 +1796,11 @@ class Controller extends Base
             // Note that even if the booking start and end times are both null, the work above to check for clashes
             // and modify the booking status is still necessary, because the bookings are still moving.
             if ($booking->getBookingStartAt() !== null) {
-                $booking->setBookingStartAt($newStart);
+                $booking->setBookingStartAt($newBookingStart);
                 $bookingIsUpdated = true;
             }
             if ($booking->getBookingEndAt() !== null) {
-                $booking->setBookingEndAt($newEnd);
+                $booking->setBookingEndAt($newBookingEnd);
                 $bookingIsUpdated = true;
             }
 
