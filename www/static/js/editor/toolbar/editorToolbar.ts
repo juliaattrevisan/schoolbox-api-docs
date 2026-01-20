@@ -205,18 +205,17 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
         });
     }
 
-    /**
-     * remove any individual plugins for specific use cases
-     * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
-     */
-    let removeItems: Array<string> = [];
-    if (config.removeFromToolbar) {
-        removeItems = config.removeFromToolbar;
-    }
-
     return {
         items,
-        removeItems,
-        shouldNotGroupWhenFull: true, // the toolbar will stop grouping items and let them wrap to the next line when there is not enough space to display them in a single row.
+        /**
+         * remove any individual plugins for specific use cases
+         * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
+         */
+        removeItems: config.removeFromToolbar || [],
+        /**
+         * the toolbar will stop grouping items and let them wrap to the next line
+         * when there is not enough space to display them in a single row.
+         */
+        shouldNotGroupWhenFull: true,
     };
 }
