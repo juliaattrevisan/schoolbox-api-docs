@@ -1281,7 +1281,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // gets tDocumentsSeq for the inserted record
             // lastInsertId() does not work because of DB trigger attached to this table
             $documentReferencesSeq = $this->connector->executeQuery(
-                "SELECT tDocumentsSeq FROM media.tDocuments WHERE
+                "SELECT tDocumentsSeq FROM {$this->schemaMedia}.tDocuments WHERE
                 Description = :filename AND
                 ClassificationCode = :classificationCode AND
                 DocumentCreatedByID = :createdById AND
