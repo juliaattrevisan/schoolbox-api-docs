@@ -12,7 +12,7 @@ import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelpe
  *
  * Requires a Page object to interact with the browser, so this cannot be used in contexts such as .beforeAll or .afterAll
  *  as the Page and Context integrations are created on a per-test basis and not available in those hooks
- * @param { Page } page - The Playwright Page object to interact with the browser
+ * @param page - The Playwright Page object to interact with the browser
  */
 export default class AcceptanceTester extends BaseTester {
     private page: Page;
