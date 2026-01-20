@@ -883,7 +883,9 @@ class Validation
     }
 
     /**
-     * This function assumes the booking dates are
+     * Return a suitable status for an updated resource booking, based on:
+     *  - Any validation errors found
+     *  - Whether the booking clashes with any other approved bookings (as supplied vai $isClash)
      *
      * @param BookingModel $booking
      * @param bool  $isClash
