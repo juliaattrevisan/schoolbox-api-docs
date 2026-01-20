@@ -34,10 +34,18 @@ class differentiationProfileModelToArrayTest extends TestCase
     private const string ADJUSTMENT_CATEGORY_ID_2 = "2";
     private const string ADJUSTMENT_CATEGORY_ID_3 = "3";
     private const string ADJUSTMENT_CATEGORY_ID_4 = "4";
+    private const string ADJUSTMENT_CATEGORY_NAME_1 = "Category 1";
+    private const string ADJUSTMENT_CATEGORY_NAME_2 = "Category 2";
+    private const string ADJUSTMENT_CATEGORY_NAME_3 = "Category 3";
+    private const string ADJUSTMENT_CATEGORY_NAME_4 = "Category 4";
     private const string ADJUSTMENT_LEVEL_ID_1 = "1";
     private const string ADJUSTMENT_LEVEL_ID_2 = "2";
     private const string ADJUSTMENT_LEVEL_ID_3 = "3";
     private const string ADJUSTMENT_LEVEL_ID_4 = "4";
+    private const string ADJUSTMENT_LEVEL_NAME_1 = "Level 1";
+    private const string ADJUSTMENT_LEVEL_NAME_2 = "Level 2";
+    private const string ADJUSTMENT_LEVEL_NAME_3 = "Level 3";
+    private const string ADJUSTMENT_LEVEL_NAME_4 = "Level 4";
 
     protected function setUp(): void
     {
@@ -158,8 +166,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(1)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)]))
-                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)]))
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)]))
+                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)]))
                     ->setOverview('This is an overview.')
                     ->setInterestsStrengths('Interests and strengths details.')
                     ->setNeedsChallenges('Needs and challenges details.')
@@ -179,8 +187,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 1,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [1],
-                    'adjustment_level'       => [1],
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]],
+                    'adjustment_level'       => [['id' => self::ADJUSTMENT_LEVEL_ID_1, 'name' => self::ADJUSTMENT_LEVEL_NAME_1]],
                     'overview'               => 'This is an overview.',
                     'interests_strengths'    => 'Interests and strengths details.',
                     'needs_challenges'       => 'Needs and challenges details.',
@@ -235,12 +243,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(3)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('This overview should not appear.')
                     ->setInterestsStrengths('These interests should not appear.')
@@ -252,8 +260,14 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 3,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [1, 2],
-                    'adjustment_level'       => [2, 4],
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_2, 'name' => self::ADJUSTMENT_CATEGORY_NAME_2]
+                    ],
+                    'adjustment_level'       => [
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_2, 'name' => self::ADJUSTMENT_LEVEL_NAME_2],
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_4, 'name' => self::ADJUSTMENT_LEVEL_NAME_4]
+                    ],
                     'status'                 => [],
                     'created_at'             => 'Feb 1, 2024 12:00am',
                     'created_by'             => null,
@@ -269,12 +283,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(4)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3)->setName(self::ADJUSTMENT_CATEGORY_NAME_3),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)
                     ]))
                     ->setOverview('Visible overview.')
                     ->setGoals('Visible goals.')
@@ -307,12 +321,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(5)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3)
                     ]))
                     ->setOverview('This should not be visible.')
                     ->setInterestsStrengths('This should not be visible.')
@@ -327,8 +341,14 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 5,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [4, 1],
-                    'adjustment_level'       => [4, 3],
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_4, 'name' => self::ADJUSTMENT_CATEGORY_NAME_4],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]
+                    ],
+                    'adjustment_level'       => [
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_4, 'name' => self::ADJUSTMENT_LEVEL_NAME_4],
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_3, 'name' => self::ADJUSTMENT_LEVEL_NAME_3]
+                    ],
                     'status'                 => [],
                     'created_at'             => 'Apr 1, 2024 12:00am',
                     'created_by'             => null,
@@ -344,12 +364,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(6)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Nothing should be visible.')
                     ->setInterestsStrengths('Nothing should be visible.')
@@ -376,12 +396,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(7)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Hidden overview.')
                     ->setInterestsStrengths('Visible interests and strengths.')
@@ -416,12 +436,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(8)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Only this overview is visible.')
                     ->setInterestsStrengths('Hidden.')
@@ -451,11 +471,11 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(9)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Visible overview.')
                     ->setInterestsStrengths('Hidden interests.')
@@ -473,7 +493,10 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 9,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [4, 1],
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_4, 'name' => self::ADJUSTMENT_CATEGORY_NAME_4],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]
+                    ],
                     'overview'               => 'Visible overview.',
                     'needs_challenges'       => 'Visible needs.',
                     'goals'                  => 'Visible goals.',
@@ -492,10 +515,10 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(10)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)
                     ]))
                     ->setOverview('This profile has expired.')
                     ->setExpired(true)
@@ -509,8 +532,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 10,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [1],
-                    'adjustment_level'       => [1],
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]],
+                    'adjustment_level'       => [['id' => self::ADJUSTMENT_LEVEL_ID_1, 'name' => self::ADJUSTMENT_LEVEL_NAME_1]],
                     'overview'               => 'This profile has expired.',
                     'status'                 => ['expired'],
                     'created_at'             => 'Jan 1, 2023 12:00am',
@@ -527,7 +550,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(11)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setGoals('This is an overview.')
                     ->setOutOfDate(true)
@@ -540,7 +563,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 11,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [2],
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_2, 'name' => self::ADJUSTMENT_CATEGORY_NAME_2]],
                     'goals'                  => 'This is an overview.',
                     'status'                 => ['outOfDate'],
                     'created_at'             => 'Mar 1, 2023 12:00am',
@@ -683,7 +706,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setStudent($student)
                     ->setCreatedBy($staff1)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setOverview('Profile with creator only.')
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'), $locale)),
@@ -694,7 +717,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 15,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [1],
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]],
                     'overview'               => 'Profile with creator only.',
                     'status'                 => [],
                     'created_at'             => 'Mar 1, 2024 12:00am',
@@ -737,7 +760,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff1)
                     ->setUpdatedBy($staff2)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setOverview('This profile was deleted.')
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale))
@@ -750,7 +773,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 17,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [2],
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_2, 'name' => self::ADJUSTMENT_CATEGORY_NAME_2]],
                     'overview'               => 'This profile was deleted.',
                     'status'                 => [],
                     'created_at'             => 'May 1, 2024 12:00am',
@@ -769,7 +792,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff2)
                     ->setUpdatedBy($staff1)
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3)
                     ]))
                     ->setInterestsStrengths('Expired profile with audit.')
                     ->setExpired(true)
@@ -782,7 +805,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 18,
                     'student'                => $userResponse,
-                    'adjustment_level'       => [3],
+                    'adjustment_level'       => [['id' => self::ADJUSTMENT_LEVEL_ID_3, 'name' => self::ADJUSTMENT_LEVEL_NAME_3]],
                     'interests_strengths'    => 'Expired profile with audit.',
                     'status'                 => ['expired'],
                     'created_at'             => 'Jul 1, 2023 12:00am',
@@ -801,12 +824,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff2)
                     ->setUpdatedBy($staff2)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3)->setName(self::ADJUSTMENT_CATEGORY_NAME_3),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2)
                     ]))
                     ->setOverview('Complete profile.')
                     ->setInterestsStrengths('Interests.')
@@ -827,8 +850,14 @@ class differentiationProfileModelToArrayTest extends TestCase
                 [
                     'id'                     => 19,
                     'student'                => $userResponse,
-                    'adjustment_category'    => [3, 4],
-                    'adjustment_level'       => [1, 2],
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_3, 'name' => self::ADJUSTMENT_CATEGORY_NAME_3],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_4, 'name' => self::ADJUSTMENT_CATEGORY_NAME_4]
+                    ],
+                    'adjustment_level'       => [
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_1, 'name' => self::ADJUSTMENT_LEVEL_NAME_1],
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_2, 'name' => self::ADJUSTMENT_LEVEL_NAME_2]
+                    ],
                     'overview'               => 'Complete profile.',
                     'interests_strengths'    => 'Interests.',
                     'needs_challenges'       => 'Needs.',
