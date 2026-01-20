@@ -56,7 +56,7 @@ function onKeySelect(): void {
  * To toggle the selected state of the result
  * @param event - the click event
  */
-function onClick(event?: MouseEvent | undefined): void {
+function onClick(event?: MouseEvent): void {
     if (!event || !event.target) {
         return;
     }
