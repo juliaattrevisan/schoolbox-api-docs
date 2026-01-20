@@ -36,9 +36,6 @@ const mainConfig = defineConfig({
             extraFileExtensions: [".vue"],
         },
     },
-    // extends: compat.extends(
-    // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
-    // ),
     rules: {
         // allow modifying props of parameters, especially valid when passing DOM elements, as we don"t really want to be cloning DOM elements
         "no-param-reassign": ["warn", { props: false }],
@@ -174,6 +171,7 @@ export default defineConfig([
     configAirbnb,
     tsEslint.configs.recommendedTypeChecked,
     eslintPluginVue.configs["flat/recommended"],
+    // eslintPluginStorybook.configs['flat/recommended'], // TODO in SA-21050, add this back in once storybook is updated
     {
         plugins: { "@stylistic": eslintPluginStylistic },
         rules: { "@stylistic/spaced-comment": "warn" },
