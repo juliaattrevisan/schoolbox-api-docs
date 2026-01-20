@@ -209,7 +209,6 @@ export default {
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
                     linkedEventType: data?.booking?.linkedEventType,
-                    linkedEventFullCalendarEventId: data?.booking?.linkedEventFullCalendarEventId,
                 };
             } else {
                 // The modal is for an event item (representing a row of the event table).

@@ -148,28 +148,6 @@ class Javascript extends Base
         $resourceBookingMapper = ResourceBookingMapper::getInstance();
         $eotcEventId = $resourceBookingMapper->getEotcEventId($booking->getId());
 
-        if ($eotcEventId !== null) {
-            // The event linked to this booking is an 'EOTC' event, referring to library/Calendar/Event/Type/EOTC/Event.php
-            $linkedEventType = 'EOTC';
-
-            // This is the id to use on the client-side with FullCalendar.getEventById().
-            // Reference: https://fullcalendar.io/docs/Calendar-getEventById
-            $linkedEventFullCalendarEventId = "$linkedEventType-" . $eotcEventId;
-        } else {
-            // The event linked to this booking is a 'Day' event, referring to library/Calendar/Event/Type/Day/Event.php
-            $linkedEventType = 'Day';
-
-            // This is the id to use on the client-side with FullCalendar.getEventById().
-            // Reference: https://fullcalendar.io/docs/Calendar-getEventById
-            $linkedEventFullCalendarEventId = (
-                $this->getEvent()->getEventVariant() === Event::VARIANT_EVENT
-                ? "$linkedEventType-" . $this->getEvent()->getEventId()
-                : null // Events of variant 'booking' do not appear on the calendar, so do not have a FullCalendar id.
-                       // To get this event to appear on the calendar, the user must click 'Add Event to Calendar'
-                       // (view-event-modal.vue).
-            );
-        }
-
         // Set title from resource name, and code and booking name
         // if either are there.
 
@@ -243,11 +221,10 @@ class Javascript extends Base
                     'buttons'  => $bookingButtons,
                     'reviewer' => $reviewerRender,
                     'related'  => $relatedBookings,
-                    'linkedEventType' => $linkedEventType,
 
-                    // This is the id by which the FullCalendar item pertaining to the linked event may be looked up
-                    // using FullCalendar.getEventById() (https://fullcalendar.io/docs/Calendar-getEventById).
-                    'linkedEventFullCalendarEventId' => $linkedEventFullCalendarEventId,
+                    // Event type 'EOTC' refers to library/Calendar/Event/Type/EOTC/Event.php.
+                    // Event type 'Day' refers to library/Calendar/Event/Type/Day/Event.php.
+                    'linkedEventType' => ($eotcEventId !== null) ? 'EOTC' : 'Day'
                 ],
             ],
         ];
