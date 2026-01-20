@@ -1712,11 +1712,13 @@ class Controller extends Base
         // Get all bookings for all events.
         $bookingsByEventId = $this->bookingMapper->getForAllEventIds($eventById->keys());
 
-        // Flatten array.
+        // Flatten array and clone each booking to avoid shared object reference issues.
+        // If cloning is not done here, bookings in the $bookingsToSave array can somehow
+        // be changed during the call to $validation->validateForClashes() below.
         $allBookings = [];
         foreach ($bookingsByEventId as $bookings) {
             foreach ($bookings as $booking) {
-                $allBookings[] = $booking;
+                $allBookings[] = clone $booking;
             }
         }
 
