@@ -1134,12 +1134,8 @@ export default {
                             </span>
                             <!-- If the modal represents a booking, and the linked event is visible on the calendar... -->
                             <span
-                                v-if="
-                                    eventExtendedProps.booking &&
-                                    eventExtendedProps.booking.linkedEventFullCalendarEventId !== null
-                                "
+                                v-if="eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.EVENT"
                             >
-                                <button @click.prevent="viewEventLinkedFromBooking">View Event (modal)</button>
                                 <a class="button" :href="ENDPOINTS.eventDetailsPath(eventExtendedProps.eventId)"
                                     >View Event Details</a
                                 >
