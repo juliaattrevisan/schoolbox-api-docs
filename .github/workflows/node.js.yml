@@ -75,7 +75,7 @@ jobs:
       - run: npm ci
 
       - name: Install hyperfine
-        run: sudo apt-get install hyperfine
+        run: sudo apt update && sudo apt-get install -y hyperfine
       - name: Check ESLint performance
         run: hyperfine --warmup 1 --parameter-list concurrency off,2,3,4,auto "node ./node_modules/eslint/bin/eslint --max-warnings=0 --concurrency {concurrency} --ext .ts,.vue ."
 
