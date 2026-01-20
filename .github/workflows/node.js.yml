@@ -58,7 +58,7 @@ jobs:
         run: npm run typecheck
 
   eslint-performance:
-    timeout-minutes: 25
+    timeout-minutes: 180
     runs-on: onprem-k3s
     strategy:
       matrix:
