@@ -1,4 +1,8 @@
 export const ENDPOINTS = Object.freeze({
+    // Do not add more paths to this file.
+    // The preferred way is to have the server supply them to the client in a '_routes' JSON object instead.
+    // TODO: Move existing paths out of this file.  Do as recommended above instead.
+
     /* Event API URLs
      */
     URL_EVENT_SOURCE: "/calendar/ajax/full",
