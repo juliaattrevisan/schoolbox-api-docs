@@ -11,6 +11,7 @@ import globals from "globals";
 import { jsdoc } from "eslint-plugin-jsdoc";
 import { importX } from "eslint-plugin-import-x";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import { rules as eslintConfigAirbnb } from "eslint-config-airbnb-extended";
 import eslintConfigPrettier from "eslint-config-prettier";
 import eslintPluginVue from "eslint-plugin-vue";
 import tsEslint from "typescript-eslint";
@@ -36,8 +37,6 @@ const mainConfig = defineConfig({
         },
     },
     // extends: compat.extends(
-    // "airbnb-base",
-    // "airbnb-typescript/base",
     // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
     // ),
     rules: {
@@ -79,6 +78,18 @@ const mainConfig = defineConfig({
 
 module.exports = defineConfig([
     eslint.configs.recommended,
+    // TODO: check over old configs with airbnb rules
+    // eslintConfigAirbnb.base.bestPractices,
+    // eslintConfigAirbnb.base.errors,
+    // eslintConfigAirbnb.base.es6,
+    // eslintConfigAirbnb.base.style,
+    // eslintConfigAirbnb.base.stylistic,
+    // eslintConfigAirbnb.base.imports,
+    // eslintConfigAirbnb.base.variables,
+    // eslintConfigAirbnb.typescript.base,
+    // eslintConfigAirbnb.typescript.imports,
+    // eslintConfigAirbnb.typescript.stylistic,
+    // eslintConfigAirbnb.typescript.typescriptEslint,
     tsEslint.configs.recommendedTypeChecked,
     eslintPluginVue.configs["flat/recommended"],
     eslintComments.recommended,
