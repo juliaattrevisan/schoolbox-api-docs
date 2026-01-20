@@ -135,8 +135,8 @@ const configImport = defineConfig([
             "import-x/no-named-default": "error",
             "import-x/no-relative-packages": "error",
             "import-x/no-self-import": "error",
+            "import-x/no-cycle": ["error", { maxDepth: "∞" }],
 
-            // "import-x/no-cycle": ["error", { maxDepth:'∞' }], // disabled for now (performance heavy)
             // Disable some rules for performance as per recommendations in https://typescript-eslint.io/troubleshooting/typed-linting/performance/#eslint-plugin-import
             "import-x/named": "off",
             "import-x/namespace": "off",
