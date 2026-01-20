@@ -153,11 +153,6 @@ class Javascript extends Base
 
         $detail = $this->getEvent()->getDetail();
         $event  = [
-            // IMPORTANT: Each event of the type rendered here represents a row of the resource_booking table.
-            //            So its unique id must be resource_booking.id.
-            // This 'id' allows retrieval of the event in client-side code by use of FullCalendar.getEventById().
-            // Reference: https://fullcalendar.io/docs/event-parsing
-            'id'         => 'ResourceBooking-' . $booking->getId(),
             'resourceId' => $booking->getResource()->getId(),
             'title'      => $this->getEvent()->getTitle(),
             'start'      => $start,
