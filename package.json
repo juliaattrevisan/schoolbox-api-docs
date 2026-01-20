@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.6.0",
+    "@eslint/js": "^9.39.2",
     "@happy-dom/jest-environment": "~18.0.1",
     "@pinia/testing": "~1.0.2",
     "@playwright/test": "~1.53.1",
@@ -81,6 +82,7 @@
     "@storybook/theming": "~8.5.3",
     "@storybook/vue3": "~8.5.3",
     "@storybook/vue3-webpack5": "~8.5.3",
+    "@stylistic/eslint-plugin": "^5.7.0",
     "@testing-library/jest-dom": "~6.6.3",
     "@types/jest": "~30.0.0",
     "@types/jquery": "~3.5.32",

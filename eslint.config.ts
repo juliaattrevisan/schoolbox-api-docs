@@ -18,6 +18,7 @@ import vueEslintParser from "vue-eslint-parser";
 import eslint from "@eslint/js";
 import type { ConfigWithExtends } from "@eslint/config-helpers";
 import eslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
+import eslintPluginStylistic from "@stylistic/eslint-plugin";
 
 const mainConfig = defineConfig({
     languageOptions: {
@@ -79,8 +80,12 @@ const mainConfig = defineConfig({
 module.exports = defineConfig([
     eslint.configs.recommended,
     tsEslint.configs.recommendedTypeChecked,
-    eslintComments.recommended,
     eslintPluginVue.configs["flat/recommended"],
+    eslintComments.recommended,
+    {
+        plugins: { "@stylistic": eslintPluginStylistic },
+        rules: { "@stylistic/spaced-comment": "warn" },
+    },
     jsdoc({
         files: ["**/*.js", "**/*.mjs"],
         config: "flat/recommended",
@@ -101,6 +106,10 @@ module.exports = defineConfig([
                     devDependencies: ["test/playwright/**/*.ts", "playwright.config.ts"],
                 },
             ],
+            // Disable some rules for performance as per recommendations in https://typescript-eslint.io/troubleshooting/typed-linting/performance/#eslint-plugin-import
+            "import-x/named": "off",
+            "import-x/namespace": "off",
+            "import-x/no-named-as-default-member": "off",
         },
         settings: {
             "import-x/parsers": {
