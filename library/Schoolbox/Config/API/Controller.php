@@ -203,4 +203,24 @@ class Controller extends Base
 
         $this->response = $this->responseAsJson($output);
     }
+
+    /**
+     * Returns site_package config value without authentication
+     *
+     * @api GET /api/config/public/site-package
+     */
+    public function apiSitePackageGet(): void
+    {
+        try {
+            $config = $this->configMapper->findOneByColumn('name', 'site_package');
+            
+            // Return only the value for this specific endpoint
+            $this->response = $this->responseAsJson([
+                'name' => 'site_package',
+                'value' => $config->getValue()
+            ]);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            throw new SchoolboxException('Config Does not Exist', 404, null, 404);
+        }
+    }
 }

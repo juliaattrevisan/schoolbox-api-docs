@@ -52,6 +52,9 @@ class Module extends BaseModule
         $this->register('PATCH', '', 'apiConfigBulkPatch', $hasApiAccess);
         $this->register('GET', '/{configName}', 'apiConfigGet', $hasApiAccess, $preloadConfig);
         $this->register('PATCH', '/{configName}', 'apiConfigPatch', $hasApiAccess, $preloadConfig);
+
+        // Unauthenticated endpoint for site_package config
+        $this->register('GET', '/public/site-package', 'apiSitePackageGet');
     }
 
 
