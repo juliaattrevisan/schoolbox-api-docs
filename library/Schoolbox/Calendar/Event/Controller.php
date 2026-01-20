@@ -1732,6 +1732,8 @@ class Controller extends Base
             $bookingIsUpdated = false;
             $bookingEvent = $eventById[$booking->getEvent()->getId()]; // Get hydrated booking. $booking->getEvent() will not be hydrated.
 
+            $booking->setEvent($bookingEvent);
+
             if ($bookingEvent->getStartDateTime() === null || $bookingEvent->getEndDateTime() === null) {
                 // This should never happen, but skip this booking to avoid later errors if it does happen.
                 continue;
