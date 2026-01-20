@@ -1,4 +1,8 @@
 export const ENDPOINTS = Object.freeze({
+    // Do not add more paths to this file.
+    // The preferred way is to have the server supply them to the client in a '_routes' JSON object instead.
+    // TODO: Move existing paths out of this file.  Do as recommended above instead.
+
     /* Event API URLs
      */
     URL_EVENT_SOURCE: "/calendar/ajax/full",
@@ -9,6 +13,7 @@ export const ENDPOINTS = Object.freeze({
 
     /* Event Modify screen
      */
+    URL_EVENT_DETAILS: "/calendar/event/{eventId}",
     URL_EVENT_MODIFY_FORM: "/calendar/event/{eventId}/modify",
     URL_EVENT_MODIFY_FORM_ACTION: "/calendar/modifyForm.php",
     URL_EVENT_ADD_TO_CALENDAR: "/calendar/event/{eventId}/addToCalendar",
@@ -111,6 +116,17 @@ export const ENDPOINTS = Object.freeze({
             null,
             btoa(window.location.pathname),
         );
+    },
+
+    /**
+     * Add bookings
+     *
+     * @param eventId
+     * @return string
+     */
+    eventDetailsPath: function (eventId) {
+        // The returnUrl is not set here because we want the default back-button behaviour.
+        return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_DETAILS, eventId, null, null);
     },
 
     /**

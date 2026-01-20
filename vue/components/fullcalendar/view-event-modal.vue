@@ -77,7 +77,7 @@ export default {
         returnUrl: {},
     },
 
-    emits: ["eventModified", "viewEventLinkedFromBooking"],
+    emits: ["eventModified"],
 
     data() {
         return {
@@ -93,6 +93,9 @@ export default {
     },
 
     computed: {
+        ENDPOINTS() {
+            return ENDPOINTS;
+        },
         // This allows EVENT_VARIANTS to be used in template code.
         EVENT_VARIANTS() {
             return EVENT_VARIANTS;
@@ -110,18 +113,6 @@ export default {
          * @return {Object}
          */
         eventExtendedProps() {
-            // Also need to render the event's buttons
-
-            /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
-             *
-             * There's a weird modal overlay that now spawns, which can cause
-             * this.event to be undefined. That leads to subsequent crashes
-             * Therefore we now have to check whether this exists before using it
-             */
-            // if (this.event == undefined) {
-            //     return;
-            // }
-
             let event = this.event,
                 data = event?.extendedProps?.data,
                 metadata = data?.meta,
@@ -218,7 +209,6 @@ export default {
                     related: data?.booking?.related || [],
                     actions: (data?.booking?.buttons || []).filter((button) => button?.href),
                     linkedEventType: data?.booking?.linkedEventType,
-                    linkedEventFullCalendarEventId: data?.booking?.linkedEventFullCalendarEventId,
                 };
             } else {
                 // The modal is for an event item (representing a row of the event table).
@@ -458,13 +448,6 @@ export default {
 
             // Notify listening components that an event has been modified (this will cause the calendar to reload events).
             this.$emit(EVENT_MODIFIED, this.event);
-        },
-
-        /**
-         * Emit an event to tell any listening component that the user has requested the opening of an event modal.
-         */
-        viewEventLinkedFromBooking() {
-            this.$emit("viewEventLinkedFromBooking", this.eventExtendedProps.booking.linkedEventFullCalendarEventId);
         },
 
         /**
@@ -1080,7 +1063,7 @@ export default {
                                 <span :class="'attend-label'">Attending?</span>
                                 <span>
                                     <a
-                                        :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
+                                        :href="ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
                                         @click.prevent="rsvpAccept"
                                         :class="{
                                             button: true,
@@ -1095,7 +1078,7 @@ export default {
                                 </span>
                                 <span>
                                     <a
-                                        :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
+                                        :href="ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
                                         @click.prevent="rsvpDecline"
                                         :class="{
                                             button: true,
@@ -1143,12 +1126,11 @@ export default {
                             </span>
                             <!-- If the modal represents a booking, and the linked event is visible on the calendar... -->
                             <span
-                                v-if="
-                                    eventExtendedProps.booking &&
-                                    eventExtendedProps.booking.linkedEventFullCalendarEventId !== null
-                                "
+                                v-if="eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.EVENT"
                             >
-                                <button @click.prevent="viewEventLinkedFromBooking">View Event</button>
+                                <a class="button" :href="ENDPOINTS.eventDetailsPath(eventExtendedProps.eventId)"
+                                    >View Event</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.links.view">
                                 <a
