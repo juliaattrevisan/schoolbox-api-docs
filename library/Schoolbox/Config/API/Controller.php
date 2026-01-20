@@ -213,7 +213,7 @@ class Controller extends Base
     {
         try {
             $config = $this->configMapper->findOneByColumn('name', 'site_package');
-            
+
             // Return only the value for this specific endpoint
             $this->response = $this->responseAsJson([
                 'name' => 'site_package',
