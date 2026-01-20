@@ -18,7 +18,7 @@ import tsEslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
 import eslint from "@eslint/js";
 import type { ConfigWithExtends } from "@eslint/config-helpers";
-import eslintComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
+import eslintPluginComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslintPluginStylistic from "@stylistic/eslint-plugin";
 
 const mainConfig = defineConfig({
@@ -40,34 +40,30 @@ const mainConfig = defineConfig({
     // "plugin:storybook/recommended", // TODO in SA-21050, add this back in once storybook is updated
     // ),
     rules: {
-        // customised rules
         // allow modifying props of parameters, especially valid when passing DOM elements, as we don"t really want to be cloning DOM elements
         "no-param-reassign": ["warn", { props: false }],
-        "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
-        // Allow console.warn and console.error, but disallow other console methods
+        // Allow console.warn, .error, and .info, but disallow other console methods
         "no-console": ["warn", { allow: ["warn", "error", "info"] }],
         // enforce consistent explicit return types on functions and class methods (except for expressions)
         "@typescript-eslint/explicit-function-return-type": ["warn", { allowExpressions: true }],
-        "@typescript-eslint/typedef": [
-            "warn",
-            {
-                parameter: true, // enforce parameters of functions to have explicit types
-                propertyDeclaration: true, // enforce properties of interfaces/types to have explicit types
-            },
-        ],
-        // change no-unused-vars to warn instead of error (to make it less misleading)
+        // enforce parameters of functions/properties of interfaces/types to have explicit types
+        "@typescript-eslint/typedef": ["warn", { parameter: true, propertyDeclaration: true }],
+        // warn instead of error to make it less misleading compared to type errors
         "@typescript-eslint/no-unused-vars": "warn",
         // enforce "import type" for type only imports
         "@typescript-eslint/consistent-type-imports": ["warn", { prefer: "type-imports" }],
-        // avoid unnecessary eslint-disable comments and enforce descriptions for them
-        "@eslint-community/eslint-comments/no-unused-disable": "warn",
-        "@eslint-community/eslint-comments/require-description": "warn",
     },
 });
 
-module.exports = defineConfig([
-    eslint.configs.recommended,
+/**
+ * This is the main style guide we use, adding a large number of opinionated but reliable rules which
+ * aim to help enforce code consistency/readability and aim to catch potential issues early.
+ *
+ * We don't use the entirety of the configs available from eslint-config-airbnb-extended.
+ * This also isn't a hard restriction, if undesirable rules are found then they can be disabled here in the future.
+ */
+const configAirbnb = defineConfig([
     eslintConfigAirbnb.base.bestPractices,
     eslintConfigAirbnb.base.errors,
     eslintConfigAirbnb.base.es6,
@@ -77,7 +73,6 @@ module.exports = defineConfig([
     eslintConfigAirbnb.typescript.typescriptEslint,
     {
         rules: {
-            /* Selective rules from eslintConfigAirbnb.base.variables */
             "no-restricted-globals": eslintConfigAirbnb.base.variables.rules!["no-restricted-globals"],
             /**
              * Override the ForOfStatement restriction from airbnb, as we want to allow
@@ -87,36 +82,40 @@ module.exports = defineConfig([
              */
             "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
 
-            /* other overrides from rules that come from the airbnb configs */
+            /* other overrides for rules that come from the airbnb configs */
             "arrow-body-style": "off",
             "no-await-in-loop": "off",
-            "no-underscore-dangle": "off",
+            "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
             "@stylistic/lines-between-class-members": "off",
             "@typescript-eslint/no-inferrable-types": "off",
             "@typescript-eslint/consistent-type-definitions": "off",
         },
     },
-    tsEslint.configs.recommendedTypeChecked,
-    eslintPluginVue.configs["flat/recommended"],
-    eslintComments.recommended,
+]);
+
+/**
+ * Avoid unnecessary eslint-disable/enable comments and enforce explanations for them
+ */
+const configComments = defineConfig([
+    eslintPluginComments.recommended,
     {
-        plugins: { "@stylistic": eslintPluginStylistic },
-        rules: { "@stylistic/spaced-comment": "warn" },
+        rules: {
+            "@eslint-community/eslint-comments/no-unused-disable": "warn",
+            "@eslint-community/eslint-comments/require-description": "warn",
+        },
     },
-    jsdoc({
-        files: ["**/*.js", "**/*.mjs"],
-        config: "flat/recommended",
-    }),
-    jsdoc({
-        files: ["**/*.ts", "**/*.vue"],
-        config: "flat/recommended-typescript",
-    }),
+]);
+
+/**
+ * Config for handling import/export syntax
+ */
+const configImport = defineConfig([
     // need to force these types for now, see https://github.com/un-ts/eslint-plugin-import-x/issues/439
     importX.flatConfigs.recommended as ConfigWithExtends,
     importX.flatConfigs.typescript as ConfigWithExtends,
     {
         rules: {
-            // allow devDependencies to be imported so that we can use them in our tests
+            // Restrict dev dependencies to specific files that need them
             "import-x/no-extraneous-dependencies": [
                 "error",
                 {
@@ -136,7 +135,8 @@ module.exports = defineConfig([
             "import-x/no-named-default": "error",
             "import-x/no-relative-packages": "error",
             "import-x/no-self-import": "error",
-            "import-x/no-cycle": ["error", { maxDepth: "∞" }],
+
+            // "import-x/no-cycle": ["error", { maxDepth:'∞' }], // disabled for now (performance heavy)
             // Disable some rules for performance as per recommendations in https://typescript-eslint.io/troubleshooting/typed-linting/performance/#eslint-plugin-import
             "import-x/named": "off",
             "import-x/namespace": "off",
@@ -153,6 +153,34 @@ module.exports = defineConfig([
             ],
         },
     },
+]);
+
+/**
+ * Linting rules for JSDoc comments
+ */
+const configJsdoc = defineConfig([
+    jsdoc({
+        files: ["**/*.js", "**/*.mjs"],
+        config: "flat/recommended",
+    }),
+    jsdoc({
+        files: ["**/*.ts", "**/*.vue"],
+        config: "flat/recommended-typescript",
+    }),
+]);
+
+export default defineConfig([
+    eslint.configs.recommended,
+    configAirbnb,
+    tsEslint.configs.recommendedTypeChecked,
+    eslintPluginVue.configs["flat/recommended"],
+    {
+        plugins: { "@stylistic": eslintPluginStylistic },
+        rules: { "@stylistic/spaced-comment": "warn" },
+    },
+    configComments,
+    configImport,
+    configJsdoc,
     eslintConfigPrettier,
     mainConfig,
     globalIgnores([
