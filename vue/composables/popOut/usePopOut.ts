@@ -130,7 +130,7 @@ export function usePopOut(
         contentElement: FloatingElement,
     ): Promise<ComputePositionReturn> {
         const position = await computePosition(buttonElement, contentElement, {
-            placement: optimalPlacement as Placement,
+            placement: optimalPlacement,
             middleware: [
                 flip({
                     boundary: document.querySelector("#container") as Boundary,
