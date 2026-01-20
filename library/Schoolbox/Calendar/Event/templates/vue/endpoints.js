@@ -121,6 +121,7 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     eventDetailsPath: function (eventId) {
+        // The returnUrl is not set here because we want the default back-button behaviour.
         return this.generateUrlFromConst(ENDPOINTS.URL_EVENT_DETAILS, eventId, null, null);
     },
 
