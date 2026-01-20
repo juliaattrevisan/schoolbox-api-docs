@@ -49,8 +49,8 @@ const mainConfig = defineConfig({
         "no-void": "off", // void is a valid return type in TypeScript
         // Allow console.warn and console.error, but disallow other console methods
         "no-console": ["warn", { allow: ["warn", "error", "info"] }],
-        // enforce consistent explicit return types on functions and class methods
-        "@typescript-eslint/explicit-function-return-type": "warn",
+        // enforce consistent explicit return types on functions and class methods (except for expressions)
+        "@typescript-eslint/explicit-function-return-type": ["warn", { allowExpressions: true }],
         "@typescript-eslint/typedef": [
             "warn",
             {
