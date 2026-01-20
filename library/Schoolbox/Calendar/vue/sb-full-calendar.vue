@@ -536,18 +536,24 @@ export default {
                 .then((response) => {
                     if (response.ok) {
                         toast.timeout({ text: "Event moved successfully" });
-                        // Must reload all events in order to get linked booking items to move also.
-                        // In case of server error do not call this.reloadEvents().  In this case the dragged event will
-                        // be left where it was dropped, but the toast will inform the user that something went wrong.
-                        // If we reloaded automatically on error, the user would not see the error toast.
-                        this.reloadEvents();
+
+                        // If the event has one or more bookings, all calendar items must
+                        // be reloaded in order to get linked booking items to move also.
+                        if (event?.extendedProps?.data?.bookings.length > 0) {
+                            this.reloadEvents();
+                        }
                     } else {
                         toast.timeout({ text: "Event could not be moved", isSuccess: false });
+                        // Note that in case of server error this.reloadEvents() is deliberately not called.  In this
+                        // case the dragged event will be left where it was dropped, but the toast will inform the user
+                        // that something went wrong.  If we reloaded automatically on error, the user would not see
+                        // the error toast.
                     }
                 })
                 .catch((error) => {
                     toast.timeout({ text: "Event could not be moved", isSuccess: false });
                     console.error(error);
+                    // See note above about why we deliberately do not call this.reloadEvents() in case of server error.
                 });
         },
 
