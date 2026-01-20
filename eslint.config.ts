@@ -43,8 +43,6 @@ const mainConfig = defineConfig({
         // customised rules
         // allow modifying props of parameters, especially valid when passing DOM elements, as we don"t really want to be cloning DOM elements
         "no-param-reassign": ["warn", { props: false }],
-        // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
-        "arrow-body-style": "off",
         "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
         "no-void": "off", // void is a valid return type in TypeScript
         // Allow console.warn and console.error, but disallow other console methods
@@ -65,20 +63,11 @@ const mainConfig = defineConfig({
         // avoid unnecessary eslint-disable comments and enforce descriptions for them
         "@eslint-community/eslint-comments/no-unused-disable": "warn",
         "@eslint-community/eslint-comments/require-description": "warn",
-        /**
-         * Override the ForOfStatement restriction from airbnb, as we want to allow
-         * for-of loops (including with await) as they are more readable than .forEach or .reduce
-         * and our browser targets support them without the need for regenerator-runtime
-         * It should also help avoid Promise.all() accidentally being used for operations that must be sequential
-         */
-        "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
-        "no-await-in-loop": "off",
     },
 });
 
 module.exports = defineConfig([
     eslint.configs.recommended,
-    // TODO: check over old configs with airbnb rules
     eslintConfigAirbnb.base.bestPractices,
     eslintConfigAirbnb.base.errors,
     eslintConfigAirbnb.base.es6,
@@ -90,9 +79,16 @@ module.exports = defineConfig([
         rules: {
             /* Selective rules from eslintConfigAirbnb.base.variables */
             "no-restricted-globals": eslintConfigAirbnb.base.variables.rules!["no-restricted-globals"],
-            "no-shadow-restricted-names": "error",
+            /**
+             * Override the ForOfStatement restriction from airbnb, as we want to allow
+             * for-of loops (including with await) as they are more readable than .forEach or .reduce
+             * and our browser targets support them without the need for regenerator-runtime
+             * It should also help avoid Promise.all() accidentally being used for operations that must be sequential
+             */
+            "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
 
             /* other overrides from rules that come from the airbnb configs */
+            "arrow-body-style": "off",
             "no-await-in-loop": "off",
             "no-underscore-dangle": "off",
             "@stylistic/lines-between-class-members": "off",
@@ -140,7 +136,7 @@ module.exports = defineConfig([
             "import-x/no-named-default": "error",
             "import-x/no-relative-packages": "error",
             "import-x/no-self-import": "error",
-            // "import-x/no-cycle": ["error", { maxDepth:'∞' }], // disabled for now (performance heavy)
+            "import-x/no-cycle": ["error", { maxDepth: "∞" }],
             // Disable some rules for performance as per recommendations in https://typescript-eslint.io/troubleshooting/typed-linting/performance/#eslint-plugin-import
             "import-x/named": "off",
             "import-x/namespace": "off",
