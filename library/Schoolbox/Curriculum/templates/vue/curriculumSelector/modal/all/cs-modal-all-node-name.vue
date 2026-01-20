@@ -13,10 +13,10 @@ import { useModalViewNodesStore } from "../../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../../store/csModalSearchStore";
 
 interface Props {
-    node: Node; // the assigned node to display
-    depth: number; // to gradually add more marginLeft to indicate node level depth
-    title: string; // the already computed node title
-    isActive: boolean; // to disable certain events when editing is taking place
+    node?: Node; // the assigned node to display
+    depth?: number; // to gradually add more marginLeft to indicate node level depth
+    title?: string; // the already computed node title
+    isActive?: boolean; // to disable certain events when editing is taking place
 }
 const props = withDefaults(defineProps<Props>(), {
     node: () => getEmptyNode(),

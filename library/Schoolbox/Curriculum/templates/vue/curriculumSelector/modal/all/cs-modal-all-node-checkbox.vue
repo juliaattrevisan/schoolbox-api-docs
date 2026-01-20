@@ -14,7 +14,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); // to ensure the input/label id is unique
 
 interface Props {
-    node: Node; // to prefill the input
+    node?: Node; // to prefill the input
 }
 const props = withDefaults(defineProps<Props>(), {
     node: () => getEmptyNode(),

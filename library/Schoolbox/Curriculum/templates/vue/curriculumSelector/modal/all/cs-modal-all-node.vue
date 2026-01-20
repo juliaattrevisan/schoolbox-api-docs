@@ -20,8 +20,8 @@ import CsModalAllNodeUsageSummary from "./cs-modal-all-node-usage-summary.vue";
 import CsModalAllNodeUsageDetails from "./cs-modal-all-node-usage-details.vue";
 
 interface Props {
-    node: Node; // to prefill the input
-    depth: number; // to gradually add more marginLeft to indicate node level depth
+    node?: Node; // to prefill the input
+    depth?: number; // to gradually add more marginLeft to indicate node level depth
 }
 
 const props = withDefaults(defineProps<Props>(), {

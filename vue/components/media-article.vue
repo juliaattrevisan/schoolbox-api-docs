@@ -7,7 +7,7 @@
 import sanitizeHtml from "sanitize-html";
 
 interface Props {
-    content: string; // the content to display
+    content?: string; // the content to display
     dataTest?: string; // the data-test attribute
     tag?: string; // when you wish to use a different tag than article
     id?: string; // the id of the element
