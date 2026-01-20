@@ -58,7 +58,7 @@ export const usePwaConfigStore = defineStore(`pwaConfig`, () => {
     }
 
     // If the current user does not have a config, create one for them
-    if (Object.prototype.hasOwnProperty.call(localPWAConfig.users, currentUserId) === false) {
+    if (Object.hasOwn(localPWAConfig.users, currentUserId) === false) {
         localPWAConfig.users[currentUserId] = defaultPWAUserConfig;
     }
 

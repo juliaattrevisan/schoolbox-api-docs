@@ -51,7 +51,7 @@ export function getKeyValuePairs(obj: Nested): Record<string, string> {
      */
     function recurse(curr: Nested, keyPath?: string): void {
         Object.keys(curr).forEach((key) => {
-            if (Object.prototype.hasOwnProperty.call(curr, key)) {
+            if (Object.hasOwn(curr, key)) {
                 const newKeyPath = keyPath ? `${keyPath}[${key}]` : key;
                 const value = curr[key];
                 if (isValueNested(value)) {

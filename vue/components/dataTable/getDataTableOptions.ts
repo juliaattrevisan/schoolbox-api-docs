@@ -42,7 +42,7 @@ function getHeadings(columnConfig: ColumnConfig[]): { headings: Record<string, s
 function getSortable(columnConfig: ColumnConfig[]): { sortable: string[] } {
     const sortable: string[] = [];
     columnConfig.forEach((column) => {
-        if (!Object.prototype.hasOwnProperty.call(column, "isSortable")) {
+        if (!Object.hasOwn(column, "isSortable")) {
             sortable.push(column.key);
         }
     });
