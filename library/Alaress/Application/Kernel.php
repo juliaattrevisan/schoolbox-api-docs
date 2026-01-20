@@ -1488,7 +1488,7 @@ abstract class Kernel
             }
 
             if (isset($key, $iv)) {
-                $communityPortal->setSecrets($key, $iv);
+                $communityPortal->setSecrets(base64_decode($key), base64_decode($iv));
             } else {
                 trigger_error(
                     'Cannot read community portal key fron env or config file - password will not be changed',
