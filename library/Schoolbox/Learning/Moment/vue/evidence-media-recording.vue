@@ -18,7 +18,8 @@ import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
 
 /**
- * @typedef {import('@js/resource/resourceUtils').AsyncUploadResponseSuccess} AsyncUploadResponseSuccess
+ * @template IsMulti extends boolean
+ * @typedef {import('@js/resource/resourceUtils').AsyncUploadResponseSuccess<IsMulti>} AsyncUploadResponseSuccess<IsMulti>
  */
 
 export default {
@@ -279,7 +280,7 @@ export default {
 
         /**
          * the media is ready, so upload it up to SchoolBox and return response
-         * @returns { Promise<AsyncUploadResponseSuccess | undefined> }
+         * @returns {Promise<AsyncUploadResponseSuccess<false> | undefined>}
          */
         async uploadMediaAndReturnResponse() {
             try {

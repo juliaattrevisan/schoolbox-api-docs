@@ -97,9 +97,9 @@ async function uploadMediaRecording(): Promise<void> {
     mediaRecordingEl.value.checkRecording();
 
     // need to override this type as evidence-media-recording.vue is not in TS
-    const response = await (
-        mediaRecordingEl.value.uploadMediaAndReturnResponse as () => Promise<AsyncUploadResponseSuccess | undefined>
-    )();
+    const response = (await mediaRecordingEl.value.uploadMediaAndReturnResponse()) as
+        | AsyncUploadResponseSuccess<false>
+        | undefined;
 
     if (response === undefined) {
         return; // failed but already handled by evidence-media-recording.vue
