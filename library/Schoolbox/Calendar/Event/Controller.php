@@ -1724,7 +1724,7 @@ class Controller extends Base
         $bookingsToSave = new GenericCollection(ResourceBookingModel::class);
 
         // Collect errors.
-        $errors = [];
+        $errorArrays = [];
 
         // Update each booking, and check for clashes.
         /** @var ResourceBookingModel $booking */
@@ -1737,8 +1737,9 @@ class Controller extends Base
                 continue;
             }
 
-            // If the booking start/end datetime is null, there is no need to update it, because it will default to the
-            // event start/end datetime, which has already moved by the exact amount we would like the booking to move.
+            // If the booking start or end datetime is null, there is no need to update it, because it will default to
+            // the event start/end datetime.  The event start/end datetimes have already moved by the exact amount we
+            // would like the booking to move.
             $newBookingStart = (
                 ($booking->getBookingStartAt() === null)
                 ? $bookingEvent->getStartDateTime() // Leave booking start time as null, and use event start time for clash detection.
@@ -1757,44 +1758,7 @@ class Controller extends Base
                 $booking
             );
 
-            // Update the booking's status depending on whether a clash with other approved bookings is detected.
-            if (count($clashErrors) > 0 && $validation->validationErrorsAreAllClashes($clashErrors)) {
-                $errors[] = $clashErrors;
-                // Set status to pending if there are clashes (even if the resource can NOT have clashes).
-                $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
-                $bookingIsUpdated = true;
-            } else {
-                // If booking is managed or moderated, and was previously approved, set status
-                // back to pending so it can be re-approved by a moderator if the time has changed.
-                $moderationId = $booking->getResource()->getModerationType()->getId();
-                $statusId = $booking->getStatus()->getId();
-                if (
-                    $booking->getResource()->isUserModerator($this->getUser())
-                    && (int)$bookingEvent->getAuthor()->getId() === (int)$this->getUser()->getId()
-                ) {
-                    /* If you're a Moderator and can moderate this request,
-                     * and you created the booking in the first place,
-                     * set it to Approved - otherwise you'll end up approving your own request anyway
-                     */
-                    $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_APPROVED));
-                    $bookingIsUpdated = true;
-                } elseif (
-                    (
-                        $moderationId === ResourceBookingModerationTypeModel::TYPE_MODERATED ||
-                        $moderationId === ResourceBookingModerationTypeModel::TYPE_MANAGED
-                    ) &&
-                    $statusId === BookingStatusModel::STATUS_APPROVED
-                ) {
-                    $booking->setStatus($this->bookingStatusMapper->createModel(BookingStatusModel::STATUS_PENDING));
-                    $bookingIsUpdated = true;
-                }
-                // if not moderated or managed, keep approved status
-            }
-
-            // If the booking start/time is null, no change is needed.  This is because the booking start/end times
-            // default to the parent event's start/end times, so the bookings move with the events automatically.
-            // Note that even if the booking start and end times are both null, the work above to check for clashes
-            // and modify the booking status is still necessary, because the bookings are still moving.
+            // As noted above, the booking start/end datetimes only need to be updated if they are non-null.
             if ($booking->getBookingStartAt() !== null) {
                 $booking->setBookingStartAt($newBookingStart);
                 $bookingIsUpdated = true;
@@ -1804,14 +1768,24 @@ class Controller extends Base
                 $bookingIsUpdated = true;
             }
 
+            $oldStatusId = $booking->getStatus()->getId();
+            $newStatusId = $validation->getNewStatusIdForBooking($booking, count($clashErrors) > 0, $this->getUser());
+
+            if ($newStatusId !== $oldStatusId) {
+                $booking->setStatus($this->bookingStatusMapper->createModel($newStatusId));
+                $bookingIsUpdated = true;
+            }
+
             if ($bookingIsUpdated) {
                 $bookingsToSave->add($booking);
             }
+
+            $errorArrays[] = $clashErrors;
         }
 
         // Save the lot.
         $this->bookingMapper->save($bookingsToSave);
 
-        return $errors;
+        return count($errorArrays) > 0 ? array_merge_recursive([], ...$errorArrays) : [];
     }
 }
