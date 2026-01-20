@@ -1129,7 +1129,7 @@ export default {
                                 v-if="eventExtendedProps.booking && eventExtendedProps.variant === EVENT_VARIANTS.EVENT"
                             >
                                 <a class="button" :href="ENDPOINTS.eventDetailsPath(eventExtendedProps.eventId)"
-                                    >View Event Details</a
+                                    >View Event</a
                                 >
                             </span>
                             <span v-if="eventExtendedProps.links.view">
