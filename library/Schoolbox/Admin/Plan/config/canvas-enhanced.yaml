@@ -110,7 +110,7 @@ config:
   canvas_data2_secret: { hide: false} # this was canvas CD1, not used now
   canvas_data2_client_id: { hide: false}
   canvas_url: { hide: false}
-  canvas_data_api_key: {hide: true} # this was canvas CD1, not used now
+  canvas_data_api_key: { hide: true } # this was canvas CD1, not used now
   canvas_bearer_token : { hide : false } # used for news and announcements (component)
 
 
