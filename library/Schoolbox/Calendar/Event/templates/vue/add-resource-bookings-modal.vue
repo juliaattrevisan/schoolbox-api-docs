@@ -24,9 +24,9 @@ const props = defineProps<Props>();
  * This defines the server response to an ENDPOINTS.addBookings request.
  */
 type AddBookingsToEventResponse = {
-    nBookingsAttempted: number;
-    nBookingsCreatedWithClash: number;
-    nBookingsCreatedWithoutClash: number;
+    nBookingsCreatedPending: number;
+    nBookingsCreatedApproved: number;
+    nBookingsCreatedRejected: number;
 };
 
 const isModalOpen = window.Vue.ref<boolean>(false);
@@ -77,31 +77,23 @@ defineExpose({
  * @param responseData The server's response to an 'addBookings' request.
  */
 function updateToastAndRefreshPage(toast: Toast, responseData: AddBookingsToEventResponse): void {
-    const nBookingsCreated = responseData.nBookingsCreatedWithoutClash + responseData.nBookingsCreatedWithClash;
-    const nBookingsNotCreated = responseData.nBookingsAttempted - nBookingsCreated;
+    const nBookingsCreated =
+        responseData.nBookingsCreatedPending +
+        responseData.nBookingsCreatedApproved +
+        responseData.nBookingsCreatedRejected;
 
     let msg;
     let isSuccess;
 
-    switch (nBookingsCreated) {
-        case responseData.nBookingsAttempted:
-            isSuccess = true;
-            msg =
-                responseData.nBookingsCreatedWithClash === 0
-                    ? "Created all bookings and found no clashes"
-                    : `Created all bookings (${responseData.nBookingsCreatedWithClash} as pending because of clash${
-                          responseData.nBookingsCreatedWithClash > 1 ? "es" : ""
-                      })`;
-            break;
-        case 0:
-            isSuccess = false;
-            msg = `Could not create any bookings because of clashes`;
-            break;
-        default:
-            isSuccess = true;
-            msg = `Created some bookings (${nBookingsNotCreated} not created because of clash${
-                nBookingsNotCreated > 1 ? "es" : ""
-            })`;
+    if (nBookingsCreated === 0) {
+        isSuccess = false;
+        msg = `Could not create any bookings because of clashes`;
+    } else {
+        isSuccess = true;
+        msg = `Created ${nBookingsCreated} booking${nBookingsCreated > 1 ? "s" : ""} - `;
+        msg += `${responseData.nBookingsCreatedPending} pending, `;
+        msg += `${responseData.nBookingsCreatedApproved} approved, `;
+        msg += `${responseData.nBookingsCreatedRejected} rejected.`;
     }
 
     toast.timeout({

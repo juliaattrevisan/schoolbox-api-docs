@@ -595,6 +595,8 @@ class Mapper extends BaseMapper
             return [];
         }
 
+        // An 'ORDER BY' clause is added here because the order set will be desired in most cases, and because
+        // returning items in a consistent order ensures consistent results, which is important for testing.
         $query = "
             SELECT
                 {$this->getColumnString('b')},
@@ -604,6 +606,7 @@ class Mapper extends BaseMapper
             WHERE b.event_id IN (" . implode(',', array_map('intval', $eventIds)) . ")
             AND b.deleted_at IS NULL
             AND r.deleted_at IS NULL
+            ORDER BY r.name ASC, b.id ASC
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
