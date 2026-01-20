@@ -6,13 +6,13 @@
  * Prettier is added to the end so eslint doesnt report on formatting issues that prettier will automatically fix.
  */
 
-import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
-import { jsdoc } from "eslint-plugin-jsdoc";
-import { importX } from "eslint-plugin-import-x";
-import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import { defineConfig, globalIgnores } from "eslint/config";
 import { rules as eslintConfigAirbnb } from "eslint-config-airbnb-extended";
 import eslintConfigPrettier from "eslint-config-prettier";
+import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
+import { importX as eslintPluginImportX } from "eslint-plugin-import-x";
+import { jsdoc as eslintPluginJsdoc } from "eslint-plugin-jsdoc";
 import eslintPluginVue from "eslint-plugin-vue";
 import tsEslint from "typescript-eslint";
 import vueEslintParser from "vue-eslint-parser";
@@ -111,8 +111,8 @@ const configComments = defineConfig([
  */
 const configImport = defineConfig([
     // need to force these types for now, see https://github.com/un-ts/eslint-plugin-import-x/issues/439
-    importX.flatConfigs.recommended as ConfigWithExtends,
-    importX.flatConfigs.typescript as ConfigWithExtends,
+    eslintPluginImportX.flatConfigs.recommended as ConfigWithExtends,
+    eslintPluginImportX.flatConfigs.typescript as ConfigWithExtends,
     {
         rules: {
             // Restrict dev dependencies to specific files that need them
@@ -159,11 +159,11 @@ const configImport = defineConfig([
  * Linting rules for JSDoc comments
  */
 const configJsdoc = defineConfig([
-    jsdoc({
+    eslintPluginJsdoc({
         files: ["**/*.js", "**/*.mjs"],
         config: "flat/recommended",
     }),
-    jsdoc({
+    eslintPluginJsdoc({
         files: ["**/*.ts", "**/*.vue"],
         config: "flat/recommended-typescript",
     }),
