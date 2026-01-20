@@ -26,7 +26,7 @@ const emit = defineEmits<{
  * @returns - a comma separated string of the ids
  */
 const ids = window.Vue.computed(() => {
-    return props.selected.join(",");
+    return props.selected.map((item) => item.id).join(",");
 });
 
 /**
