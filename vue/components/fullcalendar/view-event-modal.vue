@@ -77,7 +77,7 @@ export default {
         returnUrl: {},
     },
 
-    emits: ["eventModified", "viewEventLinkedFromBooking"],
+    emits: ["eventModified"],
 
     data() {
         return {
@@ -449,13 +449,6 @@ export default {
 
             // Notify listening components that an event has been modified (this will cause the calendar to reload events).
             this.$emit(EVENT_MODIFIED, this.event);
-        },
-
-        /**
-         * Emit an event to tell any listening component that the user has requested the opening of an event modal.
-         */
-        viewEventLinkedFromBooking() {
-            this.$emit("viewEventLinkedFromBooking", this.eventExtendedProps.booking.linkedEventFullCalendarEventId);
         },
 
         /**
