@@ -392,7 +392,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
-            'resourceBookingEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED),
+            'resourceBookingEnabled' => $resourceBookingEnabled,
 
             /* The available attendance levels which can be chosen
              */
