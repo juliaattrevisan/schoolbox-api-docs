@@ -74,8 +74,8 @@ export enum ProfileStatus {
 export type Profile = {
     id: number | null;
     student: UserCC;
-    adjustment_category: AdjustmentType | null;
-    adjustment_level: AdjustmentType | null;
+    adjustment_category: AdjustmentType[] | null;
+    adjustment_level: AdjustmentType[] | null;
     overview: string | null;
     interests_strengths: string | null;
     needs_challenges: string | null;
