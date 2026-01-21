@@ -355,42 +355,30 @@ class Controller extends Base
      */
     private function persistDifferentiationProfile(Model $model, Values $post): void
     {
-        $adjustment_level = $post->get('adjustment_level');
-        if (null !== $adjustment_level) {
+        $adjustmentLevel = $post->get('adjustment_level');
+        if (null !== $adjustmentLevel) {
             /* Ensure adjustment level is an array
              */
-            if (!is_array($adjustment_level)) {
+            if (!is_array($adjustmentLevel)) {
                 $this->sendJsonError('Adjustment level must be an array.', 400);
                 return;
             }
 
-            /* Validate to make sure all adjustment levels exist
-             */
-            $pb = $this->adjustmentLevelsMapper->getPredicateBuilder();
-            $pb->in('id', array_column($adjustment_level, 'id'));
-            $count = $this->adjustmentLevelsMapper->countByPredicates($pb);
-            if ($count !== count($adjustment_level)) {
-                $this->sendJsonError('One or more adjustment levels are invalid.', 400);
+            if (!$this->validateAdjustmentIds($adjustmentLevel, $this->adjustmentLevelsMapper, 'adjustment levels')) {
                 return;
             }
         }
 
-        $adjustment_category = $post->get('adjustment_category');
-        if (null !== $adjustment_category) {
+        $adjustmentCategory = $post->get('adjustment_category');
+        if (null !== $adjustmentCategory) {
             /* Ensure adjustment category is an array
              */
-            if (!is_array($adjustment_category)) {
+            if (!is_array($adjustmentCategory)) {
                 $this->sendJsonError('Adjustment category must be an array.', 400);
                 return;
             }
 
-            /* Validate to make sure all adjustment categories exist
-             */
-            $pb = $this->adjustmentCategoriesMapper->getPredicateBuilder();
-            $pb->in('id', array_column($adjustment_category, 'id'));
-            $count = $this->adjustmentCategoriesMapper->countByPredicates($pb);
-            if ($count !== count($adjustment_category)) {
-                $this->sendJsonError('One or more adjustment categories are invalid.', 400);
+            if (!$this->validateAdjustmentIds($adjustmentCategory, $this->adjustmentCategoriesMapper, 'adjustment categories')) {
                 return;
             }
         }
@@ -443,13 +431,13 @@ class Controller extends Base
             /** @var Model $model */
             $model
                 ->setAdjustmentLevelIds(
-                    $adjustment_level ?
-                        implode(',', array_column($adjustment_level, 'id')) :
+                    $adjustmentLevel ?
+                        implode(',', array_column($adjustmentLevel, 'id')) :
                         null
                 )
                 ->setAdjustmentCategoryIds(
-                    $adjustment_category ?
-                        implode(',', array_column($adjustment_category, 'id')) :
+                    $adjustmentCategory ?
+                        implode(',', array_column($adjustmentCategory, 'id')) :
                         null
                 )
                 ->setOverview($post->get('overview'))
@@ -475,6 +463,45 @@ class Controller extends Base
                 ->withStatus($isNewRecord ? 201 : 200);
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
+        }
+    }
+
+    /**
+     * Validate adjustment IDs exist in database
+     *
+     * @param array<array{id: int}> $adjustments
+     * @param \Schoolbox\Mapper $adjustmentMapper
+     * @param string $type
+     * @return bool Returns true if valid, false otherwise (response already set)
+     */
+    private function validateAdjustmentIds(array $adjustments, \Schoolbox\Mapper $adjustmentMapper, string $type): bool
+    {
+        $ids = array_column($adjustments, 'id');
+
+        /* Ensure there are IDs to validate
+         */
+        if (empty($ids)) {
+            $this->sendJsonError("IDs for {$type} are not provided.", 400);
+            return false;
+        }
+
+        try {
+            $pb = $adjustmentMapper->getPredicateBuilder();
+            $pb->in('id', $ids);
+            $count = $adjustmentMapper->countByPredicates($pb);
+            /* Check if all provided IDs exist
+             */
+            if ($count !== count($adjustments)) {
+                $this->sendJsonError(
+                    'One or more ' . $type . ' are invalid.',
+                    400
+                );
+                return false;
+            }
+            return true;
+        } catch (\Exception $e) {
+            $this->sendJsonError('Error updating adjustment ' . $type, 500);
+            return false;
         }
     }
 
