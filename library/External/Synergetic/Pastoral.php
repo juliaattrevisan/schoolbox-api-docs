@@ -1281,7 +1281,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // gets tDocumentsSeq for the inserted record
             // lastInsertId() does not work because of DB trigger attached to this table
             $documentReferencesSeq = $this->connector->executeQuery(
-                "SELECT tDocumentsSeq FROM media.tDocuments WHERE
+                "SELECT tDocumentsSeq FROM {$this->schemaMedia}.tDocuments WHERE
                 Description = :filename AND
                 ClassificationCode = :classificationCode AND
                 DocumentCreatedByID = :createdById AND
@@ -1364,7 +1364,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $this->pastoralAttachmentMapper->save($pastoralAttachment);
         } catch (DatabaseException $e) {
             $this->connector->rollBack();
-            throw new ExternalException('Error linking pastoral document to record in Synergetic database:' . $e->getTraceAsString());
+            /* Superclass' execute() method throws an exception with a message which we kind of ignored
+             *
+             * Note that anything inside this try/catch could throw a random error out to logging due to the failure of
+             * any of the queries executed. Getting a trace of it isn't enough: need to know why it died
+             * Probably no permissions?
+             */
+            throw new ExternalException(sprintf(
+                'Error linking pastoral document to record in Synergetic database: %s, with trace: %s',
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ));
         }
         return true;
     }
