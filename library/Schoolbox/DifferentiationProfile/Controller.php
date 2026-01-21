@@ -14,6 +14,7 @@ use Alaress\Web\Request\Values;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
+use Schoolbox\DifferentiationProfile\Translator\ResponseModelToArray;
 use Schoolbox\Filter\Mapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
@@ -344,18 +345,55 @@ class Controller extends Base
         $this->persistDifferentiationProfile($model, $body);
     }
 
+    /**
+     * Persist differentiation profile data
+     *
+     * @param Model  $model
+     * @param Values $post
+     * @return void
+     * @throws Exception
+     */
     private function persistDifferentiationProfile(Model $model, Values $post): void
     {
         $adjustment_level = $post->get('adjustment_level');
-        if (!is_array($adjustment_level) && null !== $adjustment_level) {
-            $this->sendJsonError('Adjustment level must be an array.', 400);
-            return;
+        if (null !== $adjustment_level) {
+            /* Ensure adjustment level is an array
+             */
+            if (!is_array($adjustment_level)) {
+                $this->sendJsonError('Adjustment level must be an array.', 400);
+                return;
+            }
+
+            /* Validate to make sure all adjustment levels exist
+             */
+            $pb = $this->adjustmentLevelsMapper->getPredicateBuilder();
+            $pb->in('id', array_column($adjustment_level, 'id'));
+            $count = $this->adjustmentLevelsMapper->countByPredicates($pb);
+            if ($count !== count($adjustment_level)) {
+                $this->sendJsonError('One or more adjustment levels are invalid.', 400);
+                return;
+            }
         }
 
+
         $adjustment_category = $post->get('adjustment_category');
-        if (!is_array($adjustment_category) && null !== $adjustment_category) {
-            $this->sendJsonError('Adjustment category must be an array.', 400);
-            return;
+        if (null !== $adjustment_category) {
+            /* Ensure adjustment category is an array
+             */
+            if (!is_array($adjustment_category)) {
+                $this->sendJsonError('Adjustment category must be an array.', 400);
+                return;
+            }
+
+            /* Validate to make sure all adjustment categories exist
+             */
+            $pb = $this->adjustmentCategoriesMapper->getPredicateBuilder();
+            $pb->in('id', array_column($adjustment_category, 'id'));
+            $count = $this->adjustmentCategoriesMapper->countByPredicates($pb);
+            if ($count !== count($adjustment_category)) {
+                $this->sendJsonError('One or more adjustment categories are invalid.', 400);
+                return;
+            }
         }
 
         /* Validate text field lengths
@@ -431,12 +469,11 @@ class Controller extends Base
 
             $this->mapper->save($model);
 
-            $this->response = $this->responseAsJson(
-                [
-                    "id" => $model->getId(),
-                    "updated_at" => $model->getUpdatedAt()->getShort(),
-                ]
-            )->withStatus($isNewRecord ? 201 : 200);
+            $translator = new ResponseModelToArray();
+
+            $this->response = $this
+                ->responseAsJson(call_user_func($translator, $model))
+                ->withStatus($isNewRecord ? 201 : 200);
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
         }
