@@ -25,7 +25,7 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevel;
  * Test for the differentiation profile model to array translator.
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(ModelToArray::class)]
-class differentiationProfileModelToArrayTest extends TestCase
+class DifferentiationProfileModelToArrayTest extends TestCase
 {
     private Generator $routeGenerator;
     private Authorizer $authorizer;

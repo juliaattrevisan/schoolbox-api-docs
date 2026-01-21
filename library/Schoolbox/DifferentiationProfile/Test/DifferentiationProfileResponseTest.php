@@ -15,7 +15,7 @@ use Schoolbox\DifferentiationProfile\Model;
  * @package Schoolbox\DifferentiationProfile\Test
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(ResponseModelToArray::class)]
-class differentiationProfileResponseTest extends TestCase
+class DifferentiationProfileResponseTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvokeData')]
     public function testInvokeData($model, $expected)
