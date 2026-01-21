@@ -45,14 +45,16 @@
         {% endfor %}
     {% endif %}
 
-    {# (optional) Duration #}
-    {% if assessment.duration %}
+    {# (optional) Duration
+     # If a specific amount of allowed time was configured, tell people how long they have to cmopose their response.
+     # Unlimited durations don't say anything; there's nothing you needed to know.
+     #}
+    {% if not assessment.isDurationUnlimited %}
         <li class="icon-time-value" title="Allowed Time">{% apply spaceless %}
-            You have <time>{{ duration.secondsToHoursAndMinutes(assessment.duration) }}</time> to complete this {{ locale.activity }}
+            Allowed time: <time>{{ duration.secondsToHoursAndMinutes(assessment.duration) }}</time>
         {% endapply %}</li>
     {% endif %}
 
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
-    {% include '@learning/fragments/meta/lessonPlanStudentView.twig' %}
 </ul>
 {% endapply %}
