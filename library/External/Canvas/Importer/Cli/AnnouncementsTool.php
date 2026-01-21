@@ -161,6 +161,11 @@ HELP;
             // log this to keep track of things
             $runId = (string)Uuid::uuid4();
             $importLogMapper = CanvasLogMapper::getInstance();
+
+            /* Trim away ancient logs
+             */
+            $importLogMapper->prune(self::CANVAS_ANNOUNCEMENTS_SCRIPT_NAME);
+
             $importLog = $importLogMapper->start($runId, self::CANVAS_ANNOUNCEMENTS_SCRIPT_NAME);
 
             /* Used to shank a database instance
@@ -220,10 +225,6 @@ HELP;
 
             // log completion
             $importLogMapper->finish($importLog);
-
-            /* Trim away ancient logs
-             */
-            $importLogMapper->prune();
         } else {
             $this->getLogger()->warning("Cannot acquire lock. Likely previous execution still in progress. Exiting");
             exit;
