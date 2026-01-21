@@ -316,16 +316,34 @@ class ListController extends Web\Controller\Base
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
             }
 
-            $this->redirect(
-                $controller->determineRedirect(
-                    $assessmentInfo['assessment'],
-                    $explicitReturnUrl,
-                    $assessmentInfo[Redirect::RETURN_URL],
-                    $assessmentInfo['relocated'],
-                    true,
-                    $post['toParticipation'] ?? false
-                )
+            $redirectUrl = $controller->determineRedirect(
+                $assessmentInfo['assessment'],
+                $explicitReturnUrl,
+                $assessmentInfo[Redirect::RETURN_URL],
+                $assessmentInfo['relocated'],
+                true,
+                $post['toParticipation'] ?? false
             );
+
+            /**
+             * On the create page only, there is a specific requirement that the browser's back button after redirect
+             * returns to the modify page instead of the create page. This is particularly for Quiz/DialogAgent
+             * since they have a workflow after creation to add questions/configure the agent.
+             *
+             * We need to provide 'modifyForm' so that mage can inject it into the browser history state.
+             */
+            if ($this->isXhrRequest()) {
+                $this->response = $this->responseAsJson([
+                    Redirect::RETURN_URL => $redirectUrl,
+                    'modifyForm' => $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessmentForm', [
+                        'assessmentId' => $assessmentInfo['assessment']->getId(),
+                        'assessment' => $assessmentInfo['assessment'],
+                    ]),
+                ]);
+                return;
+            }
+
+            $this->response = $this->redirectAfterPost($redirectUrl);
         } catch (InvalidArgumentException $e) {
             //Check to see if the said Course and/or Units were deleted before throwing the message
             if ($context instanceof \Schoolbox\ISoftDeletable && $context->isDeleted()) {
