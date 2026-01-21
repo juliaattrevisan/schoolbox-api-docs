@@ -175,7 +175,6 @@ class Controller extends Base
             'campusCollection' => $helper->getCampusCollection($event),
             'roleCollection' => $helper->getRoleCollection($event),
             'folderCollection' => $helper->getFolderCollection($event),
-            'resourceBookings' => $this->bookingMapper->findByColumn('event_id', $event->getId()),
             'user' => $this->getUser(),
 
             /* Modify perms are calculated in the attendance list fragment
@@ -195,6 +194,7 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
+            'canBookResources' => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED),
         ];
 
         // Only include resource booking data if the resource booking module is enabled.
