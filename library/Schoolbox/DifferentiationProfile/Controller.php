@@ -316,7 +316,7 @@ class Controller extends Base
     }
 
     /**
-     * Save differentiation profile data
+     * Update differentiation profile data
      *
      * @param User $student
      * @return void
@@ -374,7 +374,6 @@ class Controller extends Base
                 return;
             }
         }
-
 
         $adjustment_category = $post->get('adjustment_category');
         if (null !== $adjustment_category) {
