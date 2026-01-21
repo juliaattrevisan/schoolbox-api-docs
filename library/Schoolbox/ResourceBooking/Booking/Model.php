@@ -73,12 +73,12 @@ class Model implements ISoftDeletable, JsonSerializable
     /**
      * @var null|Alaress_Date_Format
      */
-    protected ?Alaress_Date_Format $bookingStartAt;
+    protected ?Alaress_Date_Format $bookingStartAt = null;
 
     /**
      * @var null|Alaress_Date_Format
      */
-    protected ?Alaress_Date_Format $bookingEndAt;
+    protected ?Alaress_Date_Format $bookingEndAt = null;
 
     /**
      * @var Collection|self[]
