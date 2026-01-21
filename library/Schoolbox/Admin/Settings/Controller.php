@@ -415,6 +415,7 @@ class Controller extends ConfigController
                     'LMS Policy',
                     'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
                     'Pastoral Care'       => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
+                    'Canvas'              => "/adminv2/canvas",
                     default               => "/adminv2/setting/$typeEncoded",          // E.g. /adminv2/setting/Modules
                 };
 
@@ -464,6 +465,9 @@ class Controller extends ConfigController
 
                     // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
                     'Pastoral Care' => $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+
+                    // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
+                    'Canvas' => $this->getConfigLoader()->get(ConfigMapper::NAME_CANVAS_ENABLED),
 
                     default => false
                 };
