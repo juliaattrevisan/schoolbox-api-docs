@@ -19,6 +19,13 @@ GRANT ALL ON schoolbox2.* to 'schoolboxvagrant'@'localhost';
 GRANT ALL ON schoolbox2.* to 'schoolboxdocker'@'%';
 
 # canvas db rather than fighting tools/canvas/create_database.php
+# drop db if it already exists
+DROP DATABASE IF EXISTS canvas_data_docker;
+DROP DATABASE IF EXISTS canvas_data2_docker;
+DROP DATABASE IF EXISTS canvas_data_docker2;
+DROP DATABASE IF EXISTS canvas_data2_docker2;
+
+# now create it again
 CREATE DATABASE canvas_data_docker CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 CREATE DATABASE canvas_data2_docker CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 CREATE DATABASE canvas_data_docker2 CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
