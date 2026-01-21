@@ -10,7 +10,7 @@ use Schoolbox\DifferentiationProfile\Translator\ResponseModelToArray;
 use Schoolbox\DifferentiationProfile\Model;
 
 /**
- * Class differentiationProfileResponse
+ * Class differentiationProfileResponseTest
  *
  * @package Schoolbox\DifferentiationProfile\Test
  */
@@ -18,7 +18,7 @@ use Schoolbox\DifferentiationProfile\Model;
 class DifferentiationProfileResponseTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvokeData')]
-    public function testInvokeData($model, $expected)
+    public function testInvokeData(Model $model, array $expected): void
     {
         $translator = new ResponseModelToArray();
 
