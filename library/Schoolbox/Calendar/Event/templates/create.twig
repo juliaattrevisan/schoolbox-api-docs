@@ -185,7 +185,7 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    {% if canBookResources %}
+                    {% if resourceBookingEnabled %}
                         {% set sectionTitle = 'Location & Resources' %}
                     {% else %}
                         {% set sectionTitle = 'Location' %}
@@ -197,7 +197,7 @@
                             <input name="location" id="location" type="text" value="{{ event.location }}" maxlength="250"/>
                         </label>
                     </div>
-                    {% if canBookResources %}
+                    {% if resourceBookingEnabled %}
                         <div class="small-12 column">
                             <label for="resourceIds">Resources</label>
                             <select id="resourceIds" data-resourcebookingsuggest name="resourceIds[]" multiple placeholder="Start typing the name of a resource"></select>
