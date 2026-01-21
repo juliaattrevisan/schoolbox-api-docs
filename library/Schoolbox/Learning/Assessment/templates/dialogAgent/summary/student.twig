@@ -20,13 +20,10 @@
     <div class="small-12 columns">
         <h1>{{ assessment.title }}</h1>
 
-        {% include '@learningAssessment/meta.twig' with {
+        {% include '@learningAssessment/dialogAgent/meta.twig' with {
             assessment: assessment,
-            submissionsBlocked: false,
             student: student,
             icon: 'icon-dialog-agent',
-            canShowcase: false,
-            isShowcased: false,
             participant: null,
             lastViews: lastViews
         } only %}
