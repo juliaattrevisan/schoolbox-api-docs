@@ -290,6 +290,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'canBookResources' => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED),
             'resources' => [],
 
             /* The available attendance levels which can be chosen
@@ -387,6 +388,7 @@ class Controller extends Base
                 'all' => $campusList,
                 'selected' => $selectedCampuses,
             ],
+            'canBookResources' => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED),
             'resources' => $this->bookingItemMapper->findByColumn('id', $resourceIds),
 
             /* The available attendance levels which can be chosen
