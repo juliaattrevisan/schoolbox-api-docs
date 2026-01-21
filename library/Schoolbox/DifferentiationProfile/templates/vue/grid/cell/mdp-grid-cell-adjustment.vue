@@ -56,7 +56,9 @@ const hasChanged = window.Vue.computed(() => {
     const filteredOriginalAdjustments = (props.adjustments ?? []).filter((adj) =>
         props.options.some((option) => option.id === adj.id),
     );
-    return selectedAdjustments.value.join(",") !== filteredOriginalAdjustments.join(",");
+    return (
+        selectedAdjustments.value.map((a) => a.id).join(",") !== filteredOriginalAdjustments.map((a) => a.id).join(",")
+    );
 });
 const isSaving = window.Vue.ref(false);
 
