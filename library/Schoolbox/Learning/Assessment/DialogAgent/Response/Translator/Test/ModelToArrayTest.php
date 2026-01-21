@@ -25,13 +25,13 @@ use Schoolbox\Learning\Assessment\DialogAgent\Response\Status;
 use Schoolbox\User;
 
 /**
- * NextRoutes test
+ * DialogAgent Response ModelToArray test
  */
 class ModelToArrayTest extends TestCase
 {
     /**
      * @param mixed $input
-     * @param int   $expected
+     * @param array   $expected
      */
     #[DataProvider('providerModelToArray')]
     public function testModelToArray($input, $expected)

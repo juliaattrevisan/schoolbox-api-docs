@@ -22,7 +22,7 @@ use Schoolbox\Learning\Assessment\DialogAgent\Model;
 use Schoolbox\Test\MockConnector;
 
 /**
- * NextRoutes test
+ * ValidConfiguration test
  */
 class ValidConfigurationTest extends TestCase
 {
@@ -43,7 +43,7 @@ class ValidConfigurationTest extends TestCase
 
     /**
      * @param mixed $input
-     * @param int   $expected
+     * @param bool   $expected
      */
     #[DataProvider('providerValidConfiguration')]
     public function testValidConfiguration($input, $expected)

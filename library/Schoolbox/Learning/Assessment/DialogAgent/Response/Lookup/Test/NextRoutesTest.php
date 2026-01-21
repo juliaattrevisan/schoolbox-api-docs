@@ -28,7 +28,7 @@ class NextRoutesTest extends TestCase
 {
     /**
      * @param mixed $input
-     * @param int   $expected
+     * @param array $expected
      */
     #[DataProvider('providerNextRoutes')]
     public function testNextRoutes($input, $expected)
