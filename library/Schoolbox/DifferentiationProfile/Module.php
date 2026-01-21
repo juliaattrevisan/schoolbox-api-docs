@@ -120,25 +120,11 @@ class Module extends BaseModule
             $getPerms,
         );
 
-        $this->register(
-            self::METHOD_POST,
-            '/create/{studentId}',
-            'createDifferentiationProfileData',
-            $updateProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
-        );
-
-        $this->register(
-            self::METHOD_PUT,
-            '/edit/{studentId}',
-            'putDifferentiationProfileData',
-            $updateProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
-        );
+        $studentPath = '/student/{studentId}';
 
         $this->register(
             self::METHOD_GET,
-            '/view/{studentId}',
+            "$studentPath/view",
             'viewDifferentiationProfileData',
             $viewProfilePerms,
             \Closure::fromCallable([$this, 'preloadStudent'])
@@ -146,9 +132,25 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_GET,
-            '/student/{studentId}',
+            $studentPath,
             'getDifferentiationProfileData',
             $getPerms,
+            \Closure::fromCallable([$this, 'preloadStudent'])
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            $studentPath,
+            'createDifferentiationProfileData',
+            $updateProfilePerms,
+            \Closure::fromCallable([$this, 'preloadStudent'])
+        );
+
+        $this->register(
+            self::METHOD_PUT,
+            $studentPath,
+            'putDifferentiationProfileData',
+            $updateProfilePerms,
             \Closure::fromCallable([$this, 'preloadStudent'])
         );
     }
