@@ -63,7 +63,6 @@ class UserResolver implements IUserResolver
     public function findModeratorsForArticle(Comms\News\Model $article): array
     {
         return array_unique(array_merge(
-            $this->getSuperuserIds(),
             $this->getGlobalNewsModerators(),
             $this->getAudienceModerators($article)
         ));
