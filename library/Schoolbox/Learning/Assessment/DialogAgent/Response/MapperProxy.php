@@ -10,10 +10,8 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response;
 
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper as ResponseMapper;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Model as DataModel;
-use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentDomainObject;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as DomainObject;
 use Schoolbox\Mapper;
 

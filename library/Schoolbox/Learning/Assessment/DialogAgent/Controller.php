@@ -32,7 +32,6 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataM
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\MapperProxy as DialogAgentResponseMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Project;
