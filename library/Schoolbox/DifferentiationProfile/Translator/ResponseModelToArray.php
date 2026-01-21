@@ -6,10 +6,6 @@ use Schoolbox\DifferentiationProfile\Model;
 
 class ResponseModelToArray
 {
-    public function __construct()
-    {
-    }
-
     public function __invoke(Model $model): array
     {
         return [
