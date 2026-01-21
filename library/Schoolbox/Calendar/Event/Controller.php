@@ -169,6 +169,8 @@ class Controller extends Base
 
         $payload = new Payload($this->di, $this->attendanceMapper)->generate($event, $this->getUser());
 
+        $resourceBookingEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED);
+
         $data = [
             'event' => $event,
             'level' => $helper->getEventLevel($event),
@@ -194,11 +196,11 @@ class Controller extends Base
                     'current' => $event->getAttendance(),
                 ],
             ],
-            'resourceBookingEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED),
+            'resourceBookingEnabled' => $resourceBookingEnabled,
         ];
 
         // Only include resource booking data if the resource booking module is enabled.
-        if ($this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED)) {
+        if ($resourceBookingEnabled) {
             $data['resourceBookingCollection'] = $helper->getResourceBookingCollection($event);
         }
 
@@ -363,7 +365,9 @@ class Controller extends Base
             ? $this->campusMapper->findAll()
             : $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
-        $this->response = $this->responseFromTemplate('@calendarEvent/create.twig', [
+        $resourceBookingEnabled = $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED);
+
+        $data = [
             'event' => $event,
             'user' => $selectedUser,
             'eventTypes' => $this->eventTypeMapper->findAll(),
@@ -389,7 +393,6 @@ class Controller extends Base
                 'selected' => $selectedCampuses,
             ],
             'resourceBookingEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED),
-            'resources' => $this->bookingItemMapper->findByColumn('id', $resourceIds),
 
             /* The available attendance levels which can be chosen
              */
@@ -411,7 +414,13 @@ class Controller extends Base
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
             'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
-        ], "Modify {$event->getTitle()}");
+        ];
+
+        if ($resourceBookingEnabled) {
+            $data['resources'] = $this->bookingItemMapper->findByColumn('id', $resourceIds);
+        }
+
+        $this->response = $this->responseFromTemplate('@calendarEvent/create.twig', $data, "Modify {$event->getTitle()}");
     }
 
 

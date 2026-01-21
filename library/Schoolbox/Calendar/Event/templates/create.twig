@@ -317,19 +317,21 @@
                                     <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
                                     <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
                                     <script type="text/javascript">
-                                        $('[data-resourcebookingsuggest]').selectizeSelector({
-                                            ajax: {
-                                                url: '/resource-booking/item/search',
-                                                type: 'GET',
-                                                dataType: 'json'
-                                            },
-                                            multiple: true,
-                                            value: [
-                                                {% for resource in resources %}
-                                                {'id': '{{ resource.id|e('js') }}', 'name': '{{ resource.name|e('js') }}'},
-                                                {% endfor %}
-                                            ],
-                                        });
+                                        {% if resourceBookingEnabled %}
+                                            $('[data-resourcebookingsuggest]').selectizeSelector({
+                                                ajax: {
+                                                    url: '/resource-booking/item/search',
+                                                    type: 'GET',
+                                                    dataType: 'json'
+                                                },
+                                                multiple: true,
+                                                value: [
+                                                    {% for resource in resources %}
+                                                    {'id': '{{ resource.id|e('js') }}', 'name': '{{ resource.name|e('js') }}'},
+                                                    {% endfor %}
+                                                ],
+                                            });
+                                        {% endif %}
                                         $(function() {
                                             $('#add-guests').userSelectizeSelector({
                                                 ajax: {
