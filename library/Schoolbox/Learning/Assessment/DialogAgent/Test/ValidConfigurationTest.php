@@ -49,6 +49,7 @@ class ValidConfigurationTest extends TestCase
     public function testValidConfiguration($input, $expected)
     {
         $this->mockDatabase->setNextFetch($input['mockfetch']);
+
         $outcome = (new DialogAgent\ValidConfiguration($this->mockDatabase))->isSatisfiedBy($input['model']);
 
         $this->assertEquals($expected, $outcome);
@@ -146,7 +147,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage('           ')
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -172,7 +173,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -184,7 +185,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -196,7 +197,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules(''),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -208,7 +209,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules(''),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -220,7 +221,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules('           '),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -232,7 +233,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules('           '),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -246,7 +247,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(1)
                         ->setOpeningMessage(null)
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -258,7 +259,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(1)
                         ->setOpeningMessage(null)
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -270,7 +271,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(1)
                         ->setOpeningMessage('cat')
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -282,7 +283,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(1)
                         ->setOpeningMessage('cat')
                         ->setRules(null),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -294,7 +295,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage('cat')
                         ->setRules('horse'),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -306,7 +307,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage('cat')
                         ->setRules('horse'),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -318,7 +319,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules('horse'),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 0
                     ]
                 ],
@@ -330,7 +331,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(null)
                         ->setOpeningMessage(null)
                         ->setRules('horse'),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 123
                     ]
                 ],
@@ -344,7 +345,7 @@ class ValidConfigurationTest extends TestCase
                         ->setScenarioId(117)
                         ->setOpeningMessage('cat')
                         ->setRules('horse'),
-                    'mockfetch' =>[
+                    'mockfetch' => [
                         'numInvalid' => 1
                     ]
                 ],
