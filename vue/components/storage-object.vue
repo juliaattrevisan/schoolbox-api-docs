@@ -72,8 +72,10 @@ function initialiseVideoPlayer(el: HTMLElement, posterLoaded: boolean = false): 
         player.value.setPlayerSize(videoDims.width, videoDims.height);
 
         // found valid dimensions! set the parent to match it so it doesn't resize
-        el.parentElement.style.minHeight = `${videoDims.height}px`;
-        el.parentElement.style.minWidth = `${videoDims.width}px`;
+        if (el.parentElement) {
+            el.parentElement.style.minHeight = `${videoDims.height}px`;
+            el.parentElement.style.minWidth = `${videoDims.width}px`;
+        }
     }
 }
 
