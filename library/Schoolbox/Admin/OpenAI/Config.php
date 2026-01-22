@@ -63,6 +63,7 @@ class Config
     public const string FIELD_TYPE_SELECT   = 'select';
     public const string FIELD_TYPE_INPUT    = 'input';
     public const string FIELD_TYPE_TEXTAREA = 'textarea';
+    public const string FIELD_TYPE_CHECKBOX = 'checkbox';
 
 
     /* Predefined config structs: as you add more providers, don't forget to pile them in here

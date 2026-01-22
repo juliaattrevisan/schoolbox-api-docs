@@ -114,6 +114,20 @@
                     <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
                 {% endfor %}
             </select>
+        {% elseif type == 'checkbox' %}
+            <div class="switch" {{ dataAttrs }} {{ style }}>
+                <input
+                    id="{{ feature.feature }}-{{ name }}-value"
+                    type="checkbox"
+                    name="{{ inputName }}"
+                    value="1"
+                    {% if inputValue %}checked{% endif %}
+                >
+                <label for="{{ feature.feature }}-{{ name }}-value">
+                    <span>On</span>
+                    <span>Off</span>
+                </label>
+            </div>
         {% else %}
             <input id="{{ feature.feature }}-{{ name }}-value"
                    type="text"
