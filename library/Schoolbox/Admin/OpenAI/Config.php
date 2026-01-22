@@ -126,29 +126,29 @@ class Config
      */
     public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER      => [
-            'type'    => 'select',
+            'type'    => self::FIELD_TYPE_SELECT,
             'options' => self::PROVIDERS,
             'section' => null,
         ],
         self::FIELD_AIKEY         => [
-            'type'    => 'input',
+            'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_GENERAL,
         ],
         self::FIELD_MODEL         => [
-            'type'    => 'select',
+            'type'    => self::FIELD_TYPE_SELECT,
             'options' => self::AI_MODELS,
             'section' => self::SECTION_OPENAI,
         ],
         self::FIELD_RESOURCE_NAME => [
-            'type'    => 'input',
+            'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_AZURE,
         ],
         self::FIELD_DEPLOYMENT_ID => [
-            'type'    => 'input',
+            'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_AZURE,
         ],
         self::FIELD_SYSTEM_PROMPT => [
-            'type'    => 'textarea',
+            'type'    => self::FIELD_TYPE_TEXTAREA,
             'section' => self::SECTION_GENERAL,
         ],
     ];
@@ -244,6 +244,21 @@ class Config
         }
         return $config[self::FIELD_PROVIDER]['value'] !== Helper::ENDPOINT_TYPE_OFF;
     }
+
+    /**
+     * Check if the feature has AI moderation enabled
+     *
+     * @param array $config
+     * @return bool
+     */
+    public function isAiModerationEnabled(array $config): bool
+    {
+        // TODO: there's no way in this current setup to know from $config what feature it's actually for?
+        // For now just check if the field is set and truthy...
+        $value = $config[self::SECTION_GENERAL][self::FIELD_AI_MODERATION]['value'] ?? false;
+        return (bool)$value;
+    }
+
 
     /**
      * Get the model or deployment ID from the config
@@ -392,6 +407,15 @@ class Config
     private function buildFormInputs(string $feature): array
     {
         $formInputs = self::DEFAULT_FORM_INPUTS;
+        if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
+            // Any feature with AI moderation support gets a config for it
+            $formInputs[self::FIELD_AI_MODERATION] = [
+                'type'    => self::FIELD_TYPE_CHECKBOX,
+                'section' => self::SECTION_GENERAL,
+            ];
+            unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
+        }
+
         if ($feature === Helper::FEATURE_IMAGE) {
             // Image feature:
             // * add output quality
@@ -403,6 +427,7 @@ class Config
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
+
         return $formInputs;
     }
 }
