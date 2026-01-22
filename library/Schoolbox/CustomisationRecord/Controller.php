@@ -24,7 +24,7 @@ class Controller extends Base
     public function viewRecords(): void
     {
         // Logic to view customisation records goes here
-        $this->responseFromTemplate('@customisationRecord/list.twig', [
+        $this->response = $this->responseFromTemplate('@customisationRecord/list.twig', [
             // Pass any necessary data to the template here
         ]);
     }
