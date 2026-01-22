@@ -33,6 +33,10 @@ if (empty($_SESSION['id'])) {
     redirectToBroken($width, $height, 403);
 }
 
+if (!isset($_GET['id'])) {
+    redirectToBroken($width, $height, 400);
+}
+
 try {
     $image = Schoolbox\Resource\My\File\Mapper::getInstance()->findById($_GET['id']);
 } catch (Schoolbox\Mapper\Exception $e) {

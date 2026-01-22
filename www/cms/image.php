@@ -40,6 +40,9 @@ $kernel->getShutdownHandler()->registerFunction(
 /* Choose a caching method to use
  */
 
+if (!isset($_GET['id'])) {
+    SitePage::redirectToBrokenImageOfSize($width, $height, 400);
+}
 
 try {
     $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($_GET['id']);
