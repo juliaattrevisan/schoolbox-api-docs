@@ -577,6 +577,34 @@ class Controller extends Base
 
 
     /**
+     * Create an $event with $_POST data from the 'Create/Edit Event' form.
+     *
+     * This function was added to ensure checkbox fields save when the 'Create/Edit Event' form is saved.
+     * See the explanation in the comment inside the function.
+     *
+     * @param Event $event
+     * @throws MapperException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     * @throws SchoolboxException
+     * @throws \Exception
+     */
+    public function postCreateForForm(Event $event): void
+    {
+        // If data for any checkbox field is missing from $this->requestPost, assume the checkbox has been left
+        // unticked, and so add a new data item for that checkbox with a boolean false value.
+        // (If this was not done, the postModify() function would assume the request came from an API user, who intends
+        //  to update other fields in the record while leaving the values of the missing checkbox fields unchanged.)
+        if ($this->requestPost->get('showAttendees') === null) {
+            $this->requestPost->offsetSet('showAttendees', false);
+        }
+
+        $this->postCreate($event);
+    }
+
+
+    /**
      * Create an event for person specified by userId
      * (remember, you can create events for other people)
      * @throws MapperException
