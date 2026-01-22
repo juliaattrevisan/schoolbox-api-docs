@@ -290,7 +290,7 @@ class Helper
                     IF(lti_assessment.assessment_id, 'LTI', NULL),
                     IF(submission_box.id, 'dueWork', NULL),
                     IF(project.id, 'project', NULL),
-                    IF(lesson_plan.id, 'lessonPlan', NULL)
+                    IF(lesson_plan.id, 'lessonPlan', NULL),
                     IF(dialog_agent.id, 'dialogAgent', NULL)
                 ) = :assessmentType 
             ";
