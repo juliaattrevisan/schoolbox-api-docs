@@ -169,12 +169,11 @@ class ParticipationHelper
                 }
 
                 $customisedPlan = $this->getCustomisedParticipation($userId);
-                /* If the student has a customised plan, exclude them from the customised plan after adding back to
+                /* If the student has a customised plan, remove participation from the customised plan after adding back to
                  * the original assessment plan.
                  */
                 if (null !== $customisedPlan) {
-                    $customisedPlan->setExcludedAt(\Alaress_Date_Format::now());
-                    $participantMapper->save($customisedPlan);
+                    $participantMapper->delete($customisedPlan);
                 }
             }
 
