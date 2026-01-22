@@ -600,7 +600,7 @@ class Controller extends Base
             $this->requestPost->offsetSet('showAttendees', false);
         }
 
-        $this->postCreate($event);
+        $this->postCreate();
     }
 
 
