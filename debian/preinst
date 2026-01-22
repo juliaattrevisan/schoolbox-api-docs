@@ -8,6 +8,81 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
+# Circuit breaker configuration
+readonly CIRCUIT_BREAKER_DIR="/var/lock/schoolbox-upgrade"
+readonly CIRCUIT_BREAKER_FILE="${CIRCUIT_BREAKER_DIR}/backup.lock"
+readonly CIRCUIT_BREAKER_TIMEOUT=86400  # 24 hours in seconds
+
+# Circuit breaker helpers
+# Check if backup circuit breaker is active
+check_backup_circuit_breaker() {
+  if [ -f "$CIRCUIT_BREAKER_FILE" ]; then
+    local last_failure=$(cat "$CIRCUIT_BREAKER_FILE" | head -n1)
+    local current_time=$(date +%s)
+    local time_diff=$((current_time - last_failure))
+
+    if [ $time_diff -lt $CIRCUIT_BREAKER_TIMEOUT ]; then
+      local hours_remaining=$(( (CIRCUIT_BREAKER_TIMEOUT - time_diff) / 3600 ))
+      echo "Circuit breaker active for database backups. Last failure was ${time_diff}s ago. Package installation blocked (retry in ${hours_remaining}h)." | tee -a /var/log/schoolbox/upgrade.log
+      echo "Failed instance:" | tee -a /var/log/schoolbox/upgrade.log
+      tail -n +2 "$CIRCUIT_BREAKER_FILE" | tee -a /var/log/schoolbox/upgrade.log
+      return 1  # Circuit breaker is active
+    else
+      echo "Circuit breaker timeout expired for backups. Removing lock and proceeding..." | tee -a /var/log/schoolbox/upgrade.log
+      clear_backup_circuit_breaker
+      return 0  # Circuit breaker expired, can proceed
+    fi
+  fi
+  return 0  # No circuit breaker, can proceed
+}
+
+# Trigger backup circuit breaker
+trigger_backup_circuit_breaker() {
+  local failed_instance=$1
+  mkdir -p "$CIRCUIT_BREAKER_DIR"
+
+  # First line: timestamp, second line: failed instance ID
+  echo "$(date +%s)" > "$CIRCUIT_BREAKER_FILE"
+  echo "$failed_instance" >> "$CIRCUIT_BREAKER_FILE"
+
+  echo "Circuit breaker triggered for database backups. Package installation will not proceed for 24 hours." | tee -a /var/log/schoolbox/upgrade.log
+  send_slack_alert "$failed_instance"
+}
+
+# Send Slack alert via webhook
+send_slack_alert() {
+  local failed_instance=$1
+  local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+  local webhook_url="https://hooks.slack.com/services/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"
+
+  local message="*[ALERT] Schoolbox database backup failed for ${failed_instance}*
+
+Schoolbox database backup failed during package upgrade and circuit breaker activated.
+
+*Failed instance:* ${failed_instance}
+*Timestamp:* ${timestamp}
+*Log file:* /var/log/schoolbox/upgrade.log
+
+Package installation will not proceed for 24 hours.
+Manual intervention required.
+
+To manually reset the circuit breaker:
+\`\`\`
+rm /var/lock/schoolbox-upgrade/backup.lock
+\`\`\`
+"
+
+  # Send to Slack webhook
+  curl -X POST -H 'Content-type: application/json' \
+    --data "{\"text\":\"${message}\"}" \
+    "$webhook_url" 2>&1 | tee -a /var/log/schoolbox/upgrade.log
+}
+
+# Clear backup circuit breaker
+clear_backup_circuit_breaker() {
+  rm -f "$CIRCUIT_BREAKER_FILE"
+}
+
 case "$1" in
     install)
     ;;
@@ -17,6 +92,12 @@ case "$1" in
             echo "Non-primary node. Skipping databases backup" | tee -a /var/log/schoolbox/upgrade.log
         else
             echo "Primary node. Backing up databases" | tee -a /var/log/schoolbox/upgrade.log
+
+            # Check circuit breaker FIRST before attempting any backups
+            if ! check_backup_circuit_breaker; then
+                echo "Error: Backup circuit breaker is active. Aborting package installation." | tee -a /var/log/schoolbox/upgrade.log
+                exit 1
+            fi
 
             instance_list=$(/usr/local/bin/schoolbox-read-instances --ini /etc/schoolbox/instances.ini --option instance-list)
             for instance_id in $instance_list; do
@@ -28,11 +109,13 @@ case "$1" in
             done
 
             any_failures=0
+            failed_instance=""
             for group in $pids; do
                 pid=$(echo "$group" | cut -d '-' -f1)
                 instance_id=$(echo "$group" | cut -d '-' -f2)
                 if ! wait "$pid"; then
                     echo "Error: Failed to backup instance $instance_id" | tee -a /var/log/schoolbox/upgrade.log
+                    failed_instance="$instance_id"
                     any_failures=1
                 else
                     echo "Backup complete for $instance_id" | tee -a /var/log/schoolbox/upgrade.log
@@ -41,8 +124,12 @@ case "$1" in
 
             if [ $any_failures != '0' ]; then
                 echo "Error: Backup failures detected. Exiting." | tee -a /var/log/schoolbox/upgrade.log
+                trigger_backup_circuit_breaker "$failed_instance"
                 exit 1;
             fi
+
+            # All backups succeeded, clear any existing circuit breaker
+            clear_backup_circuit_breaker
             echo "Finished backing up instances" | tee -a /var/log/schoolbox/upgrade.log
         fi
 
