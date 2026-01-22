@@ -49,14 +49,20 @@ class Config
         'auto',
     ];
 
-    // field name and types
+    // field keys
     public const string FIELD_PROVIDER = 'provider';
     public const string FIELD_AIKEY = 'ai_key';
     public const string FIELD_RESOURCE_NAME = 'resource_name';
     public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
     public const string FIELD_MODEL = 'model';
+    public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
     public const string FIELD_OUTPUT_QUALITY = 'output_quality';
+
+    // field types
+    public const string FIELD_TYPE_SELECT   = 'select';
+    public const string FIELD_TYPE_INPUT    = 'input';
+    public const string FIELD_TYPE_TEXTAREA = 'textarea';
 
 
     /* Predefined config structs: as you add more providers, don't forget to pile them in here
@@ -390,7 +396,7 @@ class Config
             // * add output quality
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
-                'type'    => 'select',
+                'type'    => self::FIELD_TYPE_SELECT,
                 'options' => self::OUTPUT_QUALITY_OPTIONS,
                 'section' => self::SECTION_OPENAI,
             ];
