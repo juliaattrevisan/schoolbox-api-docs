@@ -48,6 +48,7 @@ export default {
             numDeclined: this.event.attendance.payload.attendees.declined,
             guests: this.event.attendance.payload.attendees.guests,
             canInvite: this.event.attendance.payload.currentUser.canInvite,
+            resourceBookingEnabled: this.event.resourceBookingEnabled,
             resourceBookings: this.event.resourceBookings || [],
 
             /* Vue Select
@@ -665,7 +666,7 @@ export default {
             </template>
         </div>
 
-        <div v-if="resourceBookings" class="small-12 medium-8 island">
+        <div v-if="resourceBookingEnabled" class="small-12 medium-8 island">
             <section v-if="resourceBookings.length > 0" class="detail content">
                 <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
                     <h2>Resource Bookings</h2>
