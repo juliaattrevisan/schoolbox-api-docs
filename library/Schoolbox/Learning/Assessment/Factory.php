@@ -343,11 +343,21 @@ class Factory
         $this->setHasSelfAssessed(trim($post['hasSelfAssessed'] ?? ''));
         $this->setUrl(trim($post['url'] ?? ''));
 
+        /* Quiz and Dialog Agents share this $post element; same name and same requirements:
+         * numeric and no negative values allowed (coerced to zero/unlimited)
+         *
+         * Duration hours must be greater than or equal to zero
+         * Duration minutes must be greater than or equal to zero
+         */
+        $durationHours = max((int)($post['durationHours'] ?? 0), 0);
+        $durationMinutes = max((int)($post['durationMinutes'] ?? 0), 0);
+
+        $this->setDurationHours($durationHours);
+        $this->setDurationMinutes($durationMinutes);
+
         /* Quiz needs this to instantiate correctly
          */
         $this->setLearnosityReference((string)($post['learnosityReference'] ?? ''));
-        $this->setDurationHours((int)($post['durationHours'] ?? 0));
-        $this->setDurationMinutes((int)($post['durationMinutes'] ?? 0));
         $this->setReadingTimeDurationHours((int)($post['readingTimeDurationHours'] ?? 0));
         $this->setReadingTimeDurationMinutes((int)($post['readingTimeDurationMinutes'] ?? 0));
         $this->setShuffleItems((int)($post['shuffleItems'] ?? 0));
