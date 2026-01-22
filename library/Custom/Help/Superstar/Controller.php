@@ -248,6 +248,75 @@ class Controller extends Base
                 ],
             ],
         ],
+        // OLC 2026
+        2026 => [
+            // 1. Fundamentals
+            '139' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 91,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 90,
+                    'route' => null,
+                ],
+            ],
+            // 2. Teaching & Learning
+            '138' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 97,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 96,
+                    'route' => null,
+                ],
+            ],
+            // 3. Marcomms
+            '142' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 93,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 92,
+                    'route' => null,
+                ],
+            ],
+            // 4. Pastoral Care
+            '141' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 94,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => null, // TODO What is this?
+                    'route' => null,
+                ],
+            ],
+            // 5. Extra-Curricular
+            '140' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 89,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => null, // TODO What is this?
+                    'route' => null,
+                ],
+            ],
+            // 6. Superuser
+            '137' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 95,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => null, // TODO What is this?
+                    'route' => null,
+                ],
+            ],
+        ],
     ];
 
 
