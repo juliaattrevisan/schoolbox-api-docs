@@ -356,10 +356,10 @@ class Validator
         // check if start/end dates are logical (when we are not looking at all day events)
         if (!$allDayBool) {
             // grab dates, either from post, or from existing event
-            $startDateTime = $requestPost['startDate'] ?
+            $startDateTime = array_key_exists('startDate', (array)$requestPost) ?
                 new Alaress_Date_Format($requestPost['startDate'], $this->getValidFormatsForDateField('startDate', $allDayBool)) :
                 $event->getStartDateTime();
-            $endDateTime = $requestPost['endDate'] ?
+            $endDateTime = array_key_exists('endDate', (array)$requestPost) ?
                 new Alaress_Date_Format($requestPost['endDate'], $this->getValidFormatsForDateField('endDate', $allDayBool)) :
                 $event->getEndDateTime();
             // compare start/end dates
