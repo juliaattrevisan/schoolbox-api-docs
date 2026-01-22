@@ -610,9 +610,36 @@ class Controller extends Base
 
 
     /**
-     * Update $event with $_POST data
+     * Update $event with $_POST data from the 'Create/Edit Event' form.
      *
-     * There's some validation checks to ensure that you can write to the $_POST args specified
+     * This function was added to ensure checkbox fields save when the 'Create/Edit Event' form is saved.
+     * See the explanation in the comment inside the function.
+     *
+     * @param Event $event
+     * @throws MapperException
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Exception
+     */
+    public function postModifyForForm(Event $event): void
+    {
+        // If data for any checkbox field is missing from $this->requestPost, assume the checkbox has been left
+        // unticked, and so add a new data item for that checkbox with a boolean false value.
+        // (If this was not done, the postModify() function would assume the request came from an API user, who intends
+        //  to update other fields in the record while leaving the values of the missing checkbox fields unchanged.)
+        if ($this->requestPost->get('showAttendees') === null) {
+            $this->requestPost->offsetSet('showAttendees', false);
+        }
+
+        $this->postModify($event);
+    }
+
+
+    /**
+     * Update $event with $_POST data sent via an API request.
+     * Partial updates are supported, so the $_POST data may contain a subset of fields from the 'Create/Event Form'.
      *
      * @param Event $event
      * @throws MapperException
