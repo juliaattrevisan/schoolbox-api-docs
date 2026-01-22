@@ -81,15 +81,19 @@ type PastoralComment = {
 type PastoralAttachment = {
     id: number;
     realname: string;
+    route: string;
     storage: {
         filename: string;
-        mimetype: {
-            isImage: boolean;
-        };
         mime: string;
         hash: string;
+        _links: {
+            fetch: string;
+            icon: string;
+            image?: string;
+            stream?: string;
+            poster?: string;
+        };
     };
-    route: string;
 };
 
 /**

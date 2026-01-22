@@ -106,7 +106,7 @@ window.Vue.onMounted((): void => {
                             <div class="card attachment small-12">
                                 <a data-plugin="preview" :href="attachment.route" :title="attachment.storage.filename">
                                     <img
-                                        v-if="attachment.storage.mimetype.isImage"
+                                        v-if="attachment.storage._links.image"
                                         :src="`/storage/image.php?hash=${attachment.storage.hash}&size=square64`"
                                         :alt="`Download: ${attachment.realname}`"
                                     />

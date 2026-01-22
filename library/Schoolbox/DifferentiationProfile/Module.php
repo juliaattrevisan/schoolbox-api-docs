@@ -17,6 +17,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use http\Exception\UnexpectedValueException;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
@@ -29,6 +30,7 @@ use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelsMapper;
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -166,6 +168,7 @@ class Module extends BaseModule
             $this->injector->get('router.generator'),
             $this->injector->get('authorizer'),
             $this->injector->get('user'),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
         );
 
         return new Controller(

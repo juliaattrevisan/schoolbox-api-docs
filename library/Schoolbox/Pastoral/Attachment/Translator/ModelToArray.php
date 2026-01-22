@@ -23,20 +23,30 @@ class ModelToArray
     use GetRouteIfAuthorized;
 
     /**
+     * Storage translator, for translating the storage object.
+     *
+     * @var callable
+     */
+    private $storageTranslator;
+
+    /**
      * Constructor
      *
-     * @param Generator  $routeGenerator
-     * @param Authorizer $authorizer
-     * @param User       $currentUser
+     * @param Generator              $routeGenerator
+     * @param Authorizer             $authorizer
+     * @param User                   $currentUser
+     * @param StorageModelToArray    $storageTranslator
      */
     public function __construct(
         Generator $routeGenerator,
         Authorizer $authorizer,
         User $currentUser,
+        callable $storageTranslator,
     ) {
         $this->routeGenerator = $routeGenerator;
         $this->authorizer     = $authorizer;
         $this->currentUser    = $currentUser;
+        $this->storageTranslator = $storageTranslator;
     }
 
     /**
@@ -50,14 +60,7 @@ class ModelToArray
         return [
             'id' => $model->getId(),
             'realname' => $model->getRealname(),
-            'storage' => [
-                'filename' => $model->getStorage()->getFilename(),
-                'mimetype' => [
-                    'isImage' => $model->getStorage()->getMimetype()->isImage(),
-                ],
-                'mime' => $model->getStorage()->getMime(),
-                'hash' => $model->getStorage()->getHash(),
-            ],
+            'storage' => call_user_func($this->storageTranslator, $model->getStorage()),
             'route' => $this->getRouteIfAuthorized(
                 'pastoral.getStudentRecordAttachment',
                 [

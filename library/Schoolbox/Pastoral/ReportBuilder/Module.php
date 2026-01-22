@@ -40,6 +40,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
 use Schoolbox\Pastoral\Attachment\Translator\ModelToArray as PastoralAttachmentTranslator;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 
 // These mappers are injected into controllers where required
 
@@ -138,6 +139,7 @@ class Module extends BaseModule
             $this->injector->get('router.generator'),
             $this->injector->get('authorizer'),
             $this->injector->get('user'),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
         );
 
         return new Controller(
