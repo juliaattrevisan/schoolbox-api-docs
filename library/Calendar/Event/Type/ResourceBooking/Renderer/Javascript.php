@@ -158,7 +158,8 @@ class Javascript extends Base
             'start'      => $start,
             'end'        => $end,
 
-            /* Whether you can edit this event or not
+            /* Whether you can edit this event or not.
+             * Note this also determines whether the calendar item is draggable.
              */
             'editable'   => false,
 
