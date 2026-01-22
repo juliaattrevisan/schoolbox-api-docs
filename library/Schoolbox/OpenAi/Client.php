@@ -49,6 +49,15 @@ class Client implements IClient
     private const string ENDPOINT_CHAT_COMPLETIONS = '/chat/completions';
 
     /**
+     * The endpoint which OpenAI-compatible clients use for their Moderations
+     * feature.
+     *
+     * Note: This is currently only supported by the direct OpenAI API,
+     * Azure has a completely different way of approaching this.
+     */
+    private const string ENDPOINT_MODERATIONS = '/moderations';
+
+    /**
      * Constructor
      *
      * @param HttpClient            $httpClient  The HTTP client, for making requests to the AI provider.
@@ -159,6 +168,22 @@ class Client implements IClient
             $chunkSize ?? self::DEFAULT_CHUNK_SIZE,
             $eventStreamListener,
             new LogHandler\Composite(...$logListeners),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function createModerations(array $payload, Log\Model $log): ResponseInterface
+    {
+        $url      = $this->generateUrl(self::ENDPOINT_MODERATIONS);
+        $log      = $log->setEndpoint($url->__toString());
+        $request  = new Request('POST', $url, $this->authHeaders);
+        $response = $this->sendRequest($request, $payload, $log, false);
+        return $this->handleNonStreamedResponse(
+            $response,
+            $log,
+            new LogHandler\ModerationsApi\LogDiagnostics(),
         );
     }
 
