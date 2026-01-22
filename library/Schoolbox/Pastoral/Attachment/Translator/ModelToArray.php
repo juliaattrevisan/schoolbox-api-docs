@@ -35,7 +35,7 @@ class ModelToArray
      * @param Generator              $routeGenerator
      * @param Authorizer             $authorizer
      * @param User                   $currentUser
-     * @param StorageModelToArray    $storageTranslator
+     * @param callable               $storageTranslator
      */
     public function __construct(
         Generator $routeGenerator,
