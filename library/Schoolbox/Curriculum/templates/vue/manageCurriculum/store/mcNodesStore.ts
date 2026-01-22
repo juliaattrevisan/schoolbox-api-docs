@@ -11,11 +11,11 @@ import {
     getBreadcrumbs,
     getEmptyNode,
 } from "@schoolboxCurriculum/js/nodeUtils";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
@@ -187,7 +187,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             } else {
                 store.hasLoadError = true; // show the load error display state
             }
-        } catch (error) {
+        } catch {
             store.hasLoadError = true; // show the load error display state
         } finally {
             store.isLoading = false;
@@ -219,7 +219,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             } else {
                 throw new Error((responseJson as { title: string }).title);
             }
-        } catch (error) {
+        } catch {
             hasLoadError.value = true;
         } finally {
             isLoading.value = false;

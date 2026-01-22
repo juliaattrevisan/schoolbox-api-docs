@@ -133,7 +133,7 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
 function addListenersForDisablingSubmitButtons(
     ckeditorSourceEl: SbxEditorElement,
     containingForm: HTMLFormElement | null,
-    submitButtons: Array<HTMLElement>,
+    submitButtons: HTMLElement[],
 ): void {
     submitButtons.forEach((button) => {
         // Now we know we have a button, assign it to a const so it doesn't get redefined in the event listeners after loops
@@ -242,9 +242,9 @@ function setupOnUpdateTextEventHandler(
  * The purpose of doing this is to fix the disabled/enabled state of the form's submit button(s) if external code has
  * enabled the submit button without checking whether any of the CKEditor textareas are overfilled.  If any are overfilled,
  * the submit button should be disabled.
- * @param { Array<MutationRecord> } mutationList - An array of MutationRecords provided by a MutationObserver.
+ * @param mutationList - An array of MutationRecords provided by a MutationObserver.
  */
-const submitButtonMutationObserver = new MutationObserver((mutationList: Array<MutationRecord>) => {
+const submitButtonMutationObserver = new MutationObserver((mutationList: MutationRecord[]) => {
     mutationList.forEach((mutation) => {
         if (mutation.type !== "attributes" || mutation.attributeName !== "disabled") {
             return; // Skip mutations we are not interested in.
@@ -369,7 +369,7 @@ export function insertWordCount(sourceElement: SbxEditorElement, editor: SbxEdit
 
         if (config.addMaxCharCountDefaultEventListeners) {
             const containingForm = sourceElement.closest("form");
-            const submitButtons: Array<HTMLButtonElement | HTMLInputElement> =
+            const submitButtons: (HTMLButtonElement | HTMLInputElement)[] =
                 containingForm === null
                     ? []
                     : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));

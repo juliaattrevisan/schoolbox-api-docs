@@ -45,6 +45,4 @@ export interface ImageComponentData {
  * The json data thats loaded into the table,
  * as this can vary, its just a key value pair of strings
  */
-export interface Data {
-    [key: string]: unknown;
-}
+export type Data = Record<string, unknown>;

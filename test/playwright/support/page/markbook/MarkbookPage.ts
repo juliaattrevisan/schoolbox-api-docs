@@ -327,9 +327,9 @@ export default class MarkbookPage {
     async updateActivityWeightAndVerifyGrades(
         assessmentId: string | number,
         weight: string | number,
-        studentIds: Array<string | number>,
+        studentIds: (string | number)[],
         expectedClassAverage: string,
-        expectedStudentGrades: Array<string>,
+        expectedStudentGrades: string[],
     ): Promise<void> {
         await this.page.getByTestId(MarkbookPage.DATA_TEST_MARKBOOK_CLASS_AVERAGE).click();
         const assessmentCell = this.page.locator(`td[data-assessment="${assessmentId}"]`).first();
@@ -358,7 +358,7 @@ export default class MarkbookPage {
      * @param studentIds - An array of student IDs to verify
      * @param expectedStudentGrades - An array of expected student grades
      */
-    async verifyStudentGrades(studentIds: Array<string | number>, expectedStudentGrades: Array<string>): Promise<void> {
+    async verifyStudentGrades(studentIds: (string | number)[], expectedStudentGrades: string[]): Promise<void> {
         for (let i = 0; i < studentIds.length; i += 1) {
             const studentId = studentIds[i];
             const expectedStudentGrade = expectedStudentGrades[i];
@@ -382,8 +382,8 @@ export default class MarkbookPage {
      * @param weights - An array of weights to set
      */
     async updateMultipleActivityWeights(
-        assessmentIds: Array<string | number>,
-        weights: Array<string | number>,
+        assessmentIds: (string | number)[],
+        weights: (string | number)[],
     ): Promise<void> {
         await this.page.getByTestId(MarkbookPage.DATA_TEST_MARKBOOK_CLASS_AVERAGE).click();
         for (let i = 0; i < assessmentIds.length; i += 1) {
@@ -404,8 +404,8 @@ export default class MarkbookPage {
      * @param visibilityOptions - An array of visibility options to select: '0 for Staff Only', '1 for Staff and Students', '2 for Staff, Students and their Parents'
      */
     async updateMultipleActivityMarkVisibilities(
-        assessmentIds: Array<string | number>,
-        visibilityOptions: Array<string | number>,
+        assessmentIds: (string | number)[],
+        visibilityOptions: (string | number)[],
     ): Promise<void> {
         for (let i = 0; i < assessmentIds.length; i += 1) {
             const assessmentId = assessmentIds[i];
@@ -426,8 +426,8 @@ export default class MarkbookPage {
      * @param visibilities - An array of visibilities to check
      */
     async checkVisibilityOptionsSelected(
-        assessmentIds: Array<string | number>,
-        visibilities: Array<string | number>,
+        assessmentIds: (string | number)[],
+        visibilities: (string | number)[],
     ): Promise<void> {
         for (let i = 0; i < assessmentIds.length; i += 1) {
             const assessmentId = assessmentIds[i];

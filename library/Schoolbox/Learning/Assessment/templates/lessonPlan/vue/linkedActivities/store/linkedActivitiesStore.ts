@@ -114,7 +114,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
             // This means that if one fails but others succeed, then the
             // activity list is out of sync with the backend.
             linkedActivities.value = [...selectedActivities.value];
-        } catch (error) {
+        } catch {
             toast.timeout({ text: "Save failed", isSuccess: false });
         } finally {
             saveInProgress.value = false;

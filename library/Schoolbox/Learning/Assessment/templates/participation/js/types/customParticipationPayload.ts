@@ -28,7 +28,7 @@ export function postIncludeParticipant(
 }
 
 type IncludeExistingParticipantApiResponse = {
-    hasInteraction?: { [id: number]: boolean };
+    hasInteraction?: Record<number, boolean>;
 };
 
 type IncludeExistingParticipantApiPayload = {

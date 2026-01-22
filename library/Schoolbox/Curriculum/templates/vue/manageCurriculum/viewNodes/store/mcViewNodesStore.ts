@@ -4,14 +4,14 @@
  */
 
 import { defineStore } from "pinia";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useSearchStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useAddSubsectionStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcUpdateNodeStore";
-/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useAddCurriculumStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcAddCurriculumStore";
 import { useNodeUsageStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcNodeUsageStore";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";

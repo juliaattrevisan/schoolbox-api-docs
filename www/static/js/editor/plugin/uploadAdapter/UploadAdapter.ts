@@ -61,7 +61,7 @@ export default class UploadAdapter {
      * @returns - return the reject if the the load has failed
      */
     onLoaded(resolve: UploadResolve, reject: UploadReject, genericErrorText: string): void | UploadReject {
-        const response = this.xhr.response as AsyncUploadResponse;
+        const response = this.xhr.response as AsyncUploadResponse<false>;
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }

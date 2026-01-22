@@ -19,15 +19,15 @@ interface Props {
     /**
      * the endpoint to retrieve all the group data from
      */
-    dataEndpoint: string;
+    dataEndpoint?: string;
     /**
      * can only view the currently selected codes, not edit them
      */
-    isReadOnly: boolean;
+    isReadOnly?: boolean;
     /**
      * number of nodes to retrieve from the endpoint
      */
-    uiLimit: number;
+    uiLimit?: number;
     /**
      * route for the curriculum coverage report
      */

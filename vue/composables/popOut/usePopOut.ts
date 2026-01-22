@@ -130,7 +130,7 @@ export function usePopOut(
         contentElement: FloatingElement,
     ): Promise<ComputePositionReturn> {
         const position = await computePosition(buttonElement, contentElement, {
-            placement: optimalPlacement as Placement,
+            placement: optimalPlacement,
             middleware: [
                 flip({
                     boundary: document.querySelector("#container") as Boundary,
@@ -158,7 +158,7 @@ export function usePopOut(
     }
 
     /**
-     * Open the content using @floating-ui/dom to position it relative to the button
+     * Open the content using \@floating-ui/dom to position it relative to the button
      * https://floating-ui.com/
      */
     async function open(): Promise<void> {
@@ -274,7 +274,7 @@ export function usePopOut(
 
     /**
      * When the button is clicked, close the content if it's open,
-     * otherwise open it using @floating-ui/dom to position it relative to the trigger
+     * otherwise open it using \@floating-ui/dom to position it relative to the trigger
      * while also trying to keep it in the viewport
      */
     async function onButtonSelected(): Promise<void> {

@@ -71,7 +71,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
                 cancel();
                 return successMessage;
             }
-        } catch (error) {
+        } catch {
             throw new Error();
         }
 

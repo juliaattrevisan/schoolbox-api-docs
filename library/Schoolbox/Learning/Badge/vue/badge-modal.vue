@@ -14,7 +14,7 @@ interface Props {
     /**
      * whether the modal is open
      */
-    isOpen: boolean;
+    isOpen?: boolean;
     /**
      * the badge to display
      */

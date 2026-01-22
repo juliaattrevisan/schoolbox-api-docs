@@ -91,10 +91,7 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code" | "enable
     previousIsVisible: boolean; // to track if the node was visible previously (used when moving between the only show gaps toggle)
     isExpanded: boolean; // to track if the node is expanded in the report
     hasNoUsages: boolean; // to track if the node has no usages (including on children nodes)
-    storedUsages: {
-        // to store saved usages for the node
-        [key: string]: number;
-    };
+    storedUsages: Record<string, number>; // to store saved usages for the node
 };
 
 /**

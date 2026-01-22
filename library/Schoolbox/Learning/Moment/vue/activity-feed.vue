@@ -392,7 +392,7 @@ async function deleteFeedItem(targetItem: FeedItem): Promise<void> {
             data.value = newData;
             metadata.count -= 1;
         });
-    } catch (error) {
+    } catch {
         toast.timeout({ text: "Could not delete", isSuccess: false });
     } finally {
         isDeleteModalOpen.value = false;

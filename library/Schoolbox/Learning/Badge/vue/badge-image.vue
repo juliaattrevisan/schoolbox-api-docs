@@ -3,7 +3,7 @@ import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 
 interface Props {
     badge: Pick<Badge, "image" | "name" | "_links">;
-    css: string;
+    css?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {

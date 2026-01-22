@@ -76,10 +76,7 @@ export const trendOptions: Options = {
  * @param recordsOrPoints - The type of data to display (records or points).
  * @returns - The chart options for the trend.
  */
-export function getChartOptions(
-    rowData: { [key: string]: RowOptions },
-    recordsOrPoints: "records" | "points",
-): Options {
+export function getChartOptions(rowData: Record<string, RowOptions>, recordsOrPoints: "records" | "points"): Options {
     const trend = rowData.trend as Trend;
     if (trend === undefined) {
         return trendOptions;

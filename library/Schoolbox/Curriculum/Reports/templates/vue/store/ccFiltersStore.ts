@@ -15,7 +15,7 @@ export const useFiltersStore = defineStore("ccFilters", () => {
         },
         {
             value: ReportOptionValues.UNIT,
-            label: `${locale.unit.proper()}`,
+            label: locale.unit.proper(),
         },
         {
             value: ReportOptionValues.LEARNING_ACTIVITY,
@@ -23,7 +23,7 @@ export const useFiltersStore = defineStore("ccFilters", () => {
         },
         {
             value: ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN,
-            label: `${locale.lessonPlan.properPlural()}`,
+            label: locale.lessonPlan.properPlural(),
         },
         {
             value: ReportOptionValues.RUBRIC,

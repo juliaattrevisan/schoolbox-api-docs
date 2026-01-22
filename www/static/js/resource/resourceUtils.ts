@@ -28,7 +28,7 @@ export interface AsyncUploadResponseError {
     hash: "";
 }
 
-export interface AsyncUploadResponseSuccess<IsMulti extends boolean = false> {
+export interface AsyncUploadResponseSuccess<IsMulti extends boolean> {
     success: true;
     error: 200;
     message: "OK";
@@ -42,7 +42,7 @@ export interface AsyncUploadResponseSuccess<IsMulti extends boolean = false> {
 }
 
 // A response from /storage/asyncUpload.php
-export type AsyncUploadResponse<IsMulti extends boolean = false> =
+export type AsyncUploadResponse<IsMulti extends boolean> =
     | AsyncUploadResponseError
     | AsyncUploadResponseSuccess<IsMulti>;
 

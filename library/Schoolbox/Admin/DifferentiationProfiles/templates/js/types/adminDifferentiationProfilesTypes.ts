@@ -25,7 +25,7 @@ export type Field = {
  * A differentiation profile module
  */
 export type Module = {
-    fields: { [key: string]: Field };
+    fields: Record<string, Field>;
     isSortable?: boolean;
 };
 
@@ -45,6 +45,6 @@ export type Header = {
  */
 export type Data = {
     featureToggle: Toggle;
-    modules: { [key: string]: Module };
-    headers: { [key: string]: Header };
+    modules: Record<string, Module>;
+    headers: Record<string, Header>;
 };

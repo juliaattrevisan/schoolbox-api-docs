@@ -84,11 +84,11 @@ declare global {
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             l10n: RosettaStone;
-            firebaseApps: Array<{
+            firebaseApps: {
                 appIdentifier: string;
-                publicConfiguration: { [key: string]: unknown };
+                publicConfiguration: Record<string, unknown>;
                 webPushPublicKey: string;
-            }>;
+            }[];
             // Curriculum nodes global storage
             storedNodes?: string;
             isStoringNodes?: boolean;

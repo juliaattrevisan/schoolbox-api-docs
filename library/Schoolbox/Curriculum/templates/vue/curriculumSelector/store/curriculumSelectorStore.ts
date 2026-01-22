@@ -5,10 +5,10 @@
 import { defineStore } from "pinia";
 import { useDomContentLoaded } from "@schoolboxVue/composables/events/useDomContentLoaded";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-/* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Same as [SA-18428] */
 import { useNodesStore } from "./csAllNodesStore";
 import { useCurrentNodesStore } from "./csCurrentNodesStore";
-/* eslint-disable-next-line import/no-cycle -- Same as [SA-18428] */
+/* eslint-disable-next-line import-x/no-cycle -- Same as [SA-18428] */
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSharedStore } from "./csSharedStore";
 

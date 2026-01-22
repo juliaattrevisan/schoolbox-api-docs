@@ -237,9 +237,9 @@ export default class Form {
      */
     async createCompositeAudience(
         dropdown1: string,
-        audienceType1: Array<string>,
+        audienceType1: string[],
         dropdown2: string,
-        audienceType2: Array<string>,
+        audienceType2: string[],
     ): Promise<void> {
         await this.page.locator("button.button.icon-drag-drop").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
@@ -267,7 +267,7 @@ export default class Form {
      * tick the checkboxes
      * @param checkboxes - The checkboxes to tick
      */
-    async tickCheckboxes(checkboxes: Array<string>): Promise<void> {
+    async tickCheckboxes(checkboxes: string[]): Promise<void> {
         const checkbox = checkboxes.pop();
         if (checkbox) {
             await this.page.locator(`label[for="${checkbox}"]`).click();

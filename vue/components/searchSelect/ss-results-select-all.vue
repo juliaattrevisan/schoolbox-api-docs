@@ -62,7 +62,7 @@ const isSelected = window.Vue.computed(() => isAllResultsSelected.value);
  * toggle all depending on current check status
  * @param event - the click event
  */
-function onClick(event?: MouseEvent | undefined): void {
+function onClick(event?: MouseEvent): void {
     // ignore input label clicks, which get picked up due to the click listener on the parent div
     if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
         return;

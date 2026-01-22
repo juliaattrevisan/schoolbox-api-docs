@@ -44,7 +44,7 @@ export type EditorCreatedEventInfo = {
 export type EditorDeleteEventInfo = {
     editor: SbxEditor;
     containingFormId: string;
-    submitButtons: Array<HTMLInputElement | HTMLButtonElement>;
+    submitButtons: (HTMLInputElement | HTMLButtonElement)[];
 };
 
 /**
@@ -54,7 +54,7 @@ export type EditorDeleteEventInfo = {
 export type EditorDeletedEventInfo = {
     keyOfDeletedEditor: string;
     containingFormId: string;
-    submitButtons: Array<HTMLInputElement | HTMLButtonElement>;
+    submitButtons: (HTMLInputElement | HTMLButtonElement)[];
 };
 
 // The map of event names to event objects that are dispatched on the document

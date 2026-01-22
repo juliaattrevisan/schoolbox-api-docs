@@ -7,7 +7,7 @@ interface Props {
     /**
      * The number of points
      */
-    points: number;
+    points?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {

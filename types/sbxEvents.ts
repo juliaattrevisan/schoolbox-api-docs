@@ -29,5 +29,6 @@ export interface SbxGlobalDocumentEventHandlerMap
 
 /**
  * FOR EVENTS DISPATCHED TO ANY ELEMENT
+ * For now, this is identical to SbxGlobalDocumentEventHandlerMap
  */
-export interface SbxGlobalElementEventHandlerMap extends EditorElementEventHandlerMap {}
+export type SbxGlobalElementEventHandlerMap = EditorElementEventHandlerMap;

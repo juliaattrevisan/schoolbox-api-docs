@@ -35,7 +35,7 @@ export function hasErrorMessage(error: unknown): boolean {
  * Exhaustive type checking for switch statements
  * @param x - The value that should never be reached
  * @param message - The message to log if this happens to be reached (optional)
- * @throws always
+ * @throws {Error} always
  */
 export function assertUnreachable(x: never, message?: string): never {
     // only console.error if message is undefined, since if it's defined we likely are handling this intentionally elsewhere

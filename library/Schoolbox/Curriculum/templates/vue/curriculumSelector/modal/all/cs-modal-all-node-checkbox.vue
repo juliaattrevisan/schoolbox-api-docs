@@ -14,7 +14,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); // to ensure the input/label id is unique
 
 interface Props {
-    node: Node; // to prefill the input
+    node?: Node; // to prefill the input
 }
 const props = withDefaults(defineProps<Props>(), {
     node: () => getEmptyNode(),
@@ -37,7 +37,7 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * @returns {boolean} - whether the checkbox is visible or not
  */
 const isVisible = window.Vue.computed(() => {
-    return (isIdSet.value && (store.isSelectAll as boolean)) || (isIdSet.value && hasCode.value);
+    return (isIdSet.value && store.isSelectAll) || (isIdSet.value && hasCode.value);
 });
 
 /**

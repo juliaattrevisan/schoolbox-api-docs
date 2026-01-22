@@ -149,7 +149,7 @@ async function saveMark(): Promise<void> {
         }
         window.removeEventListener("beforeunload", beforeUnloadHandler);
         isSaving.value = false;
-    } catch (error) {
+    } catch {
         hasError.value = true;
     }
     await timeout(2000);

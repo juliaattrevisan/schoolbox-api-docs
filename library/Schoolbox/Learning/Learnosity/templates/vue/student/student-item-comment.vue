@@ -105,7 +105,7 @@ async function saveComment(): Promise<void> {
         }
         window.removeEventListener("beforeunload", beforeUnloadHandler);
         isSaving.value = false;
-    } catch (error) {
+    } catch {
         isSaving.value = false;
         hasError.value = true;
     }

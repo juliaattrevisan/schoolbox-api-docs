@@ -7,7 +7,7 @@
  * @param url - the url to go to, or leave blank to retrieve just the returnUrl param
  * @returns - The returnUrl parameter with the current path encoded in base64
  */
-export function getReturnUrl(url?: string | undefined): string {
+export function getReturnUrl(url?: string): string {
     const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     const returnUrl = `returnUrl=${window.btoa(currentPath)}`;
 
@@ -73,7 +73,7 @@ export function isSignificantUrlChange(oldUrl: string, newUrl: string, ignorePar
 
         // Check if all parameters and values match
         return oldKeys.some((key) => oldParams.get(key) !== newParams.get(key));
-    } catch (error) {
+    } catch {
         // If URL parsing fails, be safe and assume URLs have changed
         return true;
     }

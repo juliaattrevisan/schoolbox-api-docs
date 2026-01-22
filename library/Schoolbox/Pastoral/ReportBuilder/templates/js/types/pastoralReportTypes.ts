@@ -41,11 +41,7 @@ export type Tab = {
 /**
  * Severity colors configuration
  */
-export type SeverityColors = {
-    [severityId: number]: {
-        back: string;
-    };
-};
+export type SeverityColors = Record<number, { back: string }>;
 
 /**
  * Configuration object for pastoral settings
@@ -121,8 +117,8 @@ export type RowOptions = User | RecordsAndPoints | TypeSubType | Trend;
 export type TablePayload = {
     data: {
         tableHeaders: TableHeader[];
-        totalRow: { [key: string]: RowOptions };
-        rows: { [key: string]: RowOptions }[];
+        totalRow: Record<string, RowOptions>;
+        rows: Record<string, RowOptions>[];
     };
     metadata: Metadata;
 };

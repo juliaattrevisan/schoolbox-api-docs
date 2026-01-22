@@ -51,7 +51,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     const actionQueue = window.Vue.ref<QueuedFieldAction[]>([]);
 
     // A map of field keys to any errors that occurred while processing actions for that field
-    const actionErrors = window.Vue.ref<{ [key: string]: string }>({});
+    const actionErrors = window.Vue.ref<Record<string, string>>({});
 
     /**
      * Get the name of a field as it should be displayed in the UI

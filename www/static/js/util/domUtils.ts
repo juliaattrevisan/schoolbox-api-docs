@@ -238,7 +238,7 @@ export function injectScript(src: string): Promise<void> {
                     resolve();
                 });
                 script.addEventListener("error", (e) => {
-                    reject(e.error);
+                    reject(e.error instanceof Error ? e.error : new Error("Script failed to load"));
                 });
             }
 
@@ -254,7 +254,7 @@ export function injectScript(src: string): Promise<void> {
         });
         script.addEventListener("error", (e) => {
             console.error("injectScript failed for file ", src);
-            reject(e.error);
+            reject(e.error instanceof Error ? e.error : new Error("Script failed to load"));
         });
         script.src = src;
         document.head.appendChild(script);

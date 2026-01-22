@@ -69,7 +69,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
                     toast.timeout({ text: responseText.title, isSuccess: false });
                 }
-            } catch (error) {
+            } catch {
                 toast.timeout({ text: "There was an unexpected error", isSuccess: false });
             } finally {
                 isProcessing.value = false;

@@ -20,7 +20,7 @@ import { IMAGE_LIGHTBOX_CREATE } from "./imageLightboxEvent";
  */
 function initLightGallery(): void {
     // Group the images by their rel attribute
-    const lightboxGroups: { [key: string]: HTMLElement[] } = {};
+    const lightboxGroups: Record<string, HTMLElement[]> = {};
     const lightboxImages: NodeListOf<HTMLElement> = document.querySelectorAll("a[rel^='lightbox']");
     lightboxImages.forEach((image) => {
         const rel = image.getAttribute("rel");
