@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\DialogAgent\Response\Translator;
 use Schoolbox\API\Translator\AbstractLinks;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\NextRoutes;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model;
-use Schoolbox\Learning\Assessment\DialogAgent\Response\Lookup\Status;
 
 /**
  * Dialog Agent Response Links

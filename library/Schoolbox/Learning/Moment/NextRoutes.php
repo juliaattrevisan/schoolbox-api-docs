@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Learning\Moment;
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\User;
 

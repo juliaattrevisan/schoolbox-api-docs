@@ -82,7 +82,9 @@ class NextRoutes
              */
             self::ACTION_SUBMIT => null !== $authoritativeResponse->getSessionId(),
             self::ACTION_RESET => null !== $authoritativeResponse->getSessionId(),
-            /* reopen is only possible whilst in progress */
+            /* reopen is not possible whilst in progress; reopening is basically "unsubmitting" so it can only occur
+             * from a Submitted state
+             */
             self::ACTION_REOPEN => false,
             /* A session identifier may or may not exist, not yet submitted: participant is still doing the stuff
              * and maybe needs help. Perhaps they need help before they even get to the point of having a session id.
