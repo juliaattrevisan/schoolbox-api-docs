@@ -88,7 +88,7 @@ function clearSelection(): void {
                     class="icon-staff-students button l-flex__item--1-auto"
                     @click.prevent="handleActionSelected(selectedList, 'exclude')"
                 >
-                    Exclude
+                    Exclude {{ selectedList.length === 1 ? "Student" : "Students" }}
                 </button>
                 <button
                     v-if="props.customisations.length > 0"

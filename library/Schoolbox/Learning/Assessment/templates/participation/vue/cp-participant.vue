@@ -198,7 +198,7 @@ function onOpenIncludeInExistingModal(): void {
                         </li>
                         <li>
                             <button class="icon-staff-students" @click.prevent="onActionSelected('exclude')">
-                                Exclude
+                                Exclude Student
                             </button>
                         </li>
                         <li>
