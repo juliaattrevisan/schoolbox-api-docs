@@ -8,6 +8,7 @@ import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 
 interface Props {
     id: string;
+    required?: boolean;
     config?: Omit<PartialSbxEditorConfig, "targetElements">;
 }
 
@@ -50,5 +51,11 @@ window.Vue.onBeforeUnmount(async () => {
 </script>
 
 <template>
-    <textarea :id="props.id" ref="textareaEl" v-model="bodyProxy"></textarea>
+    <textarea
+        :id="props.id"
+        ref="textareaEl"
+        :required="props.required || undefined"
+        :name="props.id"
+        v-model="bodyProxy"
+    ></textarea>
 </template>

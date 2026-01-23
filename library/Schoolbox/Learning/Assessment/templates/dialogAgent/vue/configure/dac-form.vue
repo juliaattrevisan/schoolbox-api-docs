@@ -208,6 +208,7 @@ async function onSubmit(): Promise<void> {
                     <text-editor
                         :id="`fieldContext-${fieldContext.id}`"
                         v-model:body="fieldContext.body"
+                        required
                         :config="{
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
@@ -221,8 +222,9 @@ async function onSubmit(): Promise<void> {
                     <label for="dac-opening-message" class="required">Opening Message</label>
                     <p class="meta">Used by the AI to start the conversation and frame the learning discussion.</p>
                     <text-editor
-                        :id="`dac-opening-message`"
+                        id="dac-opening-message"
                         v-model:body="assessmentConfig.openingMessage"
+                        required
                         :config="{
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
@@ -237,8 +239,9 @@ async function onSubmit(): Promise<void> {
                         conversation.
                     </p>
                     <text-editor
-                        :id="`dac-rules`"
+                        id="dac-rules"
                         v-model:body="assessmentConfig.rules"
+                        required
                         :config="{
                             markdown: true,
                             toolbar: EditorToolbar.SIMPLE,
