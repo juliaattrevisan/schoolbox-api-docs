@@ -14,7 +14,6 @@ use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\Editor\OpenAI\Payload\DialogAgentChat as PayloadGenerator;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Status;
 use Schoolbox\Learning\Assessment\DialogAgent\Response\Model as ResponseModel;
@@ -70,21 +69,19 @@ class DialogAgentChat
         $pipeline->addInputCheck(new Guardrails\Check\Moderation(
             $this->moderationClient,
             [
-                'categories' => [
-                    "sexual",
-                    "sexual/minors",
-                    "hate",
-                    "hate/threatening",
-                    "harassment",
-                    "harassment/threatening",
-                    "self-harm",
-                    "self-harm/intent",
-                    "self-harm/instructions",
-                    "violence",
-                    "violence/graphic",
-                    "illicit",
-                    "illicit/violent",
-                ],
+                "sexual",
+                "sexual/minors",
+                "hate",
+                "hate/threatening",
+                "harassment",
+                "harassment/threatening",
+                "self-harm",
+                "self-harm/intent",
+                "self-harm/instructions",
+                "violence",
+                "violence/graphic",
+                "illicit",
+                "illicit/violent",
             ],
             $user,
             Helper::FEATURE_DIALOGAGENT,
@@ -93,15 +90,13 @@ class DialogAgentChat
 
         // $pipeline->addInputCheck(new Guardrails\Check\TopicalAlignment(
         //     $this->client,
-        //     [
-        //         // TODO: placeholder system prompt, this should include better context
-        //         'system_prompt_details' => "You are a helpful assistant. Keep responses focused on the user's questions and avoid going off-topic.",
-        //         'model' => $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'],
-        //         'previous_response_id' => $previousResponseId,
-        //     ],
+        //     $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'],
+        //     // TODO: placeholder system prompt, this should include better context
+        //     "You are a helpful assistant. Keep responses focused on the user's questions and avoid going off-topic.",
         //     $user,
         //     Helper::FEATURE_DIALOGAGENT,
         //     $sessionId,
+        //     previousResponseId: $previousResponseId,
         // ));
 
         return $pipeline;

@@ -11,22 +11,16 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Guardrails\Check;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\OpenAi\IClient;
+use Schoolbox\User;
 
 /**
  * Abstract base class for LLM-based guardrail checks using the Responses API.
  *
- * The provided $client must point to the Responses endpoint.
- * The provided $config should be an array with {
- *      model: string,                 // LLM model to use for checking the text
- *      system_prompt_details: string, // Additional system prompt details
- *      confidence_threshold: ?float,  // (Optional) Minimum confidence threshold to trigger the guardrail (0.0 to 1.0) (default: 0.7)
- *      previous_response_id: ?string, // (Optional) Previous response ID for context continuity
- * }
- *
  * Notably OpenAI's library implementation of this uses the Chat Completions API with structured outputs,
  * however we use the Responses API in most places so that is used instead to keep "previousResponseId" working
  */
-abstract class AbstractLLMCheck extends AbstractCheck
+abstract class AbstractLLMCheck implements ICheck
 {
     /**
      * These three params control wildness and output length
@@ -67,16 +61,35 @@ abstract class AbstractLLMCheck extends AbstractCheck
     ];
 
     /**
-     * Default confidence threshold if not specified in config
-     */
-    private const float DEFAULT_CONFIDENCE_THRESHOLD = 0.7;
-
-    /**
      * Prompt instructions for the LLM
      * Use the placeholder [SYSTEM_PROMPT_DETAILS] to allow insertion of details from $config['system_prompt_details']
      * @return string
      */
     abstract protected function getSystemPrompt(): string;
+
+    /**
+     * Constructor
+     *
+     * @param IClient $client              An AI provider client, must point to the Responses endpoint.
+     * @param string  $model               The LLM model to use for checking the text.
+     * @param string  $systemPromptDetails Additional details to insert into the system prompt.
+     * @param ?User   $user                The user making the request, if any.
+     * @param ?string $feature             An identifier for the feature being requested.
+     * @param ?string $sessionId           The session ID against which this request should be logged.
+     * @param float  $confidenceThreshold (Optional) Minimum confidence threshold to trigger the guardrail (0.0 to 1.0), default 0.7.
+     * @param ?string $previousResponseId  (Optional) Previous response ID for context continuity.
+     */
+    public function __construct(
+        private IClient $client,
+        private string $model,
+        private string $systemPromptDetails,
+        private ?User $user = null,
+        private ?string $feature = null,
+        private ?string $sessionId = null,
+        private float $confidenceThreshold = 0.7,
+        private ?string $previousResponseId = null,
+    ) {
+    }
 
     /**
      * @inheritDoc
@@ -88,8 +101,7 @@ abstract class AbstractLLMCheck extends AbstractCheck
         $confidence = $result['confidence'];
 
         /* Only trigger if flagged and the confidence threshold is met */
-        $confidenceThreshold = $this->config['confidence_threshold'] ?? self::DEFAULT_CONFIDENCE_THRESHOLD;
-        $isTrigger = $flagged && $confidence >= $confidenceThreshold;
+        $isTrigger = $flagged && $confidence >= $this->confidenceThreshold;
 
         return new Outcome(
             $isTrigger,
@@ -111,7 +123,7 @@ abstract class AbstractLLMCheck extends AbstractCheck
     private function callLLM(string $inputText): array
     {
         $systemPrompt = strtr($this->getSystemPrompt(), [
-            '[SYSTEM_PROMPT_DETAILS]' => $this->config['system_prompt_details'] ?? '',
+            '[SYSTEM_PROMPT_DETAILS]' => $this->systemPromptDetails,
         ]);
 
         $payload = [
@@ -121,7 +133,7 @@ abstract class AbstractLLMCheck extends AbstractCheck
                 [ 'role' => 'user', 'content' => $inputText ],
             ],
             /* Which variant of OpenAI to use (text model) */
-            'model' => $this->config['model'],
+            'model' => $this->model,
             /* A kind of OpenAI currency to use in this request */
             'max_output_tokens' => self::MAX_OUTPUT_TOKENS,
             /**
@@ -141,7 +153,7 @@ abstract class AbstractLLMCheck extends AbstractCheck
          * If there is a previous response ID, add it to the payload
          * This is used to continue a conversation
          */
-        $previousResponseId = $this->config['previous_response_id'] ?? null;
+        $previousResponseId = $this->previousResponseId;
         if (null !== $previousResponseId) {
             $payload['previous_response_id'] = $previousResponseId;
         }

@@ -11,15 +11,14 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Guardrails\Check;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\OpenAi\IClient;
+use Schoolbox\User;
 
 /**
  * Guardrail check to flag disallowed content categories using OpenAI's Moderations API.
  * https://openai.github.io/openai-guardrails-js/ref/checks/moderation/
- *
- * The provided $client must point to the Moderations endpoint.
- * The provided $config should be an array with 'categories' specifying which categories to flag.
  */
-class Moderation extends AbstractCheck
+class Moderation implements ICheck
 {
     /**
      * @inheritDoc
@@ -38,18 +37,33 @@ class Moderation extends AbstractCheck
     }
 
     /**
+     * Constructor
+     *
+     * @param IClient $client           An AI provider client, must point to the Moderations endpoint.
+     * @param array<string> $categories The list of categories which should be flagged.
+     * @param ?User   $user             The user making the request, if any.
+     * @param ?string $feature          An identifier for the feature being requested.
+     * @param ?string $sessionId        The session ID against which this request should be logged.
+     */
+    public function __construct(
+        private IClient $client,
+        private array $categories,
+        private ?User $user = null,
+        private ?string $feature = null,
+        private ?string $sessionId = null,
+    ) {
+    }
+
+    /**
      * @inheritDoc
      */
     public function check(string $inputText): Outcome
     {
-        $categories = $this->callModerationAPI($inputText);
-
-        /** @var array{categories:string[]} $config*/
-        $config = $this->config;
+        $categoryResults = $this->callModerationAPI($inputText);
 
         $flaggedCategories = [];
-        foreach ($config['categories'] as $category) {
-            $isFlagged = $categories[$category] ?? false;
+        foreach ($this->categories as $category) {
+            $isFlagged = $categoryResults[$category] ?? false;
             if ($isFlagged) {
                 $flaggedCategories[] = $category;
             }
