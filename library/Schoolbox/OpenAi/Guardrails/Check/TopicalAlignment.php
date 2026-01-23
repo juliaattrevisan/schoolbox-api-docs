@@ -42,25 +42,15 @@ class TopicalAlignment extends AbstractLLMCheck
     }
 
     /**
-     * System prompt for topical alignment analysis
-     *
-     * Placeholders:
-     * [SYSTEM_PROMPT_DETAILS]
+     * @inheritDoc
      */
-    private const string SYSTEM_PROMPT = "You are a content analysis system that determines if text stays on topic.
+    protected function getSystemPrompt(): string
+    {
+        return "You are a content analysis system that determines if text stays on topic.
 
 BUSINESS SCOPE: [SYSTEM_PROMPT_DETAILS]
 
 Determine if the text stays within the defined business scope. Flag any content
 that strays from the allowed topics.";
-
-    /**
-     * @inheritDoc
-     */
-    protected function getSystemPrompt(): string
-    {
-        return strtr(self::SYSTEM_PROMPT, [
-            '[SYSTEM_PROMPT_DETAILS]' => $this->config['system_prompt_details'],
-        ]);
     }
 }

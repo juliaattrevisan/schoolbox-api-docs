@@ -73,6 +73,7 @@ abstract class AbstractLLMCheck extends AbstractCheck
 
     /**
      * Prompt instructions for the LLM
+     * Use the placeholder [SYSTEM_PROMPT_DETAILS] to allow insertion of details from $config['system_prompt_details']
      * @return string
      */
     abstract protected function getSystemPrompt(): string;
@@ -109,11 +110,15 @@ abstract class AbstractLLMCheck extends AbstractCheck
      */
     private function callLLM(string $inputText): array
     {
+        $systemPrompt = strtr($this->getSystemPrompt(), [
+            '[SYSTEM_PROMPT_DETAILS]' => $this->config['system_prompt_details'] ?? '',
+        ]);
+
         $payload = [
             /* An ordered list of instructions for OpenAi */
             'input' => [
-                [ 'role' => 'system', 'content' => $this->getSystemPrompt(), ],
-                [ 'role' => 'user', 'content' => $inputText, ],
+                [ 'role' => 'system', 'content' => $systemPrompt ],
+                [ 'role' => 'user', 'content' => $inputText ],
             ],
             /* Which variant of OpenAI to use (text model) */
             'model' => $this->config['model'],

@@ -42,24 +42,14 @@ class UserDefinedLLM extends AbstractLLMCheck
     }
 
     /**
-     * System prompt template for user-defined content moderation
-     *
-     * Placeholders:
-     * [SYSTEM_PROMPT_DETAILS]
-     */
-    private const string SYSTEM_PROMPT = "# Instructions
-
-[SYSTEM_PROMPT_DETAILS]
-
-Flag any content that matches the criteria defined above.";
-
-    /**
      * @inheritDoc
      */
     protected function getSystemPrompt(): string
     {
-        return strtr(self::SYSTEM_PROMPT, [
-            '[SYSTEM_PROMPT_DETAILS]' => $this->config['system_prompt_details'],
-        ]);
+        return "# Instructions
+
+[SYSTEM_PROMPT_DETAILS]
+
+Flag any content that matches the criteria defined above.";
     }
 }
