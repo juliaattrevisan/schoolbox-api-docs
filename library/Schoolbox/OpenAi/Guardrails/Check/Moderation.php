@@ -13,8 +13,11 @@ namespace Schoolbox\OpenAi\Guardrails\Check;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
- * Guardrail check to flag disallowed content categories using OpenAI's moderation API.
+ * Guardrail check to flag disallowed content categories using OpenAI's Moderations API.
  * https://openai.github.io/openai-guardrails-js/ref/checks/moderation/
+ *
+ * The provided $client must point to the Moderations endpoint.
+ * The provided $config should be an array with 'categories' specifying which categories to flag.
  */
 class Moderation extends AbstractCheck
 {
@@ -27,7 +30,7 @@ class Moderation extends AbstractCheck
     }
 
     /**
-     * Human-readable explanation of the guardrail's purpose
+     * @inheritDoc
      */
     public static function getDescription(): string
     {
@@ -53,10 +56,10 @@ class Moderation extends AbstractCheck
         }
 
         /* Only trigger if the requested categories are flagged */
-        $isFlagged = \count($flaggedCategories) > 0;
+        $isTrigger = \count($flaggedCategories) > 0;
 
         return new Outcome(
-            $isFlagged,
+            $isTrigger,
             ['flaggedCategories' => $flaggedCategories]
         );
     }
@@ -71,6 +74,10 @@ class Moderation extends AbstractCheck
     private function callModerationAPI(string $inputText): array
     {
         $payload = [
+            /**
+             * This model is fixed and must be used for the moderations API (unless OpenAI creates another model I guess)
+             * Notably this means the model in the config for the feature is NOT used here.
+             */
             'model' => 'omni-moderation-latest',
             'input' => $inputText,
         ];

@@ -19,8 +19,8 @@ use Schoolbox\User;
 abstract class AbstractCheck implements ICheck
 {
     /**
-     * @param IClient $client    An AI provider client: needs to point to the Moderation endpoint.
-     * @param array   $config    Moderation config specifying categories to flag.
+     * @param IClient $client    An AI provider client (dependent on the check)
+     * @param array   $config    Guardrail check config (dependent on the check)
      * @param ?User   $user      The user making the request, if any.
      * @param ?string $feature   An identifier for the feature being requested.
      * @param ?string $sessionId The session ID against which this request should be logged.

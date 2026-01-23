@@ -35,8 +35,8 @@ use Schoolbox\User;
 class DialogAgentChat
 {
     /**
-     * Config for the moderation guardrail check
-     * https://openai.github.io/openai-guardrails-js/ref/checks/moderation/
+     * Guardrail config for the Moderation check
+     * @see Schoolbox\OpenAi\Guardrails\Check\Moderation
      */
     private const array GUARDRAIL_CONFIG_MODERATION = [
         'categories' => [
@@ -54,6 +54,15 @@ class DialogAgentChat
             "illicit",
             "illicit/violent",
         ]
+    ];
+
+    /**
+     * Guardrail config for the Topical Alignment check
+     * @see Schoolbox\OpenAi\Guardrails\Check\TopicalAlignment
+     */
+    private const array GUARDRAIL_CONFIG_TOPICAL_ALIGNMENT = [
+        // TODO: placeholder system prompt, this should include better context
+        'system_prompt_details' => "You are a helpful assistant. Keep responses focused on the user's questions and avoid going off-topic.",
     ];
 
     /**
@@ -171,8 +180,28 @@ class DialogAgentChat
 
 
         /** Guardrails: Input checks */
-        // TODO
-        // These could be called concurrently?
+        // TODO These could be called concurrently?
+        /** @var GenericCollection<Guardrails\Check\ICheck> $inputChecks */
+        $inputChecks = new GenericCollection(Guardrails\Check\ICheck::class);
+        $inputChecks->add(new Guardrails\Check\TopicalAlignment(
+            $this->client,
+            [
+                ...self::GUARDRAIL_CONFIG_TOPICAL_ALIGNMENT,
+                'model' => $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'],
+                'previous_response_id' => $previousResponseId,
+            ],
+            $user,
+            Helper::FEATURE_DIALOGAGENT,
+            $sessionId,
+        ));
+
+        foreach ($inputChecks as $check) {
+            $outcome = $check->check($userPrompt); // TODO: surely TopicalAlignment needs more context than just the user's message...
+
+            if ($outcome->isFlagged()) {
+                throw new GuardrailFlagged($check, json_encode($outcome->getMetadata()));
+            }
+        }
 
 
         return $this->client->createResponseStream(
