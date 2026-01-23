@@ -205,25 +205,22 @@ class Mapper extends \Schoolbox\Mapper
     {
         $table = $this->getTable();
 
+        // The ROW_NUMBER function returns the sequence number of the row, when
+        // sorted by the ORDER BY in the OVER statement.
         $query = "
-        DELETE FROM {$table} AS t1
-        WHERE t1.script = :script
-          AND (
-            SELECT COUNT(*)
-            FROM {$table} AS t2
-            WHERE t2.script = t1.script
-              AND (
-                  t2.start_at > t1.start_at
-                  OR (t2.start_at = t1.start_at AND t2.id > t1.id)
-              )
-          ) >= :keep
-    ";
+            DELETE t1 FROM {$table} AS t1
+            INNER JOIN (
+                SELECT id, ROW_NUMBER() OVER (ORDER BY start_at DESC, id DESC) AS row_number
+                FROM {$table}
+                WHERE t1.script = :script
+            ) AS rank ON t1.id = rank.id
+            WHERE rank.row_number > :row_number
+        ";
 
         $statement = $this->getDatabase()->prepare($query);
-
         $statement->execute([
-                                'script' => $scriptName,
-                                'keep'   => self::KEEP_LATEST,
-                            ]);
+            'script' => $scriptName,
+            'keep'   => self::KEEP_LATEST,
+        ]);
     }
 }
