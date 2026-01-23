@@ -466,9 +466,6 @@ class Controller extends ConfigController
                     // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
                     'Pastoral Care' => $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
 
-                    // This is for the settings in 'Admin -> System Settings -> Canvas Connector'.
-                    'Canvas' => $this->getConfigLoader()->get(ConfigMapper::NAME_CANVAS_ENABLED),
-
                     default => false
                 };
 
