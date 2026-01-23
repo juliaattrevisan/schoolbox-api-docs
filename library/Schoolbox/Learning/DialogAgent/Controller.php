@@ -636,6 +636,7 @@ class Controller extends Base
 
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT), // TODO
             $agentConfig,
             $this->dialogAgentResponseMessageMapper,
         );
@@ -671,6 +672,7 @@ class Controller extends Base
             // is output, which doesn't happen until after this method
             // returns.
             $problem = (new ApiProblem($e->getMessage()))
+                ->setDetail($e->getInformation())
                 ->setStatus($e->getCode())
                 ->asArray();
 
@@ -717,6 +719,7 @@ class Controller extends Base
 
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT), // TODO
             $agentConfig,
             $this->dialogAgentResponseMessageMapper,
         );
@@ -742,6 +745,7 @@ class Controller extends Base
             // is output, which doesn't happen until after this method
             // returns.
             $problem = (new ApiProblem($e->getMessage()))
+                ->setDetail($e->getInformation())
                 ->setStatus($e->getCode())
                 ->asArray();
 
