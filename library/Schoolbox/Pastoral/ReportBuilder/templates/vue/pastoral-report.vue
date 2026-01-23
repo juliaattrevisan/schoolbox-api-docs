@@ -99,6 +99,7 @@ function onPrintSelected(): void {
                     :href="`${selectedTab._links.export}?selected=${recordsOrPoints}`"
                     aria-label="Download Report as CSV"
                     title="Download Report as CSV"
+                    data-test="pastoral-report-download-button"
                 >
                     <sbx-icon name="download" />
                 </a>
@@ -112,7 +113,7 @@ function onPrintSelected(): void {
                     :class="{ active: selectedTab?.title === tab.title }"
                     @click="onTabSelected(tab)"
                 >
-                    <a>{{ tab.title }}</a>
+                    <a :data-test="`pastoral-report-${tab.title}`">{{ tab.title }}</a>
                 </dd>
             </dl>
             <template v-if="selectedTab">
