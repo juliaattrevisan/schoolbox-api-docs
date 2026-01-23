@@ -116,12 +116,6 @@ class DataSource
     {
         $model = $this->mapper->findById($id);
 
-        // Add attachments, then filter
-        $model->setAttachments(
-            $this->mapper->getJoinMapper('attachments')
-                         ->findByColumn('pastoral_id', $model->getId())
-        );
-
         $model = $this->accessLevelCensor->filterRecordsForUser(Model::createCollection()->add($model), $currentUser)->first();
 
         if (!$model instanceof Model) {

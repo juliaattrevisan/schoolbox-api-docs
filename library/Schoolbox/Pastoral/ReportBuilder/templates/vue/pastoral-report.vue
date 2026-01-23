@@ -29,11 +29,9 @@ const minWidth = 700; // Minimum width where useMaxScrollableHeight is applied
 window.Vue.provide("selectedTab", selectedTab);
 window.Vue.provide("title", props.title);
 window.Vue.provide("tabs", props.tabs);
-window.Vue.provide("config", props.config);
-window.Vue.provide("routes", props.routes);
+window.Vue.provide("pastoralConfig", props.config);
+window.Vue.provide("pastoralRoutes", props.routes);
 window.Vue.provide("localePastoral", props.localePastoral);
-window.Vue.provide("showSeverity", props.showSeverity);
-window.Vue.provide("severityColors", props.severityColors);
 
 /**
  * Keep the container below the height of the viewport

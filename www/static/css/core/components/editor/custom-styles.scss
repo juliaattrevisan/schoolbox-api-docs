@@ -44,6 +44,10 @@ article {
         clear: both;
     }
 
+    p:last-child {
+        margin-bottom: 0;
+    }
+
     // Make background / highlight colours appear when printed
     span,
     p {

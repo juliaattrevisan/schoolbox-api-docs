@@ -39,6 +39,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
+use Schoolbox\Pastoral\Attachment\Translator\ModelToArray as PastoralAttachmentTranslator;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 
 // These mappers are injected into controllers where required
 
@@ -133,6 +135,13 @@ class Module extends BaseModule
             new ScrubAdapter(),
         );
 
+        $attachmentTranslator = new PastoralAttachmentTranslator(
+            $this->injector->get('router.generator'),
+            $this->injector->get('authorizer'),
+            $this->injector->get('user'),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
+        );
+
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->injector->get('pastoralDataSource'),
@@ -156,6 +165,7 @@ class Module extends BaseModule
             new PastoralTranslator(
                 new User\Translator\Author\ModelToArray(),
                 $commentTranslator,
+                $attachmentTranslator,
                 $this->getRouter()->getGenerator(),
                 $this->injector->get('authorizer'),
                 $this->injector->get('user'),

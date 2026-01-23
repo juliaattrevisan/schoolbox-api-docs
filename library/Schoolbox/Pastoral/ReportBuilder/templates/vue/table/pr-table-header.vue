@@ -16,7 +16,7 @@ const props = defineProps<{
     isTrendSticky: boolean;
 }>();
 
-const config = window.Vue.inject<Config>("config");
+const config = window.Vue.inject<Config>("pastoralConfig");
 const recordsAndPoints = window.Vue.ref(["records", "points"]); // to toggle the tables between records and points
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });

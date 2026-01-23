@@ -17,9 +17,11 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use http\Exception\UnexpectedValueException;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral\Comment\Translator\ModelToArray as PastoralCommentTranslator;
+use Schoolbox\Pastoral\Attachment\Translator\ModelToArray as PastoralAttachmentTranslator;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -28,6 +30,7 @@ use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper as AdjustmentCategoriesMapper;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper as AdjustmentLevelsMapper;
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray as AdminConfigModelToArray;
+use Schoolbox\Resource\Storage\Translator\ModelToArray as StorageTranslator;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -161,6 +164,13 @@ class Module extends BaseModule
             new ScrubAdapter(),
         );
 
+        $attachmentTranslator = new PastoralAttachmentTranslator(
+            $this->injector->get('router.generator'),
+            $this->injector->get('authorizer'),
+            $this->injector->get('user'),
+            new StorageTranslator(new PrefixGenerator($this->getConfig())),
+        );
+
         return new Controller(
             $this->injector->get('l10n'),
             $this->getMapperFactory()->get(AdjustmentCategoriesMapper::class),
@@ -178,6 +188,7 @@ class Module extends BaseModule
             new PastoralTranslator(
                 new \Schoolbox\User\Translator\Author\ModelToArray(),
                 $commentTranslator,
+                $attachmentTranslator,
                 $this->getRouter()->getGenerator(),
                 $this->injector->get('authorizer'),
                 $this->injector->get('user'),
