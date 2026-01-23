@@ -91,18 +91,18 @@ class DialogAgentChat
             $sessionId,
         ));
 
-        $pipeline->addInputCheck(new Guardrails\Check\TopicalAlignment(
-            $this->client,
-            [
-                // TODO: placeholder system prompt, this should include better context
-                'system_prompt_details' => "You are a helpful assistant. Keep responses focused on the user's questions and avoid going off-topic.",
-                'model' => $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'],
-                'previous_response_id' => $previousResponseId,
-            ],
-            $user,
-            Helper::FEATURE_DIALOGAGENT,
-            $sessionId,
-        ));
+        // $pipeline->addInputCheck(new Guardrails\Check\TopicalAlignment(
+        //     $this->client,
+        //     [
+        //         // TODO: placeholder system prompt, this should include better context
+        //         'system_prompt_details' => "You are a helpful assistant. Keep responses focused on the user's questions and avoid going off-topic.",
+        //         'model' => $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'],
+        //         'previous_response_id' => $previousResponseId,
+        //     ],
+        //     $user,
+        //     Helper::FEATURE_DIALOGAGENT,
+        //     $sessionId,
+        // ));
 
         return $pipeline;
     }
