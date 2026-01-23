@@ -15,9 +15,12 @@ import { ResourceType, type StorageFile } from "@js/resource/resourceUtils";
 interface Props {
     storage: StorageFile;
     filename: string;
+    /** A maximum height for the resource embed */
+    maxHeight?: string;
     /**
      * Whether to force the width/height of the parent element to be the same
      * as the video element so that mejs doesn't try to resize it
+     * Use this with maxHeight to correctly control the size of the video player
      * Defaults to false
      */
     maintainDims?: boolean;
@@ -38,8 +41,13 @@ const player = window.Vue.ref<MediaElementPlayer | null>(null);
  * @param posterLoaded whether we attempted to load the poster image
  */
 function initialiseVideoPlayer(el: HTMLElement, posterLoaded: boolean = false): void {
+    let videoDims: { width: number; height: number } | null = null;
     if (props.maintainDims && el.parentElement) {
-        if (el.offsetWidth === 0) {
+        el.style.maxHeight = props.maxHeight ?? "";
+        videoDims = { width: el.offsetWidth, height: el.offsetHeight };
+        el.style.maxHeight = "";
+
+        if (videoDims.width === 0) {
             // the poster hasn't loaded yet, if we were to initialise the player now
             // then it would be invisible... so wait for the poster to exist and try again
             const img = el.getAttribute("poster");
@@ -55,14 +63,20 @@ function initialiseVideoPlayer(el: HTMLElement, posterLoaded: boolean = false): 
 
             // no poster? as a last resort just set the parent to be 100% width/height so it at least renders
             el.parentElement.style.height = "100%";
-        } else {
-            // found valid dimensions! set the parent to match it so it doesn't resize
-            el.parentElement.style.height = `${el.offsetHeight}px`;
-            el.parentElement.style.width = `${el.offsetWidth}px`;
+            videoDims = null;
         }
     }
 
     player.value = new window.MediaElementPlayer(el, getConfigForVideo());
+    if (videoDims !== null) {
+        player.value.setPlayerSize(videoDims.width, videoDims.height);
+
+        // found valid dimensions! set the parent to match it so it doesn't resize
+        if (el.parentElement) {
+            el.parentElement.style.minHeight = `${videoDims.height}px`;
+            el.parentElement.style.minWidth = `${videoDims.width}px`;
+        }
+    }
 }
 
 window.Vue.onMounted(() => {
@@ -155,7 +169,13 @@ function filesize(size: number | null): string {
     >
         <source type="audio/mpeg" :src="storage._links.stream" />
     </audio>
-    <img v-else-if="storage.type === 'image'" ref="playerRef" :src="storage._links.image" :alt="filename" />
+    <img
+        v-else-if="storage.type === 'image'"
+        ref="playerRef"
+        :src="storage._links.image"
+        :alt="filename"
+        :style="{ maxHeight: maxHeight }"
+    />
     <a v-else ref="playerRef" :href="storage._links.fetch">
         <img :src="storage._links.icon" :alt="filename" /> {{ filename }}
         <span class="meta">({{ filesize(storage.size) }})</span>
