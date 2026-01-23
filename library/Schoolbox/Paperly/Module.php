@@ -40,7 +40,7 @@ class Module extends BaseModule
         $this->register(
             'GET',
             '/view/{encodedUrl}',
-            'getPaperlyViewIframe',
+            'getPaperlyView',
             $isLoggedIn
         );
     }

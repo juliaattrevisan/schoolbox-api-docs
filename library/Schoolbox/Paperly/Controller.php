@@ -76,11 +76,6 @@ class Controller extends Base
     {
         $parsedUrl = parse_url($paperlyLink['url']);
 
-        $paperlyOpenInNewTab = $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_OPEN_IN_NEW_TAB);
-        if ($paperlyOpenInNewTab) {
-            return $paperlyLink['url'];
-        }
-
         $link = $this->base64Codec->encode(
             [
                 'pageTitle' => $paperlyLink['title'],
@@ -90,7 +85,7 @@ class Controller extends Base
 
         return $this->routeGenerator
             ->generate(
-                'paperly.getPaperlyViewIframe',
+                'paperly.getPaperlyView',
                 [
                     'encodedUrl' => urlencode($link)
                 ]
@@ -193,23 +188,56 @@ class Controller extends Base
     }
 
     /**
-     * Load an iframe for Paperly
+     * Get paperly iframe view
      *
      * @param string $encodedUrl
      * @throws Error
      */
-    public function getPaperlyViewIframe(string $encodedUrl): void
+    public function getPaperlyView(string $encodedUrl): void
     {
+        $openInTab = $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_OPEN_IN_NEW_TAB);
+
         $path = $this->base64Codec->decode(urldecode($encodedUrl));
 
+        /* Removing trailing forward slash on hostname
+         */
+        $url = preg_replace(
+            '/(?<!:)\/\//',
+            '/',
+            $this->getPaperlyHostname() . $path['url']
+        );
+
+        /* Redirecting to paperly instead of loading in iframe if `paperly_open_in_new_tab` is enabled
+         */
+        if ($openInTab) {
+            $this->getPaperlyViewRedirect($url);
+        } else {
+            $this->getPaperlyViewIframe($url, $path['pageTitle']);
+        }
+    }
+
+    /**
+     * Get paperly view with redirection
+     *
+     * @param string $url
+     */
+    public function getPaperlyViewRedirect(string $url): void
+    {
+        $this->response = $this->redirectTemporary($url);
+    }
+
+    /**
+     * Get paperly view with iframe
+     *
+     * @param string $url
+     * @param string $title
+     * @throws Error
+     */
+    public function getPaperlyViewIframe(string $url, string $title): void
+    {
         $this->response = $this->responseFromTemplate('@paperly/iframe.twig', [
-            //Removing trailing forward slash on hostname
-            'url' => preg_replace(
-                '/(?<!:)\/\//',
-                '/',
-                $this->getPaperlyHostname() . $path['url']
-            )
-        ], "Paperly " . $path['pageTitle']);
+            'url' => $url
+        ], "Paperly $title");
     }
 
 //    /**
