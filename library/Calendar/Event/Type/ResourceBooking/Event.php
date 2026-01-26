@@ -49,6 +49,8 @@ class Event extends Day\Event
         //    contents of the 'Purpose' field on the 'create booking' form.
         //  * For bookings created in the Main Calendar section, resource_booking.name will have been set to the name
         //    of the booked resource.
+        // (We are too deep here to inject the matched route (router->getMatcher()->getMatchedRoute()).
+        //  To avoid changing many files, just infer the matched route from $_SERVER['REQUEST_URI'].)
         if (str_contains($_SERVER['REQUEST_URI'], '/resource-booking/')) {
             return trim($this->getBooking()->getName()) !== ''
                 ? $this->getBooking()->getName()
