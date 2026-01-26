@@ -43,20 +43,13 @@ class Event extends Day\Event
      */
     public function getTitle()
     {
-        // Check if we're in the resource booking/item section.
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-        $inResourceSection = (
-            str_contains($requestUri, '/resource-booking/') ||
-            str_contains($requestUri, '/resource/item/')
-        );
-
         // If in the resource booking section, show whatever is stored in resource_booking.name.
         // Note the contents of resource_booking.name will depend on the section in which the booking was created:
         //  * For bookings created in the Resource Booking section, resource_booking.name will have been set to the
         //    contents of the 'Purpose' field on the 'create booking' form.
         //  * For bookings created in the Main Calendar section, resource_booking.name will have been set to the name
         //    of the booked resource.
-        if ($inResourceSection) {
+        if (str_contains($_SERVER['REQUEST_URI'], '/resource-booking/')) {
             return trim($this->getBooking()->getName()) !== ''
                 ? $this->getBooking()->getName()
                 : $this->getBooking()->getResource()->getName(); // Fall back on the resource name if booking name blank.
