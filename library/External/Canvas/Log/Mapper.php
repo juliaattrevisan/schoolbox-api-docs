@@ -210,11 +210,11 @@ class Mapper extends \Schoolbox\Mapper
         $query = "
             DELETE t1 FROM {$table} AS t1
             INNER JOIN (
-                SELECT id, ROW_NUMBER() OVER (ORDER BY start_at DESC, id DESC) AS row_number
+                SELECT id, ROW_NUMBER() OVER (ORDER BY start_at DESC, id DESC) AS row_num
                 FROM {$table}
-                WHERE t1.script = :script
+                WHERE script = :script
             ) AS rank ON t1.id = rank.id
-            WHERE rank.row_number > :row_number
+            WHERE rank.row_num > :keep
         ";
 
         $statement = $this->getDatabase()->prepare($query);
