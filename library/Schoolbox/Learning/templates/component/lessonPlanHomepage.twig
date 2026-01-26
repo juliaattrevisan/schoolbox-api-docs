@@ -43,7 +43,6 @@
 
                     {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
                     {% set specAssessment = lesson.specificationAssessment ?? null %}
-                    {% set unit = lesson.baseContext %}
 
                     {% if lesson.context is project %}
                         {# apparently you're not allowed to do this if it's from a project, related to SA-21140
