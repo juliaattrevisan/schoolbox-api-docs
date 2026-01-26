@@ -94,6 +94,8 @@ class EventConverter
         $allRelations = $this->categoryMapper->findByColumn('event_id', $event->getEventId());
         $event->setCategoryCollection($allRelations);
 
+        $event->setOriginalEvent($eventItem);
+
         return $event;
     }
 
