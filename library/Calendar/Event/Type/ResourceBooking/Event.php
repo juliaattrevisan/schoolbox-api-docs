@@ -81,7 +81,8 @@ class Event extends Day\Event
             // Only if the preferred one of those is blank or null do we fall back on the resource name.
             //
             // Notes:
-            //  * Only events of variant CalendarEvent::VARIANT_EVENT are shown on the main calendar.
+            //  * Events of variant CalendarEvent::VARIANT_EVENT are the ones shown on the main calendar.  Events of
+            //    variant CalendarEvent::VARIANT_BOOKING do not appear on the main calendar.
             //  * The contents of resource_booking.name will depend on the section in which the booking was created:
             //     * For bookings created in the Resource Booking section, resource_booking.name will have been set to the
             //       contents of the 'Purpose' field on the 'create booking' form.
