@@ -43,13 +43,20 @@ class Event extends Day\Event
      */
     public function getTitle()
     {
-        // Return whatever is stored in resource_booking.name.
-        // What that field contains will depend on the section in which the booking was created:
+        // Return whatever is stored in resource_booking.name, unless that is
+        // empty, in which case fall back on the name of the booked resource.
+        //
+        // Note that what the resource_booking.name field contains will depend
+        // on the section in which the booking was created:
         //  * For bookings created in the Resource Booking section, resource_booking.name will have been set to the
         //    contents of the 'Purpose' field on the 'create booking' form.
         //  * For bookings created in the Main Calendar section, resource_booking.name will have been set to the name
         //    of the booked resource.
-        return $this->getBooking()->getName();
+        return (
+            trim($this->getBooking()->getName()) !== ''
+            ? $this->getBooking()->getName()
+            : $this->getBooking()->getResource()->getName()
+        );
     }
 
     /**
