@@ -45,7 +45,7 @@ class PreviousAwards
             /* It turns out that STAR celebrity status might actually be optional: in 2026 we found some units only
              * have SUPERSTAR status...
              */
-            if (array_key_exists(Candidacy::SUPERSTAR, $mapping)) {
+            if (array_key_exists(Candidacy::STAR, $mapping)) {
                 $ids[] = (int)$mapping[Candidacy::STAR]['id'];
             }
         }

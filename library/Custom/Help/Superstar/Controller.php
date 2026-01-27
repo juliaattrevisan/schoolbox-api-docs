@@ -289,10 +289,10 @@ class Controller extends Base
                     'id' => 94,
                     'route' => null,
                 ],
-                Candidacy::STAR => [
-                    'id' => null, // TODO What is this?
-                    'route' => null,
-                ],
+//                Candidacy::STAR => [
+//                    'id' => null, // TODO What is this?
+//                    'route' => null,
+//                ],
             ],
             // 5. Extra-Curricular
             '140' => [
@@ -300,10 +300,10 @@ class Controller extends Base
                     'id' => 89,
                     'route' => null,
                 ],
-                Candidacy::STAR => [
-                    'id' => null, // TODO What is this?
-                    'route' => null,
-                ],
+//                Candidacy::STAR => [
+//                    'id' => null, // TODO What is this?
+//                    'route' => null,
+//                ],
             ],
             // 6. Superuser
             '137' => [
@@ -311,10 +311,10 @@ class Controller extends Base
                     'id' => 95,
                     'route' => null,
                 ],
-                Candidacy::STAR => [
-                    'id' => null, // TODO What is this?
-                    'route' => null,
-                ],
+//                Candidacy::STAR => [
+//                    'id' => null, // TODO What is this?
+//                    'route' => null,
+//                ],
             ],
         ],
     ];
