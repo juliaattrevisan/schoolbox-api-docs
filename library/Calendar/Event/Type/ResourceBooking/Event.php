@@ -92,7 +92,7 @@ class Event extends Day\Event
     public function getTitleForResourceBooking(): string
     {
         $bookingName = (
-        $this->getEventVariant() === CalendarEvent::VARIANT_EVENT
+            $this->getEventVariant() === CalendarEvent::VARIANT_EVENT
             ? $this->getOriginalEvent()?->getTitle()
             : $this->getBooking()->getName()
         );
