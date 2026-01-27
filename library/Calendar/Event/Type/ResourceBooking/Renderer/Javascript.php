@@ -14,6 +14,7 @@
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
 use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\Event as CalendarEvent;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Booking\Mapper as ResourceBookingMapper;
@@ -220,7 +221,10 @@ class Javascript extends Base
 
                     // Event type 'EOTC' refers to library/Calendar/Event/Type/EOTC/Event.php.
                     // Event type 'Day' refers to library/Calendar/Event/Type/Day/Event.php.
-                    'linkedEventType' => ($eotcEventId !== null) ? 'EOTC' : 'Day'
+                    'linkedEventType' => ($eotcEventId !== null) ? 'EOTC' : 'Day',
+
+                    // This is an alternate title for the booking, to be used in the resource booking section.
+                    'title' => $this->getEvent()->getTitleForResourceBooking(),
                 ],
             ],
         ];

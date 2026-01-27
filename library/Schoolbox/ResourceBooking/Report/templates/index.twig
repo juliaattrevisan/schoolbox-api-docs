@@ -204,11 +204,17 @@
                             </time>
                         </td>
                         <td>
+                            {% set title = attribute(event, 'getTitleForResourceBooking') is defined ? event.getTitleForResourceBooking() : event.getTitle() %}
                             {% if booking is empty %}
-                                {{ event.getTitle() }}
+                                {{ title }}
                             {% else %}
-                                <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
-                                    {{ event.getTitle() }}
+                                {% if event.getEventVariant() == 'event' %}
+                                    {% set route = routeLookup('calendarEvent.getEvent', {eventId: event.getOriginalEvent().getId()}) %}
+                                {% else %}
+                                    {% set route = routeLookup('resourceBooking.edit', {id: booking.getId()}) %}
+                                {% endif %}
+                                <a href="{{ route }}">
+                                    {{ title }}
                                 </a>
                             {% endif %}
                         </td>
