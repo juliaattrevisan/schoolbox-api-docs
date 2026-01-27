@@ -162,7 +162,7 @@ class Helper
                     ],
                     'subjectCode'      => $row['subjectCode'],
                     'project'          => (null === $row['project']) ? null : ['id' => (int)$row['project']],
-                    'weight'           => in_array($row['assessmentType'], $unweightedActivities,) ? null : (float)$row['weight'],
+                    'weight'           => in_array($row['assessmentType'], $unweightedActivities) ? null : (float)$row['weight'],
                     'dueDate'          => $row['due_date'] ? \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String() : null,
                     'rubric'           => $this->getRubric($assessmentId),
                     'participants'     => (
