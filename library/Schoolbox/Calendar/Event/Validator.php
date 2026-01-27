@@ -62,7 +62,7 @@ class Validator
 
         // Note further validation of $this->requestPost is done in $this->postModify().
         foreach ($requiredKeys as $requiredKey) {
-            if (!array_key_exists($requiredKey, (array)$originalRequestPost)) {
+            if (!$originalRequestPost->offsetExists($requiredKey)) {
                 throw new SchoolboxException("Missing required key '$requiredKey'.");
             }
         }
@@ -73,7 +73,7 @@ class Validator
                 // Nothing extra required.  Carry on.
                 break;
             case Event::ACCESS_GROUP:
-                if (!array_key_exists('folders', (array)$originalRequestPost)) {
+                if (!$originalRequestPost->offsetExists('folders')) {
                     throw new SchoolboxException(
                         "Missing required key 'folders'." .
                         "  This is required because 'level' has value " . Event::ACCESS_GROUP . '.'
@@ -81,13 +81,13 @@ class Validator
                 }
                 break;
             case Event::ACCESS_CAMPUS:
-                if (!array_key_exists('campuses', (array)$originalRequestPost)) {
+                if (!$originalRequestPost->offsetExists('campuses')) {
                     throw new SchoolboxException(
                         "Missing required key 'campuses'." .
                         "  This is required because 'level' has value " . Event::ACCESS_CAMPUS . '.'
                     );
                 }
-                if (!array_key_exists('roles', (array)$originalRequestPost)) {
+                if (!$originalRequestPost->offsetExists('roles')) {
                     throw new SchoolboxException(
                         "Missing required key 'roles'." .
                         "  This is required because 'level' has value " . Event::ACCESS_CAMPUS . '.'
@@ -118,29 +118,25 @@ class Validator
     {
         $requestPost = clone($originalRequestPost);
 
-        // Note array_key_exists() is used here instead of isset(), because isset() returns false if the array key
-        // exists but the value is null.  If the array key exists, then a new value has been supplied, and so we must
-        // assume the caller intends for that new value to replace the old value - even if the new value is null.
-
         // Account for special key 'userId' (posted by the calendar/event/create and modify pages).
-        if (array_key_exists('userId', (array)$requestPost) && !array_key_exists('user', (array)$requestPost)) {
+        if ($requestPost->offsetExists('userId') && !$requestPost->offsetExists('user')) {
             $requestPost['user'] = ['id' => $requestPost['userId']];
             unset($requestPost['userId']);
         }
 
         // Account for special key 'authorId' (posted by the calendar/event/create and modify pages).
-        if (array_key_exists('authorId', (array)$requestPost) && !array_key_exists('author', (array)$requestPost)) {
+        if ($requestPost->offsetExists('authorId') && !$requestPost->offsetExists('author')) {
             $requestPost['author'] = ['id' => $requestPost['authorId']];
             unset($requestPost['authorId']);
         }
 
         // Account for special case of key 'type' (posted by the calendar/event/create and modify pages).
-        if (array_key_exists('type', (array)$requestPost) && !is_array($requestPost['type'])) {
+        if ($requestPost->offsetExists('type') && !is_array($requestPost['type'])) {
             $requestPost['type'] = ['id' => $requestPost['type']];
         }
 
         // Account for special case of key 'guests' (posted by the calendar/event/create and modify pages).
-        if (array_key_exists('guests', (array)$requestPost) && is_string($requestPost['guests'])) {
+        if ($requestPost->offsetExists('guests') && is_string($requestPost['guests'])) {
             // Convert comma-separated string of ids to array of object stubs.
             $guestIds = (
                 strlen($requestPost['guests']) == 0
@@ -161,7 +157,7 @@ class Validator
         }
 
         // Account for special case of key 'resourceIds' (posted by the calendar/event/create and modify pages).
-        if (array_key_exists('resourceIds', (array)$requestPost) && is_array($requestPost['resourceIds'])) {
+        if ($requestPost->offsetExists('resourceIds') && is_array($requestPost['resourceIds'])) {
             // Convert array of ids to array of object stubs.
             $requestPost['resources'] = [];
             foreach ($requestPost['resourceIds'] as $resourceId) {
@@ -171,13 +167,13 @@ class Validator
         }
 
         // Account for special case of key 'maxAttendees' (posted by the calendar/event/create and modify pages).
-        if (array_key_exists('maxAttendees', (array)$requestPost) && $requestPost['maxAttendees'] === '') {
+        if ($requestPost->offsetExists('maxAttendees') && $requestPost['maxAttendees'] === '') {
             $requestPost['maxAttendees'] = null;
         }
 
         // Check booleans.
         foreach (['allDay', 'showAttendees'] as $booleanKey) {
-            if (array_key_exists($booleanKey, (array)$requestPost)) {
+            if ($requestPost->offsetExists($booleanKey)) {
                 $value = $requestPost[$booleanKey];
                 if ($booleanKey === 'allDay' && $value === '') {
                     // A blank string is sent by the create/modify form.  Interpret it as 0.
@@ -192,7 +188,7 @@ class Validator
 
         // Check integers.
         foreach (['level', 'attendance', 'maxAttendees'] as $integerKey) {
-            if (array_key_exists($integerKey, (array)$requestPost)) {
+            if ($requestPost->offsetExists($integerKey)) {
                 $value = $requestPost[$integerKey];
                 // Extra validation for integer key 'maxAttendees'.
                 if ($integerKey === 'maxAttendees') {
@@ -230,7 +226,7 @@ class Validator
 
         // Check strings.
         foreach (['efficacy', 'title', 'repeat', 'location', 'detail'] as $stringKey) {
-            if (array_key_exists($stringKey, (array)$requestPost)) {
+            if ($requestPost->offsetExists($stringKey)) {
                 if (!is_string($requestPost[$stringKey])) {
                     throw new SchoolboxException("Value for key '$stringKey' should be a string.");
                 }
@@ -258,7 +254,7 @@ class Validator
 
         // Check object stubs.
         foreach (['user', 'author', 'type'] as $objectStubKey) {
-            if (array_key_exists($objectStubKey, (array)$requestPost)) {
+            if ($requestPost->offsetExists($objectStubKey)) {
                 $objectStubValue = $requestPost[$objectStubKey];
                 $requestPost[$objectStubKey] = $this->validateObjectStub($objectStubKey, $objectStubValue);
             }
@@ -266,7 +262,7 @@ class Validator
 
         // Check arrays.
         foreach (['roles', 'campuses', 'folders', 'guests', 'resources'] as $arrayKey) {
-            if (array_key_exists($arrayKey, (array)$requestPost)) {
+            if ($requestPost->offsetExists($arrayKey)) {
                 if (!is_array($requestPost[$arrayKey])) {
                     throw new SchoolboxException(
                         "Value for key '$arrayKey' should be an array of object stubs e.g. [{\"id\": 1}, {\"id\": 2}]."
@@ -311,8 +307,8 @@ class Validator
         // TODO: Enable this rule once the form has been fixed.
         // Check that values for 'attendance' and 'guests' do not contradict.
         //if (
-        //    array_key_exists('attendance', (array)$requestPost) &&
-        //    array_key_exists('guests', (array)$requestPost) &&
+        //    $requestPost->offsetExists('attendance') &&
+        //    $requestPost->offsetExists('guests') &&
         //    $requestPost['attendance'] === EventAttendanceModel::LEVEL_NO_ATTENDANCE &&
         //    count($requestPost['guests']) > 0
         //) {
@@ -342,7 +338,7 @@ class Validator
         }
 
         // dupe the things, as we need to match and test against DAY ONLY, NO TIME
-        if (array_key_exists('repeat_until', (array)$requestPost)) {
+        if ($requestPost->offsetExists('repeat_until')) {
             try {
                 new Alaress_Date_Format(
                     $requestPost['repeat_until'],
@@ -356,10 +352,10 @@ class Validator
         // check if start/end dates are logical (when we are not looking at all day events)
         if (!$allDayBool) {
             // grab dates, either from post, or from existing event
-            $startDateTime = $requestPost['startDate'] ?
+            $startDateTime = $requestPost->offsetExists('startDate') ?
                 new Alaress_Date_Format($requestPost['startDate'], $this->getValidFormatsForDateField('startDate', $allDayBool)) :
                 $event->getStartDateTime();
-            $endDateTime = $requestPost['endDate'] ?
+            $endDateTime = $requestPost->offsetExists('endDate') ?
                 new Alaress_Date_Format($requestPost['endDate'], $this->getValidFormatsForDateField('endDate', $allDayBool)) :
                 $event->getEndDateTime();
             // compare start/end dates

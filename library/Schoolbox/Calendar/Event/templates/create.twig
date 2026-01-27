@@ -81,9 +81,9 @@
 <div class="row">
     <div class="small-12 island">
         {% if event.id %}
-            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postModify', {eventId: event.id}) %}
+            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postModifyForForm', {eventId: event.id}) %}
         {% else %}
-            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postCreate') %}
+            {% set formRoute = routeLookupIfAuthorized('calendarEvent.postCreateForForm') %}
         {% endif %}
 
         {# Append returnUrl encoding if supplied
