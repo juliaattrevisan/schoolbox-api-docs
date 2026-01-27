@@ -582,7 +582,6 @@ class Controller extends Base
      * This function was added to ensure checkbox fields save when the 'Create/Edit Event' form is saved.
      * See the explanation in the comment inside the function.
      *
-     * @param Event $event
      * @throws MapperException
      * @throws InvalidArgumentException
      * @throws LogicException
@@ -590,7 +589,7 @@ class Controller extends Base
      * @throws SchoolboxException
      * @throws \Exception
      */
-    public function postCreateForForm(Event $event): void
+    public function postCreateForForm(): void
     {
         // If data for any checkbox field is missing from $this->requestPost, assume the checkbox has been left
         // unticked, and so add a new data item for that checkbox with a boolean false value.
