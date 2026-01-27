@@ -8,11 +8,23 @@ import { ProfileStatus, type Profile } from "../../../js/types/manageDifferentia
 const props = defineProps<{
     profile: Profile;
 }>();
+
+/**
+ * To format a date string into a short date format
+ * @param dateString - the date string to format
+ * @returns - the formatted date string or null if the input is null
+ */
+function formatDateShort(dateString: string | null): string | null {
+    if (!dateString) {
+        return null;
+    }
+    return window.dayjs(dateString).format(window.dateDisplayFormats.dayjsDateShort);
+}
 </script>
 
 <template>
     <div class="l-flex-col l-pad-s l-gap-m f-no-margins">
-        <p>{{ props.profile.updated_at }}</p>
+        <p>{{ formatDateShort(props.profile.updated_at) }}</p>
         <sbx-label
             v-if="props.profile.status?.includes(ProfileStatus.OUT_OF_DATE)"
             text="Out of date"
