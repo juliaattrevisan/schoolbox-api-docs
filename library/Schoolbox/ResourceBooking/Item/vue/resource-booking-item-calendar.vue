@@ -236,6 +236,14 @@ export default {
             }
 
             eventRenderInfo.event.setProp("display", "block");
+
+            const titleForResourceBookingSection =
+                eventRenderInfo.event?.extendedProps?.data?.booking?.titleForResourceBookingSection;
+            if (titleForResourceBookingSection !== null) {
+                // Override the default title with the title for the resource booking section.
+                eventRenderInfo.event.setProp("title", titleForResourceBookingSection);
+            }
+
             return true;
         },
 

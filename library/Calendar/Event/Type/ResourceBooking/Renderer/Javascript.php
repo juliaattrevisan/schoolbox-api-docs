@@ -156,7 +156,6 @@ class Javascript extends Base
         $event  = [
             'resourceId' => $booking->getResource()->getId(),
             'title'      => $this->getEvent()->getTitle(),
-            'titleForResourceBookingSection' => $this->getAlternateTitleForResourceBookingSection($this->getEvent()->getTitle()),
             'start'      => $start,
             'end'        => $end,
 
@@ -222,7 +221,9 @@ class Javascript extends Base
 
                     // Event type 'EOTC' refers to library/Calendar/Event/Type/EOTC/Event.php.
                     // Event type 'Day' refers to library/Calendar/Event/Type/Day/Event.php.
-                    'linkedEventType' => ($eotcEventId !== null) ? 'EOTC' : 'Day'
+                    'linkedEventType' => ($eotcEventId !== null) ? 'EOTC' : 'Day',
+
+                    'titleForResourceBookingSection' => $this->getAlternateTitleForResourceBookingSection($this->getEvent()->getTitle()),
                 ],
             ],
         ];
