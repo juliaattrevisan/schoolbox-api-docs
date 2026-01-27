@@ -15,6 +15,7 @@ use GuzzleHttp\Psr7\Uri;
 use JsonException;
 use Schoolbox\Admin\OpenAI;
 use UnexpectedValueException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
 use Schoolbox\IConfigLoader;
@@ -146,6 +147,22 @@ class ClientFactory
             $this->logMapper,
         );
     }
+
+
+    /**
+     * Build an OpenAI client for use with the Moderations API
+     * https://platform.openai.com/docs/api-reference/moderations
+     *
+     * This is independent as schools can't control the moderation key,
+     * it is set by us for all schools and can be used across different AI features.
+     *
+     * @return IClient
+     */
+    public function buildOpenAiModeration(): IClient
+    {
+        return $this->buildOpenAi($this->config->get(ConfigMapper::NAME_AI_MODERATION_KEY));
+    }
+
 
     /**
      * Build an OpenAI-compatible Azure client.
