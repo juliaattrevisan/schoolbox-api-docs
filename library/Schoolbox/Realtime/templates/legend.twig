@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="small-12 island t-white-space-normal">
+    <div class="small-12 island">
         <h2 class="subheader">Notification Delivery Options</h2>
         <section>
             <ul class="information-list">
@@ -10,7 +10,7 @@
                             <p>
                                 Muted
                             </p>
-                            <p class="meta">
+                            <p class="meta t-white-space-normal">
                                 {{ who | capitalize }} won't receive this message.
                             </p>
                         </div>
@@ -25,7 +25,7 @@
                             <p>
                                 Digest
                             </p>
-                            <p class="meta">
+                            <p class="meta t-white-space-normal">
                                 This message will be collated and emailed to {{ who }} in a digest{% if digest | length > 1 %} <strong>{{ digest }}</strong>{% endif %}.<br/>
                                 It will not appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                             </p>
@@ -41,7 +41,7 @@
                             <p>
                                 Instant
                             </p>
-                            <p class="meta">
+                            <p class="meta t-white-space-normal">
                                 This message will appear in {{ who }}{{ who == 'you' ? 'r' : "'" }} internal messages list.
                             </p>
                         </div>
@@ -64,7 +64,7 @@
                             <p>
                                 Device
                             </p>
-                            <p class="meta">
+                            <p class="meta t-white-space-normal">
                                 This message will be pushed to {{ who }}{{ who == 'you' ? 'r' : "'" }} device{% if mobile | length > 1 %}s{% endif %}. <br />
                                 * Requires Instant to be enabled.
                             </p>
@@ -80,7 +80,7 @@
                             <p>
                                 Email
                             </p>
-                            <p class="meta">
+                            <p class="meta t-white-space-normal">
                                 This message will be immediately emailed to {{ who }}.<br />
                                 * Requires Instant to be enabled.
                             </p>

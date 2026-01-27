@@ -53,7 +53,7 @@
     text-align: center;
 }
 
-// Allows wrapping of meta in cards for notifications legend
-.t-white-space-normal p.meta {
-    white-space: normal;
+// Enforce wrapping of white space
+.t-white-space-normal {
+    white-space: normal !important;
 }
