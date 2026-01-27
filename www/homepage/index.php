@@ -31,6 +31,13 @@ $prefix       = 'code';
 
 /** @var SitePage $this */
 
+// No homepage ID or code? 404
+// Prior to this it redirected to /homepage/code, then /homepage/code/code,
+// before finally 404ing
+if (count($this->arg) === 0) {
+    $this->pageNotFound();
+}
+
 /* Retrieve the category ID from the URI, must be an integer and at least 1 character long
  * e.g. /homepage/43
  */
