@@ -102,19 +102,19 @@ class ModelToArray
                     ],
                 ),
             ],
-            'created_at' => $model->getCreatedAt()?->getShort(),
+            'created_at' => $model->getCreatedAt()?->toRfc3339String(),
             /* Have not decided to include created_by full details
              * so just returning the full name for now
              * TODO: update if needed
              */
             'created_by' => $model->getCreatedBy()?->getFullName(),
-            'updated_at' => $model->getUpdatedAt()?->getShort(),
+            'updated_at' => $model->getUpdatedAt()?->toRfc3339String(),
             /* Have not decided to include updated_by full details
              * so just returning the full name for now
              * TODO: update if needed
              */
             'updated_by' => $model->getUpdatedBy()?->getFullName(),
-            'deleted_at' => $model->getDeletedAt()?->getShort(),
+            'deleted_at' => $model->getDeletedAt()?->toRfc3339String(),
         ];
     }
 

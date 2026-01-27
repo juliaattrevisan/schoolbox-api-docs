@@ -10,7 +10,7 @@ class ResponseModelToArray
     {
         return [
             'id' => $model->getId(),
-            'updated_at' => $model->getUpdatedAt()->getShort(),
+            'updated_at' => $model->getUpdatedAt()->toRfc3339String(),
         ];
     }
 }
