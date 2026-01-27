@@ -1474,19 +1474,26 @@ abstract class Kernel
                 ExternalConnectorFactory::EXTERNAL_COMMUNITY_PORTAL
             );
 
-            // Load in the key and initialization vector that are required before it can be used
+            // Load in the key and initialization vector:
+            // first attempt from env vars, then from deployed configuration.
+            $key = getenv('SYNERGETIC_PASSWORD_ENCRYPTION_KEY', true) ?: null;
+            $iv  = getenv('SYNERGETIC_PASSWORD_ENCRYPTION_IV', true) ?: null;
+            if (!isset($key, $iv)) {
+                $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
+                if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
+                    $config = json_decode(file_get_contents($webServicesKeyFile), true);
+                    $key    = $config['key'] ?? null;
+                    $iv     = $config['iv'] ?? null;
+                }
+            }
 
-            $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
-
-            if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
-                $config = json_decode(file_get_contents($webServicesKeyFile), true);
-
-                $communityPortal->setSecrets(
-                    base64_decode($config['key']),
-                    base64_decode($config['iv'])
-                );
+            if (isset($key, $iv)) {
+                $communityPortal->setSecrets(base64_decode($key), base64_decode($iv));
             } else {
-                trigger_error('Cannot read community portal key - password will not be changed', E_USER_WARNING);
+                trigger_error(
+                    'Cannot read community portal key from env or config file - password will not be changed',
+                    E_USER_WARNING,
+                );
             }
 
             return $communityPortal;

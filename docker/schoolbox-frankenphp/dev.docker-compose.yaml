@@ -7,6 +7,8 @@ services:
     environment:
       DEBUG: "1"
       PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+      SYNERGETIC_PASSWORD_ENCRYPTION_KEY: ${SYNERGETIC_PASSWORD_ENCRYPTION_KEY:-}
+      SYNERGETIC_PASSWORD_ENCRYPTION_IV: ${SYNERGETIC_PASSWORD_ENCRYPTION_IV:-}
     restart: always
     build:
       context: ./schoolbox-frankenphp
