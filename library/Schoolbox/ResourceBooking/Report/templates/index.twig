@@ -205,10 +205,10 @@
                         </td>
                         <td>
                             {% if booking is empty %}
-                                {{ event.getTitle() }}
+                                {{ event.getTitleForResourceBooking() }}
                             {% else %}
                                 <a href="{{ routeLookup('resourceBooking.edit', {id: booking.getId()}) }}">
-                                    {{ event.getTitle() }}
+                                    {{ event.getTitleForResourceBooking() }}
                                 </a>
                             {% endif %}
                         </td>
