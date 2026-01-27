@@ -54,8 +54,8 @@ window.Vue.onBeforeUnmount(async () => {
     <textarea
         :id="props.id"
         ref="textareaEl"
-        :required="props.required || undefined"
         v-model="bodyProxy"
+        :required="props.required || undefined"
         :name="props.id"
     ></textarea>
 </template>
