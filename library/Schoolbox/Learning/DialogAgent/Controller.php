@@ -634,9 +634,14 @@ class Controller extends Base
             }
         }
 
+        // only provide the moderation client if enabled for this feature
+        $moderationClient = $aiConfig->isAiModerationEnabled($agentConfig)
+            ? $this->aiClientFactory->buildOpenAiModeration()
+            : null;
+
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
-            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT), // TODO
+            $moderationClient,
             $agentConfig,
             $this->dialogAgentResponseMessageMapper,
         );
@@ -717,9 +722,14 @@ class Controller extends Base
             return;
         }
 
+        // only provide the moderation client if enabled for this feature
+        $moderationClient = $aiConfig->isAiModerationEnabled($agentConfig)
+            ? $this->aiClientFactory->buildOpenAiModeration()
+            : null;
+
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
-            $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT), // TODO
+            $moderationClient,
             $agentConfig,
             $this->dialogAgentResponseMessageMapper,
         );
