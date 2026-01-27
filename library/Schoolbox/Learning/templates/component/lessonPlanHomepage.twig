@@ -43,7 +43,13 @@
 
                     {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
                     {% set specAssessment = lesson.specificationAssessment ?? null %}
-                    {% if specAssessment %}
+
+                    {% if lesson.context is project %}
+                        {# apparently you're not allowed to do this if it's from a project, related to SA-21140
+                        # i've been told even though the routes still let you snap it if you wanted, just not via the component for now
+                        #}
+                        {% set saveToCourseRoute = null %}
+                    {% elseif specAssessment %}
                         {% set saveToCourseRoute = routeLookupIfAuthorized(
                             'courseExport.putAssessmentIntoUnit',
                             {
