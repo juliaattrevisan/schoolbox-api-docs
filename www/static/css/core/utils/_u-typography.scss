@@ -54,6 +54,6 @@
 }
 
 // Enforce wrapping of white space
-.t-white-space-normal p.meta {
-    white-space: normal;
+.t-white-space-normal {
+    white-space: normal !important;
 }
