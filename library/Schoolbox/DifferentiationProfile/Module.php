@@ -111,6 +111,10 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        /* Preload student for routes that require it
+         */
+        $preloadStudent = fn(array $params) => $this->preloadStudent($params);
+
         $this->register(self::METHOD_GET, '/manage', 'manageDifferentiationProfiles', $getPerms);
         $this->register(self::METHOD_GET, '/list', 'getAllDifferentiationProfileData', $getPerms);
         $this->register(
@@ -127,7 +131,7 @@ class Module extends BaseModule
             "$studentPath/view",
             'viewDifferentiationProfileData',
             $viewProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
+            $preloadStudent,
         );
 
         $this->register(
@@ -135,7 +139,7 @@ class Module extends BaseModule
             $studentPath,
             'getDifferentiationProfileData',
             $getPerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
+            $preloadStudent,
         );
 
         $this->register(
@@ -143,7 +147,7 @@ class Module extends BaseModule
             $studentPath,
             'createDifferentiationProfileData',
             $updateProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
+            $preloadStudent,
         );
 
         $this->register(
@@ -151,7 +155,7 @@ class Module extends BaseModule
             $studentPath,
             'putDifferentiationProfileData',
             $updateProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
+            $preloadStudent,
         );
     }
 
