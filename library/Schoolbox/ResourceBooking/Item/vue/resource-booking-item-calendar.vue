@@ -237,11 +237,10 @@ export default {
 
             eventRenderInfo.event.setProp("display", "block");
 
-            const titleForResourceBookingSection =
-                eventRenderInfo.event?.extendedProps?.data?.booking?.titleForResourceBookingSection;
-            if (titleForResourceBookingSection !== null) {
+            const alternateTitle = eventRenderInfo.event?.extendedProps?.data?.booking?.title;
+            if (alternateTitle !== null) {
                 // Override the default title with the title for the resource booking section.
-                eventRenderInfo.event.setProp("title", titleForResourceBookingSection);
+                eventRenderInfo.event.setProp("title", alternateTitle);
             }
 
             return true;

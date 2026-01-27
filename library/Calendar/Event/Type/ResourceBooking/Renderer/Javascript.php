@@ -223,7 +223,8 @@ class Javascript extends Base
                     // Event type 'Day' refers to library/Calendar/Event/Type/Day/Event.php.
                     'linkedEventType' => ($eotcEventId !== null) ? 'EOTC' : 'Day',
 
-                    'titleForResourceBookingSection' => $this->getEvent()->getTitleForResourceBooking(),
+                    // This is an alternate title for the booking, to be used in the resource booking section.
+                    'title' => $this->getEvent()->getTitleForResourceBooking(),
                 ],
             ],
         ];
