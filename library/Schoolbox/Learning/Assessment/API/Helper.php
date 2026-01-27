@@ -127,6 +127,18 @@ class Helper
             $folderId     = (int)$row['folderId'];
             $assessmentId = (int)$row['id'];
 
+            /* These activities do *not* supported weights (for various reasons)
+             * Weight is not applicable to 'lessonPlan' and 'task' and dialog agents.
+             *
+             * TODO start refactoring all these activity-specific reasons away, including inverting this so we
+             *  actually whitelist activities that *do* support weights, instead of a blacklist
+             */
+            $unweightedActivities = [
+                AssessmentType::TYPE_LESSON_PLAN,
+                AssessmentType::TYPE_TASK,
+                AssessmentType::TYPE_DIALOG_AGENT
+            ];
+
             if (!isset($output[$assessmentId])) {
                 $output[$assessmentId] = [
                     'id'               => $assessmentId,
@@ -150,10 +162,7 @@ class Helper
                     ],
                     'subjectCode'      => $row['subjectCode'],
                     'project'          => (null === $row['project']) ? null : ['id' => (int)$row['project']],
-                    'weight'           => (
-                        // Weight is not applicable to 'lessonPlan' and 'task'.
-                        (in_array($row['assessmentType'], [AssessmentType::TYPE_LESSON_PLAN, AssessmentType::TYPE_TASK])) ? null : (float)$row['weight']
-                    ),
+                    'weight'           => in_array($row['assessmentType'], $unweightedActivities,) ? null : (float)$row['weight'],
                     'dueDate'          => $row['due_date'] ? \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String() : null,
                     'rubric'           => $this->getRubric($assessmentId),
                     'participants'     => (
