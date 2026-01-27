@@ -52,3 +52,8 @@
 .t-align-center {
     text-align: center;
 }
+
+// Allows wrapping of meta in cards for notifications legend
+.t-white-space-normal p.meta {
+    white-space: normal;
+}
