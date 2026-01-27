@@ -41,7 +41,13 @@ class PreviousAwards
 
         foreach ($badgeMapping as $unitSpecId => $mapping) {
             $ids[] = (int)$mapping[Candidacy::SUPERSTAR]['id'];
-            $ids[] = (int)$mapping[Candidacy::STAR]['id'];
+
+            /* It turns out that STAR celebrity status might actually be optional: in 2026 we found some units only
+             * have SUPERSTAR status...
+             */
+            if (array_key_exists(Candidacy::SUPERSTAR, $mapping)) {
+                $ids[] = (int)$mapping[Candidacy::STAR]['id'];
+            }
         }
 
         /* We're going to inject this straight in to the jugular
