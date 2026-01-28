@@ -4,12 +4,12 @@ import PastoralCareReports from "@schoolboxTest/playwright/support/page/pastoral
 import PastoralReportDetails from "@schoolboxTest/playwright/support/page/pastoralCare/pastoralReportBuilder/PastoralReportDetails";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
-test.describe("Pastoral Records", () => {
+test.describe("Pastoral Report Builder", () => {
     const reportTitle: string = "Pastoral Report Automation Test";
     const reportNameCsv: string = "report-pastoral_report_automation_test";
 
     /**
-     * update some pastoral records in the database so that it have points
+     * update some pastoral records in the database so that they have points
      */
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("update points for the pastoral records to get data for the report");
@@ -22,7 +22,7 @@ test.describe("Pastoral Records", () => {
     /**
      * Preparations
      *
-     * get logged in as admin
+     * get logged in as admin and impersonate a teacher
      */
     test.beforeEach(async ({ tester }) => {
         await tester.impersonateTeacher();
@@ -96,6 +96,7 @@ test.describe("Pastoral Records", () => {
             await createPastoralReport.selectFrequencyTables("studentByType");
             await createPastoralReport.selectFrequencyTables("studentByMonth");
             await createPastoralReport.clickSaveButton();
+            await pastoralCareReports.goto();
             await pastoralCareReports.openPastoralReport(reportTitle);
             await pastoralReportDetails.checkTabsAreNotPresented(["Student by Month", "Student by Type"]);
             await pastoralReportDetails.checkTabsArePresented([
@@ -111,7 +112,7 @@ test.describe("Pastoral Records", () => {
     });
 
     /**
-     * Create a pastoral report with all frequency tables selected using relative date,
+     * Create a pastoral report with all frequency tables selected using a fixed date range,
      * click each one of the tabs to ensure they load the records and points correctly via table and modal
      * check the print button is presented and able to export the report
      */
@@ -243,7 +244,7 @@ test.describe("Pastoral Records", () => {
                     ["oct_2017"],
                     ["week_4", "week_3", "week_2", "week_1", "week_0"],
                 ],
-                [[], ["nov_2017"], ["week_5"], ["sep_5"], ["week_5"]],
+                [[], ["nov_2017"], ["week_5"], ["sep_2017"], ["week_5"]],
             );
         } finally {
             tester.isGoingTo("Clean up: delete the pastoral report");

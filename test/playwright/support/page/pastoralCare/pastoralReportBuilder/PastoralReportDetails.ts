@@ -8,11 +8,13 @@ export default class PastoralReportDetails {
 
     static readonly DATA_TEST_PASTORAL_TAB = `pastoral-report-{tabName}`;
 
-    static readonly DATA_TEST_DOWNLOAD_BUTTON = `sbx-icon`;
+    static readonly DATA_TEST_DOWNLOAD_BUTTON = `pastoral-report-download-button`;
 
     static readonly MODAL_TABLE_RECORD = "div.pr-table__records";
 
     static readonly MODAL_RECORDS_ROWS = "ul.information-list.threaded";
+
+    static readonly RECORDS_POINTS_RADIO_BUTTON = `label[for='{radio}']`;
 
     static readonly POINTS_RADIO_BUTTON = "label[for='points']";
 
@@ -28,7 +30,7 @@ export default class PastoralReportDetails {
 
     /**
      * Navigates to the pastoral report details page
-     * @param id - The user id
+     * @param id - The report id
      */
     async goto(id: number): Promise<void> {
         await this.page.goto(PastoralReportDetails.URL.replace("{id}", id.toString()));
@@ -57,11 +59,10 @@ export default class PastoralReportDetails {
      * @param button - The button to click: "points" or "records"
      */
     async clickRecordsOrPointsRadioButton(button: "points" | "records"): Promise<void> {
-        if (button === "points") {
-            await this.page.click(PastoralReportDetails.POINTS_RADIO_BUTTON);
-        } else {
-            await this.page.click(PastoralReportDetails.RECORDS_RADIO_BUTTON);
-        }
+        const radioButton: Locator = this.page.locator(
+            PastoralReportDetails.RECORDS_POINTS_RADIO_BUTTON.replace("{radio}", button),
+        );
+        await radioButton.click();
     }
 
     /**
