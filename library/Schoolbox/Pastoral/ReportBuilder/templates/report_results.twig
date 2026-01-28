@@ -13,7 +13,8 @@
         :tabs="{{ tabs|json_encode }}"
         :config="{{ {
             pastoralPointEnabled: config.pastoral_point_enabled,
-            pastoralActionEnable: config.pastoral_action_enable
+            pastoralActionEnable: config.pastoral_action_enable,
+            pastoralSeverity: config.pastoral_severity
         }|json_encode }}"
         :routes="{{ {
             getStudentRecord: routeLookup('pastoral.getStudentRecord'),
@@ -21,8 +22,6 @@
             getIndex: routeLookup('pastoralReportBuilder.getIndex'),
         }|json_encode }}"
         locale-pastoral="{{ locale.pastoral.proper|lower }}"
-        :show-severity="{{ showSeverity ? 'true' : 'false' }}"
-        :severity-colors="{{ severityColors|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/pastoralReport.js?v={{ config.site_version }}"></script>
