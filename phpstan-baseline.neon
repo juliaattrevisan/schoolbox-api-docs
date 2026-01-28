@@ -6275,3 +6275,9 @@ parameters:
 			identifier: greaterOrEqual.alwaysTrue
 			count: 1
 			path: tools/rubric/repairSpecAssessments.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between non-empty-string and '''' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: library/External/Canvas/Sync/DataRestorer.php
