@@ -27,7 +27,12 @@ const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 if (props.hasFocusTrap) {
-    const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
+    /**
+     * to keep focus within the modal when open,
+     * but allow clicks outside, as the modal can sometimes trigger the light gallery preview,
+     * which requires outside clicks to function
+     */
+    const { activate, deactivate } = useFocusTrap(modalEl, { allowOutsideClick: true });
     /**
      * Keep focus within the modal when it's open
      */
