@@ -352,9 +352,6 @@ class Controller extends Base
      */
     public function getReportTags(PastoralTag $tag): void
     {
-        $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
-        $severityColors = $showSeverity ? $this->getSeverityColors() : [];
-
         $defaultSummaryOptions = [
             [
                 'title' => 'List',
@@ -377,8 +374,6 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
-                'showSeverity'   => $showSeverity,
-                'severityColors' => $severityColors,
                 'tabs'           => $defaultSummaryOptions,
             ],
             'Pastoral Tag Report',
@@ -423,9 +418,6 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $auditRecord->setReportId($report->getId());
         $pastoralAuditMapper->save($auditRecord);
-
-        $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
-        $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
             [
@@ -513,8 +505,6 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => $report->getName(),
-                'showSeverity'   => $showSeverity,
-                'severityColors' => $severityColors,
                 'tabs'           => $tabs,
             ],
             $report->getName(),

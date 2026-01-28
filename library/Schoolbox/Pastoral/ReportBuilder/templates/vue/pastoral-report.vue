@@ -4,7 +4,7 @@
  */
 
 import { TabType } from "../js/types/pastoralReportTypes";
-import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
+import type { Tab, Config, Routes } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
 import PrTable from "./table/pr-table.vue";
 import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
@@ -15,8 +15,6 @@ const props = defineProps<{
     config: Config;
     routes: Routes;
     localePastoral: string;
-    showSeverity: boolean;
-    severityColors: SeverityColors;
 }>();
 
 const selectedTab = window.Vue.ref<Tab | null>(null);
