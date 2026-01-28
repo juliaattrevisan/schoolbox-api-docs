@@ -21,6 +21,26 @@ use Schoolbox\User;
 class Moderation implements ICheck
 {
     /**
+     * The default moderation categories to use if an agent does not specify a separate configuration
+     * https://platform.openai.com/docs/guides/moderation#content-classifications
+     */
+    private const array DEFAULT_CATEGORIES = [
+        "sexual",
+        "sexual/minors",
+        "hate",
+        "hate/threatening",
+        "harassment",
+        "harassment/threatening",
+        "self-harm",
+        "self-harm/intent",
+        "self-harm/instructions",
+        "violence",
+        "violence/graphic",
+        "illicit",
+        "illicit/violent",
+    ];
+
+    /**
      * @inheritDoc
      */
     public static function getName(): string
@@ -39,18 +59,18 @@ class Moderation implements ICheck
     /**
      * Constructor
      *
-     * @param IClient $client           An AI provider client, must point to the Moderations endpoint.
+     * @param IClient $client            An AI provider client, must point to the Moderations endpoint.
+     * @param ?User   $user              The user making the request, if any.
+     * @param ?string $feature           An identifier for the feature being requested.
+     * @param ?string $sessionId         The session ID against which this request should be logged.
      * @param array<string> $categories The list of categories which should be flagged.
-     * @param ?User   $user             The user making the request, if any.
-     * @param ?string $feature          An identifier for the feature being requested.
-     * @param ?string $sessionId        The session ID against which this request should be logged.
      */
     public function __construct(
         private IClient $client,
-        private array $categories,
         private ?User $user = null,
         private ?string $feature = null,
         private ?string $sessionId = null,
+        private array $categories = self::DEFAULT_CATEGORIES,
     ) {
     }
 

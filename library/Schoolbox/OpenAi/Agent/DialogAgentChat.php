@@ -69,21 +69,6 @@ class DialogAgentChat
         if (null !== $this->moderationClient) {
             $pipeline->addInputCheck(new Guardrails\Check\Moderation(
                 $this->moderationClient,
-                [
-                    "sexual",
-                    "sexual/minors",
-                    "hate",
-                    "hate/threatening",
-                    "harassment",
-                    "harassment/threatening",
-                    "self-harm",
-                    "self-harm/intent",
-                    "self-harm/instructions",
-                    "violence",
-                    "violence/graphic",
-                    "illicit",
-                    "illicit/violent",
-                ],
                 $user,
                 Helper::FEATURE_DIALOGAGENT,
                 $sessionId,
