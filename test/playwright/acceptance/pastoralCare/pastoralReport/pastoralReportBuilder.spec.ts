@@ -33,6 +33,7 @@ test.describe("Pastoral Records", () => {
      * check all the tables are presented in the report,
      * modify the report to exclude some frequency tables,
      * check only the selected tables are presented in the report
+     * check the columns can be sorted properly
      */
     test("create a pastoral report and check whether the frequency tables are presented or not, check the columns can be sorted and proper student, date and types are presented", async ({
         page,
@@ -201,6 +202,10 @@ test.describe("Pastoral Records", () => {
         }
     });
 
+    /**
+     * creates a report
+     * check the dates and students are properly presented in the report
+     */
     test("creates a report and check the dates and students are properly presented in the report", async ({
         page,
         tester,

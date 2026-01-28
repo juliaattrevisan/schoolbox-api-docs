@@ -66,7 +66,7 @@ export default class PastoralReportDetails {
 
     /**
      * checks that 1 or more tabs are presented in the pastoral report details page
-     * @param tabNames - The names of the tabs
+     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
      */
     async checkTabsArePresented(tabNames: string[]): Promise<void> {
         for (const tabName of tabNames) {
@@ -79,7 +79,7 @@ export default class PastoralReportDetails {
 
     /**
      * checks that 1 or more tabs are not presented in the pastoral report details page
-     * @param tabNames - The names of the tabs
+     * @param tabNames - The names of the tabs:"List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"
      */
     async checkTabsAreNotPresented(tabNames: string[]): Promise<void> {
         for (const tabName of tabNames) {
@@ -93,7 +93,7 @@ export default class PastoralReportDetails {
     /**
      * clicks each tab in the pastoral report details page
      * checks the number of rows in the table presented in each tab
-     * @param tabNames - The names of the tabs
+     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
      * @param expectedRowCounts - The expected number of rows in each tab table
      */
     async clickTabsAndCheckRowCounts(tabNames: string[], expectedRowCounts: number[]): Promise<void> {
@@ -125,7 +125,7 @@ export default class PastoralReportDetails {
      * @param recordId - The id of the record
      * @param studentId - The id of the student
      * @param expectedTitle - The expected title of the record
-     * @param expectedSeverity - The expected severity of the record
+     * @param expectedSeverity - The expected severity of the record: Low, Critical, Medium, High
      * @param expectedPoints - The expected number of points of the record
      */
     async checkRecordDetails(
@@ -172,7 +172,7 @@ export default class PastoralReportDetails {
     /**
      * for one or more report tabs
      * clicks a report tab, clicks one or more cells in the report table to open the modal, checks the number of records presented in the modal opened, close the modal
-     * @param tabNames - The names of the tabs
+     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
      * @param childIds1 - The child row numbers in the table to click
      * @param childIds2 - The child column numbers in the table to click
      * @param expectedCounts - The expected number of records in the modal for each tab
@@ -205,7 +205,7 @@ export default class PastoralReportDetails {
     /**
      * for one or more report tabs
      * clicks a report tab, check the number of records is presented properly in the table
-     * @param tabNames - The names of the tabs
+     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
      * @param childIds1 - The child row numbers in the table to click
      * @param childIds2 - The child column numbers in the table to click
      * @param expectedCounts - The expected number in the rows in each tab table
@@ -241,8 +241,8 @@ export default class PastoralReportDetails {
 
     /**
      * clicks each tab, sorts a column and checks the sorting works properly
-     * @param tabNames - The name of the tab
-     * @param headerNames - The name of the header to sort: user
+     * @param tabNames - The name of the tab: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
+     * @param headerNames - The name of the header to sort: user, oct_2017, total, etc
      * @param childIds1 - The child row numbers in the table to click
      * @param childIds2 - The child column numbers in the table to click
      * @param expectedTexts - The expected text in the first row after sorting
@@ -277,12 +277,12 @@ export default class PastoralReportDetails {
     /**
      * for one or more report tabs
      * clicks the report tab, counts the number of data test sort buttons, check whether some type or dates are presented or not
-     * @param tabNames - The names of the tabs
+     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
      * @param expectedSortButtonCounts - The expected number of sort buttons in each tab
-     * @param typesToCheckPresent - The types to check are presented in each tab
-     * @param typesToCheckNotPresent - The types to check are not presented in each tab
-     * @param dateToCheckPresent - The dates to check are presented in each tab
-     * @param dateToCheckNotPresent - The dates to check are not presented in each tab
+     * @param typesToCheckPresent - The types to check are presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
+     * @param typesToCheckNotPresent - The types to check are not presented in each tab: eg: 1 for Award/Achievement, 7 for Behavioural Issues, etc
+     * @param dateToCheckPresent - The dates to check are presented in each tab: eg: oct_2017, week_2, etc
+     * @param dateToCheckNotPresent - The dates to check are not presented in each tab: eg: oct_2017, week_2, etc
      */
     async checkSortButtonsAndTypesDatesPresence(
         tabNames: string[],
