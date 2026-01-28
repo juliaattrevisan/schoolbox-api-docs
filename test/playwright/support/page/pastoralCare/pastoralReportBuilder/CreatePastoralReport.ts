@@ -91,21 +91,6 @@ export default class CreatePastoralReport {
     }
 
     /**
-     * create a pastoral
-     * @param title - The report title
-     * @param dateFrom - The date from value
-     * @param dateTo - The date to value
-     */
-    // async createPastoralReport(title: string, dateFrom: string, dateTo: string): Promise<void> {
-    //     await this.goto();
-    //     await this.fillReportNameField(title);
-    //     await this.selectFixedDateRadioButton();
-    //     await this.fillDateFromField(dateFrom);
-    //     await this.fillDateToField(dateTo);
-    //     await this.clickSaveButton();
-    // }
-
-    /**
      * create a pastoral report by always passing a title
      * optionally passing a date range
      * optionally passing frequency tables to be included or excluded
