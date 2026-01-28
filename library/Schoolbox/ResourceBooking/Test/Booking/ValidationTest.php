@@ -627,4 +627,195 @@ class ValidationTest extends TestCase
 
         $this->assertCount($expected, $errorsToCount);
     }
+
+    /**
+     * Data provider for testGetNewStatusIdForBooking
+     *
+     * @return array
+     */
+    public static function providerGetNewStatusIdForBooking()
+    {
+        return [
+            'valid booking, no clash, open resource' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
+            ],
+            'valid booking, no clash, moderated resource, user is moderator and author' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => true,
+                'userIsAuthor' => true,
+                'expectedStatus' => Booking\Status\Model::STATUS_APPROVED,
+            ],
+            'valid booking, no clash, moderated resource, user is not moderator' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_MODERATED,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+            ],
+            'booking with clash, clashes allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_PENDING,
+                'allowClashBookings' => true,
+            ],
+            'booking with clash, clashes not allowed' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T11:00:00+00:00',
+                'isClash' => true,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'allowClashBookings' => false,
+            ],
+            'booking in past' => [
+                'startDate' => '2020-01-01T10:00:00+00:00',
+                'endDate' => '2020-01-01T11:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+            ],
+            'booking too short' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T10:01:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'minReservationTime' => 'PT1H',
+            ],
+            'booking too long' => [
+                'startDate' => '2027-01-01T10:00:00+00:00',
+                'endDate' => '2027-01-01T15:00:00+00:00',
+                'isClash' => false,
+                'moderationType' => Item\ModerationType\Model::TYPE_OPEN,
+                'userIsModerator' => false,
+                'userIsAuthor' => false,
+                'expectedStatus' => Booking\Status\Model::STATUS_REJECTED,
+                'maxReservationTime' => 'PT2H',
+            ],
+        ];
+    }
+
+    /**
+     * Test getNewStatusIdForBooking function
+     *
+     * @param string $startDate
+     * @param string $endDate
+     * @param bool $isClash
+     * @param int $moderationType
+     * @param bool $userIsModerator
+     * @param bool $userIsAuthor
+     * @param int $expectedStatus
+     * @param bool $allowClashBookings
+     * @param string|null $minReservationTime
+     * @param string|null $maxReservationTime
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetNewStatusIdForBooking')]
+    public function testGetNewStatusIdForBooking(
+        string $startDate,
+        string $endDate,
+        bool $isClash,
+        int $moderationType,
+        bool $userIsModerator,
+        bool $userIsAuthor,
+        int $expectedStatus,
+        bool $allowClashBookings = true,
+        ?string $minReservationTime = null,
+        ?string $maxReservationTime = null
+    ): void {
+        // Create user
+        $user = new User();
+        $user->setId(123);
+
+        $validation = $this->createValidation($user);
+
+        // Create resource with moderation type
+        $resource = new Item\Model();
+        $resource->setId(456);
+        $moderationTypeModel = new Item\ModerationType\Model();
+        $moderationTypeModel->setId($moderationType);
+        $resource->setModerationType($moderationTypeModel);
+        $resource->setAllowClashBookings($allowClashBookings);
+        $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+
+        if ($minReservationTime) {
+            $resource->setMinReservationTime(
+                Interval::createFromDateInterval(new DateInterval($minReservationTime))
+            );
+        } else {
+            $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        }
+
+        if ($maxReservationTime) {
+            $resource->setMaxReservationTime(
+                Interval::createFromDateInterval(new DateInterval($maxReservationTime))
+            );
+        } else {
+            $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        }
+
+        // Mock isUserModerator to avoid database calls
+        $resource = $this->getMockBuilder(Item\Model::class)
+            ->onlyMethods(['isUserModerator'])
+            ->getMock();
+        $resource->method('isUserModerator')->willReturn($userIsModerator);
+        $resource->setId(456);
+        $resource->setModerationType($moderationTypeModel);
+        $resource->setAllowClashBookings($allowClashBookings);
+        $resource->setMinLeadTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+
+        if ($minReservationTime) {
+            $resource->setMinReservationTime(
+                Interval::createFromDateInterval(new DateInterval($minReservationTime))
+            );
+        } else {
+            $resource->setMinReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        }
+
+        if ($maxReservationTime) {
+            $resource->setMaxReservationTime(
+                Interval::createFromDateInterval(new DateInterval($maxReservationTime))
+            );
+        } else {
+            $resource->setMaxReservationTime(Interval::createFromDateInterval(new DateInterval('PT0H')));
+        }
+
+        // Create event
+        $event = new Event();
+        $event->setStartDateTime(new \Alaress_Date_Format($startDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+        $event->setEndDateTime(new \Alaress_Date_Format($endDate, \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+        // Set author
+        $author = new User();
+        $author->setId($userIsAuthor ? 123 : 999);
+        $event->setAuthor($author);
+
+        // Create booking
+        $booking = new Booking\Model();
+        $booking->setResource($resource);
+        $booking->setEvent($event);
+
+        // Test
+        $result = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
+        $this->assertEquals($expectedStatus, $result);
+    }
 }
