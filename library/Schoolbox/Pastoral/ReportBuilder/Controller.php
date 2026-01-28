@@ -352,9 +352,6 @@ class Controller extends Base
      */
     public function getReportTags(PastoralTag $tag): void
     {
-        $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
-        $severityColors = $showSeverity ? $this->getSeverityColors() : [];
-
         $defaultSummaryOptions = [
             [
                 'title' => 'List',
@@ -377,8 +374,6 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
-                'showSeverity'   => $showSeverity,
-                'severityColors' => $severityColors,
                 'tabs'           => $defaultSummaryOptions,
             ],
             'Pastoral Tag Report',
@@ -423,9 +418,6 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $auditRecord->setReportId($report->getId());
         $pastoralAuditMapper->save($auditRecord);
-
-        $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
-        $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
             [
@@ -513,8 +505,6 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => $report->getName(),
-                'showSeverity'   => $showSeverity,
-                'severityColors' => $severityColors,
                 'tabs'           => $tabs,
             ],
             $report->getName(),
@@ -1204,28 +1194,5 @@ class Controller extends Base
     private function getCsv(?array $var): ?string
     {
         return is_array($var) ? implode(',', $var) : null;
-    }
-
-    /**
-     * Returns array of severities with colour in format of
-     * severity id => ['back' => background colour, 'fore' => foreground colour]
-     * @return array
-     */
-    private function getSeverityColors(): array
-    {
-        $severityColors = [];
-        $severities     = $this->pastoralSeverityMapper->findAll(['deleted' => true])->indexBy('id');
-        $transformer    = new ColorHelper();
-        $colorFactory   = $transformer->getColorFactory();
-        foreach ($severities as $severityId => $severity) {
-            if (!$severity->getColor()) {
-                continue;
-            }
-            $severityColors[$severityId] = [
-                'back' => $severity->getColor(),
-                'fore' => $transformer->calculateForeground($colorFactory->build($severity->getColor()))->getAsRgba(),
-            ];
-        }
-        return $severityColors;
     }
 }
