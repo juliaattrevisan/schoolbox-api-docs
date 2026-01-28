@@ -1195,27 +1195,4 @@ class Controller extends Base
     {
         return is_array($var) ? implode(',', $var) : null;
     }
-
-    /**
-     * Returns array of severities with colour in format of
-     * severity id => ['back' => background colour, 'fore' => foreground colour]
-     * @return array
-     */
-    private function getSeverityColors(): array
-    {
-        $severityColors = [];
-        $severities     = $this->pastoralSeverityMapper->findAll(['deleted' => true])->indexBy('id');
-        $transformer    = new ColorHelper();
-        $colorFactory   = $transformer->getColorFactory();
-        foreach ($severities as $severityId => $severity) {
-            if (!$severity->getColor()) {
-                continue;
-            }
-            $severityColors[$severityId] = [
-                'back' => $severity->getColor(),
-                'fore' => $transformer->calculateForeground($colorFactory->build($severity->getColor()))->getAsRgba(),
-            ];
-        }
-        return $severityColors;
-    }
 }
