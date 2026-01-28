@@ -278,6 +278,10 @@ class DataRestorer
         $countTables = count($tables);
         $this->log->debug(sprintf("%d tables found", $countTables));
         foreach ($tables as $idx => $table) {
+            // if table doesn't match what is expected... then log and exit, before we blow away more things...
+            if (!in_array($table, $this->tableNames)) {
+                throw new SchoolboxException("Unexpected table '$table' in Canvas DB");
+            }
             $idx++;
             $this->log->debug("Dropping table $idx/$countTables '$table'");
             $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->getConnector()->getQuoter()->quoteIdentifier($table)}");
