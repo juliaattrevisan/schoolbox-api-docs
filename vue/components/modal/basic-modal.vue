@@ -7,7 +7,6 @@
 import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
-import { vOnClickOutside } from "@vueuse/components";
 
 interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
@@ -81,7 +80,8 @@ function onBackgroundClick(): void {
     <teleport to="body">
         <transition>
             <div v-if="isOpen" ref="modalEl" class="modal">
-                <div v-on-click-outside="onBackgroundClick" :class="`modal__container modal__container--${modalSize}`">
+                <div class="modal__background" @click="onBackgroundClick"></div>
+                <div :class="`modal__container modal__container--${modalSize}`">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <div class="modal__container_main"><slot></slot></div>
                     <slot name="footer"></slot>
@@ -102,7 +102,6 @@ function onBackgroundClick(): void {
 
 <style lang="scss" scoped>
 .modal {
-    background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
     left: 0;
     overflow: auto;
@@ -110,6 +109,14 @@ function onBackgroundClick(): void {
     top: 0;
     width: 100%;
     z-index: var(--sbx-depth-modal);
+    &__background {
+        background-color: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        left: 0;
+        position: fixed;
+        top: 0;
+        width: 100%;
+    }
     &__container {
         background: white;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
