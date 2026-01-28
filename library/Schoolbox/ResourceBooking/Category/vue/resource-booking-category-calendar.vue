@@ -247,7 +247,7 @@ export default {
             }
 
             const alternateTitle = eventRenderInfo.event?.extendedProps?.data?.booking?.title;
-            if (alternateTitle !== null) {
+            if (typeof alternateTitle !== "undefined" && alternateTitle !== null) {
                 // Override the default title with the title for the resource booking section.
                 eventRenderInfo.event.setProp("title", alternateTitle);
             }
