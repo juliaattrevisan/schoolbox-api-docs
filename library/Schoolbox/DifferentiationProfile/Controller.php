@@ -14,7 +14,6 @@ use Alaress\Web\Request\Values;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
-use Schoolbox\DifferentiationProfile\Translator\ResponseModelToArray;
 use Schoolbox\Filter\Mapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\DifferentiationProfile\Mapper as DifferentiationProfileMapper;
@@ -456,10 +455,19 @@ class Controller extends Base
 
             $this->mapper->save($model);
 
-            $translator = new ResponseModelToArray();
+            /* Retrieve the updated model with the updated adjustments
+             */
+            $model = $this->mapper->findById($model->getId());
+
+            $profileTranslator = new ModelToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1),
+            );
 
             $this->response = $this
-                ->responseAsJson(call_user_func($translator, $model))
+                ->responseAsJson(call_user_func($profileTranslator, $model))
                 ->withStatus($isNewRecord ? 201 : 200);
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
