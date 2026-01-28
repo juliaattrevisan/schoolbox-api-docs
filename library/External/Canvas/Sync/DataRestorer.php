@@ -264,8 +264,10 @@ class DataRestorer
     public function dropCanvasDbTables(): void
     {
         // check if the canvasDB matches the schoolbox DB... if they do, something is very wrong... and we should exit quickly...
-        if ($this->canvasDb->getCanvasDbName() === SQL_db ||
-            $this->canvasDb->getCanvasDbName() === SQL_db_read ) {
+        if (
+            $this->canvasDb->getCanvasDbName() === (string)SQL_db ||
+            $this->canvasDb->getCanvasDbName() === (string)SQL_db_read
+        ) {
             throw new SchoolboxException("CanvasDB incorrectly configured, it should NOT be the same as the schoolbox DB");
         }
 
