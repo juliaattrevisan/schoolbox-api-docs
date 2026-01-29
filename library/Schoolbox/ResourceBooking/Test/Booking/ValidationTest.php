@@ -820,14 +820,14 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * Data provider for testCheckForClashesIfResourceBookingsMoved
+     * Data provider for testCheckForClashesIfResourceBookingsMoved.
      *
      * @return array
      */
     public static function providerCheckForClashesIfResourceBookingsMoved()
     {
         return [
-            'no clashes - booking times dont overlap' => [
+            "no clashes - booking times don't overlap" => [
                 'movedBookings' => [
                     ['id' => 1, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
@@ -906,7 +906,7 @@ class ValidationTest extends TestCase
                     6 => false,
                 ],
             ],
-            'multiple bookings - some clash and some dont' => [
+            "multiple bookings - some clash and some don't" => [
                 'movedBookings' => [
                     ['id' => 7, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                     ['id' => 8, 'resourceId' => 100, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
@@ -919,9 +919,9 @@ class ValidationTest extends TestCase
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    7 => true,  // Clashes with first approved booking
-                    8 => false, // No clash
-                    9 => true,  // Clashes with second approved booking
+                    7 => true,  // Clashes with first approved booking.
+                    8 => false, // No clash.
+                    9 => true,  // Clashes with second approved booking.
                 ],
             ],
             'multiple resources - different clash results per resource' => [
@@ -938,8 +938,8 @@ class ValidationTest extends TestCase
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    10 => true,  // Clashes with resource 100's booking
-                    11 => false, // No clash with resource 200's booking
+                    10 => true,  // Clashes with resource 100's booking.
+                    11 => false, // No clash with resource 200's booking.
                 ],
             ],
             'no approved bookings for resource' => [
@@ -947,7 +947,7 @@ class ValidationTest extends TestCase
                     ['id' => 12, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
                 ],
                 'approvedBookingPeriods' => [
-                    // No approved bookings for resource 100
+                    // No approved bookings for resource 100.
                 ],
                 'expectedIsClashByBookingId' => [
                     12 => false,
@@ -965,9 +965,11 @@ class ValidationTest extends TestCase
                     ],
                 ],
                 'expectedIsClashByBookingId' => [
-                    13 => false, // Should exit early at first period since it starts after booking end
+                    13 => false, // Should exit early at first period since it starts after booking end.
                 ],
             ],
+            // Note we cannot test whether the moved bookings themselves are removed from the set of bookings
+            // to check against, because the set of bookings to check against comes from the mocked Mapper.
         ];
     }
 
