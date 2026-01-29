@@ -14,7 +14,7 @@ INSERT INTO config (
 )
 VALUES (
     'ai_moderation_key',
-    'sk-', -- TODO: confirm which key to use
+    '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',
     'AI Moderation Key',
     'Key for the OpenAI Moderation API',
     (SELECT id FROM lu_config_field WHERE `field` = 'json'),
