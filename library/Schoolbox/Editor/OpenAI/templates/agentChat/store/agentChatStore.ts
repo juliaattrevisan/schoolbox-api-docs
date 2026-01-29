@@ -5,9 +5,9 @@ import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSessionId } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
-import { AgentChatMessageType } from "../agentChatTypes";
+import { AgentChatGuardrailSeverity, AgentChatMessageType } from "../agentChatTypes";
 import type { AgentChatFeedMessage, AnyAgentChatFeedMessage, AgentChatLogEntry } from "../agentChatTypes";
-import { AgentChatMessageEventType, generateImage } from "./agentChatPayload";
+import { AgentChatMessageEventType, sendMessage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
 
 /**
@@ -239,7 +239,7 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         };
 
         let hasErrored = false;
-        const response = await generateImage(
+        const response = await sendMessage(
             config.messageRoute,
             payload,
             activeGeneration.value.abortController.signal,
@@ -253,6 +253,25 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                             status: "error",
                             responseId: activeGeneration.value?.response.data.responseId ?? null,
                             message: event.data.message,
+                        },
+                        meta: null,
+                        entryKey: getNextEntryKey(),
+                        createdAt: getRfc3339String(new Date()),
+                    });
+                    activeGeneration.value?.abortController.abort();
+                    activeGeneration.value = null;
+                    return;
+                }
+
+                if (event.eventType === AgentChatMessageEventType.GUARDRAIL_FLAGGED) {
+                    /** The request was blocked by a guardrail check */
+                    hasErrored = true;
+                    feed.value.push({
+                        type: AgentChatMessageType.ALERT,
+                        data: {
+                            side: AgentChatMessageType.RESPONSE,
+                            severity: AgentChatGuardrailSeverity,
+                            message: event.data.data.message,
                         },
                         meta: null,
                         entryKey: getNextEntryKey(),

@@ -41,4 +41,8 @@ enum MessageEventType: string
      * The frontend will terminate the stream after receiving this event
      */
     case ERROR = 'error';
+    /**
+     * Guardrail flagged - the request was blocked by a guardrail check
+     */
+    case GUARDRAIL_FLAGGED = 'guardrail_flagged';
 }

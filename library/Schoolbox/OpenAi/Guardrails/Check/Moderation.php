@@ -87,6 +87,7 @@ class Moderation implements ICheck
         $isTrigger = \count($flaggedCategories) > 0;
 
         return new Outcome(
+            $this,
             $isTrigger,
             ['flaggedCategories' => $flaggedCategories]
         );

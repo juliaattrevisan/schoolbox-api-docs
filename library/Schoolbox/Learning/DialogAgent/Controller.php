@@ -647,6 +647,10 @@ class Controller extends Base
         );
 
         try {
+            $response
+                ->setUpdatedBy($this->getUser()->getId())
+                ->setUpdatedAt(\Alaress_Date_Format::now());
+
             $stream = $agent->requestStream(
                 $this->getUser(),
                 $assessment,
@@ -661,9 +665,6 @@ class Controller extends Base
              * We must wait until now to save, as the log must exist
              * for the session ID foreign key constraint to be satisfied
              */
-            $response
-                ->setUpdatedBy($this->getUser()->getId())
-                ->setUpdatedAt(\Alaress_Date_Format::now());
             $this->dialogAgentResponseMapper->save($response);
 
             // The iterable response can just be passed straight to responseAsEventStream

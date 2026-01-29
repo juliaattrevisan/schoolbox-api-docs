@@ -98,6 +98,7 @@ abstract class AbstractLLMCheck implements ICheck
         $isTrigger = $flagged && $confidence >= $this->confidenceThreshold;
 
         return new Outcome(
+            $this,
             $isTrigger,
             ['flagged' => $flagged, 'confidence' => $confidence],
         );

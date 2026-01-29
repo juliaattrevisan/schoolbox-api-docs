@@ -12,6 +12,7 @@ namespace Schoolbox\OpenAi\Exception;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\Guardrails\Check\ICheck;
+use Schoolbox\OpenAi\Guardrails\Check\Outcome;
 
 /**
  * Exception raised when a guardrail flags the input as disallowed.
@@ -26,10 +27,11 @@ class GuardrailFlagged extends SchoolboxException
     /**
      * Constructor
      *
+     * @param Outcome $outcome    The outcome of the guardrail check
      * @param ICheck $check       The guardrail check that was flagged
      * @param string $information Extra information to be included in the error
      */
-    public function __construct(ICheck $check, string $information = '')
+    public function __construct(private Outcome $outcome, ICheck $check, string $information = '')
     {
         $message = \sprintf(
             "The request failed to meet expected guidelines (%s)",
@@ -41,5 +43,14 @@ class GuardrailFlagged extends SchoolboxException
         if ('' !== $information) {
             $this->information = $information;
         }
+    }
+
+    /**
+     * Retrieve the Outcome associated with this exception
+     * @return Outcome
+     */
+    public function getOutcome(): Outcome
+    {
+        return $this->outcome;
     }
 }

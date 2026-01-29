@@ -87,14 +87,10 @@ class Pipeline
 
             $outcome = $check->check($inputText, $log);
 
-            $log->setOutputText(json_encode([
-                'guardrail' => $check->getName(),
-                'flagged' => $outcome->isFlagged(),
-                'metadata' => $outcome->getMetadata(),
-            ], JSON_THROW_ON_ERROR));
+            $log->setOutputText(json_encode($outcome->asArray(), JSON_THROW_ON_ERROR));
 
             if ($outcome->isFlagged()) {
-                $e = new GuardrailFlagged($check);
+                $e = new GuardrailFlagged($outcome, $check);
                 $log->setErrorMessage($e->getMessage());
                 $log->setReturnCode($e->getCode());
                 $this->client->saveLog($log);

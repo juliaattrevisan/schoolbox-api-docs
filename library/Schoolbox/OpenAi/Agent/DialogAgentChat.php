@@ -22,6 +22,8 @@ use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Mapper 
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\OpenAi\AgentChat\EventStream\ResponseListener;
 use Schoolbox\OpenAi\AgentChat\LogHandler\LogOutputText;
+use Schoolbox\OpenAi\AgentChat\MessageEventType;
+use Schoolbox\OpenAi\EventStream\Message;
 use Schoolbox\OpenAi\Exception\GuardrailFlagged;
 use Schoolbox\OpenAi\Guardrails;
 use Schoolbox\OpenAi\IClient;
@@ -33,6 +35,13 @@ use Schoolbox\User;
  */
 class DialogAgentChat
 {
+    /**
+     * The message to display when a guardrail check fails for a learner's request
+     */
+    private const string GUARDRAIL_FAIL_LEARNER_MESSAGE = "Your response didn't meet the discussion guidelines, so it has been locked.
+
+Your teacher has been notified.";
+
     /**
      * Constructor
      *
@@ -111,8 +120,25 @@ class DialogAgentChat
         ?string $previousResponseId = null,
         ?ResponseModel $responseModel = null,
     ): iterable {
+        /* If there's a response model, add a message for the user's request */
+        if ($responseModel) {
+            // $responseModel is a domain object: translate to data model
+            $responseMessageModel = $this->responseMessageMapper->createModel()
+                ->setDialogAgentResponse(new ResponseDataModel()->setId($responseModel->getId()))
+                ->setRole(Role::User->value)
+                ->setStatus(Status::Ok->value)
+                ->setContent($userPrompt);
+            $this->responseMessageMapper->save($responseMessageModel);
+        }
+
         $pipeline = $this->buildGuardrails($user, $sessionId, $previousResponseId);
+
+        try {
         $pipeline->checkInputGuardrails($userPrompt);
+        } catch (GuardrailFlagged $e) {
+            // guardrail triggered, the request should not proceed
+            return $this->handleGuardrailFailure($e, $responseModel);
+        }
 
         $payload = new PayloadGenerator(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
@@ -128,19 +154,10 @@ class DialogAgentChat
 
         $logListener = new LogOutputText();
 
-        // Is there a response model?
-        // If so, add a message for the response.
+        /* If there's a response,
+         * also listen for the completed response from the agent, and add a message once it's done
+         */
         if ($responseModel) {
-            // $responseModel is a domain object: translate to data model
-            $responseMessageModel = $this->responseMessageMapper->createModel()
-                ->setDialogAgentResponse(new ResponseDataModel()->setId($responseModel->getId()))
-                ->setRole(Role::User->value)
-                ->setStatus(Status::Ok->value)
-                ->setContent($userPrompt);
-            $this->responseMessageMapper->save($responseMessageModel);
-
-            // Also: listen for the completed response from the agent, and add
-            // a message once it's done
             $logListener = new Composite(
                 $logListener,
                 new DialogAgentChat\SaveMessageLogListener($this->responseMessageMapper, $responseModel),
@@ -166,5 +183,45 @@ class DialogAgentChat
             new ResponseListener(requireFinalImage: false),
             $logListener,
         );
+    }
+
+    /**
+     * When a guardrail fails, handle the flagged message
+     * @param GuardrailFlagged $e
+     * @param ?ResponseModel $responseModel
+     * @return iterable<string>
+     */
+    private function handleGuardrailFailure(GuardrailFlagged $e, ?ResponseModel $responseModel): iterable
+    {
+        $message = $e->getMessage();
+
+        /**
+         * If there's a response model, then this is a request as part of a learner's attempt.
+         * - show the learner a custom message due to the failure and log it to the response so we can show it again later
+         * - lock the response as it failed guardrails
+         */
+        if ($responseModel) {
+            $responseMessageModel = $this->responseMessageMapper->createModel()
+                ->setDialogAgentResponse(new ResponseDataModel()->setId($responseModel->getId()))
+                ->setRole(Role::Assistant->value)
+                ->setStatus(Status::GuardrailFlagged->value)
+                ->setContent(json_encode($e->getOutcome()->asArray(), JSON_THROW_ON_ERROR))
+                // Set the creation time to the current time,
+                // instead of the request time:
+                // this more accurately reflects when the response was received.
+                ->setCreatedAt(\Alaress_Date_Format::newFromTimestamp(time()));
+            $this->responseMessageMapper->save($responseMessageModel);
+
+            // override the message to a generic one for the learner
+            $message = self::GUARDRAIL_FAIL_LEARNER_MESSAGE;
+            // TODO: lock the response as it failed guardrails (SA-21699)
+        }
+
+        $outputMessage = new Message(
+            json_encode(['message' => $message], JSON_THROW_ON_ERROR),
+            MessageEventType::GUARDRAIL_FLAGGED->value
+        );
+
+        yield $outputMessage->__toString();
     }
 }

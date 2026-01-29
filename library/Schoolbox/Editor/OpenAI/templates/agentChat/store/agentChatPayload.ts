@@ -33,6 +33,10 @@ export enum AgentChatMessageEventType {
      * The frontend will terminate the stream after receiving this event
      */
     ERROR = "error",
+    /**
+     * Guardrail flagged - the request was blocked by a guardrail check
+     */
+    GUARDRAIL_FLAGGED = "guardrail_flagged",
 }
 
 export type AgentChatApiPayload = {
@@ -64,17 +68,18 @@ type AgentChatApiResponseCompleted = {
 type AgentChatApiMessageEvent =
     | SseMessageEvent<AgentChatMessageEventType.CREATED, { responseId: string }>
     | SseMessageEvent<AgentChatMessageEventType.PARTIAL_IMAGE, { responseId: string; image: AgentChatImage }>
-    | SseMessageEvent<AgentChatMessageEventType.DELTA, { responseId: string; delta: string }>;
+    | SseMessageEvent<AgentChatMessageEventType.DELTA, { responseId: string; delta: string }>
+    | SseMessageEvent<AgentChatMessageEventType.GUARDRAIL_FLAGGED, { message: string }>;
 
 /**
- * Generate an image using the image generation API
+ * Send a message to an API endpoint which supports the Agent Chat SSE format
  * @param url - The endpoint to fetch
  * @param body - The data to send in the request
  * @param signal - AbortSignal to cancel the request if needed
  * @param onMessage - The callback to handle each message from the server
  * @returns The response from the fetch
  */
-export async function generateImage(
+export async function sendMessage(
     url: string,
     body: AgentChatApiPayload,
     signal: AbortSignal | null,

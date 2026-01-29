@@ -17,13 +17,24 @@ namespace Schoolbox\OpenAi\Guardrails\Check;
 class Outcome
 {
     /**
+     * @param ICheck $check The guardrail check that produced this outcome
      * @param bool $flagged True if the guardrail flagged the input as disallowed
      * @param array $metadata Additional structured data about the check result
      */
     public function __construct(
+        private ICheck $check,
         private bool $flagged,
         private array $metadata = [],
     ) {
+    }
+
+    /**
+     * Retrieve the guardrail check that produced this outcome
+     * @return ICheck
+     */
+    public function getCheck(): ICheck
+    {
+        return $this->check;
     }
 
     /**
@@ -42,5 +53,18 @@ class Outcome
     public function getMetadata(): array
     {
         return $this->metadata;
+    }
+
+    /**
+     * Format the outcome details for logs, this should match LogFormat::GUARDRAIL
+     * @return array
+     */
+    public function asArray(): array
+    {
+        return [
+            'guardrail' => $this->check->getName(),
+            'flagged' => $this->isFlagged(),
+            'metadata' => $this->getMetadata(),
+        ];
     }
 }
