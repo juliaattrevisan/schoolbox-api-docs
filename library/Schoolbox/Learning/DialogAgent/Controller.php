@@ -864,6 +864,7 @@ class Controller extends Base
     public function postReopen(Response $response): void
     {
         $response
+            ->setLockedAt(null) // in case it was locked, this is how you unlock it
             ->setSubmittedAt(null)
             ->setSubmittedBy(null);
 
