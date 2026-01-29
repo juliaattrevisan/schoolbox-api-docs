@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
 use PDO;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Resource\Storage;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
@@ -126,6 +127,18 @@ class Helper
             $folderId     = (int)$row['folderId'];
             $assessmentId = (int)$row['id'];
 
+            /* These activities do *not* supported weights (for various reasons)
+             * Weight is not applicable to 'lessonPlan' and 'task' and dialog agents.
+             *
+             * TODO start refactoring all these activity-specific reasons away, including inverting this so we
+             *  actually whitelist activities that *do* support weights, instead of a blacklist
+             */
+            $unweightedActivities = [
+                AssessmentType::TYPE_LESSON_PLAN,
+                AssessmentType::TYPE_TASK,
+                AssessmentType::TYPE_DIALOG_AGENT
+            ];
+
             if (!isset($output[$assessmentId])) {
                 $output[$assessmentId] = [
                     'id'               => $assessmentId,
@@ -133,7 +146,7 @@ class Helper
                     'assessmentType'   => $row['assessmentType'],
                     'commonAssessment' => (
                         // Common assessment is only applicable to 'dueWork'.
-                        ($row['assessmentType'] === 'dueWork') ? (bool)$row['commonAssessment'] : null
+                        (AssessmentType::TYPE_DUE_WORK === $row['assessmentType']) ? (bool)$row['commonAssessment'] : null
                     ),
                     'workType'         => (
                         [
@@ -149,15 +162,12 @@ class Helper
                     ],
                     'subjectCode'      => $row['subjectCode'],
                     'project'          => (null === $row['project']) ? null : ['id' => (int)$row['project']],
-                    'weight'           => (
-                        // Weight is not applicable to 'lessonPlan' and 'task'.
-                        (in_array($row['assessmentType'], ['lessonPlan', 'task'])) ? null : (float)$row['weight']
-                    ),
+                    'weight'           => in_array($row['assessmentType'], $unweightedActivities) ? null : (float)$row['weight'],
                     'dueDate'          => $row['due_date'] ? \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String() : null,
                     'rubric'           => $this->getRubric($assessmentId),
                     'participants'     => (
                         // Participants is not applicable to 'lessonPlan'.
-                        ($row['assessmentType'] === 'lessonPlan') ? null : []
+                        (AssessmentType::TYPE_LESSON_PLAN === $row['assessmentType']) ? null : []
                     )
                 ];
             }
@@ -218,80 +228,85 @@ class Helper
         $folderCodes = [];
         $folderIds = [];
 
-        $select = (
-            "SELECT
-             assessment.id,
-             assessment.title,
-             assessment.weight,
-             assessment.course_managed AS commonAssessment,
-             lu_work_type.name AS `workTypeName`,
-             lu_work_type.id AS `workTypeId`,
-             assessment.due_date,
-             mv_assessment_relation.folder_id AS `folderId`,
-             COALESCE(
-                 IF(task.id, 'task', NULL),
-                 IF(assess.assessment_id, 'quiz', NULL),
-                 IF(lti_assessment.assessment_id, 'LTI', NULL),
-                 IF(submission_box.id, 'dueWork', NULL),
-                 IF(project.id, 'project', NULL),
-                 IF(lesson_plan.id, 'lessonPlan', NULL)
-             ) AS `assessmentType`,
-             folder.name AS `folderName`,
-             (
-                 SELECT course_specification.subject_code
-                 FROM course_specification
-                 JOIN course_implementation ON (
-                    course_implementation.course_specification_id = course_specification.id AND
-                    mv_assessment_relation.course_implementation_id = course_implementation.id
-                 )
-             ) AS `subjectCode`,
-             (
-                 SELECT GROUP_CONCAT(id)
-                 FROM lu_year_level
-                 LEFT JOIN folder_year_level ON folder_year_level.year_level_id = lu_year_level.id
-                 WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
-             ) AS `yearLevelId`,
-             markTypeTable.hr_name AS markType,
-             projectParent.assessment_id AS `project`
-             "
-        );
-
-        $from = (
-            "FROM mv_assessment_relation
-             JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
-             LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
-             LEFT JOIN task ON assessment.id = task.assessment_id
-             LEFT JOIN assess ON assessment.id = assess.assessment_id
-             LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
-             LEFT JOIN project ON assessment.id = project.assessment_id
-             LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
-             LEFT JOIN folder ON mv_assessment_relation.folder_id = folder.id
-             LEFT JOIN submission_mark_type AS markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
-             LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
-             LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
-             "
-        );
-        $where = (
-            "WHERE assessment.deleted_at is null
-            "
-        );
-        if (array_key_exists('assessmentId', $filter)) {
-            $where .= " AND mv_assessment_relation.assessment_id = :assessmentId ";
-            $params['assessmentId'] = $filter['assessmentId'];
-        }
-        if (array_key_exists('assessmentType', $filter)) {
-            $where .= (
-                " AND COALESCE(
+        $select = "
+            SELECT
+                assessment.id,
+                assessment.title,
+                assessment.weight,
+                assessment.course_managed AS commonAssessment,
+                lu_work_type.name AS `workTypeName`,
+                lu_work_type.id AS `workTypeId`,
+                assessment.due_date,
+                mv_assessment_relation.folder_id AS `folderId`,
+                COALESCE(
                     IF(task.id, 'task', NULL),
                     IF(assess.assessment_id, 'quiz', NULL),
                     IF(lti_assessment.assessment_id, 'LTI', NULL),
                     IF(submission_box.id, 'dueWork', NULL),
                     IF(project.id, 'project', NULL),
-                    IF(lesson_plan.id, 'lessonPlan', NULL)
-                 ) = :assessmentType "
-            );
+                    IF(lesson_plan.id, 'lessonPlan', NULL),
+                    IF(dialog_agent.id, 'dialogAgent', NULL)
+                ) AS `assessmentType`,
+                folder.name AS `folderName`,
+                (
+                    SELECT course_specification.subject_code
+                    FROM course_specification
+                    JOIN course_implementation ON (
+                        course_implementation.course_specification_id = course_specification.id AND
+                        mv_assessment_relation.course_implementation_id = course_implementation.id
+                    )
+                ) AS `subjectCode`,
+                (
+                    SELECT GROUP_CONCAT(id)
+                    FROM lu_year_level
+                    LEFT JOIN folder_year_level ON folder_year_level.year_level_id = lu_year_level.id
+                    WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
+                ) AS `yearLevelId`,
+                markTypeTable.hr_name AS markType,
+                projectParent.assessment_id AS `project`
+        ";
+
+        $from = "
+            FROM mv_assessment_relation
+            INNER JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
+            LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+            LEFT JOIN task ON assessment.id = task.assessment_id
+            LEFT JOIN assess ON assessment.id = assess.assessment_id
+            LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+            LEFT JOIN project ON assessment.id = project.assessment_id
+            LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+            LEFT JOIN folder ON mv_assessment_relation.folder_id = folder.id
+            LEFT JOIN submission_mark_type AS markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+            LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
+            LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
+            LEFT JOIN dialog_agent ON assessment.id = dialog_agent.assessment_id
+        ";
+
+        $where = "
+            WHERE assessment.deleted_at is null
+        ";
+
+        if (array_key_exists('assessmentId', $filter)) {
+            $where .= " AND mv_assessment_relation.assessment_id = :assessmentId ";
+            $params['assessmentId'] = $filter['assessmentId'];
+        }
+
+        if (array_key_exists('assessmentType', $filter)) {
+            $where .= " 
+                AND COALESCE(
+                    IF(task.id, 'task', NULL),
+                    IF(assess.assessment_id, 'quiz', NULL),
+                    IF(lti_assessment.assessment_id, 'LTI', NULL),
+                    IF(submission_box.id, 'dueWork', NULL),
+                    IF(project.id, 'project', NULL),
+                    IF(lesson_plan.id, 'lessonPlan', NULL),
+                    IF(dialog_agent.id, 'dialogAgent', NULL)
+                ) = :assessmentType 
+            ";
+
             $params['assessmentType'] = $filter['assessmentType'];
         }
+
         if (array_key_exists('folder', $filter)) {
             //check if folder is an array
             if (is_array($filter['folder'])) {
@@ -423,7 +438,7 @@ class Helper
             `participant`.`lastname`       as `participant_last_name`,
             `participant`.`synergy_id`     as `participant_external_id`
         ';
-        $reviewerFields    = '
+        $reviewerFields = '
             `reviewer`.`id`             as `reviewer_id`,
             `reviewer`.`title`          as `reviewer_title`,
             `reviewer`.`firstname`      as `reviewer_first_name`,
@@ -572,6 +587,35 @@ class Helper
               `prr`.`deleted_at` is null
               and `pr`.`assessment_id` in ({$bindings->getPlaceholder()})
             PROJECT,
+            /* Dialog Agents' feedback is always the one associated with an authoritative response
+             * The feedbacks are created by a machine and ungraded, so expect some odd-feeling data to emerge here
+             */
+            <<<DIALOGAGENT
+                SELECT
+                    da.assessment_id AS assessment_id,
+                    'dialog_agent_feedback' AS feedback_table,
+                    daf.id AS feedback_id,
+                    daf.updated_at AS completion_date,
+                    null AS comment,
+                    null AS mark,
+                    null AS norm_mark,
+                    $participantFields,
+                    null AS reviewer_id,
+                    null AS reviewer_title,
+                    null AS reviewer_first_name,
+                    null AS reviewer_preferred_name,
+                    null AS reviewer_last_name,
+                    null AS reviewer_external_id
+                FROM dialog_agent da
+                INNER JOIN dialog_agent_response dar ON da.id = dar.dialog_agent_id
+                INNER JOIN dialog_agent_feedback daf ON dar.id = daf.response_id
+                LEFT JOIN user participant ON dar.learner_id = participant.id
+                WHERE dar.authoritative = 1
+                AND da.assessment_id IN ({$bindings->getPlaceholder()})
+                AND da.deleted_at IS NULL
+                AND dar.deleted_at IS NULL
+                AND daf.deleted_at IS NULL
+            DIALOGAGENT
         ];
 
         $statement = $this->mapper->getDatabase()->query(
@@ -767,6 +811,26 @@ class Helper
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
             group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
             LTI,
+            <<<DIALOGAGENT
+                SELECT
+                    da.assessment_id AS assessment_id,
+                    'dialog_agent_response' AS response_table,
+                    dar.id AS response_id,
+                    dar.submitted_at AS completion_date,
+                    null AS comment,
+                    null AS mark,
+                    null AS norm_mark,
+                    $participantFields,
+                    $submitterFields
+                FROM dialog_agent da
+                INNER JOIN dialog_agent_response dar ON da.id = dar.dialog_agent_id
+                LEFT JOIN user participant ON dar.learner_id = participant.id
+                LEFT JOIN user submitter ON dar.submitted_by = submitter.id
+                WHERE dar.authoritative = 1
+                AND da.assessment_id IN ({$bindings->getPlaceholder()})
+                AND da.deleted_at IS NULL
+                AND dar.deleted_at IS NULL
+            DIALOGAGENT
         ];
 
         $responseStatement = $this->mapper->getDatabase()->query(
@@ -879,7 +943,7 @@ class Helper
                      * and whilst we are at is, lets append the new code.
                      */
                     /**
-                     * let's be completly specific about the movement of data.
+                     * let's be completely specific about the movement of data.
                      * I don't know the order values are assigned, or if that will change in the future
                      *
                      * original idea was to:
@@ -925,7 +989,7 @@ class Helper
                 $output['capabilities'][$row['capability_id']] = [
                     'id'            => (int)$row['capability_id'],
                     'name'          => $row['capability_name'],
-                    'maxValue'     => (float)$row['capability_max_value'],
+                    'maxValue'      => (float)$row['capability_max_value'],
                     'indicators'    => []
                 ];
             }
@@ -970,47 +1034,44 @@ class Helper
     public function getRubricFeedback(string $assessmentId, int $feedbackID): ?array
     {
         $statement = $this->mapper->getDatabase()->prepare("
-        select `sb`.`assessment_id`                                  AS `assessment_id`,
-           `vr`.`capability_mark_type_id`                        AS `capability_mark_type_id`,
-           `vr`.`capability_grade_group_id`                      AS `capability_grade_group_id`,
-           `sr`.`owner`                                          AS `student_id`,
-           `sr`.`marker`                                         AS `marker_id`,
-           `sr`.`id`                                             AS `feedback_id`,
-           `sr`.`published_at`                                   AS `feedback_date`,
-           `sr`.`review_route`                                   AS `feedback_type`,
-           `vr`.`capability_id`                                  AS `capability_id`,
-           `vr`.`capability_name`                                AS `capability_name`,
-           `vr`.`capability_max_value`                           AS `capability_max_value`,
-           if(`rcm`.`valid`, `rcm`.`value`, NULL)                AS `capability_mark`,
-           if(`rcm`.`valid`, `rcm`.`human_readable_value`, NULL) AS `capability_human_readable_mark`,
-           `vr`.`indicator_id`                                   AS `indicator_id`,
-           `vr`.`indicator_name`                                 AS `indicator_name`,
-           `vr`.`indicator_max_value`                            AS `indicator_max_value`,
-           if(`rim`.`valid`, `rim`.`value`, NULL)                AS `indicator_mark`,
-           `rim`.`descriptor_id`                                 AS `descriptor_id`,
-           `rim`.`descriptor_name`                               AS `descriptor_name`,
-           `rd`.`max_value`                                      AS `descriptor_max_value`,
-           `rd`.`description`                                    AS `descriptor_descriptor`,
-           `rl`.`sequence`                                       AS `descriptor_sequence`
-        from ((((`v_rubric` `vr`
-            join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
-            join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
-            join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =
-                                                     `vr`.`capability_id`))
-            left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
-            LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
-            LEFT JOIN `rubric_level` `rl` on (`rd`.`level_id` = `rl`.`id` and `sb`.`id` = `rl`.`box_id` and `rl`.`deleted_at` is null)
-        where `sr`.`deleted_at` is null
-            and `sr`.`published_at` is not null
-            and (`rcm`.`valid` is true or `rim`.`valid` is true)
-            and
-                `sb`.`assessment_id` = :assessmentID
-            AND
-                `sr`.`review_route` = 'instructor'
-            AND
-                `sr`.`id` = :feedbackID
-        order by `sb`.`assessment_id`, `sr`.`owner`, `sr`.`published_at`, `vr`.`capability_sequence`, `vr`.`capability_id`,
-            `vr`.`indicator_sequence`, `vr`.`indicator_id`
+            select 
+                `sb`.`assessment_id`                              AS `assessment_id`,
+                `vr`.`capability_mark_type_id`                        AS `capability_mark_type_id`,
+                `vr`.`capability_grade_group_id`                      AS `capability_grade_group_id`,
+                `sr`.`owner`                                          AS `student_id`,
+                `sr`.`marker`                                         AS `marker_id`,
+                `sr`.`id`                                             AS `feedback_id`,
+                `sr`.`published_at`                                   AS `feedback_date`,
+                `sr`.`review_route`                                   AS `feedback_type`,
+                `vr`.`capability_id`                                  AS `capability_id`,
+                `vr`.`capability_name`                                AS `capability_name`,
+                `vr`.`capability_max_value`                           AS `capability_max_value`,
+                if(`rcm`.`valid`, `rcm`.`value`, NULL)                AS `capability_mark`,
+                if(`rcm`.`valid`, `rcm`.`human_readable_value`, NULL) AS `capability_human_readable_mark`,
+                `vr`.`indicator_id`                                   AS `indicator_id`,
+                `vr`.`indicator_name`                                 AS `indicator_name`,
+                `vr`.`indicator_max_value`                            AS `indicator_max_value`,
+                if(`rim`.`valid`, `rim`.`value`, NULL)                AS `indicator_mark`,
+                `rim`.`descriptor_id`                                 AS `descriptor_id`,
+                `rim`.`descriptor_name`                               AS `descriptor_name`,
+                `rd`.`max_value`                                      AS `descriptor_max_value`,
+                `rd`.`description`                                    AS `descriptor_descriptor`,
+                `rl`.`sequence`                                       AS `descriptor_sequence`
+            from ((((`v_rubric` `vr`
+                join `submission_box` `sb`on (`vr`.`assessment_id` = `sb`.`assessment_id`))
+                join `submission_return` `sr` on (`sb`.`id` = `sr`.`box_id`))
+                join `rubric_capability_mark` `rcm` on (`rcm`.`return_id` = `sr`.`id` and `rcm`.`rubric_capability_id` =`vr`.`capability_id`))
+                left join `v_rubric_indicator_mark_extend` `rim` on (`rim`.`rubric_indicator_id` = `vr`.`indicator_id` and `rcm`.`id` = `rim`.`rubric_capability_mark_id`))
+                LEFT JOIN `rubric_descriptor` `rd` on (`rim`.`descriptor_id` = `rd`.`id` and `rd`.`deleted_at` is null)
+                LEFT JOIN `rubric_level` `rl` on (`rd`.`level_id` = `rl`.`id` and `sb`.`id` = `rl`.`box_id` and `rl`.`deleted_at` is null)
+            where `sr`.`deleted_at` is null
+                and `sr`.`published_at` is not null
+                and (`rcm`.`valid` is true or `rim`.`valid` is true)
+                and `sb`.`assessment_id` = :assessmentID
+                AND `sr`.`review_route` = 'instructor'
+                AND `sr`.`id` = :feedbackID
+            order by `sb`.`assessment_id`, `sr`.`owner`, `sr`.`published_at`, `vr`.`capability_sequence`, `vr`.`capability_id`,
+                `vr`.`indicator_sequence`, `vr`.`indicator_id`
         ");
         $statement->execute(
             [
