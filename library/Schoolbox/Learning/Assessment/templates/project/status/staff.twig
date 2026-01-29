@@ -298,9 +298,16 @@ Data:
                     if (event.target.dataset.dataLoaded === 'true') {
                         return;
                     }
-                    $.get(event.target.dataset.classStatusHref, function(data)
-                    {
-                        $('#class-' + event.target.dataset.clickLoad).html(data);
+
+                    // fetch the class status data
+                    fetch(event.target.dataset.classStatusHref, { credentials: 'same-origin' })
+                        .then(function(response) { return response.text(); })
+                        .then(function(data) {
+                            var el = document.getElementById('class-' + event.target.dataset.clickLoad);
+                            if (el) { el.innerHTML = data; }
+                        })
+                        .catch(function() {
+                        // failed to load class content
                     });
 
                     // update data attribute
