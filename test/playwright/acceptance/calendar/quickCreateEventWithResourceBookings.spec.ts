@@ -40,7 +40,7 @@ test.describe("Create event with resource bookings", () => {
         // Wait for calendar to be fully loaded with FullCalendar initialized
         await page.waitForFunction(
             () => {
-                return window.hasOwnProperty("sbProps") && document.querySelector(".fc") !== null;
+                return Object.hasOwn(window, "sbProps") && document.querySelector(".fc") !== null;
             },
             { timeout: 10000 },
         );
