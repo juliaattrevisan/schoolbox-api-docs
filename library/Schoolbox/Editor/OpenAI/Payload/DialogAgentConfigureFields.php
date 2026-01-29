@@ -127,7 +127,7 @@ class DialogAgentConfigureFields
                     'description' => 'An opening message from the perspective of the agent to start the discussion with the student',
                 ],
             ],
-            'required' => ['fields'],
+            'required' => ['fields', 'openingMessage'],
             'additionalProperties' => false,
         ],
         'strict' => true
