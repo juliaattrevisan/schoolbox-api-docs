@@ -135,3 +135,10 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
     align-self: center;
     flex: 0 0 auto;
 }
+
+// Remove extra margin/padding added to checkbox labels in forms.scss
+.sbx-body input[type="checkbox"]:not(.plain) + label.checkbox-label,
+body.login input[type="checkbox"]:not(.plain) + label {
+    margin: 0 !important;
+    padding: 0 !important;
+}
