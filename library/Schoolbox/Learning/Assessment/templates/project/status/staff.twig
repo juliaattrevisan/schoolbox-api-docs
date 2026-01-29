@@ -274,15 +274,27 @@ Data:
                 </div>
             {% endif %}
 
-            {% include '@learningAssessment/project/status/class.twig' %}
 
             {% if showGroups %}
+                <div id="class-{{ aImpl.assessment.id  }}">
+                    <span data-click-load="{{ aImpl.assessment.id }}" data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}">Click to load participants</span>
                 </div>
+                </div>
+            {% else %}
+                {% include '@learningAssessment/project/status/class.twig' %}
             {% endif %}
         {% endfor %}
 
         {% if showGroups %}
             <script type="text/javascript">
+                // when a user clicks the text in data-click-load
+                // we should async fetch the participants and add it to the div
+                $('[data-click-load]').click(function (event) {
+                    $.get(event.target.dataset.classStatusHref, function(data)
+                    {
+                        $('#class-' + event.target.dataset.clickLoad).html(data);
+                    });
+                });
                 $(function () {
                     $('[data-collapser]').collapsable();
                 });
