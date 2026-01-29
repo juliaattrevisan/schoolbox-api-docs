@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
 import type { GalleryItem } from "lightgallery/lg-utils";
+import { useEventBus } from "@vueuse/core";
 import { getRfc3339String } from "@js/util/dateUtils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSessionId } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
+import { acPromptEventKey } from "../agentChatSymbols";
 import { AgentChatGuardrailSeverity, AgentChatMessageType } from "../agentChatTypes";
 import type { AgentChatFeedMessage, AnyAgentChatFeedMessage, AgentChatLogEntry } from "../agentChatTypes";
 import { AgentChatMessageEventType, sendMessage } from "./agentChatPayload";
@@ -24,6 +26,7 @@ export type AgentChatRequestConfig = {
 
 export const useAgentChatStore = defineStore("agentChat", () => {
     const feed = window.Vue.ref<AnyAgentChatFeedMessage[]>([]);
+    const acPromptEventBus = useEventBus(acPromptEventKey);
 
     const activeGeneration = window.Vue.ref<{
         response: AgentChatFeedMessage<AgentChatMessageType.RESPONSE>;
@@ -279,6 +282,8 @@ export const useAgentChatStore = defineStore("agentChat", () => {
                     });
                     activeGeneration.value?.abortController.abort();
                     activeGeneration.value = null;
+
+                    acPromptEventBus.emit({ guardrailTriggered: true });
                     return;
                 }
 
