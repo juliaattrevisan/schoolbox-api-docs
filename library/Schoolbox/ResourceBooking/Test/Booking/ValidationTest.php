@@ -333,7 +333,6 @@ class ValidationTest extends TestCase
             ->method('findForResource')
             ->willReturn($conflictingBookings);
 
-        /** @var BookingMapper $mockMapper */
         $validation = $this->createValidation(new User(), $mockMapper, new StatusMapper(), new TermMapper());
 
         $resource = new Item\Model();
@@ -1006,7 +1005,6 @@ class ValidationTest extends TestCase
                 return $result;
             });
 
-        /** @var BookingMapper $mockMapper */
         $validation = $this->createValidation(new User(), $mockMapper);
 
         // Create moved bookings collection.
@@ -1266,7 +1264,6 @@ class ValidationTest extends TestCase
                 return $result;
             });
 
-        /** @var BookingMapper $mockMapper */
         $validation = $this->createValidation(new User(), $mockMapper);
 
         // Create events collection.
