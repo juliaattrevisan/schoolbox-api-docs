@@ -1466,4 +1466,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
         );
         return $this->aiCache?->get($cacheKey);
     }
+
+    /**
+     * project only endpoint
+     *
+     * fetch and display the participants for a specific class assessment, that is part of the course assessment
+     * this is not chromed, so we can async it into the dom and it _should_ just work...
+     *
+     * @api GET /learning/assessments/{assessmentId}/status/{classAssId}
+     * @param IAssessable $courseAss
+     * @param IAssessable $classAss
+     * @return void
+     */
+    public function getClassStatus(IAssessable $courseAss, IAssessable $classAss): void
+    {
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
 }
