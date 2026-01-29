@@ -262,6 +262,11 @@ Data:
                                 </div>
                                 <nav>
                                     <a
+                                        {% if showGroups %}
+                                            data-data-loaded="false"
+                                            data-click-load="{{ aImpl.assessment.id }}"
+                                            data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}"
+                                        {% endif %}
                                         data-collapser="collap-{{ aImpl.assessment.id }}"
                                         href="#"
                                         class="icon-up-arrow collapse"
@@ -277,7 +282,6 @@ Data:
 
             {% if showGroups %}
                 <div id="class-{{ aImpl.assessment.id  }}">
-                    <span data-click-load="{{ aImpl.assessment.id }}" data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}">Click to load participants</span>
                 </div>
                 </div>
             {% else %}
@@ -290,13 +294,20 @@ Data:
                 // when a user clicks the text in data-click-load
                 // we should async fetch the participants and add it to the div
                 $('[data-click-load]').click(function (event) {
+                    // if data has been loaded, exit
+                    if (event.target.dataset.dataLoaded === 'true') {
+                        return;
+                    }
                     $.get(event.target.dataset.classStatusHref, function(data)
                     {
                         $('#class-' + event.target.dataset.clickLoad).html(data);
                     });
-                });
-                $(function () {
-                    $('[data-collapser]').collapsable();
+
+                    // update data attribute
+                    event.target.dataset.dataLoaded = 'true';
+
+                    // enable full collapsable on this class now
+                    $(event.target).collapsable();
                 });
             </script>
         {% endif %}
