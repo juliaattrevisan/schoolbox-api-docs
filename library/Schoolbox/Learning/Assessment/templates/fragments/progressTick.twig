@@ -67,8 +67,19 @@
             studentId:    student.id
         }) %}
         {% if detailRoute is not null and detailRoute != '' %}
+            {% set currentStatus = null %}
+            {% if assessment is dialogAgent %}
+                {# dialog agent has a helpful method to grab the status, just use that #}
+                {% set authResponse = assessment.getAuthoritativeResponse(participant, false) %}
+                {% if authResponse %}
+                    {% set currentStatus = authResponse.currentStatus %}
+                {% endif %}
+            {% endif %}
+
             {% if loggedInUserShouldSeeIncompleteStatus %}
                 <span class="no-text progress-tick incomplete" title="Incomplete"></span>
+            {% elseif currentStatus %}
+                <span class="no-text progress-tick {{ currentStatus.progressTickClass }}" title="{{ currentStatus.translate }}"></span>
             {% elseif participant.isFeedbackRequired %}
                 <span class="no-text progress-tick pending" title="Awaiting Feedback"></span>
             {% elseif participant.isResubmissionRequired %}
