@@ -58,7 +58,8 @@ const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(()
                     data: {
                         side: AgentChatMessageType.RESPONSE,
                         severity: AgentChatGuardrailSeverity,
-                        message: `The request failed to meet expected guidelines (${entry.data.output.data.guardrail}) ${JSON.stringify(entry.data.output.data.metadata)}`, // just stringify this for now, could be improved later
+                        title: `The request failed to meet expected guidelines (${entry.data.output.data.guardrail})`,
+                        message: JSON.stringify(entry.data.output.data.metadata), // just stringify this for now, could be improved later
                     },
                 });
             } else {

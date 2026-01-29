@@ -48,6 +48,7 @@ type FeedItemDataAlert = {
      * - alert: X (although AgentChatFeedMessage<AgentChatMessageType.RESPONSE> is essentially the same thing)
      */
     severity: "highlight" | "warning" | "warning-tint" | "alert";
+    title?: string; // optional title for the alert (shows in bold)
     message: string;
 };
 
