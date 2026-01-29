@@ -14,12 +14,14 @@ interface Props {
     size?: "m" | "s"; // Size of the modal, 'm' for medium and 's' for small
     showCloseButton?: boolean; // Whether to show the close button
     hasFocusTrap?: boolean; // Whether to use focus trap within the modal
+    allowOutsideClick?: boolean; // Whether to allow outside clicks when focus trap is active
 }
 const props = withDefaults(defineProps<Props>(), {
     hasBackgroundClick: false,
     size: "m",
     showCloseButton: true,
     hasFocusTrap: true,
+    allowOutsideClick: false,
 });
 
 const modalSize = window.Vue.computed(() => props.size || "m"); // Default size is medium
@@ -28,11 +30,12 @@ const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/c
 
 if (props.hasFocusTrap) {
     /**
-     * to keep focus within the modal when open,
-     * but allow clicks outside, as the modal can sometimes trigger the light gallery preview,
+     * To keep focus within the modal when open,
+     * but allow clicks outside, as the modal sometimes requires external interaction.
+     * For example if the light gallery preview is used within the modal,
      * which requires outside clicks to function
      */
-    const { activate, deactivate } = useFocusTrap(modalEl, { allowOutsideClick: true });
+    const { activate, deactivate } = useFocusTrap(modalEl, { allowOutsideClick: props.allowOutsideClick });
     /**
      * Keep focus within the modal when it's open
      */

@@ -60,7 +60,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
 </script>
 
 <template>
-    <basic-modal v-model:is-open="isOpen" has-background-click>
+    <basic-modal v-model:is-open="isOpen" has-background-click allow-outside-click>
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <div v-else class="l-flex-col l-gap-m">

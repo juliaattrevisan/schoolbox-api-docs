@@ -101,7 +101,7 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
 </script>
 
 <template>
-    <basic-modal v-model:is-open="isOpen" has-background-click>
+    <basic-modal v-model:is-open="isOpen" has-background-click allow-outside-click>
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <template v-else-if="selectedHeader !== null">
