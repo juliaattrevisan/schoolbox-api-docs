@@ -1311,7 +1311,17 @@ class Controller extends Assessment\Controller
 
         if ($requestPost->get('responseId')) {
             // Load an existing response to update
-            $response = $this->dueWorkResponseMapper->findById($requestPost->get('responseId'));
+            $response = $this->dueWorkResponseMapper->findByColumnList([
+                'id' => $requestPost->get('responseId'),
+                'owner' => $student->getId()
+            ])->first();
+
+            /* Couldn't find a response associated with the $student, despite its id provided: this is a potential
+             * potential hijack scenario so let's just die neatly here
+             */
+            if (null === $response) {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+            }
 
             /* @var Response\Model $response */
             //check if $response has already been finalised, if so error
@@ -1327,6 +1337,7 @@ class Controller extends Assessment\Controller
                                                     ->setCreatedAt(Alaress_Date_Format::now())
                                                     ->setUpdatedAt(Alaress_Date_Format::now());
         }
+
         $response->setAssessable($assessment);
 
         // Replace files with what was actually submitted
