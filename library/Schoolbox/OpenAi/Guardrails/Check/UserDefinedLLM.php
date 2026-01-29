@@ -28,14 +28,6 @@ class UserDefinedLLM extends AbstractLLMCheck
     /**
      * @inheritDoc
      */
-    public static function getDescription(): string
-    {
-        return 'User-defined LLM guardrail for custom content moderation';
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function getSystemPrompt(): string
     {
         return "# Instructions

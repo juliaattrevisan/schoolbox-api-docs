@@ -49,14 +49,6 @@ class Moderation implements ICheck
     }
 
     /**
-     * @inheritDoc
-     */
-    public static function getDescription(): string
-    {
-        return 'Flags text containing disallowed content categories';
-    }
-
-    /**
      * Constructor
      *
      * @param IClient $client            An AI provider client, must point to the Moderations endpoint.

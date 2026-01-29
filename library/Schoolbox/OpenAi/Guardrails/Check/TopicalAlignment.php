@@ -28,14 +28,6 @@ class TopicalAlignment extends AbstractLLMCheck
     /**
      * @inheritDoc
      */
-    public static function getDescription(): string
-    {
-        return 'Checks that the content stays within the defined business scope';
-    }
-
-    /**
-     * @inheritDoc
-     */
     protected function getSystemPrompt(): string
     {
         return "You are a content analysis system that determines if text stays on topic.

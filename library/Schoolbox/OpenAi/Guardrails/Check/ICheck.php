@@ -22,12 +22,6 @@ interface ICheck
     public static function getName(): string;
 
     /**
-     * Human-readable explanation of the guardrail's purpose
-     * @return string
-     */
-    public static function getDescription(): string;
-
-    /**
      * Perform the check
      *
      * @param string $inputText The text to analyse
