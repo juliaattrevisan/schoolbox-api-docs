@@ -204,7 +204,7 @@ test.describe("Pastoral Report Builder", () => {
     });
 
     /**
-     * creates a report
+     * Creates a pastoral report builder
      * check the dates and students are properly presented in the report
      */
     test("creates a report and check the dates and students are properly presented in the report", async ({
