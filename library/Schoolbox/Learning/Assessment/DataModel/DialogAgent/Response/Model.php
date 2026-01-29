@@ -58,6 +58,12 @@ class Model implements ISoftDeletable
     /**
      * @var \Alaress_Date_Format|null
      */
+    private ?\Alaress_Date_Format $lockedAt = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
     private ?\Alaress_Date_Format $submittedAt = null;
 
 
@@ -172,6 +178,26 @@ class Model implements ISoftDeletable
     public function setStartedAt(?\Alaress_Date_Format $startedAt): self
     {
         $this->startedAt = $startedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getLockedAt(): ?\Alaress_Date_Format
+    {
+        return $this->lockedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $lockedAt
+     * @return $this
+     */
+    public function setLockedAt(?\Alaress_Date_Format $lockedAt): self
+    {
+        $this->lockedAt = $lockedAt;
         return $this;
     }
 

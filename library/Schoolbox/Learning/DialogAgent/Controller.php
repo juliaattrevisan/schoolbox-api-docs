@@ -643,6 +643,7 @@ class Controller extends Base
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $moderationClient,
             $agentConfig,
+            $this->dialogAgentResponseMapper,
             $this->dialogAgentResponseMessageMapper,
         );
 
@@ -732,6 +733,7 @@ class Controller extends Base
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $moderationClient,
             $agentConfig,
+            $this->dialogAgentResponseMapper,
             $this->dialogAgentResponseMessageMapper,
         );
 
