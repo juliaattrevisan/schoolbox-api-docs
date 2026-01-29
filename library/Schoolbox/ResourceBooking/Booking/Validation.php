@@ -817,7 +817,8 @@ class Validation
      *    bookings in the $movedBookings array.
      * @param GenericCollection<int, BookingItemModel> $resourceById
      *  - Resources indexed by resourceId.  This array should contain all the resources that are booked in $movedBookings.
-     * @return array
+     * @return array<int, bool>
+     *  - For each moved booking id, whether a clash was detected.
      */
     public function checkForClashesIfResourceBookingsMoved(
         GenericCollection $movedBookings,
@@ -872,7 +873,8 @@ class Validation
      *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
-     * @return array
+     * @return array<int, array<int, bool>>
+     *  - For each event, for each resource id, whether a clash was detected.
      */
     public function checkForClashesIfResourceBookingsAddedToEvents(
         GenericCollection $resourceById,

@@ -818,4 +818,234 @@ class ValidationTest extends TestCase
         $result = $validation->getNewStatusIdForBooking($booking, $isClash, $user);
         $this->assertEquals($expectedStatus, $result);
     }
+
+    /**
+     * Data provider for testCheckForClashesIfResourceBookingsMoved
+     *
+     * @return array
+     */
+    public static function providerCheckForClashesIfResourceBookingsMoved()
+    {
+        return [
+            'no clashes - booking times dont overlap' => [
+                'movedBookings' => [
+                    ['id' => 1, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    1 => false,
+                ],
+            ],
+            'single clash - booking overlaps with one approved booking' => [
+                'movedBookings' => [
+                    ['id' => 2, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    2 => true,
+                ],
+            ],
+            'booking completely contains approved booking' => [
+                'movedBookings' => [
+                    ['id' => 3, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T14:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    3 => true,
+                ],
+            ],
+            'approved booking completely contains moved booking' => [
+                'movedBookings' => [
+                    ['id' => 4, 'resourceId' => 100, 'startDate' => '2077-01-01T11:00:00+00:00', 'endDate' => '2077-01-01T12:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T14:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    4 => true,
+                ],
+            ],
+            'booking ends exactly when approved booking starts - no clash' => [
+                'movedBookings' => [
+                    ['id' => 5, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T11:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    5 => false,
+                ],
+            ],
+            'booking starts exactly when approved booking ends - no clash' => [
+                'movedBookings' => [
+                    ['id' => 6, 'resourceId' => 100, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T10:00:00+00:00', 'endDatetime' => '2077-01-01T12:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    6 => false,
+                ],
+            ],
+            'multiple bookings - some clash and some dont' => [
+                'movedBookings' => [
+                    ['id' => 7, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 8, 'resourceId' => 100, 'startDate' => '2077-01-01T12:00:00+00:00', 'endDate' => '2077-01-01T13:00:00+00:00'],
+                    ['id' => 9, 'resourceId' => 100, 'startDate' => '2077-01-01T15:00:00+00:00', 'endDate' => '2077-01-01T16:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:30:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    7 => true,  // Clashes with first approved booking
+                    8 => false, // No clash
+                    9 => true,  // Clashes with second approved booking
+                ],
+            ],
+            'multiple resources - different clash results per resource' => [
+                'movedBookings' => [
+                    ['id' => 10, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                    ['id' => 11, 'resourceId' => 200, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T10:30:00+00:00', 'endDatetime' => '2077-01-01T11:30:00+00:00'],
+                    ],
+                    200 => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    10 => true,  // Clashes with resource 100's booking
+                    11 => false, // No clash with resource 200's booking
+                ],
+            ],
+            'no approved bookings for resource' => [
+                'movedBookings' => [
+                    ['id' => 12, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    // No approved bookings for resource 100
+                ],
+                'expectedIsClashByBookingId' => [
+                    12 => false,
+                ],
+            ],
+            'early exit optimization - sorted periods with start time after booking end' => [
+                'movedBookings' => [
+                    ['id' => 13, 'resourceId' => 100, 'startDate' => '2077-01-01T10:00:00+00:00', 'endDate' => '2077-01-01T11:00:00+00:00'],
+                ],
+                'approvedBookingPeriods' => [
+                    100 => [
+                        ['startDatetime' => '2077-01-01T12:00:00+00:00', 'endDatetime' => '2077-01-01T13:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T14:00:00+00:00', 'endDatetime' => '2077-01-01T15:00:00+00:00'],
+                        ['startDatetime' => '2077-01-01T16:00:00+00:00', 'endDatetime' => '2077-01-01T17:00:00+00:00'],
+                    ],
+                ],
+                'expectedIsClashByBookingId' => [
+                    13 => false, // Should exit early at first period since it starts after booking end
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Test checkForClashesIfResourceBookingsMoved function
+     *
+     * @param array $movedBookings
+     * @param array $approvedBookingPeriods
+     * @param array $expectedIsClashByBookingId
+     *              The expected return value of Validation->checkForClashesIfResourceBookingMoved().
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCheckForClashesIfResourceBookingsMoved')]
+    public function testCheckForClashesIfResourceBookingsMoved(
+        array $movedBookings,
+        array $approvedBookingPeriods,
+        array $expectedIsClashByBookingId
+    ): void {
+        // Create a mock mapper that returns future approved booking periods.
+        $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
+        $mockMapper
+            ->method('getPeriodsOfFutureApprovedBookingsByResourceId')
+            ->willReturnCallback(function ($resourceIds, $sortByStartDatetimeAsc, $bookingIdsToExclude) use ($approvedBookingPeriods) {
+                // Convert datetime strings to Alaress_Date_Format objects
+                $result = [];
+                foreach ($approvedBookingPeriods as $resourceId => $periods) {
+                    $result[$resourceId] = [];
+                    foreach ($periods as $period) {
+                        $result[$resourceId][] = [
+                            'startDatetime' => new \Alaress_Date_Format($period['startDatetime'], \Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                            'endDatetime' => new \Alaress_Date_Format($period['endDatetime'], \Alaress_Date_Format::FORMAT_RFC3339_W3C),
+                        ];
+                    }
+                }
+                return $result;
+            });
+
+        /** @var BookingMapper $mockMapper */
+        $validation = $this->createValidation(new User(), $mockMapper);
+
+        // Create moved bookings collection.
+        $movedBookingsCollection = new \Schoolbox\GenericCollection(Booking\Model::class);
+        foreach ($movedBookings as $bookingData) {
+            $booking = new Booking\Model();
+            $booking->setId($bookingData['id']);
+
+            // Create event with start/end dates
+            $event = new Event();
+            $event->setStartDateTime(new \Alaress_Date_Format($bookingData['startDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+            $event->setEndDateTime(new \Alaress_Date_Format($bookingData['endDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+            // Create resource
+            $resource = new Item\Model();
+            $resource->setId($bookingData['resourceId']);
+
+            $booking->setEvent($event);
+            $booking->setResource($resource);
+
+            // Set booking start/end (these override event dates in the function)
+            $booking->setBookingStartAt(new \Alaress_Date_Format($bookingData['startDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+            $booking->setBookingEndAt(new \Alaress_Date_Format($bookingData['endDate'], \Alaress_Date_Format::FORMAT_RFC3339_W3C));
+
+            $movedBookingsCollection->add($booking);
+        }
+
+        // Create resources collection
+        $resourcesCollection = new \Schoolbox\GenericCollection(Item\Model::class);
+        $uniqueResourceIds = array_unique(array_column($movedBookings, 'resourceId'));
+        foreach ($uniqueResourceIds as $resourceId) {
+            $resource = new Item\Model();
+            $resource->setId($resourceId);
+            $resourcesCollection->setOffset($resourceId, $resource);
+        }
+
+        // Test the function
+        /** @var Validation $validation */
+        $result = $validation->checkForClashesIfResourceBookingsMoved($movedBookingsCollection, $resourcesCollection);
+
+        // Assert the results match expectations
+        $this->assertEquals($expectedIsClashByBookingId, $result);
+    }
 }
