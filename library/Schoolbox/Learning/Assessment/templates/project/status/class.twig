@@ -1,0 +1,45 @@
+{% if aImpl.assessment.allParticipants | length %}
+    <section
+            {% if showGroups %}
+                data-collapse-state="uncollapsed"
+                data-collapsable="collap-{{ aImpl.assessment.id }}"
+            {% endif %}
+    >
+        <ul class="information-list">
+            {% for participant in aImpl.assessment.allParticipants %}
+                <li>
+                    <div class="flex-grade">
+                        <div class="small-12 compact card columns">
+                            {# cache to prevent repeated traversals #}
+                            <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: aImpl.assessment.id, studentId: participant.user.id}) }}">
+                                {% include 'include/portrait.twig' with {user: participant.user} only %}
+                                <p>
+                                    {{ participant.user.formatName }}
+                                    <span class="pipe meta">
+                                                    {% set stats = aImpl.participantStats[participant.user.id] %}
+                                        {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                                                </span>
+                                </p>
+                            </a>
+                        </div>
+
+                        {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
+
+                        {% if publishedHumanReadableMark is not null %}
+                            <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
+                                <span>{{ publishedHumanReadableMark }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% else %}
+    {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: aImpl.assessment.id, context: aImpl.assessment }) %}
+    <div class="empty-state">
+        <i class="icon-group"></i>
+        <p>There are no students currently undertaking this {{ locale.project }}.</p>
+        <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
+    </div>
+{% endif %}

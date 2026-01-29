@@ -15,6 +15,7 @@ use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
@@ -219,7 +220,7 @@ class Controller extends Assessment\Controller
                 'participantStats' => $participantStats,
             ];
         } else {
-            $assessments = $this->getUnitAssessments($assessment);
+            $assessments = $this->getUnitAssessments($assessment, false);
             /** @var Project $assessment */
             foreach ($assessments as $assessment) {
                 // Calculate summary totals for display purposes
@@ -373,5 +374,54 @@ class Controller extends Assessment\Controller
         }
 
         return parent::determineRedirect($assessment, $postReturnUrl, $defaultReturnUrl, $relocated, $isCreate);
+    }
+
+
+    public function getClassStatus(IAssessable $courseAss, IAssessable $classAss)
+    {
+        if (!$courseAss->isSpecification()) {
+            //if not spec, error
+            throw new Exception\NotFound();
+        } else {
+            // check if the class assessment is a child of the course assessment
+            if ($classAss->getSpecificationAssessment()?->getId() !== $courseAss->getId()) {
+                throw new Exception\NotFound();
+            }
+            $assessments = new GenericCollection(IAssessable::class, [$classAss]);
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+
+            $twigData = [
+                'baseContext'      => $courseAss->getBaseContext(),
+                'assessment'       => $courseAss,
+                'aImpls'           => [],
+                'showGroups'       => true,
+                'returnUrl'        =>
+                    $this->requestQuery->get(Redirect::RETURN_URL)
+                        ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                        : $this->getSession()->getHistory(),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            ];
+            /** @var Project $assessment */
+            foreach ($assessments as $assessment) {
+                // Calculate summary totals for display purposes
+                $participants = $assessment->getAllParticipants();
+
+                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+                foreach ($participants as $participant) {
+                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+                }
+
+                $twigData['participantStats'][$assessment->getId()] = $participantStats;
+                $twigData['aImpl']= [
+                    'assessment' => $assessment,
+                    'participantStats' => $participantStats,
+                ];
+            }
+        }
+
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/project/status/class.twig',
+            $twigData
+        );
     }
 }

@@ -1369,7 +1369,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @return array|Collection
      * @throws MapperException
      */
-    protected function getUnitAssessments(IAssessable $assessment): array|Collection
+    protected function getUnitAssessments(IAssessable $assessment, bool $hydrateParticipants = true): array|Collection
     {
         $assessments = [];
         if ($assessment->isSpecification()) {
@@ -1407,7 +1407,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             });
 
             // hydrate participants
-            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+            if ($hydrateParticipants) {
+                $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+            }
         }
         return $assessments;
     }

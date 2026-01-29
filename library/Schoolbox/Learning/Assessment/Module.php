@@ -120,6 +120,9 @@ class Module extends BaseModule
         $preloadAssessment             = function ($params) {
             return $this->preloadAssessment($params);
         };
+        $preloadCourseClassAssessment             = function ($params) {
+            return $this->preloadCourseClassAssessment($params);
+        };
         $preloadParticipant            = function ($params) {
             return $this->preloadAssessmentAndStudent($params);
         };
@@ -230,6 +233,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/modify", 'getUpdateAssessmentForm', $canModify, $preloadAssessment); // a || c
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment', $canDelete, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/status", 'getStatus', $canViewStatus, $preloadAssessment); // a || c
+        $this->register('GET', "$assRoute/status/{classAssId:\d+}", 'getClassStatus', $canViewStatus, $preloadCourseClassAssessment); // a || c
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
@@ -506,6 +510,37 @@ class Module extends BaseModule
 
         return [
             'assessment' => $assessment
+        ];
+    }
+
+
+    /**
+     * @param array     $params
+     * @param User|null $student
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws MapperException\Deleted
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadCourseClassAssessment(array $params, ?User $student = null): array
+    {
+        $courseAss  = $this->preloadAssessment($params, $student)['assessment'];
+        try {
+            $classAss = $this->getAssessmentMapperProxy()->findById($params['classAssId']);
+        } catch (MapperException\Deleted $e) {
+            throw new MapperException\Deleted(
+                'Sorry, the activity could not be updated. Please ensure the activity ' .
+                'still exists and contact your support if the problem persists.'
+            );
+        } catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        return [
+            'assessment' => $courseAss,
+            'courseAss' => $courseAss,
+            'classAss' => $classAss
         ];
     }
 
