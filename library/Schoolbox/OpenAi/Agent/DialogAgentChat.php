@@ -120,6 +120,8 @@ Your teacher has been notified.";
         ?string $previousResponseId = null,
         ?ResponseModel $responseModel = null,
     ): iterable {
+        // TODO: In ALL AI endpoints, we should validate the prompt length to avoid malicious token usage
+
         /* If there's a response model, add a message for the user's request */
         if ($responseModel) {
             // $responseModel is a domain object: translate to data model
@@ -134,7 +136,7 @@ Your teacher has been notified.";
         $pipeline = $this->buildGuardrails($user, $sessionId, $previousResponseId);
 
         try {
-        $pipeline->checkInputGuardrails($userPrompt);
+            $pipeline->checkInputGuardrails($userPrompt);
         } catch (GuardrailFlagged $e) {
             // guardrail triggered, the request should not proceed
             return $this->handleGuardrailFailure($e, $responseModel);
