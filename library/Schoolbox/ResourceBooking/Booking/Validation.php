@@ -800,8 +800,15 @@ class Validation
 
     /**
      * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
-     * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
-     * This function can be used to check for clashes efficiently when there is a large set of potential moves.
+     * same resource that end in the future.
+     *
+     * Notes:
+     *  1. This function only checks against approved bookings that end in the future, because these are the only
+     *     bookings that can clash with new bookings that start in the future.  New bookings that start in the past
+     *     will always be rejected due to the self::ERROR_IN_PAST validation check.  It is the caller's responsibility
+     *     to make that check.  A suggestion is to use $this->getNewStatusIdForBooking() to get the status of the
+     *     moved bookings, which makes that check.
+     *  2. If a booking does clash, the new booking can still be made if clash bookings are allowed on the resource.
      *
      * @param GenericCollection<int, BookingModel> $movedBookings
      *  - Bookings to check for clashes.  This array should contain bookings whose start/end times have been updated
@@ -818,6 +825,7 @@ class Validation
     ): array {
         $isClashByBookingId = [];
 
+        // See note 1 in the docblock for an explanation of why we only check against future approved bookings.
         $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
             $resourceById->keys(),
             sortByStartDatetimeAsc: true,
@@ -852,8 +860,15 @@ class Validation
 
     /**
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
-     * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
-     * allowed on the resource.)
+     * a clash with an already approved booking.
+     *
+     * Notes:
+     *  1. This function only checks against approved bookings that end in the future, because these are the only
+     *     bookings that can clash with new bookings that start in the future.  New bookings that start in the past
+     *     will always be rejected due to the self::ERROR_IN_PAST validation check.  It is the caller's responsibility
+     *     to make that check.  A suggestion is to use $this->getNewStatusIdForBooking() to get the status of the
+     *     moved bookings, which makes that check.
+     *  2. If a booking does clash, the new booking can still be made if clash bookings are allowed on the resource.
      *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
@@ -865,6 +880,7 @@ class Validation
     ): array {
         $isClashByResourceIdByEventId = [];
 
+        // See note 1 in the docblock for an explanation of why we only check against future approved bookings.
         $periodsOfApprovedBookingsByResourceId = $this->bookingMapper->getPeriodsOfFutureApprovedBookingsByResourceId(
             $resourceById->keys(),
             sortByStartDatetimeAsc: true
