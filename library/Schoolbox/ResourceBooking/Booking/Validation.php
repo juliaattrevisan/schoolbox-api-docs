@@ -802,7 +802,6 @@ class Validation
      * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
      * same resource.  (If it does clash, the new booking can still be made if clash bookings are allowed on the resource.)
      * This function can be used to check for clashes efficiently when there is a large set of potential moves.
-     * TODO: Move this function into ResourceBooking\Booking\Validation
      *
      * @param GenericCollection<int, BookingModel> $movedBookings
      *  - Bookings to check for clashes.  This array should contain bookings whose start/end times have been updated
@@ -855,7 +854,6 @@ class Validation
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
      * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
      * allowed on the resource.)
-     * TODO: Move this function into ResourceBooking\Booking\Validation
      *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.
