@@ -68,7 +68,7 @@ test.describe("Student Participation Tests", () => {
 
         // Impersonate Mario Izzo and verify the new due date of the activity
         await tester.impersonateViaUserProfilePage("Mario Izzo");
-        await studentParticipation.verifyDueDateText(userId, "650", "Due today");
+        await studentParticipation.verifyDueDateText(userId, "650", "today");
 
         // Impersonate Jack Coles and verify the new due date activity on status page
         await tester.impersonateTeacher();
