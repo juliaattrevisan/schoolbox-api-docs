@@ -167,7 +167,9 @@ test.describe("Create event with resource bookings", () => {
         tester.isGoingTo("verify Catering resource booking appears with Approved status");
         await verifyResourceBookingOnCalendar(page, "Catering", "approved");
 
-        tester.isGoingTo("verify Schoolbox Catering Support booking appears with Pending status");
+        tester.isGoingTo(
+            "verify Schoolbox Catering Support booking appears with Pending status (because this resource is moderated)",
+        );
         await verifyResourceBookingOnCalendar(page, "Schoolbox Catering Support", "pending");
 
         tester.isGoingTo("clean up test data");
