@@ -824,7 +824,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function providerCheckForClashesIfResourceBookingsMoved()
+    public static function providerCheckForClashesIfResourceBookingsMoved(): array
     {
         return [
             "no clashes - booking times don't overlap" => [
