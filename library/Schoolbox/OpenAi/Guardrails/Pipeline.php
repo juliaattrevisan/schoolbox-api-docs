@@ -11,8 +11,11 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Guardrails;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\OpenAi\Exception\GuardrailFlagged;
 use Schoolbox\OpenAi\Guardrails\Check\ICheck;
+use Schoolbox\OpenAi\IClient;
+use Schoolbox\User;
 
 /**
  * Guardrails pipeline
@@ -35,8 +38,18 @@ class Pipeline
 
     // TODO: Output checks?
 
-    public function __construct()
-    {
+    /**
+     * @param IClient $client The AI provider client which should be used to create logs
+     * @param User $user
+     * @param string $feature
+     * @param string $sessionId
+     */
+    public function __construct(
+        private IClient $client,
+        private User $user,
+        private string $feature,
+        private string $sessionId,
+    ) {
         $this->inputChecks = new GenericCollection(ICheck::class);
     }
 
@@ -57,10 +70,38 @@ class Pipeline
     public function checkInputGuardrails(string $inputText): void
     {
         foreach ($this->inputChecks as $check) {
-            $outcome = $check->check($inputText);
+            /**
+             * For now, create a separate log here with the relevant info
+             * This is a bit of a workaround for how logs work, we ideally want to store a log
+             * on failure of a guardrail, but successful checks don't necessarily need a log
+             * unless they are AI-based checks in which case we want the log for AI audit info.
+             */
+            $log = $this->client->createLog(
+                ['guardrail' => $check->getName()], // this will either be overridden (by an AI-based check) or remain like this (for non-AI checks such as regex)
+                $inputText,
+                $this->user,
+                $this->feature,
+                $this->sessionId,
+                  null, // TODO: should probably have a log format so we can show these on the AI Usage Log
+            );
+
+            $outcome = $check->check($inputText, $log);
+
+            $log->setOutputText(json_encode([
+                'guardrail' => $check->getName(),
+                'flagged' => $outcome->isFlagged(),
+                'metadata' => $outcome->getMetadata(),
+            ], JSON_THROW_ON_ERROR));
+
             if ($outcome->isFlagged()) {
-                throw new GuardrailFlagged($check, json_encode($outcome->getMetadata()));
+                $e = new GuardrailFlagged($check);
+                $log->setErrorMessage($e->getMessage());
+                $log->setReturnCode($e->getCode());
+                $this->client->saveLog($log);
+                throw $e;
             }
+
+            $this->client->saveLog($log);
         }
     }
 }

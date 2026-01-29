@@ -12,7 +12,7 @@ namespace Schoolbox\OpenAi\Guardrails\Check;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\IClient;
-use Schoolbox\User;
+use Schoolbox\Editor\OpenAI\Log;
 
 /**
  * Guardrail check to flag disallowed content categories using OpenAI's Moderations API.
@@ -60,16 +60,10 @@ class Moderation implements ICheck
      * Constructor
      *
      * @param IClient $client            An AI provider client, must point to the Moderations endpoint.
-     * @param ?User   $user              The user making the request, if any.
-     * @param ?string $feature           An identifier for the feature being requested.
-     * @param ?string $sessionId         The session ID against which this request should be logged.
      * @param array<string> $categories The list of categories which should be flagged.
      */
     public function __construct(
         private IClient $client,
-        private ?User $user = null,
-        private ?string $feature = null,
-        private ?string $sessionId = null,
         private array $categories = self::DEFAULT_CATEGORIES,
     ) {
     }
@@ -77,9 +71,9 @@ class Moderation implements ICheck
     /**
      * @inheritDoc
      */
-    public function check(string $inputText): Outcome
+    public function check(string $inputText, Log\Model $log): Outcome
     {
-        $categoryResults = $this->callModerationAPI($inputText);
+        $categoryResults = $this->callModerationAPI($inputText, $log);
 
         $flaggedCategories = [];
         foreach ($this->categories as $category) {
@@ -102,10 +96,11 @@ class Moderation implements ICheck
      * Call the OpenAI moderation API
      *
      * @param string $inputText The text to analyse
+     * @param Log\Model $log The log to write to
      * @return array<string,bool> A list of the categories, and whether they are flagged or not
      * @throws SchoolboxException If the response couldn't be parsed as expected
      */
-    private function callModerationAPI(string $inputText): array
+    private function callModerationAPI(string $inputText, Log\Model $log): array
     {
         $payload = [
             /**
@@ -116,15 +111,7 @@ class Moderation implements ICheck
             'input' => $inputText,
         ];
 
-        /* For now, create a separate log here with the relevant info */
-        $log = $this->client->createLog(
-            $payload,
-            $inputText,
-            $this->user,
-            $this->feature,
-            $this->sessionId,
-            null, // TODO: should probably have a log format so we can show these on the AI Usage Log
-        );
+        $log->setPrompt(json_encode($payload));
 
         $response = $this->client->createModerations($payload, $log);
         $data = json_decode($response->getBody()->getContents(), true);

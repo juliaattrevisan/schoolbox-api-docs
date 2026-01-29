@@ -63,16 +63,17 @@ class DialogAgentChat
      * @param null|string $previousResponseId
      * @return Guardrails\Pipeline
      */
-    private function buildGuardrails(User $user, string $sessionId, ?string $previousResponseId): Guardrails\Pipeline {
-        $pipeline = new Guardrails\Pipeline();
+    private function buildGuardrails(User $user, string $sessionId, ?string $previousResponseId): Guardrails\Pipeline
+    {
+        $pipeline = new Guardrails\Pipeline(
+            $this->client,
+            $user,
+            Helper::FEATURE_DIALOGAGENT,
+            $sessionId,
+        );
 
         if (null !== $this->moderationClient) {
-            $pipeline->addInputCheck(new Guardrails\Check\Moderation(
-                $this->moderationClient,
-                $user,
-                Helper::FEATURE_DIALOGAGENT,
-                $sessionId,
-            ));
+            $pipeline->addInputCheck(new Guardrails\Check\Moderation($this->moderationClient));
         }
 
         // $pipeline->addInputCheck(new Guardrails\Check\TopicalAlignment(
@@ -80,9 +81,6 @@ class DialogAgentChat
         //     $this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'],
         //     // TODO: placeholder system prompt, this should include better context
         //     "You are a helpful assistant. Keep responses focused on the user's questions and avoid going off-topic.",
-        //     $user,
-        //     Helper::FEATURE_DIALOGAGENT,
-        //     $sessionId,
         //     previousResponseId: $previousResponseId,
         // ));
 
@@ -113,6 +111,9 @@ class DialogAgentChat
         ?string $previousResponseId = null,
         ?ResponseModel $responseModel = null,
     ): iterable {
+        $pipeline = $this->buildGuardrails($user, $sessionId, $previousResponseId);
+        $pipeline->checkInputGuardrails($userPrompt);
+
         $payload = new PayloadGenerator(
             trim($this->config[Config::FIELD_PROVIDER]['value']),
             trim($this->config[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
@@ -157,10 +158,6 @@ class DialogAgentChat
 
         /** Immediately save the log so the dialog agent response can be associated without failing a foreign key constraint */
         $this->client->saveLog($log);
-
-        $pipeline = $this->buildGuardrails($user, $sessionId, $previousResponseId);
-
-        $pipeline->checkInputGuardrails($userPrompt);
 
         return $this->client->createResponseStream(
             $payload,

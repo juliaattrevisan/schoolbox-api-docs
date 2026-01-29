@@ -12,7 +12,7 @@ namespace Schoolbox\OpenAi\Guardrails\Check;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\OpenAi\IClient;
-use Schoolbox\User;
+use Schoolbox\Editor\OpenAI\Log;
 
 /**
  * Abstract base class for LLM-based guardrail checks using the Responses API.
@@ -73,9 +73,6 @@ abstract class AbstractLLMCheck implements ICheck
      * @param IClient $client              An AI provider client, must point to the Responses endpoint.
      * @param string  $model               The LLM model to use for checking the text.
      * @param string  $systemPromptDetails Additional details to insert into the system prompt.
-     * @param ?User   $user                The user making the request, if any.
-     * @param ?string $feature             An identifier for the feature being requested.
-     * @param ?string $sessionId           The session ID against which this request should be logged.
      * @param float  $confidenceThreshold (Optional) Minimum confidence threshold to trigger the guardrail (0.0 to 1.0), default 0.7.
      * @param ?string $previousResponseId  (Optional) Previous response ID for context continuity.
      */
@@ -83,9 +80,6 @@ abstract class AbstractLLMCheck implements ICheck
         private IClient $client,
         private string $model,
         private string $systemPromptDetails,
-        private ?User $user = null,
-        private ?string $feature = null,
-        private ?string $sessionId = null,
         private float $confidenceThreshold = 0.7,
         private ?string $previousResponseId = null,
     ) {
@@ -94,9 +88,9 @@ abstract class AbstractLLMCheck implements ICheck
     /**
      * @inheritDoc
      */
-    public function check(string $inputText): Outcome
+    public function check(string $inputText, Log\Model $log): Outcome
     {
-        $result = $this->callLLM($inputText);
+        $result = $this->callLLM($inputText, $log);
         $flagged = $result['flagged'];
         $confidence = $result['confidence'];
 
@@ -116,11 +110,12 @@ abstract class AbstractLLMCheck implements ICheck
      * Invokes the OpenAI LLM, enforces prompt/response contract, parses the LLM's
      * output, and returns a validated result.
      *
-     * @param string $inputText    Text to analyse
+     * @param string $inputText The text to analyse
+     * @param Log\Model $log The log to write to
      * @return array{flagged:bool,confidence:float} Parsed LLM output
      * @throws SchoolboxException If the response couldn't be parsed as expected
      */
-    private function callLLM(string $inputText): array
+    private function callLLM(string $inputText, Log\Model $log): array
     {
         $systemPrompt = strtr($this->getSystemPrompt(), [
             '[SYSTEM_PROMPT_DETAILS]' => $this->systemPromptDetails,
@@ -158,15 +153,7 @@ abstract class AbstractLLMCheck implements ICheck
             $payload['previous_response_id'] = $previousResponseId;
         }
 
-        /* For now, create a separate log here with the relevant info */
-        $log = $this->client->createLog(
-            $payload,
-            $inputText,
-            $this->user,
-            $this->feature,
-            $this->sessionId,
-            null, // TODO: should probably have a log format so we can show these on the AI Usage Log
-        );
+        $log->setPrompt(json_encode($payload));
 
         $response = $this->client->createResponse($payload, $log);
         $data = json_decode($response->getBody()->getContents(), true);
