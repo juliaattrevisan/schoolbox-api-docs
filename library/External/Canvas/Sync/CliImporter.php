@@ -231,6 +231,10 @@ class CliImporter extends CliTool\App
         // log this to keep track of things
         $runId = (string)Uuid::uuid4();
         $canvasLogMapper = CanvasLogMapper::getInstance();
+
+        /* Trim away ancient logs
+        */
+        $canvasLogMapper->prune(self::CANVAS_IMPORTER_DOWNLOAD_SCRIPT_NAME);
         $importLog = $canvasLogMapper->start($runId, self::CANVAS_IMPORTER_DOWNLOAD_SCRIPT_NAME);
 
         // Check api config
@@ -336,6 +340,7 @@ class CliImporter extends CliTool\App
         // log import  completion
         $canvasLogMapper->finish($importLog);
 
+        $canvasLogMapper->prune(self::CANVAS_IMPORTER_SYNC_SCRIPT_NAME);
         $syncLog = $canvasLogMapper->start($runId, self::CANVAS_IMPORTER_SYNC_SCRIPT_NAME);
 
         try {
@@ -358,10 +363,6 @@ class CliImporter extends CliTool\App
         $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
         (new CliTool\Kernel($app, $options))->runApp();
-
-        /* Trim away ancient logs
-         */
-        $canvasLogMapper->prune();
     }
 
 

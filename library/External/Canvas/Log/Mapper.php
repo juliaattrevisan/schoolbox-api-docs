@@ -22,9 +22,9 @@ use Schoolbox\GenericCollection;
 class Mapper extends \Schoolbox\Mapper
 {
     /**
-     * Anything older than now minus EXPIRY_THRESHOLD days gets deleted
+     * Keep only this many records for each script
      */
-    private const EXPIRY_THRESHOLD = 1;
+    private const KEEP_LATEST = 5;
 
 
     /**
@@ -196,24 +196,31 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Anything older than EXPIRY_THRESHOLD days gets...pruned away
+     * Trim excess records for a given script
      *
+     * @param string $scriptName
      * @return void
-     * @throws \PDOException
      */
-    public function prune(): void
+    public function prune(string $scriptName): void
     {
-        $threshold = \Alaress_Date_Format::now()->addDays(-1 * self::EXPIRY_THRESHOLD)->getDatabase();
+        $table = $this->getTable();
 
+        // The ROW_NUMBER function returns the sequence number of the row, when
+        // sorted by the ORDER BY in the OVER statement.
         $query = "
-            DELETE FROM {$this->getTable()}
-            WHERE created_at < :threshold
+            DELETE t1 FROM {$table} AS t1
+            INNER JOIN (
+                SELECT id, ROW_NUMBER() OVER (ORDER BY start_at DESC, id DESC) AS row_num
+                FROM {$table}
+                WHERE script = :script
+            ) AS rank ON t1.id = rank.id
+            WHERE rank.row_num > :keep
         ";
 
         $statement = $this->getDatabase()->prepare($query);
-
         $statement->execute([
-            'threshold' => $threshold
+            'script' => $scriptName,
+            'keep'   => self::KEEP_LATEST,
         ]);
     }
 }

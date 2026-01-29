@@ -257,7 +257,7 @@ VALUES (
            'canvas_code_redirect_homepages',
            'Redirect homepage to',
            'The Canvas object used for redirection.',
-           (SELECT id FROM lu_config_field WHERE field = 'select'),
+           (SELECT id FROM lu_config_field WHERE field = 'selectKey'),
            @canvas_config_id,
            'course_code;course code:subject_code;subject code:subject_code_section;subject code from section',
            'true',
