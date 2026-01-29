@@ -88,7 +88,12 @@ function parse_args(){
         --"$ARG_FILE_NAME")
         file_name="$2"; shift; shift;
         file_name_short=$(echo "$file_name" | cut -d'?' -f1); # Strip off any '?versionId=abc' trailing part
+        # If there's no folder:
+        # ensure $file_dirname is empty so that `aws s3 sync` works
         file_dirname=$(dirname "$file_name_short")
+        if [ $file_dirname == '.' ]; then
+          file_dirname=''
+        fi
         file_basename=$(basename "$file_name_short")
         ;;
         --"$ARG_CACHE_DIR")
