@@ -35,6 +35,8 @@ test.describe("Create event with resource bookings", () => {
     /**
      * Helper to click on a specific time slot in the calendar
      * The calendar grid shows hourly slots, and we need to click on the 1pm slot
+     * @param page - Playwright page object
+     * @param hour - Hour to click (24-hour format, e.g., 13 for 1pm)
      */
     async function clickCalendarTimeSlot(page: Page, hour: number): Promise<void> {
         // Wait for calendar to be fully loaded with FullCalendar initialized
@@ -72,6 +74,8 @@ test.describe("Create event with resource bookings", () => {
 
     /**
      * Helper to type in the search-select resources field and wait for results
+     * @param page - Playwright page object
+     * @param query - Search query string
      */
     async function searchForResources(page: Page, query: string): Promise<void> {
         // The resources search-select has labelId="resources"
@@ -85,6 +89,8 @@ test.describe("Create event with resource bookings", () => {
 
     /**
      * Helper to select a resource by clicking its checkbox or label
+     * @param page - Playwright page object
+     * @param resourceId - ID of the resource to select
      */
     async function selectResourceCheckbox(page: Page, resourceId: string): Promise<void> {
         // Try clicking the checkbox container div which is more reliably clickable
@@ -96,6 +102,8 @@ test.describe("Create event with resource bookings", () => {
 
     /**
      * Helper to verify an event appears on the calendar with the correct time
+     * @param page - Playwright page object
+     * @param eventTitle - Title of the event to verify
      */
     async function verifyEventOnCalendar(page: Page, eventTitle: string): Promise<void> {
         // Find event by title - regular events don't have the 'booking' class
@@ -109,6 +117,9 @@ test.describe("Create event with resource bookings", () => {
     /**
      * Helper to verify a resource booking appears on the calendar with the correct status
      * Bookings appear as calendar events with the resource name
+     * @param page - Playwright page object
+     * @param resourceName - Name of the resource to verify
+     * @param expectedStatusClass - Expected status class (approved, pending, or rejected)
      */
     async function verifyResourceBookingOnCalendar(
         page: Page,
