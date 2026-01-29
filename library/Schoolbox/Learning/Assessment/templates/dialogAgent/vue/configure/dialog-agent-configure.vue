@@ -66,10 +66,6 @@ const isGeneratingFields = window.Vue.ref<boolean>(false);
 const generateFieldsError = window.Vue.ref<string | null>(null);
 
 type ApiGenerateConfigurationFieldsResponse = {
-    /**
-     * NOTE: openingMessage won't actually be generated at the moment, but I expect we'll want it at some point
-     * @see /library/Schoolbox/Editor/OpenAI/Payload/DialogAgentConfigureFields.php
-     */
     openingMessage: string | null;
     fields: Record<DialogAgentScenarioField["id"], string | null>;
 };
