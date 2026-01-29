@@ -1,28 +1,83 @@
 <script setup lang="ts">
+import { assertUnreachable } from "@js/util/errorUtils";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
-import type { AnyAgentChatFeedMessage } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import { AiFeature } from "./payload";
-import type { AiLogFormat, AiSessionLogApiResponse } from "./payload";
+import {
+    AgentChatGuardrailSeverity,
+    AgentChatMessageType,
+} from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import { AiFeature, AiLogFormat } from "./payload";
+import type { AiSessionLogApiResponse } from "./payload";
 
 interface Props {
     feature: AiFeature;
-    sessionLog: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT>;
+    sessionLog: AiSessionLogApiResponse<AiLogFormat.AGENT_CHAT | AiLogFormat.GUARDRAIL>;
 }
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
 
-const sessionFeed = window.Vue.computed<AnyAgentChatFeedMessage[]>(() => {
+const sessionFeed = window.Vue.computed<ReturnType<typeof acStore.parseFeed>>(() => {
     const firstLog = props.sessionLog[0];
     if (firstLog === undefined) {
         return [];
     }
 
-    return acStore.parseFeed(
-        props.sessionLog.flatMap((entry) => [entry.data.input, entry.data.output]),
-        firstLog.createdBy,
-    );
+    const feed: AgentChatLogEntry[] = [];
+    for (const entry of props.sessionLog) {
+        if (entry.logFormat === AiLogFormat.AGENT_CHAT) {
+            /** An agent chat message can be directly pushed to the feed */
+            feed.push(entry.data.input);
+            feed.push(entry.data.output);
+        } else if (entry.logFormat === AiLogFormat.GUARDRAIL) {
+            /** Convert guardrail log entries to the agent chat log format */
+
+            /** Ignore any successful guardrail checks, we don't need to show them here */
+            if (entry.data.output.type === "guardrail" && entry.data.output.data.flagged === false) {
+                continue;
+            }
+
+            /**
+             * The input is still relevant, it reflects the original request
+             *
+             * As we're hiding successful guardrail checks, there shouldn't be duplicate inputs
+             * since a failed guardrail will prevent the AgentChat log from ever being created
+             */
+            feed.push({
+                createdAt: entry.data.input.createdAt,
+                type: AgentChatMessageType.REQUEST,
+                data: entry.data.input.data,
+            });
+
+            /** Show full information about why the request failed guardrails as this is the usage log in admin */
+            if (entry.data.output.type === "guardrail") {
+                feed.push({
+                    createdAt: entry.data.output.createdAt,
+                    type: AgentChatMessageType.ALERT,
+                    data: {
+                        side: AgentChatMessageType.RESPONSE,
+                        severity: AgentChatGuardrailSeverity,
+                        message: `The request failed to meet expected guidelines (${entry.data.output.data.guardrail}) ${JSON.stringify(entry.data.output.data.metadata)}`, // just stringify this for now, could be improved later
+                    },
+                });
+            } else {
+                feed.push({
+                    createdAt: entry.data.output.createdAt,
+                    type: AgentChatMessageType.ALERT,
+                    data: {
+                        side: AgentChatMessageType.RESPONSE,
+                        severity: "alert",
+                        message: entry.data.output.data,
+                    },
+                });
+            }
+        } else {
+            assertUnreachable(entry);
+        }
+    }
+
+    return acStore.parseFeed(feed, firstLog.createdBy);
 });
 
 const agentIcon = window.Vue.computed(() => {

@@ -15,6 +15,9 @@ export type AgentChatImage = {
     mime: "image/png"; // currently always PNG, but here if we want to support other formats in the future
 };
 
+/** Severity level to use for a guardrail alert */
+export const AgentChatGuardrailSeverity = "warning" satisfies FeedItemDataAlert["severity"];
+
 type FeedItemDataRequest = string;
 type FeedItemDataResponse = {
     status: "success" | "error" | "in_progress";

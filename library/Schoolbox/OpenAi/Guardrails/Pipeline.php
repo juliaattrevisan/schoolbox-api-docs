@@ -82,7 +82,7 @@ class Pipeline
                 $this->user,
                 $this->feature,
                 $this->sessionId,
-                  null, // TODO: should probably have a log format so we can show these on the AI Usage Log
+                LogFormat::GUARDRAIL, // TODO: this might fool the usage log into thinking the whole session is a guardrail format?
             );
 
             $outcome = $check->check($inputText, $log);

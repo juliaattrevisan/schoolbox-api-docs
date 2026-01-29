@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Editor\OpenAI\Log\Translator\Session;
 
 use Schoolbox\User;
-use Schoolbox\Editor\OpenAI\Helper;
-use Schoolbox\Editor\OpenAI\Log\LogFormat;
 use Schoolbox\Editor\OpenAI\Log\Model;
 
 class ModelToArray
@@ -47,6 +45,9 @@ class ModelToArray
         return [
             'id' => $log->getSessionId(),
             'feature' => $log->getFeature(),
+            // TODO: a session can have multiple log formats, but you'd need to always fetch all the data to determine that...
+            // We should probably have a Session Model that can handle this properly and avoid
+            // this ambiguity with the Log model being used for two separate ideas
             'logFormat' => $log->getLogFormat(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'createdBy' => $log->getUser() ? $this->userTranslator->__invoke($log->getUser()) : null,

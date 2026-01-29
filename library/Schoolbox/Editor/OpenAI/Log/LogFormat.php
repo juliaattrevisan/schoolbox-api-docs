@@ -20,4 +20,8 @@ enum LogFormat: string
      * logs which can be shown using the Agent Chat logic on the frontend (conversations between the user and AI)
      */
     case AGENT_CHAT = 'agent_chat';
+    /**
+     * logs which correspond to Guardrail checks
+     */
+    case GUARDRAIL = 'guardrail';
 }
