@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\T
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Model;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Role;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Message\Status;
+use Schoolbox\OpenAi\Agent\DialogAgentChat;
 
 class ModelToArray
 {
@@ -26,6 +27,21 @@ class ModelToArray
      */
     public function __invoke(Model $model): array
     {
+        if ($model->getStatus() === Status::GuardrailFlagged->value) {
+            /** A guardrail failed */
+
+            return [
+                'type' => 'alert',
+                'data' => [
+                    'side' => 'response',
+                    'severity' => 'warning',
+                    // TODO: Perhaps show something more relevant for instructors?
+                    'message' => DialogAgentChat::GUARDRAIL_FAIL_LEARNER_MESSAGE,
+                ],
+                'createdAt' => $model->getCreatedAt(),
+            ];
+        }
+
         /** Input/output text shouldn't be NULL, but technically could be in the DB - handle just in case */
         $message = $model->getContent() ?? '';
 

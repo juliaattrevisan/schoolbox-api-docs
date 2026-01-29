@@ -38,7 +38,7 @@ class DialogAgentChat
     /**
      * The message to display when a guardrail check fails for a learner's request
      */
-    private const string GUARDRAIL_FAIL_LEARNER_MESSAGE = "Your response didn't meet the discussion guidelines, so it has been locked.
+    public const string GUARDRAIL_FAIL_LEARNER_MESSAGE = "Your response didn't meet the discussion guidelines, so it has been locked.
 
 Your teacher has been notified.";
 
