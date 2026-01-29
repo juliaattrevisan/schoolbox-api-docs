@@ -71,6 +71,12 @@ class Model extends AbstractResponse
      */
     public function getCurrentStatus(): Status
     {
+        /* Locked: this overrides submitted and represents a response that was locked due to a guardrail breach
+         */
+        if (null !== $this->getLockedAt()) {
+            return Status::LOCKED;
+        }
+
         /* Submitted: disregard all other statuses
          */
         if (null !== $this->getSubmittedAt()) {

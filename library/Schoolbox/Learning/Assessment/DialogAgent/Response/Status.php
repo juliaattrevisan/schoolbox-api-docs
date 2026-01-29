@@ -13,14 +13,14 @@ enum Status: string
 {
     /**
      * Consts correlating to the status enum used by frontend world
-     * Not to be confused with the progress tick classes, despite them currently being the same strings
+     * Not to be confused with the progress tick classes
      * @see /library/Schoolbox/Assessment/Types/dialogAgent.ts
      */
     case INCOMPLETE = 'incomplete';
     case IN_PROGRESS = 'in-progress';
+    case LOCKED = 'locked';
     case REQUIRES_ASSISTANCE = 'requires-assistance';
     case SUBMITTED = 'submitted';
-
 
     /**
      * Convert a programmatically-meaningful state into its human-readable equivalent and vice versa
@@ -35,8 +35,28 @@ enum Status: string
         return match ($this) {
             Status::INCOMPLETE => 'Incomplete',
             Status::IN_PROGRESS => 'In Progress',
+            Status::LOCKED => 'Locked',
             Status::REQUIRES_ASSISTANCE => 'Requires Assistance',
             Status::SUBMITTED => 'Submitted',
+        };
+    }
+
+    /**
+     * Convert a programmatically-meaningful state into its progress tick class equivalent
+     *
+     * @return string
+     */
+    public function progressTickClass(): string
+    {
+        // This is a valid use of $this:
+        // see https://www.php.net/manual/en/language.enumerations.methods.php
+        // phpcs:ignore
+        return match ($this) {
+            Status::INCOMPLETE => 'incomplete',
+            Status::IN_PROGRESS => 'in-progress',
+            Status::LOCKED => 'failed',
+            Status::REQUIRES_ASSISTANCE => 'requires-assistance',
+            Status::SUBMITTED => 'submitted',
         };
     }
 }

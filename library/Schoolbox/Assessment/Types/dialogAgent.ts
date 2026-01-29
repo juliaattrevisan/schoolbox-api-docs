@@ -22,6 +22,7 @@ export enum DialogAgentResponseAction {
 export enum DialogAgentResponseStatus {
     INCOMPLETE = "incomplete",
     IN_PROGRESS = "in-progress",
+    LOCKED = "locked",
     ASSISTANCE = "requires-assistance",
     SUBMITTED = "submitted",
 }
@@ -30,6 +31,7 @@ export enum DialogAgentResponseStatus {
 export const STATUS_LABELS: Record<DialogAgentResponseStatus, string> = {
     [DialogAgentResponseStatus.INCOMPLETE]: "Incomplete",
     [DialogAgentResponseStatus.IN_PROGRESS]: "In Progress",
+    [DialogAgentResponseStatus.LOCKED]: "Locked",
     [DialogAgentResponseStatus.ASSISTANCE]: "Requires Assistance",
     [DialogAgentResponseStatus.SUBMITTED]: "Submitted",
 };
@@ -38,6 +40,7 @@ export const STATUS_LABELS: Record<DialogAgentResponseStatus, string> = {
 export const STATUS_TICKS: Record<DialogAgentResponseStatus, ProgressTickClass> = {
     [DialogAgentResponseStatus.INCOMPLETE]: ProgressTickClass.INCOMPLETE,
     [DialogAgentResponseStatus.IN_PROGRESS]: ProgressTickClass.IN_PROGRESS,
+    [DialogAgentResponseStatus.LOCKED]: ProgressTickClass.FAILED,
     [DialogAgentResponseStatus.ASSISTANCE]: ProgressTickClass.REQUIRES_ASSISTANCE,
     [DialogAgentResponseStatus.SUBMITTED]: ProgressTickClass.SUBMITTED,
 };
