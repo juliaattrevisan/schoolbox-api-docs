@@ -1,0 +1,57 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Customisation Records</h1>
+        </div>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Student</th>
+            <th>Date (Created)</th>
+            <th>Class</th>
+            <th>Unit</th>
+            <th>Customisation Type</th>
+            <th>Customisation Activity</th>
+            <th>Original Activity</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for record in records %}
+            <tr>
+                <td>
+                    {% set studentName = record.user.lastName ~ ', ' ~ (record.user.preferredName ?: record.user.firstName) %}
+                    <div>
+                        <img alt="{{ studentName }}" src="{{ record.user._links.avatar }}" />
+                    </div>
+                    <div>
+                        {{ studentName }}
+                    </div>
+                    <div class="meta">{{ record.user.id }}</div>
+                </td>
+                <td>{{ record.created_at|date("Y-m-d H:i") }}</td>
+                <td>{{ record.unit.class.title }}</td>
+                <td>{{ record.unit.title }}</td>
+                <td>{{ record.customised_activity.type }}</td>
+                <td>
+                    <a href="{{ record.customised_activity._links.view }}">
+                        {{ record.customised_activity.title }}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ record.original_activity._links.view }}">
+                        {{ record.original_activity.title }}
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">No customisation records found.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -18,6 +18,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -136,6 +137,9 @@ class Model implements ISoftDeletable
      * @var int|null
      */
     private ?int $originalAssessmentId = null;
+
+    private ?Model $originalAssessment = null;
+
     /**
      * The task which may or may not be associated with this assessment.
      *
@@ -1083,13 +1087,20 @@ class Model implements ISoftDeletable
         return $this->originalAssessmentId;
     }
 
-    /**
-     * @param int|null $originalAssessmentId
-     * @return self
-     */
+    public function getOriginalAssessment(): ?Model
+    {
+        return $this->originalAssessment;
+    }
+
     public function setOriginalAssessmentId(?int $originalAssessmentId): self
     {
         $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
+
+    public function setOriginalAssessment(?Model $originalAssessment): self
+    {
+        $this->originalAssessment = $originalAssessment;
         return $this;
     }
 }

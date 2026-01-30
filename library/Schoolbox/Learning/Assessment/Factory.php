@@ -125,6 +125,11 @@ class Factory
     private ?int $originalAssessmentId;
 
     /**
+     * @var IAssessable|null
+     */
+    private ?IAssessable $originalAssessment = null;
+
+    /**
      * @var string
      */
     protected $publishAt;
@@ -850,6 +855,11 @@ class Factory
         return $this->originalAssessmentId;
     }
 
+    public function getOriginalAssessment(): ?IAssessable
+    {
+        return $this->originalAssessment;
+    }
+
     /**
      * @param int|null $originalAssessmentId
      * @return self
@@ -857,6 +867,12 @@ class Factory
     public function setOriginalAssessmentId(?int $originalAssessmentId): self
     {
         $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
+
+    public function setOriginalAssessment(?IAssessable $originalAssessment): self
+    {
+        $this->originalAssessment = $originalAssessment;
         return $this;
     }
 

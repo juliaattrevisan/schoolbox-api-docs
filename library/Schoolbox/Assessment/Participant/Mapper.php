@@ -13,10 +13,12 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Participant\Plan;
 
@@ -375,6 +377,83 @@ class Mapper extends BaseMapper
         return $planIds;
     }
 
+    /**
+     * Finds all customisation records (participants with static or custom participation plans)
+     *
+     * @return GenericCollection
+     * @throws Exception
+     */
+    public function findAllCustomisationRecords(): GenericCollection
+    {
+        $query = "
+            SELECT {$this->getColumnString()},
+                   {$this->getJoinColumnString('plan', 'pp')},
+                   {$this->getJoinColumnString('user', 'u')},
+                   {$this->getJoinMapper('plan')->getJoinColumnString('assessment', 'a')},
+                   {$this->getJoinMapper('plan')->getJoinColumnString('assessment', 'oa')},
+                   {$this->getJoinMapper('plan.assessment')->getJoinColumnString('assessment_course_unit_implementation', 'cui')},
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinColumnString('course', 'ci')},
+                   {$this->getJoinMapper('plan.assessment.assessment_course_unit_implementation')->getJoinMapper('course')->getJoinColumnString('folder', 'f')}
+            FROM   {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('plan', '', 'pp')}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
+            LEFT JOIN assessment_course_unit_implementation ui ON a.id = ui.assessment_id
+            LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
+            LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
+            LEFT JOIN folder f ON ci.folder_id = f.id
+            LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
+            WHERE (pp.is_dynamic = :static_plan OR pp.is_dynamic = :custom_participation)
+              AND pp.deleted_at IS NULL
+        ";
+
+
+        $statement = $this->getDatabase()->executeQuery($query, [
+            'static_plan' => PlanMapper::PLAN_TYPE_STATIC,
+            'custom_participation' => PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION,
+        ]);
+        $collection = $this->createCollection();
+
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $participant = $this->hydrate($row);
+            $planMapper = $this->getJoinMapper('plan');
+            $assessmentMapper = $planMapper->getJoinMapper('assessment');
+            /* Hydrate plan with the assessment details too
+             */
+            $plan = $planMapper->hydrate($row, 'pp');
+            /** @var \Schoolbox\Learning\Assessment\DataModel\Model $assessment */
+            $assessment = $assessmentMapper->hydrate($row, 'a');
+            if ($assessment->getOriginalAssessmentId() !== null) {
+                $assessment->setOriginalAssessment(
+                    $assessmentMapper->hydrate($row, 'oa')
+                );
+            }
+            /* Hydrating the unit implementation and course implementation for the assessment
+             */
+            /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $assessmentContext */
+            $assessmentContext = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation', 'cui');
+            /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Model $courseImplementation */
+            $courseImplementation = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'ci');
+            if ($courseImplementation !== null) {
+                $folder = $assessmentMapper->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'f');
+                /* Hydrating folder for class details
+                 */
+                $courseImplementation->setFolder($folder);
+                $assessmentContext->setCourse($courseImplementation);
+            }
+            $assessment->setAssessmentContext($assessmentContext);
+            $plan->setAssessment($assessment);
+            /* Hydrate user
+             */
+            $user = $this->getJoinMapper('user')->hydrate($row, 'u');
+
+            $participant->setPlan($plan);
+            $participant->setUser($user);
+            $collection[$participant->getId()] = $participant;
+        }
+
+        return $collection;
+    }
 
     /**
      * Any notifications related to assessment participations must be deferred

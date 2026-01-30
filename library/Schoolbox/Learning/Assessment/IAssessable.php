@@ -735,11 +735,21 @@ interface IAssessable extends ISoftDeletable
     public function getOriginalAssessmentId(): ?int;
 
     /**
+     * @return IAssessable|null
+     */
+    public function getOriginalAssessment(): ?IAssessable;
+
+    /**
      * @param int|null $originalAssessmentId
      * @return self
      */
     public function setOriginalAssessmentId(?int $originalAssessmentId): self;
 
+    /**
+     * @param IAssessable|null $originalAssessment
+     * @return self
+     */
+    public function setOriginalAssessment(?IAssessable $originalAssessment): self;
 
     /**
      * Get the weight

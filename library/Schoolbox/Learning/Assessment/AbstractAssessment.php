@@ -104,6 +104,13 @@ abstract class AbstractAssessment implements IAssessable
     private ?int $originalAssessmentId = null;
 
     /**
+     * If this assessment was cloned from another assessment, this is a reference
+     * back to that original assessment.
+     *
+     * @var IAssessable|null
+     */
+    private ?IAssessable $originalAssessment = null;
+    /**
      * The person who created this Assessable
      *
      * @var User
@@ -1070,6 +1077,11 @@ abstract class AbstractAssessment implements IAssessable
         return $this->originalAssessmentId;
     }
 
+    public function getOriginalAssessment(): ?IAssessable
+    {
+        return $this->originalAssessment;
+    }
+
     /**
      * @param int|null $originalAssessmentId
      * @return self
@@ -1077,6 +1089,12 @@ abstract class AbstractAssessment implements IAssessable
     public function setOriginalAssessmentId(?int $originalAssessmentId): self
     {
         $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
+
+    public function setOriginalAssessment(?IAssessable $originalAssessment): self
+    {
+        $this->originalAssessment = $originalAssessment;
         return $this;
     }
 
