@@ -166,7 +166,7 @@ test.describe("Quick create event then add and remove bookings on event details 
         tester.isGoingTo("remove Schoolbox Board Meeting Room booking");
         // Find the modify icon next to Board Meeting Room and click it
         const boardMeetingRoomRow = page.locator('text="Schoolbox Board Meeting Room"').locator("..");
-        const modifyIcon = boardMeetingRoomRow.locator('.icon-modify').first();
+        const modifyIcon = boardMeetingRoomRow.locator(".icon-modify").first();
         await modifyIcon.click();
         await page.waitForTimeout(500); // Wait for edit form to slide down
 
@@ -180,7 +180,7 @@ test.describe("Quick create event then add and remove bookings on event details 
 
         tester.isGoingTo("add Schoolbox Chapel Audio Visual Support booking");
         // Click the + button to add more bookings
-        const addBookingButton = page.locator('.icon-add').first();
+        const addBookingButton = page.locator(".icon-add").first();
         await addBookingButton.click();
         await page.waitForTimeout(500);
 
