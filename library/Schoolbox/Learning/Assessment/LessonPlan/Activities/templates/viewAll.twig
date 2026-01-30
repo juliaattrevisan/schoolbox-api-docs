@@ -121,8 +121,13 @@
                                         {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
                                         {% set hasAssessmentRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute %}
 
+                                        {% if assessment.context is project %}
+                                            {# apparently you're not allowed to do this if it's from a project, related to SA-21140
+                                            # i've been told even though the routes still let you snap it if you wanted, just not via the component for now
+                                            #}
+                                            {% set saveToCourseRoute = null %}
                                         {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
-                                        {% if specAssessment %}
+                                        {% elseif specAssessment %}
                                             {% set saveToCourseRoute = routeLookupIfAuthorized(
                                                 'courseExport.putAssessmentIntoUnit',
                                                 {
