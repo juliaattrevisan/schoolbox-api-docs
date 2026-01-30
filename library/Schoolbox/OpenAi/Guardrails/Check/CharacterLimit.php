@@ -27,7 +27,7 @@ class CharacterLimit implements ICheck
      */
     public static function getName(): string
     {
-        return 'CharacterLimit';
+        return 'Character Limit';
     }
 
     /**
@@ -44,6 +44,12 @@ class CharacterLimit implements ICheck
      */
     public function check(string $inputText, Log\Model $log): Outcome
     {
-        return new Outcome($this, mb_strlen($inputText) > $this->charLimit);
+        $length = mb_strlen($inputText);
+
+        return new Outcome(
+            $this,
+            $length > $this->charLimit,
+            ['length' => $length, 'limit' => $this->charLimit]
+        );
     }
 }
