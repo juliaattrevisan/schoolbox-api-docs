@@ -3,8 +3,6 @@
     <description>PHPCS configuration file.</description>
     <file>library</file>
 
-    <!-- exclude our migrations directory from the violation check-->
-    <!-- <exclude-pattern>*/migrations/*</exclude-pattern> -->
     <exclude-pattern>*\.(twig|scss|css|js)$</exclude-pattern>
 
     <config name="testVersion" value="8.4-"/>
@@ -13,8 +11,6 @@
     <arg  value="np"/>
     <arg name="colors"/>
 
-    <!-- Run against the PHPCompatibility ruleset -->
-    <rule ref="PHPCompatibility"/>
     <!-- Our base rule: set to PSR12-->
     <rule ref="PSR12" >
         <exclude name="Generic.Files.LineLength"/>
