@@ -234,6 +234,7 @@ class Module extends BaseModule
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment', $canDelete, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/status", 'getStatus', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/status/{classAssId:\d+}", 'getClassStatus', $canViewStatus, $preloadCourseClassAssessment); // a || c
+        $this->register('GET', "$assRoute/status/{classAssId:\d+}/chunk", 'getClassStatusChunk', $canViewStatus, $preloadCourseClassAssessment); // a || c
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c

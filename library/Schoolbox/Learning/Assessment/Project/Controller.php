@@ -51,6 +51,8 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 class Controller extends Assessment\Controller
 {
+    private const PARTICIPANT_CHUNK_SIZE = 100;
+
     /**
      * Controller constructor.
      *
@@ -417,6 +419,11 @@ class Controller extends Assessment\Controller
                 // Calculate summary totals for display purposes
                 $participants = $assessment->getAllParticipants();
 
+                // slice/cut the participants to a chunked count
+                $participantCount = $participants->count();
+                $participantCursor = $this->requestQuery->get('participantCursor', 0);
+                $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
+
                 $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
                 foreach ($participants as $participant) {
                     $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
@@ -424,6 +431,8 @@ class Controller extends Assessment\Controller
 
                 $twigData['participantStats'][$assessment->getId()] = $participantStats;
                 $twigData['aImpl']= [
+                    'participantCount' => $participantCount,
+                    'participantCursor' => $participantCursor + self::PARTICIPANT_CHUNK_SIZE,
                     'assessment' => $assessment,
                     'participantStats' => $participantStats,
                 ];
@@ -432,6 +441,72 @@ class Controller extends Assessment\Controller
 
         $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/project/status/class.twig',
+            $twigData
+        );
+    }
+
+    /**
+     * fetch and display the participants for a specific class assessment, that is part of the course assessment
+     * this is not chromed, so we can async it into the dom and it _should_ just work... (chunked version)
+     *
+     * @param IAssessable $courseAss
+     * @param IAssessable $classAss
+     * @return void
+     * @throws Exception\NotFound
+     * @throws \Twig\Error\Error
+     *@api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
+     */
+    public function getClassStatusChunk(IAssessable $courseAss, IAssessable $classAss): void
+    {
+        if (!$courseAss->isSpecification()) {
+            //if not spec, error
+            throw new Exception\NotFound();
+        } else {
+            // check if the class assessment is a child of the course assessment
+            if ($classAss->getSpecificationAssessment()?->getId() !== $courseAss->getId()) {
+                throw new Exception\NotFound();
+            }
+            $assessments = new GenericCollection(IAssessable::class, [$classAss]);
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+
+            $twigData = [
+                'baseContext'      => $courseAss->getBaseContext(),
+                'assessment'       => $courseAss,
+                'aImpls'           => [],
+                'showGroups'       => true,
+                'returnUrl'        =>
+                    $this->requestQuery->get(Redirect::RETURN_URL)
+                        ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                        : $this->getSession()->getHistory(),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            ];
+            /** @var Project $assessment */
+            foreach ($assessments as $assessment) {
+                // Calculate summary totals for display purposes
+                $participants = $assessment->getAllParticipants();
+
+                // slice/cut the participants to a chunked count
+                $participantCount = $participants->count();
+                $participantCursor = $this->requestQuery->get('participantCursor', 0);
+                $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
+
+                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+                foreach ($participants as $participant) {
+                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+                }
+
+                $twigData['participantStats'][$assessment->getId()] = $participantStats;
+                $twigData['aImpl']= [
+                    'participantCount' => $participantCount,
+                    'participantCursor' => $participantCursor + self::PARTICIPANT_CHUNK_SIZE,
+                    'assessment' => $assessment,
+                    'participantStats' => $participantStats,
+                ];
+            }
+        }
+
+        $this->response = $this->responseFromTemplateUnthemed(
+            '@learningAssessment/project/status/classChunk.twig',
             $twigData
         );
     }

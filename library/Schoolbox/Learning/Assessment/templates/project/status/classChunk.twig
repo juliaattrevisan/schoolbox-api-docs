@@ -1,0 +1,34 @@
+{% for participant in aImpl.assessment.allParticipants %}
+    {% set stats = aImpl.participantStats[participant.user.id] ?? null %}
+    {% if stats %}
+    <li>
+        <div class="flex-grade">
+            <div class="small-12 compact card columns">
+                {# cache to prevent repeated traversals #}
+                <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: aImpl.assessment.id, studentId: participant.user.id}) }}">
+                    {% include 'include/portrait.twig' with {user: participant.user} only %}
+                    <p>
+                        {{ participant.user.formatName }}
+                        <span class="pipe meta">
+                            {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                        </span>
+                    </p>
+                </a>
+            </div>
+
+            {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
+
+            {% if publishedHumanReadableMark is not null %}
+                <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
+                    <span>{{ publishedHumanReadableMark }}</span>
+                </div>
+            {% endif %}
+        </div>
+    </li>
+    {% endif %}
+{% endfor %}
+{% if aImpl.participantCursor < aImpl.participantCount %}
+    <li data-click-load-more data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}?participantCursor={{ aImpl.participantCursor }}">
+        <span>Load More</span>
+    </li>
+{% endif %}

@@ -291,6 +291,21 @@ Data:
 
         {% if showGroups %}
             <script type="text/javascript">
+                let loadMoreFun = function (event) {
+                    // fetch the class status data
+                    fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
+                            .then(function(response) { return response.text(); })
+                            .then(function(data) {
+                                var el = event.target.parentNode;
+                                if (el) { el.innerHTML = data; }
+                                $(event.target.parentNode).children('[data-click-load-more]').click(loadMoreFun);
+                            })
+                            .catch(function() {
+                                // failed to load class content
+                            });
+                }
+
+
                 // when a user clicks the text in data-click-load
                 // we should async fetch the participants and add it to the div
                 $('[data-click-load]').click(function (event) {
@@ -305,6 +320,7 @@ Data:
                         .then(function(data) {
                             var el = document.getElementById('class-' + event.target.dataset.clickLoad);
                             if (el) { el.innerHTML = data; }
+                            $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreFun);
                         })
                         .catch(function() {
                         // failed to load class content
@@ -315,6 +331,9 @@ Data:
 
                     // enable full collapsable on this class now
                     $(event.target).collapsable();
+
+                    // initialise the load more button if it exists
+                    $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreFun);
                 });
             </script>
         {% endif %}
