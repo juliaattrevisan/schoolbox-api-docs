@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class Revision
 {
-
     /** @var int */
     protected $id;
 

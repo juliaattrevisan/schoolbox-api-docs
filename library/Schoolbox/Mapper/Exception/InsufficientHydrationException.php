@@ -21,5 +21,4 @@ namespace Schoolbox\Mapper\Exception;
  */
 class InsufficientHydrationException extends \LogicException
 {
-
 }

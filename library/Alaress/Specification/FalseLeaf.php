@@ -17,7 +17,6 @@ namespace Alaress\Specification;
  */
 class FalseLeaf extends Leaf
 {
-
     /**
      * @inheritdoc
      */

@@ -33,7 +33,6 @@ use Schoolbox\Mapper as BaseMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *

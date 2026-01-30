@@ -24,7 +24,6 @@ use Schoolbox\UserMapper;
  */
 class Module extends BaseModule
 {
-
     /**
      * @var string
      */

@@ -18,7 +18,6 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  */
 class Campus
 {
-
     /**
      * @var IApi
      */

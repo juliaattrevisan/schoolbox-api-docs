@@ -18,5 +18,4 @@ namespace Schoolbox\Learning\Assessment\Task\Exception;
  */
 class InvalidTaskResponseException extends \LogicException
 {
-
 }

@@ -12,7 +12,6 @@ namespace Schoolbox\External\Normalise\User\Common;
 
 class Phone
 {
-
     /**
      * The phone number
      *

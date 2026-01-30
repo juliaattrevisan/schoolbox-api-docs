@@ -15,7 +15,6 @@ use Schoolbox;
 
 abstract class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * Interface for connecting to external database.
      *

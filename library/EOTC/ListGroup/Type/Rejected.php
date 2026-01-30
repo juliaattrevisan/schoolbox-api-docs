@@ -15,7 +15,6 @@ use EOTC\ListGroup\Response;
 
 class Rejected extends Base
 {
-
     /**
      * Next status id
      *

@@ -30,7 +30,6 @@ use Schoolbox\Fixtures\Team\Position\Participant\Mapper as ParticipantPositionMa
 
 class Snapshot implements ISnapshot
 {
-
     /**
      * @var Collection
      */

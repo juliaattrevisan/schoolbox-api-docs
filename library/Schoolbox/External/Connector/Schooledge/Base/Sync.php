@@ -16,7 +16,6 @@ use Schoolbox\Sync\Iterator;
 
 class Sync extends Base implements ISync
 {
-
     /**
      * {@inheritdoc}
      */

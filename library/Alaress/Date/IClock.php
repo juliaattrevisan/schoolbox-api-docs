@@ -20,7 +20,6 @@ namespace Alaress\Date;
  */
 interface IClock
 {
-
     /**
      * Return the current time, as represented by this Clock.
      * Any positive integer is acceptable.

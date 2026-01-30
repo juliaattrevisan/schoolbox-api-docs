@@ -20,7 +20,6 @@ use InvalidArgumentException;
  */
 class Collator
 {
-
     /**
      * Find at least one file for each of the $expectedXmls in the $rootPath specified
      *

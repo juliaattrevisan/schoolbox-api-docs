@@ -14,7 +14,6 @@ use Alaress\Database\Quoter\IQuoter;
 
 interface ISqlFunc
 {
-
     /**
      * Return a parameter prefix to insert in query.
      *

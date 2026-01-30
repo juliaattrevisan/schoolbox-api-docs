@@ -22,7 +22,6 @@ use Schoolbox\RoleMapper;
  */
 class RoleAccessMapper extends Mapper
 {
-
     /**
     * @return void
     */

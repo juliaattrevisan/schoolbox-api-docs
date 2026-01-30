@@ -15,7 +15,6 @@ use Schoolbox\Test\TestCase;
 
 class SubmissionBoxTest extends TestCase
 {
-
     /**
      * @var SubmissionBox
      */

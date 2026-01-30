@@ -16,7 +16,6 @@ namespace EOTC\ListGroup;
 
 class Mapping
 {
-
     /**
      * Event List Group mapping
      *

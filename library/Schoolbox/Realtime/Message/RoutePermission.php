@@ -13,7 +13,6 @@ use Schoolbox\Role;
 
 class RoutePermission
 {
-
     const MUTE    = 'MU';
     const DIGEST  = 'DI';
     const INSTANT = 'IN';

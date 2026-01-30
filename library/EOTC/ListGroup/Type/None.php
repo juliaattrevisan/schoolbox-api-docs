@@ -24,7 +24,6 @@ use EOTC\EventStatusMapper;
 
 class None
 {
-
     /**
      * Next status id
      *

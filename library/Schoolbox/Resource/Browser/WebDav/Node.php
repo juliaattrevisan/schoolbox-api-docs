@@ -14,8 +14,6 @@ use Schoolbox\Resource\Browser\AbstractNode;
 
 class Node extends AbstractNode
 {
-
-
     /**
      * @param int         $nodeId
      * @param string|null $mimeFilter

@@ -14,7 +14,6 @@ use Schoolbox\Collection;
 
 interface FeedableMapperInterface
 {
-
     /**
      * @param int $context
      * @param int $limit

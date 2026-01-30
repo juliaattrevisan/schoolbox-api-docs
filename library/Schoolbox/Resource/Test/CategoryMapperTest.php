@@ -15,7 +15,6 @@ use Schoolbox\Test\TestCase;
 
 class CategoryMapperTest extends TestCase
 {
-
     /**
      * @var FileMapper
      */

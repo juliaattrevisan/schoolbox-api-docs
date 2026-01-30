@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 
 class FileDecorator
 {
-
     /**
      * @var IFeedback
      */

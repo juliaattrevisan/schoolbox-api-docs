@@ -11,7 +11,5 @@
  */
 class Survey_Export_Graph extends Evaluation_Export_Graph
 {
-
-
     protected $columnHeadings = array("Synergy ID", "Respondent", "Response");
 }

@@ -27,7 +27,6 @@ use Schoolbox\Resource\AbstractFileMapper;
  */
 class Mapper extends AbstractFileMapper implements Schoolbox\IHomepageCleanable
 {
-
     /** @var Resource\Storage\Mapper */
     protected $storageMapper;
 

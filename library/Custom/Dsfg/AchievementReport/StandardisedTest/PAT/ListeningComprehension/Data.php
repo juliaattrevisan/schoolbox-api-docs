@@ -14,7 +14,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Stanine\Payload;
 
 class Data extends Base
 {
-
     /**
      * Graph title
      */

@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 
 abstract class AbstractKeyConverter implements IKeyConverter
 {
-
     /** @var Filter\Model */
     private $filter;
 

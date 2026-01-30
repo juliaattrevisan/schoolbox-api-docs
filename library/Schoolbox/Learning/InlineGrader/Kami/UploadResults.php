@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
  */
 class UploadResults
 {
-
     /** @var int */
     private $countSuccess = 0;
 

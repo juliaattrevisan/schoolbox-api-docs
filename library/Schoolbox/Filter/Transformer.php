@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 class Transformer
 {
-
     /**
      * Indexed by filter.class
      *

@@ -22,7 +22,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @throws \InvalidArgumentException
      */

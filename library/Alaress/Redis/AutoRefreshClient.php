@@ -15,7 +15,6 @@ use Predis\CommunicationException;
 
 class AutoRefreshClient extends Client
 {
-
     const MAX_ATTEMPTS = 3;
 
     /**

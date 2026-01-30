@@ -11,7 +11,6 @@ namespace Alaress\WorkerCrew\Pooling;
 
 class ConfiguredDispatchStrategyBuilder
 {
-
     /** @var int */
     protected $minWorkers = DefaultDispatchStrategy::MIN_WORKERS;
 

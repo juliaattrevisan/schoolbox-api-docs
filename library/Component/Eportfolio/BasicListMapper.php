@@ -14,7 +14,6 @@ use Schoolbox;
 
 class BasicListMapper extends Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

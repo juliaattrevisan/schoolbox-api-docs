@@ -20,7 +20,6 @@ use EOTC\Event;
 
 class Chain
 {
-
     /**
      * The item exists in this ListGroup node
      *

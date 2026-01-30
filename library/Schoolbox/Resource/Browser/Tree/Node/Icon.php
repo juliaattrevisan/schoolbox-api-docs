@@ -12,7 +12,6 @@ namespace Schoolbox\Resource\Browser\Tree\Node;
 
 class Icon
 {
-
     /**
      * css class associated with this icon
      * (threePanel resource browser)

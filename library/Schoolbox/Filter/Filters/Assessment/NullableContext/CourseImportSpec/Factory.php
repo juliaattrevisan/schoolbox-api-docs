@@ -23,7 +23,6 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Factory extends NullableContext\Factory
 {
-
     /** @var CourseSpec\Mapper */
     private $courseSpecMapper;
 

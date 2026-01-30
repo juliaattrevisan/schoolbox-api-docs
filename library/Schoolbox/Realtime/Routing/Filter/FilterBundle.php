@@ -15,7 +15,6 @@ use SplObjectStorage;
 
 class FilterBundle implements FilterInterface
 {
-
     /** @var SplObjectStorage|FilterInterface[] */
     protected $filters;
 

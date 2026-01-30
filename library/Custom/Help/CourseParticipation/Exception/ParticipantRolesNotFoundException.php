@@ -15,5 +15,4 @@ namespace Custom\Help\CourseParticipation\Exception;
  */
 class ParticipantRolesNotFoundException extends \UnexpectedValueException
 {
-
 }

@@ -44,7 +44,6 @@ die();
  */
 class ConflictingExternalIds
 {
-
     /**
      * @var array
      */

@@ -9,5 +9,4 @@
  */
 class Assess_Question_Category_List extends Evaluation_Question_Category_List
 {
-
 }

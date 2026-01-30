@@ -19,7 +19,6 @@ namespace SocialStream\Post\Thumbnail;
  */
 class Chain
 {
-
     /**
      * Resultant thumbnail url
      *

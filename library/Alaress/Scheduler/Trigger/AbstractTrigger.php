@@ -14,7 +14,6 @@ use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 
 abstract class AbstractTrigger implements TriggerInterface
 {
-
     /** @var string */
     protected $label;
 

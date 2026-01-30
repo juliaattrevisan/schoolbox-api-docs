@@ -12,7 +12,6 @@ namespace Component\Eportfolio;
 
 abstract class ListItem
 {
-
     /**
      * Primary key
      *

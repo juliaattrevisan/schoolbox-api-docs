@@ -20,5 +20,4 @@ use RuntimeException;
  */
 class ResponseDecodeException extends RuntimeException implements ITassApiException
 {
-
 }

@@ -20,7 +20,6 @@ use function array_merge;
  */
 class Factory extends AbstractFactory
 {
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter

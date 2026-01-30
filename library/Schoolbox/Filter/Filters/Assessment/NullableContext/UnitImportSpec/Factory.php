@@ -30,7 +30,6 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Factory extends NullableContext\Factory
 {
-
     /** @var Folder\Mapper */
     private $folderMapper;
 

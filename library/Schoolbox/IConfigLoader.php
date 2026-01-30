@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 interface IConfigLoader
 {
-
     /**
      * Return the value of the given config var
      *

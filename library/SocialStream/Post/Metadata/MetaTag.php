@@ -12,7 +12,6 @@ namespace SocialStream\Post\Metadata;
 
 class MetaTag extends Metadata
 {
-
     /**
      * Fetch information out of the meta tags
      *

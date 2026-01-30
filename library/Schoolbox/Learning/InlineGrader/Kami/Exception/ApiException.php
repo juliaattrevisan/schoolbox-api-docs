@@ -15,5 +15,4 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
  */
 class ApiException extends \UnexpectedValueException implements IKamiException
 {
-
 }

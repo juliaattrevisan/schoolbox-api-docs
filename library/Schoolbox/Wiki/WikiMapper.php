@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
  */
 class WikiMapper extends Mapper implements FeedableMapperInterface
 {
-
     /**
      * @return void
      */

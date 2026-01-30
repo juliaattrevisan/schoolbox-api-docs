@@ -19,5 +19,4 @@ use UnexpectedValueException;
  */
 class UdParseException extends UnexpectedValueException implements ITassApiException
 {
-
 }

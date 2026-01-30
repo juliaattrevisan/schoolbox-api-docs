@@ -22,7 +22,6 @@ use Schoolbox\Comms\News\Statistics\Mapper as StatisticsMapper;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException

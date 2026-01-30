@@ -19,7 +19,6 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends Filter\AbstractDefinition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Allow Goals';
 

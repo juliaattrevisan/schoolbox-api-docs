@@ -16,7 +16,6 @@ use Schoolbox\User;
  */
 class BaseComponent implements IComponent
 {
-
     /** @var IDefinition */
     private $definition;
 

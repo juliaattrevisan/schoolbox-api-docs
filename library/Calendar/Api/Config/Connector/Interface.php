@@ -9,7 +9,6 @@
  */
 interface Calendar_Api_Config_Connector_Interface
 {
-
     /**
      * Method for uniquely rendering on admin screen
      *

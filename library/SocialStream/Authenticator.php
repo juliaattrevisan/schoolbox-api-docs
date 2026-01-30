@@ -25,7 +25,6 @@ use UnexpectedValueException;
  */
 class Authenticator
 {
-
     /**
      * A SocialStream_Post instance
      *

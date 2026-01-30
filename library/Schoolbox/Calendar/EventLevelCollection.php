@@ -25,7 +25,6 @@ use Schoolbox\Collection;
  */
 class EventLevelCollection extends Collection
 {
-
     /**
      * Ram in hardcoded values
      *

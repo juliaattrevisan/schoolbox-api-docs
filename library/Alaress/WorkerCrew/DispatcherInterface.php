@@ -11,7 +11,6 @@ namespace Alaress\WorkerCrew;
 
 interface DispatcherInterface
 {
-
     /**
      * Accepts a task to be dispatched.
      *

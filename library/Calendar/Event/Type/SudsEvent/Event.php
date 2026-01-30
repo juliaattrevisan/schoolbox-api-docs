@@ -16,7 +16,6 @@ use Calendar\Event\Type\Day;
  */
 class Event extends Day\Event
 {
-
     /**
      * @var string|null
      */

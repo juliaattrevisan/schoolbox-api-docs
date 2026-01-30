@@ -17,5 +17,4 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  */
 class Exception extends \DomainException
 {
-
 }

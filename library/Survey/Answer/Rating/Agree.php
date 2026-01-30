@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Rating_Agree extends Evaluation_Answer_Rating_Agree
 {
-
     /**
      * Always use Correct css class
      *

@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 
 class Model
 {
-
     /** @var int */
     public const SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
 

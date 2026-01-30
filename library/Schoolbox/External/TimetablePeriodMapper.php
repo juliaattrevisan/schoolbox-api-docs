@@ -24,7 +24,6 @@ use Schoolbox\Collection;
  */
 class TimetablePeriodMapper extends Schoolbox\Mapper
 {
-
     /**
      * {@inheritdoc}
      */

@@ -38,7 +38,6 @@ die();
  */
 class Explorer
 {
-
     /**
      * @var IApi
      */

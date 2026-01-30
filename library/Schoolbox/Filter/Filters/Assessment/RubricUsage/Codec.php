@@ -22,7 +22,6 @@ use function preg_match;
  */
 class Codec
 {
-
     /**
      * Concrete filter option key.
      *

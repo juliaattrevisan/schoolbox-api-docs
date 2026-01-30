@@ -20,7 +20,6 @@ use EOTC\Event;
 
 class PriorityChain
 {
-
     /**
      * @var Response
      */

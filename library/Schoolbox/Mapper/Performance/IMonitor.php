@@ -15,7 +15,6 @@ use Schoolbox\Mapper;
 
 interface IMonitor extends LoggerInterface
 {
-
     /**
      * @param Mapper $mapper
      * @return void

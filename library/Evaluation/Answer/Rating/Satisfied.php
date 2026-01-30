@@ -11,7 +11,4 @@
  */
 abstract class Evaluation_Answer_Rating_Satisfied extends Evaluation_Answer_Radio
 {
-
-
-
 }

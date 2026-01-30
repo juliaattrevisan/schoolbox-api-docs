@@ -21,7 +21,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class ApiStatistics implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */

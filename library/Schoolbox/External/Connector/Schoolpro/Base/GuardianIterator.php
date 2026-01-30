@@ -15,7 +15,6 @@ use Schoolbox\Sync\Iterator\Guardian;
 
 class GuardianIterator extends Guardian
 {
-
     /**
      * @inheritdoc
      */

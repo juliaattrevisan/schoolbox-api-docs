@@ -14,7 +14,6 @@ namespace Schoolbox\Filter;
  */
 class RequestChecker
 {
-
     /**
      * Returns whether the payload indicates we are filtering to a sub-set of available upcoming assessments
      *

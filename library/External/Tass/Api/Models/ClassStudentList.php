@@ -12,5 +12,4 @@ namespace External\Tass\Api\Models;
 
 class ClassStudentList
 {
-
 }

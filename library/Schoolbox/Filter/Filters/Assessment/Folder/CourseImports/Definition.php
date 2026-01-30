@@ -23,7 +23,6 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends FolderFilter\Definition
 {
-
     // The name to expose in the Admin UI
     protected const NAME = 'Folders';
 

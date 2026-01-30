@@ -13,7 +13,6 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 
 class DispatchStrategy extends DefaultDispatchStrategy
 {
-
     const TASK_ROUTE = 'route';
 
     /**

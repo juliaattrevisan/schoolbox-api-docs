@@ -26,7 +26,6 @@ use Schoolbox\Mapper\AbstractMapperProxy;
  */
 class MapperProxy extends AbstractMapperProxy
 {
-
     /**
      * This mapper proxy converts searches on `assessment_id` to
      * `lti_assessment.id`, and converts the searched `assessment_id` values to

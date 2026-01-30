@@ -11,7 +11,6 @@ namespace Alaress\Rules\Token;
 
 class Filter
 {
-
     /** @var string */
     protected $filter;
 

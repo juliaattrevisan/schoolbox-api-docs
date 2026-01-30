@@ -10,7 +10,6 @@
 
 class Component_Dashboard_GreetingController extends Component_Dashboard_ControllerAbstract
 {
-
     private $greeting;
 
     /**

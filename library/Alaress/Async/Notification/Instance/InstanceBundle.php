@@ -13,7 +13,6 @@ use SplObjectStorage;
 
 class InstanceBundle
 {
-
     /** @var SplObjectStorage|Instance[] */
     protected $splStore;
 

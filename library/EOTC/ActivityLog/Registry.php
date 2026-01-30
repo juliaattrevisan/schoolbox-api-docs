@@ -14,7 +14,6 @@ use Schoolbox\Collection;
 
 class Registry
 {
-
     /**
      * A Collection of observers
      *

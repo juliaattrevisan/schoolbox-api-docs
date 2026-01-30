@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\Turnitin\Group\Process;
  */
 class Differential
 {
-
     /**
      * Find all the $local things you need to add
      * Find all the $remote things you need to remove

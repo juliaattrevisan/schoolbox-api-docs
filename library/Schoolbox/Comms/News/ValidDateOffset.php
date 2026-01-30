@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News;
 
 class ValidDateOffset
 {
-
     /**
      * Determine if one of the date offset policies contains a parseable value
      * Use string to time to decide with its linguistical bmf

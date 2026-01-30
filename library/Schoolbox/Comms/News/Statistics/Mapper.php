@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * Consts to match schema enums
      */

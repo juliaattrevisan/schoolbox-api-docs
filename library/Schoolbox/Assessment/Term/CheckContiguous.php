@@ -25,7 +25,6 @@ namespace Schoolbox\Assessment\Term;
  */
 class CheckContiguous
 {
-
     /**
      * @var Mapper
      */

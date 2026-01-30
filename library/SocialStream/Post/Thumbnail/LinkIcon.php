@@ -12,7 +12,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class LinkIcon extends Thumbnail
 {
-
     /**
      * The xpath query
      *

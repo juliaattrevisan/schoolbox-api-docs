@@ -14,7 +14,6 @@ use GuzzleHttp\Client;
 
 class ReCaptcha
 {
-
     /**
      * @var string
      */

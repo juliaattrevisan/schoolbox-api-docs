@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
 
 class Footer extends Base
 {
-
     /**
      * Returns data for twig rendering
      *

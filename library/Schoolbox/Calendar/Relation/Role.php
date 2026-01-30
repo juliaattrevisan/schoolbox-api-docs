@@ -17,7 +17,6 @@ namespace Schoolbox\Calendar\Relation;
  */
 class Role
 {
-
     /**
      * eventId to which this sid belongs
      *

@@ -15,7 +15,6 @@ namespace SocialStream\Post\Player;
  */
 class Storage extends Player
 {
-
     /**
      * Fetch thumbnail
      *

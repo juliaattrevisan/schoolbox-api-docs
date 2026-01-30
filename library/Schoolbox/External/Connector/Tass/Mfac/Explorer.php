@@ -20,7 +20,6 @@ use Alaress\Database\Connector\IConnector;
 
 class Explorer
 {
-
     /**
      * Show the recombined results for a particular family type
      */

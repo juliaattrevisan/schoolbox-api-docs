@@ -14,7 +14,6 @@ use Config;
 
 class VCalExporter implements IExporter
 {
-
     /**
      * This will stream the vcal output as it parses over the event collection
      *

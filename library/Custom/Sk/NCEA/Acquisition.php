@@ -14,7 +14,6 @@ use Alaress\Database\Connector\IConnector;
 
 class Acquisition
 {
-
     /**
      * @var IConnector
      */

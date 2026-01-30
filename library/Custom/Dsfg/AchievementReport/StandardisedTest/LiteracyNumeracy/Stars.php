@@ -16,7 +16,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
  */
 class Stars
 {
-
     /**
      * Whether there was any data found
      *

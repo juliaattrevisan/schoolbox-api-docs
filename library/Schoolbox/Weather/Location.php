@@ -23,7 +23,6 @@ namespace Schoolbox\Weather;
  */
 class Location
 {
-
     /**
      * Default location for which to obtain weather data
      */

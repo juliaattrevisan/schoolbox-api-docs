@@ -24,7 +24,6 @@ use Schoolbox\Resource\Folder;
  */
 class FinalUserAccess
 {
-
     /**
      * Representations of the mutations that occurred, in chronological order
      */

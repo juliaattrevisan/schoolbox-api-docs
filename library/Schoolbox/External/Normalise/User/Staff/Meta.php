@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 
 class Meta
 {
-
     /**
      * An instance of Category
      *

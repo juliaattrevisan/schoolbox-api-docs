@@ -27,7 +27,6 @@ use Schoolbox\External\TimetablePeriodMapper;
  */
 class TimetableStructure extends AbstractImporter
 {
-
     /**
      * @var TimetableCycleMapper
      */

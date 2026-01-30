@@ -14,7 +14,6 @@ use Schoolbox\Mapper;
 
 interface CrudEventInterface extends EventInterface
 {
-
     /**
      * @return Mapper
      */

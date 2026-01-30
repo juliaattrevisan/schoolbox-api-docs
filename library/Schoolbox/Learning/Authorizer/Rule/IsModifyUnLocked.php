@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
  */
 class IsModifyUnLocked extends IsUnLocked
 {
-
     /**
      * @inheritdoc
      */

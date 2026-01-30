@@ -22,7 +22,6 @@ use UnderflowException;
  */
 interface IUserResolver
 {
-
     /**
      * Returns the ids of users who are capable of moderating this article either because:
      * * they are superusers, or

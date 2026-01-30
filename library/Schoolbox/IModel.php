@@ -19,7 +19,6 @@ namespace Schoolbox;
  */
 interface IModel
 {
-
     /**
      * Returns a collection that can only hold models of the type this function was called on.
      *

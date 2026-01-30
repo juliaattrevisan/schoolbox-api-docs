@@ -22,5 +22,4 @@ namespace Schoolbox\Assessment\Course\Import;
  */
 class InvalidDataStateException extends \UnexpectedValueException
 {
-
 }

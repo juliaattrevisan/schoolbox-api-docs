@@ -11,6 +11,5 @@ namespace Calendar\Event\Collection;
 
 interface IExporter
 {
-
     public function export(Renderer $renderer, string $filename): void;
 }

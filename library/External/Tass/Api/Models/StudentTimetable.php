@@ -12,7 +12,6 @@ namespace External\Tass\Api\Models;
 
 class StudentTimetable
 {
-
     /** @var string */
     private $date;
     /** @var int */

@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class UserExists extends Condition
 {
-
     /**
      * @param bool $negate
      */

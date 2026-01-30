@@ -15,7 +15,6 @@ use Alaress\Rules\Token\Tokenizer;
 
 abstract class TokenizedRuleset extends Ruleset
 {
-
     /** @var Tokenizer */
     protected $tokenizer;
 

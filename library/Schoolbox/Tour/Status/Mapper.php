@@ -24,7 +24,6 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * @inheritdoc
      */

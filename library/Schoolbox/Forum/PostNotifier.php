@@ -30,7 +30,6 @@ use Schoolbox\User;
 
 class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     // somebody posts on a forum
     const TRIGGER_FOLLOWED  = 'followed';
     // somebody replied to your forum post or thread

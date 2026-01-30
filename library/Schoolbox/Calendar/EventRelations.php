@@ -33,7 +33,6 @@ use UnexpectedValueException;
  */
 class EventRelations
 {
-
     /**
      * Access level, an int
      *

@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class RecursiveRoute implements IRoute
 {
-
     /** @var string */
     private $path;
 

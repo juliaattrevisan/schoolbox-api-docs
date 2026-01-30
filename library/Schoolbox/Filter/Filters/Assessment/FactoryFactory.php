@@ -38,7 +38,6 @@ use InvalidArgumentException;
  */
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
-
     protected const ENTITY = Assessment\Mapper::class;
 
     /** @var RosettaStone */

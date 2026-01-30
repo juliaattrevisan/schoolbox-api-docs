@@ -19,7 +19,6 @@ use Schoolbox\User;
  */
 class TotalPayload
 {
-
     /**
      * @var IConnector
      */

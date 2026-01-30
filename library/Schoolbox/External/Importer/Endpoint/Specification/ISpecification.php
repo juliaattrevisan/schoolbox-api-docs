@@ -16,7 +16,6 @@ namespace Schoolbox\External\Importer\Endpoint\Specification;
  */
 interface ISpecification
 {
-
     /**
      * Status text for existing nodes
      */

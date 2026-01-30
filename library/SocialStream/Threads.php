@@ -21,7 +21,6 @@ use Scrub;
  */
 class Threads
 {
-
     /**
      * A schoolbox collection of SocialStream_Post instances
      *

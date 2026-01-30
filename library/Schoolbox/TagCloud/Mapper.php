@@ -20,7 +20,6 @@ use Schoolbox\Collection;
  */
 class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
-
     const SCHOOL_PREFIX = 'school:';
 
     /**

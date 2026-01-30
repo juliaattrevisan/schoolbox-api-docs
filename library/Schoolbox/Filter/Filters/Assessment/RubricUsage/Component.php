@@ -25,7 +25,6 @@ use function array_merge;
  */
 class Component extends Filter\BaseComponent
 {
-
     /**
      * @var Codec
      */

@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 class Sidebar
 {
-
     /**
      * @var Mapper
      */

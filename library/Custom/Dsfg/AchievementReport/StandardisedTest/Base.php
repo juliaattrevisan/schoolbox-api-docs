@@ -12,7 +12,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest;
 
 abstract class Base extends \Custom\Dsfg\AchievementReport\Base
 {
-
     /**
      * For highcharts, its default version of null is string 'null'
      */

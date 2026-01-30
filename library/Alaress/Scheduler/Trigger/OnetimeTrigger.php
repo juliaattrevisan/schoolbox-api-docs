@@ -13,7 +13,6 @@ use Alaress\Scheduler\Event\EventInterface;
 
 abstract class OnetimeTrigger extends AbstractTrigger
 {
-
     /** @var int */
     protected $timestamp;
 

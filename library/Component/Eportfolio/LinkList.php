@@ -12,7 +12,6 @@ namespace Component\Eportfolio;
 
 class LinkList extends ListItem
 {
-
     /**
      * Human readable version of the link
      * $content is the actual url itself

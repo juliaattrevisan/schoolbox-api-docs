@@ -19,7 +19,6 @@ use Schoolbox\User;
  */
 class ValidAccess
 {
-
     /**
      * Decide if $user can access the Achievement Reports based on the $configVar
      * dio_achievement_report_enabled

@@ -11,9 +11,6 @@
  */
 class Assess_Question_Bank extends Evaluation_Question_Bank
 {
-
-
-
     /**
      * Constructor
      */

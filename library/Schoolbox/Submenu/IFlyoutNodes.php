@@ -18,7 +18,6 @@ namespace Schoolbox\Submenu;
  */
 interface IFlyoutNodes
 {
-
     /**
      * Generate an array of nodes to use in the Flyout menu
      * Example usage as follows. It's only loosely defined but

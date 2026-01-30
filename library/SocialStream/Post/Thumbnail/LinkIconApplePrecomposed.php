@@ -14,7 +14,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class LinkIconApplePrecomposed extends Thumbnail
 {
-
     /**
      * The xpath query
      *

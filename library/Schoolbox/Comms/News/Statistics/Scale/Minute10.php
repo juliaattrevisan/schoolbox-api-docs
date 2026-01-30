@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Minute10 extends Base
 {
-
     /**
      * @return string
      */

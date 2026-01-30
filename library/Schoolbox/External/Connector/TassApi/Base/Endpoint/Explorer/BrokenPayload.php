@@ -40,7 +40,6 @@ die();
  */
 class BrokenPayload
 {
-
     /**
      * @var array
      */

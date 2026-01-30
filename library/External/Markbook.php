@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class External_Markbook implements External_MarkbookInterface
 {
-
     /** @var External_MarkbookInterface */
     private $database;
 

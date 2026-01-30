@@ -23,7 +23,6 @@ use UnexpectedValueException;
  */
 class Codec
 {
-
     private const DELIMITER_SELECTIZE = ',';
     private const DELIMITER_COMPOSITE = ';';
     private const DELIMITER_SIMPLE = ':';

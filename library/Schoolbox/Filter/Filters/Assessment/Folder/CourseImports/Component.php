@@ -17,7 +17,6 @@ use Schoolbox\Resource\Folder;
 
 class Component extends Filter\BaseComponent
 {
-
     /**
      * Indexed by folder.id
      *

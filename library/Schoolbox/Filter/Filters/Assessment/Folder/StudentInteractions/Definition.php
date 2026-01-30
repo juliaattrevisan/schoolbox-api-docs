@@ -25,7 +25,6 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends FolderFilter\Definition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Student Folders';
 

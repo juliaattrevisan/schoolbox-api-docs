@@ -21,7 +21,6 @@ use UnexpectedValueException;
 
 class ValidSelfReflectionWithResponse extends ValidSelfReflection
 {
-
     /**
      * The currently logged-in user can self-reflect on the specified Participant's IResponse
      * only when the following conditions are met

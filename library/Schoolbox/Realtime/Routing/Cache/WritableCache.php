@@ -15,7 +15,6 @@ use UnderflowException;
 
 interface WritableCache
 {
-
     /**
      * @param string $instanceId
      * @param int[] $userIds

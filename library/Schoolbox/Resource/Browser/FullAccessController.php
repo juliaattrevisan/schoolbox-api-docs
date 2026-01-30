@@ -12,7 +12,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class FullAccessController extends AbstractController
 {
-
     /**
      * Controller constructor.
      */

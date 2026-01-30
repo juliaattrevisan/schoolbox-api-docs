@@ -20,5 +20,4 @@ namespace Alaress\Lock;
  */
 class LockRefreshException extends \Exception
 {
-
 }

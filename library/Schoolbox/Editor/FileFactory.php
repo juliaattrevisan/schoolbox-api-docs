@@ -24,7 +24,6 @@ use UnexpectedValueException;
  */
 class FileFactory
 {
-
     /**
      * A hash tuple e.g. browse:55
      *

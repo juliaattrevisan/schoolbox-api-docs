@@ -19,7 +19,6 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
  */
 class TravelLog
 {
-
     // The Vist Gateway API URL for SchoolBox
     private const API_URL = 'https://gateway.verso.school/';
 

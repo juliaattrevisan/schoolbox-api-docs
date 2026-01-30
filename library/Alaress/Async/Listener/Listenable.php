@@ -11,7 +11,6 @@ namespace Alaress\Async\Listener;
 
 interface Listenable
 {
-
     /**
      * @param EventListener $listener
      * @return void

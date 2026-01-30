@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Course\Config;
 
 class Model
 {
-
     /**
      * @var int
      */

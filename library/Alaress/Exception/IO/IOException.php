@@ -11,5 +11,4 @@ namespace Alaress\Exception\IO;
 
 class IOException extends \RuntimeException
 {
-
 }

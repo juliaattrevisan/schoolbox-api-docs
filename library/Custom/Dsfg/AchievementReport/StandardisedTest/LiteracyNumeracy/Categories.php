@@ -11,7 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
 class Categories
 {
-
     /**
      * Generate a template of x categories
      *

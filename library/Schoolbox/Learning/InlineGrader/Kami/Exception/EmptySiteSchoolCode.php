@@ -18,5 +18,4 @@ use RuntimeException;
  */
 class EmptySiteSchoolCode extends RuntimeException implements IKamiException
 {
-
 }

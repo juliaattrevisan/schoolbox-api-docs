@@ -9,7 +9,6 @@
  */
 abstract class Report_Abstract
 {
-
     /**
      * @var null
      */

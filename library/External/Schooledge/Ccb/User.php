@@ -12,7 +12,6 @@ declare(strict_types=1);
  */
 class External_Schooledge_Ccb_User extends External_Schooledge_User
 {
-
     /**
      * Builds a filter for a student's contacts.
      *

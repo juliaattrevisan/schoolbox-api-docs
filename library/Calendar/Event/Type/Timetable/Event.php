@@ -17,7 +17,6 @@ use Calendar\Event\Type\Day;
 
 class Event extends Day\Event
 {
-
     /**
      * @var string $timetableCode Timetable external definition code
      */

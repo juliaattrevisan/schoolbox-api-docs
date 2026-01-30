@@ -12,7 +12,6 @@ namespace Etherpad;
 
 class Session
 {
-
     /**
      * Sessions and cookies are valid for this number of hours
      *

@@ -12,7 +12,6 @@ namespace EOTC\ActivityLog;
 
 class Mapper extends \Schoolbox\Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('eotc_activitylog');

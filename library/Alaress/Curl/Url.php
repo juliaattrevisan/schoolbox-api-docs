@@ -13,7 +13,6 @@ use Proxy\Server;
  */
 class Alaress_Curl_Url
 {
-
     /**
      * Errors returned by curl are collated into this stack
      *

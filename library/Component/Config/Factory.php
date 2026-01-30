@@ -11,7 +11,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Factory
 {
-
     private static array $invalid = array('factory', 'abstract', 'interface');
 
     /**

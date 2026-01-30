@@ -20,7 +20,6 @@ use Schoolbox\User;
  */
 class Campus extends Base
 {
-
     /**
      * @var CampusMapper
      */

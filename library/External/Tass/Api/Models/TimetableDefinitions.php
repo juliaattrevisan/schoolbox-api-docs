@@ -12,7 +12,6 @@ namespace External\Tass\Api\Models;
 
 class TimetableDefinitions
 {
-
     /** @var int */
     private $daysMax;
 

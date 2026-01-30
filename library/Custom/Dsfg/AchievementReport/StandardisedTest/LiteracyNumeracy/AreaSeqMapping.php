@@ -11,7 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
 class AreaSeqMapping
 {
-
     /**
      * Find the AreaSeq sequence that we use to map red/blue/green data series
      *

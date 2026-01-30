@@ -15,7 +15,6 @@ use Alaress_Date_Format;
 // TODO de-dupe with Student?
 class EnrolledStudent
 {
-
     /** @var Alaress_Date_Format|null */
     private $acceptDate;
 

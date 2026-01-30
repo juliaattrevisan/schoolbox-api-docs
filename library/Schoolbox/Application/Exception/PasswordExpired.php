@@ -12,5 +12,4 @@ namespace Schoolbox\Application\Exception;
 
 class PasswordExpired extends Exception
 {
-
 }

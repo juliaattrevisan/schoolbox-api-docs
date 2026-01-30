@@ -16,7 +16,6 @@ use Schoolbox\Realtime\WorkNotifier;
 
 abstract class RecurringTrigger extends AbstractTrigger
 {
-
     /** @var CronExpression */
     protected $cron;
 

@@ -16,7 +16,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
  */
 class Navigation extends Base
 {
-
     /**
      * Find all the years that have an Individual Stanine value != 0
      *

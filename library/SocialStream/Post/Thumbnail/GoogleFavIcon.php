@@ -12,7 +12,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class GoogleFavIcon extends Thumbnail
 {
-
     public function fetchThumbnail()
     {
 

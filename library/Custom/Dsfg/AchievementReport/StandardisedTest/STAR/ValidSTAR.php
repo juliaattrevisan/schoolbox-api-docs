@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class ValidSTAR
 {
-
     /**
      * Certain year levels always display the tab.
      * Other year levels display the tab only if there is data there

@@ -14,7 +14,6 @@ use Schoolbox\Admin\Settings\FieldType\Checkbox;
 
 class Renderer extends Checkbox\Renderer
 {
-
     /**
      * @inheritdoc
      */

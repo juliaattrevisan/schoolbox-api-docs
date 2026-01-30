@@ -15,5 +15,4 @@ namespace Schoolbox\External;
  */
 class Exception extends \Exception
 {
-
 }

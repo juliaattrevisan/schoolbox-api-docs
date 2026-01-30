@@ -35,7 +35,6 @@ use function in_array;
  */
 class Definition extends Filter\AbstractDefinition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Activity State';
 

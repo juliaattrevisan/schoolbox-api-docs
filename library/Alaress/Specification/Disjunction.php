@@ -15,7 +15,6 @@ namespace Alaress\Specification;
  */
 class Disjunction extends Composite
 {
-
     /**
      * Returns whether the candidate audience specification satisfies this specification
      *

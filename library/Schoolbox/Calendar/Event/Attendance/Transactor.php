@@ -27,7 +27,6 @@ use UnexpectedValueException;
  */
 class Transactor
 {
-
     /**
      * @var Mapper
      */

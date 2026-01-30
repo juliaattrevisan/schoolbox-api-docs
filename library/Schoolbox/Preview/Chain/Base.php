@@ -12,7 +12,6 @@ namespace Schoolbox\Preview\Chain;
 
 abstract class Base
 {
-
     /**
      * Result data
      *

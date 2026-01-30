@@ -17,7 +17,6 @@ namespace Alaress\Specification;
  */
 class ExclusiveOr extends Composite
 {
-
     /**
      * @inheritdoc
      */

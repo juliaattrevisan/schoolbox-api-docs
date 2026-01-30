@@ -30,7 +30,6 @@ use Schoolbox\User;
 
 class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_FOLLOWED  = 'followed';
 
     /** @var FolderMapper */

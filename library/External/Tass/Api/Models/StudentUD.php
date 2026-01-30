@@ -17,9 +17,6 @@ use Alaress_Date_Format;
  */
 class StudentUD
 {
-
-
-
     /** @var array */
     private $udCodes;
 

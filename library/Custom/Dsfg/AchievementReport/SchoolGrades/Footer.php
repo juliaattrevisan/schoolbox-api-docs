@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
 class Footer extends Base
 {
-
     /**
      * Returns data for twig rendering
      *

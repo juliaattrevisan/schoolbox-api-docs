@@ -29,7 +29,6 @@ use Schoolbox\User;
  */
 class Progression
 {
-
     /**
      * We're making raw sql queries here, so I need this thing to do it
      *

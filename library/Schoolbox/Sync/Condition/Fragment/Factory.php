@@ -17,7 +17,6 @@ use Schoolbox\Sync\Condition\Type\Model as ConditionType;
  */
 class Factory
 {
-
     /**
      * General purpose Condition
      */

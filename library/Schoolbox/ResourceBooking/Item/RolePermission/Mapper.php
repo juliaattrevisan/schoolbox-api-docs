@@ -14,7 +14,6 @@ use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
 {
-
     public function mapping()
     {
         $this->hasTable('resource_role_permission');

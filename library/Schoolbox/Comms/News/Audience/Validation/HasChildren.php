@@ -18,7 +18,6 @@ use Alaress\Specification;
  */
 class HasChildren extends Specification\Leaf
 {
-
     /**
      * @param Audience\Model $candidate
      * @return bool

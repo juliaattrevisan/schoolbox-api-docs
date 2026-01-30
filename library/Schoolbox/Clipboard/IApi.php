@@ -16,7 +16,6 @@ namespace Schoolbox\Clipboard;
  */
 interface IApi
 {
-
     /**
      * Retrieves data from an endpoint
      *

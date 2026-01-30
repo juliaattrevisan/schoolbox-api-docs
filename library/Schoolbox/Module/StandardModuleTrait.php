@@ -22,7 +22,6 @@ use Alaress\Twig\Loader\IChainLoader;
  */
 trait StandardModuleTrait
 {
-
     /**
      * Helper method for adding a template path for this component's basename.
      *

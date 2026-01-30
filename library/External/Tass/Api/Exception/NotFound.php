@@ -20,5 +20,4 @@ use UnexpectedValueException;
  */
 class NotFound extends UnexpectedValueException implements ITassApiException
 {
-
 }

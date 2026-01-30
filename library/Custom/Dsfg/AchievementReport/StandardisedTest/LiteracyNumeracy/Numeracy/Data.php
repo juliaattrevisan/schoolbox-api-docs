@@ -14,7 +14,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
 
 class Data extends Base
 {
-
     /**
      * Data source
      *

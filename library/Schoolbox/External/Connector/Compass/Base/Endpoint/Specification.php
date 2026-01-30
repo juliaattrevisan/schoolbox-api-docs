@@ -20,7 +20,6 @@ use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
  */
 class Specification
 {
-
     /**
      * @var IApi
      */

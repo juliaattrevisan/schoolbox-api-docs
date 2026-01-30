@@ -20,7 +20,6 @@ use Schoolbox\Collection;
  */
 class Fragment
 {
-
     /**
      * Template filename
      *

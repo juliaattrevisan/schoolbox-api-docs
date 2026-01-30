@@ -14,7 +14,6 @@ use Schoolbox\Sync;
 
 class Model
 {
-
     /** @var int */
     protected $id;
 

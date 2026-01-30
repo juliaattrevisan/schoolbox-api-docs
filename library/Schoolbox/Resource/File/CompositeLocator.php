@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Exception\NotFound;
  */
 class CompositeLocator implements ILocator
 {
-
     /**
      * @var ILocator[]
      */

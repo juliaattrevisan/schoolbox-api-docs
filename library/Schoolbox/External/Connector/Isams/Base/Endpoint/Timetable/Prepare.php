@@ -25,7 +25,6 @@ use Schoolbox\External\TimetablePeriodMapper;
  */
 class Prepare implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */

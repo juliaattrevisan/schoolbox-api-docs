@@ -23,7 +23,6 @@ use Schoolbox\Collection;
  */
 class ClassPeriodMapper extends Schoolbox\Mapper
 {
-
     /**
      * {@inheritdoc}
      */

@@ -16,7 +16,6 @@ use Schoolbox\Admin\Settings\FieldType\Input;
 
 class Renderer extends Input\Renderer
 {
-
     /**
      * @inheritdoc
      */

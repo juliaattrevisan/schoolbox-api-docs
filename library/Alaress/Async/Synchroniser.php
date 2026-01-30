@@ -13,7 +13,6 @@ use Predis\ClientInterface;
 
 class Synchroniser
 {
-
     /** @var ClientInterface */
     private $redis;
 

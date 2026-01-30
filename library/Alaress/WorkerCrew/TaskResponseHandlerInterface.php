@@ -11,7 +11,6 @@ namespace Alaress\WorkerCrew;
 
 interface TaskResponseHandlerInterface
 {
-
     /**
      * Handles a response from a Worker
      *

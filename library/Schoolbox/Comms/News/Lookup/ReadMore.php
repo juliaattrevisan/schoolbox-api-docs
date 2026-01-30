@@ -23,7 +23,6 @@ use Schoolbox\Comms\News\ValidHasReadMore;
  */
 class ReadMore
 {
-
     /**
      * @var string
      */

@@ -19,7 +19,6 @@ namespace Schoolbox\Calendar\Component\Dashboard;
  */
 class FilterCodec
 {
-
     /**
      * DSN format
      *

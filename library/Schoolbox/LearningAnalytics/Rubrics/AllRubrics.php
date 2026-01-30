@@ -15,7 +15,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementatio
 
 class AllRubrics
 {
-
     /**
      * An array of rubric data to plot
      *

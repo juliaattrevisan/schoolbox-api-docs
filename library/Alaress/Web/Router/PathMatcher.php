@@ -22,7 +22,6 @@ use Alaress\Module\Loader as ModuleLoader;
 
 class PathMatcher
 {
-
     /**
      * A list of rules that have been defined.
      *

@@ -16,7 +16,6 @@ use Schoolbox\Role;
 
 class DigestTrigger extends RecurringTrigger
 {
-
     /**
      * @param WorkNotifier $notifier
      * @param string       $schedule

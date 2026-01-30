@@ -12,5 +12,4 @@ namespace Component\Eportfolio;
 
 class BasicList extends ListItem
 {
-
 }

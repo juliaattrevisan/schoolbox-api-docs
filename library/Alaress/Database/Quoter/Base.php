@@ -15,7 +15,6 @@ use Alaress\Database\Predicate\InvalidColumnException;
  */
 abstract class Base implements IQuoter
 {
-
     /**
      * @inheritdoc
      */

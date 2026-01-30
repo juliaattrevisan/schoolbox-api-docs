@@ -12,7 +12,6 @@
  */
 class Alaress_Validator_Date extends Alaress_Validator_Abstract
 {
-
     protected $value = array();
 
     /**

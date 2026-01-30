@@ -14,7 +14,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
 class Data extends Base
 {
-
     /**
      * Y categories, Stages
      */

@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class DuplicateFilter implements FilterInterface
 {
-
     /** @var IListFactory */
     protected $factory;
 

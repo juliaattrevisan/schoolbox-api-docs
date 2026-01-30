@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Routing\Filter;
 
 abstract class ContextFilter implements FilterInterface
 {
-
     /**
      * Tests the overlap of a context value with the corresponding data from the user object
      *

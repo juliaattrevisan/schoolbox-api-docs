@@ -23,7 +23,6 @@ use Schoolbox\Resource\Folder;
  */
 class ValidUseCohortMarks
 {
-
     /**
      * Decide whether LMS Cohort Comparison should be activated for $folder
      *

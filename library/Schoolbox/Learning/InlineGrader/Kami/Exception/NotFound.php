@@ -18,5 +18,4 @@ use GuzzleHttp\Exception\ClientException;
  */
 class NotFound extends ClientException implements IKamiException
 {
-
 }

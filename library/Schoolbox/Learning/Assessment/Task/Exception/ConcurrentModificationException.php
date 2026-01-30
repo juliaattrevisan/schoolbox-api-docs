@@ -19,5 +19,4 @@ namespace Schoolbox\Learning\Assessment\Task\Exception;
  */
 class ConcurrentModificationException extends \LogicException
 {
-
 }

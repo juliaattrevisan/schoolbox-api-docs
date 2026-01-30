@@ -6,7 +6,6 @@
  */
 class Alaress_HTMLPurifier_Injector_SafeObject extends HTMLPurifier_Injector_SafeObject
 {
-
     protected $allowedParam = array(
         'wmode' => true,
         'movie' => true,

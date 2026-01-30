@@ -16,7 +16,6 @@ namespace Alaress\Database\Predicate;
  */
 class Bindings
 {
-
     /** @var string */
     private $placeholder;
 

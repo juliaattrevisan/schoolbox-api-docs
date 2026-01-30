@@ -14,7 +14,6 @@ use OutOfRangeException;
 
 interface IPaginator
 {
-
     /**
      * Publicly set properties of paginators: items displayed per page, and
      * total items displayed

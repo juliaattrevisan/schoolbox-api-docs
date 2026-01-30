@@ -17,7 +17,6 @@ use PDO;
 
 class Base extends BaseQuery implements IStoredProcedure
 {
-
     /** @var string $name Function name */
     protected $name;
 

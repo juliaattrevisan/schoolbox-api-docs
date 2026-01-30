@@ -21,7 +21,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer;
  */
 class BrokenPayloadCodec
 {
-
     /**
      * Encode a (module, method, params, queryArgs) tuple
      * These represent the api request we tried to make, but it failed for some reason

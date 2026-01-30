@@ -16,7 +16,6 @@ use Schoolbox\Role;
 
 class MockDigestTrigger extends DigestTrigger
 {
-
     /** @var bool */
     protected $hasFired = false;
 

@@ -15,7 +15,6 @@ namespace SocialStream\Post\Player;
  */
 class Ted extends Player
 {
-
     /**
      * Fetch thumbnail
      *

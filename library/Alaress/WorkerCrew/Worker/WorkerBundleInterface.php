@@ -13,7 +13,6 @@ use OutOfBoundsException;
 
 interface WorkerBundleInterface
 {
-
     /**
      * Attaches a Worker
      *

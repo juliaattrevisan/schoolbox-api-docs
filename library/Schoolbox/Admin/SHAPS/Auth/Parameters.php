@@ -28,7 +28,6 @@ namespace Schoolbox\Admin\SHAPS\Auth;
 
 class Parameters
 {
-
     /**
      * The url of help.schoolbox.com.au
      *

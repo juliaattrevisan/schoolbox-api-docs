@@ -13,7 +13,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
 class GroupData
 {
-
     /**
      * Generate a placeholder array, grouped by x-axis labels and AreaSeq value
      * Placeholder array defaults to string 'null', for highcharts

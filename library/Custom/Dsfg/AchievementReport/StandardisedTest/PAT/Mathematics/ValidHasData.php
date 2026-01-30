@@ -16,7 +16,6 @@ use Schoolbox\YearLevel;
  */
 class ValidHasData
 {
-
     /**
      * Certain year levels always display the graph.
      * Other year levels display the graph only if there is data there

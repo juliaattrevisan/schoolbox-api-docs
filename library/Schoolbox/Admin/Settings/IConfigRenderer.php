@@ -18,7 +18,6 @@ use Schoolbox\Config\Config;
  */
 interface IConfigRenderer
 {
-
     /**
      * Returns the template and data to render into the template with keys 'template' and 'data'
      *

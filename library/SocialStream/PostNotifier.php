@@ -35,7 +35,6 @@ use SocialStream_Post_Abstract;
 
 class PostNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_POSTED = 'posted';
     const TRIGGER_REPLIED = 'replied';
 

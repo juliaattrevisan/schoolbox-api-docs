@@ -12,7 +12,6 @@ namespace Schoolbox\External\Normalise\User\Common;
 
 class Campus
 {
-
     /**
      * Identifier
      * (May be synonymous with $code)

@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Model
 {
-
     /**
      * @var int
      */

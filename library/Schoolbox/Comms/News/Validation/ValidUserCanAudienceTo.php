@@ -23,7 +23,6 @@ use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
  */
 class ValidUserCanAudienceTo extends Specification\Leaf
 {
-
     /**
      * Note this is the effector, not the author.
      *

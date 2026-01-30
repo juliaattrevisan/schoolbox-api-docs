@@ -14,7 +14,6 @@ use Twig\Error\RuntimeError;
 
 class InlineImage
 {
-
     /**
      * Outputs the image in $source (based in WEB_root) as a data: URL. Adds the
      * image mime type as well.

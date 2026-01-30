@@ -15,7 +15,6 @@ use EOTC\ListGroup\Response;
 
 class ConfirmRAMs extends Base
 {
-
     /**
      * Next status id
      *

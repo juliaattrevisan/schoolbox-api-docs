@@ -19,7 +19,6 @@ use Schoolbox\Collection;
 
 class Guardian extends Base
 {
-
     /* Contact
      */
 

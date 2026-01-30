@@ -18,7 +18,6 @@ use Schoolbox\External\Profile\Model as BaseProfile;
  */
 class Model
 {
-
     /**
      * @var null|BaseProfile
      */

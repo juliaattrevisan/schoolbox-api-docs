@@ -11,8 +11,6 @@
  */
 class Survey_Attempt extends Evaluation_Attempt
 {
-
-
     public $_table = 'assess_attempt';
     public $_index = 'attempt_id';
 }

@@ -28,7 +28,6 @@ use Schoolbox\User;
  */
 class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
 {
-
     /**
      * @return string
      */

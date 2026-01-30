@@ -15,7 +15,6 @@ use RangeException;
 
 class Worker extends PipeWriter
 {
-
     const READY = 0x1;
     const BUSY  = 0x2;
     const DONE  = 0x4;

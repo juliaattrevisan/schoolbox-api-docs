@@ -17,7 +17,6 @@ namespace Schoolbox\Sync\Condition\Fragment;
  */
 class Fragment
 {
-
     /**
      * Template filename
      *

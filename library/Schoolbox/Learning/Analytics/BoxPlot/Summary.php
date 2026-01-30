@@ -18,7 +18,6 @@ namespace Schoolbox\Learning\Analytics\BoxPlot;
  */
 class Summary
 {
-
     /**
      * @var array
      */

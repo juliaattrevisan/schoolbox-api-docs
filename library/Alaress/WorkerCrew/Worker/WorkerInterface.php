@@ -14,7 +14,6 @@ use RuntimeException;
 
 interface WorkerInterface
 {
-
     /**
      * @param string $buffer
      * @throws InvalidArgumentException

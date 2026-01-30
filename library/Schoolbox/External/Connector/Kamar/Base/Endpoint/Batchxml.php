@@ -26,7 +26,6 @@ use SimpleXMLElement;
  */
 class Batchxml
 {
-
     /**
      * @var IApi
      */

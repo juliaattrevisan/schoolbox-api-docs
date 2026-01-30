@@ -15,7 +15,6 @@ use EOTC\ListGroup\Response;
 
 class Approved extends Base
 {
-
     /**
      * Next status id
      *

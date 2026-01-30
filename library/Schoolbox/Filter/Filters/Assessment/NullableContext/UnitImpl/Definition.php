@@ -29,7 +29,6 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends NullableContext\Definition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Unit Implementation';
 

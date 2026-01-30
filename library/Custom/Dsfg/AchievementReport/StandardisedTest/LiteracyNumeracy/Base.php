@@ -11,7 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
 abstract class Base extends \Custom\Dsfg\AchievementReport\StandardisedTest\Base
 {
-
     /**
      * Find all the data for Literacy/Numeracy graphs
      *

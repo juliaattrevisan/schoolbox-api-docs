@@ -28,7 +28,6 @@ namespace Schoolbox\Sync\Provisioner;
  */
 class UserAccessXOR
 {
-
     /**
      * The xor also must account for changes in access level,
      * which is the value of each tuple, since

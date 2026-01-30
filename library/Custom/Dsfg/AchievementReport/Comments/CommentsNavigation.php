@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\Comments;
 
 class CommentsNavigation extends Base
 {
-
     /**
      * Returns data for twig rendering
      *

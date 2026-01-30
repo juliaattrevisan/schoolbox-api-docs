@@ -14,7 +14,6 @@ use ReflectionMethod;
 
 class Subscription
 {
-
     /** @var array */
     private $conditions;
     /** @var array */

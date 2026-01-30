@@ -23,7 +23,6 @@ use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 
 abstract class AbstractNode implements NodeInterface
 {
-
     const MAX_DEPTH = 100;
 
     const ALL_FILES = null;

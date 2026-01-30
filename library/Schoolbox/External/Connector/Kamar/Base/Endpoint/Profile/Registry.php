@@ -24,7 +24,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
  */
 class Registry
 {
-
     /**
      * @var array
      */

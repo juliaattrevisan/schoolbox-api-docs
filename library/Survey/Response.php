@@ -11,8 +11,6 @@
  */
 class Survey_Response extends Evaluation_Response
 {
-
-
     public $_table = 'assess_response';
     public $_index = 'response_id';
 /* A const to determine whether to randomise questions

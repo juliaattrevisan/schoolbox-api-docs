@@ -19,8 +19,6 @@ use Alaress\Scheduler\Event\EventInterface;
  */
 class CancelTrigger extends AbstractTrigger
 {
-
-
     /**
      * @param string $label
      * @param EventInterface $event

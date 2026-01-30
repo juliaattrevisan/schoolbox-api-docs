@@ -15,7 +15,6 @@ namespace Schoolbox\Resource\Browser\Tree;
 
 class Node
 {
-
     /**
      * Node id
      *

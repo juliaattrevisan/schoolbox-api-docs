@@ -11,7 +11,6 @@ namespace Alaress\Async\AMQP\Bunny;
 
 interface ControlInterface
 {
-
     /**
      * @param array $fields
      * @return array

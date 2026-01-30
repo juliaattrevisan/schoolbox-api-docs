@@ -16,7 +16,6 @@ use InvalidArgumentException;
 
 class Renderer extends Select\Renderer
 {
-
     // Serialised Options keys
     public const OPTION_KEY_MAPPER           = 'mapper';
     public const OPTION_KEY_GET_KEY_METHOD   = 'getKeyMethod';

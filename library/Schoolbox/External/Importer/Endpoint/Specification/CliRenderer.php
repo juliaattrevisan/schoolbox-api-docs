@@ -18,8 +18,6 @@ use Psr\Log\LoggerInterface;
  */
 class CliRenderer
 {
-
-
     /**
      * Number of spaces for output formatting
      */

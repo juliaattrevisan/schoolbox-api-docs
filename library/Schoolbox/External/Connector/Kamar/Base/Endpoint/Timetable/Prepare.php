@@ -24,7 +24,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Prepare implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */

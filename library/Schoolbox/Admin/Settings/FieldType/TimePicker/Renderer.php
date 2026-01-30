@@ -14,7 +14,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Renderer extends AbstractRenderer
 {
-
     /**
      * @inheritdoc
      */

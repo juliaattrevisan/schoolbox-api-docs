@@ -13,7 +13,6 @@ use Alaress\Async\Notification\Instance\Instance;
 
 interface IServiceManager
 {
-
     /**
      * @param int      $userId
      * @param Instance $instance

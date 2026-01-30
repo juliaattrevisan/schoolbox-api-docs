@@ -11,7 +11,6 @@ namespace Alaress\Redis\Async\Event;
 
 abstract class AbstractEvent implements IEvent
 {
-
     /** @var string  */
     protected $payload;
 

@@ -17,7 +17,6 @@ use Schoolbox\L10n\RosettaStone;
 
 class Factory extends AbstractFactory
 {
-
     /** @var RosettaStone */
     private $rosettaStone;
 

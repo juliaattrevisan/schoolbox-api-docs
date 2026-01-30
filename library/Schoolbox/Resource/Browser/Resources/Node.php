@@ -30,7 +30,6 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
  */
 class Node extends AbstractNode
 {
-
     /**
      * Library for determining permissions
      * @var Access

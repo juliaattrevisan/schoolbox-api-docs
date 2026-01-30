@@ -22,7 +22,6 @@ use Schoolbox\Collection;
  */
 class ExistingUserAccess
 {
-
     /**
      * @var \Schoolbox\Resource\Folder\Mapper
      */

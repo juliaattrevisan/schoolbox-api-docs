@@ -9,7 +9,6 @@
  */
 class Survey_Export_CSV extends Evaluation_Export_CSV
 {
-
     /**
      * @var string[]
      */

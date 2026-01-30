@@ -12,7 +12,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class Direct extends Thumbnail
 {
-
     /**
      * Find itemprop='image'
      *

@@ -17,7 +17,6 @@ namespace Schoolbox\Calendar\Relation;
  */
 class Personal
 {
-
     /**
      * eventId to which this sid belongs
      *

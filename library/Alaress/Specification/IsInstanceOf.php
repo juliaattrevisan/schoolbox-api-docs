@@ -15,7 +15,6 @@ namespace Alaress\Specification;
  */
 class IsInstanceOf extends Leaf
 {
-
     /** @var string */
     private $className;
 

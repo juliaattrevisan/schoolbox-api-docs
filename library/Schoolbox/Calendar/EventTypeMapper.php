@@ -24,7 +24,6 @@ use Schoolbox\Collection;
  */
 class EventTypeMapper extends Schoolbox\Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('luEventType');

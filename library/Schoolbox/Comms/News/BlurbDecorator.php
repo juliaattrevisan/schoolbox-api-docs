@@ -22,7 +22,6 @@ use Scrub;
  */
 class BlurbDecorator implements IDecorator
 {
-
     /**
      * @var string
      */

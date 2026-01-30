@@ -9,7 +9,6 @@
  */
 class Alaress_Log_Probe
 {
-
     /**
      * Constructor
      *

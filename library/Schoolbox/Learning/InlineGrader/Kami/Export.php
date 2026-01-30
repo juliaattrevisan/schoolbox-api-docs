@@ -22,7 +22,6 @@ use Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException;
  */
 class Export
 {
-
     const STATUS_PENDING = 'pending';
     const STATUS_DONE = 'done';
     const STATUS_ERROR = 'error';

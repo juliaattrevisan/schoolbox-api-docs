@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 interface GeneratorInterface
 {
-
     /**
      * @param User $user
      * @return string[][]

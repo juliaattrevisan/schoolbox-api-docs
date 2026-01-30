@@ -11,7 +11,6 @@ namespace Schoolbox\Column;
 
 class Set implements IColumnType
 {
-
     /**
      * Translates a value from a database field or other data store, into a
      * string, integer or object value for use in a model object.

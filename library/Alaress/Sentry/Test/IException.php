@@ -14,5 +14,4 @@ namespace Alaress\Sentry\Test;
  */
 interface IException
 {
-
 }

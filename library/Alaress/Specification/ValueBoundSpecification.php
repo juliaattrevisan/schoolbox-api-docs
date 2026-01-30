@@ -14,7 +14,6 @@ use UnexpectedValueException;
 
 abstract class ValueBoundSpecification extends Leaf
 {
-
     /** @var mixed */
     private $expectedValue;
 

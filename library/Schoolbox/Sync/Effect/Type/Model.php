@@ -13,7 +13,6 @@ use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 class Model
 {
-
     /** @var int */
     protected $id;
 

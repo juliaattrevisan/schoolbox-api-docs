@@ -14,7 +14,6 @@ use UnexpectedValueException;
 
 class Equals extends ValueBoundSpecification
 {
-
     /**
      * @inheritdoc
      */

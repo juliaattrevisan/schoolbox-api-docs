@@ -13,7 +13,6 @@ use Calendar\Event\Type\EventBase;
 
 class JsonExporter implements IExporter
 {
-
     /**
      * @param Renderer $renderer
      * @param string   $filename

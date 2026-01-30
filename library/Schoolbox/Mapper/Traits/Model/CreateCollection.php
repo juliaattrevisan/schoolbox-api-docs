@@ -17,7 +17,6 @@ use Schoolbox\GenericCollection;
  */
 trait CreateCollection
 {
-
     /**
      * Creates a collection that may only contain items of the class it is used in
      */

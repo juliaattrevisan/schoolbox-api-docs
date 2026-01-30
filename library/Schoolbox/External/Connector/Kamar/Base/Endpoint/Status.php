@@ -20,7 +20,6 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
  */
 class Status implements IStatus
 {
-
     /**
      * @var string
      */

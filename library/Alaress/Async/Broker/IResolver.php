@@ -16,7 +16,6 @@ namespace Alaress\Async\Broker;
  */
 interface IResolver
 {
-
     /**
      * @throws DuplicateResolutionException
      * @return void

@@ -13,7 +13,6 @@ use Schoolbox\Mapper;
 
 abstract class AbstractTestMapper extends Mapper
 {
-
     /**
      * Overrides constructor as public, so that new instances can be created
      * without going through getInstance().

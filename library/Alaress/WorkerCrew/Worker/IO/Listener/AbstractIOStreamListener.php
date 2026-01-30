@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractIOStreamListener implements StreamListener
 {
-
     /** @var LoggerInterface */
     protected $log;
 

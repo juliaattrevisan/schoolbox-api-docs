@@ -11,7 +11,6 @@ namespace Alaress\Rules\Token;
 
 class Token
 {
-
     /** @var string */
     protected $token;
     /** @var string */

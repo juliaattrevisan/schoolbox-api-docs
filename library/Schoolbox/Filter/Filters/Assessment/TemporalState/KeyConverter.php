@@ -18,7 +18,6 @@ use Schoolbox\Filter\AbstractKeyConverter;
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * All 'TemporalState' values known to the system (regardless of whether they are available)
      *

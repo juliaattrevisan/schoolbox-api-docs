@@ -20,7 +20,6 @@ use Psr\Log\LoggerInterface;
  */
 class ApiStatistics implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */

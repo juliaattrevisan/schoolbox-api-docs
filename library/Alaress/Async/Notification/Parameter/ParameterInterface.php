@@ -15,7 +15,6 @@ use JsonSerializable;
 
 interface ParameterInterface extends JsonSerializable
 {
-
     /**
      * Use whichever parameter comes in first. Implies all will be identical.
      */

@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Exception\NotFound;
 
 class QuoteMapper extends \Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

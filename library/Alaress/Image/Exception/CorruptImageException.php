@@ -18,5 +18,4 @@ use UnexpectedValueException;
  */
 class CorruptImageException extends UnexpectedValueException
 {
-
 }

@@ -16,7 +16,6 @@ use SplQueue;
 
 class MockAMQPConnector implements AMQPInterface
 {
-
     /** @var SplQueue */
     protected $splQueue;
 

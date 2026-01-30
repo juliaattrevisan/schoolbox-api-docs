@@ -16,5 +16,4 @@ use InvalidArgumentException;
  */
 class UnknownEntityTypeException extends InvalidArgumentException
 {
-
 }

@@ -12,5 +12,4 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
 
 interface IKamiException
 {
-
 }

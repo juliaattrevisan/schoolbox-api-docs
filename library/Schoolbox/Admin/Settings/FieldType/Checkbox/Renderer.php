@@ -14,7 +14,6 @@ use Schoolbox\Admin\Settings\FieldType\AbstractRenderer;
 
 class Renderer extends AbstractRenderer
 {
-
     /**
      * @inheritdoc
      */

@@ -11,7 +11,4 @@
  */
 abstract class Evaluation_Answer_YesNo extends Evaluation_Answer_Radio
 {
-
-
-
 }

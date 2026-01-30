@@ -10,7 +10,6 @@
 
 class Component_Dashboard_TextboxController extends Component_Dashboard_ControllerAbstract
 {
-
     private $content;
     private $hideHeader;
 

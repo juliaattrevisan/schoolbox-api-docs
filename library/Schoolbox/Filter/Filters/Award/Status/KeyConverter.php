@@ -17,7 +17,6 @@ use function in_array;
 
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * @inheritdoc
      * @return string

@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationTest extends TestCase
 {
-
     /**
      * @param string $title
      * @param array  $params

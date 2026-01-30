@@ -11,7 +11,6 @@
  */
 class Survey_Answer_TrueFalse extends Evaluation_Answer_TrueFalse
 {
-
     /**
      * Always use Correct css class
      *

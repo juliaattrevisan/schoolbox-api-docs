@@ -20,7 +20,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementatio
  */
 class SortForMarkbook implements IAssessableComparator
 {
-
     /**
      * @inheritdoc
      */

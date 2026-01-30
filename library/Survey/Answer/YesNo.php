@@ -11,7 +11,6 @@
  */
 class Survey_Answer_YesNo extends Evaluation_Answer_YesNo
 {
-
     /**
      * Always use Correct css class
      *

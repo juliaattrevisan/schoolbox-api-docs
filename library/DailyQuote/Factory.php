@@ -12,7 +12,6 @@ namespace DailyQuote;
 
 class Factory
 {
-
     /**
      * An instance of ConfigMapper
      *

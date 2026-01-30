@@ -15,7 +15,6 @@ use EOTC\ListGroup\Response;
 
 class PendingDetails extends Base
 {
-
     /**
      * Next status id, based on RAMS requirement
      *

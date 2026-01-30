@@ -25,5 +25,4 @@ namespace Alaress\Specification;
  */
 abstract class Leaf extends Base
 {
-
 }

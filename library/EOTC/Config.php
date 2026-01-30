@@ -12,7 +12,6 @@ namespace EOTC;
 
 class Config
 {
-
     /**
      * Identifier
      *

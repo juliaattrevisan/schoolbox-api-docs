@@ -14,7 +14,6 @@ use Schoolbox\Realtime\Schedule\Event\Event;
 
 class TriggerBundle implements TriggerBundleInterface
 {
-
     /** @var TriggerFactory */
     protected $factory;
 

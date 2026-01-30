@@ -22,7 +22,6 @@ use Schoolbox;
  */
 class TimetableCycleMapper extends Schoolbox\Mapper
 {
-
     /**
      * {@inheritdoc}
      */

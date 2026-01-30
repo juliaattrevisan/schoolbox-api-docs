@@ -12,7 +12,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class OpenGraph extends Thumbnail
 {
-
     /**
      * The xpath query
      *

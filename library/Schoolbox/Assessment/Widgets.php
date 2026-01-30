@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 
 class Widgets
 {
-
     /**
      * Outputs the visibility dropdown for this page.
      *

@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
  */
 trait LogTrait
 {
-
     /**
      * @var LoggerInterface|null
      */

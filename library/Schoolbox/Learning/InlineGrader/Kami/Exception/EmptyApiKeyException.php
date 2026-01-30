@@ -15,5 +15,4 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
  */
 class EmptyApiKeyException extends \RuntimeException implements IKamiException
 {
-
 }

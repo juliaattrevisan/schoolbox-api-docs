@@ -12,7 +12,6 @@ namespace External\Tass\Api\Models;
 
 class TimetableSetup
 {
-
     /**
      * Will be null if fetched from API with 'contacts' set to false
      *

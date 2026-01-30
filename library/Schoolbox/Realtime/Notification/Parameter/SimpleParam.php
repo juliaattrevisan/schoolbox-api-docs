@@ -13,7 +13,6 @@ use Alaress\Async\Notification\Parameter\Param;
 
 class SimpleParam extends Param
 {
-
     /**
      * Display the parameter without any decoration
      *

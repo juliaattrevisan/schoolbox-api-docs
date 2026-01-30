@@ -31,7 +31,6 @@ use function array_unique;
  */
 class Translator
 {
-
     /** @var IConnector */
     private $database;
 

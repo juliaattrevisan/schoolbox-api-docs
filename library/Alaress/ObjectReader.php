@@ -27,7 +27,6 @@ use Traversable;
  */
 class ObjectReader
 {
-
     /**
      * @param mixed $value
      * @return mixed If $value is an array, it will return the first non-empty value.

@@ -23,7 +23,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
  */
 class Preconditions
 {
-
     /**
      * Require at least one profile xml
      */

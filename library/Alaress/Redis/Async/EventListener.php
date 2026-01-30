@@ -13,7 +13,6 @@ use Alaress\Redis\Async\Event\IEvent;
 
 interface EventListener
 {
-
     /**
      * Handle the given event
      *

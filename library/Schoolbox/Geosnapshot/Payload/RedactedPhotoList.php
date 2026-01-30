@@ -17,7 +17,6 @@ namespace Schoolbox\Geosnapshot\Payload;
  */
 class RedactedPhotoList
 {
-
     /**
      * They needed this specific format exactly
      */

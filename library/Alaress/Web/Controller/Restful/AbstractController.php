@@ -14,8 +14,6 @@ use Alaress\Web\Controller\Exception;
 
 abstract class AbstractController extends Base implements IController
 {
-
-
     /**
      * Populate the Response object with a form that provides a means to mutate the given (new) entity.
      * Only text/html is Accept-able.

@@ -21,8 +21,6 @@ use Schoolbox\User;
 
 class LinkNotifier extends ResourceNotifier
 {
-
-
     /**
      * @inheritdoc
      */

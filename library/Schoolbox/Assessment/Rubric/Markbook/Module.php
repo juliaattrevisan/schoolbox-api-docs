@@ -25,7 +25,6 @@ use Schoolbox\Filter;
 
 class Module extends BaseModule
 {
-
     protected $basename = 'rubricMarkbook';
 
 

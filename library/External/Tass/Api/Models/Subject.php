@@ -12,7 +12,6 @@ namespace External\Tass\Api\Models;
 
 class Subject
 {
-
     /** @var string */
     private $subjectCode;
 

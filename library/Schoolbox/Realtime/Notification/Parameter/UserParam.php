@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class UserParam extends Param
 {
-
     /**
      * Use standard vars from the user object, and default to the append stacking mode
      *
