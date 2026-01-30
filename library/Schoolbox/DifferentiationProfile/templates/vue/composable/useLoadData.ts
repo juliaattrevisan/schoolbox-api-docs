@@ -126,6 +126,13 @@ export function useLoadData(
         }
     });
 
+    /**
+     * Set the default sortBy for the first load
+     */
+    window.Vue.onMounted(() => {
+        sortBy.value = getDefaultSortBy();
+    });
+
     return {
         isNewLoading,
         isMoreLoading,
