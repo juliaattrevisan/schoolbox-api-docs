@@ -7,7 +7,6 @@
 import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
-import { vOnClickOutside } from "@vueuse/components";
 
 interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
@@ -15,12 +14,14 @@ interface Props {
     size?: "m" | "s"; // Size of the modal, 'm' for medium and 's' for small
     showCloseButton?: boolean; // Whether to show the close button
     hasFocusTrap?: boolean; // Whether to use focus trap within the modal
+    allowOutsideClick?: boolean; // Whether to allow outside clicks when focus trap is active
 }
 const props = withDefaults(defineProps<Props>(), {
     hasBackgroundClick: false,
     size: "m",
     showCloseButton: true,
     hasFocusTrap: true,
+    allowOutsideClick: false,
 });
 
 const modalSize = window.Vue.computed(() => props.size || "m"); // Default size is medium
@@ -28,7 +29,13 @@ const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 if (props.hasFocusTrap) {
-    const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
+    /**
+     * To keep focus within the modal when open,
+     * but allow clicks outside, as the modal sometimes requires external interaction.
+     * For example if the light gallery preview is used within the modal,
+     * which requires outside clicks to function
+     */
+    const { activate, deactivate } = useFocusTrap(modalEl, { allowOutsideClick: props.allowOutsideClick });
     /**
      * Keep focus within the modal when it's open
      */
@@ -81,7 +88,8 @@ function onBackgroundClick(): void {
     <teleport to="body">
         <transition>
             <div v-if="isOpen" ref="modalEl" class="modal">
-                <div v-on-click-outside="onBackgroundClick" :class="`modal__container modal__container--${modalSize}`">
+                <div class="modal__background" @click="onBackgroundClick"></div>
+                <div :class="`modal__container modal__container--${modalSize}`">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <div class="modal__container_main"><slot></slot></div>
                     <slot name="footer"></slot>
@@ -102,7 +110,6 @@ function onBackgroundClick(): void {
 
 <style lang="scss" scoped>
 .modal {
-    background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
     left: 0;
     overflow: auto;
@@ -110,6 +117,14 @@ function onBackgroundClick(): void {
     top: 0;
     width: 100%;
     z-index: var(--sbx-depth-modal);
+    &__background {
+        background-color: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        left: 0;
+        position: fixed;
+        top: 0;
+        width: 100%;
+    }
     &__container {
         background: white;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
