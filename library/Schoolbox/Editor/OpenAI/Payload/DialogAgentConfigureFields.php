@@ -122,16 +122,12 @@ class DialogAgentConfigureFields
                     'required' => [],
                     'additionalProperties' => false,
                 ],
-                /**
-                 * "opening message is meant to be left blank, only the scenario specific fields should be added" ~ Andrew 2026
-                 * I've left this here in the somewhat high chance we want something generated here that isn't a field later on...
-                 */
-                // 'openingMessage' => [
-                //     'type' => 'string',
-                //     'description' => 'An opening message from the perspective of the agent to start the discussion with the student',
-                // ],
+                'openingMessage' => [
+                    'type' => 'string',
+                    'description' => 'An opening message from the perspective of the agent to start the discussion with the student',
+                ],
             ],
-            'required' => ['fields'],
+            'required' => ['fields', 'openingMessage'],
             'additionalProperties' => false,
         ],
         'strict' => true
