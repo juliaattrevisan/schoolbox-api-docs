@@ -84,6 +84,8 @@ Your teacher has been notified.";
             $sessionId,
         );
 
+        $pipeline->addInputCheck(new Guardrails\Check\CharacterLimit());
+
         if (null !== $this->moderationClient) {
             $pipeline->addInputCheck(new Guardrails\Check\Moderation($this->moderationClient));
         }
