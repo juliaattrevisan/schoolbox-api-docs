@@ -291,7 +291,7 @@ Data:
 
         {% if showGroups %}
             <script type="text/javascript">
-                let loadMoreFun = function (event) {
+                function loadMoreFun(event) {
                     // fetch the class status data
                     fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
                             .then(function(response) { return response.text(); })
