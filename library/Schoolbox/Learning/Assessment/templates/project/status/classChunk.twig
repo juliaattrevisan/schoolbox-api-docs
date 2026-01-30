@@ -30,6 +30,6 @@
 {% endfor %}
 {% if aImpl.participantCursor < aImpl.participantCount %}
     <li data-click-load-more data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}?participantCursor={{ aImpl.participantCursor }}">
-        <span>Load More</span>
+        <a class="button load-more expand" title="Load more">Load more</a>
     </li>
 {% endif %}
