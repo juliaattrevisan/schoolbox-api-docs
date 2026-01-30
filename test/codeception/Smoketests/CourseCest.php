@@ -351,7 +351,7 @@ class CourseCest
         #WHEN
         $unit_name   = $title . ' second unit added';
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
-        $unitSpecPayload->setFormParam('name', $unit_name);
+        $unitSpecPayload->setName($unit_name);
         $i->amGoingTo('Send request create a second unit spec');
         $i->sendRequest($unitSpecPayload);
         $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
@@ -368,7 +368,7 @@ class CourseCest
         #WHEN
         $unit_name   = $title . ' third unit added';
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($course_spec->getId());
-        $unitSpecPayload->setFormParam('name', $unit_name);
+        $unitSpecPayload->setName($unit_name);
         $i->amGoingTo('Send request create a third unit spec');
         $i->sendRequest($unitSpecPayload);
         $unitSpec        = $i->grabFirstUnitSpecByTitle($unit_name);
@@ -551,8 +551,7 @@ class CourseCest
     private function createUnit(IntegrationTester $i, int $courseSpecId, string $unit_name): void
     {
         $unitSpecPayload = new Payload\Course\Unit\Specification\Create($courseSpecId);
-        $unitSpecPayload->setFormParam('name', $unit_name);
-        $unitSpecPayload->setFormParam('workType', AssessmentForm::WORKTYPE_ASSESSMENT_TASK); // Required form parameter.
+        $unitSpecPayload->setName($unit_name);
         $i->amGoingTo('Send request create a unit spec');
         $i->sendRequest($unitSpecPayload);
     }
