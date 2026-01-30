@@ -7,7 +7,7 @@ import { createLightbox } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiSessionId } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { acPromptEventKey } from "../agentChatSymbols";
-import { AgentChatGuardrailSeverity, AgentChatMessageType } from "../agentChatTypes";
+import { AGENT_CHAT_MAX_PROMPT_CHARS, AgentChatGuardrailSeverity, AgentChatMessageType } from "../agentChatTypes";
 import type { AgentChatFeedMessage, AnyAgentChatFeedMessage, AgentChatLogEntry } from "../agentChatTypes";
 import { AgentChatMessageEventType, sendMessage } from "./agentChatPayload";
 import type { AgentChatApiPayload } from "./agentChatPayload";
@@ -224,6 +224,23 @@ export const useAgentChatStore = defineStore("agentChat", () => {
             entryKey: getNextEntryKey(),
             createdAt: getRfc3339String(new Date()),
         });
+
+        /** final chance before hitting the CharacterLimit guardrail, make sure the request doesn't exceed the limit */
+        if (payload.userPrompt.length > AGENT_CHAT_MAX_PROMPT_CHARS) {
+            // someone should only get here if they edited the textarea's max length attribute manually
+            feed.value.push({
+                type: AgentChatMessageType.ALERT,
+                data: {
+                    side: AgentChatMessageType.RESPONSE,
+                    severity: AgentChatGuardrailSeverity,
+                    message: `Your message exceeds the maximum allowed length of ${AGENT_CHAT_MAX_PROMPT_CHARS} characters. Please shorten your message and try again.`,
+                },
+                meta: null,
+                entryKey: getNextEntryKey(),
+                createdAt: getRfc3339String(new Date()),
+            });
+            return false;
+        }
 
         activeGeneration.value = {
             response: {

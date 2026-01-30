@@ -4,6 +4,7 @@ import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import { useAgentChatStore } from "./store/agentChatStore";
 import type { AgentChatRequestConfig } from "./store/agentChatStore";
+import { AGENT_CHAT_MAX_PROMPT_CHARS } from "./agentChatTypes";
 import type { AgentChatPromptAttribute } from "./agentChatTypes";
 import { acPromptEventKey } from "./agentChatSymbols";
 
@@ -178,6 +179,7 @@ acPromptEventBus.on(({ retryRequest }) => {
             :placeholder="props.promptPlaceholder"
             style="resize: vertical; margin-bottom: 0"
             :disabled="isFormDisabled || undefined"
+            :maxlength="AGENT_CHAT_MAX_PROMPT_CHARS"
             required
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
