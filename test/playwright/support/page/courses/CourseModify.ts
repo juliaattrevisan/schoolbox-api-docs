@@ -21,6 +21,10 @@ export default class CourseModify {
 
     static readonly DATATEST_COURSE_NEW_UNIT_ADD = "course-new-unit-add";
 
+    static readonly NAME_INPUT = "#name";
+
+    static readonly NEXT_BUTTON = `input[value="Next"]`;
+
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
         this.tester = tester;
@@ -32,6 +36,21 @@ export default class CourseModify {
      */
     async goto(courseId: number): Promise<void> {
         await this.page.goto(CourseModify.URL.replace(CourseModify.URL_ID_FRAGMENT, courseId.toString()));
+    }
+
+    /**
+     * Fills the course name
+     * @param courseName - The course name to fill
+     */
+    async fillCourseName(courseName: string): Promise<void> {
+        await this.page.locator(CourseModify.NAME_INPUT).pressSequentially(courseName);
+    }
+
+    /**
+     * Clicks the next button
+     */
+    async clickNextButton(): Promise<void> {
+        await this.page.locator(CourseModify.NEXT_BUTTON).click();
     }
 
     /**
