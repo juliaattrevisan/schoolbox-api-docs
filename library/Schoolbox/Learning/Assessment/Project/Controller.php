@@ -218,6 +218,8 @@ class Controller extends Assessment\Controller
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
         if (!$assessment->isSpecification()) {
             $twigData['aImpls'][$assessment->getId()] = [
+                'participantCount' => null,
+                'participantCursor' => null,
                 'assessment' => $assessment,
                 'participantStats' => $participantStats,
             ];
@@ -235,6 +237,8 @@ class Controller extends Assessment\Controller
 
                 $twigData['participantStats'][$assessment->getId()] = $participantStats;
                 $twigData['aImpls'][$assessment->getId()] = [
+                    'participantCount' => null,
+                    'participantCursor' => null,
                     'assessment' => $assessment,
                     'participantStats' => $participantStats,
                 ];
