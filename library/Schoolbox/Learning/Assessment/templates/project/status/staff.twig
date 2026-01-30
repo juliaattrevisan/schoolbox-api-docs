@@ -269,7 +269,7 @@ Data:
                                         {% endif %}
                                         data-collapser="collap-{{ aImpl.assessment.id }}"
                                         href="#"
-                                        class="icon-up-arrow collapse"
+                                        class="icon-down-arrow collapse"
                                         title="Expand/collapse content"
                                     ></a>
                                 </nav>
@@ -313,6 +313,9 @@ Data:
                     if (event.target.dataset.dataLoaded === 'true') {
                         return;
                     }
+
+                    // swap out the class `icon-down-arrow` to `icon-up-arrow` before it loads
+                    $(event.target).removeClass('icon-down-arrow').addClass('icon-up-arrow');
 
                     // fetch the class status data
                     fetch(event.target.dataset.classStatusHref, { credentials: 'same-origin' })
