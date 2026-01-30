@@ -61,7 +61,7 @@ class Notifier extends AbstractModuleNotifier
     private const string PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
     private const string PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
     private const string PATTERN_SOMEONE_SUBMITTED_TITLE = ':effector has submitted their :action for review.';
-    private const string PATTERN_SOMEONE_FAILED_GUARDRAILS_TITLE = ':effector has failed guardrail checks for their :action, please review their :dialogAgent.';
+    private const string PATTERN_SOMEONE_FAILED_GUARDRAILS_TITLE = ':effector has failed guardrail checks for :activity, please review their :dialogAgent.';
 
 
     /**
@@ -466,11 +466,7 @@ class Notifier extends AbstractModuleNotifier
              */
             ->setParams([
                 'effector' => new UserParam($effector),
-                'action' => new Param(sprintf(
-                    '%s %s',
-                    $assessmentDataModel->getTitle(),
-                    $this->l10n->translate('dialogAgent')
-                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+                'activity' => new Param($assessmentDataModel->getTitle(), $href),
                 'dialogAgent' => new Param($this->l10n->translate('dialogAgent'), $href, Param::STACKING_REPLACE_NO_DECORATION),
             ]);
 
