@@ -467,7 +467,7 @@ class Controller extends Assessment\Controller
             }
 
             $twigData['participantStats'][$assessment->getId()] = $participantStats;
-            $twigData['aImpl']= [
+            $twigData['aImpl'] = [
                 'participantCount' => $participantCount,
                 'participantCursor' => $participantCursor + self::PARTICIPANT_CHUNK_SIZE,
                 'assessment' => $assessment,
