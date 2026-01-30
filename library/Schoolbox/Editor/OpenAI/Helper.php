@@ -75,6 +75,13 @@ class Helper
     public const int DIFFERENTIATION_PROFILE_CACHE_DEFAULT_TTL = 604800; // 7 days
 
     /**
+     * The features which support AI moderation
+     */
+    public const array FEATURES_WITH_AI_MODERATION = [
+        self::FEATURE_DIALOGAGENT,
+    ];
+
+    /**
      * Controller constructor.
      *
      * Whilst this class is deprecated, its constants have not yet been.

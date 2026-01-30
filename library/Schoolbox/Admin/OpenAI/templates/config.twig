@@ -34,6 +34,10 @@
         'title': 'Azure OpenAI Deployment ID',
         'description': 'The deployment name you chose when you deployed the model in Azure.'
     },
+    'ai_moderation': {
+        'title': 'Enable AI Moderation',
+        'description': 'Recommended. AI messages are checked by Schoolbox AI moderation before posting. Failed messages are blocked. Content is processed by a third-party AI service outside school control.'
+    },
     'system_prompt': {
         'title': 'Generation System Prompt',
         'description': 'Provide some additional instructions to shape what the AI service generates for requests.'
@@ -114,6 +118,20 @@
                     <option value="{{ option }}"{% if inputValue == option %} selected {% endif %}>{{ option }}</option>
                 {% endfor %}
             </select>
+        {% elseif type == 'checkbox' %}
+            <div class="switch" {{ dataAttrs }} {{ style }}>
+                <input
+                    id="{{ feature.feature }}-{{ name }}-value"
+                    type="checkbox"
+                    name="{{ inputName }}"
+                    value="1"
+                    {% if inputValue %}checked{% endif %}
+                >
+                <label for="{{ feature.feature }}-{{ name }}-value">
+                    <span>On</span>
+                    <span>Off</span>
+                </label>
+            </div>
         {% else %}
             <input id="{{ feature.feature }}-{{ name }}-value"
                    type="text"

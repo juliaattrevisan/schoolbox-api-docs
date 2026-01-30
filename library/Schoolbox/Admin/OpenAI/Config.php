@@ -49,14 +49,21 @@ class Config
         'auto',
     ];
 
-    // field name and types
+    // field keys
     public const string FIELD_PROVIDER = 'provider';
     public const string FIELD_AIKEY = 'ai_key';
     public const string FIELD_RESOURCE_NAME = 'resource_name';
     public const string FIELD_DEPLOYMENT_ID = 'deployment_id';
     public const string FIELD_MODEL = 'model';
+    public const string FIELD_AI_MODERATION = 'ai_moderation';
     public const string FIELD_SYSTEM_PROMPT  = 'system_prompt';
     public const string FIELD_OUTPUT_QUALITY = 'output_quality';
+
+    // field types
+    public const string FIELD_TYPE_SELECT   = 'select';
+    public const string FIELD_TYPE_INPUT    = 'input';
+    public const string FIELD_TYPE_TEXTAREA = 'textarea';
+    public const string FIELD_TYPE_CHECKBOX = 'checkbox';
 
 
     /* Predefined config structs: as you add more providers, don't forget to pile them in here
@@ -119,29 +126,29 @@ class Config
      */
     public const array DEFAULT_FORM_INPUTS = [
         self::FIELD_PROVIDER      => [
-            'type'    => 'select',
+            'type'    => self::FIELD_TYPE_SELECT,
             'options' => self::PROVIDERS,
             'section' => null,
         ],
         self::FIELD_AIKEY         => [
-            'type'    => 'input',
+            'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_GENERAL,
         ],
         self::FIELD_MODEL         => [
-            'type'    => 'select',
+            'type'    => self::FIELD_TYPE_SELECT,
             'options' => self::AI_MODELS,
             'section' => self::SECTION_OPENAI,
         ],
         self::FIELD_RESOURCE_NAME => [
-            'type'    => 'input',
+            'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_AZURE,
         ],
         self::FIELD_DEPLOYMENT_ID => [
-            'type'    => 'input',
+            'type'    => self::FIELD_TYPE_INPUT,
             'section' => self::SECTION_AZURE,
         ],
         self::FIELD_SYSTEM_PROMPT => [
-            'type'    => 'textarea',
+            'type'    => self::FIELD_TYPE_TEXTAREA,
             'section' => self::SECTION_GENERAL,
         ],
     ];
@@ -237,6 +244,21 @@ class Config
         }
         return $config[self::FIELD_PROVIDER]['value'] !== Helper::ENDPOINT_TYPE_OFF;
     }
+
+    /**
+     * Check if the feature has AI moderation enabled
+     *
+     * @param array $config
+     * @return bool
+     */
+    public function isAiModerationEnabled(array $config): bool
+    {
+        // TODO: there's no way in this current setup to know from $config what feature it's actually for?
+        // For now just check if the field is set and truthy...
+        $value = $config[self::SECTION_GENERAL][self::FIELD_AI_MODERATION]['value'] ?? false;
+        return (bool)$value;
+    }
+
 
     /**
      * Get the model or deployment ID from the config
@@ -385,17 +407,27 @@ class Config
     private function buildFormInputs(string $feature): array
     {
         $formInputs = self::DEFAULT_FORM_INPUTS;
+        if (\in_array($feature, Helper::FEATURES_WITH_AI_MODERATION, true)) {
+            // Any feature with AI moderation support gets a config for it
+            $formInputs[self::FIELD_AI_MODERATION] = [
+                'type'    => self::FIELD_TYPE_CHECKBOX,
+                'section' => self::SECTION_GENERAL,
+            ];
+            unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
+        }
+
         if ($feature === Helper::FEATURE_IMAGE) {
             // Image feature:
             // * add output quality
             // * remove Azure option
             $formInputs[self::FIELD_OUTPUT_QUALITY] = [
-                'type'    => 'select',
+                'type'    => self::FIELD_TYPE_SELECT,
                 'options' => self::OUTPUT_QUALITY_OPTIONS,
                 'section' => self::SECTION_OPENAI,
             ];
             unset($formInputs[self::FIELD_PROVIDER]['options'][Helper::ENDPOINT_TYPE_AZURE]);
         }
+
         return $formInputs;
     }
 }

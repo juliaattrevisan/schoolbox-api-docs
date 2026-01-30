@@ -150,6 +150,7 @@ class ConfigTest extends TestCase
             Helper::ENDPOINT_TYPE_GENERAL => [
                 Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
                 Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+                Config::FIELD_AI_MODERATION => ['value' => '1'],
             ],
             Helper::ENDPOINT_TYPE_OPENAI => [
                 Config::FIELD_MODEL => ['value' => 'gpt-4o'],
@@ -200,6 +201,7 @@ class ConfigTest extends TestCase
                 Helper::ENDPOINT_TYPE_GENERAL => [
                     Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
                     Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+                    Config::FIELD_AI_MODERATION => ['value' => '1'],
                 ],
                 Helper::ENDPOINT_TYPE_OPENAI => [
                     Config::FIELD_MODEL => ['value' => 'gpt-4o'],
@@ -222,6 +224,7 @@ class ConfigTest extends TestCase
             Helper::ENDPOINT_TYPE_GENERAL => [
                 Config::FIELD_AIKEY => ['value' => 'shared-key-456'],
                 Config::FIELD_SYSTEM_PROMPT => ['value' => 'Azure prompt'],
+                Config::FIELD_AI_MODERATION => ['value' => '1'],
             ],
             Helper::ENDPOINT_TYPE_OPENAI => [
                 Config::FIELD_MODEL => ['value' => ''],
@@ -254,6 +257,7 @@ class ConfigTest extends TestCase
             Helper::ENDPOINT_TYPE_GENERAL => [
                 Config::FIELD_AIKEY => ['value' => 'openai-key-123'],
                 Config::FIELD_SYSTEM_PROMPT => ['value' => 'System prompt'],
+                Config::FIELD_AI_MODERATION => ['value' => '1'],
             ],
             // Helper::ENDPOINT_TYPE_OPENAI is intentionally omitted
             Helper::ENDPOINT_TYPE_AZURE => [
@@ -280,6 +284,7 @@ class ConfigTest extends TestCase
             Helper::ENDPOINT_TYPE_GENERAL => [
                 Config::FIELD_AIKEY => ['value' => 'shared-key-456'],
                 Config::FIELD_SYSTEM_PROMPT => ['value' => 'Azure prompt'],
+                Config::FIELD_AI_MODERATION => ['value' => '1'],
             ],
             Helper::ENDPOINT_TYPE_OPENAI => [
                 Config::FIELD_MODEL => ['value' => ''],
