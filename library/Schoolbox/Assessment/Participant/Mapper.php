@@ -398,7 +398,12 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('plan', '', 'pp')}
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
             INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
-            LEFT JOIN assessment_course_unit_implementation ui ON a.id = ui.assessment_id
+            LEFT JOIN (
+                SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                FROM project_assessment pa
+                     INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+            ) pa ON a.id = pa.assessment_id
+            LEFT JOIN assessment_course_unit_implementation ui ON a.id = ui.assessment_id or pa.projectAssessmentId = ui.assessment_id
             LEFT JOIN course_unit_implementation cui ON ui.course_unit_implementation_id = cui.id
             LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
             LEFT JOIN folder f ON ci.folder_id = f.id

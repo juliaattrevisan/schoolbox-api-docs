@@ -6,8 +6,9 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Assessment\Participant\Model;
-use Schoolbox\Assessment\Participant\Plan\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplModel;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use Schoolbox\User\Translator\ModelToArray as UserModelToArray;
@@ -49,6 +50,15 @@ class ModelToArray
             $customiseActivityView = null;
         }
 
+        /** @var UnitImplModel $context */
+        $context = $plan->getAssessment()->getContextUnitImplementation();
+        if (null === $context) {
+            /* Assessment in a project, then look at the project context
+             */
+            /* @var ProjectModel $context */
+            $context = $plan->getAssessment()->getContextProject()->getAssessmentModel()->getAssessmentContext();
+        }
+
         return [
             'created_at' => $originalActivity->getCreatedAt(),
             'user' => call_user_func($this->userTranslator, $participant->getUser()),
@@ -71,9 +81,9 @@ class ModelToArray
                 ]
             ],
             'unit' => [
-                'title' => $plan->getAssessment()->getContextUnitImplementation()?->getTitle(),
+                'title' => $context?->getTitle(),
                 'class' => [
-                    'title' => $plan->getAssessment()->getContextUnitImplementation()?->getFolder()?->getTitle()
+                    'title' => $context?->getFolder()?->getTitle()
                 ]
             ]
         ];
