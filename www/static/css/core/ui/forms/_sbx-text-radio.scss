@@ -14,14 +14,13 @@
     color: var(--sbx-color-accent);
     cursor: pointer;
     display: inline-grid;
-    height: 1.875rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
-    margin: 0.5rem 0 0.5rem 0 !important; // Not removed via appearance // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    height: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     min-height: auto !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     place-content: center;
     position: static !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     transform: translateY(-0.075em);
-    width: 1.875rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    width: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     &:hover:not(:disabled) {
         // We don't want the hover effect on input elements, as there's potential for reduced contrast on elements
         background: var(
@@ -35,10 +34,10 @@
         border-radius: 50%;
         box-shadow: inset 1rem 1rem var(--sbx-color-accent); // using box-shadow will allow the tick to be visible when printed
         content: "";
-        height: 1rem;
+        height: 0.85rem;
         transform: scale(0);
         transition: var(--sbx-animation-form-input-change) transform ease-in-out;
-        width: 1rem;
+        width: 0.85rem;
     }
     &:checked::before {
         // When the checkbox is checked, show the tick
@@ -58,6 +57,24 @@
     }
     & + label {
         cursor: pointer;
-        vertical-align: text-bottom;
+    }
+}
+
+// Layout fixes for radio buttons inside option lists
+.sbx-body {
+    .buttons-container {
+        align-items: flex-start !important; // override legacy styles
+    }
+
+    .option-list {
+        li {
+            display: flex;
+
+            &:has(input[type="radio"] + label) {
+                align-items: flex-start;
+                white-space: normal;
+                margin-top: 0.5rem;
+            }
+        }
     }
 }

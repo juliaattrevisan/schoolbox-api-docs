@@ -229,12 +229,6 @@ body {
     & li:last-child {
         border-bottom: none; /* Explicitly ensure the very last item in the list has no border */
     }
-
-    & li:not(:last-child) {
-        /* Added :not(:last-child) so the final element doesn't get a bottom border */
-        border-bottom: 1px solid var(--sbx-color-foreground-secondary); /* The separator is now visible */
-        margin-bottom: 0.5rem; /* adds spacing between items */
-    }
 }
 
 .information-list .small-12.card.wrap-down {
@@ -890,34 +884,6 @@ input[type="checkbox"]:not(.plain) + label::before {
         & dl {
             margin-inline: -16px;
             width: calc(100% + 32px);
-        }
-
-        & .feed.filter-container:nth-of-type(1) {
-            & .activity-feed {
-                border-bottom: 0;
-                max-width: 100%;
-
-                & .profile-learning-actions {
-                    & > div {
-                        gap: 1rem;
-                        margin-top: 1rem;
-                        max-width: 100%;
-
-                        & a {
-                            background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 95%);
-
-                            &:hover {
-                                background-color: color-mix(in srgb, var(--sbx-color-accent), transparent 0%);
-                            }
-                        }
-                    }
-                }
-            }
-
-            & .feed-column.left,
-            & .feed-column.right {
-                display: none;
-            }
         }
     }
 }

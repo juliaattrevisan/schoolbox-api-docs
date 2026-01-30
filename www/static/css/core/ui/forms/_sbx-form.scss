@@ -46,7 +46,7 @@
 
 .sbx-body .option-list .columns:has(input + label),
 .sbx-body .option-list li:has(input + label) {
-    white-space: nowrap;
+    white-space: normal;
 }
 // Ensure meta text wraps normally
 .sbx-body .columns:has(input + label) p.meta,
