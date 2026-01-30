@@ -1,0 +1,17 @@
+{% extends '@learningAssessment/componentListItem.twig' %}
+
+{% set isParticipant = assessable.isParticipant(USER) %}
+
+{% block actionsClass -%}
+    {%- set actionCount = isActionRoutes or isParticipant ? 1 : 0 -%}
+    {%- if actionCount %}actions-small-{{ actionCount }}{% endif -%}
+{%- endblock %}
+
+{% block extraNavItems %}
+    {% if isParticipant and not isActionRoutes %}
+        {% include '@learningAssessment/fragments/progressTick.twig' with {
+            assessment: assessable,
+            student: USER
+        } only %}
+    {% endif %}
+{% endblock %}
