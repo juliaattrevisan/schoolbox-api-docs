@@ -1,3 +1,4 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
 {% for participant in aImpl.assessment.allParticipants %}
     {% set stats = aImpl.participantStats[participant.user.id] ?? null %}
     {% if stats %}
