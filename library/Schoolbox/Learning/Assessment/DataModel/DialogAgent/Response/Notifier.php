@@ -53,6 +53,7 @@ class Notifier extends AbstractModuleNotifier
     public const string TRIGGER_REOPENED = 'reopened';
     public const string TRIGGER_RESET = 'reset';
     public const string TRIGGER_SUBMITTED = 'submitted';
+    public const string TRIGGER_LOCKED = 'locked';
 
 
     /** Text for each notification
@@ -60,6 +61,7 @@ class Notifier extends AbstractModuleNotifier
     private const string PATTERN_SOMEONE_REOPENED_TITLE = ':effector has reopened your :action';
     private const string PATTERN_SOMEONE_RESET_TITLE = ':effector has reset your :action';
     private const string PATTERN_SOMEONE_SUBMITTED_TITLE = ':effector has submitted their :action for review.';
+    private const string PATTERN_SOMEONE_FAILED_GUARDRAILS_TITLE = ':effector has failed guardrail checks for their :action, please review their :dialogAgent.';
 
 
     /**
@@ -133,6 +135,7 @@ class Notifier extends AbstractModuleNotifier
             $bundle->attach(self::TRIGGER_REOPENED, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_RESET, self::IMMEDIATELY);
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_LOCKED, self::IMMEDIATELY);
         }
     }
 
@@ -140,6 +143,7 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Notify students when a response was put into Reopened state:
      *     - submitted_at is null now, but previously wasn't
+     *     - OR locked_at is null now, but previously wasn't
      *
      * Note that $diff[0] is "the current state of the object"
      * Note that $diff[1] is "the previous state of the object"
@@ -153,15 +157,17 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentReopened(ResponseDataModel $model, User $effector, ?array $diff): Envelope
     {
-        /* submitted_at stayed the same: this wasn't reopened
+        /* submitted_at AND locked_at stayed the same: this wasn't reopened
          */
-        if (!isset($diff['submittedAt'])) {
+        if (!isset($diff['submittedAt']) && !isset($diff['lockedAt'])) {
             return new Envelope();
         }
 
         /* If staff was doing a sobo, ignore it: that isn't reopening a response
          * SOBOing has the same signature as reopening, since it's setting submitted_at to a different value; what we
          * can infer is that:
+         *     - changing lockedAt from a meaningful value to a NULLish value equates to a Reopen
+         *     - changing lockedAt from a NULLish value to a meaningful value equates to a response being locked
          *     - changing submittedAt from a meaningful value to a NULLish value equates to a Reopen
          *     - changing submittedAt from a NULLish value to a meaningful value equates to a SOBO
          *
@@ -170,7 +176,7 @@ class Notifier extends AbstractModuleNotifier
          * Note that $diff[0] is "the current state of the object"
          * Note that $diff[1] is "the previous state of the object"
          */
-        if ('' !== trim((string)$diff['submittedAt'][0])) {
+        if ('' !== trim((string)$diff['submittedAt'][0]) && '' !== trim((string)$diff['lockedAt'][0])) {
             return new Envelope();
         }
 
@@ -382,6 +388,90 @@ class Notifier extends AbstractModuleNotifier
                     $assessmentDataModel->getTitle(),
                     $this->l10n->translate('dialogAgent')
                 ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+            ]);
+
+        /* Craft the message we're gonna send
+         */
+        $instance = $bob->build();
+
+        /* Define the recipient; all we need is their id.
+         *
+         * For staff, there might be multiple teachers associated with an activity so I suppose we gotta go find them
+         * and make an $instance for each. To do that we can send it to the WRITE access users of the assessment's folder.
+         */
+        $assessment = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+        $folder = $assessment->getAssessmentContext()->getFolder();
+
+        /* ....then set up an envelope that'll send an $instance to all the teachers in the set...
+         */
+        $envelope = new Envelope();
+        $envelope->broadcastToCategory($folder, UserAccess::ACCESS_WRITE, $instance);
+
+        return $envelope;
+    }
+
+
+    /**
+     * Notify staff when a response was locked due to failing a guardrail check:
+     *      - locked_at is meaningful now, but previously wasn't
+     *
+     * Note that $diff[0] is "the current state of the object"
+     * Note that $diff[1] is "the previous state of the object"
+     *
+     * @param Model $model
+     * @param User $effector
+     * @param array|null $diff
+     * @return Envelope
+     * @throws Deleted
+     * @throws Exception
+     */
+    public function notifyStaffLocked(ResponseDataModel $model, User $effector, ?array $diff): Envelope
+    {
+        /* locked_at stayed the same: this wasn't reopened
+         */
+        if (!isset($diff['lockedAt'])) {
+            return new Envelope();
+        }
+
+        /* Models with deep hierarchies might not be fully hydrated, or hydrated enough for you to get the parts you need.
+         * You can refetch using a mapper to get more hydrated parts if you needed them.
+         */
+        /** @var ResponseDataModel $response */
+        $response = $this->mapper->findById($model->getId());
+
+        /* A mostly-hydrated assessment data model
+         */
+        $assessmentDataModel = $this->assessmentMapper->findById($response->getDialogAgent()->getAssessmentModel()->getId());
+
+        /* Craft a url that sends the recipient somewhere meaningful when clicking the notification
+         */
+        $href = \sprintf(self::PATTERN_STAFF_HREF, $assessmentDataModel->getId());
+
+        /* Basically string replacements to compose the message in the notification
+         */
+        $bob = (new Builder())
+            ->setTitle(self::PATTERN_SOMEONE_FAILED_GUARDRAILS_TITLE)
+            ->setIcon($this->getUserIcon($effector))
+            ->setHref($href)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic(sprintf(
+                '%s.%s.%s',
+                $this->getSlug(),
+                $response->getId(),
+                self::TRIGGER_LOCKED
+            ))
+            ->setTimestamp($model->getCreatedAt()->getUnixTimeStamp())
+            /* Basically string replacements to compose the message in the notification
+             */
+            ->setParams([
+                'effector' => new UserParam($effector),
+                'action' => new Param(sprintf(
+                    '%s %s',
+                    $assessmentDataModel->getTitle(),
+                    $this->l10n->translate('dialogAgent')
+                ), $href, Param::STACKING_REPLACE_NO_DECORATION),
+                'dialogAgent' => new Param($this->l10n->translate('dialogAgent'), $href, Param::STACKING_REPLACE_NO_DECORATION),
             ]);
 
         /* Craft the message we're gonna send
