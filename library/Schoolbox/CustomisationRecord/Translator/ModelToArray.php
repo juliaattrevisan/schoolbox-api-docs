@@ -55,8 +55,7 @@ class ModelToArray
         if (null === $context) {
             /* Assessment in a project, then look at the project context
              */
-            /* @var ProjectModel $context */
-            $context = $plan->getAssessment()->getContextProject()->getAssessmentModel()->getAssessmentContext();
+            $context = $plan->getAssessment()->getContextProject()->getAssessmentModel()->getContextUnitImplementation();
         }
 
         return [
