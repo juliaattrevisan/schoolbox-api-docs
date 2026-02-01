@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class CourseModify {
     private page: Page;
@@ -91,6 +92,7 @@ export default class CourseModify {
      */
     async clickSelectLocation(): Promise<void> {
         await this.page.locator(CourseModify.SELECTOR_LOCATION).click();
+        await this.tester.common.waitForModalToBeOpen();
     }
 
     /**
@@ -110,5 +112,37 @@ export default class CourseModify {
 
         const unitSpecId = await this.page.locator("li[data-unit-spec]").last().getAttribute("data-unit-spec");
         return Number(unitSpecId);
+    }
+
+    /**
+     * clicks next to save the course without passing mandatory fields
+     * check the error messages are shown
+     */
+    async checkMandatoryErrorMessages(): Promise<void> {
+        await this.clickNextButton();
+        await expect(this.page.locator("#name-error")).toContainText("Please enter a name for this course");
+        await expect(this.page.locator("#parent-error")).toContainText(
+            "Please select a faculty or subject for this course",
+        );
+    }
+
+    /**
+     * click a folder on the select folder modal
+     * @param folderId - The folder ID to click
+     */
+    async clickFolderOnSelectFolderModal(folderId: number): Promise<void> {
+        await this.page.locator(`[id="${folderId}"]`).click();
+    }
+
+    /**
+     * click select use folder location
+     * @param folderId - The folder ID to check if it is selected
+     */
+    async clickSelectUseFolderLocation(folderId: number): Promise<void> {
+        const modal = this.page.locator("div.resource-browser.row");
+        const folder = modal.locator(`a[href="/homepage/${folderId}"]`);
+        await expect(folder).toContainClass("jstree-anchor jstree-clicked");
+        await this.page.locator(CourseModify.SELECTOR_USE_FOLDER).click();
+        await this.tester.common.waitForModalToBeClosed();
     }
 }
