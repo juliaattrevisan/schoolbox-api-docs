@@ -100,7 +100,7 @@ $(function () {
                     }
 
                     file.hash = data.hash;
-                    file.imageUrl = data.meta.file._links.icon;
+                    file.imageUrl = data.meta?.file?._links?.icon;
 
                 });
 
