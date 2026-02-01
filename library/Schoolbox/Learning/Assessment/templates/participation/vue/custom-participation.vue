@@ -16,7 +16,7 @@ import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
 import CpConfirmModifyModal from "./cp-confirm-modify-modal.vue";
 import CpSuggestedCustomisationModal from "./cp-suggested-customisation-modal.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
-import { useGetStudentPastoralCounts } from "./composable/useGetStudentPastoralCounts";
+import { useGetPastoralFlags } from "./composable/useGetPastoralFlags";
 import { useExcludeParticipant } from "./composable/useExcludeParticipant";
 import { useIncludeParticipant } from "./composable/useIncludeParticipant";
 import { useIncludeInExisting } from "./composable/useIncludeInExisting";
@@ -50,9 +50,9 @@ const canSuggestCustomisation = window.Vue.computed(() => {
 });
 
 /**
- * Get student pastoral counts
+ * Get student pastoral flags
  */
-const { loadError, studentPastoralCounts } = useGetStudentPastoralCounts(
+const { loadError, pastoralFlags } = useGetPastoralFlags(
     props.pastoralEnabled,
     props.routes.getStudentsPastoralCountsUrl,
     () => allParticipants.value,
@@ -148,7 +148,7 @@ function onViewSuggestedCustomisation(participant: Participant): void {
                         v-model:selected-list="selectedList"
                         :participant="participant"
                         :show-checkboxes="showCheckboxes"
-                        :student-pastoral-counts="studentPastoralCounts"
+                        :pastoral-flags="pastoralFlags"
                         :routes="props.routes"
                         :assessment-id="props.assessmentId"
                         :can-suggest-customisation="canSuggestCustomisation"

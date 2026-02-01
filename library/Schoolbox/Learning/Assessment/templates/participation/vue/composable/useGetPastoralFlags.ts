@@ -5,28 +5,28 @@ import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag
 import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
- * Composable for fetching and managing student pastoral counts
+ * Composable for fetching and managing student pastoral flags
  * @param pastoralEnabled - Whether the pastoral feature is enabled
- * @param getStudentsPastoralCountsUrl - The URL template to fetch student pastoral counts
+ * @param getStudentsPastoralCountsUrl - The URL template to fetch student pastoral flags
  * @param allParticipants - Function that returns the list of all participants
- * @returns loadError, studentPastoralCounts, getStudentPastoralCounts
+ * @returns loadError, pastoralFlags, getStudentPastoralFlags
  */
-export function useGetStudentPastoralCounts(
+export function useGetPastoralFlags(
     pastoralEnabled: boolean,
     getStudentsPastoralCountsUrl: string,
     allParticipants: () => Participant[],
 ): {
     loadError: Ref<string | null>;
-    studentPastoralCounts: Ref<Record<string, PastoralFlag[]>>;
-    getStudentPastoralCounts: () => Promise<void>;
+    pastoralFlags: Ref<Record<string, PastoralFlag[]>>;
+    getStudentPastoralFlags: () => Promise<void>;
 } {
     const loadError = window.Vue.ref<string | null>(null);
-    const studentPastoralCounts = window.Vue.ref<Record<string, PastoralFlag[]>>({});
+    const pastoralFlags = window.Vue.ref<Record<string, PastoralFlag[]>>({});
 
     /**
-     * Fetch the pastoral counts for the students
+     * Fetch the pastoral flags for the students
      */
-    async function getStudentPastoralCounts(): Promise<void> {
+    async function getStudentPastoralFlags(): Promise<void> {
         if (!pastoralEnabled || getStudentsPastoralCountsUrl === "") {
             return;
         }
@@ -46,7 +46,7 @@ export function useGetStudentPastoralCounts(
             if (typeof responseJson !== "object" || responseJson === null) {
                 throw new Error("Unexpected response format");
             }
-            studentPastoralCounts.value = responseJson;
+            pastoralFlags.value = responseJson;
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
             if (isAbortError(error)) {
@@ -60,15 +60,15 @@ export function useGetStudentPastoralCounts(
     }
 
     /**
-     * Load the student pastoral counts when the component is mounted.
+     * Load the student pastoral flags when the component is mounted.
      */
     window.Vue.onMounted(() => {
-        void getStudentPastoralCounts();
+        void getStudentPastoralFlags();
     });
 
     return {
         loadError,
-        studentPastoralCounts,
-        getStudentPastoralCounts,
+        pastoralFlags,
+        getStudentPastoralFlags,
     };
 }
