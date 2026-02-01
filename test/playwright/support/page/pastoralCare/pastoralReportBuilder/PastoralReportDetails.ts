@@ -10,9 +10,9 @@ export default class PastoralReportDetails {
 
     static readonly DATA_TEST_DOWNLOAD_BUTTON = `pastoral-report-download-button`;
 
-    static readonly MODAL_TABLE_RECORD = "div.pr-table__records";
+    static readonly DATA_TEST_MODAL_TABLE_RECORD = "pr-table-modal-records";
 
-    static readonly MODAL_RECORDS_ROWS = "ul.information-list.threaded";
+    static readonly DATA_TEST_MODAL_RECORDS_ROWS = "pastoral-records-modal-list";
 
     static readonly RECORDS_POINTS_RADIO_BUTTON = `label[for='{radio}']`;
 
@@ -20,9 +20,9 @@ export default class PastoralReportDetails {
 
     static readonly RECORDS_RADIO_BUTTON = "label[for='records']";
 
-    static readonly CLOSE_MODAL_BUTTON = "button.close-modal";
+    static readonly DATA_TEST_CLOSE_MODAL_BUTTON = "basic-modal-close-button";
 
-    static readonly DATA_TEST_SORT_BUTTON = "sort-button-{headerName}";
+    static readonly DATA_TEST_SORT_BUTTON = "pr-table-header-sort-button-{headerName}";
 
     constructor(page: Page) {
         this.page = page;
@@ -106,7 +106,7 @@ export default class PastoralReportDetails {
             );
             await tabLocator.click();
             const tableLocator = this.page.getByTestId("pr-table-container");
-            await expect(tableLocator.locator("tr.pr-table-row")).toHaveCount(expectedRowCount);
+            await expect(tableLocator.getByTestId("pr-table-data-row")).toHaveCount(expectedRowCount);
         }
     }
 
@@ -118,7 +118,7 @@ export default class PastoralReportDetails {
         const listTabLocator = this.page.getByTestId("pastoral-report-List");
         await listTabLocator.click();
         const listLocator = this.page.getByTestId("pr-list");
-        await expect(listLocator.locator("div.c-island")).toHaveCount(expectedCount);
+        await expect(listLocator.getByTestId("pr-list-record-rows")).toHaveCount(expectedCount);
     }
 
     /**
@@ -166,8 +166,10 @@ export default class PastoralReportDetails {
      */
     async checkModalRecordCount(childId1: number, childId2: number, expectedCount: number): Promise<void> {
         await this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`).click();
-        const modalTableLocator = this.page.locator(PastoralReportDetails.MODAL_TABLE_RECORD);
-        await expect(modalTableLocator.locator(PastoralReportDetails.MODAL_RECORDS_ROWS)).toHaveCount(expectedCount);
+        const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+        await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
+            expectedCount,
+        );
     }
 
     /**
@@ -194,11 +196,11 @@ export default class PastoralReportDetails {
             );
             await tabLocator.click();
             await this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`).click();
-            const modalTableLocator = this.page.locator(PastoralReportDetails.MODAL_TABLE_RECORD);
-            await expect(modalTableLocator.locator(PastoralReportDetails.MODAL_RECORDS_ROWS)).toHaveCount(
+            const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+            await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
                 expectedCount,
             );
-            const closeButton = this.page.locator(PastoralReportDetails.CLOSE_MODAL_BUTTON);
+            const closeButton = this.page.getByTestId(PastoralReportDetails.DATA_TEST_CLOSE_MODAL_BUTTON);
             await closeButton.click();
         }
     }
@@ -236,7 +238,7 @@ export default class PastoralReportDetails {
      * click the close modal button
      */
     async closeModal(): Promise<void> {
-        const closeButton = this.page.locator(PastoralReportDetails.CLOSE_MODAL_BUTTON);
+        const closeButton = this.page.getByTestId(PastoralReportDetails.DATA_TEST_CLOSE_MODAL_BUTTON);
         await closeButton.click();
     }
 
@@ -305,24 +307,32 @@ export default class PastoralReportDetails {
                 PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
             );
             await tabLocator.click();
-            const sortButtonsLocator = this.page.getByTestId(/^sort-button/);
+            const sortButtonsLocator = this.page.getByTestId(/^pr-table-header-sort-button/);
             await expect(sortButtonsLocator).toHaveCount(expectedSortButtonCount);
 
             for (const type of typesPresent) {
-                const typeLocator = this.page.getByTestId(`sort-button-count_subtype_${type}`);
+                const typeLocator = this.page.getByTestId(
+                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
+                );
                 await expect(typeLocator).toBeVisible();
             }
 
             for (const type of typesNotPresent) {
-                const typeLocator = this.page.getByTestId(`sort-button-count_subtype_${type}`);
+                const typeLocator = this.page.getByTestId(
+                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", `count_subtype_${type}`),
+                );
                 await expect(typeLocator).not.toBeVisible();
             }
             for (const date of datePresent) {
-                const dateLocator = this.page.getByTestId(`sort-button-${date}`);
+                const dateLocator = this.page.getByTestId(
+                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", date),
+                );
                 await expect(dateLocator).toBeVisible();
             }
             for (const date of dateNotPresent) {
-                const dateLocator = this.page.getByTestId(`sort-button-${date}`);
+                const dateLocator = this.page.getByTestId(
+                    PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", date),
+                );
                 await expect(dateLocator).not.toBeVisible();
             }
         }

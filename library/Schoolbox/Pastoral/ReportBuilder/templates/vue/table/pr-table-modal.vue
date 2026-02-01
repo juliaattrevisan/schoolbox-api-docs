@@ -135,10 +135,10 @@ const { printAllRecords, isLoading: isLoadingPrint } = usePrintRecords(
                         /></a>
                     </nav>
                 </div>
-                <div ref="modalResultsRef" class="pr-table__records">
+                <div ref="modalResultsRef" class="pr-table__records" data-test="pr-table-modal-records">
                     <div class="l-flex-col l-gap-s">
                         <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
-                            <ul class="information-list threaded">
+                            <ul class="information-list threaded" data-test="pastoral-records-modal-list">
                                 <pastoral-record :record="record" />
                             </ul>
                         </div>

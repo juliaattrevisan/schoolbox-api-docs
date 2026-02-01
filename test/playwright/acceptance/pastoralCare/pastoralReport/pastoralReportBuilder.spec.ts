@@ -1,3 +1,12 @@
+/**
+ * Tests for pastoral care reports
+ *
+ * Prerequisites:
+ * 1. Provision sales.tar.gz data
+ *
+ * Execute: npx playwright test pastoralReportBuilder.spec.ts
+ */
+
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CreatePastoralReport from "@schoolboxTest/playwright/support/page/pastoralCare/pastoralReportBuilder/CreatePastoralReport";
 import PastoralCareReports from "@schoolboxTest/playwright/support/page/pastoralCare/pastoralReportBuilder/PastoralCareReports";

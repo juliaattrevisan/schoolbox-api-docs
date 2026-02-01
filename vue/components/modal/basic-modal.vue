@@ -90,6 +90,7 @@ function onBackgroundClick(): void {
                         class="close-modal"
                         title="Close modal"
                         aria-label="Close modal"
+                        data-test="basic-modal-close-button"
                         @click.prevent="onCloseClick"
                     >
                         <sbx-icon name="close" size="1.5rem" color="white" />

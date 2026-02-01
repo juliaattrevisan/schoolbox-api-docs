@@ -139,7 +139,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                 <button
                     v-if="header.isSortable"
                     class="title-button f-always-show"
-                    :data-test="`sort-button-${header.key}`"
+                    :data-test="`pr-table-header-sort-button-${header.key}`"
                     @click.prevent="onSortSelected(header.key)"
                 >
                     <span>
