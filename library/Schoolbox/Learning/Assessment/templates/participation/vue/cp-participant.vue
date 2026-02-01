@@ -5,14 +5,14 @@
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
-import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { hasCustomisation } from "../js/util/participantUtils";
 
 const props = defineProps<{
     participant: Participant;
     showCheckboxes: boolean;
-    studentPastoralCounts: Record<string, StudentPastoralCountBadge[]>;
+    studentPastoralCounts: Record<string, PastoralFlag[]>;
     routes: Routes;
     assessmentId: number;
     canSuggestCustomisation: boolean | undefined;

@@ -1,7 +1,7 @@
 /**
- * The expected payload for individual student in pastoral counts badges
+ * When a pastoral type flag has been activated to display on student profiles
  */
-export type StudentPastoralCountBadge = {
+export type PastoralFlag = {
     bgColor: string;
     count: string;
     destinationUrl: string;

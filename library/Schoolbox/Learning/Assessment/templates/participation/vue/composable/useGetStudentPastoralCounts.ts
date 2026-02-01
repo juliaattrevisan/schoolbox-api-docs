@@ -1,7 +1,7 @@
 import type { Ref } from "vue";
 import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
 import type { Participant } from "../../js/types/customParticipationTypes";
 
 /**
@@ -17,11 +17,11 @@ export function useGetStudentPastoralCounts(
     allParticipants: () => Participant[],
 ): {
     loadError: Ref<string | null>;
-    studentPastoralCounts: Ref<Record<string, StudentPastoralCountBadge[]>>;
+    studentPastoralCounts: Ref<Record<string, PastoralFlag[]>>;
     getStudentPastoralCounts: () => Promise<void>;
 } {
     const loadError = window.Vue.ref<string | null>(null);
-    const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
+    const studentPastoralCounts = window.Vue.ref<Record<string, PastoralFlag[]>>({});
 
     /**
      * Fetch the pastoral counts for the students
@@ -42,7 +42,7 @@ export function useGetStudentPastoralCounts(
                 const errorMessage = await extractErrorMessage(response);
                 throw new Error(errorMessage);
             }
-            const responseJson = (await response.json()) as Record<string, StudentPastoralCountBadge[]>;
+            const responseJson = (await response.json()) as Record<string, PastoralFlag[]>;
             if (typeof responseJson !== "object" || responseJson === null) {
                 throw new Error("Unexpected response format");
             }
