@@ -20,6 +20,7 @@ use DateTimeZone;
 use Schoolbox\Admin\DifferentiationProfiles\Model as ProfileConfig;
 use Schoolbox\DifferentiationProfile\AdjustmentCategories\Model as AdjustmentCategory;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevel;
+use Schoolbox\Pastoral\Model as PastoralModel;
 
 /**
  * Test for the differentiation profile model to array translator.
@@ -109,6 +110,11 @@ class DifferentiationProfileModelToArrayTest extends TestCase
             ],
         ];
 
+        $pastoralActive = new PastoralModel()
+            ->setId(1)
+            ->setExpiresAt(null)
+            ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-05-01 00:00:00', new DateTimeZone('UTC'), $locale));
+
         $staff1 = new User()
             ->setId(3)
             ->setLastname('Staff')
@@ -132,7 +138,11 @@ class DifferentiationProfileModelToArrayTest extends TestCase
         return [
             'New Profile' => [
                 // Test case 1: Empty/new model with minimal data
-                new Model()->setStudent($student),
+                new Model()
+                    ->setStudent($student)
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
                     new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
@@ -154,9 +164,9 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     'strategies_adjustments' => null,
                     'goals'                  => null,
                     '_routes'                => $routes,
-                    'created_at'             => null,
+                    'created_at'             => '2024-01-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2024-01-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
                 ],
@@ -173,6 +183,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('Needs and challenges details.')
                     ->setStrategiesAdjustments('Strategies and adjustments details.')
                     ->setGoals('Goals details.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-02 01:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -208,6 +219,8 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(2)
                     ->setStudent($student)
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setDeletedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
@@ -232,7 +245,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => null,
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2024-03-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => '2024-03-01T00:00:00+00:00',
                 ],
@@ -252,7 +265,9 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ]))
                     ->setOverview('This overview should not appear.')
                     ->setInterestsStrengths('These interests should not appear.')
-                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
                     new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
@@ -272,7 +287,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => '2024-02-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2024-02-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
                 ],
@@ -295,6 +310,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setInterestsStrengths('Hidden interests.')
                     ->setNeedsChallenges('Hidden needs.')
                     ->setStrategiesAdjustments('Hidden strategies.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-15 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-20 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -333,7 +349,9 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('This should not be visible.')
                     ->setStrategiesAdjustments('This should not be visible.')
                     ->setGoals('This should not be visible.')
-                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-04-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-04-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-04-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
                     new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
@@ -353,7 +371,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => '2024-04-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2024-04-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
                 ],
@@ -376,7 +394,9 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('Nothing should be visible.')
                     ->setStrategiesAdjustments('Nothing should be visible.')
                     ->setGoals('Nothing should be visible.')
-                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, []),
                 [
                     'id'                     => 6,
@@ -385,7 +405,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => '2024-05-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2024-05-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
                 ],
@@ -408,6 +428,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('Visible needs and challenges.')
                     ->setStrategiesAdjustments('Visible strategies and adjustments.')
                     ->setGoals('Hidden goals.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-06-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-06-15 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -448,7 +469,9 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('Hidden.')
                     ->setStrategiesAdjustments('Hidden.')
                     ->setGoals('Hidden.')
-                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('overview')->setModule('details'),
                 ]),
@@ -460,7 +483,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => '2024-07-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2024-07-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
                 ],
@@ -482,6 +505,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('Visible needs.')
                     ->setStrategiesAdjustments('Hidden strategies.')
                     ->setGoals('Visible goals.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-08-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-08-10 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -521,7 +545,14 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                         new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)
                     ]))
                     ->setOverview('This profile has expired.')
-                    ->setExpired(true)
+                    ->setPastoralRecords(
+                        new GenericCollection(
+                            PastoralModel::class,
+                            [
+                                (clone $pastoralActive)->setExpiresAt(Alaress_Date_Format::newDatabaseDate('2022-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                            ]
+                        )
+                    )
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-06-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -553,7 +584,14 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                         new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setGoals('This is an overview.')
-                    ->setOutOfDate(true)
+                    ->setPastoralRecords(
+                        new GenericCollection(
+                            PastoralModel::class,
+                            [
+                                (clone $pastoralActive)->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                            ]
+                        )
+                    )
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-03-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-09-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -580,8 +618,16 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setId(12)
                     ->setStudent($student)
                     ->setOverview('This is an overview.')
-                    ->setExpired(true)
-                    ->setOutOfDate(true)
+                    ->setPastoralRecords(
+                        new GenericCollection(
+                            PastoralModel::class,
+                            [
+                                (clone $pastoralActive)
+                                    ->setExpiresAt(Alaress_Date_Format::newDatabaseDate('2021-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                            ]
+                        )
+                    )
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2022-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2022-12-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -605,9 +651,18 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(13)
                     ->setStudent($student)
-                    ->setExpired(true)
-                    ->setOutOfDate(true)
-                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00', new DateTimeZone('UTC'), $locale)),
+                    ->setPastoralRecords(
+                        new GenericCollection(
+                            PastoralModel::class,
+                            [
+                                (clone $pastoralActive)
+                                    ->setExpiresAt(Alaress_Date_Format::newDatabaseDate('2020-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2022-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                            ]
+                        )
+                    )
+                    ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00', new DateTimeZone('UTC'), $locale))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('overview')->setModule('details'),
                     new ProfileConfig()->setName('goals')->setModule('details'),
@@ -621,7 +676,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => '2021-01-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => null,
+                    'updated_at'             => '2021-01-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
                 ],
@@ -632,7 +687,8 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setStudent($student)
                     ->setCreatedBy($staff1)
                     ->setUpdatedBy($staff1)
-                ,
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
+                    ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2025-01-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
                     new ProfileConfig()->setName('adjustment_level')->setModule('adjustments'),
@@ -656,7 +712,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     '_routes'                => $routes,
                     'created_at'             => null,
                     'created_by'             => $staffResponse1,
-                    'updated_at'             => null,
+                    'updated_at'             => '2025-01-01T00:00:00+00:00',
                     'updated_by'             => $staffResponse1,
                     'deleted_at'             => null,
                 ]
@@ -669,6 +725,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff1)
                     ->setUpdatedBy($staff2)
                     ->setOverview('This is an overview.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-10 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-15 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -709,6 +766,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                         new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setOverview('Profile with creator only.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('adjustment_category')->setModule('adjustments'),
@@ -735,6 +793,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setStudent($student)
                     ->setUpdatedBy($staff2)
                     ->setGoals('Profile with updater only.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-04-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
                     new ProfileConfig()->setName('goals')->setModule('details'),
@@ -763,6 +822,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                         new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setOverview('This profile was deleted.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-15 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setDeletedAt(Alaress_Date_Format::newDatabaseDate('2024-06-01 00:00:00', new DateTimeZone('UTC'), $locale)),
@@ -795,7 +855,14 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                         new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3)
                     ]))
                     ->setInterestsStrengths('Expired profile with audit.')
-                    ->setExpired(true)
+                    ->setPastoralRecords(
+                        new GenericCollection(
+                            PastoralModel::class,
+                            [
+                                (clone $pastoralActive)->setExpiresAt(Alaress_Date_Format::newDatabaseDate('2022-12-31 00:00:00', new DateTimeZone('UTC'), $locale))
+                            ]
+                        )
+                    )
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-07-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-12-01 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
@@ -836,6 +903,7 @@ class DifferentiationProfileModelToArrayTest extends TestCase
                     ->setNeedsChallenges('Needs.')
                     ->setStrategiesAdjustments('Strategies.')
                     ->setGoals('Goals.')
+                    ->setPastoralRecords(new GenericCollection(PastoralModel::class, [$pastoralActive]))
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-01 00:00:00', new DateTimeZone('UTC'), $locale))
                     ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-07-20 00:00:00', new DateTimeZone('UTC'), $locale)),
                 new GenericCollection(ProfileConfig::class, [
