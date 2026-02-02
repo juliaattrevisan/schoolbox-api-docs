@@ -1,3 +1,5 @@
+import type { Metadata } from "@js/util/sbx/apiUtils";
+
 /**
  * To define the structure of each column
  */
@@ -9,4 +11,12 @@ export type Header = {
     width: number;
     isSticky: boolean;
     isSortable: boolean;
+};
+
+/**
+ * The expected payload
+ */
+export type Payload = {
+    data: string[];
+    metadata: Metadata;
 };
