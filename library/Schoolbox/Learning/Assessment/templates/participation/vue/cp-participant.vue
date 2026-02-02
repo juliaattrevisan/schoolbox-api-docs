@@ -6,6 +6,7 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
+import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/pastoral-flags.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { hasCustomisation } from "../js/util/participantUtils";
 
@@ -114,18 +115,7 @@ function onOpenIncludeInExistingModal(): void {
                     {{ props.participant.user.preferredName || props.participant.user.firstname }}
                     {{ props.participant.user.pronoun || "" }}
                 </template>
-                <div class="l-flex-row l-gap-xs">
-                    <sbx-label
-                        v-for="studentBadge in pastoralFlags[props.participant.user.id]"
-                        :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                        :title="studentBadge.title"
-                        :text="studentBadge.count.toString()"
-                        :icon="studentBadge.icon"
-                        :background-color="studentBadge.bgColor"
-                        :text-color="studentBadge.fgColor"
-                        :href="studentBadge.destinationUrl"
-                    />
-                </div>
+                <pastoral-flags :user-id="props.participant.user.id" :pastoral-flags="props.pastoralFlags" />
             </div>
         </td>
         <td v-if="props.differentiationEnabled">
