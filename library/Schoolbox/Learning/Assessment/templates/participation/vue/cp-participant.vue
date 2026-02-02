@@ -6,7 +6,7 @@
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
-import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/pastoral-flags.vue";
+import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/flags/pastoral-flags.vue";
 import type { CustomisedPlan, Participant, Plan, Routes } from "../js/types/customParticipationTypes";
 import { hasCustomisation } from "../js/util/participantUtils";
 

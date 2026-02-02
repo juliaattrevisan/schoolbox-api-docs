@@ -5,7 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import locale from "@js/terminology/rosettaStone";
 import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
-import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/pastoral-flags.vue";
+import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/flags/pastoral-flags.vue";
 
 export default {
     name: "class-list",
