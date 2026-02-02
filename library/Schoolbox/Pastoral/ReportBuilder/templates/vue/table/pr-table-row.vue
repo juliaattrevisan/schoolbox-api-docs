@@ -53,6 +53,7 @@ function onCellSelected(header: TableHeader): void {
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
+            :data-test="`pr-table-data-cell-${header.key}-${(props.rowData[header.key] as User).firstName || (props.rowData[header.key] as RecordsAndPoints).records || (props.rowData[header.key] as RecordsAndPoints).records}`"
             :class="{
                 'u-border-right': true,
                 'u-sticky-left':

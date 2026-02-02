@@ -1,5 +1,6 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
+import { has } from "lodash";
 
 export default class PastoralReportDetails {
     private page: Page;
@@ -180,22 +181,60 @@ export default class PastoralReportDetails {
      * @param childIds2 - The child column numbers in the table to click
      * @param expectedCounts - The expected number of records in the modal for each tab
      */
+    // async clickTabAndCheckModalRecordCounts(
+    //     tabNames: string[],
+    //     childIds1: number[],
+    //     childIds2: number[],
+    //     expectedCounts: number[],
+    // ): Promise<void> {
+    //     for (let i = 0; i < tabNames.length; i += 1) {
+    //         const tabName = tabNames[i];
+    //         const childId1 = childIds1[i];
+    //         const childId2 = childIds2[i];
+    //         const expectedCount = expectedCounts[i];
+    //         const tabLocator = this.page.getByTestId(
+    //             PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
+    //         );
+    //         await tabLocator.click();
+    //         await this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`).click();
+
+    //         const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
+    //         await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
+    //             expectedCount,
+    //         );
+    //         const closeButton = this.page.getByTestId(PastoralReportDetails.DATA_TEST_CLOSE_MODAL_BUTTON);
+    //         await closeButton.click();
+    //     }
+    // }
+
+    /**
+     * for one or more report tabs
+     * clicks a report tab, clicks one or more cells in the report table to open the modal, checks the number of records presented in the modal opened, close the modal
+     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
+     * @param studentNames - The names of the students to locate the rows to click
+     * @param tableCells - The table cells to click in the located rows
+     * @param expectedCounts - The expected number of records in the modal for each tab
+     */
     async clickTabAndCheckModalRecordCounts(
         tabNames: string[],
-        childIds1: number[],
-        childIds2: number[],
+        studentNames: string[],
+        tableCells: string[],
         expectedCounts: number[],
     ): Promise<void> {
         for (let i = 0; i < tabNames.length; i += 1) {
             const tabName = tabNames[i];
-            const childId1 = childIds1[i];
-            const childId2 = childIds2[i];
+            const studentName = studentNames[i];
+            const tableCell = tableCells[i];
             const expectedCount = expectedCounts[i];
             const tabLocator = this.page.getByTestId(
                 PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
             );
             await tabLocator.click();
-            await this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`).click();
+
+            // find the student row by name and then clicks a cell in that row
+            const row = this.page.getByTestId("pr-table-data-row").filter({ hasText: studentName });
+            await row.getByTestId(`pr-table-data-cell-${tableCell}`).click();
+
             const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
             await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
                 expectedCount,
