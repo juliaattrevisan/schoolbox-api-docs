@@ -355,6 +355,7 @@ Data:
                         .then(function(data) {
                             var el = document.getElementById('class-' + event.target.dataset.clickLoad);
                             if (el) { el.innerHTML = data; }
+                            // initialise the load more button if it exists
                             $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
                         })
                         .catch(function() {
@@ -366,9 +367,6 @@ Data:
 
                     // enable full collapsable on this class now
                     $(event.target).collapsable();
-
-                    // initialise the load more button if it exists
-                    $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
                 });
             </script>
         {% endif %}
