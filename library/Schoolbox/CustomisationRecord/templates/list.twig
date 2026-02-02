@@ -1,5 +1,25 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(allBreadcrumbs) }}
+
+{{ bread.crumbs(
+    [ locale.differentiationProfile.plural ]
+) }}
+
+{% set reportContentId = 'customisation-records-container' %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                document.dispatchEvent(new CustomEvent('customisation-records__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
+            });
+        });
+    </script>
+{% endautoescape %}
 
 <div class="f-container">
     <div class="l-flex-col l-gap-m">
@@ -23,7 +43,7 @@
     </div>
 </div>
 
-<div class="actions-small-1 row">
+{# <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
             <h1>Customisation Records</h1>
@@ -72,4 +92,4 @@
         {% endfor %}
         </tbody>
     </table>
-</div>
+</div> #}
