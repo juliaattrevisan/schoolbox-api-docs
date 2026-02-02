@@ -670,80 +670,82 @@ export default {
                                 />
                             </td>
                             <td>
-                                <template v-if="student.id">
-                                    <a :href="'/search/user/' + student.id">
-                                        {{ student.lastname + ", " + student.firstname }}
-                                        {{
-                                            student.preferredname && student.preferredname != student.firstname
-                                                ? "‘" + student.preferredname + "’"
-                                                : ""
-                                        }}
-                                        {{ student.pronoun }}
-                                    </a>
-                                </template>
-                                <template v-else>
-                                    {{ student.lastname + ", " + student.firstname }}
-                                    {{
-                                        student.preferredname && student.preferredname != student.firstname
-                                            ? "‘" + student.preferredname + "’"
-                                            : ""
-                                    }}
-                                    {{ student.pronoun }}
-                                </template>
-
-                                <span class="meta">({{ student.synergy_id }})</span>
-                                <span class="show-for-print"><br />{{ student.email }}</span>
-                                <br />
-                                <div class="l-flex-row l-gap-xs l-pad-s--vert">
-                                    <sbx-label
-                                        v-for="studentBadge in studentPastoralCounts[student.id]"
-                                        :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                        :title="studentBadge.title"
-                                        :text="studentBadge.count.toString()"
-                                        :icon="studentBadge.icon"
-                                        :background-color="studentBadge.bgColor"
-                                        :text-color="studentBadge.fgColor"
-                                        :href="studentBadge.destinationUrl"
-                                    />
-                                </div>
-
-                                <p class="meta inline-container">
-                                    <slot name="student-meta" v-bind:student="student">
-                                        <span
-                                            v-if="showMedicalAlerts && Number(student.EnglishSecondFlag) === 1"
-                                            class="icon-eng-second-lang highlight"
-                                            title="English as an Additional Language"
-                                        >
-                                        </span>
-                                        <span
-                                            v-if="showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1"
-                                            class="icon-bell warning"
-                                            :title="specialNeedsLabel"
-                                        >
-                                        </span>
-                                        <span
-                                            v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
-                                            class="icon-alert alert"
-                                            :title="'Medical Alert: ' + student.StudentMedicalAlert"
-                                        >
-                                        </span>
-                                    </slot>
-                                </p>
-
-                                <ul
-                                    data-dropdown-content
-                                    class="f-dropdown"
-                                    :id="'overflow' + student.id"
-                                    v-if="student.id && Object.keys(student.routes).length"
-                                >
-                                    <slot name="student-menu-items" v-bind:student="student">
-                                        <li v-for="(element, index) in student.routes" :key="index">
-                                            <a :href="element.href" :class="element.class" :title="element.title">
-                                                {{ element.label }}
+                                <div class="l-flex-col l-gap-s">
+                                    <div class="l-flex-row l-gap-s">
+                                        <template v-if="student.id">
+                                            <a :href="'/search/user/' + student.id">
+                                                {{ student.lastname + ", " + student.firstname }}
+                                                {{
+                                                    student.preferredname && student.preferredname != student.firstname
+                                                        ? "‘" + student.preferredname + "’"
+                                                        : ""
+                                                }}
+                                                {{ student.pronoun }}
                                             </a>
-                                        </li>
-                                    </slot>
-                                </ul>
+                                        </template>
+                                        <template v-else>
+                                            {{ student.lastname + ", " + student.firstname }}
+                                            {{
+                                                student.preferredname && student.preferredname != student.firstname
+                                                    ? "‘" + student.preferredname + "’"
+                                                    : ""
+                                            }}
+                                            {{ student.pronoun }}
+                                        </template>
+                                        <span class="meta f-no-margins">({{ student.synergy_id }})</span>
+                                        <span class="show-for-print"><br />{{ student.email }}</span>
+                                    </div>
+                                    <div class="l-flex-row l-gap-xs">
+                                        <sbx-label
+                                            v-for="studentBadge in studentPastoralCounts[student.id]"
+                                            :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
+                                            :title="studentBadge.title"
+                                            :text="studentBadge.count.toString()"
+                                            :icon="studentBadge.icon"
+                                            :background-color="studentBadge.bgColor"
+                                            :text-color="studentBadge.fgColor"
+                                            :href="studentBadge.destinationUrl"
+                                        />
+                                    </div>
+                                    <p class="meta inline-container f-no-margins">
+                                        <slot name="student-meta" v-bind:student="student">
+                                            <span
+                                                v-if="showMedicalAlerts && Number(student.EnglishSecondFlag) === 1"
+                                                class="icon-eng-second-lang highlight"
+                                                title="English as an Additional Language"
+                                            >
+                                            </span>
+                                            <span
+                                                v-if="
+                                                    showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1
+                                                "
+                                                class="icon-bell warning"
+                                                :title="specialNeedsLabel"
+                                            >
+                                            </span>
+                                            <span
+                                                v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
+                                                class="icon-alert alert"
+                                                :title="'Medical Alert: ' + student.StudentMedicalAlert"
+                                            >
+                                            </span>
+                                        </slot>
+                                    </p>
+                                    <ul
+                                        data-dropdown-content
+                                        class="f-dropdown"
+                                        :id="'overflow' + student.id"
+                                        v-if="student.id && Object.keys(student.routes).length"
+                                    >
+                                        <slot name="student-menu-items" v-bind:student="student">
+                                            <li v-for="(element, index) in student.routes" :key="index">
+                                                <a :href="element.href" :class="element.class" :title="element.title">
+                                                    {{ element.label }}
+                                                </a>
+                                            </li>
+                                        </slot>
+                                    </ul>
+                                </div>
                             </td>
                             <td class="show-for-medium-up" v-if="differentiationEnabled">
                                 <button
