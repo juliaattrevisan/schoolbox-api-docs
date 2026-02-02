@@ -97,40 +97,40 @@
             /**
              * reach out and get a summary of which users have pastoral results
              */
-            $.get(pastoralCountUrl)
-                    .done(function (response) {
-                        pastoralCountBadges = response;
+            // $.get(pastoralCountUrl)
+            //         .done(function (response) {
+            //             pastoralCountBadges = response;
 
-                        /**
-                         * for each of the students we receive a summary
-                         */
-                        for (let studentId in pastoralCountBadges) {
+            //             /**
+            //              * for each of the students we receive a summary
+            //              */
+            //             for (let studentId in pastoralCountBadges) {
 
-                            /**
-                             * check whether they have any badges
-                             */
-                            if (pastoralCountBadges[studentId].length) {
-                                let studentCountBadgeContainer = $(`#pastoralCountBadges-${studentId}`);
-                                let tagMarkup = '';
+            //                 /**
+            //                  * check whether they have any badges
+            //                  */
+            //                 if (pastoralCountBadges[studentId].length) {
+            //                     let studentCountBadgeContainer = $(`#pastoralCountBadges-${studentId}`);
+            //                     let tagMarkup = '';
 
-                                /**
-                                 * then build the markup for each badge
-                                 */
-                                for (let index in pastoralCountBadges[studentId]) {
-                                    let studentBadge = pastoralCountBadges[studentId][index];
-                                    tagMarkup = tagMarkup.concat(tagPastoralCountBadge(studentId, studentBadge.typeId, studentBadge.subtypeId, studentBadge.title, studentBadge.icon, studentBadge.fgColor, studentBadge.bgColor, studentBadge.count));
-                                }
+            //                     /**
+            //                      * then build the markup for each badge
+            //                      */
+            //                     for (let index in pastoralCountBadges[studentId]) {
+            //                         let studentBadge = pastoralCountBadges[studentId][index];
+            //                         tagMarkup = tagMarkup.concat(tagPastoralCountBadge(studentId, studentBadge.typeId, studentBadge.subtypeId, studentBadge.title, studentBadge.icon, studentBadge.fgColor, studentBadge.bgColor, studentBadge.count));
+            //                     }
 
-                                /**
-                                 * then write the badges for the student into the dom and un-hide the students container
-                                 */
-                                if (tagMarkup.length) {
-                                    studentCountBadgeContainer.html(tagMarkup);
-                                    studentCountBadgeContainer.removeClass('hide');
-                                }
-                            }
-                        }
-                    });
+            //                     /**
+            //                      * then write the badges for the student into the dom and un-hide the students container
+            //                      */
+            //                     if (tagMarkup.length) {
+            //                         studentCountBadgeContainer.html(tagMarkup);
+            //                         studentCountBadgeContainer.removeClass('hide');
+            //                     }
+            //                 }
+            //             }
+            //         });
         }
 
     });
