@@ -89,6 +89,7 @@ $this->setBlock(TEMPLATE_content, 'student', 'student_block');
 $this->setBlock(TEMPLATE_content, 'attendance_time_step', 'attendance_time_step_block');
 $this->setBlock(TEMPLATE_content, 'attendance_period', 'attendance_period_block');
 $this->setBlock(TEMPLATE_content, 'class_list_link', 'class_list_link_block');
+$this->setBlock(TEMPLATE_content, 'PASTORAL_ENABLED', 'pastoral_enabled_block');
 
 // Dropdowns and such for each student
 
@@ -458,18 +459,23 @@ if ($class) {
             $this->setVar('reason_options_block', '');
         }
 
-        $this->setVar(
-            [
-                'ALL_STUDENT_IDS'      => json_encode($schoolboxStudentIds),
-                'PASTORAL_STUDENT_URL' => "/pastoral/student/{studentId}?type={typeId}&subtype={subTypeId}",
-                'PASTORAL_ENABLED'     => json_encode(
-                    $configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                    && $_SESSION['user']->getRole()->getAccessPastoral()
-                    && $configLoader->get(ConfigMapper::NAME_SHOW_ATTENDANCE_FLAGS)
-                ),
-                'PASTORAL_FLAGS_URL'   => '/pastoral/students/count/' . implode(',', $schoolboxStudentIds),
-            ]
-        );
+        /**
+         * Only render the pastoral flags if pastoral is enabled,
+         * the user has access and the config to show attendance flags is on
+         */
+        if ($configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+            && $_SESSION['user']->getRole()->getAccessPastoral()
+            && $configLoader->get(ConfigMapper::NAME_SHOW_ATTENDANCE_FLAGS)
+        ) {
+            $this->setVar(
+                [
+                    'PASTORAL_FLAGS_URL'   => '/pastoral/students/count/' . implode(',', $schoolboxStudentIds),
+                ]
+            );
+            $this->parse('pastoral_enabled_block', 'PASTORAL_ENABLED');
+        } else {
+            $this->setVar('pastoral_enabled_block', '');
+        }
 
 
         $folderMapper = FolderMapper::getInstance();

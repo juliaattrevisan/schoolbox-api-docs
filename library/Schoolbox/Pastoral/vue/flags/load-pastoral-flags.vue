@@ -5,13 +5,14 @@
 
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
+import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/flags/pastoral-flags.vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 
 const props = defineProps<{
     url: string;
 }>();
 
-// const payload = window.Vue.ref<RecordsPayload | null>(null); // to store the payload that matches the current query
+const payload = window.Vue.ref<Record<string, PastoralFlag[]> | null>(null); // to store the loaded flags
 const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
 
 /**
@@ -26,6 +27,7 @@ async function loadFlags(): Promise<void> {
         if (!response.success) {
             throw new Error(response.message || "Failed to load data");
         }
+        payload.value = response.data;
         // const newPayload = response.data;
         // check if the response does not have the expected structure
         // if (!Array.isArray(newPayload.data.results)) {
@@ -61,7 +63,13 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div>{{ props.url }}</div>
+    <template v-if="payload">
+        <template v-for="(flags, studentId) in payload" :key="`flags-container-${studentId}`">
+            <teleport :to="`#pastoral-flags-container-${studentId}`">
+                <pastoral-flags :flags="flags" />
+            </teleport>
+        </template>
+    </template>
 </template>
 
 <style scoped></style>
