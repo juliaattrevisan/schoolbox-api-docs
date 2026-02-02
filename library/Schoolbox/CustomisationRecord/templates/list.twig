@@ -1,8 +1,5 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
-
-{{ bread.crumbs(
-    [ locale.differentiationProfile.plural ]
-) }}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 {% set reportContentId = 'customisation-records-container' %}
 
