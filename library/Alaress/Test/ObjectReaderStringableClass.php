@@ -18,7 +18,7 @@ class ObjectReaderStringableClass
     /**
      * @param string $string
      */
-    function __construct($string)
+    public function __construct($string)
     {
         $this->string = $string;
     }
@@ -27,7 +27,7 @@ class ObjectReaderStringableClass
     /**
      * @return string
      */
-    function __toString()
+    public function __toString()
     {
         return (string)$this->string;
     }

@@ -24,8 +24,8 @@ class MappingCollectionTest extends TestCase
      * @param IMapper $mapper
      * @param string  $column
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMapping_uses')]
-    public function testColumnToPropertyMapping_uses(IMapper $mapper, string $column): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMappingUses')]
+    public function testColumnToPropertyMappingUses(IMapper $mapper, string $column): void
     {
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
     }
@@ -35,8 +35,8 @@ class MappingCollectionTest extends TestCase
      * @param IMapper $mapper
      * @param string  $column
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMapping_joins')]
-    public function testColumnToPropertyMapping_joins(IMapper $mapper, string $column): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMappingJoins')]
+    public function testColumnToPropertyMappingJoins(IMapper $mapper, string $column): void
     {
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
     }
@@ -46,8 +46,8 @@ class MappingCollectionTest extends TestCase
      * @param IMapper $mapper
      * @param string  $column
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMapping_joinsReverseSingle')]
-    public function testColumnToPropertyMapping_joinsReverseSingle(IMapper $mapper, string $column): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMappingJoinsReverseSingle')]
+    public function testColumnToPropertyMappingJoinsReverseSingle(IMapper $mapper, string $column): void
     {
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
     }
@@ -57,8 +57,8 @@ class MappingCollectionTest extends TestCase
      * @param IMapper $mapper
      * @param string  $column
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMapping_joinsReverseMulti')]
-    public function testColumnToPropertyMapping_joinsReverseMulti(IMapper $mapper, string $column): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMappingJoinsReverseMulti')]
+    public function testColumnToPropertyMappingJoinsReverseMulti(IMapper $mapper, string $column): void
     {
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
     }
@@ -68,8 +68,8 @@ class MappingCollectionTest extends TestCase
      * @param IMapper $mapper
      * @param string  $column
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMapping_joinsVia')]
-    public function testColumnToPropertyMapping_joinsVia(IMapper $mapper, string $column): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMappingJoinsVia')]
+    public function testColumnToPropertyMappingJoinsVia(IMapper $mapper, string $column): void
     {
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
     }
@@ -81,8 +81,8 @@ class MappingCollectionTest extends TestCase
      * @param string  $hydratorClass
      * @throws Framework\Exception
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMapping_recursive')]
-    public function testColumnToPropertyMapping_recursive(IMapper $mapper, string $column, string $hydratorClass): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerColumnToPropertyMappingRecursive')]
+    public function testColumnToPropertyMappingRecursive(IMapper $mapper, string $column, string $hydratorClass): void
     {
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
         /** @noinspection UnnecessaryAssertionInspection */
@@ -95,7 +95,7 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public static function providerColumnToPropertyMapping_uses(): array
+    public static function providerColumnToPropertyMappingUses(): array
     {
         $data = [];
 
@@ -130,7 +130,7 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public static function providerColumnToPropertyMapping_joins(): array
+    public static function providerColumnToPropertyMappingJoins(): array
     {
         $mapper = new class extends Mapper {
             protected function mapping(): void
@@ -148,7 +148,7 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public static function providerColumnToPropertyMapping_joinsReverseSingle(): array
+    public static function providerColumnToPropertyMappingJoinsReverseSingle(): array
     {
         $mapper = new class extends Mapper {
             protected function mapping(): void
@@ -167,7 +167,7 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public static function providerColumnToPropertyMapping_joinsReverseMulti(): array
+    public static function providerColumnToPropertyMappingJoinsReverseMulti(): array
     {
         $mapper = new class extends Mapper {
             protected function mapping(): void
@@ -186,7 +186,7 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public static function providerColumnToPropertyMapping_joinsVia(): array
+    public static function providerColumnToPropertyMappingJoinsVia(): array
     {
         $mapper = new class extends Mapper {
             protected function mapping(): void
@@ -205,7 +205,7 @@ class MappingCollectionTest extends TestCase
     /**
      * @return array
      */
-    public static function providerColumnToPropertyMapping_recursive(): array
+    public static function providerColumnToPropertyMappingRecursive(): array
     {
         // t1.id <= t2.t1_id <= t3.t2_t1_id
 

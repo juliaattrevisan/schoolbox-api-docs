@@ -19,7 +19,7 @@ class ValidationTest extends TestCase
      * @param null|string $referrer
      * @param bool        $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validOpenReferrer')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidOpenReferrer')]
     public function testValidOpenReferrer(?string $referrer, bool $expected)
     {
         $validation = new Statistics\ValidOpenReferrer();
@@ -32,7 +32,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validOpenReferrer(): array
+    public static function providerValidOpenReferrer(): array
     {
         return [
             'Valid referrer: dashboard' => [

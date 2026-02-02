@@ -10,12 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter;
 
-use function in_array;
-
 use Schoolbox\GenericCollection;
-use Schoolbox\User;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Resource\Folder;
+use Schoolbox\User;
+
+use function in_array;
 
 abstract class AbstractFactory implements IFactory
 {

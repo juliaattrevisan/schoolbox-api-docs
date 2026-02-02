@@ -32,7 +32,7 @@ class ValidEventPhotosAvailableTest extends TestCase
      * @param int         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validEventPhotosAvailable')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidEventPhotosAvailable')]
     public function testValidEventPhotosAvailable($apiKey, $featureFlag, $eventName, $expected)
     {
         $outcome = (new ValidEventPhotosAvailable())
@@ -48,7 +48,7 @@ class ValidEventPhotosAvailableTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validEventPhotosAvailable(): array
+    public static function providerValidEventPhotosAvailable(): array
     {
         return [
 

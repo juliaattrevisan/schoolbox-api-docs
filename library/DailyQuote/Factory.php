@@ -62,10 +62,9 @@ class Factory
 
             $lastSelectedIndex->setValue($dailyQuote->getId());
             $this->getConfigMapper()->save($lastSelectedIndex);
-        }
-        /* Reuse a previously selected quote
-         */
-        else {
+        } else {
+            /* Reuse a previously selected quote
+             */
             $dailyQuote = $this->getQuoteMapper()->findById($lastSelectedIndex->getValue());
         }
 

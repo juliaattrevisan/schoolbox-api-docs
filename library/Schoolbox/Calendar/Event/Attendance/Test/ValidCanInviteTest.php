@@ -32,7 +32,7 @@ class ValidCanInviteTest extends TestCase
      * @param bool $configVar
      * @param bool $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCanInvite')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidCanInvite')]
     public function testValidCanInvite(User $user, bool $configVar, bool $expected): void
     {
         $outcome = (new ValidCanInvite())->isSatisfiedBy($user, $configVar);
@@ -45,7 +45,7 @@ class ValidCanInviteTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validCanInvite(): array
+    public static function providerValidCanInvite(): array
     {
 
         /* Superuser prototypes

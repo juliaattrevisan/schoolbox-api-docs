@@ -28,8 +28,8 @@ class DueWorkStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isResponseRequired')]
-    public function test_isResponseRequired(Participant $participant, $isResponseRequired)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsResponseRequired')]
+    public function testIsResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
@@ -57,8 +57,8 @@ class DueWorkStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isFeedbackRequired
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isFeedbackRequired')]
-    public function test_selfAssessable_isFeedbackRequired(Participant $participant, $isFeedbackRequired)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsFeedbackRequired')]
+    public function testSelfAssessableIsFeedbackRequired(Participant $participant, $isFeedbackRequired)
     {
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
@@ -71,8 +71,8 @@ class DueWorkStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isReviewComplete')]
-    public function test_selfAssessable_isReviewComplete(Participant $participant, $isReviewComplete)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsReviewComplete')]
+    public function testSelfAssessableIsReviewComplete(Participant $participant, $isReviewComplete)
     {
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
@@ -85,8 +85,8 @@ class DueWorkStatusTest extends TestCase
     /**
      * @param Participant $participant
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_participants')]
-    public function test_mutual_exclusive_states(Participant $participant)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerParticipants')]
+    public function testMutualExclusiveStates(Participant $participant)
     {
         $countStates = 0;
         if ($participant->isResponseRequired()) {
@@ -105,7 +105,7 @@ class DueWorkStatusTest extends TestCase
 
     // ================= Data Providers =================
 
-    public static function provider_isResponseRequired()
+    public static function providerIsResponseRequired()
     {
         $dueWork = DemoData::getDueWork(1);
 
@@ -242,7 +242,7 @@ class DueWorkStatusTest extends TestCase
         ];
     }
 
-    public static function provider_isFeedbackRequired()
+    public static function providerIsFeedbackRequired()
     {
         $dueWork = DemoData::getDueWork(1);
 
@@ -302,7 +302,7 @@ class DueWorkStatusTest extends TestCase
         ];
     }
 
-    public static function provider_isReviewComplete()
+    public static function providerIsReviewComplete()
     {
         $dueWork = DemoData::getDueWork(1);
 
@@ -366,7 +366,7 @@ class DueWorkStatusTest extends TestCase
     /**
      * @return Participant[][]
      */
-    public static function provider_participants()
+    public static function providerParticipants()
     {
         $dueWork = DemoData::getDueWork(1);
 

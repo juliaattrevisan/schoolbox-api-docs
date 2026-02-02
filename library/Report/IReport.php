@@ -8,17 +8,17 @@
  */
 interface Report_IReport
 {
-    function setIndexID($groupID);
-    function getIndexID();
-    function getReportTitle();
-    function setFields($cols);
-    function addFields($cols);
-    function getFields();
-    function getDefaultOrderBy();
-    function getSortableFields();
-    function populateDataset($offset, $limit, $orderBy = "", $orderDir = "ASC");
-    function displayFilterBlock();
-    function export();
+    public function setIndexID($groupID);
+    public function getIndexID();
+    public function getReportTitle();
+    public function setFields($cols);
+    public function addFields($cols);
+    public function getFields();
+    public function getDefaultOrderBy();
+    public function getSortableFields();
+    public function populateDataset($offset, $limit, $orderBy = "", $orderDir = "ASC");
+    public function displayFilterBlock();
+    public function export();
 
 // TODO: refactor Report_Abstract to implement IReport so these can be included in interface
 //    function setup();

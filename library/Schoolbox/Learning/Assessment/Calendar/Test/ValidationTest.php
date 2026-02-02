@@ -23,7 +23,7 @@ class ValidationTest extends TestCase
      * @param mixed $input
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validExample')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidExample')]
     public function testValidExample($input, $expected)
     {
         /* Substitute this with a spec pattern or other conditional
@@ -44,7 +44,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validExample(): array
+    public static function providerValidExample(): array
     {
         return [
 

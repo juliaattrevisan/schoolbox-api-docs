@@ -24,7 +24,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validBroadcastRequirements(): array
+    public function providerValidBroadcastRequirements(): array
     {
         $user = (new User())->setId(19);
         $date = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 14);
@@ -107,7 +107,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validArticle')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidArticle')]
     public function testValidArticle(Model $article, $expected): void
     {
         $validation = new ValidArticleAttributes();
@@ -120,7 +120,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validArticle(): array
+    public static function providerValidArticle(): array
     {
         $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
@@ -169,7 +169,7 @@ class ValidationTest extends TestCase
      * @param Model $article
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validArticleDates')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidArticleDates')]
     public function testValidArticleDates(Model $article, $expected): void
     {
         $validation = new ValidArticleAttributes();
@@ -182,7 +182,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validArticleDates(): array
+    public static function providerValidArticleDates(): array
     {
         $date1 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $date2 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
@@ -219,7 +219,7 @@ class ValidationTest extends TestCase
      * @param string $dateOffset
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validDateOffset')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDateOffset')]
     public function testValidDateOffset(string $dateOffset, $expected): void
     {
         $validation = new ValidDateOffset();
@@ -232,7 +232,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validDateOffset(): array
+    public static function providerValidDateOffset(): array
     {
         return [
             'Valid (+1 day)' => [
@@ -288,7 +288,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validAccessibility(): array
+    public function providerValidAccessibility(): array
     {
         $userResolver = new MockUserResolver();
 
