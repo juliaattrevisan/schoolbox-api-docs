@@ -10,13 +10,13 @@
     <table>
         <thead>
         <tr>
-            {% for header in records.data.tableHeaders %}
-                <th>{{ header.title }}</th>
+            {% for head in header %}
+                <th>{{ head.title }}</th>
             {% endfor %}
         </tr>
         </thead>
         <tbody>
-        {% for record in records.data.rows %}
+        {% for record in records.data %}
             <tr>
                 <td>
                     {% set studentName = record.user.lastName ~ ', ' ~ (record.user.preferredName ?: record.user.firstName) %}

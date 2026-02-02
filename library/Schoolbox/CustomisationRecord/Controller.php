@@ -41,10 +41,7 @@ class Controller extends Base
         $records = $records->map(fn($record) => call_user_func($translator, $record));
 
         $records = [
-            'data' => [
-                'tableHeaders' => $this->recordTableHeaders(),
-                'rows' => $records,
-            ],
+            'data' => $records,
             /* temporary cursor implementation
              */
             'metadata' => [
@@ -61,9 +58,39 @@ class Controller extends Base
             'allBreadcrumbs' => [
                 [$pageTitle],
             ],
+            'header' => $this->recordTableHeaders(),
             'records' => $records,
             $pageTitle,
         ]);
+    }
+
+    public function getListRecords(): void
+    {
+        $records = $this->participantMapper->findAllCustomisationRecords();
+
+        $translator = new Translator\ModelToArray(
+            $this->getRouter()->getGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+            new \Schoolbox\User\Translator\ModelToArray(),
+            $this->assessmentMapperProxy
+        );
+
+        $records = $records->map(fn($record) => call_user_func($translator, $record));
+
+        $records = [
+            'data' => $records->reindex(),
+            /* temporary cursor implementation
+             */
+            'metadata' => [
+                'count' => count($records),
+                'cursor' => [
+                    "current" => null,
+                    "next" => null,
+                ]
+            ],
+        ];
+        $this->response = $this->responseAsJson($records);
     }
 
     private function recordTableHeaders(): array
