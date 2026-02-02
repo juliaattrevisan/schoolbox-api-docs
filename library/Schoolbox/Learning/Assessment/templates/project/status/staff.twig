@@ -288,6 +288,12 @@ Data:
         {% if showGroups %}
             <script type="text/javascript">
                 function loadMoreParticipants(event) {
+                    // hide the load more button
+                    event.preventDefault();
+                    $(event.target).hide();
+                    // show the loader
+                    $(event.target.parentNode).find('[data-loader]').removeClass('hide');
+
                     // fetch the class status data
                     fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
                             .then(function(response) { return response.text(); })
