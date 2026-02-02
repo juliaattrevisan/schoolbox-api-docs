@@ -467,6 +467,7 @@ if ($class) {
                     && $_SESSION['user']->getRole()->getAccessPastoral()
                     && $configLoader->get(ConfigMapper::NAME_SHOW_ATTENDANCE_FLAGS)
                 ),
+                'PASTORAL_FLAGS_URL'   => '/pastoral/students/count/' . implode(',', $schoolboxStudentIds),
             ]
         );
 
