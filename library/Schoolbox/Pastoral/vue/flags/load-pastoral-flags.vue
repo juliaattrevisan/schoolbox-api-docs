@@ -6,14 +6,13 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
 import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/flags/pastoral-flags.vue";
-import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { hasErrorMessage } from "@js/util/errorUtils";
 
 const props = defineProps<{
     url: string;
 }>();
 
 const payload = window.Vue.ref<Record<string, PastoralFlag[]> | null>(null); // to store the loaded flags
-const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
 
 /**
  * Load the pastoral flags from the provided URL
@@ -27,29 +26,16 @@ async function loadFlags(): Promise<void> {
         if (!response.success) {
             throw new Error(response.message || "Failed to load data");
         }
+        // check for expected structure
+        if (typeof response.data !== "object" || response.data === null) {
+            throw new Error("Unexpected response format");
+        }
         payload.value = response.data;
-        // const newPayload = response.data;
-        // check if the response does not have the expected structure
-        // if (!Array.isArray(newPayload.data.results)) {
-        //     throw new Error("Unexpected response format");
-        // }
-        // reset the payload if it's a new load or append to the existing results if it's a load of more results
-        // if (isNewLoad.value) {
-        //     payload.value = newPayload;
-        // } else {
-        //     payload.value?.data.results.push(...newPayload.data.results);
-        //     payload.value!.metadata = newPayload.metadata; // Update metadata to reflect the latest state
-        // }
     } catch (error) {
-        // ignore abort errors, as the previous request was cancelled
-        if (isAbortError(error)) {
-            return;
-        }
         if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
+            console.error(error.message);
             return;
         }
-        loadError.value = "An unexpected error occurred while loading the data.";
         console.error(error);
     }
 }
