@@ -119,8 +119,7 @@ function onOpenIncludeInExistingModal(): void {
                     v-if="
                         pastoralFlags[props.participant.user.id] && pastoralFlags[props.participant.user.id].length > 0
                     "
-                    :user-id="props.participant.user.id"
-                    :pastoral-flags="props.pastoralFlags"
+                    :pastoral-flags="props.pastoralFlags[props.participant.user.id]"
                 />
             </div>
         </td>

@@ -699,8 +699,7 @@ export default {
                                     </div>
                                     <pastoral-flags
                                         v-if="pastoralFlags[student.id] && pastoralFlags[student.id].length > 0"
-                                        :user-id="student.id"
-                                        :pastoral-flags="pastoralFlags"
+                                        :pastoral-flags="pastoralFlags[student.id]"
                                     />
                                     <p class="meta inline-container f-no-margins">
                                         <slot name="student-meta" v-bind:student="student">

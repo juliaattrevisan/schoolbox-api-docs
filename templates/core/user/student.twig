@@ -199,15 +199,12 @@
                                                  # it's not really consolidated in this payload
                                                  #}
                                                 <dt class="full-width">
-                                                    <div class="pastoral-flags">
-                                                        {% for pastoralCount in selectedField.value %}
-                                                            <a href="{{ pastoralCount.destinationUrl }}" data-test="student-profile-pastoral-flag-{{ pastoralCount.typeId }}-{{ pastoralCount.subtypeId ?? 0 }}"
-                                                            <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
-                                                                data-tooltip title="{{ pastoralCount.title }}"
-                                                                style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
-                                                            >{{ pastoralCount.count }}</span></a>
-                                                        {% endfor %}
+                                                    <div id="pastoral-flags-container">
+                                                        <pastoral-flags
+                                                            :pastoral-flags="{{ selectedField.value | json_encode }}"
+                                                        />
                                                     </div>
+                                                    <script src="{{ CDN_PREFIX }}/js/bundle/pastoralFlags.js?v={{ config.site_version }}"></script>
                                                 </dt>
                                             {% else %}
                                                 {# Note that some fields require special handling (different data structures)

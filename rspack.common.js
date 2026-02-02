@@ -243,6 +243,7 @@ module.exports = {
         pastoralReport: "./library/Schoolbox/Pastoral/ReportBuilder/templates/vue/pastoralReport.ts",
         manageDifferentiationProfiles:
             "./library/Schoolbox/DifferentiationProfile/templates/vue/manageDifferentiationProfiles.ts",
+        pastoralFlags: "./library/Schoolbox/Pastoral/vue/pastoralFlags.ts",
 
         // Resource
         googleFiles: "./library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js",

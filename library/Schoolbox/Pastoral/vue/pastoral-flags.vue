@@ -6,15 +6,14 @@
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
 
 const props = defineProps<{
-    userId: number;
-    pastoralFlags: Record<string, PastoralFlag[]>;
+    pastoralFlags: PastoralFlag[];
 }>();
 </script>
 
 <template>
     <div class="l-flex-row l-gap-xs">
         <sbx-label
-            v-for="flag in pastoralFlags[props.userId]"
+            v-for="flag in props.pastoralFlags"
             :key="`flag-${flag.typeId}-${flag.subtypeId}`"
             :title="flag.title"
             :text="flag.count.toString()"
