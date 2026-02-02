@@ -462,6 +462,9 @@ class Controller extends Assessment\Controller
             // slice/cut the participants to a chunked count
             $participantCount = $participants->count();
             $participantCursor = (int)$this->requestQuery->get('participantCursor', 0);
+            if ($participantCursor < 0) {
+                $participantCursor = 0;
+            }
             $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
 
             $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
