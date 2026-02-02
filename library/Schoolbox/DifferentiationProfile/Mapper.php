@@ -23,7 +23,7 @@ use Schoolbox\Pastoral\Model as PastoralModel;
 /**
  * Class Mapper
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
- * @method Model[] findOneByColumn($columnList, $options = [])
+ * @method Model[] findOneByColumn($columnName, $columnValue, array $options = array())
  *
  * @package Schoolbox\DifferentiationProfile
  */
@@ -694,15 +694,10 @@ class Mapper extends BaseMapper
                ->isTrue('t.contribute_differentiation_profile')
                ->isTrue('c.contribute_differentiation_profile')
         );
-        $pastoralRecords = $pastoralMapper->findByPredicates(
-            $pb,
-            [
-                'order' => [
-                    'created_at' => 'DESC',
-                ]
-            ]
-        )->groupByCallback(function (PastoralModel $v) {
-            return $v->getStudent()->getId();
+        $pastoralRecords = $pastoralMapper
+            ->findByPredicates($pb)
+            ->groupByCallback(function (PastoralModel $v) {
+                return $v->getStudent()->getId();
         });
 
         foreach ($profiles as $profile) {
