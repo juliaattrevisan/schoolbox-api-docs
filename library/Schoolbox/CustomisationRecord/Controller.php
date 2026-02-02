@@ -41,7 +41,10 @@ class Controller extends Base
         $records = $records->map(fn($record) => call_user_func($translator, $record));
 
         $records = [
-            'data' => $records,
+            'data' => [
+                'tableHeaders' => $this->recordTableHeaders(),
+                'rows' => $records,
+            ],
             /* temporary cursor implementation
              */
             'metadata' => [
@@ -61,5 +64,53 @@ class Controller extends Base
             'records' => $records,
             $pageTitle,
         ]);
+    }
+
+    private function recordTableHeaders(): array
+    {
+        return [
+            [
+                'key' => 'user',
+                'title' => 'Name',
+                'type' => 'User',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'created_at',
+                'title' => 'Date (Created)',
+                'type' => 'DateTime',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'class',
+                'title' => 'Class',
+                'type' => 'Basic',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'unit',
+                'title' => 'Unit',
+                'type' => 'Basic',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'type',
+                'title' => 'Customisation Type',
+                'type' => 'Basic',
+                'isSortable' => true,
+            ],
+            [
+                'key' => 'customised_activity',
+                'title' => 'Customised Activity',
+                'type' => 'Basic',
+                'isSortable' => false,
+            ],
+            [
+                'key' => 'original_activity',
+                'title' => 'Original Activity',
+                'type' => 'Basic',
+                'isSortable' => false,
+            ],
+        ];
     }
 }
