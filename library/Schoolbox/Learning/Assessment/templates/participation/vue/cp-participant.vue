@@ -115,7 +115,13 @@ function onOpenIncludeInExistingModal(): void {
                     {{ props.participant.user.preferredName || props.participant.user.firstname }}
                     {{ props.participant.user.pronoun || "" }}
                 </template>
-                <pastoral-flags :user-id="props.participant.user.id" :pastoral-flags="props.pastoralFlags" />
+                <pastoral-flags
+                    v-if="
+                        pastoralFlags[props.participant.user.id] && pastoralFlags[props.participant.user.id].length > 0
+                    "
+                    :user-id="props.participant.user.id"
+                    :pastoral-flags="props.pastoralFlags"
+                />
             </div>
         </td>
         <td v-if="props.differentiationEnabled">
