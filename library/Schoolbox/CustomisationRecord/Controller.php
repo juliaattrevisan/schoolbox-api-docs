@@ -60,6 +60,9 @@ class Controller extends Base
             ],
             'header' => $this->recordTableHeaders(),
             'records' => $records,
+            'routes' => [
+                'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
+            ],
             $pageTitle,
         ]);
     }
