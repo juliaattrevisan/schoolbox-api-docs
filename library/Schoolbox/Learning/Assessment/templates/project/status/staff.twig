@@ -346,27 +346,45 @@ Data:
                         return;
                     }
 
+                    var toast = $('#assessment-toast');
+                    toast.toastActivate({text: 'Fetching participants...'});
+
                     // swap out the class `icon-down-arrow` to `icon-up-arrow` before it loads
                     $(event.target).removeClass('icon-down-arrow').addClass('icon-up-arrow');
 
                     // fetch the class status data
                     fetch(event.target.dataset.classStatusHref, { credentials: 'same-origin' })
-                        .then(function(response) { return response.text(); })
+                        .then(function(response) {
+                            if (!response.ok) {
+                                // toaster
+                                toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+                                // exit
+                                return;
+                            }
+                            return response.text();
+                        })
                         .then(function(data) {
                             var el = document.getElementById('class-' + event.target.dataset.clickLoad);
-                            if (el) { el.innerHTML = data; }
-                            // initialise the load more button if it exists
-                            $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
+                            if (el && data) {
+                                el.innerHTML = data;
+
+                                // toaster
+                                toast.toastTimeout({text: 'Loaded.', css: 'success'});
+
+                                // initialise the load more button if it exists
+                                $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
+
+                                // update data attribute once content has successfully loaded
+                                event.target.dataset.dataLoaded = 'true';
+
+                                // enable full collapsable on this class now that content is present
+                                $(event.target).collapsable();
+                            }
                         })
                         .catch(function() {
-                        // failed to load class content
+                            // toaster
+                            toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
                     });
-
-                    // update data attribute
-                    event.target.dataset.dataLoaded = 'true';
-
-                    // enable full collapsable on this class now
-                    $(event.target).collapsable();
                 });
             </script>
         {% endif %}
