@@ -698,7 +698,7 @@ class Mapper extends BaseMapper
             ->findByPredicates($pb)
             ->groupByCallback(function (PastoralModel $v) {
                 return $v->getStudent()->getId();
-        });
+            });
 
         foreach ($profiles as $profile) {
             $studentId = $profile->getStudent()->getId();
