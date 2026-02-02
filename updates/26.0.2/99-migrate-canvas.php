@@ -10,7 +10,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  * CLI Tool
