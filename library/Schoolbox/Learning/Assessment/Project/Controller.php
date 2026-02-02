@@ -236,10 +236,11 @@ class Controller extends Assessment\Controller
 
                 $twigData['participantStats'][$assessment->getId()] = $participantStats;
                 $twigData['aImpls'][$assessment->getId()] = [
-                    'participantCount' => null,
+                    'participantCount' => $participants->count(),
                     'participantCursor' => null,
                     'assessment' => $assessment,
                     'participantStats' => $participantStats,
+                    'participants' => $participants,
                 ];
             }
         }
@@ -478,6 +479,7 @@ class Controller extends Assessment\Controller
                 'participantCursor' => $participantCursor + self::PARTICIPANT_CHUNK_SIZE,
                 'assessment' => $assessment,
                 'participantStats' => $participantStats,
+                'participants' => $participants,
             ];
         }
 
