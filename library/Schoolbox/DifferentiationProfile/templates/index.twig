@@ -11,7 +11,7 @@
         $(function () {
             // Filtered content has been [re]loaded
             $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
-                document.dispatchEvent(new CustomEvent('manage-differentiation-profiles__onFilterChange', {
+                document.dispatchEvent(new CustomEvent('lazy-grid__onFilterChange', {
                     detail: {
                         selectedFilters
                     }

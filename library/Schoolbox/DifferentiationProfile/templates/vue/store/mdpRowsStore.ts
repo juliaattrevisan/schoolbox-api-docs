@@ -7,7 +7,7 @@ import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import type { Header } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
-import { ON_FILTER_CHANGE } from "../../js/MDPEvents";
+import { ON_FILTER_CHANGE } from "@schoolboxVue/components/grid/lazyGrid/event/LazyGridEvent";
 import { useLoadData } from "../composable/useLoadData";
 
 export const useRowsStore = defineStore(`rowsStore`, () => {
