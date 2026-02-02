@@ -80,7 +80,7 @@ window.Vue.onUnmounted(() => {
     <div class="no-print">
         <i v-if="dragStore.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
         <div>
-            <a :href="props.unit.homepage" :data-test="`unit-planner-unit-link-${props.unit.id}`">
+            <a :href="props.unit.homepage" :data-test="`unit-planner-unit-link-${props.unit.id}`" class="no-print">
                 <strong>{{ props.unit.title }}</strong>
             </a>
             <ul>
@@ -125,6 +125,13 @@ window.Vue.onUnmounted(() => {
         position: absolute; // Avoid the content being pushed around by the draggable holder
         text-wrap: wrap;
         top: 5px;
+    }
+}
+
+/* Styles for printing */
+@media print {
+    .no-print {
+        display: none !important; // Hide elements with 'no-print' class
     }
 }
 </style>
