@@ -15,7 +15,6 @@ use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
@@ -406,12 +405,12 @@ class Controller extends Assessment\Controller
      * fetch and display the participants for a specific class assessment, that is part of the course assessment
      * this is not chromed, so we can async it into the dom and it _should_ just work... (chunked version)
      *
+     * @api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
      * @param IAssessable $courseAss
      * @param IAssessable $classAss
      * @return void
      * @throws Exception\NotFound
      * @throws \Twig\Error\Error
-     *@api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
      */
     public function getClassStatusChunk(IAssessable $courseAss, IAssessable $classAss): void
     {
@@ -462,7 +461,7 @@ class Controller extends Assessment\Controller
 
             // slice/cut the participants to a chunked count
             $participantCount = $participants->count();
-            $participantCursor = $this->requestQuery->get('participantCursor', 0);
+            $participantCursor = (int)$this->requestQuery->get('participantCursor', 0);
             $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
 
             $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
