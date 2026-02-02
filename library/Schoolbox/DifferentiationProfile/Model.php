@@ -32,8 +32,6 @@ class Model implements ISoftDeletable
     private ?string $needs_challenges = null;
     private ?string $strategies_adjustments = null;
     private ?string $goals = null;
-    private ?bool $expired = null;
-    private ?bool $out_of_date = null;
 
     private ?GenericCollection $pastoral_records = null;
 

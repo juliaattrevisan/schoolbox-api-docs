@@ -23,7 +23,7 @@ use Schoolbox\Pastoral\Model as PastoralModel;
 /**
  * Class Mapper
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
- * @method Model[] findOneByColumn($columnName, $columnValue, array $options = array())
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = array())
  *
  * @package Schoolbox\DifferentiationProfile
  */
