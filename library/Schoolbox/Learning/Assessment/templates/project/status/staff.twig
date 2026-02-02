@@ -294,18 +294,45 @@ Data:
                     // show the loader
                     $(event.target.parentNode).find('[data-loader]').removeClass('hide');
 
+                    var toast = $('#assessment-toast');
+                    toast.toastActivate({text: 'Fetching participants...'});
+
                     // fetch the class status data
                     fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
-                            .then(function(response) { return response.text(); })
+                            .then(function(response) {
+                                if (!response.ok) {
+                                    // toaster
+                                    toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+
+                                    // show the hidden things
+                                    $(event.target).show();
+                                    // show the loader
+                                    $(event.target.parentNode).find('[data-loader]').addClass('hide');
+                                    // exit
+                                    return;
+                                }
+                                return response.text();
+                            })
                             .then(function(data) {
                                 var el = event.target.parentNode;
-                                if (el) {
+                                if (el && data) {
+                                    // toaster
+                                    toast.toastTimeout({text: 'Loaded.', css: 'success'});
                                     el.innerHTML = data;
                                     $(el).find('[data-click-load-more]').click(loadMoreParticipants);
+                                } else {
+                                    // toaster
+                                    toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
                                 }
                             })
                             .catch(function() {
-                                // failed to load class content
+                                // toaster
+                                toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+
+                                // show the hidden things
+                                $(event.target).show();
+                                // show the loader
+                                $(event.target.parentNode).find('[data-loader]').addClass('hide');
                             });
                 }
 
