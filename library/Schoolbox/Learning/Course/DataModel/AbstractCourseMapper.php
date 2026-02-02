@@ -28,6 +28,21 @@ abstract class AbstractCourseMapper extends BaseMapper
     }
 
     /**
+     * @param array $ids
+     * @param array $options
+     * @return GenericCollection|AbstractCourse[]
+     */
+    public function findAllByIds(array $ids, array $options = []): GenericCollection
+    {
+        if (!count($ids)) {
+            return $this->createCollection();
+        }
+        /** @var GenericCollection|AbstractCourse[] $courses */
+        $courses = parent::findByColumn('id', $ids, $options);
+        return $this->loadUnitsForCollection($courses);
+    }
+
+    /**
      * Loads all units specifications into a course specification.
      *
      * @param AbstractCourse $course

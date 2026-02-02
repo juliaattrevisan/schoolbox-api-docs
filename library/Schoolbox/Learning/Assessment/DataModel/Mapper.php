@@ -1763,8 +1763,10 @@ class Mapper extends BaseMapper
      * Augments the list from hydrateSelect() with context unit implementations.
      *
      * @param GenericCollection<Model> $modelList
-     * @param array<int>             $unitImplIds
+     * @param array<int>               $unitImplIds
      * @return GenericCollection<Model>
+     * @throws Deleted
+     * @throws Exception
      */
     private function augmentListWithUnitImplContexts(
         GenericCollection $modelList,
@@ -1779,12 +1781,30 @@ class Mapper extends BaseMapper
                 ['deleted' => true],
             )->indexBy('id');
 
+            /** @var CourseImpl\Mapper  $contextCourseImplMapper */
+            $contextCourseImplMapper = $this->getJoinMapper('assessment_course_unit_implementation.course');
+            $courseImplIds = [];
+            foreach ($contextUnitImpls as $unitImpl) {
+                $courseImplIds[] = $unitImpl->getCourse()->getId();
+            }
+
+            $courseImpls = !empty($courseImplIds)
+                ? $contextCourseImplMapper->findAllByIds($courseImplIds)->indexBy('id')
+                : [];
+
             foreach ($modelList as $model) {
                 $context = $model->getAssessmentContext();
                 if ($context instanceof UnitImpl\Model) {
                     $hydratedContext = $contextUnitImpls[$context->getId()] ?? null;
                     if ($hydratedContext instanceof UnitImpl\Model) {
                         $model->setAssessmentContext($hydratedContext);
+                        $courseImplId = $hydratedContext->getCourse()->getId();
+                        /* Fully hydrate the course implementation to include the unit
+                         * implementations where it is possible
+                         */
+                        if (isset($courseImpls[$courseImplId])) {
+                            $hydratedContext->setCourse($courseImpls[$courseImplId]);
+                        }
                     }
                 }
             }
