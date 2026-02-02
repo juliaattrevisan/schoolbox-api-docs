@@ -40,7 +40,18 @@ class Controller extends Base
 
         $records = $records->map(fn($record) => call_user_func($translator, $record));
 
-//        new \Alaress_Probe($records); // For debugging purposes
+        $records = [
+            'data' => $records,
+            /* temporary cursor implementation
+             */
+            'metadata' => [
+                'count' => count($records),
+                'cursor' => [
+                    "current" => null,
+                    "next" => null,
+                ]
+            ],
+        ];
 
         // Logic to view customisation records goes here
         $this->response = $this->responseFromTemplate('@customisationRecord/list.twig', [

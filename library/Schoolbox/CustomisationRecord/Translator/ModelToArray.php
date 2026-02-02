@@ -81,9 +81,9 @@ class ModelToArray
             ],
             'unit' => [
                 'title' => $context?->getTitle(),
-                'class' => [
-                    'title' => $context?->getFolder()?->getTitle()
-                ]
+            ],
+            'class' => [
+                'title' => $context?->getFolder()?->getTitle()
             ]
         ];
     }
