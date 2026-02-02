@@ -291,20 +291,19 @@ Data:
 
         {% if showGroups %}
             <script type="text/javascript">
-                function loadMoreFun(event) {
+                function loadMoreParticipants(event) {
                     // fetch the class status data
                     fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
                             .then(function(response) { return response.text(); })
                             .then(function(data) {
                                 var el = event.target.parentNode;
                                 if (el) { el.innerHTML = data; }
-                                $(event.target.parentNode).children('[data-click-load-more]').click(loadMoreFun);
+                                $(event.target.parentNode).children('[data-click-load-more]').click(loadMoreParticipants);
                             })
                             .catch(function() {
                                 // failed to load class content
                             });
                 }
-
 
                 // when a user clicks the text in data-click-load
                 // we should async fetch the participants and add it to the div
@@ -323,7 +322,7 @@ Data:
                         .then(function(data) {
                             var el = document.getElementById('class-' + event.target.dataset.clickLoad);
                             if (el) { el.innerHTML = data; }
-                            $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreFun);
+                            $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
                         })
                         .catch(function() {
                         // failed to load class content
@@ -336,7 +335,7 @@ Data:
                     $(event.target).collapsable();
 
                     // initialise the load more button if it exists
-                    $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreFun);
+                    $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
                 });
             </script>
         {% endif %}
