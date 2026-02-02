@@ -80,22 +80,35 @@ test.describe("Pastoral Report Builder", () => {
             ]);
 
             tester.isGoingTo("sort the columns and check it works properly");
+
             await pastoralReportDetails.sortColumnAndCheck(
+                // Student by Type tab: sort by Name and check Sasha White the first row
+                // Type by Month tab: sort by Oct 2017 and check the 4 records number is in the row 9
+                // Type by Week tab: sort by Total Records and check the 1 record number is in the row 8
+                // Student by Month tab: sort by Oct 2017 and check the last row has number 3
+                // Student by Week tab: sort by 29 Oct - 4 Nov, 2017  and check Penelope Li is in the row 4
+
                 ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
                 ["user", "oct_2017", "total", "oct_2017", "week_8"],
-                [2, 9, 8, 1, 3],
-                [1, 13, 2, 13, 1],
-                ["White, Sasha", "4", "1", "7", "Li, Penelope"],
+                ["user-Sasha", "oct_2017-4", "total-1", "oct_2017-3", "user-Penelope"],
+                [2, 9, 8, 6, 3], // row numbers
+                ["White, Sasha", "4", "1", "3", "Li, Penelope"],
             );
 
             await pastoralReportDetails.clickRecordsOrPointsRadioButton("points");
 
             await pastoralReportDetails.sortColumnAndCheck(
+                // Student by Type tab: sort by Name and check Sasha White the first row
+                // Type by Month tab: sort by Oct 2017 and check the 5 points number is in the row 9 for the oct column
+                // Type by Week tab: sort by Total Points and check the 5 points number is in the row 9 for the total column
+                // Student by Month tab: sort by Oct 2017 and check the last row has number 6 for the oct column
+                // Student by Week tab: sort by 29 Oct - 4 Nov, 2017  and check Penelope Li is in the row 3
+
                 ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
                 ["user", "oct_2017", "total", "oct_2017", "week_8"],
-                [2, 9, 9, 1, 3],
-                [1, 13, 2, 13, 1],
-                ["White, Sasha", "5", "5", "9", "Li, Penelope"],
+                ["user-Sasha", "oct_2017-5", "total-5", "oct_2017-6", "user-Penelope"],
+                [2, 9, 9, 6, 3], // row numbers
+                ["White, Sasha", "5", "5", "6", "Li, Penelope"],
             );
 
             tester.isGoingTo(
@@ -172,47 +185,59 @@ test.describe("Pastoral Report Builder", () => {
             tester.isGoingTo("check each one of the tabs load the records data correctly");
             await pastoralCareReports.goto();
             await pastoralCareReports.openPastoralReport(reportTitle);
-            // await pastoralReportDetails.clickTabAndCheckModalRecordCounts(
-            //     ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
-            //     // Jana Reed row total column number 3; Total Records Oct 2017; Academic 29-Oct-4Nov; Penelope Oct; Sasha total records
-            //     [4, 1, 2, 3, 6],
-            //     [2, 13, 48, 13, 2],
-            //     [3, 7, 4, 1, 1],
-            // );
+
             await pastoralReportDetails.clickTabAndCheckModalRecordCounts(
-                ["Student by Type"],
-                // Jana Reed row total column number 3; Total Records Oct 2017; Academic 29-Oct-4Nov; Penelope Oct; Sasha total records
-                ["Reed, Jana"],
-                ["total-3"],
-                [3],
+                // Student by Type tab: Jana Reed row(number 4) clicking the total records column
+                // Type by Month tab: Award/Achievement row(number 2) clicking the Total Records Oct 2017 column
+                // Type by Week tab: Award/Achievement row(number 2) clicking the Academic 29-Oct-4Nov column
+                // Student by Month tab: Penelope row(number 3) clicking Oct 2017 column
+                // Student by Week tab: Sasha row(number 6) clicking the total records column
+                ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
+                [4, 2, 2, 3, 6], // row numbers
+                ["total-3", "oct_2017-4", "week_8-4", "oct_2017-1", "total-1"],
+                [3, 4, 4, 1, 1], // expected counts
             );
 
-            // await pastoralReportDetails.checkRowCounts(
-            //     ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
-            //     // Jana Reed row total column number 3; Academic Total Records; Discipline 29-Oct-4Nov; Jana Oct; Total Records
-            //     [4, 2, 7, 4, 1],
-            //     [2, 2, 48, 13, 2],
-            //     [`3`, `4`, `1`, `3`, `7`],
-            // );
+            await pastoralReportDetails.checkRowCounts(
+                // Student by Type tab: Jana Reed row(number 4) checking the total column number 3;
+                // Type by Month tab: Academic Achievement row(number 2) checking the Total Records;
+                // Type by Week tab: Discipline Uniform Infraction row(number 7) checking the 29-Oct-4Nov;
+                // Student by Month tab: Jana Reed row(number 4) checking the Oct column;
+                // Student by Week tab: Mario Izzo row(number 2) checking the total records column;
+                ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
+                [4, 2, 7, 4, 2], // row numbers
+                ["total-3", "total-4", "week_8-1", "oct_2017-3", "total-1"],
+                [`3`, `4`, `1`, `3`, `1`], // expected counts
+            );
 
-            // tester.isGoingTo("check each one of the tabs load the points data correctly");
+            tester.isGoingTo("check each one of the tabs load the points data correctly");
 
-            // await pastoralReportDetails.clickTab("Student by Type");
-            // await pastoralReportDetails.clickRecordsOrPointsRadioButton("points");
-            // await pastoralReportDetails.checkRowCounts(
-            //     ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
-            //     // Total x total points; Academic Total Records; Academic 29-Oct-4Nov; Jana Oct; Mario 29-Oct-4Nov
-            //     [1, 2, 2, 4, 2],
-            //     [2, 2, 48, 13, 48],
-            //     [`9`, `5`, `5`, `6`, `3`],
-            // );
-            // await pastoralReportDetails.clickTabAndCheckModalRecordCounts(
-            //     ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
-            //     // Jana Reed row total column number 3; Total Points Oct 2017; Academic 29-Oct-4Nov; Mario Oct; Mario total points
-            //     [4, 1, 2, 2, 2],
-            //     [2, 13, 48, 13, 2],
-            //     [2, 3, 1, 1, 1],
-            // );
+            await pastoralReportDetails.clickTab("Student by Type");
+            await pastoralReportDetails.clickRecordsOrPointsRadioButton("points");
+
+            await pastoralReportDetails.checkRowCounts(
+                // Student by Type tab: Jana Reed row(number 4) checking the total column;
+                // Type by Month tab: Academic Achievement row(number 2) checking the Total Points;
+                // Type by Week tab: Academic Achievement row(number 2) checking checking the 29-Oct-4Nov;
+                // Student by Month tab: Jana Reed row(number 4) checking the Oct column;
+                // Student by Week tab: Mario Izzo row(number 2) checking the 29-Oct-4Nov column;
+                ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
+                [4, 2, 2, 4, 2], // row numbers
+                ["total-6", "total-5", "week_8-5", "oct_2017-6", "total-3"],
+                [`6`, `5`, `5`, `6`, `3`], // expected counts
+            );
+
+            await pastoralReportDetails.clickTabAndCheckModalRecordCounts(
+                // Student by Type tab: Jana Reed row (number 4) clicking the total points column
+                // Type by Month tab: Academic row (number 2) clicking the Oct 2017 column
+                // Type by Week tab: Academic row (number 2) clicking the 29-Oct-4Nov column
+                // Student by Month tab: Mario row (number 2) clicking Oct 2017 column
+                // Student by Week tab: Mario  row (number 2) clicking the total points column
+                ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
+                [4, 2, 2, 2, 2], // row numbers
+                ["total-6", "oct_2017-5", "week_8-5", "oct_2017-3", "total-3"],
+                [2, 1, 1, 1, 1], // expected counts
+            );
         } finally {
             tester.isGoingTo("Clean up: delete the pastoral report");
             await db.dontHaveInDatabase("pastoral_report", { name: reportTitle, deleted_at: null });
@@ -234,7 +259,7 @@ test.describe("Pastoral Report Builder", () => {
             const pastoralReportDetails = new PastoralReportDetails(page);
 
             tester.isGoingTo(
-                "navigate to create pastoral report page, fill in the report title, date range and save the report",
+                "navigate to create pastoral report page, fill in the report title, date range, records types Academic and Medical and save the report",
             );
             await createPastoralReport.createPastoralReport(
                 reportTitle,

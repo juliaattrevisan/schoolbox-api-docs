@@ -1,6 +1,5 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
-import { has } from "lodash";
 
 export default class PastoralReportDetails {
     private page: Page;
@@ -159,71 +158,22 @@ export default class PastoralReportDetails {
     }
 
     /**
-     * clicks a cell in the report able to open the modal with the records details
-     * check the number of records presented in the modal opened
-     * @param childId1 - The child row number in the table to click
-     * @param childId2 - The child column number in the table to click
-     * @param expectedCount - The expected number of records in the modal
-     */
-    async checkModalRecordCount(childId1: number, childId2: number, expectedCount: number): Promise<void> {
-        await this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`).click();
-        const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
-        await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
-            expectedCount,
-        );
-    }
-
-    /**
      * for one or more report tabs
      * clicks a report tab, clicks one or more cells in the report table to open the modal, checks the number of records presented in the modal opened, close the modal
      * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param childIds1 - The child row numbers in the table to click
-     * @param childIds2 - The child column numbers in the table to click
-     * @param expectedCounts - The expected number of records in the modal for each tab
-     */
-    // async clickTabAndCheckModalRecordCounts(
-    //     tabNames: string[],
-    //     childIds1: number[],
-    //     childIds2: number[],
-    //     expectedCounts: number[],
-    // ): Promise<void> {
-    //     for (let i = 0; i < tabNames.length; i += 1) {
-    //         const tabName = tabNames[i];
-    //         const childId1 = childIds1[i];
-    //         const childId2 = childIds2[i];
-    //         const expectedCount = expectedCounts[i];
-    //         const tabLocator = this.page.getByTestId(
-    //             PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
-    //         );
-    //         await tabLocator.click();
-    //         await this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`).click();
-
-    //         const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
-    //         await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
-    //             expectedCount,
-    //         );
-    //         const closeButton = this.page.getByTestId(PastoralReportDetails.DATA_TEST_CLOSE_MODAL_BUTTON);
-    //         await closeButton.click();
-    //     }
-    // }
-
-    /**
-     * for one or more report tabs
-     * clicks a report tab, clicks one or more cells in the report table to open the modal, checks the number of records presented in the modal opened, close the modal
-     * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param studentNames - The names of the students to locate the rows to click
-     * @param tableCells - The table cells to click in the located rows
+     * @param rowNumbers - The row to locate in the table: 1 for first row, 2 for second row, etc
+     * @param tableCells - The table cell columns to click in the located rows
      * @param expectedCounts - The expected number of records in the modal for each tab
      */
     async clickTabAndCheckModalRecordCounts(
         tabNames: string[],
-        studentNames: string[],
+        rowNumbers: number[],
         tableCells: string[],
         expectedCounts: number[],
     ): Promise<void> {
         for (let i = 0; i < tabNames.length; i += 1) {
             const tabName = tabNames[i];
-            const studentName = studentNames[i];
+            const rowNumber = rowNumbers[i];
             const tableCell = tableCells[i];
             const expectedCount = expectedCounts[i];
             const tabLocator = this.page.getByTestId(
@@ -231,14 +181,17 @@ export default class PastoralReportDetails {
             );
             await tabLocator.click();
 
-            // find the student row by name and then clicks a cell in that row
-            const row = this.page.getByTestId("pr-table-data-row").filter({ hasText: studentName });
+            // finds the row and clicks a cell column in that row
+            const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
             await row.getByTestId(`pr-table-data-cell-${tableCell}`).click();
 
+            // by clicking the cell, a modal opens - locating the modal and counting the records rows
             const modalTableLocator = this.page.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_TABLE_RECORD);
             await expect(modalTableLocator.getByTestId(PastoralReportDetails.DATA_TEST_MODAL_RECORDS_ROWS)).toHaveCount(
                 expectedCount,
             );
+
+            // closing the modal
             const closeButton = this.page.getByTestId(PastoralReportDetails.DATA_TEST_CLOSE_MODAL_BUTTON);
             await closeButton.click();
         }
@@ -248,28 +201,30 @@ export default class PastoralReportDetails {
      * for one or more report tabs
      * clicks a report tab, check the number of records is presented properly in the table
      * @param tabNames - The names of the tabs: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param childIds1 - The child row numbers in the table to click
-     * @param childIds2 - The child column numbers in the table to click
-     * @param expectedCounts - The expected number in the rows in each tab table
+     * @param rowNumbers - The row to locate in the table: 1 for first row, 2 for second row, etc
+     * @param tableCells - The table cell columns to click in the located rows
+     * @param expectedCounts - The expected number of records in the modal for each tab
      */
     async checkRowCounts(
         tabNames: string[],
-        childIds1: number[],
-        childIds2: number[],
+        rowNumbers: number[],
+        tableCells: string[],
         expectedCounts: string[],
     ): Promise<void> {
         for (let i = 0; i < tabNames.length; i += 1) {
             const tabName = tabNames[i];
-            const childId1 = childIds1[i];
-            const childId2 = childIds2[i];
+            const rowNumber = rowNumbers[i];
+            const tableCell = tableCells[i];
             const expectedCount = expectedCounts[i];
 
             const tabLocator = this.page.getByTestId(
                 PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
             );
             await tabLocator.click();
-            const tableLocator = this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`);
-            await expect(tableLocator).toHaveText(expectedCount);
+
+            // finds the row and locate a cell column in that row - checks the correct number is presented
+            const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
+            await expect(row.getByTestId(`pr-table-data-cell-${tableCell}`)).toHaveText(expectedCount);
         }
     }
 
@@ -285,22 +240,22 @@ export default class PastoralReportDetails {
      * clicks each tab, sorts a column and checks the sorting works properly
      * @param tabNames - The name of the tab: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
      * @param headerNames - The name of the header to sort: user, oct_2017, total, etc
-     * @param childIds1 - The child row numbers in the table to click
-     * @param childIds2 - The child column numbers in the table to click
+     * @param columnNames - The column name to check the expected data
+     * @param rowNumbers - The row to locate in the table: 1 for first row, 2 for second row, etc
      * @param expectedTexts - The expected text in the first row after sorting
      */
     async sortColumnAndCheck(
         tabNames: string[],
         headerNames: string[],
-        childIds1: number[],
-        childIds2: number[],
+        columnNames: string[],
+        rowNumbers: number[],
         expectedTexts: string[],
     ): Promise<void> {
         for (let i = 0; i < tabNames.length; i += 1) {
             const tabName = tabNames[i];
             const headerName = headerNames[i];
-            const childId1 = childIds1[i];
-            const childId2 = childIds2[i];
+            const columnName = columnNames[i];
+            const rowNumber = rowNumbers[i];
             const expectedText = expectedTexts[i];
 
             const tabLocator = this.page.getByTestId(
@@ -311,8 +266,10 @@ export default class PastoralReportDetails {
                 PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", headerName),
             );
             await sortButton.click();
-            const tableLocator = this.page.locator(`table tbody tr:nth-child(${childId1}) td:nth-child(${childId2})`);
-            await expect(tableLocator).toHaveText(expectedText);
+
+            // finds the row and locate a cell column in that row - checks the correct number is presented
+            const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
+            await expect(row.getByTestId(`pr-table-data-cell-${columnName}`)).toHaveText(expectedText);
         }
     }
 
