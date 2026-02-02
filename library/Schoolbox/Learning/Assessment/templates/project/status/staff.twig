@@ -310,6 +310,8 @@ Data:
                 // when a user clicks the text in data-click-load
                 // we should async fetch the participants and add it to the div
                 $('[data-click-load]').click(function (event) {
+                    //stop the scroll
+                    event.preventDefault();
                     // if data has been loaded, exit
                     if (event.target.dataset.dataLoaded === 'true') {
                         return;
