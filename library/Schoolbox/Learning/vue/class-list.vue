@@ -5,11 +5,13 @@
 /* eslint-enable vue/no-v-html */
 import locale from "@js/terminology/rosettaStone";
 import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
+import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/pastoral-flags.vue";
 
 export default {
     name: "class-list",
     components: {
         ViewDpModal,
+        PastoralFlags,
     },
     props: {
         /**
@@ -257,7 +259,7 @@ export default {
     data() {
         return {
             studentLists: [],
-            studentPastoralCounts: [],
+            pastoralFlags: [],
             showSkeletonLoader: true,
             selectedStudents: [],
             studentsCheckboxElements: undefined,
@@ -319,7 +321,7 @@ export default {
 
             try {
                 const pastoralCountsResponse = await fetch(this.getStudentsPastoralCountsEndpoint());
-                this.studentPastoralCounts = await pastoralCountsResponse.json();
+                this.pastoralFlags = await pastoralCountsResponse.json();
             } catch (error) {
                 console.warn(error);
             } finally {
@@ -695,18 +697,11 @@ export default {
                                         <span class="meta f-no-margins">({{ student.synergy_id }})</span>
                                         <span class="show-for-print"><br />{{ student.email }}</span>
                                     </div>
-                                    <div class="l-flex-row l-gap-xs">
-                                        <sbx-label
-                                            v-for="studentBadge in studentPastoralCounts[student.id]"
-                                            :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
-                                            :title="studentBadge.title"
-                                            :text="studentBadge.count.toString()"
-                                            :icon="studentBadge.icon"
-                                            :background-color="studentBadge.bgColor"
-                                            :text-color="studentBadge.fgColor"
-                                            :href="studentBadge.destinationUrl"
-                                        />
-                                    </div>
+                                    <pastoral-flags
+                                        v-if="pastoralFlags[student.id] && pastoralFlags[student.id].length > 0"
+                                        :user-id="student.id"
+                                        :pastoral-flags="pastoralFlags"
+                                    />
                                     <p class="meta inline-container f-no-margins">
                                         <slot name="student-meta" v-bind:student="student">
                                             <span
