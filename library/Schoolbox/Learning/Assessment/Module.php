@@ -538,6 +538,16 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
+        if (!$courseAss->isSpecification()) {
+            //if not spec, error
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // check if the class assessment is a child of the course assessment
+        if ($classAss->getSpecificationAssessment()?->getId() !== $courseAss->getId()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         return [
             'assessment' => $courseAss,
             'courseAss' => $courseAss,

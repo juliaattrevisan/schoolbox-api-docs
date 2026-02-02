@@ -432,15 +432,6 @@ class Controller extends Assessment\Controller
      */
     private function getClassStudentInfo(IAssessable $courseAss, IAssessable $classAss): array
     {
-        if (!$courseAss->isSpecification()) {
-            //if not spec, error
-            throw new Exception\NotFound();
-        }
-
-        // check if the class assessment is a child of the course assessment
-        if ($classAss->getSpecificationAssessment()?->getId() !== $courseAss->getId()) {
-            throw new Exception\NotFound();
-        }
         $assessments = new GenericCollection(IAssessable::class, [$classAss]);
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
