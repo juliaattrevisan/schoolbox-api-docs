@@ -297,8 +297,10 @@ Data:
                             .then(function(response) { return response.text(); })
                             .then(function(data) {
                                 var el = event.target.parentNode;
-                                if (el) { el.innerHTML = data; }
-                                $(event.target.parentNode).children('[data-click-load-more]').click(loadMoreParticipants);
+                                if (el) {
+                                    el.innerHTML = data;
+                                    $(el).find('[data-click-load-more]').click(loadMoreParticipants);
+                                }
                             })
                             .catch(function() {
                                 // failed to load class content
