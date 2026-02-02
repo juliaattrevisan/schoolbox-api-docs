@@ -3,27 +3,17 @@
  * Manage Customisation Records page
  */
 
-import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import LazyGrid from "@schoolboxVue/components/grid/lazyGrid/lazy-grid.vue";
+import type { Header, Routes } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
-import type { Routes as PastoralRoutes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
-import type {
-    Routes,
-    CRHeader,
-    AdjustmentType,
-    ProfileAdjustmentKeys,
-    ProfileTextKeys,
-    Payload,
-    Profile,
-} from "../js/types/manageDifferentiationProfilesTypes";
-import CrGridCellStudent from "./grid/cell/cr-grid-cell-student.vue";
+import { useRowsStore } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
 import { useHeaderStore } from "./store/crHeaderStore";
-import { useRowsStore } from "./store/crRowsStore";
+
 const props = defineProps<{
-    header: CRHeader[];
+    header: Header[];
     routes: Routes;
 }>();
 
@@ -56,39 +46,12 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
         <div ref="scrollableRef" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
             <lazy-grid
                 :header="headerStore.header"
-                :rows="rowsStore.payload.data.profiles"
+                :rows="rowsStore.payload.data"
                 :is-loading="rowsStore.isMoreLoading"
                 :sort-by="rowsStore.sortBy"
                 :order="rowsStore.order"
                 @sort="rowsStore.onSort"
             >
-                <template #User="{ row, header: columnHeader }">
-                    <mdp-grid-cell-student :user="row[columnHeader.key] as User" :profile="row as Profile" />
-                </template>
-                <template #Adjustment="{ row, header: columnHeader }">
-                    <mdp-grid-cell-adjustment
-                        :profile="row as Profile"
-                        :header-key="columnHeader.key as ProfileAdjustmentKeys"
-                        :adjustments="row[columnHeader.key] as number[]"
-                        :options="
-                            columnHeader.key === 'adjustment_category'
-                                ? props.adjustmentCategories
-                                : props.adjustmentLevels
-                        "
-                    />
-                </template>
-                <template #Text="{ row, header: columnHeader }">
-                    <!-- ignore is added below to avoid the brackets being removed from :text, which causes a vue/no-deprecated-filter warning *_* -->
-                    <!-- prettier-ignore -->
-                    <mdp-grid-cell-text
-                    :profile="row as Profile"
-                    :header-key="columnHeader.key as ProfileTextKeys"
-                    :text="(row[columnHeader.key] as string | null)"
-                />
-                </template>
-                <template #Date="{ row }">
-                    <mdp-grid-cell-last-updated :profile="row as Profile" />
-                </template>
             </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
         </div>

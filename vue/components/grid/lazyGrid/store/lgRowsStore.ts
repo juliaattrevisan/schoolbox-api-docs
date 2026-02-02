@@ -58,7 +58,19 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     function init($header: Header[], $route: string): void {
         header.value = $header;
         route.value = $route;
-        initFilterListener();
+        // initFilterListener();
+        /**
+         * The filter listener is automatically triggered once set up,
+         * but for now we need to set up manually
+         */
+        const newUrl = new URL(route.value, window.location.origin);
+        const searchParams = new URLSearchParams();
+        searchParams.set(SearchParam.LIMIT, limit.toString());
+        searchParams.set(SearchParam.SORT_BY, sortBy.value);
+        searchParams.set(SearchParam.ORDER, order.value);
+        searchParams.set(SearchParam.CURSOR, ""); // Reset cursor on sort change
+        newUrl.search = searchParams.toString();
+        url.value = newUrl.toString();
     }
 
     /**

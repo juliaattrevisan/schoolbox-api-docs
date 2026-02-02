@@ -7,7 +7,7 @@ import type { Header } from "./types/lazyGridTypes";
 
 const props = defineProps<{
     header: Header[];
-    rows: { [key: string]: unknown }[];
+    rows: Record<string, unknown>[];
     isLoading: boolean;
     sortBy: string;
     order: "ASC" | "DESC";
