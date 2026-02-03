@@ -25,6 +25,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -327,41 +328,20 @@ class Controller extends Base
         // populate related records
         $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null, $showArchived);
 
-        $pastoralCountHelper = new PastoralCountHelper(
-            $this->routeGenerator,
-            $this->pastoralTypeMapper,
-            $this->pastoralSubTypeMapper,
-            $this->pastoralDataSource,
-            $this->termMapper
-        );
-        $countSummaryByMonth = $pastoralCountHelper->countStudentEventsByTypesByMonth($this->getUser(), $student, $pastoralCountHelper->getStartDate($pastoralCountHelper::COUNT_PERIOD_12MONTHS));
+        $data = $pageRecords->map($this->pastoralTranslator)->reindex();
 
         $this->response = $this->responseAsJson([
-            'records' => $pageRecords,
+            'data'     => [
+                'results' => $data,
+            ],
+            // 'metadata' => [
+            //     'count'  => $count,
+            //     'cursor' => [
+            //         'next'    => $next,
+            //         'current' => $current,
+            //     ],
+            // ],
         ]);
-
-        // $this->response = $this->responseFromTemplate(
-        //     '@pastoral/student.twig',
-        //     [
-        //         'user'                => $user,
-        //         'recordCount'         => $recordCount,
-        //         'records'             => $pageRecords,
-        //         'student'             => $student,
-        //         'pageCurrent'         => $pageCurrent,
-        //         'types'               => $this->pastoralTypeMapper->findAll(),
-        //         'subtypes'            => $this->pastoralSubTypeMapper->findAll(),
-        //         'countSummaryByMonth' => [
-        //             'recordCount' => count($countSummaryByMonth),
-        //             'series'      => $pastoralCountHelper->buildMonthlyBarChart($countSummaryByMonth),
-        //         ],
-        //         'typeSelected'        => $typeId,
-        //         'subtypeSelected'     => $subtypeId,
-        //         'showArchived'        => $showArchived ? 1 : 0,
-        //         'resultsPerPage'      => $resultsPerPage,
-        //         'pagesToDisplay'      => $maxPage,
-        //     ],
-        //     $student->getFullName(),
-        // );
     }
 
     /**
