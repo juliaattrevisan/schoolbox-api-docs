@@ -49,6 +49,7 @@ trait CSVTrait
                 ? $event->getPublishDate()->getLocalShort()
                 : '',
             $event->canAttend() ? 1 : 0,
+            $this->getPurposeValue(),
         ];
 
         /**
@@ -71,5 +72,15 @@ trait CSVTrait
     public function setBaseUrl(string $baseUrl): void
     {
         $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * This is overridden by Calendar\Event\Type\ResourceBooking\Renderer\Csv.
+     *
+     * @return string
+     */
+    protected function getPurposeValue(): string
+    {
+        return '';
     }
 }
