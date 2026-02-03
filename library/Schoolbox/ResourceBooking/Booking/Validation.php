@@ -969,4 +969,74 @@ class Validation
 
         return BookingStatusModel::STATUS_PENDING;
     }
+
+
+    /**
+     * fetch all clash events and timetable events that clash with the bookings
+     *
+     * based off @see \Schoolbox\ResourceBooking\Booking\Validation::validateForClashes
+     * @param Item\Model $resource
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param Model|null $existingBooking
+     * @return Collection|Model[]|EventInterface[]
+     */
+    public function getClashEvents(
+        Item\Model $resource,
+        DateTime $startDate,
+        DateTime $endDate,
+        ?Model $existingBooking = null
+    ): Collection {
+        // Only check approved bookings. Wow, the calendar population method
+        // can do exactly that!
+        // I do however want to allow a booking to start at the same time
+        // that the previous booking ended.
+        // (We may need to implement a down time between bookings.)
+        /** @var Collection|Model[] $conflictingBookings */
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate);
+
+        // Conflicting bookings could include the existing booking.
+        // Remove it, because a booking can't conflict with itself!
+        // Also remove any items in the same series, because bookings can't
+        // conflict with bookings in the same series (they're all offset at the
+        // same time)
+        // There may be rare occurrences where they can (a booking that is so
+        // long it overlaps the next item in series!), but I'm not going to
+        // worry about those.
+        if ($existingBooking instanceof Model) {
+            $existingId = $existingBooking->getId();
+
+            if ($existingId) {
+                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
+                $conflictingBookings = $conflictingBookings->filter(
+                /**
+                 * @param Model $item
+                 * @return bool
+                 */
+                    function ($item) use ($existingId, $existingSeriesId) {
+                        /** @var Model $item */
+                        if ($item->getId() == $existingId) {
+                            return false;
+                        }
+                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                );
+            }
+        }
+
+        if (strlen($resource->getRoomCode() ?? '') > 0) {
+            // Check if there's a timetabled class here, too.
+            $conflictingBookings = $conflictingBookings->merge($this->getTimetableRoomEvents(
+                $resource->getRoomCode(),
+                $startDate,
+                $endDate
+            ));
+        }
+
+        return $conflictingBookings;
+    }
 }
