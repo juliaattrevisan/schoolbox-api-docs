@@ -10,6 +10,7 @@ import { useSelectedList } from "@schoolboxVue/composables/form/useSelectedList"
 import type { User } from "@schoolboxLibrary/types/User";
 import ViewDpModal from "@schoolboxLibrary/DifferentiationProfile/templates/vue/view-dp-modal.vue";
 import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_TASK } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Routes as PastoralRoutes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import CpParticipant from "./cp-participant.vue";
 import CpBottomDrawer from "./cp-bottom-drawer.vue";
 import CpIncludeInExistingModal from "./cp-include-in-existing-modal.vue";
@@ -30,7 +31,15 @@ const props = defineProps<{
     assessmentId: number;
     assessmentType: string;
     customisations: (Plan | CustomisedPlan)[];
+    pastoralConfig: Config;
+    pastoralRoutes: PastoralRoutes;
 }>();
+
+/**
+ * To pass through to the pastoral-records-modal that displays when a flag is selected
+ */
+window.Vue.provide("pastoralConfig", props.pastoralConfig);
+window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 
 /**
  * Handle selection of participants via checkboxes

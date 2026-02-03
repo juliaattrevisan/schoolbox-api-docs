@@ -35,6 +35,15 @@
     :assessment-id="{{ assessment.id }}"
     assessment-type="{{ assessment.familyName }}"
     :customisations="{{ (customisations ?? []) | json_encode }}"
+    :pastoral-config="{{ {
+        pastoralPointEnabled: config.pastoral_point_enabled,
+        pastoralActionEnable: config.pastoral_action_enable,
+        pastoralSeverity: config.pastoral_severity,
+    }|json_encode }}"
+    :pastoral-routes="{{ {
+        getStudentRecord: routeLookup('pastoral.getStudentRecord'),
+        getReportTags: routeLookup('pastoralReportBuilder.getReportTags'),
+    }|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>
