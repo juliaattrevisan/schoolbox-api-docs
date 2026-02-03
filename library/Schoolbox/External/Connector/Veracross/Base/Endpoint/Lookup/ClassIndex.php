@@ -19,22 +19,6 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Class
 class ClassIndex
 {
     /**
-     * classes:list produces a giant pile of data of LITERALLY EVERYTHING (e.g. Clipboard teams etc) which makes for a
-     * very large list; we obtain Meeting Times for all of these. We don't need all of that data; we just need a subset.
-     * These course types allow you to delineate these types of "classes"
-     *
-     * TODO Move to academics.classes:list instead
-     */
-    private const array CLASS_COURSE_TYPES = [
-        5, // Academic
-        /* TODO Unlock these progressively
-            2, // Advisory (not sure what this really means atm)
-            1, // Homeroom
-        */
-    ];
-
-
-    /**
      * Remember the output we might have previously generated
      *
      * @var array|null
@@ -101,27 +85,29 @@ class ClassIndex
 
             /* Find class codes and stuff
              */
-            $generator = $this->api->retrieve('GET', 'classes', Classes::SCOPE, [
-                'course_type' => 5
-            ]);
+            foreach (Classes::CLASS_COURSE_TYPES as $courseType) {
+                $generator = $this->api->retrieve('GET', 'classes', Classes::SCOPE, [
+                    'course_type' => $courseType
+                ]);
 
-            foreach ($generator as $page) {
-                /* Avengers Assemble!
-                 */
-                foreach ($page['data'] as $record) {
-                    /* No watchlist? Add every $record we encounter
-                     * This should be the main use case for the fleet
+                foreach ($generator as $page) {
+                    /* Avengers Assemble!
                      */
-                    if (!$watchlistEnabled) {
-                        $this->lookup[$record['id']] = $this->minimise($record);
-                        continue;
-                    }
+                    foreach ($page['data'] as $record) {
+                        /* No watchlist? Add every $record we encounter
+                         * This should be the main use case for the fleet
+                         */
+                        if (!$watchlistEnabled) {
+                            $this->lookup[$record['id']] = $this->minimise($record);
+                            continue;
+                        }
 
-                    /* Otherwise only add the ones specifically for each $specificClassIds
-                     * to help minimise memory consumption
-                     */
-                    if (isset($specificClassIds[$record['id']])) {
-                        $this->lookup[$record['id']] = $this->minimise($record);
+                        /* Otherwise only add the ones specifically for each $specificClassIds
+                         * to help minimise memory consumption
+                         */
+                        if (isset($specificClassIds[$record['id']])) {
+                            $this->lookup[$record['id']] = $this->minimise($record);
+                        }
                     }
                 }
             }

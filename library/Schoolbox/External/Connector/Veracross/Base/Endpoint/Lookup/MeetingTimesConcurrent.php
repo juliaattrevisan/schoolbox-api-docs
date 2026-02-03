@@ -29,13 +29,13 @@ class MeetingTimesConcurrent
      * while we're experimenting with limits in prod. If we wanted to push the veracross limits, we might
      * end up needing to fulfil plan B, which is make 300 requests then nap for 3 minutes.
      */
-    private const CLASS_CHUNK_SIZE = 30;
+    private const int CLASS_CHUNK_SIZE = 30;
 
 
     /**
      * Number of decimal places for logging purposes.
      */
-    private const PRECISION = 2;
+    private const int PRECISION = 2;
 
 
     /**

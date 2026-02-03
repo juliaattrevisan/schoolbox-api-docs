@@ -35,7 +35,7 @@ class Enrolments
      *  For now I have to presume immutability
      */
 
-    private const CLASS_STATUS_ACTIVE = 1;
+    private const int CLASS_STATUS_ACTIVE = 1;
 
     /**
      * Remember the output we might have previously generated
@@ -86,9 +86,36 @@ class Enrolments
                 /* Segregated Import for a specific set of people
                  */
                 foreach ($this->watchlist as $externalId) {
+                    foreach (Classes::CLASS_COURSE_TYPES as $courseType) {
+                        $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
+                            'person_id' => $externalId,
+                            'course_type' => $courseType,
+                            'class_status' => self::CLASS_STATUS_ACTIVE,
+                            'currently_enrolled' => true,
+                        ]);
+
+                        foreach ($generator as $page) {
+                            /* Avengers Assemble!
+                             */
+                            foreach ($page['data'] as $record) {
+                                $this->log->debug(sprintf(
+                                    'Prefetching enrolments for %s: internal class id %s',
+                                    $externalId,
+                                    $record['internal_class_id']
+                                ));
+
+                                $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
+                            }
+                        }
+                    }
+                }
+            } else {
+                /* Otherwise just obtain all the enrolments.
+                 * This is the main use case in the fleet.
+                 */
+                foreach (Classes::CLASS_COURSE_TYPES as $courseType) {
                     $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
-                        'person_id' => $externalId,
-                        'course_type' => 5,
+                        'course_type' => $courseType,
                         'class_status' => self::CLASS_STATUS_ACTIVE,
                         'currently_enrolled' => true,
                     ]);
@@ -97,6 +124,8 @@ class Enrolments
                         /* Avengers Assemble!
                          */
                         foreach ($page['data'] as $record) {
+                            $externalId = trim((string)$record['person_id']);
+
                             $this->log->debug(sprintf(
                                 'Prefetching enrolments for %s: internal class id %s',
                                 $externalId,
@@ -105,31 +134,6 @@ class Enrolments
 
                             $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
                         }
-                    }
-                }
-            } else {
-                /* Otherwise just obtain all the enrolments.
-                 * This is the main use case in the fleet.
-                 */
-                $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
-                    'course_type' => 5,
-                    'class_status' => self::CLASS_STATUS_ACTIVE,
-                    'currently_enrolled' => true,
-                ]);
-
-                foreach ($generator as $page) {
-                    /* Avengers Assemble!
-                     */
-                    foreach ($page['data'] as $record) {
-                        $externalId = trim((string)$record['person_id']);
-
-                        $this->log->debug(sprintf(
-                            'Prefetching enrolments for %s: internal class id %s',
-                            $externalId,
-                            $record['internal_class_id']
-                        ));
-
-                        $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
                     }
                 }
             }

@@ -36,11 +36,29 @@ class Classes implements IStrategy
     /**
      * The scopes we used for manufacturing a Schedule Timetable
      */
-    public const SCOPE = '
+    public const string SCOPE = '
         classes:list
         academics.enrollments:list
         academics.classes.meeting_times:list
     ';
+
+
+    /**
+     * classes:list produces a giant pile of data of LITERALLY EVERYTHING (e.g. Clipboard teams etc) which makes for a
+     * very large list; we obtain Meeting Times for all of these. We don't need all of that data; we just need a subset.
+     * These course types allow you to delineate these types of "classes"
+     *
+     * This is shared among multiple lookups.
+     *
+     * TODO Move to academics.classes:list instead
+     */
+    public const array CLASS_COURSE_TYPES = [
+        5, // Academic
+        /* TODO Unlock these progressively
+            2, // Advisory (not sure what this really means atm)
+            1, // Homeroom
+        */
+    ];
 
 
     /**
