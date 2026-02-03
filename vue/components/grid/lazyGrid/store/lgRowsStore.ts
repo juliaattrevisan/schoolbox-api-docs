@@ -7,7 +7,7 @@ import type { Nested } from "@js/util/queryUtils";
 import { SearchParam } from "@js/util/sbx/apiUtils";
 import { getKeyValuePairs } from "@js/util/queryUtils";
 import type { Header } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
-import { ON_FILTER_CHANGE } from "../event/LazyGridEvent";
+// import { ON_FILTER_CHANGE } from "../event/LazyGridEvent";
 import { useLoadData } from "../composable/useLoadData";
 
 export const useRowsStore = defineStore(`rowsStore`, () => {
@@ -35,20 +35,20 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
     /**
      * Listen for filter changes and reload data accordingly
      */
-    function initFilterListener(): void {
-        document.addEventListener(ON_FILTER_CHANGE, (event) => {
-            filters.value = event.detail.selectedFilters;
-            const newUrl = new URL(route.value, window.location.origin);
-            const searchParams = new URLSearchParams();
-            addFilterSearchParams(searchParams, filters.value);
-            searchParams.set(SearchParam.LIMIT, limit.toString());
-            searchParams.set(SearchParam.SORT_BY, sortBy.value);
-            searchParams.set(SearchParam.ORDER, order.value);
-            searchParams.set(SearchParam.CURSOR, ""); // Reset cursor on sort change
-            newUrl.search = searchParams.toString();
-            url.value = newUrl.toString();
-        });
-    }
+    // function initFilterListener(): void {
+    //     document.addEventListener(ON_FILTER_CHANGE, (event) => {
+    //         filters.value = event.detail.selectedFilters;
+    //         const newUrl = new URL(route.value, window.location.origin);
+    //         const searchParams = new URLSearchParams();
+    //         addFilterSearchParams(searchParams, filters.value);
+    //         searchParams.set(SearchParam.LIMIT, limit.toString());
+    //         searchParams.set(SearchParam.SORT_BY, sortBy.value);
+    //         searchParams.set(SearchParam.ORDER, order.value);
+    //         searchParams.set(SearchParam.CURSOR, ""); // Reset cursor on sort change
+    //         newUrl.search = searchParams.toString();
+    //         url.value = newUrl.toString();
+    //     });
+    // }
 
     /**
      * store any passed through properties
