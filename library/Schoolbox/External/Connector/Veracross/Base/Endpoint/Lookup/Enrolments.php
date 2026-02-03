@@ -88,6 +88,7 @@ class Enrolments
                 foreach ($this->watchlist as $externalId) {
                     $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
                         'person_id' => $externalId,
+                        'course_type' => 5,
                         'class_status' => self::CLASS_STATUS_ACTIVE,
                         'currently_enrolled' => true,
                     ]);
@@ -96,6 +97,12 @@ class Enrolments
                         /* Avengers Assemble!
                          */
                         foreach ($page['data'] as $record) {
+                            $this->log->debug(sprintf(
+                                'Prefetching enrolments for %s: internal class id %s',
+                                $externalId,
+                                $record['internal_class_id']
+                            ));
+
                             $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
                         }
                     }
@@ -105,6 +112,7 @@ class Enrolments
                  * This is the main use case in the fleet.
                  */
                 $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
+                    'course_type' => 5,
                     'class_status' => self::CLASS_STATUS_ACTIVE,
                     'currently_enrolled' => true,
                 ]);
@@ -114,6 +122,12 @@ class Enrolments
                      */
                     foreach ($page['data'] as $record) {
                         $externalId = trim((string)$record['person_id']);
+
+                        $this->log->debug(sprintf(
+                            'Prefetching enrolments for %s: internal class id %s',
+                            $externalId,
+                            $record['internal_class_id']
+                        ));
 
                         $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
                     }
