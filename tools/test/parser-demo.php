@@ -16,6 +16,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     public function run(): void
     {
         $this->optionParser->process();
+        var_dump($this->optionParser->getOptions());
         echo $this->optionParser->getHelpText();
     }
 
@@ -26,6 +27,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     {
         return null;
     }
+
+//    public function getShortOpts(): array
+//    {
+//        return ['x'];
+//    }
 
     protected function getName(): string
     {
@@ -45,6 +51,13 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
                 null,
                 GetOpt\GetOpt::NO_ARGUMENT,
             )->setDescription('Test mode')
+        );
+        $this->optionParser->addOption(
+            new GetOpt\Option(
+                'f',
+                'folder',
+                GetOpt\GetOpt::REQUIRED_ARGUMENT,
+            )->setDescription('Folder on which to operate')
         );
         return $this;
     }

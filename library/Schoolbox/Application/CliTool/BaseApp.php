@@ -35,8 +35,12 @@ abstract class BaseApp extends App
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 
         // Set up the CLI argument parser
-        $this->optionParser = new GetOpt\GetOpt();
-        $this->optionParser->getHelp()->set(GetOpt\Help::DESCRIPTION, $this->getDescription());
+        $this->optionParser = new GetOpt\GetOpt()
+            ->set(GetOpt\GetOpt::SETTING_STRICT_OPERANDS, true);
+        $help = new Help()
+            ->set(Help::NAME, $this->getName())
+            ->set(Help::DESCRIPTION, $this->getDescription());
+        $this->optionParser->setHelp($help);
 
         // Set up command-line options
         $this->assignDeprecatedOptions();
@@ -50,6 +54,10 @@ abstract class BaseApp extends App
         return $this;
     }
 
+    /**
+     * Assign options from the now-deprecated `getShortOpts` and `getLongOpts`
+     * methods.
+     */
     private function assignDeprecatedOptions(): void
     {
         // Extract app options, exc. help
