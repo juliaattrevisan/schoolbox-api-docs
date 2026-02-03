@@ -4,13 +4,23 @@
  */
 
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
 import PastoralFlags from "@schoolboxLibrary/Pastoral/vue/flags/pastoral-flags.vue";
 import { hasErrorMessage } from "@js/util/errorUtils";
 
 const props = defineProps<{
     url: string;
+    // pastoralConfig: Config;
+    // pastoralRoutes: Routes;
+    test: string;
 }>();
+
+/**
+ * To pass through to the pastoral-records-modal that displays when a flag is selected
+ */
+window.Vue.provide("pastoralConfig", props.pastoralConfig);
+window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
 
 const payload = window.Vue.ref<Record<string, PastoralFlag[]> | null>(null); // to store the loaded flags
 

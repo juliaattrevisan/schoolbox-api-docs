@@ -35,8 +35,7 @@ const meta = window.Vue.ref<string>("");
 function onFlagSelect(event: CustomEvent): void {
     console.warn(event.detail);
     // temporary static values for testing
-    url.value =
-        "/pastoral/report/results/8/tab/studentByType/scope?column=total&selected=records&limit=20&row%5Bstudent_id%5D=13";
+    url.value = "/pastoral/flags/13?type=1&subtype=22";
 }
 </script>
 

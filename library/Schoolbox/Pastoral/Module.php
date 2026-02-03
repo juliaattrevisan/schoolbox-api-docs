@@ -218,6 +218,7 @@ class Module extends BaseModule
                     '/actions'                                                                     => ['getActions' => $permissionStaff],
                     '/search'                                                                      => ['getSearch' => $permissionStaff],
                     '/student/{studentId:\d+}'                                                     => ['getStudent' => $permissionStudentView],
+                    '/student/flag/{studentId:\d+}'                                                => ['getFlag' => $permissionStudentView],
                     '/students/count/{studentIds:[\d\x2c]+}'                                       => ['getStudentsCount' => $permissionStudentsCountView],
                     '/student/{studentId:\d+}/record/{recordId:\d+}'                               => ['getStudentRecord' => $permissionRecordView],
                     '/student/{studentId:\d+}/linked/{linkedStudentId:\d+}'                        => ['getLinked' => $permissionStudentView],
