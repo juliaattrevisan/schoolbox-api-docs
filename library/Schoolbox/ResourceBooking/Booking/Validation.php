@@ -979,7 +979,7 @@ class Validation
      * @param DateTime   $startDate
      * @param DateTime   $endDate
      * @param Model|null $existingBooking
-     * @return Collection|Model[]|EventInterface[]
+     * @return Collection<Model|EventInterface> or
      */
     public function getClashEvents(
         Item\Model $resource,

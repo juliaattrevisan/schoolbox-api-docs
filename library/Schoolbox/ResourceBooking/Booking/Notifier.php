@@ -284,12 +284,15 @@ class Notifier extends AbstractModuleNotifier
                     $object
                 );
 
-                $clashEvents = $this->validation->getClashEvents(
-                    $object->getResource(),
-                    $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
-                    $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
-                    $object
-                );
+                if (!empty($clashErrors)) {
+                    // only grab clash events if there were clashes...
+                    $clashEvents = $this->validation->getClashEvents(
+                        $object->getResource(),
+                        $startDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                        $endDateTimeAlaressObj->getDateTimeObject(), // We need a different kind of date object.
+                        $object
+                    );
+                }
             }
         }
 
