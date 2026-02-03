@@ -3,13 +3,15 @@
  * Manage Customisation Records page
  */
 
+import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import LazyGrid from "@schoolboxVue/components/grid/lazyGrid/lazy-grid.vue";
 import type { Header, Routes } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
-import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
+import LgUserCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-user-cell.vue";
 import { useRowsStore } from "@schoolboxVue/components/grid/lazyGrid/store/lgRowsStore";
+import { useMaxScrollableHeight } from "@schoolboxVue/composables/content/useMaxScrollableHeight";
 import { useHeaderStore } from "./store/crHeaderStore";
 
 const props = defineProps<{
@@ -52,6 +54,9 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                 :order="rowsStore.order"
                 @sort="rowsStore.onSort"
             >
+                <template #User="{ row, header: columnHeader }">
+                    <lg-user-cell :user="row[columnHeader.key] as User" />
+                </template>
             </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
         </div>
