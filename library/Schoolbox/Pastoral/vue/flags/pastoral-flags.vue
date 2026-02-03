@@ -3,12 +3,23 @@
  * Display a list of pastoral flags
  */
 
+import type { Routes, Config } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag";
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
 
 const props = defineProps<{
     flags: PastoralFlag[];
+    pastoralConfig?: Config;
+    pastoralRoutes?: Routes;
 }>();
+
+/**
+ * To pass through to the pastoral-records-modal that displays when a flag is selected
+ */
+if (props.pastoralConfig && props.pastoralRoutes) {
+    window.Vue.provide("pastoralConfig", props.pastoralConfig);
+    window.Vue.provide("pastoralRoutes", props.pastoralRoutes);
+}
 
 /**
  * The details to display in the modal and trigger its opening
