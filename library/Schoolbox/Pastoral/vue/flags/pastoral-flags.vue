@@ -33,9 +33,9 @@ const meta = window.Vue.ref<string>("");
  * @param event - the href of the flag (as sbx-label is a custom element it'll be a CustomEvent)
  */
 function onFlagSelect(event: CustomEvent): void {
-    console.warn(event.detail);
-    // temporary static values for testing
-    url.value = "/pastoral/student/flag/13?type=1&subtype=22";
+    const eventDetail = event.detail as { href: string; title: string }[];
+    url.value = eventDetail[0].href;
+    title.value = eventDetail[0].title;
 }
 </script>
 

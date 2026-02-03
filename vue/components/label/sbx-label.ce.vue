@@ -50,12 +50,17 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    select: [href: string | undefined];
+    select: [{ href: string | undefined; title: string | undefined }];
 }>();
 </script>
 
 <template>
-    <button v-if="props.isButton" class="sbx-label-button" :title="props.title" @click="emit('select', props.href)">
+    <button
+        v-if="props.isButton"
+        class="sbx-label-button"
+        :title="props.title"
+        @click="emit('select', { href: props.href, title: props.title })"
+    >
         <span
             :class="`sbx-label sbx-label--${props.sentiment}`"
             :title="props.title"

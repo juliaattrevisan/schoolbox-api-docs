@@ -302,7 +302,7 @@ class Helper
             /** @noinspection PhpUnhandledExceptionInspection */
             $destinationUrl = sprintf(
                 "%s?type=%s&subtype=%s",
-                $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $student->getId()]),
+                $this->routeGenerator->generate('pastoral.getFlag', ['studentId' => $student->getId()]),
                 $studentCount->getOffset('typeId'),
                 $studentCount->getOffset('subtypeId')
             );
