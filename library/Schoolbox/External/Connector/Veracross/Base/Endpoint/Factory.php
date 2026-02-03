@@ -38,21 +38,21 @@ class Factory
      * Event source is an arbitrary string that helps identify the thing that imported
      * them into the local event table so you can do a mass remove if needed
      */
-    public const SOURCE_NAME = 'suds_veracross';
+    public const string SOURCE_NAME = 'suds_veracross';
 
 
     /**
      * Get timetable classes occurring this far in the past
-     * Measured in weeks, defaults to -2 weeks
+     * Measured in weeks, defaults to -1 weeks
      */
-    private const FROM = -1;
+    private const int FROM = -1;
 
 
     /**
      * Get timetable classes up to this far into the future
      * Measured in weeks, defaults to 12 weeks (3 months)
      */
-    private const TO = 12;
+    private const int TO = 12;
 
 
     /**
