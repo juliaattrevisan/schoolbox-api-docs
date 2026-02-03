@@ -47,6 +47,15 @@ Data:
         get-set-as-goal-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}"
         get-create-learning-moment-form-endpoint="{{ routeLookup('learningMomentEvidence.redirectToCreateForm') }}"
         :differentiation-enabled="Boolean({{ differentiationProfileEnabled }})"
+        :pastoral-config="{{ {
+            pastoralPointEnabled: config.pastoral_point_enabled,
+            pastoralActionEnable: config.pastoral_action_enable,
+            pastoralSeverity: config.pastoral_severity,
+        }|json_encode }}"
+        :pastoral-routes="{{ {
+            getStudentRecord: routeLookup('pastoral.getStudentRecord'),
+            getReportTags: routeLookup('pastoralReportBuilder.getReportTags'),
+        }|json_encode }}"
     >
         {% block classListSlots %}
         {% endblock classListSlots %}

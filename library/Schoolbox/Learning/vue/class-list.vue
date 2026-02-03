@@ -255,6 +255,28 @@ export default {
             type: Boolean,
             default: false,
         },
+
+        /**
+         * The pastoral configuration for use in the pastoral-records-modal when a pastoral flag is selected
+         */
+        pastoralConfig: {
+            type: Object,
+            required: false,
+        },
+
+        /**
+         * The pastoral routes for use in the pastoral-records-modal when a pastoral flag is selected
+         */
+        pastoralRoutes: {
+            type: Object,
+            required: false,
+        },
+    },
+    provide() {
+        return {
+            pastoralConfig: this.pastoralConfig,
+            pastoralRoutes: this.pastoralRoutes,
+        };
     },
     data() {
         return {
