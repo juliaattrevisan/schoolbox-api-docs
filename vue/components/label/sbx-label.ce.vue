@@ -11,29 +11,31 @@ interface Props {
     /**
      * The sentiment of the label, which impacts the color of the label
      */
-    sentiment?: "success" | "warning" | "alert" | "neutral" | undefined;
+    sentiment?: "success" | "warning" | "alert" | "neutral";
     /**
      * The background color of the label
      */
-    backgroundColor?: string | undefined;
+    backgroundColor?: string;
     /**
      * The text color of the label
      */
-    textColor?: string | undefined;
+    textColor?: string;
     /**
      * The icon of the label
      */
-    icon?: string | undefined;
-
+    icon?: string;
     /**
      * The href of the label
      */
-    href?: string | undefined;
-
+    href?: string;
     /**
      * The text of the label
      */
-    text?: string | undefined;
+    text?: string;
+    /**
+     * Can be used as a button
+     */
+    isButton?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -44,11 +46,29 @@ const props = withDefaults(defineProps<Props>(), {
     icon: undefined,
     href: undefined,
     text: undefined,
+    isButton: false,
 });
+
+const emit = defineEmits<{
+    select: [href: string | undefined];
+}>();
 </script>
 
 <template>
-    <a v-if="props.href" :href="props.href" class="sbx-label-link" :title="props.title">
+    <button v-if="props.isButton" class="sbx-label-button" :title="props.title" @click="emit('select', props.href)">
+        <span
+            :class="`sbx-label sbx-label--${props.sentiment}`"
+            :title="props.title"
+            :style="{
+                backgroundColor: props.backgroundColor || undefined,
+                color: props.textColor || undefined,
+            }"
+        >
+            <sbx-icon v-if="props.icon" :name="props.icon" class="sbx-label__icon" />
+            {{ props.text }}
+        </span>
+    </button>
+    <a v-else-if="props.href" :href="props.href" class="sbx-label-link" :title="props.title">
         <span
             :class="`sbx-label sbx-label--${props.sentiment}`"
             :title="props.title"
@@ -82,6 +102,7 @@ Long term they will reference the design colour tokens
 */
 .sbx-label {
     align-items: center;
+    border-radius: var(--sbx-config-field-roundness, 0);
     color: white;
     display: inline-flex;
     font-size: 0.75rem;
@@ -90,6 +111,20 @@ Long term they will reference the design colour tokens
     padding: var(--spacing-xs) var(--spacing-s);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+}
+
+/* Lean into the span styles instead, so remove the default button styles */
+.sbx-label-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.sbx-label-button:focus {
+    border-color: var(--sbx-color-accent, black);
+    outline: var(--sbx-border-width-normal, 1px) solid var(--sbx-color-accent, black);
+    outline-offset: calc(var(--sbx-border-width-normal, 1px) + 1px);
 }
 
 .sbx-label-link {
