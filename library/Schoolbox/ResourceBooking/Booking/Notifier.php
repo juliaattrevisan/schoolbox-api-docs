@@ -362,7 +362,11 @@ class Notifier extends AbstractModuleNotifier
                 }
                 if ($clashEvent instanceof Model) {
                     // we can only notify the owner of other resource bookings, NOT timetable, they MAY not have an owner
-                    $envelope->targetToUser($clashEvent->getEvent()->getOwner(), $bob->build());
+                    $clashEventModel = $clashEvent->getEvent();
+                    $eventOwner = $clashEventModel?->getOwner();
+                    if ($eventOwner !== null) {
+                        $envelope->targetToUser($eventOwner, $bob->build());
+                    }
                 }
             }
         }
