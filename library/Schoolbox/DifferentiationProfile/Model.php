@@ -332,7 +332,7 @@ class Model implements ISoftDeletable
     {
         /** @var PastoralModel $pastoralRecord */
         foreach ($this->pastoral_records as $pastoralRecord) {
-            if ($pastoralRecord->getUpdatedAt() > $this->getUpdatedAt()) {
+            if ($pastoralRecord->getUpdatedAt() > ($this->getUpdatedAt() ?? \Alaress_Date_Format::now())) {
                 return true;
             }
         }
