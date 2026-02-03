@@ -176,7 +176,7 @@ test.describe("Lesson Plan Activity", () => {
      */
 
     test("Lesson Plan Fields Visibility", async ({ tester, page, db }) => {
-        const courseList = new CourseList(page);
+        const courseList = new CourseList(tester, page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
 
         const teacher = "Mr Jack Coles";

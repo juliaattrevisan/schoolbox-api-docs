@@ -136,15 +136,7 @@ test.describe("Course list tests", () => {
             await courseList.verifyCourseNameInList(newCourseName, false);
         } finally {
             tester.isGoingTo("clean up the database by removing the created course and folder");
-
-            const folderId = (await db.grabFromDatabase("folder", "id", {
-                name: newCourseName,
-            })) as number;
-
             await UnitPlanner.dbDeleteCourse(db, newCourseName);
-
-            // await db.dontHaveInDatabase("course_specification", { folder_id: folderId });
-            // await db.dontHaveInDatabase("folder", { name: newCourseName });
         }
     });
 });
