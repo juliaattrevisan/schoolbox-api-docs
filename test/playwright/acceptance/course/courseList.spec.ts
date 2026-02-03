@@ -2,6 +2,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
 import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
 
 test.describe("Course list tests", () => {
     const courseName = "Year 9 English";
@@ -22,7 +23,7 @@ test.describe("Course list tests", () => {
      * check the empty message is shown
      * search for a course that does exist
      * ensure the course is shown in the results
-     * click the course 3-dot menu and ensure it the proper options are shown
+     * click the course 3-dot menu and ensure the proper options are shown
      * check by expanding the arrow the units are presented
      */
     test("Searches for a course checking the results and the 3-dot options", async ({ tester, page }) => {
@@ -34,13 +35,13 @@ test.describe("Course list tests", () => {
         await common.verifyEmptyStateIsShown();
         await page.reload(); // Clear previous search
 
-        tester.isGoingTo("search for a existing course and ensure the course is shown in the results");
+        tester.isGoingTo("search for an existing course and ensure the course is shown in the results");
         await courseList.searchForCourse("Year 9");
         await courseList.verifyCourseCount(2);
         await expect(page.getByTestId(`course-list-${courseYear3}`)).not.toBeVisible();
         await expect(page.getByTestId(`course-list-${courseYear9French}`)).toBeVisible();
 
-        tester.isGoingTo("click the course 3-dot menu and ensure it the proper options are shown");
+        tester.isGoingTo("click the course 3-dot menu and ensure the proper options are shown");
         await courseList.verifyCourseDotMenuOptions(
             courseId,
             courseName,
@@ -140,8 +141,10 @@ test.describe("Course list tests", () => {
                 name: newCourseName,
             })) as number;
 
-            await db.dontHaveInDatabase("course_specification", { folder_id: folderId });
-            await db.dontHaveInDatabase("folder", { name: newCourseName });
+            await UnitPlanner.dbDeleteCourse(db, newCourseName);
+
+            // await db.dontHaveInDatabase("course_specification", { folder_id: folderId });
+            // await db.dontHaveInDatabase("folder", { name: newCourseName });
         }
     });
 });

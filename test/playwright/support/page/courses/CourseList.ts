@@ -1,7 +1,6 @@
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { expect } from "@schoolboxTest/playwright/support/integrations";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class CourseList {
     private tester: AcceptanceTester;
@@ -15,8 +14,6 @@ export default class CourseList {
     static readonly SEARCH_FIELD = "#course-search";
 
     static readonly ADD_BUTTON = "a.icon-add";
-
-    static readonly COURSE_NAME = `course-list-{newCourseName}`;
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -122,7 +119,6 @@ export default class CourseList {
      */
     async clickCourseDotMenu(courseDropdownNumber: number): Promise<void> {
         await this.page.getByTestId(`${CourseList.DATA_TEST_COURSE_DOT_MENU}-${courseDropdownNumber}`).click();
-        // await expect(this.page.locator(`ul#courseDropdown-${courseDropdownNumber}`)).toBeVisible();
     }
 
     /**
@@ -159,7 +155,7 @@ export default class CourseList {
      * @param newCourseName - The course name to verify
      * @param isPresent - Whether the course name should be present or not
      */
-    async verifyCourseNameInList(newCourseName: string, isPresent = true): Promise<void> {
+    async verifyCourseNameInList(newCourseName: string, isPresent: boolean = true): Promise<void> {
         const courseLocator = this.page.getByTestId(`course-list-${newCourseName}`);
         if (isPresent) {
             await expect(courseLocator).toBeVisible();

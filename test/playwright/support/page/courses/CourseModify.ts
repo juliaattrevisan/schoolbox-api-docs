@@ -1,7 +1,6 @@
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class CourseModify {
     private page: Page;
