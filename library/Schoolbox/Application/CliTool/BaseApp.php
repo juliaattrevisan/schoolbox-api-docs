@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
 
-use Ahc\Cli\Input\Command;
+use GetOpt;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -23,7 +23,7 @@ abstract class BaseApp extends App
     /**
      * Command-line option parser
      */
-    protected Command $optionParser;
+    protected GetOpt\GetOpt $optionParser;
 
     /**
      * Overridden to allow the option parser to be set up.
@@ -35,20 +35,18 @@ abstract class BaseApp extends App
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 
         // Set up the CLI argument parser
-        $this->optionParser = new Command($this->getName(), $this->getDescription())
-            ->version($this->getConfig()->get(ConfigMapper::NAME_SITE_VERSION));
+        $this->optionParser = new GetOpt\GetOpt();
+        $this->optionParser->getHelp()->set(GetOpt\Help::DESCRIPTION, $this->getDescription());
 
         // Set up command-line options
         $this->assignDeprecatedOptions();
         if ($this->hasPerformMode()) {
-            $this->optionParser = $this->optionParser
-                ->option('-p, --perform', 'Perform mode');
+            $this->optionParser = $this->optionParser->addOption(
+                new GetOpt\Option('p', 'perform', GetOpt\GetOpt::NO_ARGUMENT)
+                    ->setDescription('Perform mode')
+            );
         }
         $this->setOptions();
-
-        // Parse command-line options:
-        // note this will auto-invoke help and exit if set.
-        $this->optionParser->parse($_SERVER['argv']);
         return $this;
     }
 
@@ -66,8 +64,13 @@ abstract class BaseApp extends App
         foreach ($shortOptions as $shortOption) {
             // What type of option is this?
             // No value, mandatory value, optional value?
-            $this->optionParser = $this->optionParser->option(
-                '-' . rtrim($shortOption, ':'),
+            $hasOptions = str_ends_with($shortOption, ':');
+            $this->optionParser = $this->optionParser->addOption(
+                new GetOpt\Option(
+                    rtrim($shortOption, ':'),
+                    null,
+                    $hasOptions ? GetOpt\GetOpt::REQUIRED_ARGUMENT : GetOpt\GetOpt::NO_ARGUMENT,
+                )
             );
         }
 
@@ -80,8 +83,13 @@ abstract class BaseApp extends App
             );
         }
         foreach ($longOptions as $longOption) {
-            $this->optionParser = $this->optionParser->option(
-                '--' . rtrim($longOption, ':'),
+            $hasOptions = str_ends_with($longOption, ':');
+            $this->optionParser = $this->optionParser->addOption(
+                new GetOpt\Option(
+                    null,
+                    rtrim($longOption, ':'),
+                    $hasOptions ? GetOpt\GetOpt::REQUIRED_ARGUMENT : GetOpt\GetOpt::NO_ARGUMENT,
+                )
             );
         }
     }
@@ -130,6 +138,6 @@ abstract class BaseApp extends App
         if (!$this->hasPerformMode()) {
             throw new \LogicException('This application does not have a perform mode.');
         }
-        return $this->optionParser->perform;
+        return $this->optionParser->get('p');
     }
 }

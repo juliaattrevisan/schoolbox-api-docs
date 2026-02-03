@@ -15,7 +15,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     public function run(): void
     {
-        var_dump($this->optionParser->values());
+        $this->optionParser->process();
+        echo $this->optionParser->getHelpText();
     }
 
     /**
@@ -38,9 +39,12 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
 
     protected function setOptions(): CliTool\BaseApp
     {
-        $this->optionParser->option(
-            '-t',
-            'Test mode',
+        $this->optionParser->addOption(
+            new GetOpt\Option(
+                't',
+                null,
+                GetOpt\GetOpt::NO_ARGUMENT,
+            )->setDescription('Test mode')
         );
         return $this;
     }
