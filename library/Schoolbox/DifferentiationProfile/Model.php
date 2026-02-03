@@ -316,8 +316,19 @@ class Model implements ISoftDeletable
         return $this->updated_by;
     }
 
+    /**
+     * Check if the differentiation profile is expired
+     *
+     * @return bool|null
+     */
     public function isExpired(): ?bool
     {
+        /* No pastoral records exist, so expiration status is unknown
+         */
+        if ($this->getPastoralRecords()->count() === 0) {
+            return null;
+        }
+
         /** @var PastoralModel $pastoralRecord */
         foreach ($this->pastoral_records as $pastoralRecord) {
             if (!$pastoralRecord->isArchived()) {
@@ -328,8 +339,19 @@ class Model implements ISoftDeletable
         return true;
     }
 
+    /**
+     * Check if the differentiation profile is out-of-date
+     *
+     * @return bool|null
+     */
     public function isOutOfDate(): ?bool
     {
+        /* No pastoral records exist, so out-of-date status is unknown
+         */
+        if ($this->getPastoralRecords()->count() === 0) {
+            return null;
+        }
+
         /** @var PastoralModel $pastoralRecord */
         foreach ($this->pastoral_records as $pastoralRecord) {
             if ($pastoralRecord->getUpdatedAt() > ($this->getUpdatedAt() ?? \Alaress_Date_Format::now())) {
