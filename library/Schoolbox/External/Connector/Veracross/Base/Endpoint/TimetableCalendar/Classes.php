@@ -56,8 +56,8 @@ class Classes implements IStrategy
         5, // Academic
         /* TODO Unlock these progressively
             2, // Advisory (not sure what this really means atm)
-            1, // Homeroom
         */
+        1, // Homeroom
     ];
 
 
