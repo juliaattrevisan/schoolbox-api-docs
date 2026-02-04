@@ -30,6 +30,7 @@ interface Props {
     routeNewUnits: string | null;
     routeModifyCourse: string | null;
     routeCourseMarkbook: string | null;
+    routeLearningAnalytics: string | null;
 }
 
 const props = defineProps<Props>();
@@ -165,6 +166,7 @@ window.Vue.onUnmounted(() => {
         :route-new-units="props.routeNewUnits"
         :route-modify-course="props.routeModifyCourse"
         :route-course-markbook="props.routeCourseMarkbook"
+        :route-learning-analytics="props.routeLearningAnalytics"
     />
     <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">

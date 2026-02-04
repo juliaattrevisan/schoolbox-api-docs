@@ -16,6 +16,7 @@ interface Props {
     routeNewUnits: string | null;
     routeModifyCourse: string | null;
     routeCourseMarkbook: string | null;
+    routeLearningAnalytics: string | null;
 }
 const props = defineProps<Props>();
 
@@ -75,6 +76,9 @@ function onPrintSelected(): void {
             <a :href="`${props.routeCurriculumCoverage}?courseId=${props.courseId}`" class="icon-report"
                 >Curriculum Coverage</a
             >
+        </li>
+        <li v-if="routeLearningAnalytics">
+            <a :href="`${props.routeLearningAnalytics}`" class="icon-poll">Learning Analytics</a>
         </li>
         <li v-if="routeModifyCourse" class="separator">Manage</li>
         <li v-if="routeModifyCourse">
