@@ -967,7 +967,7 @@ class Validation
     /**
      * Return a suitable status for an updated resource booking, based on:
      *  - Any validation errors found
-     *  - Whether the booking clashes with any other approved bookings (as supplied vai $isClash)
+     *  - Whether the booking clashes with any other approved bookings (as supplied via $isClash)
      *
      * @param BookingModel $booking
      * @param bool  $isClash

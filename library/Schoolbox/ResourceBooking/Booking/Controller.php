@@ -384,40 +384,18 @@ class Controller extends Base
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
 
-                // If item is moderated, already approved and time changed, set item to need approval again.
-                $moderationId = $booking->getResource()->getModerationType()->getId();
-                $statusId     = $booking->getStatus()->getId();
-
-                // Figure out the new booking status.
-                $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
-                if (
-                    $bookingStartDateTime !== null &&
-                    array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
-                ) {
-                    // Set status to pending because this booking has a clash.
-                    $bookingStatusId = Status\Model::STATUS_PENDING;
-                } else {
-                    if (
-                        $booking->getResource()->isUserModerator($this->getUser())
-                        && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
-                    ) {
-                        /* If you're a Moderator and can moderate this request,
-                         * and you created the booking in the first place,
-                         * set it to Approved - otherwise you'll end up approving your own request anyway
-                         */
-                        $bookingStatusId = Status\Model::STATUS_APPROVED;
-                    } elseif (
-                        ($moderationId === Item\ModerationType\Model::TYPE_MODERATED || $moderationId === Item\ModerationType\Model::TYPE_MANAGED) &&
-                        $statusId === Status\Model::STATUS_APPROVED &&
-                        $isTimeChanged
-                    ) {
-                        $bookingStatusId = Status\Model::STATUS_PENDING;
-                    } else {
-                        // Otherwise set the status as if we were creating a non-clashing booking.
-                        $bookingStatusId = $this->getStatusIdForNonClashBooking($booking);
-                    }
+                // If the booking's period has changed, figure out the status as if this is a new booking.
+                // Otherwise, leave the booking's status as it was.
+                if ($isTimeChanged) {
+                    $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
+                    $thisBookingHasClashes = (
+                        $bookingStartDateTime !== null &&
+                        array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
+                    );
+                    // TODO: Pass a boolean override parameter to the function below.
+                    $bookingStatusId = $validation->getNewStatusIdForBooking($booking, $thisBookingHasClashes, $this->getUser());
+                    $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
                 }
-                $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
 
                 $bookingList->add($booking);
             }
