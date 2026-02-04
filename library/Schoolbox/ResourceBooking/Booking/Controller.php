@@ -340,11 +340,6 @@ class Controller extends Base
             $item,
         );
 
-        // TODO: If 'override_validation' is set (and canUserModerateThisItem($this->getUser() is true):
-        //  * ignore all validation errors it is possible to ignore (e.g. can't ignore datetime format errors)
-        //  * reject all currently approved bookings that clash with this booking
-        //  * approve this booking
-
         $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
         $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
         $code = self::HTTP_STATUS_CODE_OK;
