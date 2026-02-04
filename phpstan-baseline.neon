@@ -571,12 +571,6 @@ parameters:
 			path: library/Calendar/Api/EventType/Timetable/ExternalConstrained/Default.php
 
 		-
-			message: '#^Variable \$categoryList might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: library/Calendar/Api/EventType/Timetable/Room.php
-
-		-
 			message: '#^Call to function is_object\(\) with Alaress_Date_Format will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 2
@@ -3403,12 +3397,6 @@ parameters:
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
-			message: '#^PHPDoc tag @var does not specify variable name\.$#'
-			identifier: varTag.noVariable
-			count: 3
-			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
-
-		-
 			message: '#^PHPDoc tag @var with type Alaress_Date_Format is not subtype of native type null\.$#'
 			identifier: varTag.nativeType
 			count: 1
@@ -4609,20 +4597,8 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
 
 		-
-			message: '#^PHPDoc tag @var does not specify variable name\.$#'
-			identifier: varTag.noVariable
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IResponse.php
-
-		-
-			message: '#^PHPDoc tag @var does not specify variable name\.$#'
-			identifier: varTag.noVariable
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
@@ -4897,12 +4873,6 @@ parameters:
 			path: library/Schoolbox/Learning/Classes/ClassList.php
 
 		-
-			message: '#^PHPDoc tag @var does not specify variable name\.$#'
-			identifier: varTag.noVariable
-			count: 1
-			path: library/Schoolbox/Learning/Classes/ClassList.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\Component\\Dashboard\\ClassController\:\:execute\(\) should return true but returns false\.$#'
 			identifier: return.type
 			count: 1
@@ -5127,12 +5097,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Module.php
-
-		-
-			message: '#^PHPDoc tag @var does not specify variable name\.$#'
-			identifier: varTag.noVariable
 			count: 1
 			path: library/Schoolbox/LearningAnalytics/Module.php
 
@@ -5859,12 +5823,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\ResourceBooking\\Booking\\Validation\:\:method\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Test/Booking/ValidationTest.php
-
-		-
-			message: '#^PHPDoc tag @var with type External_Timetable is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
-			identifier: varTag.nativeType
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Test/Booking/ValidationTest.php
 

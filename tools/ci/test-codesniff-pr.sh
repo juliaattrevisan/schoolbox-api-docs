@@ -58,8 +58,12 @@ BASESHA=$(cat .git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sh
 
 echo "Base sha = $BASESHA"
 
-# Exclude deleted files from the list of files to check
-CHANGED_FILES=$(git diff "$BASESHA" --name-only --diff-filter=d)
+# Exclude deleted files and non-PHP files from the list of files to check
+CHANGED_FILES=$(git diff "$BASESHA" --name-only --diff-filter=d *.php)
+if [[ -z $CHANGED_FILES ]]; then
+        echo "No PHP files changed: skipping PHPCS check";
+        exit 0;
+fi
 
 echo "Files changed = $CHANGED_FILES"
 
