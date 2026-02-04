@@ -402,12 +402,12 @@ class Validation
      * avoid repetition when all those functions need to be called from multiple places.
      *
      * @param Item\Model $resource
-     * @param            $startDate
-     * @param            $endDate
-     * @param            $override
+     * @param DateTime   $startDate
+     * @param DateTime   $endDate
+     * @param bool       $override
      * @return array
      */
-    public function validateSimpleRules(Item\Model $resource, $startDate, $endDate, $override): array
+    public function validateSimpleRules(Item\Model $resource, DateTime $startDate, DateTime $endDate, bool $override): array
     {
         $errors = [];
 
