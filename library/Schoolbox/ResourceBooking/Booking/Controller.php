@@ -390,9 +390,8 @@ class Controller extends Base
                 $event->setDetail($booking->getNotes());
                 $this->eventMapper->save($event);
 
-                // If the booking's period has changed, figure out the status as if this is a new booking.
-                // Otherwise, leave the booking's status as it was.
                 if ($isTimeChanged) {
+                    // The booking's period has changed, so figure out the status as if this is a new booking.
                     $bookingStartDateTime = $booking->getEvent()->getStartDateTime();
                     $thisBookingHasClashes = (
                         $bookingStartDateTime !== null &&
@@ -405,10 +404,19 @@ class Controller extends Base
                         $overrideValidation,
                     );
                     $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
+                } else {
+                    // The booking's period has not changed, so leave the booking's status as it was.
+                    // Unless we are overriding validation, in which case set it to STATUS_APPROVED.
+                    if ($overrideValidation && $booking->getStatus()->getId() !== Status\Model::STATUS_APPROVED) {
+                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                    }
                 }
 
                 $bookingList->add($booking);
             }
+
+            // TODO: If $overrideValidation, add any clashing bookings whose status must be changed to 'rejected' to $bookingList before saving.
+
             $this->bookingMapper->save($bookingList);
 
             // Now delete deleted series
