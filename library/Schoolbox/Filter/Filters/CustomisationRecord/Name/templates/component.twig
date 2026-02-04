@@ -1,0 +1,26 @@
+{% extends '@filters/_component.twig' %}
+
+{% block filterName %}Name{% endblock %}
+
+{% block filterComponent %}
+    {% set isDisabled = false %}
+    {{ parent() }}
+{% endblock filterComponent %}
+
+{% block userOptions %}
+    {# Empty input is required so that filter works if not user-configurable, or
+       nothing is selected #}
+    <li>
+        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
+        {% if isUserConfigurable %}
+            <input type="text"
+                placeholder="Enter a full or partial student name"
+                name="filter_selection[{{ definition.filter.id }}][]"
+                value="{{ searchQuery }}"
+                data-value-default="" />
+        {% else %}
+            {{ parent() }}
+        {% endif %}
+    </li>
+{% endblock userOptions %}

@@ -48,6 +48,7 @@ class Mapper extends \Schoolbox\Mapper
                 Filter\Page\Model::PAGE_AWARD_LIST,
                 Filter\Page\Model::PAGE_CLASS_PASTORAL,
                 Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE,
+                Filter\Page\Model::PAGE_CUSTOMISATION_RECORD,
             ]
         );
         $this->uses('key', self::TYPE_STRING);

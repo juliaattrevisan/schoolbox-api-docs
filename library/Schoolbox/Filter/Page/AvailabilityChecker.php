@@ -71,6 +71,10 @@ class AvailabilityChecker
             case Model::PAGE_DIFFERENTIATION_PROFILE:
                 return (bool)$this->config->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED);
 
+            case Model::PAGE_CUSTOMISATION_RECORD:
+                return $this->config->get(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION)
+                    && $this->config->get(ConfigMapper::NAME_LMS_ENABLED);
+
             default:
                 // There exists `Model::PAGE_LEARNING_ANALYTICS` as well:
                 // I don't think the learning analytics filter is in use at all

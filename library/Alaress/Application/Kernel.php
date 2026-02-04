@@ -2066,6 +2066,7 @@ abstract class Kernel
                         new Filter\Filters\Award\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\Pastoral\FactoryFactory($mapperFactory, $config),
                         new Filter\Filters\DifferentiationProfile\FactoryFactory($mapperFactory, $config),
+                        new Filter\Filters\CustomisationRecord\FactoryFactory($mapperFactory, $config),
                     );
                 }
             )

@@ -140,6 +140,6 @@ class Definition extends Filter\AbstractDefinition
      */
     protected static function getTemplatesDir(): string
     {
-        return '@filterDefinitions/Event/Campus/templates';
+        return '@filterDefinitions/DifferentiationProfile/Campus/templates';
     }
 }
