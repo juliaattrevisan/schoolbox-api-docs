@@ -39,7 +39,7 @@ class Module extends BaseModule
         );
 
         $this->register(self::METHOD_GET, '/records', 'viewRecords', $staffWithViewPermission);
-        $this->register(self::METHOD_GET, '/records/list', 'getListRecords', $staffWithViewPermission);
+        $this->register(self::METHOD_POST, '/records/list', 'getListRecords', $staffWithViewPermission);
     }
 
     /**
@@ -49,7 +49,10 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
-            $this->injector->get('assessmentDataSource')
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
         );
     }
 

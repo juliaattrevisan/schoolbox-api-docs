@@ -11,6 +11,7 @@ namespace Schoolbox\CustomisationRecord;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Participant\Mapper;
+use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 
 class Controller extends Base
@@ -21,6 +22,9 @@ class Controller extends Base
     public function __construct(
         private Mapper $participantMapper,
         private MapperProxy $assessmentMapperProxy,
+        private IFactoryFactory $filterFactoryFactory,
+        private \Schoolbox\Filter\Mapper $filterMapper,
+        private \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper,
     ) {
         // Controller initialization code can go here
     }
@@ -36,6 +40,16 @@ class Controller extends Base
             $this->getUser(),
             new \Schoolbox\User\Translator\ModelToArray(),
             $this->assessmentMapperProxy
+        );
+
+        $route = $this->getRouteIfAuthorized('customisationRecord.getListRecords');
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            \Schoolbox\Filter\Page\Model::PAGE_CUSTOMISATION_RECORD,
+            null,
+            $this->getUser(),
+            [],
+            $this->requestQuery->getArrayCopy(),
         );
 
         $records = $records->map(fn($record) => call_user_func($translator, $record));
@@ -54,17 +68,21 @@ class Controller extends Base
         ];
 
         // Logic to view customisation records goes here
-        $this->response = $this->responseFromTemplate('@customisationRecord/list.twig', [
-            'allBreadcrumbs' => [
-                [$pageTitle],
-            ],
-            'header' => $this->recordTableHeaders(),
-            'records' => $records,
-            'routes' => [
-                'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
+        $this->response = $this->responseFromTemplate(
+            '@customisationRecord/list.twig',
+            [
+                'allBreadcrumbs' => [
+                    [$pageTitle],
+                ],
+                'header' => $this->recordTableHeaders(),
+                'records' => $records,
+                'routes' => [
+                    'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
+                ],
+                'filterPanel' => $filterPanel,
             ],
             $pageTitle,
-        ]);
+        );
     }
 
     public function getListRecords(): void
