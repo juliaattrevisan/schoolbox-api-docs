@@ -50,6 +50,7 @@
     .selector label::before,
     .selector label::after,
     .progress,
+    input[type="radio"]:not(.plain) + label.input-toggle,
     .progress .meter {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
