@@ -11,7 +11,6 @@
  */
 class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther
 {
-
     /**
      * @var string
      */

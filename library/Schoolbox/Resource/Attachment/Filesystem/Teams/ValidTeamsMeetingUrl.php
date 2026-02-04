@@ -21,7 +21,6 @@ namespace Schoolbox\Resource\Attachment\Filesystem\Teams;
  */
 class ValidTeamsMeetingUrl
 {
-
     /**
      * Microsoft Teams meetings have this basic prefix
      *

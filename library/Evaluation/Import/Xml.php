@@ -183,9 +183,8 @@ abstract class Evaluation_Import_Xml
             } else {
                 return 'NULL';
             }
-        }
-        // 16.5 +
-        else {
+        } else {
+            // 16.5 +
             /** @var SimpleXMLElement $configs */
             $configs = $question->configs->children();
             if ($configs->count()) {

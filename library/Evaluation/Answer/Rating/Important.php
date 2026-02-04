@@ -11,7 +11,4 @@
  */
 abstract class Evaluation_Answer_Rating_Important extends Evaluation_Answer_Radio
 {
-
-
-
 }

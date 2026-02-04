@@ -43,7 +43,6 @@ use Schoolbox\Learning\Badge;
  */
 class Transactor
 {
-
     /**
      * A list of Award instances since we need to inspect
      * the past to decide the future

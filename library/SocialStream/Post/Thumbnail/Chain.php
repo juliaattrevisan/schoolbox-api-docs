@@ -19,7 +19,6 @@ namespace SocialStream\Post\Thumbnail;
  */
 class Chain
 {
-
     /**
      * Resultant thumbnail url
      *
@@ -51,11 +50,10 @@ class Chain
          */
         if (($curl != null) && strlen($curl->getResult())) {
             $data = $curl->getResult();
-        }
-        /* Use a default xml-parser friendly version of empty string
-         * in case someone links to a nonexistent file or something
-         */
-        else {
+        } else {
+            /* Use a default xml-parser friendly version of empty string
+             * in case someone links to a nonexistent file or something
+             */
             $data = '<html></html>';
         }
 

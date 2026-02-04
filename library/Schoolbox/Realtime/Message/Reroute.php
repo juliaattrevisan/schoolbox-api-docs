@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class Reroute
 {
-
     /** @var User */
     protected $user;
 

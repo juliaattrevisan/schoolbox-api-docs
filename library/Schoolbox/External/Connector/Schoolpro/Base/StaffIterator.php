@@ -17,7 +17,6 @@ use Schoolbox\Sync\Iterator\Staff;
 
 class StaffIterator extends Staff
 {
-
     /**
      * @return string
      */

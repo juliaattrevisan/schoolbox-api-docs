@@ -26,7 +26,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 
 class TimetableScheduler extends CronScheduler
 {
-
     /** @var Collection|Campus[] */
     protected $campuses;
 

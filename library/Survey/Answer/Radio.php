@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Radio extends Evaluation_Answer_Radio
 {
-
     /**
      * Always use Correct css class
      *

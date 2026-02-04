@@ -14,7 +14,6 @@ namespace Schoolbox\Calendar\Relation;
 
 class Campus
 {
-
     /**
      * eventId to which this sid belongs
      *

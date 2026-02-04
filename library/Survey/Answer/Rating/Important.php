@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Rating_Important extends Evaluation_Answer_Rating_Important
 {
-
     /**
      * Always use Correct css class
      *

@@ -21,7 +21,6 @@ use Schoolbox\User;
 
 class TreeBuilder extends AbstractTreeBuilder
 {
-
     /** @var User */
     protected $user;
 

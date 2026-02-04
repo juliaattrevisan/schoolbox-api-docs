@@ -16,7 +16,6 @@ namespace Schoolbox;
  */
 interface IUserComparator
 {
-
     /**
      * Returns:
      * * $left <  $right => -ve

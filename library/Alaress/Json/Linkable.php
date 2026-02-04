@@ -16,7 +16,6 @@ namespace Alaress\Json;
  */
 interface Linkable
 {
-
     /**
      * Return an array of Api\Link objects, indexed by the desired output key
      *

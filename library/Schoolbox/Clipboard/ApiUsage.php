@@ -18,7 +18,6 @@ namespace Schoolbox\Clipboard;
  */
 class ApiUsage
 {
-
     /**
      * A list of (module, endpoint, count) tuples
      *

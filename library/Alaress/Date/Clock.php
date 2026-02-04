@@ -18,7 +18,6 @@ namespace Alaress\Date;
  */
 class Clock implements IClock
 {
-
     /** @var int */
     protected $offset;
 

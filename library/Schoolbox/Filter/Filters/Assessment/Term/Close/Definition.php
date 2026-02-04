@@ -28,7 +28,6 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends AssessmentTermFilter\Definition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Academic Period Closed';
 

@@ -41,7 +41,7 @@ class ModuleChecker
     public function isEnabled(string $connectorClass): bool
     {
         switch ($connectorClass) {
-            case Calendar_Api_Config_Connector_Booking::class   : // Fall through.
+            case Calendar_Api_Config_Connector_Booking::class: // Fall through.
             case Calendar_Api_Config_Connector_Moderation::class:
                 return 1 === (int)$this->config->get('resource_booking_enabled');
             case Calendar_Api_Config_Connector_EOTC::class:

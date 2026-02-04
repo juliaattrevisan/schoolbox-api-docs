@@ -19,7 +19,6 @@ use InvalidArgumentException;
  */
 class Coalesce extends AbstractSqlFunc
 {
-
     /**
      * Unescaped column names, with optional table prefix. eg 'table.column' or 'column'
      *

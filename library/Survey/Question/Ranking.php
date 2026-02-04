@@ -10,5 +10,4 @@
 
 class Survey_Question_Ranking extends Evaluation_Question_Ranking
 {
-
 }

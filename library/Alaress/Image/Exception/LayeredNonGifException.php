@@ -16,5 +16,4 @@ use InvalidArgumentException;
  */
 class LayeredNonGifException extends InvalidArgumentException
 {
-
 }

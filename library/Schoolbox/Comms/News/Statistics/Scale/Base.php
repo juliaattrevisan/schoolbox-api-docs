@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News\Statistics\Scale;
 
 abstract class Base implements IScale
 {
-
     /**
      * Generates a one-node range containing only today's date
      *

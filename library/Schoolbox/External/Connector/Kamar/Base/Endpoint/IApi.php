@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
  */
 interface IApi
 {
-
     /**
      * Retrieves a XML document representing the result from the API call.
      *

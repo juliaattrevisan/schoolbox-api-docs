@@ -10,7 +10,6 @@ namespace Custom\Dsfg\AchievementReport\IB;
 
 class Navigation extends Base
 {
-
     /**
      * Returns data for twig rendering
      *

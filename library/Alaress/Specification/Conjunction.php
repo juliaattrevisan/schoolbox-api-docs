@@ -15,7 +15,6 @@ namespace Alaress\Specification;
  */
 class Conjunction extends Composite
 {
-
     /**
      * @inheritdoc
      */

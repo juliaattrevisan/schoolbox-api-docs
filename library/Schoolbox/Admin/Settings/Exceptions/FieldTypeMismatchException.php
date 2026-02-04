@@ -15,5 +15,4 @@ namespace Schoolbox\Admin\Settings\Exceptions;
  */
 class FieldTypeMismatchException extends \InvalidArgumentException
 {
-
 }

@@ -27,7 +27,6 @@ use Schoolbox\User;
  */
 class Envelope extends InstanceBundle
 {
-
     /**
      * @param int      $service
      * @param int      $id

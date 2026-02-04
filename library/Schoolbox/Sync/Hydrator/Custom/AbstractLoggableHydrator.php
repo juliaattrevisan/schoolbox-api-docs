@@ -16,7 +16,6 @@ use Schoolbox\User as InternalUser;
 
 abstract class AbstractLoggableHydrator implements HydratorInterface
 {
-
     /** @var LoggerInterface */
     private $logger;
 

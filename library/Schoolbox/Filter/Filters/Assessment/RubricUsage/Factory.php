@@ -40,7 +40,6 @@ use UnexpectedValueException;
  */
 class Factory extends AbstractFactory
 {
-
     /** @var Folder\Mapper */
     private $folderMapper;
 

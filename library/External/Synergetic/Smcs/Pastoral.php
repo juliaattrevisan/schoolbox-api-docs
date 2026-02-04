@@ -7,7 +7,6 @@
 
 class External_Synergetic_Smcs_Pastoral extends External_Synergetic_Pastoral
 {
-
     /** @inheritDoc */
     protected function getStudentViewName(): string
     {

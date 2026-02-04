@@ -16,5 +16,4 @@ namespace Schoolbox\Learning\InlineGrader\Kami\Exception;
  */
 class InvalidStatusException extends \UnexpectedValueException implements IKamiException
 {
-
 }

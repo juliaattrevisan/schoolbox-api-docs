@@ -17,7 +17,6 @@ namespace Schoolbox\External;
  */
 class ClassInvolvement
 {
-
     /**
      * @var int
      */

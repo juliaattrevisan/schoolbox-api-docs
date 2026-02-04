@@ -22,7 +22,6 @@ use Schoolbox\External\Profile as UserProfile;
  */
 class Prepare implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */

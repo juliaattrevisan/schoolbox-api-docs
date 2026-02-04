@@ -14,7 +14,6 @@ use SocialStream;
 
 class StandardFeed extends Feed
 {
-
     /**
      * @param Schoolbox\IConfigLoader $conf
      * @param int                     $context

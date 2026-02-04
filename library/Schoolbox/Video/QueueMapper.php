@@ -29,7 +29,6 @@ use Schoolbox\UserMapper;
  */
 class QueueMapper extends Mapper
 {
-
     /* Possible video states */
     const STATUS_PENDING = 'pending';
     const STATUS_PROCESSING = 'processing';

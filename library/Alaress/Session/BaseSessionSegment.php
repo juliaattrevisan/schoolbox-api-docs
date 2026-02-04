@@ -17,7 +17,6 @@ use Aura\Session as BaseSession;
 
 class BaseSessionSegment extends BaseSession\Segment
 {
-
     /**
      * Constructor - doesn't take a name parameter, because it works on
      * $_SESSION directly.

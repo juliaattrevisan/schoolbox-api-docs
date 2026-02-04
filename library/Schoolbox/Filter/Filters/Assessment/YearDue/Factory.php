@@ -19,7 +19,6 @@ use Schoolbox\Filter;
  */
 class Factory extends AbstractFactory
 {
-
     /**
      * Build a filter definition, ready to use in the admin pages
      *

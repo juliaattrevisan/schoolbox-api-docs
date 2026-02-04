@@ -19,7 +19,6 @@ use Psr\Log\LoggerInterface;
 
 class ErrorIOListener extends LogIOListener
 {
-
     /** @var PoolInterface */
     protected $pool;
 

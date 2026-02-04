@@ -19,7 +19,6 @@ use Schoolbox\Filter;
  */
 interface IFactory
 {
-
     /**
      * Build a filter definition, ready to use in the admin pages
      *

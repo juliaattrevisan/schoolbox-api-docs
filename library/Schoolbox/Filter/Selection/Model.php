@@ -13,7 +13,6 @@ use Schoolbox\Filter;
 
 class Model
 {
-
     /** @var Filter\Model */
     private $filter;
 

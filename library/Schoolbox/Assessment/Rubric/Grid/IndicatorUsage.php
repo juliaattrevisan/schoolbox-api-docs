@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 class IndicatorUsage
 {
-
     /**
      * Descriptor directionality across the entire set
      */

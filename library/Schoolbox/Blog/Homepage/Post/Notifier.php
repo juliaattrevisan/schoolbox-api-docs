@@ -30,7 +30,6 @@ use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_POSTED = 'posted';
 
 

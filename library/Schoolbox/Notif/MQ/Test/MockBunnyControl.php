@@ -14,7 +14,6 @@ use RuntimeException;
 
 class MockBunnyControl implements ControlInterface
 {
-
     /** @var array */
     protected $queues;
     /** @var array */

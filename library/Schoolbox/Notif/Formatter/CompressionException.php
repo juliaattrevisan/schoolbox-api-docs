@@ -13,5 +13,4 @@ use Schoolbox\Notif\NotifException;
 
 class CompressionException extends NotifException
 {
-
 }

@@ -9,28 +9,26 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
-use Schoolbox\Mapper\DefinitionException;
-
-use function count;
-
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\User;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
-use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder;
+use Schoolbox\User;
+
+use function count;
 
 /**
  * A factory for building 'UnitSpec' filter objects
  */
 class Factory extends NullableContext\Factory
 {
-
     /** @var Folder\Mapper */
     private $folderMapper;
 

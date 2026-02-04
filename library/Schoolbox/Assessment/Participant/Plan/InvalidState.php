@@ -18,5 +18,4 @@ use LogicException;
  */
 class InvalidState extends LogicException
 {
-
 }

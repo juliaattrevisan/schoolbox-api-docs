@@ -14,7 +14,6 @@ use Schoolbox\GenericCollection;
 
 class StudentAddresses
 {
-
     /** @var StudentAddress[]|GenericCollection */
     private $studentAddresses;
 

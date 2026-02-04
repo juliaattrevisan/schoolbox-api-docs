@@ -11,8 +11,6 @@ namespace Alaress\WorkerCrew\IPC;
 
 interface ProtocolInterface
 {
-
-
     /**
      * @return int
      */

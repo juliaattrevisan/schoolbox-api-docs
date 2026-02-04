@@ -18,8 +18,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
  */
 class ApiUsage
 {
-
-
     /**
      * A list of (module, endpoint, count) tuples
      *

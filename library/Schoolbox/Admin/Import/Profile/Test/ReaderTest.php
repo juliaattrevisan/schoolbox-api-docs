@@ -20,7 +20,6 @@ use Schoolbox\Admin\Import\Profile\Reader;
 
 class ReaderTest extends TestCase
 {
-
     /**
      * hasHeaderRow is true
      *

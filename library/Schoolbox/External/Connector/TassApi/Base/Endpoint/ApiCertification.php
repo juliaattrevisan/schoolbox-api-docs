@@ -21,7 +21,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class ApiCertification implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */

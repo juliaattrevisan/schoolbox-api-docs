@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 interface SourceInterface
 {
-
     public const HARD_LIMIT = 50;
 
     /**

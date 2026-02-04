@@ -15,7 +15,6 @@ namespace EOTC;
 
 class ManyManyRelation extends \Schoolbox\Mapper
 {
-
     /**
      * An array definition
      *

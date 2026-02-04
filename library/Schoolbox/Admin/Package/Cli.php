@@ -13,7 +13,6 @@ use Schoolbox\UserMapper;
 
 class Cli extends CliTool\App
 {
-
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 

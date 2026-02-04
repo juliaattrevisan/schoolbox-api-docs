@@ -30,7 +30,6 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Mapper extends BaseMapper
 {
-
     protected function mapping()
     {
         $this->hasTable('rubric_indicator');

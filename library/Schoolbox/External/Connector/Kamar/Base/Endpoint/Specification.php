@@ -19,7 +19,6 @@ use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
  */
 abstract class Specification implements ISpecification
 {
-
     /**
      * @var Batchxml
      */

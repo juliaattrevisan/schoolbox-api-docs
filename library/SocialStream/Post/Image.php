@@ -10,7 +10,6 @@
 
 class SocialStream_Post_Image extends SocialStream_Post_Abstract
 {
-
     /**
      * @var string
      */

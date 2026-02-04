@@ -11,5 +11,4 @@ namespace Schoolbox\Notif;
 
 class NotifException extends \Exception
 {
-
 }

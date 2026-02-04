@@ -14,7 +14,6 @@ use Schoolbox\Admin\Settings\FieldType\Input;
 
 class Renderer extends Input\Renderer
 {
-
     protected function getTemplate(): string
     {
         return 'password.twig';

@@ -12,7 +12,6 @@ use Schoolbox\User;
 
 class Model
 {
-
     /** @var int */
     protected $id;
 

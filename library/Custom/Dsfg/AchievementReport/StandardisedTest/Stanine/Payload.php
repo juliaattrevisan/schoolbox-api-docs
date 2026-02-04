@@ -13,7 +13,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
 class Payload
 {
-
     /**
      * Payload struct
      *

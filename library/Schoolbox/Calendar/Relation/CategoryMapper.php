@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
  */
 class CategoryMapper extends Schoolbox\Mapper
 {
-
     /**
      * Mapping
      *

@@ -21,7 +21,6 @@ use Schoolbox\Collection;
  */
 class EventStatusMapper extends \Schoolbox\Mapper
 {
-
     /* These consts are referenced in numerous places but
      * for the same context.
      */

@@ -12,7 +12,6 @@ namespace Schoolbox\File;
 
 class Extension
 {
-
     /**
      * Identifier
      *

@@ -20,7 +20,6 @@ use GuzzleHttp\TransferStats;
  */
 class Api implements IApi
 {
-
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
      *

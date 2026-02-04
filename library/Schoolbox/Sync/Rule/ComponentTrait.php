@@ -11,7 +11,6 @@ namespace Schoolbox\Sync\Rule;
 
 trait ComponentTrait
 {
-
     /** @var int */
     protected $id;
 

@@ -14,7 +14,6 @@ namespace Alaress\DataStructures;
  */
 class ObjectNode
 {
-
     /** @var object */
     private $element;
 

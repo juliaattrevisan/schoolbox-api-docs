@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Factory
 {
-
     /**
      * The allowed scaleOptions for a user to choose
      *

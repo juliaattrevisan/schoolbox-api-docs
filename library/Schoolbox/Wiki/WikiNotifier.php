@@ -29,7 +29,6 @@ use Schoolbox\UserMapper;
 
 class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_CREATED = 'created';
 
     /** @var RevisionMapper */

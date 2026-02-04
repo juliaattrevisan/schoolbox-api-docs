@@ -13,7 +13,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 
 class Data extends Base
 {
-
     /**
      * I changed the SELECT aliases from the original, in the interest of posterity
      *

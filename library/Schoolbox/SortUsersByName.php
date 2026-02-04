@@ -15,7 +15,6 @@ namespace Schoolbox;
  */
 class SortUsersByName implements IUserComparator
 {
-
     /**
      * Returns:
      * * $left <  $right => -ve

@@ -28,7 +28,7 @@ class UserAccessXORTest extends TestCase
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_same')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSame')]
     public function testSame(array $array1, array $array2, int $expected)
     {
 
@@ -44,7 +44,7 @@ class UserAccessXORTest extends TestCase
      *
      * @return array
      */
-    public static function provider_same(): array
+    public static function providerSame(): array
     {
         return [
 
@@ -150,7 +150,7 @@ class UserAccessXORTest extends TestCase
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_different')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDifferent')]
     public function testDifferent(array $array1, array $array2, int $expected)
     {
 
@@ -166,7 +166,7 @@ class UserAccessXORTest extends TestCase
      *
      * @return array
      */
-    public static function provider_different(): array
+    public static function providerDifferent(): array
     {
         return [
 

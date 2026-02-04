@@ -13,7 +13,6 @@ namespace Alaress\Paginator;
 
 interface IUrlPaginator extends IPaginator
 {
-
     /**
      * Creates a URL out of whatever the URL I passed is.
      *

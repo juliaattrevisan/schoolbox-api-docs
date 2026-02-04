@@ -14,7 +14,6 @@ use Schoolbox\Calendar;
 
 class EventRecurrenceMapper extends Calendar\EventRecurrenceMapper
 {
-
     /**
      * @param Event $seriesEvent
      * @param Event $coreEvent

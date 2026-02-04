@@ -11,5 +11,4 @@ namespace Schoolbox\Assessment;
 
 class Exception extends \Exception
 {
-
 }

@@ -18,7 +18,6 @@ use RuntimeException;
  */
 interface IApi
 {
-
     /**
      * Retrieves a data document representing the result from the API call.
      *

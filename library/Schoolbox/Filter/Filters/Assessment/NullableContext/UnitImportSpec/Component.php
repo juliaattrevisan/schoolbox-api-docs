@@ -20,7 +20,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
  */
 class Component extends Filter\BaseComponent
 {
-
     /**
      * @var GenericCollection|CourseSpec\Model[]
      */

@@ -18,7 +18,6 @@ namespace Alaress\Redis\Async\Event;
  */
 interface IEvent
 {
-
     /**
      * @return string
      */

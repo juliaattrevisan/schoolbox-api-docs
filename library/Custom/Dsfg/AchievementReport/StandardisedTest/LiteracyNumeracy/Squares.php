@@ -13,7 +13,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
 class Squares
 {
-
     /**
      * Columns denoting grey squares' data
      */

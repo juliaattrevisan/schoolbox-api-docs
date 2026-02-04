@@ -12,7 +12,6 @@ namespace Schoolbox\Column;
 
 class Serialized implements IColumnType
 {
-
     /**
      * @param string            $value
      * @param \Schoolbox\Mapper $mapper

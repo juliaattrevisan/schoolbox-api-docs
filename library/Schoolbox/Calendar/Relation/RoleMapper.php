@@ -20,7 +20,6 @@ use Schoolbox\Mapper;
  */
 class RoleMapper extends Mapper
 {
-
     /**
      * Mapping
      *

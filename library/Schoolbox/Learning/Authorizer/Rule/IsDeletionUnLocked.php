@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
  */
 class IsDeletionUnLocked extends IsUnLocked
 {
-
     /**
      * @inheritdoc
      */

@@ -11,7 +11,6 @@ namespace Alaress\Async\Listener\Stream;
 
 class StreamEvent
 {
-
     /** @var resource */
     protected $stream;
 

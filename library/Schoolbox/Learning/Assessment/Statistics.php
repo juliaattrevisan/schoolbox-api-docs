@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\Assessment;
  */
 class Statistics
 {
-
     /**
      * @var IAssessable
      */

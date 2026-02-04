@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\Assessment;
  */
 interface IAssessableComparator
 {
-
     /**
      * Returns:
      * * $left <  $right => -ve

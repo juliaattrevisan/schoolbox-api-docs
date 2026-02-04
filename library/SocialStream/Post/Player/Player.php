@@ -15,7 +15,6 @@ namespace SocialStream\Post\Player;
  */
 abstract class Player
 {
-
     /**
      * The url to fetch
      *

@@ -9,7 +9,6 @@
  */
 class Report_Boarder extends Report_Parent
 {
-
     /**
      * Constructor
      *

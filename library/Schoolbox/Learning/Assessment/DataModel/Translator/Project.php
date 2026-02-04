@@ -31,7 +31,6 @@ use UnexpectedValueException;
  */
 class Project implements IAssessmentTypeTranslator
 {
-
     /**
      * @var BaseTranslator
      */

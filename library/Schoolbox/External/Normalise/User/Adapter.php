@@ -25,7 +25,6 @@ use Schoolbox\User;
  */
 class Adapter
 {
-
     /**
      * Crappy alex handler
      *

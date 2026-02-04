@@ -23,5 +23,4 @@ use InvalidArgumentException;
  */
 class InvalidArg extends InvalidArgumentException implements ITassApiException
 {
-
 }

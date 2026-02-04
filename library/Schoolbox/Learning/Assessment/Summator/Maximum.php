@@ -16,7 +16,6 @@ use Schoolbox\Collection;
 
 class Maximum extends AbstractSummator
 {
-
     /** @var float|null */
     protected ?float $max = null;
 

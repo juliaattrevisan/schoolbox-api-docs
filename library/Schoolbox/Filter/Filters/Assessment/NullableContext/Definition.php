@@ -31,7 +31,6 @@ use Schoolbox\Filter;
  */
 abstract class Definition extends Filter\AbstractDefinition
 {
-
     public const KEY_NONE = 'none';  // match assessments that do NOT reside in this context
 
 

@@ -18,7 +18,6 @@ use SitePage;
  */
 class NodeRenderer
 {
-
     /**
      * The usual sitepage
      *

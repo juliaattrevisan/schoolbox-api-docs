@@ -33,7 +33,7 @@ class ValidUseCohortMarksTest extends TestCase
      * @param bool         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validLMSCohortComparison')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidLMSCohortComparison')]
     public function testValidLMSCohortComparison(bool $configOption, Folder\Model $folder, bool $expected): void
     {
         $actual = (new Cohort\ValidUseCohortMarks())->isSatisfiedBy($configOption, $folder);
@@ -49,7 +49,7 @@ class ValidUseCohortMarksTest extends TestCase
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public static function provider_validLMSCohortComparison(): array
+    public static function providerValidLMSCohortComparison(): array
     {
         $folderMapper = Folder\Mapper::getInstance();
         $yearLevelMapper = YearLevel\Mapper::getInstance();

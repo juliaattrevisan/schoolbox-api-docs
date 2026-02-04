@@ -24,7 +24,6 @@ use Schoolbox\Sync\Rule;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *

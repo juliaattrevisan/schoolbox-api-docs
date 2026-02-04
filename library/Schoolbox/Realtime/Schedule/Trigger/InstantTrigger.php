@@ -15,7 +15,6 @@ use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
 class InstantTrigger extends OnetimeTrigger implements InstantTriggerInterface
 {
-
     /** @var ModuleNotifierInterface */
     protected $notifier;
 

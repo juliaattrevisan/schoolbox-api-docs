@@ -19,7 +19,6 @@ use Schoolbox\User;
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * All 'AllowAsGoal' values known to the system (regardless of whether they are available)
      *

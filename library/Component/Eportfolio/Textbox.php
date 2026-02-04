@@ -12,5 +12,4 @@ namespace Component\Eportfolio;
 
 class Textbox extends ListItem
 {
-
 }

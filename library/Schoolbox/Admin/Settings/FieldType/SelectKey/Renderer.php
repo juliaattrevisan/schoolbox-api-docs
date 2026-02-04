@@ -14,7 +14,6 @@ use Schoolbox\Admin\Settings\FieldType\Select;
 
 class Renderer extends Select\Renderer
 {
-
     /**
      * Converts a string representation of options into an array form
      *

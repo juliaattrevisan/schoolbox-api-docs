@@ -9,7 +9,6 @@
  */
 class Survey_Graph_Render
 {
-
     /**
      * @var array
      */

@@ -23,8 +23,6 @@ use Schoolbox\External\Profile as UserProfile;
  */
 class Cleanup implements IStrategy
 {
-
-
     /**
      * @var LoggerInterface
      */

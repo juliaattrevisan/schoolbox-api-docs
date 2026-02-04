@@ -22,7 +22,6 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Contents
 {
-
     /**
      * An instance of CategoryModel
      *

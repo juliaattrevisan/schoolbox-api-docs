@@ -5,7 +5,7 @@
  */
 class Alaress_HTMLPurifier_AttrTransform_SafeObject extends HTMLPurifier_AttrTransform_SafeObject
 {
-    function transform($attr, $config, $context)
+    public function transform($attr, $config, $context)
     {
         return $attr;
     }

@@ -11,7 +11,6 @@ namespace Custom\Dsfg\AchievementReport\CoCurricular;
 
 class Activities extends Base
 {
-
     /**
      * Find all the co-curricular activities in which a student has been involved,
      * grouped by year and ordered

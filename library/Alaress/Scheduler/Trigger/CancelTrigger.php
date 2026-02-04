@@ -19,13 +19,11 @@ use Alaress\Scheduler\Event\EventInterface;
  */
 class CancelTrigger extends AbstractTrigger
 {
-
-
     /**
      * @param string $label
      * @param EventInterface $event
      */
-    function __construct($label, $event)
+    public function __construct($label, $event)
     {
         $this->label = $label;
         $this->event = $event;

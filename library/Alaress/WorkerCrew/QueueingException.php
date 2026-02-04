@@ -13,5 +13,4 @@ use OutOfBoundsException;
 
 class QueueingException extends OutOfBoundsException
 {
-
 }

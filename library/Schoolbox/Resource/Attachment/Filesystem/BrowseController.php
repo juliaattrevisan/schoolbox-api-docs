@@ -19,7 +19,6 @@ use Schoolbox\Resource\Attachment\NavigatorController;
  */
 class BrowseController extends NavigatorController
 {
-
     /** @var RosettaStone */
     protected $rosetta;
 

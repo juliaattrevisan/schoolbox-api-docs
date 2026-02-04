@@ -16,7 +16,6 @@ namespace SocialStream\Post\Thumbnail;
 
 class ItempropThumbnailUrl extends Thumbnail
 {
-
     /**
      * The xpath query
      *

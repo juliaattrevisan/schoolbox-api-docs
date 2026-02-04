@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationBundleTest extends TestCase
 {
-
     public function testAppendSingleInstance()
     {
         $bundle = new \Alaress\Async\Notification\NotificationBundle();

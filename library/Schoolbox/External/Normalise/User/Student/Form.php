@@ -16,7 +16,6 @@ use Schoolbox\External\Normalise\User\Staff;
 
 class Form
 {
-
     /**
      * The numeric value of a students' Form
      *

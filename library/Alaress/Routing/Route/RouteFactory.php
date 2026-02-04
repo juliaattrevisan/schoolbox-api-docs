@@ -14,7 +14,6 @@ use InvalidArgumentException;
 
 class RouteFactory
 {
-
     /** @var bool */
     private $recurse;
 

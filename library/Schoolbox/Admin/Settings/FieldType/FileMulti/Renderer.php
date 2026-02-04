@@ -16,7 +16,6 @@ use Schoolbox\Resource\Attachment\Zone;
 
 class Renderer extends File\Renderer
 {
-
     /**
      * @inheritdoc
      */

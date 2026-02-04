@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Rating_Satisfied extends Evaluation_Answer_Rating_Satisfied
 {
-
     /**
      * Always use Correct css class
      *

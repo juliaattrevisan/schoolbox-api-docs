@@ -14,7 +14,6 @@ use Alaress_Date_Format;
 
 interface EventInterface
 {
-
     /**
      * Set author
      *

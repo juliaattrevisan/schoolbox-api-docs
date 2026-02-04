@@ -20,7 +20,6 @@ use Schoolbox\Resource\Attachment\NavigatorController;
  */
 class Office365Controller extends NavigatorController
 {
-
     /**
      * @param bool               $multi
      * @param string             $mimeFilter

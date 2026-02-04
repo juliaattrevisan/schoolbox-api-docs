@@ -11,7 +11,6 @@ namespace Alaress\Rules;
 
 abstract class Condition
 {
-
     /** @var bool */
     protected $negate;
 

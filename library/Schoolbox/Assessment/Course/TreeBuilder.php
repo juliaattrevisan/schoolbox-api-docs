@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class TreeBuilder extends Resources\TreeBuilder
 {
-
     /** @var int */
     private $currentParentId;
 

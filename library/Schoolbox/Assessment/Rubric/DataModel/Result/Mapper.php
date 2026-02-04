@@ -19,7 +19,6 @@ use Schoolbox\Mapper as BaseMapper;
  */
 class Mapper extends BaseMapper
 {
-
     protected function mapping()
     {
         $this->hasTable('rubric_result');

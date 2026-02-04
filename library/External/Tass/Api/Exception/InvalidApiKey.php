@@ -16,5 +16,4 @@ use InvalidArgumentException;
  */
 class InvalidApiKey extends InvalidArgumentException
 {
-
 }

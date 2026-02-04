@@ -12,7 +12,6 @@ namespace DailyQuote;
 
 class Config
 {
-
     /**
      * Identifier
      *

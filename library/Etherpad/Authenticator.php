@@ -14,7 +14,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Authenticator
 {
-
     /**
      * An instance of \Group
      *

@@ -17,7 +17,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
  */
 class Heading extends Base
 {
-
     /**
      * Find the Year Level for a student who was in a particular calendar year
      *

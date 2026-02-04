@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Factory
 {
-
     /**
      * An instance of \EOTC\Event
      *

@@ -14,7 +14,6 @@ use Schoolbox;
 
 class CoverPhotoMapper extends Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

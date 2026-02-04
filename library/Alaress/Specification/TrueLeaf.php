@@ -17,7 +17,6 @@ namespace Alaress\Specification;
  */
 class TrueLeaf extends Leaf
 {
-
     /**
      * @inheritdoc
      */

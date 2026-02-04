@@ -27,7 +27,6 @@ use Schoolbox\Collection;
  */
 class ClassInvolvementMapper extends Schoolbox\Mapper
 {
-
     /**
      * {@inheritdoc}
      */

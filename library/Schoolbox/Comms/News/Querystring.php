@@ -25,7 +25,6 @@ use ArrayAccess;
  */
 class Querystring
 {
-
     /**
      * Querystring param for the Compact Mode option
      */

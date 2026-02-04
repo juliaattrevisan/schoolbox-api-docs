@@ -11,7 +11,6 @@ use Schoolbox\Collection;
  */
 class TimezoneFactory
 {
-
     /**
      * @var TimezoneFactory
      */

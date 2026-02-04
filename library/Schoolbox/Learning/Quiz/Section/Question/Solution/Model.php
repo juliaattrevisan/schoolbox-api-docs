@@ -43,7 +43,7 @@ class Model implements ISoftDeletable
      * Clears ID so subsequent saves are INSERT instead of UPDATE
      * @return void
      */
-    function __clone()
+    public function __clone()
     {
         // clear ID + reference
         $this->id = null;

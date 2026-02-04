@@ -13,5 +13,4 @@ use Schoolbox\Realtime\RealtimeException;
 
 class ScheduleException extends RealtimeException
 {
-
 }

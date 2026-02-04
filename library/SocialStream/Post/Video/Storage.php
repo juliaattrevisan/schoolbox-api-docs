@@ -21,7 +21,6 @@ use SocialStream\Post\Player\Player;
  */
 class Storage extends Player
 {
-
     /**
      * Fetch thumbnail
      *

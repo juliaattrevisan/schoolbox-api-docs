@@ -32,7 +32,6 @@ use UnexpectedValueException;
  */
 class Payload
 {
-
     /**
      * @var ContainerInterface
      */

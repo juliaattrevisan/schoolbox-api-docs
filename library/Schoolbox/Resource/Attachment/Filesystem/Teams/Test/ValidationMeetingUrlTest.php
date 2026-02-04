@@ -30,7 +30,7 @@ class ValidationMeetingUrlTest extends TestCase
      * @param mixed $input
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validMeetingUrl')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidMeetingUrl')]
     public function testValidMeetingUrl($input, $expected)
     {
         $outcome = (new ValidTeamsMeetingUrl())->isSatisifiedBy($input);
@@ -43,7 +43,7 @@ class ValidationMeetingUrlTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validMeetingUrl(): array
+    public static function providerValidMeetingUrl(): array
     {
         return [
 

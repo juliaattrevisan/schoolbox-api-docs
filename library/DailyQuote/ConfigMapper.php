@@ -12,7 +12,6 @@ namespace DailyQuote;
 
 class ConfigMapper extends \Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

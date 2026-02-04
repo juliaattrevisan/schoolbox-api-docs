@@ -20,7 +20,6 @@ use Schoolbox\Resource\Storage;
  */
 interface IFileMapper extends IStorageWrapper
 {
-
     /**
      * @return Storage\Mapper
      */

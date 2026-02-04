@@ -17,7 +17,6 @@ use Schoolbox\Test\TestCase;
 
 class FolderTest extends TestCase
 {
-
     /**
      * The folder that's being tested.
      *

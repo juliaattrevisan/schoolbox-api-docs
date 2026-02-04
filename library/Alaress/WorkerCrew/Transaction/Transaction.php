@@ -14,7 +14,6 @@ use React\EventLoop\TimerInterface;
 
 class Transaction extends AbstractTransaction
 {
-
     /** @var callable */
     private $callback;
 

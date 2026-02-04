@@ -12,7 +12,6 @@ namespace External\Tass\Api\Models;
 
 class Teacher
 {
-
     /** @var string */
     private $class;
 

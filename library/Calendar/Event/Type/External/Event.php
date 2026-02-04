@@ -14,8 +14,6 @@ use Calendar\Event\Type\EventBase;
 
 class Event extends EventBase
 {
-
-
     /**
      * Event location
      *

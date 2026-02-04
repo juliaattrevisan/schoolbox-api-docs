@@ -16,7 +16,6 @@ use EOTC\ConfigMapper;
 
 class Urgent extends Base
 {
-
     /**
      * Determine where to go next
      *

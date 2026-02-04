@@ -14,7 +14,6 @@ use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 
 interface InstantTriggerInterface extends TriggerInterface
 {
-
     /**
      * @return AbstractModuleNotifier
      */

@@ -18,7 +18,6 @@ use Schoolbox\Resource\Folder;
  */
 abstract class Factory extends Filter\AbstractFactory
 {
-
     /**
      * @var Folder\Mapper
      */

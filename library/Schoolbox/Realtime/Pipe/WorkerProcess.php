@@ -32,7 +32,6 @@ use Schoolbox\User;
 
 class WorkerProcess extends AbstractProcess
 {
-
     /** @var IListFactory */
     private $factory;
 

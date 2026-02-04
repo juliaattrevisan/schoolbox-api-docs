@@ -24,7 +24,6 @@ use const E_USER_WARNING;
  */
 class Transactor
 {
-
     /** @var Audience\Mapper */
     private $audienceMapper;
 

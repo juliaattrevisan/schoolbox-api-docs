@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Feed extends Decorator
 {
-
     /**
      * Aggregates data from the given sources, returning it as a Collection of Feed\Items
      *

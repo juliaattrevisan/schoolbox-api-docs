@@ -19,7 +19,6 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
  */
 class ValidRelationship extends Specification\Leaf
 {
-
     /** @var string[][] */
     private $validModifiers;
 

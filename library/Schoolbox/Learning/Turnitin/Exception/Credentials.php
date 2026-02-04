@@ -18,5 +18,4 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  */
 class Credentials extends Exception
 {
-
 }

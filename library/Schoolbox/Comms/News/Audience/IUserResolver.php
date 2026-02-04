@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 interface IUserResolver
 {
-
     /**
      * Returns the ids of users who are in this article's audience
      *

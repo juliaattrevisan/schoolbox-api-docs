@@ -19,7 +19,6 @@ namespace Schoolbox\Clipboard;
  */
 interface IStrategy
 {
-
     /**
      * Import data from endpoints into local schema
      */

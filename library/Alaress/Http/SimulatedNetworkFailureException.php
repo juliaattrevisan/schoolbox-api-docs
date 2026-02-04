@@ -15,5 +15,4 @@ use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
 
 class SimulatedNetworkFailureException extends ClientException implements IKamiException
 {
-
 }

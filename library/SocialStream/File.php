@@ -17,7 +17,6 @@ use Schoolbox\Resource\Storage\Model;
  */
 class File
 {
-
     /**
      * The url to curl, to obtain an file
      */

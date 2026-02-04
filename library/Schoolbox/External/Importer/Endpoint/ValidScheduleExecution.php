@@ -16,7 +16,6 @@ namespace Schoolbox\External\Importer\Endpoint;
  */
 class ValidScheduleExecution
 {
-
     /**
      * Hours when twice-daily and daily occurs successfully
      */

@@ -21,7 +21,6 @@ use Schoolbox\Mapper;
  */
 class CampusMapper extends Schoolbox\Mapper
 {
-
     /**
      * Mapping
      *

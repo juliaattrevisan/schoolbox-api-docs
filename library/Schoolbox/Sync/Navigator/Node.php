@@ -14,7 +14,6 @@ namespace Schoolbox\Sync\Navigator;
  */
 class Node
 {
-
     /**
      * The name of this breadcrumb
      *

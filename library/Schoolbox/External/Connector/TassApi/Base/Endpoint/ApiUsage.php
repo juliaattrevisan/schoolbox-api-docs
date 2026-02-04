@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
  */
 class ApiUsage
 {
-
     /**
      * One of studentdetails, identitymanagement, lmsintegration
      *

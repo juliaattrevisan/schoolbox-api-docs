@@ -17,7 +17,6 @@ use Schoolbox\GenericCollection;
  */
 class PadMapper extends \Schoolbox\Mapper
 {
-
     /**
      * Define column/property mapping
      *

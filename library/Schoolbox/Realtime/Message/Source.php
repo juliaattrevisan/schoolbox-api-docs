@@ -11,7 +11,6 @@ namespace Schoolbox\Realtime\Message;
 
 class Source
 {
-
     /** @var int */
     protected $id;
     /** @var NS */

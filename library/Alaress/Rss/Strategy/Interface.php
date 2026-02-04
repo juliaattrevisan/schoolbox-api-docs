@@ -9,7 +9,6 @@
  */
 interface Alaress_Rss_Strategy_Interface
 {
-
     /**
      * Get a list of $limit RSS items
      *

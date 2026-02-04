@@ -12,7 +12,6 @@ namespace Schoolbox\External;
 
 class TimetablePeriod
 {
-
     /**
      * @var int
      */

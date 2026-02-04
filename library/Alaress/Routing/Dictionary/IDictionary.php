@@ -17,7 +17,6 @@ namespace Alaress\Routing\Dictionary;
  */
 interface IDictionary
 {
-
     /**
      * Return the delimiter this dictionary defines for separating terms.
      *  - For URLs or *nix paths this is `/`

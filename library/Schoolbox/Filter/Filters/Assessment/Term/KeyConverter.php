@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 abstract class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * All Term Ids in the system (regardless of whether they are available)
      *

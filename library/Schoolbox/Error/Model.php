@@ -12,7 +12,6 @@ namespace Schoolbox\Error;
 
 class Model
 {
-
     /**
      * @var int
      */

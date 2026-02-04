@@ -14,7 +14,6 @@ use Alaress_Date_Format;
 
 interface IScale
 {
-
     /**
      * Get the sql representing the aggregation of each strategy's setting
      *

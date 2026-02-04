@@ -12,7 +12,6 @@
 
 class Alaress_Rss_Strategy_Atom implements Alaress_Rss_Strategy_Interface
 {
-
     /**
      * Get a list of $limit RSS items
      *

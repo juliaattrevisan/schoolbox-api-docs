@@ -16,7 +16,6 @@ use Schoolbox\Collection;
 
 class Navigator
 {
-
     /**
      * A collection of Nodes
      *

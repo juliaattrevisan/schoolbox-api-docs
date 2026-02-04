@@ -25,7 +25,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Cleanup implements IStrategy
 {
-
     /**
      * Archived xmls go here
      */

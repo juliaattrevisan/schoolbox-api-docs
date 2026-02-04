@@ -15,7 +15,6 @@ namespace Schoolbox\Learning\Assessment\Seb;
  */
 class ValidSebCheck
 {
-
     /**
      * If an assessment requires the SEB Safe Exam Browser to complete work,
      * it checks whether the $_SERVER superglobal contains the two headers

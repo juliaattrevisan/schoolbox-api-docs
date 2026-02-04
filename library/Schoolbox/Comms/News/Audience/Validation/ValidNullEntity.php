@@ -18,7 +18,6 @@ use Alaress\Specification;
  */
 class ValidNullEntity extends Specification\Leaf
 {
-
     /**
      * The set of entities that can target null, indexed by entityType
      * @var bool[]

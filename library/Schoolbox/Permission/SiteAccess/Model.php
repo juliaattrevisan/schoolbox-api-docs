@@ -11,7 +11,6 @@ namespace Schoolbox\Permission\SiteAccess;
 
 class Model
 {
-
     /** @var string */
     private $siteSchoolCode;
 

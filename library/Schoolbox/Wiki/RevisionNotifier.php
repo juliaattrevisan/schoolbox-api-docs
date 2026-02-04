@@ -29,7 +29,6 @@ use Schoolbox\User;
 
 class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 {
-
     const TRIGGER_REVISED = 'revised';
 
     /** @var WikiMapper */

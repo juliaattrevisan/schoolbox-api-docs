@@ -14,7 +14,6 @@ use OutOfRangeException;
 
 class Paginator implements IPaginator
 {
-
     /**
      * @var int
      */

@@ -15,7 +15,6 @@ namespace SocialStream\Post\Video;
  */
 class Chain
 {
-
     /**
      * Resultant thumbnail poster and source
      *

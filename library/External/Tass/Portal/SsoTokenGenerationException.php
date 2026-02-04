@@ -15,5 +15,4 @@ namespace External\Tass\Portal;
  */
 class SsoTokenGenerationException extends \UnexpectedValueException
 {
-
 }

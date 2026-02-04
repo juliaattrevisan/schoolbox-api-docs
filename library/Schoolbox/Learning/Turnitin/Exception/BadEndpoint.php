@@ -16,5 +16,4 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  */
 class BadEndpoint extends Exception
 {
-
 }

@@ -11,5 +11,4 @@ namespace Alaress\Async\Listener;
 
 interface EventListener
 {
-
 }

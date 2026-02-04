@@ -16,7 +16,6 @@ use EOTC\ListGroup\Mapping;
 
 abstract class Base
 {
-
     /**
      * A chain node
      *

@@ -17,7 +17,6 @@ use Schoolbox\External\Connector\ISync;
 
 class Sync extends BaseSync implements ISync
 {
-
     /**
      * Returns query and parameters to get parents
      * @param bool $useCommRules

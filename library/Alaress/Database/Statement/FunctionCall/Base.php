@@ -18,7 +18,6 @@ use PDOStatement;
 
 class Base extends BaseQuery implements IFunctionCall
 {
-
     /** @var string $name Function name */
     protected $name;
 

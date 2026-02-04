@@ -14,7 +14,6 @@ use Schoolbox\External\Normalise\User\Staff;
 
 class House
 {
-
     /**
      * Identifier
      * (May be synonymous with $code)

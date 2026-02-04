@@ -11,5 +11,4 @@ namespace Schoolbox\Realtime;
 
 class RealtimeException extends \Exception
 {
-
 }

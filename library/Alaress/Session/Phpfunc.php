@@ -50,6 +50,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
     /**
      * @see session_start
      */
+    // phpcs:ignore PSR1.Methods.CamelCapsMethodName.NotCamelCaps -- Overrides Aura\Session\Phpfunc
     public function session_start()
     {
         // start of with doing whatever the parent wanted to do

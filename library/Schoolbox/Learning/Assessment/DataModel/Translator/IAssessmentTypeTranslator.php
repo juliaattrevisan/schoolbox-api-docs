@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
  */
 interface IAssessmentTypeTranslator
 {
-
     /**
      * @return IAssessableDataModel
      */

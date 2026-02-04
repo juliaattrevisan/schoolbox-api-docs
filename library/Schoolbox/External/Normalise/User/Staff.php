@@ -20,7 +20,6 @@ use Schoolbox\Collection;
 
 class Staff extends Base
 {
-
     /* Personal
      */
 

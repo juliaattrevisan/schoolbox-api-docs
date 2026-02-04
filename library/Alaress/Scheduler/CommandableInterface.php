@@ -11,7 +11,6 @@ namespace Alaress\Scheduler;
 
 interface CommandableInterface
 {
-
     /**
      * Bind the queue(s) relevant to your commands
      *

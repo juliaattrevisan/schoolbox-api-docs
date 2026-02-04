@@ -18,7 +18,6 @@ use Schoolbox\Calendar\EventTypeMapper;
  */
 class EventTypeGenerator
 {
-
     /**
      * @var EventTypeMapper
      */

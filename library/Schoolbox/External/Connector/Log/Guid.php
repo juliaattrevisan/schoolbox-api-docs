@@ -14,7 +14,6 @@ namespace Schoolbox\External\Connector\Log;
  */
 class Guid
 {
-
     /**
      * Generate a microsofty style guid
      *

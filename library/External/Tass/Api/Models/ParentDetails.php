@@ -19,7 +19,6 @@ use Alaress_Date_Format;
  */
 class ParentDetails
 {
-
     /** @var array TODO explode into individual attributes, or make sub-object collection */
     private $addresses;
 

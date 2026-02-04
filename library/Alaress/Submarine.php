@@ -16,7 +16,6 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class Alaress_Submarine
 {
-
     /**
      * Alaress_SilentProbe constructor.
      * @param null $_

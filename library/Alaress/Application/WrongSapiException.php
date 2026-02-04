@@ -12,5 +12,4 @@ namespace Alaress\Application;
  */
 class WrongSapiException extends \UnexpectedValueException
 {
-
 }

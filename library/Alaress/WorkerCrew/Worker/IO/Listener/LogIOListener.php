@@ -13,7 +13,6 @@ use Alaress\Async\Listener\Stream\StreamEvent;
 
 class LogIOListener extends AbstractIOStreamListener
 {
-
     /**
      * Sent when the stream has been closed for any reason
      *

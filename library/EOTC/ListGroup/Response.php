@@ -12,7 +12,6 @@ namespace EOTC\ListGroup;
 
 class Response
 {
-
     /**
      * The next status for the Event, corresponding to its
      * crurent status and configuration

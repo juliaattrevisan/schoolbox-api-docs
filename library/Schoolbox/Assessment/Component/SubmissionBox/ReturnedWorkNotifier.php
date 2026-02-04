@@ -37,7 +37,6 @@ use Schoolbox\UserMapper;
 
 class ReturnedWorkNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_RETURNED               = 'returned';
     const PATTERN_MARKED_STUDENT_TITLE   = ':teacher has marked your work for :boxname in :catname';
     const PATTERN_MARKED_PARENT_TITLE    = ':teacher has marked :student\'s work for :boxname in :catname';

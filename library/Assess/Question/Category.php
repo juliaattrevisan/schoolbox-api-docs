@@ -11,7 +11,5 @@
  */
 class Assess_Question_Category extends Evaluation_Question_Category
 {
-
-
     protected $availability = 'assess';
 }

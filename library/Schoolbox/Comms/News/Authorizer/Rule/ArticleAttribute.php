@@ -18,7 +18,6 @@ use UnexpectedValueException;
  */
 abstract class ArticleAttribute implements IAuthorizationRule
 {
-
     /**
      * @param array  $params
      * @param string $key

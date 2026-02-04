@@ -18,7 +18,6 @@ use Alaress\Specification;
  */
 class ValidTreeHeight extends Specification\Leaf
 {
-
     /** @var int */
     private $maxHeight;
 

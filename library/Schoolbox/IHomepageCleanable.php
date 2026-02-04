@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 interface IHomepageCleanable
 {
-
     /**
      * Soft-deletes content for specified homepage
      *

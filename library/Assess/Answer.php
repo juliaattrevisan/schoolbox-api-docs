@@ -11,8 +11,6 @@
  */
 class Assess_Answer extends Evaluation_Answer
 {
-
-
     /**
      * Get an instance of a responseHandler upon instantiation
      */

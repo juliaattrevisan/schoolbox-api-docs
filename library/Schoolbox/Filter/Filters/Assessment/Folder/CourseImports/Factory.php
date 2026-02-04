@@ -25,7 +25,6 @@ use Schoolbox\Resource\Folder;
  */
 class Factory extends FolderFilter\Factory
 {
-
     /** @var CourseImplementation\Mapper */
     private $courseImplMapper;
 

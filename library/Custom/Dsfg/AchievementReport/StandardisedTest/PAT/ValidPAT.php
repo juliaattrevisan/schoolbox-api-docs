@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 class ValidPAT
 {
-
     /**
      * @var User
      */

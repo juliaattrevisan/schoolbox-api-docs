@@ -16,7 +16,6 @@ use RuntimeException;
  */
 class Api implements IApi
 {
-
     /**
      * The path to where the kamar xml was cached
      *

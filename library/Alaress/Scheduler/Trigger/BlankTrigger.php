@@ -13,7 +13,6 @@ use Alaress\Scheduler\Event\BlankEvent;
 
 class BlankTrigger extends OnetimeTrigger
 {
-
     /**
      * The only parameter relevant to this trigger is a timestamp
      *

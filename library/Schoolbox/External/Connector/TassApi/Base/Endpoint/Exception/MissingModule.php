@@ -16,5 +16,4 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception;
  */
 class MissingModule extends \DomainException
 {
-
 }

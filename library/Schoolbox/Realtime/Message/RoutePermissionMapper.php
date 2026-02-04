@@ -22,7 +22,6 @@ use Schoolbox\User;
 
 class RoutePermissionMapper extends Mapper
 {
-
     /** @var PDOStatement[] */
     protected $prepared = [];
 

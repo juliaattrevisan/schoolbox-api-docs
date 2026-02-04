@@ -11,7 +11,6 @@ namespace Alaress\Redis\Async\Event;
 
 class Message extends AbstractEvent
 {
-
     /** @var string */
     protected $channel;
 

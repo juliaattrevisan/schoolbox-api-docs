@@ -10,7 +10,6 @@
 
 class WebdavTreeBuilder
 {
-
     /**
      * @var PortfolioWebDAV
      */

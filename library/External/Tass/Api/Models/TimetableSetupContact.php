@@ -12,7 +12,6 @@ namespace External\Tass\Api\Models;
 
 class TimetableSetupContact
 {
-
     /** @var string */
     private $email;
 

@@ -20,7 +20,6 @@ use Alaress\Json\Decorator\IDecorator;
  */
 class AttachmentDecorator implements IDecorator
 {
-
     /**
      * A set of (article_id, count) tuples
      *

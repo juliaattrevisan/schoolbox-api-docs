@@ -23,7 +23,6 @@ use Schoolbox\User;
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * @var Access
      */

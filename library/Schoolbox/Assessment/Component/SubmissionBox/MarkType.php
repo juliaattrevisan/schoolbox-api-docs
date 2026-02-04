@@ -14,7 +14,6 @@ use Schoolbox;
 
 class MarkType
 {
-
     /* These integer consts reference submission_mark_type.mark_type_id column
      * Some schools have altered their lookup table's contents, causing the consts
      * to desync. I don't know how that resolved itself, but we can't accommodate

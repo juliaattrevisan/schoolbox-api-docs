@@ -16,7 +16,6 @@ use OutOfBoundsException;
 
 class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
 {
-
     protected $flywheelSpins;
 
     protected $minWorkers;

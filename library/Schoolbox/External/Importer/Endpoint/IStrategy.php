@@ -19,7 +19,6 @@ namespace Schoolbox\External\Importer\Endpoint;
  */
 interface IStrategy
 {
-
     /**
      * Import data from xml into local schema
      */

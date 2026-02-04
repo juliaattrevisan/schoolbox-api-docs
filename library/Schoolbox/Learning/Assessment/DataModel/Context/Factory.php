@@ -21,7 +21,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
  */
 class Factory
 {
-
     /**
      * @var FolderMapper
      */

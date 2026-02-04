@@ -14,7 +14,6 @@ namespace Schoolbox\Calendar;
 
 class EventLevel
 {
-
     /**
      * Id of the event level
      *

@@ -9,14 +9,13 @@
 
 class ConfigFallback implements \Schoolbox\IConfigLoader
 {
-
     protected $cfg;
 
     public function __construct()
     {
         $this->cfg = array(
             'mail_support_address'  => 'support@alaress.com.au',
-            'logs_dir'              => '/var/log/schoolbox/'.INSTANCE_ID.'/',
+            'logs_dir'              => '/var/log/schoolbox/' . INSTANCE_ID . '/',
             'debug_mode'            => true
         );
     }

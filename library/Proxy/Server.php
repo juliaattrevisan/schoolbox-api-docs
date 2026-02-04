@@ -20,7 +20,6 @@ use Schoolbox\IConfigLoader;
  */
 class Server
 {
-
     const PROXY_AUTH_METHOD = CURLAUTH_BASIC;
     const PROXY_TYPE = CURLPROXY_HTTP;
     const PROXY_AUTH_STRING = "Basic";

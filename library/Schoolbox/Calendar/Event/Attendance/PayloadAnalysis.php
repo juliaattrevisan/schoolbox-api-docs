@@ -18,7 +18,6 @@ use Schoolbox\User;
  */
 class PayloadAnalysis
 {
-
     /**
      * @var int|null
      */

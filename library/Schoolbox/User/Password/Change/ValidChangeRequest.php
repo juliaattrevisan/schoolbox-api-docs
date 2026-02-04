@@ -14,7 +14,6 @@ use Alaress\Password\Service;
 
 class ValidChangeRequest
 {
-
     /**
      * Minimum number of characters in a password
      */

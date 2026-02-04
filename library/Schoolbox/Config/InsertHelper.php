@@ -23,7 +23,6 @@ use PDOException;
  */
 abstract class InsertHelper extends CliTool\App
 {
-
     /** @var IQuery */
     private $insertStatement;
 

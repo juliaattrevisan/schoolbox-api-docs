@@ -16,5 +16,4 @@ use Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
  */
 class KeyConverter extends AssessmentTermFilter\KeyConverter
 {
-
 }

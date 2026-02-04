@@ -22,7 +22,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Setup implements IStrategy
 {
-
     /**
      * @var string
      */

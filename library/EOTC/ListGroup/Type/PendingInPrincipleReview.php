@@ -15,7 +15,6 @@ use EOTC\ListGroup\Response;
 
 class PendingInPrincipleReview extends Base
 {
-
     /**
      * Next status id
      *

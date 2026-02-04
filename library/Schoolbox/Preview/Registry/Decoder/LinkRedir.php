@@ -28,7 +28,6 @@ use Schoolbox\Resource\LinkMapper;
 
 class LinkRedir extends Base
 {
-
     /**
      * Regex
      *

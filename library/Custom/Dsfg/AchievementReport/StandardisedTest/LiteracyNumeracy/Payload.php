@@ -11,7 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
 class Payload
 {
-
     /**
      * Indexes of each series
      */

@@ -19,7 +19,6 @@ use Schoolbox\Resource\Attachment\NavigatorController;
  */
 class WebdavController extends NavigatorController
 {
-
     /**
      * @param bool   $multi
      * @param string $mimeFilter

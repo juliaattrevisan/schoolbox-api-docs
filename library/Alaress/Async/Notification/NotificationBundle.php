@@ -19,7 +19,6 @@ use Schoolbox\L10n\RosettaStoneFactory;
  */
 class NotificationBundle
 {
-
     /** @var Notification[] */
     protected $notifications;
 

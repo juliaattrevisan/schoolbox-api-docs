@@ -21,7 +21,6 @@ use Schoolbox\Resource\Storage;
  */
 interface IStorageWrapper
 {
-
     /**
      * Wrap a given storage model in your appropriate filetype
      *

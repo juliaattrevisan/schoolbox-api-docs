@@ -14,7 +14,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 class CategoryParam extends Param
 {
-
     /**
      * Use standard vars from the category object, and default to the append stacking mode
      *

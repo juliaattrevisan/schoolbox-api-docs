@@ -21,7 +21,6 @@ use Schoolbox\GenericCollection;
  */
 abstract class Factory extends Filter\AbstractFactory
 {
-
     /**
      * Do the overrides indicate any folders are being inserted into the folder filter option list?
      *

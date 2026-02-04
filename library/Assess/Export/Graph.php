@@ -11,8 +11,4 @@
  */
 class Assess_Export_Graph extends Evaluation_Export_Graph
 {
-
-
-
-
 }

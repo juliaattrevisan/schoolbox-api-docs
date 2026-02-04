@@ -22,7 +22,6 @@ namespace Schoolbox\Comms\News;
  */
 class ValidHasReadMore
 {
-
     /**
      * Decide if $article should show a Read More link, depending on the contents
      * of the article, and whether your configs are set up in a particular way

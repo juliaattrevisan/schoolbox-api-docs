@@ -18,7 +18,6 @@ use Schoolbox\Role;
 
 class DigestTriggerFactory
 {
-
     /** @var WorkNotifier */
     private $notifier;
 

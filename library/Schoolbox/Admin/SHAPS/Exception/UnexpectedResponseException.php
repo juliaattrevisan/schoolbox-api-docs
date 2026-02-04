@@ -13,5 +13,4 @@ use GuzzleHttp\Exception\BadResponseException;
  */
 class UnexpectedResponseException extends BadResponseException
 {
-
 }

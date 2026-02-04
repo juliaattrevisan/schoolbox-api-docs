@@ -22,7 +22,6 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
  */
 class ShowcaseMapper extends Schoolbox\Mapper
 {
-
     /**
      * @inheritdoc
      * @TODO - join this table to assessment_id instead of submission_box_id

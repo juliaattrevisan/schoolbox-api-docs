@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
  */
 interface IKeyConverter
 {
-
     /**
      * @return Model
      */

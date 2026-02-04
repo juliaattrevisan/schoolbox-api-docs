@@ -21,6 +21,8 @@ use Schoolbox\Mapper\Traits\Model\CreateCollection;
  */
 class Model
 {
+    use CreateCollection;
+
     // Any audience modifier?
     public const RELATIONSHIP_SELF        = 'self';                 // eg, Audience = the user 15
     public const RELATIONSHIP_PARENTS_OF  = 'parents_of';           // eg, Audience = parents of user 15
@@ -42,9 +44,6 @@ class Model
             self::RELATIONSHIP_TEACHERS_OF,
         ];
     }
-
-
-    use CreateCollection;
 
     /**
      * @deprecated No longer used as of 20.0, but retained in codebase due to usage by 19.1.3 update script

@@ -20,7 +20,6 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
  */
 class EmployeeExternalId
 {
-
     /**
      * An arbitrary string used to prefix Employees' user_code. This field is usually numeric
      * and can directly conflict with student external ids, so you end up with employees' profiles

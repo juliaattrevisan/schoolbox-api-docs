@@ -14,7 +14,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Renderer extends AbstractRenderer
 {
-
     /**
      * Returns the id of the field type this renderer relates to. Used to ensure we don't
      * attempt to render a config of an incompatible type

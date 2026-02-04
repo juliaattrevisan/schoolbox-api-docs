@@ -17,7 +17,6 @@ use Schoolbox\Learning\Assessment\Redirect;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @inheritDoc
      */

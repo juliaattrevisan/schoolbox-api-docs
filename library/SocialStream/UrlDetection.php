@@ -12,7 +12,6 @@ namespace SocialStream;
 
 class UrlDetection
 {
-
     /**
      * Urls used by Storage
      *

@@ -16,7 +16,6 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
  */
 class StatusChecker
 {
-
     /** @var Mapper */
     private $mapper;
 

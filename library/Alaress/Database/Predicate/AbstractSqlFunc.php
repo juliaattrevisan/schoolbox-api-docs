@@ -14,5 +14,4 @@ namespace Alaress\Database\Predicate;
  */
 abstract class AbstractSqlFunc implements ISqlFunc
 {
-
 }

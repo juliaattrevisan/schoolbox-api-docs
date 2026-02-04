@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class SelfSendNewsFilter extends SelfSendFilter
 {
-
     /**
      * This is to appease JPC
      *

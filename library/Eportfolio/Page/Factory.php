@@ -10,7 +10,6 @@
 
 class Eportfolio_Page_Factory
 {
-
     /**
      * Decide which kind of page to manufacture
      *

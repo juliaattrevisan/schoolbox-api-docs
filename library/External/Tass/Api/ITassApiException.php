@@ -16,5 +16,4 @@ namespace External\Tass\Api;
  */
 interface ITassApiException
 {
-
 }

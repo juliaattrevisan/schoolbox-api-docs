@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Exception;
 
 class RerouteMapper extends Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('msg_reroute');

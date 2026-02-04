@@ -13,7 +13,6 @@ namespace Calendar\Event\Type;
 
 interface RendererInterface
 {
-
     /**
      * Returns the output from the render action for this event
      *

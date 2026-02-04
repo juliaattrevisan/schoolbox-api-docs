@@ -20,7 +20,6 @@ use UnexpectedValueException;
 
 class ValidSelfAssessable
 {
-
     /**
      * The currently-logged-in user
      *

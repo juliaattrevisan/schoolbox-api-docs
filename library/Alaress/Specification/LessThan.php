@@ -19,7 +19,6 @@ use UnexpectedValueException;
  */
 class LessThan extends ValueBoundSpecification
 {
-
     /**
      * @inheritdoc
      */

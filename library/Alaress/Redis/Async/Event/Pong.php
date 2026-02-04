@@ -11,5 +11,4 @@ namespace Alaress\Redis\Async\Event;
 
 class Pong extends AbstractEvent
 {
-
 }

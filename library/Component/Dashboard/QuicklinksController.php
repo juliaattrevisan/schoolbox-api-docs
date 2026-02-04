@@ -10,7 +10,6 @@
 
 class Component_Dashboard_QuicklinksController extends Component_Dashboard_ControllerAbstract
 {
-
     private $quicklinks;
 
     /**

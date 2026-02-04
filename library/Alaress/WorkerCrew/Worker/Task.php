@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 
 class Task
 {
-
     /** @var object */
     protected $id;
     /** @var string */

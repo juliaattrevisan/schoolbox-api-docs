@@ -21,7 +21,6 @@ use Schoolbox\Filter\Filters\Assessment\NullableContext;
  */
 class Factory extends NullableContext\Factory
 {
-
     /** @var UnitImpl\Mapper */
     private $unitImplMapper;
 

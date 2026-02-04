@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Rating_Like extends Evaluation_Answer_Rating_Like
 {
-
     /**
      * Always use Correct css class
      *

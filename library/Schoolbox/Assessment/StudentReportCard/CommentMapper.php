@@ -14,7 +14,6 @@ use Schoolbox\Mapper;
 
 class CommentMapper extends Mapper
 {
-
     protected function mapping()
     {
         // register table and model

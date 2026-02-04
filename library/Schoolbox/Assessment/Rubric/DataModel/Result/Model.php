@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Result;
 
 class Model
 {
-
     /**
      * Maximum length of a rubric result set label as used in Admin > LMS > Rubrics
      *

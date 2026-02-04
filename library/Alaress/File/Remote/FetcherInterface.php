@@ -13,7 +13,6 @@ use OutOfBoundsException;
 
 interface FetcherInterface
 {
-
     /**
      * Retrieves the metadata for the given fileId
      *

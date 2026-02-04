@@ -11,7 +11,6 @@ namespace Alaress\Scheduler\Event;
 
 interface EventInterface
 {
-
     /**
      * Returns the principal that caused this event
      *

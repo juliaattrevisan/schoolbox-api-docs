@@ -22,7 +22,6 @@ namespace Schoolbox\External\Normalise\User\Staff;
 
 class Category
 {
-
     /**
      * Staff category code
      * Usually an abbreviation

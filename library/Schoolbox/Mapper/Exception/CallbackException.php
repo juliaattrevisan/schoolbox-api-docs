@@ -19,5 +19,4 @@ use UnexpectedValueException;
  */
 class CallbackException extends UnexpectedValueException
 {
-
 }

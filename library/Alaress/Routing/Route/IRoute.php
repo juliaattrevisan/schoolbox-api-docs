@@ -13,7 +13,6 @@ use InvalidArgumentException;
 
 interface IRoute
 {
-
     /**
      * Returns the data payload held by this route
      *

@@ -12,7 +12,6 @@ namespace Eportfolio;
 
 class Permission
 {
-
     const TYPE_PARENT = 'parent';
     const TYPE_GROUP = 'group';
     const TYPE_STUDENT = 'student';

@@ -17,7 +17,6 @@ namespace Schoolbox\External;
  */
 class ClassPeriod
 {
-
     /**
      * @var int
      */

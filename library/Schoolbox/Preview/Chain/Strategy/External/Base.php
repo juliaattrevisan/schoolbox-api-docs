@@ -17,7 +17,6 @@ use Schoolbox\Preview\Chain\Strategy\Base as StrategyBase;
  */
 abstract class Base extends StrategyBase
 {
-
     /**
      * The requested url
      *

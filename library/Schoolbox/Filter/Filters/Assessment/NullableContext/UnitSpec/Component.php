@@ -16,7 +16,6 @@ use Schoolbox\Filter\BaseComponent;
  */
 class Component extends BaseComponent
 {
-
     // No implementation yet - exists for now just to enable query building
     // TODO - likely if implemented this would be a list of unit specs somehow
     // TODO - associated with current context, rather than all unitSpecs known to system

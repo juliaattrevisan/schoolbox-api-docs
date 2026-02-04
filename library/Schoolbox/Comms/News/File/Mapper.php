@@ -23,7 +23,6 @@ use Schoolbox\File\Mimetype;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     /**
      * @throws \InvalidArgumentException
      */

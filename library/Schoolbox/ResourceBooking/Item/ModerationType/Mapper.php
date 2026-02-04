@@ -17,7 +17,6 @@ use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
 {
-
     public function mapping()
     {
         $this->hasTable('lu_resource_moderation_type');

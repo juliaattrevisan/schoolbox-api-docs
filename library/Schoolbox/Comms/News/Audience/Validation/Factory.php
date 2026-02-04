@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 class Factory
 {
-
     /** @var GenericCollection|Audience\Segment\IStrategy[] */
     private $validRelationships;
 

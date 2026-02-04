@@ -15,7 +15,6 @@ use Scrub;
 
 class Wrapper
 {
-
     /**
      * The value of the title tag for the HTML document.
      *

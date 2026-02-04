@@ -16,7 +16,6 @@ use Schoolbox\YearLevel;
  */
 class ValidHasData
 {
-
     /**
      * Certain year levels always display the table.
      * Other year levels display the table only if there is data there

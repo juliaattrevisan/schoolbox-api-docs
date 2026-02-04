@@ -11,7 +11,6 @@ namespace Alaress\Scheduler\Event;
 
 class BlankEvent implements EventInterface
 {
-
     /**
      * Returns the principal that caused this event
      *

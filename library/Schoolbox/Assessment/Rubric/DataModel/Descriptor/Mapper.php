@@ -32,7 +32,6 @@ use Schoolbox\GenericCollection;
  */
 class Mapper extends Schoolbox\Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('rubric_descriptor');

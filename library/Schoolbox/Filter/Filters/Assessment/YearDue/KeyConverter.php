@@ -16,7 +16,6 @@ use Schoolbox\Filter\AbstractKeyConverter;
  */
 class KeyConverter extends AbstractKeyConverter
 {
-
     /**
      * @inheritdoc
      */

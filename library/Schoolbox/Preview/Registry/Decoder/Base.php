@@ -12,7 +12,6 @@ namespace Schoolbox\Preview\Registry\Decoder;
 
 abstract class Base
 {
-
     /**
      * Decode the url, distilling the actual url from some
      * encapsulated structure

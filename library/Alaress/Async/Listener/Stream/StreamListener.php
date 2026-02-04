@@ -13,7 +13,6 @@ use Alaress\Async\Listener\EventListener;
 
 interface StreamListener extends EventListener
 {
-
     /**
      * Sent when the stream is successfully connected
      *

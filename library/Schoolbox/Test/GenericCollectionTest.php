@@ -34,8 +34,8 @@ class GenericCollectionTest extends TestCase
      * @param bool              $expected
      * @throws ReflectionException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isCollectionOfInterface')]
-    public function test_isCollectionOfInterface(GenericCollection $collection, string $interface, bool $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsCollectionOfInterface')]
+    public function testIsCollectionOfInterface(GenericCollection $collection, string $interface, bool $expected): void
     {
         $actual = $collection->isCollectionOf($interface);
         $this->assertEquals($expected, $actual);
@@ -47,8 +47,8 @@ class GenericCollectionTest extends TestCase
      * @param bool              $expected
      * @throws ReflectionException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isCollectionOfClass')]
-    public function test_isCollectionOfClass(GenericCollection $collection, string $class, bool $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsCollectionOfClass')]
+    public function testIsCollectionOfClass(GenericCollection $collection, string $class, bool $expected): void
     {
         $actual = $collection->isCollectionOf($class);
         $this->assertEquals($expected, $actual);
@@ -60,8 +60,8 @@ class GenericCollectionTest extends TestCase
      * @param bool              $expected
      * @throws ReflectionException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isCollectionOf')]
-    public function test_isCollectionOf(GenericCollection $collection, string $otherType, bool $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsCollectionOf')]
+    public function testIsCollectionOf(GenericCollection $collection, string $otherType, bool $expected): void
     {
         $actual = $collection->isCollectionOf($otherType);
         $this->assertEquals($expected, $actual);
@@ -70,7 +70,7 @@ class GenericCollectionTest extends TestCase
 
     // ============= Data Providers =============
 
-    public static function provider_isCollectionOfInterface(): array
+    public static function providerIsCollectionOfInterface(): array
     {
         // SPL Interface inheritance tree:
         /* - Traversable
@@ -88,7 +88,7 @@ class GenericCollectionTest extends TestCase
         ];
     }
 
-    public static function provider_isCollectionOfClass(): array
+    public static function providerIsCollectionOfClass(): array
     {
         // SPL Class inheritance tree:
         /* - IteratorIterator
@@ -106,7 +106,7 @@ class GenericCollectionTest extends TestCase
         ];
     }
 
-    public static function provider_isCollectionOf(): array
+    public static function providerIsCollectionOf(): array
     {
         // SPL Class interfaces:
         // - IteratorIterator implements Iterator   (but not Countable)

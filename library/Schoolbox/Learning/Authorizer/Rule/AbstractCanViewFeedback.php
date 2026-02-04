@@ -15,7 +15,6 @@ use InvalidArgumentException;
 
 abstract class AbstractCanViewFeedback extends AbstractParticipationRule
 {
-
     /**
      * Locate a student User instance in supplied params
      *

@@ -15,7 +15,6 @@ use TypeError;
 
 class Collection implements IColumnType
 {
-
     /**
      * The property to set on the model when hydrating, or get when dehydrating.
      * If not set, then the mapper's ID property is used.

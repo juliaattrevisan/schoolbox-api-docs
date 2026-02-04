@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
  */
 class PersonalMapper extends Schoolbox\Mapper
 {
-
     /**
      * Mapping
      *

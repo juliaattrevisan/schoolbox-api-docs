@@ -12,7 +12,6 @@
  */
 class Component_Config_SizeNoAll extends \Component_Config_Size
 {
-
     /**
      * @inheritdoc
      */

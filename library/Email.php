@@ -11,7 +11,6 @@
 
 class Email
 {
-
     /**
      * The email address to analyse
      *

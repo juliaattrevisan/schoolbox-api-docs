@@ -20,7 +20,6 @@ use Schoolbox\User;
  */
 class ValidCanInvite
 {
-
     /**
      * Decide whether $user is allowed to invite other users
      *

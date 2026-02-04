@@ -19,7 +19,6 @@ use Schoolbox\Preview\Registry\Decoder\Base as DecoderBase;
 
 class Registry
 {
-
     /**
      * A Collection of decoders
      *

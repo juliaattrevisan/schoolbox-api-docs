@@ -21,5 +21,4 @@ use RuntimeException;
  */
 class Unauthorised extends RuntimeException implements ITassApiException
 {
-
 }

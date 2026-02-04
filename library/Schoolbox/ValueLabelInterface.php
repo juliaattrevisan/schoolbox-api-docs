@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 interface ValueLabelInterface
 {
-
     /**
      * Find a key/value representation of this model's data
      * and return it as a 2D array of value (an identifier)

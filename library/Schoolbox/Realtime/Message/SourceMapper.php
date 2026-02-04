@@ -18,7 +18,6 @@ use Schoolbox\Mapper;
  */
 class SourceMapper extends Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('msg_source');

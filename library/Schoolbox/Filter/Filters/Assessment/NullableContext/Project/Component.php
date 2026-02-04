@@ -21,7 +21,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
  */
 class Component extends Filter\BaseComponent
 {
-
     /**
      * Projects that reside on options set as available in admin, and are linked
      * to current user's folders.

@@ -12,7 +12,6 @@ namespace Alaress\Specification;
 
 abstract class Composite extends Base
 {
-
     /** @var ISpecification[] */
     private $components;
 

@@ -14,7 +14,6 @@ use RuntimeException;
 
 class AlaressIPCProtocol implements ProtocolInterface
 {
-
     /**
      * @return int
      */

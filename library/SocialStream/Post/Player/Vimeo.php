@@ -15,7 +15,6 @@ namespace SocialStream\Post\Player;
  */
 class Vimeo extends Player
 {
-
     /**
      * Fetch thumbnail
      *

@@ -14,7 +14,6 @@ use Schoolbox\External\Normalise\User\Common\Campus;
 
 class Subject
 {
-
     /**
      * Abbreviated code
      *

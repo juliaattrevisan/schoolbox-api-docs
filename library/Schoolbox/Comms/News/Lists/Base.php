@@ -32,7 +32,6 @@ use Schoolbox\User;
  */
 abstract class Base
 {
-
     /**
      * System default for the number of items per page
      * Typically connects to search_type_limit

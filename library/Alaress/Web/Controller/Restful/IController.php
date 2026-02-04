@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Exception;
 
 interface IController
 {
-
     /**
      * Populate the Response object with a list of entities:
      *  - in the format provided in the request Accepts header

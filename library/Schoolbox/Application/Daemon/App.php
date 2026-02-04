@@ -15,7 +15,6 @@ use React\EventLoop\LoopInterface;
 
 abstract class App
 {
-
     /**
      * @param ContainerInterface $di
      * @param LoopInterface      $loop

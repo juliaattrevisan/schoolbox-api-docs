@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class Log
 {
-
     /** @var int */
     protected $id;
 

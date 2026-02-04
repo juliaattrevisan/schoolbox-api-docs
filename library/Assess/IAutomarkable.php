@@ -14,7 +14,6 @@ namespace Assess;
  */
 interface IAutomarkable
 {
-
     /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.

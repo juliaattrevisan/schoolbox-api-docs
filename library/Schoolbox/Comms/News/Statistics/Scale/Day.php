@@ -12,7 +12,6 @@ namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Day extends Base
 {
-
     /**
      * @return string
      */

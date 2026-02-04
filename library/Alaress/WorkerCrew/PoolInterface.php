@@ -15,7 +15,6 @@ use OutOfBoundsException;
 
 interface PoolInterface extends EventEmitterInterface
 {
-
     const RELEASE_HARD = true;
     const RELEASE_SOFT = false;
 

@@ -11,7 +11,6 @@ namespace Proxy\Test;
 
 class ProxyServerTestConfigLoader implements \Schoolbox\IConfigLoader
 {
-
     protected $auth = [];
 
     public function __construct($host, $port, $user, $pass)

@@ -9,7 +9,6 @@
  */
 class Alaress_Cache_Log
 {
-
     /**
      * Show plain debugging messages
      *

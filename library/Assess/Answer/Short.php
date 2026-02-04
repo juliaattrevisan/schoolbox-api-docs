@@ -11,9 +11,6 @@
  */
 class Assess_Answer_Short extends Evaluation_Answer_Short
 {
-
-
-
     /**
      * Javascript class to use when creating UI
      *

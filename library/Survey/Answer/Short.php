@@ -11,7 +11,6 @@
  */
 class Survey_Answer_Short extends Evaluation_Answer_Short
 {
-
     /**
      * @var string
      */

@@ -11,7 +11,6 @@
  */
 class Survey_Export_Xml extends Evaluation_Export_Xml
 {
-
     /**
      * Renders the survey-specific data
      *

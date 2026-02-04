@@ -17,7 +17,6 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
  */
 class Model
 {
-
     /** @var int */
     public const SEQUENCE_BASE = 1; // Capability sequence is 1-based, not 0-based
 

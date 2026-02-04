@@ -23,7 +23,6 @@ use Alaress\Scheduler\Event\EventInterface;
  */
 interface TriggerInterface
 {
-
     /**
      * Return the timestamp at which this trigger should fire (can be in the past)
      *

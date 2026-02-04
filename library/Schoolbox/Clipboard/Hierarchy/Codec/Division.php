@@ -15,7 +15,6 @@ namespace Schoolbox\Clipboard\Hierarchy\Codec;
  */
 class Division
 {
-
     /**
      * Combine two disparate data points into one
      *

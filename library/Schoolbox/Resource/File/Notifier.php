@@ -23,7 +23,6 @@ use Schoolbox\User;
 
 class Notifier extends ResourceNotifier
 {
-
     /**
      * @inheritdoc
      */

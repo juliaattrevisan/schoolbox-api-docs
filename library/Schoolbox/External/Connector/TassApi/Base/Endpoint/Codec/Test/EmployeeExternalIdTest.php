@@ -27,7 +27,7 @@ class EmployeeExternalIdTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validEncodeDecode(): array
+    public static function providerValidEncodeDecode(): array
     {
         return [
             'Re-encoded Employee 1' => [
@@ -54,7 +54,7 @@ class EmployeeExternalIdTest extends TestCase
      * @param string $input
      * @param string $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validEncodeDecode')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidEncodeDecode')]
     public function testValidEncodeDecode(string $input, string $expected): void
     {
         $codec = new EmployeeExternalId();
@@ -68,7 +68,7 @@ class EmployeeExternalIdTest extends TestCase
      *
      * @return array
      */
-    public function provider_validEncode(): array
+    public function providerValidEncode(): array
     {
         return [
             'Encoded Employee 1' => [
@@ -95,7 +95,7 @@ class EmployeeExternalIdTest extends TestCase
      * @param string $input
      * @param string $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validDecode')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDecode')]
     public function testValidEncode(string $input, string $expected): void
     {
         $codec = new EmployeeExternalId();
@@ -108,7 +108,7 @@ class EmployeeExternalIdTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validDecode(): array
+    public static function providerValidDecode(): array
     {
         return [
             'Decoded Employee 1' => [
@@ -135,7 +135,7 @@ class EmployeeExternalIdTest extends TestCase
      * @param string $input
      * @param string $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validDecode')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDecode')]
     public function testValidDecode(string $input, string $expected): void
     {
         $codec = new EmployeeExternalId();

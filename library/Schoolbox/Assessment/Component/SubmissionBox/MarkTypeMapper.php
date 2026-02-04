@@ -21,7 +21,6 @@ use Schoolbox;
  */
 class MarkTypeMapper extends Schoolbox\Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('submission_mark_type');

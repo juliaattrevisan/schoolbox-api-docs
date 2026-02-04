@@ -16,7 +16,6 @@ use Alaress\Rules\Token\Tokenizer;
 
 class MockTokenizer extends Tokenizer
 {
-
     /**
      * @param array $tokens
      */

@@ -28,8 +28,8 @@ class TaskStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_selfAssessable_isResponseRequired')]
-    public function test_selfAssessable_isResponseRequired(Participant $participant, $isResponseRequired)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSelfAssessableIsResponseRequired')]
+    public function testSelfAssessableIsResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
@@ -42,8 +42,8 @@ class TaskStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isFeedbackRequired
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_selfAssessable_isFeedbackRequired')]
-    public function test_selfAssessable_isFeedbackRequired(Participant $participant, $isFeedbackRequired)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSelfAssessableIsFeedbackRequired')]
+    public function testSelfAssessableIsFeedbackRequired(Participant $participant, $isFeedbackRequired)
     {
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
@@ -56,8 +56,8 @@ class TaskStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_selfAssessable_isReviewComplete')]
-    public function test_selfAssessable_isReviewComplete(Participant $participant, $isReviewComplete)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSelfAssessableIsReviewComplete')]
+    public function testSelfAssessableIsReviewComplete(Participant $participant, $isReviewComplete)
     {
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
@@ -70,8 +70,8 @@ class TaskStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isResponseRequired
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_notSelfAssessable_isResponseRequired')]
-    public function test_NotSelfAssessable_isResponseRequired(Participant $participant, $isResponseRequired)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotSelfAssessableIsResponseRequired')]
+    public function testNotSelfAssessableIsResponseRequired(Participant $participant, $isResponseRequired)
     {
         $expected = $isResponseRequired;
         $actual = $participant->isResponseRequired();
@@ -84,8 +84,8 @@ class TaskStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isFeedbackRequired
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_notSelfAssessable_isFeedbackRequired')]
-    public function test_NotSelfAssessable_isFeedbackRequired(Participant $participant, $isFeedbackRequired)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotSelfAssessableIsFeedbackRequired')]
+    public function testNotSelfAssessableIsFeedbackRequired(Participant $participant, $isFeedbackRequired)
     {
         $expected = $isFeedbackRequired;
         $actual = $participant->isFeedbackRequired();
@@ -98,8 +98,8 @@ class TaskStatusTest extends TestCase
      * @param Participant $participant
      * @param bool        $isReviewComplete
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_notSelfAssessable_isReviewComplete')]
-    public function test_NotSelfAssessable_isReviewComplete(Participant $participant, $isReviewComplete)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNotSelfAssessableIsReviewComplete')]
+    public function testNotSelfAssessableIsReviewComplete(Participant $participant, $isReviewComplete)
     {
         $expected = $isReviewComplete;
         $actual = $participant->isReviewComplete();
@@ -111,8 +111,8 @@ class TaskStatusTest extends TestCase
     /**
      * @param Participant $participant
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_participants')]
-    public function test_mutual_exclusive_states(Participant $participant)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerParticipants')]
+    public function testMutualExclusiveStates(Participant $participant)
     {
         $countStates = 0;
         if ($participant->isResponseRequired()) {
@@ -132,7 +132,7 @@ class TaskStatusTest extends TestCase
 
     // ================= Data Providers =================
 
-    public static function provider_selfAssessable_isResponseRequired()
+    public static function providerSelfAssessableIsResponseRequired()
     {
         $task = DemoData::getSelfAssessableTask(1);
 
@@ -149,7 +149,7 @@ class TaskStatusTest extends TestCase
         ];
     }
 
-    public static function provider_selfAssessable_isFeedbackRequired()
+    public static function providerSelfAssessableIsFeedbackRequired()
     {
         $task = DemoData::getSelfAssessableTask(1);
 
@@ -166,7 +166,7 @@ class TaskStatusTest extends TestCase
         ];
     }
 
-    public static function provider_selfAssessable_isReviewComplete()
+    public static function providerSelfAssessableIsReviewComplete()
     {
         $task = DemoData::getSelfAssessableTask(1);
 
@@ -183,7 +183,7 @@ class TaskStatusTest extends TestCase
         ];
     }
 
-    public static function provider_notSelfAssessable_isResponseRequired()
+    public static function providerNotSelfAssessableIsResponseRequired()
     {
         $task = DemoData::getNonSelfAssessableTask(2);
 
@@ -196,7 +196,7 @@ class TaskStatusTest extends TestCase
         ];
     }
 
-    public static function provider_notSelfAssessable_isFeedbackRequired()
+    public static function providerNotSelfAssessableIsFeedbackRequired()
     {
         $task = DemoData::getNonSelfAssessableTask(2);
 
@@ -209,7 +209,7 @@ class TaskStatusTest extends TestCase
         ];
     }
 
-    public static function provider_notSelfAssessable_isReviewComplete()
+    public static function providerNotSelfAssessableIsReviewComplete()
     {
         $task = DemoData::getNonSelfAssessableTask(2);
 
@@ -225,7 +225,7 @@ class TaskStatusTest extends TestCase
     /**
      * @return Participant[][]
      */
-    public static function provider_participants()
+    public static function providerParticipants()
     {
         $task1 = DemoData::getSelfAssessableTask(1);
         $task2 = DemoData::getSelfAssessableTask(2);

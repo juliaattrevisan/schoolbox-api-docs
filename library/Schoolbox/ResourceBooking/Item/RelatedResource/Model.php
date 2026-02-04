@@ -14,7 +14,6 @@ use Schoolbox\ResourceBooking\Item\Model as ResourceModel;
 
 class Model
 {
-
     /**
      * @var int
      */

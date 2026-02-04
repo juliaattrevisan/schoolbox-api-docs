@@ -16,7 +16,6 @@ use Schoolbox\Comms\News;
 
 class Lists
 {
-
     /**
      * @var Mapper
      */

@@ -14,7 +14,6 @@ use Schoolbox\IConfigLoader;
 
 class CoreContext
 {
-
     /** @var array */
     protected $context;
 

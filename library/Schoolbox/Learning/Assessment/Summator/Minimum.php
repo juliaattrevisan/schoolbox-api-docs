@@ -21,7 +21,6 @@ use Schoolbox\Collection;
 
 class Minimum extends AbstractSummator
 {
-
     /**
      * @var float|null
      */

@@ -20,7 +20,6 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Specification as BaseSpecif
  */
 class Specification extends BaseSpecification
 {
-
     /**
      * Profile nodes
      *

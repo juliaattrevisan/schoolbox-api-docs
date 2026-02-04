@@ -17,7 +17,6 @@ use Calendar_Api_Config_Connector_Interface;
  */
 class ApiHierarchyGenerator
 {
-
     /** @var ModuleChecker */
     private $moduleChecker;
 

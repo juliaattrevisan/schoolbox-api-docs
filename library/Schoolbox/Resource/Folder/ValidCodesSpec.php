@@ -28,7 +28,6 @@ use function substr;
  */
 class ValidCodesSpec extends Leaf
 {
-
     /** @var Code\Mapper */
     private $folderCodeMapper;
 

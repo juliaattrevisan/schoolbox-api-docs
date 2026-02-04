@@ -12,7 +12,6 @@ namespace Schoolbox\External\Normalise\User;
 
 class Tutor extends Staff
 {
-
     /**
      * Tutor group
      *

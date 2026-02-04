@@ -11,7 +11,6 @@
  */
 abstract class Alaress_Validator_Abstract implements Alaress_Validator_ValidatorInterface
 {
-
     protected $options = array();
     protected $value   = null;
 
