@@ -19,6 +19,14 @@
 <script type="text/javascript">
     $(function() {
 
+        // Update the window history
+        if (window.history && window.history.replaceState && window.history.pushState) {
+            // Overwrite the current history entry (removes POST semantics)
+            window.history.replaceState({}, null, window.location.href);
+            // Add a new entry so back/forward navigations land on this GET-style entry
+            window.history.pushState({}, null, window.location.href);
+        }
+
         // Disable iFrame embed on mail content
         /**
          * Initialise the editor
