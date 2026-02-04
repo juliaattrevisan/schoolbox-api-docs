@@ -81,8 +81,8 @@ self.addEventListener("fetch", (evt) => {
 
     // clicking the back button to navigate back to a POST request
     // the service worker cannot handle this. Bypass such requests.
-    if (evt.request.cache === 'only-if-cached' || evt.request.method !== 'GET') {
-        return
+    if (evt.request.cache === "only-if-cached" || evt.request.method !== "GET") {
+        return;
     }
 
     evt.respondWith(

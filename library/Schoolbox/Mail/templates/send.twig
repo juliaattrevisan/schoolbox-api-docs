@@ -18,13 +18,9 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/clipboard/jquery.clipboard-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
-
-        // Update the window history
-        if (window.history && window.history.replaceState && window.history.pushState) {
-            // Overwrite the current history entry (removes POST semantics)
+        // Overwrite the current history entry to remove POST semantics without altering back/forward behavior
+        if (window.history && window.history.replaceState) {
             window.history.replaceState({}, null, window.location.href);
-            // Add a new entry so back/forward navigations land on this GET-style entry
-            window.history.pushState({}, null, window.location.href);
         }
 
         // Disable iFrame embed on mail content
