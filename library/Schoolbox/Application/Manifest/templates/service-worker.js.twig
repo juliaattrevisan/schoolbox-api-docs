@@ -68,17 +68,21 @@ self.addEventListener("fetch", (evt) => {
         return;
     }
 
-    // Avoid intercepting browser back/forward restorations and POST navigations:
-    // - Some back/forward navigations set cache === "only-if-cached" which causes
-    //   fetch() in WorkerGlobalScope to throw when combined with certain modes.
-    // - POST navigations should be handled by the browser (resubmit prompt).
-    if (evt.request.cache === 'only-if-cached' && evt.request.mode !== 'same-origin') {
-        return
+    // The offline page should only be returned if:
+    // - The request is a page navigation (evt.request.mode === "navigate")
+    // - AND the request is not a redirect (evt.request.redirect !== "follow")
+    // https://fetch.spec.whatwg.org/#concept-request-mode is a good reference for what these actually mean
+    //
+    // The redirect check is to avoid triggering the offline page if we make a request to a page that fails to load (e.g. see SA-16458)
+    if (evt.request.mode !== "navigate" && evt.request.redirect !== "follow") {
+        // Not a page navigation, bail.
+        return;
     }
 
-    // Only handle top-level navigations (pages) and non-redirects
-    if (evt.request.mode !== "navigate" || evt.request.redirect === "follow") {
-        return;
+    // clicking the back button to navigate back to a POST request
+    // the service worker cannot handle this. Bypass such requests.
+    if (evt.request.cache === 'only-if-cached' || evt.request.method !== 'GET') {
+        return
     }
 
     evt.respondWith(
