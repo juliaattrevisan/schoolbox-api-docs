@@ -201,8 +201,9 @@ class Validation
         $endDate       = null;
 
         // Only users allowed to moderate this item may override validation
-        $override = !empty($postData['override_validation'])
-            && $resource->canUserModerateThisItem($this->user);
+        $override = (
+            !empty($postData['override_validation']) && $resource->canUserModerateThisItem($this->user)
+        );
 
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
@@ -217,6 +218,7 @@ class Validation
         }
 
         // Return early if either date couldn't be parsed.
+        // These validation errors cannot be overridden, because if the dates can't be parsed, we don't have a booking.
         if ($startDate === null || $endDate === null) {
             return $errors;
         }
@@ -246,13 +248,16 @@ class Validation
                 [$thisResource, $thisStart, $thisEnd] = $check;
 
                 // Validate for matching the current term
-                if ($thisResource->getCurrentTermRestriction()) {
+                if (!$override && $thisResource->getCurrentTermRestriction()) {
                     $errors = array_merge_recursive(
                         $errors,
                         $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
                     );
                 }
 
+                // Validate for clashes even if $override is true.
+                // The clash validation results will allow us to find and reject the clashing bookings.
+                // See $this->validateBookingIgnoringClashesIfClashesAllowed().
                 $errors = array_merge_recursive(
                     $errors,
                     $this->validateForClashes($thisResource, $thisStart, $thisEnd)
@@ -273,13 +278,16 @@ class Validation
                 [$thisResource, $thisStart, $thisEnd, $thisBooking] = $check;
 
                 // Validate for matching the current term
-                if ($thisResource->getCurrentTermRestriction()) {
+                if (!$override && $thisResource->getCurrentTermRestriction()) {
                     $errors = array_merge_recursive(
                         $errors,
                         $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
                     );
                 }
 
+                // Validate for clashes even if $override is true.
+                // The clash validation results will allow us to find and reject the clashing bookings.
+                // See $this->validateBookingIgnoringClashesIfClashesAllowed().
                 $errors = array_merge_recursive(
                     $errors,
                     $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking)
@@ -970,11 +978,17 @@ class Validation
      *  - Whether the booking clashes with any other approved bookings (as supplied via $isClash)
      *
      * @param BookingModel $booking
-     * @param bool  $isClash
+     * @param bool $isClash
      * @param User $user
+     * @param bool $overrideValidation
      * @return int
      */
-    public function getNewStatusIdForBooking(BookingModel $booking, bool $isClash, User $user): int
+    public function getNewStatusIdForBooking(
+        BookingModel $booking,
+        bool $isClash,
+        User $user,
+        bool $overrideValidation = false
+    ): int
     {
         $resource = $booking->getResource();
 
@@ -990,11 +1004,11 @@ class Validation
             $resource,
             $bookingStartAt->getDateTimeObject(),
             $bookingEndAt->getDateTimeObject(),
-            false,
+            $overrideValidation,
         );
 
         // This check is done separately since it is not included in $this->validateSimpleRules().
-        if ($resource->getCurrentTermRestriction()) {
+        if (!$overrideValidation && $resource->getCurrentTermRestriction()) {
             $errors = array_merge_recursive(
                 $errors,
                 $this->validateCurrentTermRestriction($bookingEndAt->getDateTimeObject(), $this->getCurrentTerm())
@@ -1013,7 +1027,7 @@ class Validation
             );
         }
 
-        return $this->getStatusIdForNonClashBooking($booking, $user);
+        return $this->getStatusIdForNonClashBooking($booking, $user, $overrideValidation);
     }
 
     /**
@@ -1025,16 +1039,21 @@ class Validation
      *
      * @param BookingModel $booking
      * @param User $user
+     * @param bool $overrideValidation
      * @return int
      */
-    private function getStatusIdForNonClashBooking(BookingModel $booking, User $user): int
+    private function getStatusIdForNonClashBooking(
+        BookingModel $booking,
+        User $user,
+        bool $overrideValidation = false
+    ): int
     {
         $resource = $booking->getResource();
         $event = $booking->getEvent();
 
-        // What about the resource? If it's an open resource, confirm the
-        // booking immediately.
-        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
+        // What about the resource? If it's an open resource, confirm the booking immediately.
+        // Also approve immediately if $overrideValidation is true.
+        if ($overrideValidation || $resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
             return BookingStatusModel::STATUS_APPROVED;
         }
 

@@ -374,6 +374,12 @@ class Controller extends Base
 
             $isTimeChanged = $startDelta->getSecondTotal() !== 0 || $endDelta->getSecondTotal() !== 0;
 
+            // Only users allowed to moderate this item may override validation.
+            // Determine this in the same way as is done in Validation->validateBookingFromPostData().
+            $overrideValidation = (
+                !empty($postData['override_validation']) && $item->getResource()->canUserModerateThisItem($this->user)
+            );
+
             // Save the whole series
             $bookingList = new Collection();
             foreach ($series as $booking) {
@@ -392,8 +398,12 @@ class Controller extends Base
                         $bookingStartDateTime !== null &&
                         array_key_exists($bookingStartDateTime->getDatabaseDate(), $clashBookingStartDatesAsKeys)
                     );
-                    // TODO: Pass a boolean override parameter to the function below.
-                    $bookingStatusId = $validation->getNewStatusIdForBooking($booking, $thisBookingHasClashes, $this->getUser());
+                    $bookingStatusId = $validation->getNewStatusIdForBooking(
+                        $booking,
+                        $thisBookingHasClashes,
+                        $this->getUser(),
+                        $overrideValidation,
+                    );
                     $booking->setStatus($this->getStatusMapper()->createModel($bookingStatusId));
                 }
 
