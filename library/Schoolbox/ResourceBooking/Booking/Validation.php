@@ -19,6 +19,8 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\ResourceBooking\Booking\Model as BookingModel;
 use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
 use Schoolbox\ResourceBooking\Item\Model as BookingItemModel;
@@ -799,6 +801,45 @@ class Validation
     }
 
     /**
+     * Validate the booking of a single resource $item, possibly as a recurrence.
+     * If clash bookings are allowed for the resource, do not record clash validation errors.  Remember the dates on
+     * which clashes are found however, and return those in a separate array.  This allows the caller to identify the
+     * bookings that clash for special treatment (e.g. the caller may wish to set the status of those bookings to 'pending').
+     *
+     * @param Item\Model $item
+     * @param array $bookingDetailsForItem - See docblock on for Validation->validateBookingFromPostData() for details.
+     * @param null|Model $existingBooking
+     * @return array
+     * @throws MapperException
+     * @throws Deleted
+     */
+    public function validateBookingIgnoringClashesIfClashesAllowed(
+        Item\Model $item,
+        array $bookingDetailsForItem,
+        ?Model $existingBooking = null
+    ): array {
+        // Validate this item.
+        $errors = $this->validateBookingFromPostData($item, $bookingDetailsForItem, $existingBooking);
+
+        // If clashes are allowed on the booking, and all validation errors are clash errors...
+        $clashBookingStartDatesAsKeys = [];
+        if (
+            count($errors) > 0 && $item->getAllowClashBookings() &&
+            $this->validationErrorsAreAllClashes($errors)
+        ) {
+            // Remember the start dates of clash bookings.
+            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
+            foreach ($errors[self::START_PERIOD_ERRORS] as $startDate => $errors) {
+                $clashBookingStartDatesAsKeys[$startDate] = null;
+            }
+            // Ignore errors since all were clashes and clashes are allowed.
+            $errors = [];
+        }
+
+        return [$errors, $clashBookingStartDatesAsKeys];
+    }
+
+    /**
      * For each booking in $movedBookings, check whether the booking clashes with any existing approved bookings of the
      * same resource that end in the future.
      *
@@ -861,6 +902,7 @@ class Validation
 
     /**
      * For each event in $eventById, check whether adding a booking of each resource in $resourceById would result in
+<<<<<<< HEAD
      * a clash with an already approved booking.
      *
      * Notes:
@@ -870,6 +912,10 @@ class Validation
      *     to make that check.  A suggestion is to use $this->getNewStatusIdForBooking() to get the status of the
      *     moved bookings, which makes that check.
      *  2. If a booking does clash, the new booking can still be made if clash bookings are allowed on the resource.
+=======
+     * a clash with an already approved booking.  (If so, the new booking can still be made if clash bookings are
+     * allowed on the resource.)
+>>>>>>> a51a229baf2 (Move function into Validation class [SA-21759])
      *
      * @param GenericCollection<int, BookingItemModel> $resourceById - Resources indexed by resourceId.
      * @param GenericCollection<int, Event> $eventById - Events indexed by eventId.

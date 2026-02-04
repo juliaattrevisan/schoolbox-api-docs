@@ -28,7 +28,6 @@ use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -206,12 +205,22 @@ class Controller extends Base
      */
     public function createBooking(Item\Model $item): void
     {
-        $bookingList = null;
-
-        $code = self::HTTP_STATUS_CODE_OK;
-        [$errors, $clashBookingStartDatesAsKeys] = (
-            $this->validateBookingIgnoringClashesIfClashesAllowed($item, $this->requestPost->getArrayCopy())
+        $validation = new Validation(
+            $this->getUser(),
+            $this->getBookingMapper(),
+            $this->getStatusMapper(),
+            $this->getTermMapper(),
+            $this->getExternalTimetableHandler(),
+            $this->getCampusMapper(),
+            $this->getConfigLoader(),
+            $this->getExternalEventMapper()
         );
+        [$errors, $clashBookingStartDatesAsKeys] = (
+            $validation->validateBookingIgnoringClashesIfClashesAllowed($item, $this->requestPost->getArrayCopy())
+        );
+
+        $bookingList = null;
+        $code = self::HTTP_STATUS_CODE_OK;
 
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
@@ -315,11 +324,17 @@ class Controller extends Base
             throw new SchoolboxException("Bookings linked to events cannot be updated by this method.");
         }
 
-        $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
-        $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
-
-        $code = self::HTTP_STATUS_CODE_OK;
-        [$errors, $clashBookingStartDatesAsKeys] = $this->validateBookingIgnoringClashesIfClashesAllowed(
+        $validation = new Validation(
+            $this->getUser(),
+            $this->getBookingMapper(),
+            $this->getStatusMapper(),
+            $this->getTermMapper(),
+            $this->getExternalTimetableHandler(),
+            $this->getCampusMapper(),
+            $this->getConfigLoader(),
+            $this->getExternalEventMapper()
+        );
+        [$errors, $clashBookingStartDatesAsKeys] = $validation->validateBookingIgnoringClashesIfClashesAllowed(
             $item->getResource(),
             $this->requestPost->getArrayCopy(),
             $item,
@@ -329,6 +344,10 @@ class Controller extends Base
         //  * ignore all validation errors it is possible to ignore (e.g. can't ignore datetime format errors)
         //  * reject all currently approved bookings that clash with this booking
         //  * approve this booking
+
+        $originalStart = clone $item->getEvent()->getStartDateTime()->getDateTimeObject();
+        $originalEnd   = clone $item->getEvent()->getEndDateTime()->getDateTimeObject();
+        $code = self::HTTP_STATUS_CODE_OK;
 
         if (empty($errors)) {
             $item
@@ -1297,55 +1316,5 @@ class Controller extends Base
         // approve the new booking
         $errorsNew = $this->changeStatus($item, Status\Model::STATUS_APPROVED);
         $this->setUpdateStatusResponse($item, $this->getStatusChangeCallbackUrl(), array_merge($errorsOld, $errorsNew));
-    }
-
-    /**
-     * Validate the booking of a single resource $item, possibly as a recurrence.
-     * If clash bookings are allowed for the resource, do not record clash validation errors.  Remember the dates on
-     * which clashes are found however, and return those in a separate array.  This allows the caller to identify the
-     * bookings that clash for special treatment (e.g. the caller may wish to set the status of those bookings to 'pending').
-     * TODO: Move this function into ResourceBooking/Booking/Validation.php.
-     *
-     * @param Item\Model $item
-     * @param array $bookingDetailsForItem - See docblock on for Validation->validateBookingFromPostData() for details.
-     * @param null|Model $existingBooking
-     * @return array
-     * @throws MapperException
-     * @throws Deleted
-     */
-    private function validateBookingIgnoringClashesIfClashesAllowed(
-        Item\Model $item,
-        array $bookingDetailsForItem,
-        ?Model $existingBooking = null
-    ): array {
-        // Validate this item.
-        $validation = new Validation(
-            $this->getUser(),
-            $this->getBookingMapper(),
-            $this->getStatusMapper(),
-            $this->getTermMapper(),
-            $this->getExternalTimetableHandler(),
-            $this->getCampusMapper(),
-            $this->getConfigLoader(),
-            $this->getExternalEventMapper()
-        );
-        $errors = $validation->validateBookingFromPostData($item, $bookingDetailsForItem, $existingBooking);
-
-        // If clashes are allowed on the booking, and all validation errors are clash errors...
-        $clashBookingStartDatesAsKeys = [];
-        if (
-            count($errors) > 0 && $item->getAllowClashBookings() &&
-            $validation->validationErrorsAreAllClashes($errors)
-        ) {
-            // Remember the start dates of clash bookings.
-            // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
-            foreach ($errors[Validation::START_PERIOD_ERRORS] as $startDate => $errors) {
-                $clashBookingStartDatesAsKeys[$startDate] = null;
-            }
-            // Ignore errors since all were clashes and clashes are allowed.
-            $errors = [];
-        }
-
-        return [$errors, $clashBookingStartDatesAsKeys];
     }
 }
