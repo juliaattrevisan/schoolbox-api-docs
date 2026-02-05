@@ -443,19 +443,30 @@ class Validation
      *
      * @return array If not empty, this contains the errors for this change.
      */
-    public function validateChangeStatus(Model $booking, $status)
+    public function validateChangeStatus(Model $booking, int $status): array
     {
-        switch ($status) {
-            case Status\Model::STATUS_APPROVED:
-                return $this->validateForClashes(
-                    $booking->getResource(),
-                    $booking->getEvent()->getStartDateTime()->getDateTimeObject(),
-                    $booking->getEvent()->getEndDateTime()->getDateTimeObject(),
-                    $booking
-                );
-            default:
-                return [];
+        $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDatetime();
+        $bookingEndAt = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDatetime();
+
+        if ($bookingStartAt === null) {
+            // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
+            return [self::START_PERIOD_ERRORS => [self::ERROR_INVALID => [self::ERROR_INVALID]]];
         }
+
+        if ($bookingEndAt === null) {
+            // This should never happen since we fall back to event start/end dates, but handle this theoretical case.
+            return [self::END_PERIOD_ERRORS => [self::ERROR_INVALID => [self::ERROR_INVALID]]];
+        }
+
+        return match ($status) {
+            Status\Model::STATUS_APPROVED => $this->validateForClashes(
+                $booking->getResource(),
+                $bookingStartAt->getDateTimeObject(),
+                $bookingEndAt->getDateTimeObject(),
+                $booking
+            ),
+            default => [],
+        };
     }
 
     /**
