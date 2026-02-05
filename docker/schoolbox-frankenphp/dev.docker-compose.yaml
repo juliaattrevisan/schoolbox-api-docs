@@ -10,6 +10,7 @@ services:
       SYNERGETIC_PASSWORD_ENCRYPTION_KEY: ${SYNERGETIC_PASSWORD_ENCRYPTION_KEY:-}
       SYNERGETIC_PASSWORD_ENCRYPTION_IV: ${SYNERGETIC_PASSWORD_ENCRYPTION_IV:-}
     restart: always
+    pull_policy: always
     build:
       context: ./schoolbox-frankenphp
       dockerfile: dev-image.Dockerfile

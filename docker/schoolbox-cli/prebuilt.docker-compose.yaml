@@ -12,6 +12,7 @@
 services:
   schoolbox-cli:
     container_name: schoolbox-cli
+    pull_policy: always
     restart: always
     image: ${SCHOOLBOX_CLI_IMAGE}
     environment:
