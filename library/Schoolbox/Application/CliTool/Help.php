@@ -86,8 +86,68 @@ class Help extends BaseHelp
                     . $this->renderUsageCommand()
                     . $this->renderUsageOptions()
                     . $this->renderUsageOperands(),
-                '{DESCRIPTION}' => $this->renderDescription(),
+                '{DESCRIPTION}' => $this->wrapText($this->renderDescription()),
             ],
         );
+    }
+
+    private function wrapText(string $text): string
+    {
+        $indent   = str_repeat(' ', self::INDENT_WIDTH);
+        $maxWidth = $this->getScreenWidth();
+
+        // First split by line-break, appending a paragraph to each
+        $paragraphs = preg_split('/(\n)/', $text, -1);
+        $paragraphs = array_map(fn ($p) => $indent . $p, $paragraphs);
+
+        // Break on space or hyphen if possible:
+        // if the next word would still be too long, don't break.
+        $paragraphs = array_map($this->splitParagraph(...), $paragraphs);
+        return rtrim(implode(PHP_EOL, $paragraphs)) . PHP_EOL . PHP_EOL;
+//        foreach ($paragraphs as $paragraph) {
+//            if (mb_strlen($paragraph) > $maxWidth) {
+//
+//            }
+//        }
+
+
+//        $output = [];
+//        // First split by line-break
+//        $paragraphs = preg_split('/(\n)/', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+//        foreach ($paragraphs as $paragraph) {
+//            // Then split by space or dash
+//            $col      = self::INDENT_WIDTH;
+//            $words    = preg_split('/([\s-])/', trim($paragraph), -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+//            $output[] = $indent;
+//            foreach ($words as $word) {
+//
+//            }
+//
+//            $output[] = PHP_EOL;
+//        }
+    }
+
+    private function splitParagraph(string $paragraph, int $iteration = 1): string
+    {
+        // Break infinite recursion
+        if ($iteration > 100) {
+            return $paragraph;
+        }
+
+        $indent   = str_repeat(' ', self::INDENT_WIDTH);
+        $maxWidth = $this->getScreenWidth();
+        if (mb_strlen($paragraph) > $maxWidth) {
+            // Find last space before maxWidth:
+            // if there is none, split at first after maxWidth
+            $lastSplit = mb_strrpos(mb_substr($paragraph, 0, $maxWidth), ' ');
+            if ($lastSplit === false) {
+                $lastSplit = mb_strpos($paragraph, ' ', $maxWidth);
+            }
+            return mb_substr($paragraph, 0, $lastSplit)
+                . PHP_EOL
+                . $indent
+                . trim($this->splitParagraph(mb_substr($paragraph, $lastSplit), $iteration + 1));
+        }
+        return $paragraph;
     }
 }
