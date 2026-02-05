@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\DifferentiationProfile;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Request\Values;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Collection;
 use Schoolbox\DifferentiationProfile\Translator\ModelToArray;
@@ -103,7 +104,7 @@ class Controller extends Base
                     fn(AdminConfigModel $config) => call_user_func($this->adminConfigModelToArray, $config)
                 ),
                 'routes' => [
-                    'getData' => $this->getRouteIfAuthorized('differentiationProfiles.getDifferentiationProfileData'),
+                    'getData' => $this->getRouteIfAuthorized('differentiationProfiles.getAllDifferentiationProfileData'),
                     'genAi' => $this->getRouteIfAuthorized('openai.postDifferentiation'),
                 ]
             ],
@@ -111,7 +112,7 @@ class Controller extends Base
         );
     }
 
-    public function getDifferentiationProfileData(): void
+    public function getAllDifferentiationProfileData(): void
     {
         $adminConfigs         = $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1);
 
@@ -281,42 +282,104 @@ class Controller extends Base
     }
 
     /**
-     * Save differentiation profile data
+     * Create differentiation profile data
      *
      * @param User $student
      * @return void
      * @throws Exception
      */
-    public function postDifferentiationProfileData(User $student): void
+    public function createDifferentiationProfileData(User $student): void
     {
         $post = $this->requestPost;
 
-        $id = $post->getInt('id');
-
-        /* Look for the existing differentiation profile record if an ID is provided
+        /* Check if a profile already exists for the student
          */
-        if (null !== $id) {
-            try {
-                $model = $this->mapper->findById($id);
-            } catch (\Exception $e) {
-                $this->sendJsonError('Differentiation profile record not found.', 404);
-                return;
-            }
-        } else {
+        try {
+            $this->mapper->findOneByColumn('student_id', $student->getId());
+            $this->sendJsonError('Profile for student already exists.', 400);
+            return;
+        } catch (Exception\NotFound $e) {
+            /* No existing profile found, proceed to create a new one
+             */
+        }
+
+        try {
             $model = $this->mapper->createModel()
                                   ->setStudent($student);
-        }
-
-        $adjustment_level = $post->get('adjustment_level');
-        if (!is_array($adjustment_level) && null !== $adjustment_level) {
-            $this->sendJsonError('Adjustment level must be an array.', 400);
+        } catch (\Exception $e) {
+            $this->sendJsonError('Failed to create differentiation profile record.', 500);
             return;
         }
 
-        $adjustment_category = $post->get('adjustment_category');
-        if (!is_array($adjustment_category) && null !== $adjustment_category) {
-            $this->sendJsonError('Adjustment category must be an array.', 400);
+        $this->persistDifferentiationProfile($model, $post);
+    }
+
+    /**
+     * Update differentiation profile data
+     *
+     * @param User $student
+     * @return void
+     * @throws Exception
+     */
+    public function putDifferentiationProfileData(User $student): void
+    {
+        $body = new Values($this->request->getParsedBody() ?? []);
+
+        try {
+            /** @var Model $model */
+            $model = $this->mapper->findOneByColumn(
+                'student_id',
+                $student->getId(),
+                [
+                    'order' => [
+                        'updated_at' => DifferentiationProfileMapper::SORT_ORDER_DESC,
+                    ],
+                ]
+            );
+        } catch (\Exception $e) {
+            $this->sendJsonError('Differentiation profile record not found.', 404);
             return;
+        }
+
+        $this->persistDifferentiationProfile($model, $body);
+    }
+
+    /**
+     * Persist differentiation profile data
+     *
+     * @param Model  $model
+     * @param Values $post
+     * @return void
+     * @throws Exception
+     */
+    private function persistDifferentiationProfile(Model $model, Values $post): void
+    {
+        $adjustmentLevel = $post->get('adjustment_level');
+        if (null !== $adjustmentLevel) {
+            /* Ensure adjustment level is an array
+             */
+            if (!is_array($adjustmentLevel)) {
+                $this->sendJsonError('Adjustment level must be an array.', 400);
+                return;
+            }
+
+            if (!$this->validateAdjustmentIds($adjustmentLevel, $this->adjustmentLevelsMapper, 'adjustment levels')) {
+                return;
+            }
+        }
+
+        $adjustmentCategory = $post->get('adjustment_category');
+        if (null !== $adjustmentCategory) {
+            /* Ensure adjustment category is an array
+             */
+            if (!is_array($adjustmentCategory)) {
+                $this->sendJsonError('Adjustment category must be an array.', 400);
+                return;
+            }
+
+            if (!$this->validateAdjustmentIds($adjustmentCategory, $this->adjustmentCategoriesMapper, 'adjustment categories')) {
+                return;
+            }
         }
 
         /* Validate text field lengths
@@ -366,8 +429,16 @@ class Controller extends Base
         try {
             /** @var Model $model */
             $model
-                ->setAdjustmentLevelIds($adjustment_level ? implode(',', $adjustment_level) : null)
-                ->setAdjustmentCategoryIds($adjustment_category ? implode(',', $adjustment_category) : null)
+                ->setAdjustmentLevelIds(
+                    $adjustmentLevel ?
+                        implode(',', array_column($adjustmentLevel, 'id')) :
+                        null
+                )
+                ->setAdjustmentCategoryIds(
+                    $adjustmentCategory ?
+                        implode(',', array_column($adjustmentCategory, 'id')) :
+                        null
+                )
                 ->setOverview($post->get('overview'))
                 ->setGoals($post->get('goals'))
                 ->setStrategiesAdjustments($post->get('strategies_adjustments'))
@@ -375,22 +446,70 @@ class Controller extends Base
                 ->setInterestsStrengths($post->get('interests_strengths'))
                 ->setUpdatedBy($this->getUser());
 
+            $isNewRecord = null === $model->getId();
             /* Set created_by only if it's a new record
              */
-            if (null === $id) {
+            if ($isNewRecord) {
                 $model->setCreatedBy($this->getUser());
             }
 
             $this->mapper->save($model);
 
-            $this->response = $this->responseAsJson(
-                [
-                    "id" => $model->getId(),
-                    "updated_at" => $model->getUpdatedAt()->getShort(),
-                ]
-            )->withStatus(200);
+            /* Retrieve the updated model with the updated adjustments
+             */
+            $model = $this->mapper->findById($model->getId());
+
+            $profileTranslator = new ModelToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1),
+            );
+
+            $this->response = $this
+                ->responseAsJson(call_user_func($profileTranslator, $model))
+                ->withStatus($isNewRecord ? 201 : 200);
         } catch (\Exception $e) {
             $this->sendJsonError('Failed to save differentiation profile data.', 500);
+        }
+    }
+
+    /**
+     * Validate adjustment IDs exist in database
+     *
+     * @param array<array{id: int}> $adjustments
+     * @param \Schoolbox\Mapper $adjustmentMapper
+     * @param string $type
+     * @return bool Returns true if valid, false otherwise (response already set)
+     */
+    private function validateAdjustmentIds(array $adjustments, \Schoolbox\Mapper $adjustmentMapper, string $type): bool
+    {
+        $ids = array_column($adjustments, 'id');
+
+        /* Ensure there are IDs to validate
+         */
+        if (empty($ids)) {
+            $this->sendJsonError("IDs for {$type} are not provided.", 400);
+            return false;
+        }
+
+        try {
+            $pb = $adjustmentMapper->getPredicateBuilder();
+            $pb->in('id', $ids);
+            $count = $adjustmentMapper->countByPredicates($pb);
+            /* Check if all provided IDs exist
+             */
+            if ($count !== count($adjustments)) {
+                $this->sendJsonError(
+                    'One or more ' . $type . ' are invalid.',
+                    400
+                );
+                return false;
+            }
+            return true;
+        } catch (\Exception $e) {
+            $this->sendJsonError('Error updating adjustment ' . $type, 500);
+            return false;
         }
     }
 
@@ -442,5 +561,38 @@ class Controller extends Base
                 return $carry;
             }, [])
         );
+    }
+
+    /**
+     * Get differentiation profile data for a student
+     *
+     * @param User $student
+     * @return void
+     * @throws Exception
+     */
+    public function getDifferentiationProfileData(User $student): void
+    {
+        try {
+            $profile = $this->mapper->findOneByColumn(
+                'student_id',
+                $student->getId(),
+                [
+                    'order' => ['updated_at' => DifferentiationProfileMapper::SORT_ORDER_DESC],
+                ]
+            );
+
+            $profileTranslator = new ModelToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getUser(),
+                $this->differentiationProfileConfigMapper->findByColumn('is_enabled', 1),
+            );
+            $data = call_user_func($profileTranslator, $profile);
+            $this->response = $this->responseAsJson($data);
+            return;
+        } catch (Exception\NotFound $e) {
+            $this->sendJsonError('Differentiation profile record not found for the student.', 404);
+            return;
+        }
     }
 }

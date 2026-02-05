@@ -25,7 +25,7 @@ use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevel;
  * Test for the differentiation profile model to array translator.
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(ModelToArray::class)]
-class differentiationProfileModelToArrayTest extends TestCase
+class DifferentiationProfileModelToArrayTest extends TestCase
 {
     private Generator $routeGenerator;
     private Authorizer $authorizer;
@@ -34,10 +34,18 @@ class differentiationProfileModelToArrayTest extends TestCase
     private const string ADJUSTMENT_CATEGORY_ID_2 = "2";
     private const string ADJUSTMENT_CATEGORY_ID_3 = "3";
     private const string ADJUSTMENT_CATEGORY_ID_4 = "4";
+    private const string ADJUSTMENT_CATEGORY_NAME_1 = "Category 1";
+    private const string ADJUSTMENT_CATEGORY_NAME_2 = "Category 2";
+    private const string ADJUSTMENT_CATEGORY_NAME_3 = "Category 3";
+    private const string ADJUSTMENT_CATEGORY_NAME_4 = "Category 4";
     private const string ADJUSTMENT_LEVEL_ID_1 = "1";
     private const string ADJUSTMENT_LEVEL_ID_2 = "2";
     private const string ADJUSTMENT_LEVEL_ID_3 = "3";
     private const string ADJUSTMENT_LEVEL_ID_4 = "4";
+    private const string ADJUSTMENT_LEVEL_NAME_1 = "Level 1";
+    private const string ADJUSTMENT_LEVEL_NAME_2 = "Level 2";
+    private const string ADJUSTMENT_LEVEL_NAME_3 = "Level 3";
+    private const string ADJUSTMENT_LEVEL_NAME_4 = "Level 4";
 
     protected function setUp(): void
     {
@@ -118,6 +126,7 @@ class differentiationProfileModelToArrayTest extends TestCase
         $routes = [
             'linkedRecords' => null,
             'edit' => null,
+            'create' => null,
         ];
 
         return [
@@ -135,6 +144,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => null,
+                    'status'                 => ['unpopulated'],
                     'student'                => $userResponse,
                     'adjustment_category'    => null,
                     'adjustment_level'       => null,
@@ -143,13 +153,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => null,
                     'strategies_adjustments' => null,
                     'goals'                  => null,
-                    'status'                 => ['unpopulated'],
+                    '_routes'                => $routes,
                     'created_at'             => null,
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Complete Profile' => [
@@ -157,8 +166,8 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new Model()
                     ->setId(1)
                     ->setStudent($student)
-                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)]))
-                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)]))
+                    ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)]))
+                    ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)]))
                     ->setOverview('This is an overview.')
                     ->setInterestsStrengths('Interests and strengths details.')
                     ->setNeedsChallenges('Needs and challenges details.')
@@ -177,21 +186,21 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 1,
+                    'status'                 => [],
                     'student'                => $userResponse,
-                    'adjustment_category'    => [1],
-                    'adjustment_level'       => [1],
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]],
+                    'adjustment_level'       => [['id' => self::ADJUSTMENT_LEVEL_ID_1, 'name' => self::ADJUSTMENT_LEVEL_NAME_1]],
                     'overview'               => 'This is an overview.',
                     'interests_strengths'    => 'Interests and strengths details.',
                     'needs_challenges'       => 'Needs and challenges details.',
                     'strategies_adjustments' => 'Strategies and adjustments details.',
                     'goals'                  => 'Goals details.',
-                    'status'                 => [],
-                    'created_at'             => 'Jan 1, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-01-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Jan 2, 2024 1:00am',
+                    'updated_at'             => '2024-01-02T01:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Deleted Profile' => [
@@ -211,6 +220,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 2,
+                    'status'                 => ['unpopulated'],
                     'student'                => $userResponse,
                     'adjustment_category'    => null,
                     'adjustment_level'       => null,
@@ -219,13 +229,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => null,
                     'strategies_adjustments' => null,
                     'goals'                  => null,
-                    'status'                 => ['unpopulated'],
+                    '_routes'                => $routes,
                     'created_at'             => null,
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
-                    'deleted_at'             => 'Mar 1, 2024 12:00am',
-                    '_routes'                => $routes,
+                    'deleted_at'             => '2024-03-01T00:00:00+00:00',
                 ],
             ],
             'Partial Config - Only Adjustment Fields' => [
@@ -234,12 +243,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(3)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('This overview should not appear.')
                     ->setInterestsStrengths('These interests should not appear.')
@@ -250,16 +259,22 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 3,
-                    'student'                => $userResponse,
-                    'adjustment_category'    => [1, 2],
-                    'adjustment_level'       => [2, 4],
                     'status'                 => [],
-                    'created_at'             => 'Feb 1, 2024 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_2, 'name' => self::ADJUSTMENT_CATEGORY_NAME_2]
+                    ],
+                    'adjustment_level'       => [
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_2, 'name' => self::ADJUSTMENT_LEVEL_NAME_2],
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_4, 'name' => self::ADJUSTMENT_LEVEL_NAME_4]
+                    ],
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-02-01T00:00:00+00:00',
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Overview and Goals Only' => [
@@ -268,12 +283,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(4)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3)->setName(self::ADJUSTMENT_CATEGORY_NAME_3),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)
                     ]))
                     ->setOverview('Visible overview.')
                     ->setGoals('Visible goals.')
@@ -288,16 +303,16 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 4,
+                    'status'                 => [],
                     'student'                => $userResponse,
                     'overview'               => 'Visible overview.',
                     'goals'                  => 'Visible goals.',
-                    'status'                 => [],
-                    'created_at'             => 'Mar 15, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-03-15T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Mar 20, 2024 12:00am',
+                    'updated_at'             => '2024-03-20T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - No Text Fields' => [
@@ -306,12 +321,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(5)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3)
                     ]))
                     ->setOverview('This should not be visible.')
                     ->setInterestsStrengths('This should not be visible.')
@@ -325,16 +340,22 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 5,
-                    'student'                => $userResponse,
-                    'adjustment_category'    => [4, 1],
-                    'adjustment_level'       => [4, 3],
                     'status'                 => [],
-                    'created_at'             => 'Apr 1, 2024 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_4, 'name' => self::ADJUSTMENT_CATEGORY_NAME_4],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]
+                    ],
+                    'adjustment_level'       => [
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_4, 'name' => self::ADJUSTMENT_LEVEL_NAME_4],
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_3, 'name' => self::ADJUSTMENT_LEVEL_NAME_3]
+                    ],
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-04-01T00:00:00+00:00',
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Empty Config Collection' => [
@@ -343,12 +364,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(6)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Nothing should be visible.')
                     ->setInterestsStrengths('Nothing should be visible.')
@@ -359,14 +380,14 @@ class differentiationProfileModelToArrayTest extends TestCase
                 new GenericCollection(ProfileConfig::class, []),
                 [
                     'id'                     => 6,
-                    'student'                => $userResponse,
                     'status'                 => [],
-                    'created_at'             => 'May 1, 2024 12:00am',
+                    'student'                => $userResponse,
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-05-01T00:00:00+00:00',
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Three Middle Fields' => [
@@ -375,12 +396,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(7)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Hidden overview.')
                     ->setInterestsStrengths('Visible interests and strengths.')
@@ -396,17 +417,17 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 7,
+                    'status'                 => [],
                     'student'                => $userResponse,
                     'interests_strengths'    => 'Visible interests and strengths.',
                     'needs_challenges'       => 'Visible needs and challenges.',
                     'strategies_adjustments' => 'Visible strategies and adjustments.',
-                    'status'                 => [],
-                    'created_at'             => 'Jun 1, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-06-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Jun 15, 2024 12:00am',
+                    'updated_at'             => '2024-06-15T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Single Field Enabled' => [
@@ -415,12 +436,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(8)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Only this overview is visible.')
                     ->setInterestsStrengths('Hidden.')
@@ -433,15 +454,15 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 8,
+                    'status'                 => [],
                     'student'                => $userResponse,
                     'overview'               => 'Only this overview is visible.',
-                    'status'                 => [],
-                    'created_at'             => 'Jul 1, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-07-01T00:00:00+00:00',
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Partial Config - Alternating Fields' => [
@@ -450,11 +471,11 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(9)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_4)->setName(self::ADJUSTMENT_LEVEL_NAME_4)
                     ]))
                     ->setOverview('Visible overview.')
                     ->setInterestsStrengths('Hidden interests.')
@@ -471,18 +492,21 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 9,
+                    'status'                 => [],
                     'student'                => $userResponse,
-                    'adjustment_category'    => [4, 1],
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_4, 'name' => self::ADJUSTMENT_CATEGORY_NAME_4],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]
+                    ],
                     'overview'               => 'Visible overview.',
                     'needs_challenges'       => 'Visible needs.',
                     'goals'                  => 'Visible goals.',
-                    'status'                 => [],
-                    'created_at'             => 'Aug 1, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-08-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Aug 10, 2024 12:00am',
+                    'updated_at'             => '2024-08-10T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Expired Profile' => [
@@ -491,10 +515,10 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(10)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1)
                     ]))
                     ->setOverview('This profile has expired.')
                     ->setExpired(true)
@@ -507,17 +531,17 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 10,
-                    'student'                => $userResponse,
-                    'adjustment_category'    => [1],
-                    'adjustment_level'       => [1],
-                    'overview'               => 'This profile has expired.',
                     'status'                 => ['expired'],
-                    'created_at'             => 'Jan 1, 2023 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]],
+                    'adjustment_level'       => [['id' => self::ADJUSTMENT_LEVEL_ID_1, 'name' => self::ADJUSTMENT_LEVEL_NAME_1]],
+                    'overview'               => 'This profile has expired.',
+                    '_routes'                => $routes,
+                    'created_at'             => '2023-01-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Jun 1, 2023 12:00am',
+                    'updated_at'             => '2023-06-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Out of Date Profile' => [
@@ -526,7 +550,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setId(11)
                     ->setStudent($student)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setGoals('This is an overview.')
                     ->setOutOfDate(true)
@@ -538,16 +562,16 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 11,
-                    'student'                => $userResponse,
-                    'adjustment_category'    => [2],
-                    'goals'                  => 'This is an overview.',
                     'status'                 => ['outOfDate'],
-                    'created_at'             => 'Mar 1, 2023 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_2, 'name' => self::ADJUSTMENT_CATEGORY_NAME_2]],
+                    'goals'                  => 'This is an overview.',
+                    '_routes'                => $routes,
+                    'created_at'             => '2023-03-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Sep 1, 2023 12:00am',
+                    'updated_at'             => '2023-09-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Expired and Out of Date Profile' => [
@@ -565,15 +589,15 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 12,
+                    'status'                 => ['expired', 'outOfDate'],
                     'student'                => $userResponse,
                     'overview'               => 'This is an overview.',
-                    'status'                 => ['expired', 'outOfDate'],
-                    'created_at'             => 'Jan 1, 2022 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2022-01-01T00:00:00+00:00',
                     'created_by'             => null,
-                    'updated_at'             => 'Dec 1, 2022 12:00am',
+                    'updated_at'             => '2022-12-01T00:00:00+00:00',
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Expired, Out of Date, and Unpopulated Profile' => [
@@ -590,16 +614,16 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 13,
+                    'status'                 => ['expired', 'outOfDate', 'unpopulated'],
                     'student'                => $userResponse,
                     'overview'               => null,
                     'goals'                  => null,
-                    'status'                 => ['expired', 'outOfDate', 'unpopulated'],
-                    'created_at'             => 'Jan 1, 2021 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2021-01-01T00:00:00+00:00',
                     'created_by'             => null,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ],
             ],
             'Newly created profile' => [
@@ -620,6 +644,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => null,
+                    'status'                 => ['unpopulated'],
                     'student'                => $userResponse,
                     'adjustment_category'    => null,
                     'adjustment_level'       => null,
@@ -628,13 +653,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => null,
                     'strategies_adjustments' => null,
                     'goals'                  => null,
-                    'status'                 => ['unpopulated'],
+                    '_routes'                => $routes,
                     'created_at'             => null,
                     'created_by'             => $staffResponse1,
                     'updated_at'             => null,
                     'updated_by'             => $staffResponse1,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ]
             ],
             'Profile is updated by another staff' => [
@@ -658,6 +682,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 14,
+                    'status'                 => [],
                     'student'                => $userResponse,
                     'adjustment_category'    => null,
                     'adjustment_level'       => null,
@@ -666,13 +691,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     'needs_challenges'       => null,
                     'strategies_adjustments' => null,
                     'goals'                  => null,
-                    'status'                 => [],
-                    'created_at'             => 'Jan 10, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-01-10T00:00:00+00:00',
                     'created_by'             => $staffResponse1,
-                    'updated_at'             => 'Feb 15, 2024 12:00am',
+                    'updated_at'             => '2024-02-15T00:00:00+00:00',
                     'updated_by'             => $staffResponse2,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ]
             ],
             'Profile with only created_by set' => [
@@ -682,7 +706,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setStudent($student)
                     ->setCreatedBy($staff1)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_1)->setName(self::ADJUSTMENT_CATEGORY_NAME_1)
                     ]))
                     ->setOverview('Profile with creator only.')
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'), $locale)),
@@ -692,16 +716,16 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 15,
-                    'student'                => $userResponse,
-                    'adjustment_category'    => [1],
-                    'overview'               => 'Profile with creator only.',
                     'status'                 => [],
-                    'created_at'             => 'Mar 1, 2024 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_1, 'name' => self::ADJUSTMENT_CATEGORY_NAME_1]],
+                    'overview'               => 'Profile with creator only.',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-03-01T00:00:00+00:00',
                     'created_by'             => $staffResponse1,
                     'updated_at'             => null,
                     'updated_by'             => null,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ]
             ],
             'Profile with only updated_by set' => [
@@ -717,15 +741,15 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 16,
+                    'status'                 => [],
                     'student'                => $userResponse,
                     'goals'                  => 'Profile with updater only.',
-                    'status'                 => [],
+                    '_routes'                => $routes,
                     'created_at'             => null,
                     'created_by'             => null,
-                    'updated_at'             => 'Apr 1, 2024 12:00am',
+                    'updated_at'             => '2024-04-01T00:00:00+00:00',
                     'updated_by'             => $staffResponse2,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ]
             ],
             'Deleted profile with creator and updater' => [
@@ -736,7 +760,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff1)
                     ->setUpdatedBy($staff2)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_2)->setName(self::ADJUSTMENT_CATEGORY_NAME_2)
                     ]))
                     ->setOverview('This profile was deleted.')
                     ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-05-01 00:00:00', new DateTimeZone('UTC'), $locale))
@@ -748,16 +772,16 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 17,
-                    'student'                => $userResponse,
-                    'adjustment_category'    => [2],
-                    'overview'               => 'This profile was deleted.',
                     'status'                 => [],
-                    'created_at'             => 'May 1, 2024 12:00am',
-                    'created_by'             => $staffResponse1,
-                    'updated_at'             => 'May 15, 2024 12:00am',
-                    'updated_by'             => $staffResponse2,
-                    'deleted_at'             => 'Jun 1, 2024 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_category'    => [['id' => self::ADJUSTMENT_CATEGORY_ID_2, 'name' => self::ADJUSTMENT_CATEGORY_NAME_2]],
+                    'overview'               => 'This profile was deleted.',
                     '_routes'                => $routes,
+                    'created_at'             => '2024-05-01T00:00:00+00:00',
+                    'created_by'             => $staffResponse1,
+                    'updated_at'             => '2024-05-15T00:00:00+00:00',
+                    'updated_by'             => $staffResponse2,
+                    'deleted_at'             => '2024-06-01T00:00:00+00:00',
                 ]
             ],
             'Expired profile with full audit trail' => [
@@ -768,7 +792,7 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff2)
                     ->setUpdatedBy($staff1)
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_3)->setName(self::ADJUSTMENT_LEVEL_NAME_3)
                     ]))
                     ->setInterestsStrengths('Expired profile with audit.')
                     ->setExpired(true)
@@ -780,16 +804,16 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 18,
-                    'student'                => $userResponse,
-                    'adjustment_level'       => [3],
-                    'interests_strengths'    => 'Expired profile with audit.',
                     'status'                 => ['expired'],
-                    'created_at'             => 'Jul 1, 2023 12:00am',
+                    'student'                => $userResponse,
+                    'adjustment_level'       => [['id' => self::ADJUSTMENT_LEVEL_ID_3, 'name' => self::ADJUSTMENT_LEVEL_NAME_3]],
+                    'interests_strengths'    => 'Expired profile with audit.',
+                    '_routes'                => $routes,
+                    'created_at'             => '2023-07-01T00:00:00+00:00',
                     'created_by'             => $staffResponse2,
-                    'updated_at'             => 'Dec 1, 2023 12:00am',
+                    'updated_at'             => '2023-12-01T00:00:00+00:00',
                     'updated_by'             => $staffResponse1,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ]
             ],
             'Complete profile with same creator and updater' => [
@@ -800,12 +824,12 @@ class differentiationProfileModelToArrayTest extends TestCase
                     ->setCreatedBy($staff2)
                     ->setUpdatedBy($staff2)
                     ->setAdjustmentCategory(new GenericCollection(AdjustmentCategory::class, [
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3),
-                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_3)->setName(self::ADJUSTMENT_CATEGORY_NAME_3),
+                        new AdjustmentCategory()->setId(self::ADJUSTMENT_CATEGORY_ID_4)->setName(self::ADJUSTMENT_CATEGORY_NAME_4)
                     ]))
                     ->setAdjustmentLevel(new GenericCollection(AdjustmentLevel::class, [
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1),
-                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_1)->setName(self::ADJUSTMENT_LEVEL_NAME_1),
+                        new AdjustmentLevel()->setId(self::ADJUSTMENT_LEVEL_ID_2)->setName(self::ADJUSTMENT_LEVEL_NAME_2)
                     ]))
                     ->setOverview('Complete profile.')
                     ->setInterestsStrengths('Interests.')
@@ -825,21 +849,27 @@ class differentiationProfileModelToArrayTest extends TestCase
                 ]),
                 [
                     'id'                     => 19,
+                    'status'                 => [],
                     'student'                => $userResponse,
-                    'adjustment_category'    => [3, 4],
-                    'adjustment_level'       => [1, 2],
+                    'adjustment_category'    => [
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_3, 'name' => self::ADJUSTMENT_CATEGORY_NAME_3],
+                        ['id' => self::ADJUSTMENT_CATEGORY_ID_4, 'name' => self::ADJUSTMENT_CATEGORY_NAME_4]
+                    ],
+                    'adjustment_level'       => [
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_1, 'name' => self::ADJUSTMENT_LEVEL_NAME_1],
+                        ['id' => self::ADJUSTMENT_LEVEL_ID_2, 'name' => self::ADJUSTMENT_LEVEL_NAME_2]
+                    ],
                     'overview'               => 'Complete profile.',
                     'interests_strengths'    => 'Interests.',
                     'needs_challenges'       => 'Needs.',
                     'strategies_adjustments' => 'Strategies.',
                     'goals'                  => 'Goals.',
-                    'status'                 => [],
-                    'created_at'             => 'Jul 1, 2024 12:00am',
+                    '_routes'                => $routes,
+                    'created_at'             => '2024-07-01T00:00:00+00:00',
                     'created_by'             => $staffResponse2,
-                    'updated_at'             => 'Jul 20, 2024 12:00am',
+                    'updated_at'             => '2024-07-20T00:00:00+00:00',
                     'updated_by'             => $staffResponse2,
                     'deleted_at'             => null,
-                    '_routes'                => $routes,
                 ]
             ]
         ];

@@ -66,6 +66,8 @@ class Module extends BaseModule
             ),
         );
 
+        /* Checking if the user has WRITE service permission that matches the campus of the student being accessed
+         */
         $hasCampusPerms =  new Rule\HasServicePermission(
             UserAccess::SERVICE_DIFFERENTIATION,
             UserAccess::ACCESS_WRITE,
@@ -85,9 +87,9 @@ class Module extends BaseModule
             $hasCampusPerms
         );
 
-        /* Only staff can view differentiation profiles when the feature is enabled
+        /* Only allow access if feature is enabled, user is staff, profile exists and is populated
          */
-        $getProfilePerms = new Rule\All(
+        $viewProfilePerms = new Rule\All(
             $staffWithFeatureEnabled,
             new Rule\Callback(function (array $params): void {
                 try {
@@ -112,28 +114,51 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        /* Preload student for routes that require it
+         */
+        $preloadStudent = fn(array $params) => $this->preloadStudent($params);
+
         $this->register(self::METHOD_GET, '/manage', 'manageDifferentiationProfiles', $getPerms);
-        $this->register(self::METHOD_GET, '/list', 'getDifferentiationProfileData', $getPerms);
+        $this->register(self::METHOD_GET, '/list', 'getAllDifferentiationProfileData', $getPerms);
         $this->register(
             self::METHOD_GET,
             '/linkedRecords/{studentId}',
             'getLinkedPastoralRecords',
             $getPerms,
         );
+
+        $studentPath = '/student/{studentId}';
+
         $this->register(
-            self::METHOD_POST,
-            '/edit/{studentId}',
-            'postDifferentiationProfileData',
-            $updateProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
+            self::METHOD_GET,
+            "$studentPath/view",
+            'viewDifferentiationProfileData',
+            $viewProfilePerms,
+            $preloadStudent,
         );
 
         $this->register(
             self::METHOD_GET,
-            '/view/{studentId}',
-            'viewDifferentiationProfileData',
-            $getProfilePerms,
-            \Closure::fromCallable([$this, 'preloadStudent'])
+            $studentPath,
+            'getDifferentiationProfileData',
+            $getPerms,
+            $preloadStudent,
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            $studentPath,
+            'createDifferentiationProfileData',
+            $updateProfilePerms,
+            $preloadStudent,
+        );
+
+        $this->register(
+            self::METHOD_PUT,
+            $studentPath,
+            'putDifferentiationProfileData',
+            $updateProfilePerms,
+            $preloadStudent,
         );
     }
 

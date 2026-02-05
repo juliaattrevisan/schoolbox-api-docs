@@ -93,7 +93,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                     <mdp-grid-cell-adjustment
                         :profile="row as Profile"
                         :header-key="columnHeader.key as ProfileAdjustmentKeys"
-                        :adjustments="row[columnHeader.key] as number[]"
+                        :adjustments="row[columnHeader.key] as AdjustmentType[]"
                         :options="
                             columnHeader.key === 'adjustment_category'
                                 ? props.adjustmentCategories

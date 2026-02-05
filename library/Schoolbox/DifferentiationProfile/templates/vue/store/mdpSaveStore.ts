@@ -62,8 +62,12 @@ export const useSaveStore = defineStore(`saveStore`, () => {
         if (isSaving.value) {
             return;
         }
-        if (profile._routes.edit === undefined) {
-            loadError.value = "Edit route is undefined";
+
+        const saveRoute = profile.id === null ? profile._routes.create : profile._routes.edit;
+        const saveMethod = profile.id === null ? "POST" : "PUT";
+
+        if (saveRoute === undefined) {
+            loadError.value = "Route is undefined";
             return;
         }
         const toast = window.sbProps.toastActivate("Saving...");
@@ -71,8 +75,8 @@ export const useSaveStore = defineStore(`saveStore`, () => {
             isSaving.value = true;
             loadError.value = null;
             const response = await apiRequest<SaveResponse, Partial<Profile>>({
-                url: profile._routes.edit,
-                method: "POST",
+                url: saveRoute,
+                method: saveMethod,
                 body: getSaveBody(profile, toSave),
             });
             if (!response.success) {
