@@ -16,7 +16,6 @@ use External_Timetable;
 use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\External\Event\Mapper;
-use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
