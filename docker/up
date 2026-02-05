@@ -320,7 +320,7 @@ function start_containers() {
     # start cron in schoolbox-cli container, so that cron tasks actually run:
     # even though this is in a post_start in docker/base.docker-compose.yaml,
     # it is not guaranteed to run on docker/up
-    docker exec -it schoolbox-cli sudo /etc/init.d/cron start
+    "$(dirname "$0")/compose" exec -it schoolbox-cli sudo /etc/init.d/cron start
 
     # Also rebuild cronjobs
     docker exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker
@@ -333,13 +333,13 @@ function start_containers() {
     # Create vhosts in rabbitmq container:
     # this can't be done in post_start, because the container's not healthy at
     # that time
-    docker exec -it rabbitmq rabbitmqctl add_vhost docker
-    docker exec -it rabbitmq rabbitmqctl set_permissions -p docker guest ".*" ".*" ".*"
+    "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl add_vhost docker
+    "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl set_permissions -p docker guest ".*" ".*" ".*"
     "$(dirname "$0")/compose" restart schoolbox-scheduled schoolbox-mobiled
     case "${SECOND_INSTANCE_ENABLE}" in
         1 | true | yes | on)
-            docker exec -it rabbitmq rabbitmqctl add_vhost docker2
-            docker exec -it rabbitmq rabbitmqctl set_permissions -p docker2 guest ".*" ".*" ".*"
+            "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl add_vhost docker2
+            "$(dirname "$0")/compose" exec -it rabbitmq rabbitmqctl set_permissions -p docker2 guest ".*" ".*" ".*"
             "$(dirname "$0")/compose" restart schoolbox2-scheduled schoolbox2-mobiled
             ;;
     esac
