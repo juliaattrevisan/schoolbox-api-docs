@@ -65,6 +65,7 @@
 .sbx-body .input-group a,
 .sbx-body .cursor-pagination button,
 .sbx-body .avatar-switch nav a,
+.sbx-body .context-switch nav a,
 .sbx-body .sub-nav li a,
 .sbx-body .sub-nav dd a,
 .sbx-body .sub-nav li.active a,
@@ -228,11 +229,4 @@
 .sbx-body .fc-event,
 .sbx-body .fc-event:hover {
     border-radius: var(--sbx-config-field-roundness) !important;
-}
-
-/**
- * Avatar switch navigation link height fix
- */
-.sbx-body .avatar-switch nav a {
-    height: auto !important;
 }
