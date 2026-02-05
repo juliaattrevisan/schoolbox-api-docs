@@ -11,9 +11,8 @@ import { hasErrorMessage } from "@js/util/errorUtils";
 
 const props = defineProps<{
     url: string;
-    // pastoralConfig: Config;
-    // pastoralRoutes: Routes;
-    test: string;
+    pastoralConfig: Config;
+    pastoralRoutes: Routes;
 }>();
 
 /**

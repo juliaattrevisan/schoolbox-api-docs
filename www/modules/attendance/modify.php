@@ -470,6 +470,15 @@ if ($class) {
             $this->setVar(
                 [
                     'PASTORAL_FLAGS_URL'   => '/pastoral/students/count/' . implode(',', $schoolboxStudentIds),
+                    'PASTORAL_CONFIG' => json_encode([
+                        'pastoralPointEnabled' => $configLoader->get(ConfigMapper::NAME_PASTORAL_POINT_ENABLED) ? true : false,
+                        'pastoralActionEnable' => $configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED) ? true : false,
+                        'pastoralSeverity' => $configLoader->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED) ? true : false,
+                    ]),
+                    'PASTORAL_ROUTES' => json_encode([
+                        'getStudentRecord' =>  $this->routeLookup('pastoral.getStudentRecord'),
+                        'getReportTags' => $this->routeLookup('pastoralReportBuilder.getReportTags'),
+                    ]),
                 ]
             );
             $this->parse('pastoral_enabled_block', 'PASTORAL_ENABLED');
