@@ -63,7 +63,13 @@
 .sbx-body .flex-list.buttons button,
 .sbx-body .sub-nav li a,
 .sbx-body .input-group a,
-.sbx-body .cursor-pagination button {
+.sbx-body .cursor-pagination button,
+.sbx-body .avatar-switch nav a,
+.sbx-body .context-switch nav a,
+.sbx-body .sub-nav li a,
+.sbx-body .sub-nav dd a,
+.sbx-body .sub-nav li.active a,
+.sbx-body .sub-nav dd.active a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);
@@ -124,7 +130,7 @@
 /**
  * An existing flex list of buttons, just add some gap
  */
-.flex-list.buttons {
+.sbx-body .flex-list.buttons {
     gap: var(--sbx-size-xs);
 }
 
@@ -210,21 +216,9 @@
 }
 
 /**
- * Border radius for sub-nav links
- */
-.sub-nav {
-    li a,
-    dd a,
-    li.active a,
-    dd.active a {
-        border-radius: var(--sbx-config-field-roundness);
-    }
-}
-
-/**
  *  notification advanced settings buttons alignment fix
  */
-.actions-small-6 > nav > [data-perm-container] {
+.sbx-body .actions-small-6 > nav > [data-perm-container] {
     display: inline-flex;
     align-items: center;
 }
@@ -232,7 +226,7 @@
 /**
  * FullCalendar button hover border radius fix
  */
-.fc-event,
-.fc-event:hover {
+.sbx-body .fc-event,
+.sbx-body .fc-event:hover {
     border-radius: var(--sbx-config-field-roundness) !important;
 }

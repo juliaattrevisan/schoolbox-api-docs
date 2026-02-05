@@ -108,7 +108,7 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 }
 
 // filter styles in view status page
-.sbx-body ul#filters {
+.sbx-body ul.filters {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-xs);

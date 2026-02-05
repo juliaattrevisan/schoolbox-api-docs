@@ -30,15 +30,7 @@
     .dzone,
 
     // Labels
-    .reviewed.label,
-    .submitted.label,
-    .submitted-late.label,
-    .unsubmitted.label,
-    .success.label,
-    .alert.label,
-    .neutral.label,
-    .label.highlight,
-    .label.filter,
+    .label,
 
     // Specific inner elements
     .checklist.events li label,
@@ -47,6 +39,7 @@
     .selector label::before,
     .selector label::after,
     .progress,
+    input[type="radio"]:not(.plain) + label.input-toggle,
     .progress .meter {
         border-radius: var(--sbx-config-field-roundness) !important;
     }

@@ -641,44 +641,6 @@ input[type="checkbox"]:not(.plain) + label::before {
    16. Search Page & Results
    ========================================================================== */
 
-// Search page styles
-.context-switch {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 0.5rem;
-    align-items: center;
-    &:before,
-    &:after {
-        content: none;
-    }
-    & .semester {
-        width: 100%;
-        & select {
-            margin-bottom: 0;
-        }
-    }
-    & .subject {
-        grid-column: 2/3;
-        margin: 0;
-        width: 100%;
-    }
-    & nav {
-        float: none;
-        & a {
-            border-radius: calc(var(--sbx-border-radius-normal) / 3);
-            background-color: transparent;
-            border: 1px solid var(--sbx-color-accent);
-            margin-bottom: 0;
-            min-height: unset !important;
-            padding-block: 0.43rem;
-            &[disabled] {
-                background-color: transparent;
-                border: 1px solid var(--sbx-color-accent);
-            }
-        }
-    }
-}
-
 // Card styles
 .v-card {
     & .card-content {
