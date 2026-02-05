@@ -79,12 +79,24 @@ class Controller extends Base
         $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
 
         $sortOrder = match ($orderBy) {
-            /* Default to sorting by student name
+            Cursor::CURSOR_ORDER_BY_CREATED_AT => [
+                'created_at' => $order,
+                'id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CLASS_NAME => [
+              'f.name' => $order,
+              'id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_UNIT_NAME => [
+              'cui.title' => $order,
+              'id' => $order,
+            ],
+            /* Default to sorting by user's name
              */
             default => [
                 'u.lastname'    => $order,
                 'u.chosen_name' => $order,
-                'user_id'  => $order,
+                'id'  => $order,
             ]
         };
 
@@ -171,12 +183,24 @@ class Controller extends Base
         $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
 
         $sortOrder = match ($orderBy) {
-            /* Default to sorting by student name
+            Cursor::CURSOR_ORDER_BY_CREATED_AT => [
+                'created_at' => $order,
+                'id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CLASS_NAME => [
+                'f.name' => $order,
+                'id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_UNIT_NAME => [
+                'cui.title' => $order,
+                'id' => $order,
+            ],
+            /* Default to sorting by user's name
              */
             default => [
                 'u.lastname'    => $order,
                 'u.chosen_name' => $order,
-                'user_id'  => $order,
+                'id'  => $order,
             ]
         };
 
