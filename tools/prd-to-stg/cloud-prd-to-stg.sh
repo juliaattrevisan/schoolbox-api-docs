@@ -1,9 +1,8 @@
 #!/bin/bash
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
-# IMPORTANT:
-#   This file is under version control at https://github.com/alaress/puppet-alaress
-#   and is managed by puppet. Any manual changes to this file will be overwritten.
+
+set -eEuo pipefail
 
 # Constants
 readonly LOG=/usr/bin/alaress-logger
@@ -34,8 +33,8 @@ readonly PRESERVED_CONFIG=(
   "paperly_iframe_api_host" "paperly_iframe_api_key" "paperly_agent_ip_whitelist" "paperly_agent_secret" "paperly_agent_external_db_host_override" "paperly_agent_external_db_user_override" "paperly_agent_external_db_password_override" "paperly_agent_external_db_name_override" "paperly_open_in_new_tab"
 
   # Others
-  "xml_dir" "file_dir" "otfs_verify_previous_file" "api_key" "otfs_s3_cred_key" "otfs_s3_cred_secret" "schooldata_import_frequency"
-  "otfs_s3_alt_host" "otfs_s3_alt_bucket" "otfs_s3_alt_region" "otfs_s3_alt_bucket" "otfs_s3_alt_access_key" "otfs_s3_alt_secret_key"
+  "xml_dir" "file_dir" "otfs_verify_previous_file" "api_key" "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_s3_bucket" "otfs_s3_region" "schooldata_import_frequency"
+  "otfs_s3_alt_host" "otfs_s3_alt_bucket" "otfs_s3_alt_region" "otfs_s3_alt_access_key" "otfs_s3_alt_secret_key"
 
   # Cloudwork
   "cloudwork_oauth_identity_provider" "cloudwork_oauth_client_id" "cloudwork_oauth_client_secret" "cloudwork_oauth_identifying_claims"
@@ -48,24 +47,33 @@ readonly PRESERVED_CONFIG=(
   "amqp_host" "redis_url" "redis_ephemeral_url" "taskd_redis_url" "clamd_host" "clamd_port"
 )
 readonly SITE_VERSION_SITE_TYPE_STG_CHANGED='21.0.10'  # Version where site_type 'dev' => 'stg'
+readonly DAILY_S3_PREFIX='backups/daily/'
 
 # Global vars
-declare source_sql_host
-declare source_sql_user
-declare source_sql_pass
-declare source_sql_schema
 declare dest_sql_host
 declare dest_sql_user
 declare dest_sql_pass
 declare dest_sql_schema
+declare source_instance_id
 declare to_instance_id;       # STG instance id we are syncing data to
 declare alaress_password
 declare -A sql_config=()
-declare staging_backup_file   # Filename where we will temporarily store the staging backup. We will restore this if the script fails.
+declare staging_backup_file   # Filename where we store the staging backup. We will restore this if the script fails.
+declare prd_backup_file
+declare staging_backup_ready=0
+declare s3_cred_key
+declare s3_cred_secret
+declare s3_region
+declare s3_bucket
+declare s3_alt_host
+declare s3_alt_bucket
+declare s3_alt_region
+declare s3_alt_access_key
+declare s3_alt_secret_key
 
 
 function usage () {
-  echo "Usage : $0 --source-host [X] --source-user [X] --source-pass [X] --source-schema [X] --to-instance [Y]";
+  echo "Usage : $0 --source-instance-id [X] --to-instance [Y]";
 }
 
 function log(){
@@ -81,26 +89,22 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
+function is_tty(){
+  [[ -t 1 ]] && [[ -t 2 ]]
+}
+
+function can_use_pv(){
+  command -v pv >/dev/null 2>&1 && is_tty
+}
+
 
 # Parse CLI args
 function parse_args() {
   local errors=0
   while [[ $# -gt 0 ]]; do
     case $1 in
-      --source-host)
-        source_sql_host="$2";
-        shift; shift;
-        ;;
-      --source-user)
-        source_sql_user="$2";
-        shift; shift;
-        ;;
-      --source-pass)
-        source_sql_pass="$2";
-        shift; shift;
-        ;;
-      --source-schema)
-        source_sql_schema="$2";
+      --source-instance-id)
+        source_instance_id="$2";
         shift; shift;
         ;;
       --to-instance)
@@ -116,7 +120,7 @@ function parse_args() {
     esac
   done
 
-  if [[ $errors == 1 ]] || [[ -z $source_sql_host ]] || [[ -z $source_sql_user ]] || [[ -z $source_sql_pass ]] || [[ -z $source_sql_schema ]] || [[ -z $to_instance_id ]]; then
+  if [[ $errors == 1 ]] || [[ -z $source_instance_id ]] || [[ -z $to_instance_id ]]; then
       usage
       exit 1
   fi
@@ -129,6 +133,39 @@ function get_dest_sql_credentials() {
   dest_sql_pass=$(INSTANCE_ID="$to_instance_id" schoolbox-read-instances --ini "$INI_FILE" --option SQL_passwd);
   dest_sql_host=$(INSTANCE_ID="$to_instance_id" schoolbox-read-instances --ini "$INI_FILE" --option SQL_host);
   dest_sql_schema=$(INSTANCE_ID="$to_instance_id" schoolbox-read-instances --ini "$INI_FILE" --option SQL_db);
+}
+
+function read_dest_s3_config(){
+  local sql_command
+  local config_value
+  local -r config_names=(
+    "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_s3_region" "otfs_s3_bucket"
+    "otfs_s3_alt_host" "otfs_s3_alt_bucket" "otfs_s3_alt_region" "otfs_s3_alt_access_key" "otfs_s3_alt_secret_key"
+  )
+
+  for config_name in "${config_names[@]}"; do
+    sql_command="SELECT ifnull(value, '') FROM config WHERE name='$config_name'"
+    if ! config_value=$(mariadb -u "$dest_sql_user" -p"$dest_sql_pass" -h "$dest_sql_host" "$dest_sql_schema" -BNe "$sql_command" 2>/dev/null); then
+      error "Unable to fetch value for config '$config_name'"
+      exit 1
+    fi
+    case "$config_name" in
+      otfs_s3_cred_key) s3_cred_key="$config_value";;
+      otfs_s3_cred_secret) s3_cred_secret="$config_value";;
+      otfs_s3_region) s3_region="$config_value";;
+      otfs_s3_bucket) s3_bucket="$config_value";;
+      otfs_s3_alt_host) s3_alt_host="$config_value";;
+      otfs_s3_alt_bucket) s3_alt_bucket="$config_value";;
+      otfs_s3_alt_region) s3_alt_region="$config_value";;
+      otfs_s3_alt_access_key) s3_alt_access_key="$config_value";;
+      otfs_s3_alt_secret_key) s3_alt_secret_key="$config_value";;
+    esac
+  done
+
+  if [[ -z $s3_cred_key ]] || [[ -z $s3_cred_secret ]] || [[ -z $s3_region ]] || [[ -z $s3_bucket ]]; then
+    error "Missing S3 configuration in destination config table"
+    exit 1
+  fi
 }
 
 
@@ -189,8 +226,19 @@ function check_dest_is_staging(){
 
 #prd to stg db syncs should only be performed for the same organisations, if not same, exit
 function check_source_and_dest_org_codes_match(){
-  dest_org_code=$(mariadb -u "$dest_sql_user" -p"$dest_sql_pass" -h "$dest_sql_host" "$dest_sql_schema" -sse "SELECT value FROM config WHERE name = 'site_school_code'");
-  source_org_code=$(mariadb -u "$source_sql_user" -p"$source_sql_pass" -h "$source_sql_host" "$source_sql_schema" -sse "SELECT value FROM config WHERE name = 'site_school_code'");
+  if ! dest_org_code=$(mariadb -u "$dest_sql_user" -p"$dest_sql_pass" -h "$dest_sql_host" "$dest_sql_schema" -sse "SELECT value FROM config WHERE name = 'site_school_code'"); then
+    error "Unable to fetch destination site_school_code"
+    exit 1
+  fi
+  if [[ -z ${prd_backup_file:-} ]] || [[ ! -f $prd_backup_file ]]; then
+    error "Production backup file not available for org code validation"
+    exit 1
+  fi
+  source_org_code=$(gunzip -c "$prd_backup_file" | sed -n "s/.*('site_school_code','\([^']*\)'.*/\1/p" | head -n1)
+  if [[ -z $source_org_code ]]; then
+    error "Unable to extract source site_school_code from production backup"
+    exit 1
+  fi
 
   if [[ $source_org_code != "$dest_org_code" ]]; then
     error "Error: source site_school_code '$source_org_code' does not match destination site_school_code '$dest_org_code'.
@@ -211,24 +259,15 @@ function backup_staging_database(){
     error "Unable to dump staging database '$dest_sql_schema'"
     exit 1;
   fi
+  staging_backup_ready=1
 }
 
 
 # Copy database from production to staging instance
 function sync_database(){
-  log "Fetching existing production database if not exists already";
-  local prd_backup_file
-  prd_backup_file="/var/lib/schoolbox/prd_""$source_sql_schema""_""$(date -I)"".sql";
-
-  if [[ -f "$prd_backup_file" ]]; then
-    log "Production database dump already exists. Re-using: '$prd_backup_file'"
-  else
-    if mariadb-dump --single-transaction --no-tablespaces --add-drop-table -h "$source_sql_host" --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u "$source_sql_user" -p"$source_sql_pass" "$source_sql_schema" > "$prd_backup_file"; then
-      log "Production database dumped to '$prd_backup_file'";
-    else
-      error "Error: unable to backup production database to '$prd_backup_file'";
-      exit 1;
-    fi
+  if [[ -z ${prd_backup_file:-} ]] || [[ ! -f $prd_backup_file ]]; then
+    error "Production backup file not found: '$prd_backup_file'"
+    exit 1
   fi
 
   # Drop all database views
@@ -250,7 +289,7 @@ function sync_database(){
 
   # Import production dump file into staging
   log "Importing production backup into staging database..."
-  if (echo "SET MAX_STATEMENT_TIME=0; "; pv "$prd_backup_file") | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -h "$dest_sql_host" -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema"; then
+  if (echo "SET MAX_STATEMENT_TIME=0;"; if can_use_pv; then pv "$prd_backup_file" | gunzip -c; else gunzip -c "$prd_backup_file"; fi) | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -h "$dest_sql_host" -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema"; then
     log "Schema import successful, removing backup file: '$prd_backup_file'";
     rm -v "$prd_backup_file";
   else
@@ -261,7 +300,11 @@ function sync_database(){
 }
 
 update_log_dir(){
-  mariadb -h "$dest_sql_host" -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema" -e "UPDATE config SET value = '/var/log/schoolbox/$to_instance_id' WHERE name = 'logs_dir'"
+  if ! mariadb -h "$dest_sql_host" -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema" -e "UPDATE config SET value = '/var/log/schoolbox/$to_instance_id' WHERE name = 'logs_dir'"; then
+    error "Error: unable to update logs_dir config"
+    restore_staging_database
+    exit 1
+  fi
 }
 
 # Update data dirs in the staging instance database
@@ -377,13 +420,18 @@ function upgrade_instance(){
 
 # Restores the original staging database in the event something goes wrong during sync
 function restore_staging_database(){
+  if [[ $staging_backup_ready -ne 1 ]] || [[ -z ${staging_backup_file:-} ]] || [[ ! -f $staging_backup_file ]]; then
+    error "Rollback requested but staging backup is unavailable"
+    return 1
+  fi
+
   log "Restoring staging database from '$staging_backup_file'"
-  if (echo "SET MAX_STATEMENT_TIME=0; "; pv "$staging_backup_file") | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -h "$dest_sql_host" -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema"; then
+  if (echo "SET MAX_STATEMENT_TIME=0; "; if can_use_pv; then pv "$staging_backup_file"; else cat "$staging_backup_file"; fi) | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -h "$dest_sql_host" -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema"; then
     log "Schema import successful, removing backup file: '$staging_backup_file'";
     rm -v "$staging_backup_file";
   else
     error "Error: unable to restore staging database";
-    exit 1;
+    return 1;
   fi;
 }
 
@@ -402,22 +450,110 @@ function get_plan_type_from_instance_registry() {
     -H "Content-Type: application/json"
   )";
 
+  if [[ -z $ir_host_instances_json ]]; then
+    error "Instance registry returned an empty response"
+    return 1
+  fi
+
   echo "$ir_host_instances_json" | jq -r '.ir_host_instances | .[] | .plan_type';
 }
 
 
 function set_plan() {
-  INSTANCE_ID="$to_instance_id" /usr/share/schoolbox/tools/set-plan.php --plan "$(get_plan_type_from_instance_registry)";
+  local plan_type
+  if ! plan_type=$(get_plan_type_from_instance_registry); then
+    error "Unable to fetch plan type from instance registry"
+    restore_staging_database
+    exit 1
+  fi
+  INSTANCE_ID="$to_instance_id" /usr/share/schoolbox/tools/set-plan.php --plan "$plan_type";
 }
 
+function build_aws_env(){
+  if [[ -n $s3_alt_host ]] && [[ -n $s3_alt_bucket ]]; then
+    export AWS_ACCESS_KEY_ID="$s3_alt_access_key"
+    export AWS_SECRET_ACCESS_KEY="$s3_alt_secret_key"
+    export AWS_DEFAULT_REGION="$s3_alt_region"
+  else
+    export AWS_ACCESS_KEY_ID="$s3_cred_key"
+    export AWS_SECRET_ACCESS_KEY="$s3_cred_secret"
+    export AWS_DEFAULT_REGION="$s3_region"
+  fi
+}
+
+function aws_endpoint_args(){
+  if [[ -n $s3_alt_host ]] && [[ -n $s3_alt_bucket ]]; then
+    echo "--endpoint-url $s3_alt_host"
+  else
+    echo ""
+  fi
+}
+
+function get_s3_bucket(){
+  if [[ -n $s3_alt_host ]] && [[ -n $s3_alt_bucket ]]; then
+    echo "$s3_alt_bucket"
+  else
+    echo "$s3_bucket"
+  fi
+}
+
+function find_latest_backup_key(){
+  local bucket
+  local aws_args
+  local latest_key
+  bucket=$(get_s3_bucket)
+  aws_args=$(aws_endpoint_args)
+  if ! latest_key=$(aws s3 ls "s3://$bucket/${DAILY_S3_PREFIX}${source_instance_id}_schoolbox_" $aws_args \
+    | tr -s ' ' \
+    | cut -d' ' -f4 \
+    | grep -E "^${source_instance_id}_schoolbox_[0-9]{4}-[0-9]{2}-[0-9]{2}\.sql\.gz$" \
+    | sort \
+    | tail -n1); then
+    return 1
+  fi
+  if [[ -z $latest_key ]]; then
+    return 1
+  fi
+  echo "${DAILY_S3_PREFIX}${latest_key}"
+}
+
+function download_prd_backup(){
+  local bucket
+  local aws_args
+  local selected_key
+  local backup_date
+
+  build_aws_env
+  bucket=$(get_s3_bucket)
+  aws_args=$(aws_endpoint_args)
+  if ! selected_key=$(find_latest_backup_key); then
+    error "Unable to locate a daily backup in S3 for instance '$source_instance_id'"
+    exit 1
+  fi
+
+  backup_date=$(basename "$selected_key" | sed -n "s/^${source_instance_id}_schoolbox_\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\)\.sql\.gz$/\1/p")
+  if [[ -z $backup_date ]]; then
+    error "Unable to determine backup date from key '$selected_key'"
+    exit 1
+  fi
+
+  prd_backup_file="/var/lib/schoolbox/${source_instance_id}_schoolbox_${backup_date}.sql.gz"
+  if ! aws s3 cp "s3://$bucket/$selected_key" "$prd_backup_file" $aws_args; then
+    error "Unable to download production backup from S3: s3://$bucket/$selected_key"
+    exit 1
+  fi
+  log "Downloaded production backup: s3://$bucket/$selected_key"
+}
 
 # Main script logic
 function main() {
   export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games;
   parse_args "$@"
   get_dest_sql_credentials
+  read_dest_s3_config
   read_dest_sql_config
   check_dest_is_staging
+  download_prd_backup
   check_source_and_dest_org_codes_match
   backup_staging_database
   sync_database
