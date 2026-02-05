@@ -91,6 +91,10 @@ class Controller extends Base
               'cui.title' => $order,
               'id' => $order,
             ],
+            Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE => [
+                'pp.customisation_type' => $order,
+                'id' => $order,
+            ],
             /* Default to sorting by user's name
              */
             default => [

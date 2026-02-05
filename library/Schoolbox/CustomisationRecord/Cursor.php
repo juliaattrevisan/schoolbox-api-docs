@@ -17,11 +17,13 @@ class Cursor implements ICursor
     public const string CURSOR_ORDER_BY_CREATED_AT = 'created';
     public const string CURSOR_ORDER_BY_CLASS_NAME = 'class';
     public const string CURSOR_ORDER_BY_UNIT_NAME = 'unit';
+    public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE = 'type';
 
     public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'user_id';
     public const string CURSOR_ORDER_BY_CREATED_AT_COLUMN = 'created_at';
     public const string CURSOR_ORDER_BY_CLASS_NAME_COLUMN = 'f.name';
     public const string CURSOR_ORDER_BY_UNIT_NAME_COLUMN = 'cui.title';
+    public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN = 'pp.customisation_type';
 
     public function __construct(
         private User $viewer,
@@ -96,6 +98,12 @@ class Cursor implements ICursor
             ]);
         }
 
+        if ($this->orderBy === self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE) {
+            return $this->codec->encode([
+                self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $lastRecord->getPlan()->getCustomisationType(),
+                self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
+            ]);
+        }
         /* Return student collection if default order by is used
          */
         return $this->codec->encode([

@@ -94,9 +94,18 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
+        $staticPlan = PlanMapper::PLAN_TYPE_STATIC;
+        $customParticipantPlan = PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION;
+        $modifiedActivity = PlanMapper::CUSTOMISATION_TYPE_STATIC;
+        $newActivity = PlanMapper::CUSTOMISATION_TYPE_CUSTOM_PARTICIPATION;
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('plan', 'pp')},
+                   CASE
+                       WHEN pp.is_dynamic = {$staticPlan} THEN '{$modifiedActivity}'
+                       WHEN pp.is_dynamic = {$customParticipantPlan} THEN '{$newActivity}'
+                       ELSE NULL
+                   END AS customisation_type,
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},
                    {$this->getJoinColumnString('plan.assessment', 'oa')},

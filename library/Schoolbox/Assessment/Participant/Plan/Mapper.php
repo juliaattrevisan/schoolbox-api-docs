@@ -30,6 +30,8 @@ class Mapper extends BaseMapper
     public const PLAN_TYPE_STATIC = 0;
     public const PLAN_TYPE_DYNAMIC = 1;
     public const PLAN_TYPE_CUSTOM_PARTICIPATION = 2;
+    public const CUSTOMISATION_TYPE_STATIC = 'Modified Activity';
+    public const CUSTOMISATION_TYPE_CUSTOM_PARTICIPATION = 'New Activity';
 
     public function mapping(): void
     {
