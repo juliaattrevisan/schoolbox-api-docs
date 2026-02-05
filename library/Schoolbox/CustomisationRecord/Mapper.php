@@ -9,15 +9,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\CustomisationRecord;
 
+use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\Assessment\Participant\Model;
 use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
+use Schoolbox\Filter\Filters\CustomisationRecord;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use PDO;
 
 class Mapper extends BaseMapper
 {
+    public const int DEFAULT_LIMIT = 20;
+
     /**
      * Setup mapper
      */
@@ -123,6 +129,127 @@ class Mapper extends BaseMapper
             LEFT JOIN course_implementation ci ON cui.course_implementation_id = ci.id
             LEFT JOIN folder f ON ci.folder_id = f.id
             LEFT JOIN assessment oa ON a.original_assessment_id = oa.id
+            LEFT JOIN differentiation_profiles ON differentiation_profiles.student_id = u.id
+            LEFT JOIN differentiation_profiles_adjustment_category ac ON FIND_IN_SET(ac.id, differentiation_profiles.adjustment_category)
+            LEFT JOIN differentiation_profiles_adjustment_level al ON FIND_IN_SET(al.id, differentiation_profiles.adjustment_level)
+
         ";
+    }
+
+    public function findByFilters(
+        User $viewer,
+        ?array $nameSearch,
+        ?array $yearLevelIds,
+        ?array $campusIds,
+        ?array $adjustmentCategories,
+        ?array $adjustmentLevels,
+        ?array $termIds,
+        ?array $cursorParams = null,
+        ?array $order = null,
+        ?int $limit = null
+    ): GenericCollection {
+        $pb = $this->getPredicateBuilder();
+        if (!empty($nameSearch)) {
+            $pb = $this->buildNameSearchPredicate($pb, $nameSearch);
+        }
+
+        if (!empty($yearLevelIds)) {
+            $pb = $this->buildYearLevelPredicate($pb, $yearLevelIds);
+        }
+
+        if (!empty($campusIds)) {
+            $pb = $this->buildTermPredicate($pb, $termIds);
+        }
+
+        if (!empty($campusIds)) {
+            $pb = $pb->in('sc.campus', $campusIds);
+        }
+
+        if (!empty($adjustmentCategories)) {
+            $categoriesPlaceholders = Builder::getArrayPlaceholders($adjustmentCategories, 'adjustmentCategory');
+            $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN $categoriesPlaceholders", [
+                'adjustment_categories_none_key' => CustomisationRecord\AdjustmentCategory\KeyConverter::NONE_KEY_VALUE,
+                ...Builder::getArrayParameters($adjustmentCategories, 'adjustmentCategory')
+            ]);
+        }
+
+        if (!empty($adjustmentLevels)) {
+            $levelsPlaceholders = Builder::getArrayPlaceholders($adjustmentLevels, 'adjustmentLevel');
+            $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN $levelsPlaceholders", [
+                'adjustment_levels_none_key' => CustomisationRecord\AdjustmentLevel\KeyConverter::NONE_KEY_VALUE,
+                ...Builder::getArrayParameters($adjustmentLevels, 'adjustmentLevel')
+            ]);
+        }
+
+        $option = [];
+
+        if (null !== $limit) {
+            $option['limit'] = $limit;
+        }
+
+        if (!empty($order)) {
+            $option['order'] = $order;
+        }
+
+        return $this->findByPredicates(
+            $pb,
+            $option,
+        );
+    }
+
+    /**
+     * Build name search predicate
+     * @param Builder $pb
+     * @param array $nameSearch
+     * @return Builder
+     */
+    private function buildNameSearchPredicate(Builder $pb, array $nameSearch): Builder
+    {
+        // Just use the first one, and split it into tokens
+        foreach ($nameSearch as $nameSearchString => $_) {
+            $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
+            foreach ($names as $name) {
+                if (strlen($name) > 0 && $name !== CustomisationRecord\Name\Definition::KEY_ALL) {
+                    $pb = $pb->any(
+                        $this->getPredicateBuilder()->like(
+                            'u.chosen_name',
+                            '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                        )->like(
+                            'u.lastname',
+                            '%' . $this->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                        )
+                    );
+                }
+            }
+        }
+        return $pb;
+    }
+
+    /**
+     * Build year level predicate
+     * @param Builder $pb
+     * @param array $yearLevelIds
+     * @return Builder
+     */
+    private function buildYearLevelPredicate(Builder $pb, array $yearLevelIds): Builder
+    {
+        $yearlevelPlaceholders = Builder::getArrayPlaceholders($yearLevelIds, 'yearLevelId');
+        $pb = $pb->rawWhere("COALESCE(u.year_id, :year_levels_none_key) IN $yearlevelPlaceholders", [
+            'year_levels_none_key' => CustomisationRecord\YearLevel\KeyConverter::NONE_KEY_VALUE,
+            ...Builder::getArrayParameters($yearLevelIds, 'yearLevelId')
+        ]);
+        return $pb;
+    }
+
+    /**
+     * Build term predicate
+     * @param Builder $pb
+     * @param array $termIds
+     * @return Builder
+     */
+    private function buildTermPredicate(Builder $pb, array $termIds): Builder
+    {
+        $termPlaceholders = Builder::getArrayPlaceholders($termIds, 'termId');
+        return $pb;
     }
 }

@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Participant\Mapper;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -39,7 +38,7 @@ class Module extends BaseModule
         );
 
         $this->register(self::METHOD_GET, '/records', 'viewRecords', $staffWithViewPermission);
-        $this->register(self::METHOD_POST, '/records/list', 'getListRecords', $staffWithViewPermission);
+        $this->register(self::METHOD_GET, '/records/list', 'getListRecords', $staffWithViewPermission);
     }
 
     /**

@@ -60,7 +60,8 @@ class ModelToArray
 
         return [
             'created_at' => $originalActivity->getCreatedAt(),
-            'user' => call_user_func($this->userTranslator, $participant->getUser()),
+//            'user' => call_user_func($this->userTranslator, $participant->getUser()),
+            'student_name' => $participant->getUser()->getFullName(),
             'customised_activity' => [
                 'id' => $plan->getId(),
                 'title' => $plan->getName() ?? $plan->getAssessment()->getTitle(),

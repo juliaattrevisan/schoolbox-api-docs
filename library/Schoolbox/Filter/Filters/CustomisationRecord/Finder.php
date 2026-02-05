@@ -15,7 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\CustomisationRecord\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use Schoolbox\CustomisationRecord\Model;
+use Schoolbox\Assessment\Participant\Model;
 
 /**
  * Finder for the customisation record filter.

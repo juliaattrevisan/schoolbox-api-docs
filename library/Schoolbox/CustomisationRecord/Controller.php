@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\CustomisationRecord;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Participant\Mapper;
 use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Filter;
 
 class Controller extends Base
 {
@@ -20,7 +20,7 @@ class Controller extends Base
      * Controller constructor
      */
     public function __construct(
-        private Mapper $participantMapper,
+        private Mapper $mapper,
         private MapperProxy $assessmentMapperProxy,
         private IFactoryFactory $filterFactoryFactory,
         private \Schoolbox\Filter\Mapper $filterMapper,
@@ -32,7 +32,6 @@ class Controller extends Base
     public function viewRecords(): void
     {
         $pageTitle = 'Customisation Records';
-        $records = $this->participantMapper->findAllCustomisationRecords();
 
         $translator = new Translator\ModelToArray(
             $this->getRouter()->getGenerator(),
@@ -42,27 +41,75 @@ class Controller extends Base
             $this->assessmentMapperProxy
         );
 
-        $route = $this->getRouteIfAuthorized('customisationRecord.getListRecords');
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
-            \Schoolbox\Filter\Page\Model::PAGE_CUSTOMISATION_RECORD,
+            Filter\Page\Model::PAGE_CUSTOMISATION_RECORD,
             null,
             $this->getUser(),
             [],
             $this->requestQuery->getArrayCopy(),
         );
 
-        $records = $records->map(fn($record) => call_user_func($translator, $record));
+        $request = $this->requestQuery['filter_selection'] ?? [];
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
 
-        $records = [
-            'data' => $records,
+        $page  = Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
+        $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
+            $this->getUser(),
+            $page,
+        );
+
+        /** @var Filter\Filters\CustomisationRecord\Finder $finder */
+        $finder = Filter\Filters\CustomisationRecord\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            /* Default to sorting by student name
+             */
+            default => [
+                'u.lastname'    => $order,
+                'u.chosen_name' => $order,
+                'user_id'  => $order,
+            ]
+        };
+
+        $cursor = new Cursor(
+            $this->getUser(),
+            $finder,
+            $dynamicFilters,
+            $orderBy,
+            $sortOrder,
+            $limit,
+        );
+
+        $records = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+
+        $data = $records->map(fn($record) => call_user_func($translator, $record))->reindex();
+
+        $recordPayload = [
+            'data' => $data,
             /* temporary cursor implementation
              */
             'metadata' => [
-                'count' => count($records),
+                'count' => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    "current" => null,
-                    "next" => null,
+                    "current" => $cursor->current($records),
+                    "next" => $cursor->next($records),
                 ]
             ],
         ];
@@ -75,7 +122,7 @@ class Controller extends Base
                     [$pageTitle],
                 ],
                 'header' => $this->recordTableHeaders(),
-                'records' => $records,
+                'records' => $recordPayload,
                 'routes' => [
                     'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
                 ],
@@ -87,8 +134,6 @@ class Controller extends Base
 
     public function getListRecords(): void
     {
-        $records = $this->participantMapper->findAllCustomisationRecords();
-
         $translator = new Translator\ModelToArray(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
@@ -97,21 +142,70 @@ class Controller extends Base
             $this->assessmentMapperProxy
         );
 
-        $records = $records->map(fn($record) => call_user_func($translator, $record));
+        $request = $this->requestQuery['filter_selection'] ?? [];
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
 
-        $records = [
-            'data' => $records->reindex(),
+        $page  = Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
+        $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
+            $this->getUser(),
+            $page,
+        );
+
+        /** @var Filter\Filters\CustomisationRecord\Finder $finder */
+        $finder = Filter\Filters\CustomisationRecord\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            /* Default to sorting by student name
+             */
+            default => [
+                'u.lastname'    => $order,
+                'u.chosen_name' => $order,
+                'user_id'  => $order,
+            ]
+        };
+
+        $cursor = new Cursor(
+            $this->getUser(),
+            $finder,
+            $dynamicFilters,
+            $orderBy,
+            $sortOrder,
+            $limit,
+        );
+
+        $records = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+
+        $data = $records->map(fn($record) => call_user_func($translator, $record))->reindex();
+
+        $recordPayload = [
+            'data' => $data,
             /* temporary cursor implementation
              */
             'metadata' => [
-                'count' => count($records),
+                'count' => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    "current" => null,
-                    "next" => null,
+                    "current" => $cursor->current($records),
+                    "next" => $cursor->next($records),
                 ]
             ],
         ];
-        $this->response = $this->responseAsJson($records);
+        $this->response = $this->responseAsJson($recordPayload);
     }
 
     private function recordTableHeaders(): array
