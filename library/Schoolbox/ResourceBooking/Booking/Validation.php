@@ -1020,8 +1020,16 @@ class Validation
             $overrideValidation,
         );
 
+        if ($overrideValidation && count($errors) === 0) {
+            // All the non-overridable validation rules have been checked, so we can approve.
+            // Note if there were clashing bookings, they are assumed to have been dealt with by the calling function.
+            // The clashing bookings should be dealt with by rejecting them and sending notifications.
+            // The end result should be that no approved bookings for any resource overlap.
+            return BookingStatusModel::STATUS_APPROVED;
+        }
+
         // This check is done separately since it is not included in $this->validateSimpleRules().
-        if (!$overrideValidation && $resource->getCurrentTermRestriction()) {
+        if ($resource->getCurrentTermRestriction()) {
             $errors = array_merge_recursive(
                 $errors,
                 $this->validateCurrentTermRestriction($bookingEndAt->getDateTimeObject(), $this->getCurrentTerm())
@@ -1040,7 +1048,7 @@ class Validation
             );
         }
 
-        return $this->getStatusIdForNonClashBooking($booking, $user, $overrideValidation);
+        return $this->getStatusIdForNonClashBooking($booking, $user);
     }
 
     /**
@@ -1052,20 +1060,17 @@ class Validation
      *
      * @param BookingModel $booking
      * @param User $user
-     * @param bool $overrideValidation
      * @return int
      */
     private function getStatusIdForNonClashBooking(
         BookingModel $booking,
         User $user,
-        bool $overrideValidation = false
     ): int {
         $resource = $booking->getResource();
         $event = $booking->getEvent();
 
         // What about the resource? If it's an open resource, confirm the booking immediately.
-        // Also approve immediately if $overrideValidation is true.
-        if ($overrideValidation || $resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
+        if ($resource->getModerationType()->getId() === BookingModerationTypeModel::TYPE_OPEN) {
             return BookingStatusModel::STATUS_APPROVED;
         }
 
