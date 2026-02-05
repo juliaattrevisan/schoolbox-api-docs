@@ -188,15 +188,19 @@ class Controller extends Base
 
         $sortOrder = match ($orderBy) {
             Cursor::CURSOR_ORDER_BY_CREATED_AT => [
-                'created_at' => $order,
+                Cursor::CURSOR_ORDER_BY_CREATED_AT_COLUMN => $order,
                 'id' => $order,
             ],
             Cursor::CURSOR_ORDER_BY_CLASS_NAME => [
-                'f.name' => $order,
+                Cursor::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $order,
                 'id' => $order,
             ],
             Cursor::CURSOR_ORDER_BY_UNIT_NAME => [
-                'cui.title' => $order,
+                Cursor::CURSOR_ORDER_BY_UNIT_NAME_COLUMN => $order,
+                'id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE => [
+                Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
                 'id' => $order,
             ],
             /* Default to sorting by user's name

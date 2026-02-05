@@ -14,7 +14,7 @@ use Schoolbox\User;
 class Cursor implements ICursor
 {
     public const string CURSOR_DEFAULT_ORDER_BY = 'user';
-    public const string CURSOR_ORDER_BY_CREATED_AT = 'created';
+    public const string CURSOR_ORDER_BY_CREATED_AT = 'created_at';
     public const string CURSOR_ORDER_BY_CLASS_NAME = 'class';
     public const string CURSOR_ORDER_BY_UNIT_NAME = 'unit';
     public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE = 'type';
@@ -23,7 +23,7 @@ class Cursor implements ICursor
     public const string CURSOR_ORDER_BY_CREATED_AT_COLUMN = 'created_at';
     public const string CURSOR_ORDER_BY_CLASS_NAME_COLUMN = 'f.name';
     public const string CURSOR_ORDER_BY_UNIT_NAME_COLUMN = 'cui.title';
-    public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN = 'pp.customisation_type';
+    public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN = 'customisation_type';
 
     public function __construct(
         private User $viewer,
