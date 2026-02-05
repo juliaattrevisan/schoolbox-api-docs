@@ -49,10 +49,11 @@ function onCellSelected(header: TableHeader): void {
 </script>
 
 <template>
-    <tr class="pr-table-row">
+    <tr class="pr-table-row" data-test="pr-table-data-row">
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
+            :data-test="`pr-table-data-cell-${header.key}-${(props.rowData[header.key] as User).firstName || (props.rowData[header.key] as RecordsAndPoints).records || (props.rowData[header.key] as RecordsAndPoints).points || (props.rowData[header.key] as TypeSubType).subtype}`"
             :class="{
                 'u-border-right': true,
                 'u-sticky-left':

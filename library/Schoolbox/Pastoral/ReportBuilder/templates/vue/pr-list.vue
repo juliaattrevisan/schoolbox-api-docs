@@ -69,7 +69,12 @@ defineExpose({ printAllRecords });
         </div>
         <template v-else-if="payload">
             <div v-if="payload.data.results.length > 0" class="l-flex-col l-gap-s">
-                <div v-for="record in payload.data.results" :key="record.id" class="c-island">
+                <div
+                    v-for="record in payload.data.results"
+                    :key="record.id"
+                    class="c-island"
+                    data-test="pr-list-record-rows"
+                >
                     <ul class="information-list threaded">
                         <pastoral-record :record="record" />
                     </ul>
