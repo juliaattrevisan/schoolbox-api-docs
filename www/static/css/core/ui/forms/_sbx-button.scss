@@ -129,7 +129,7 @@
 /**
  * An existing flex list of buttons, just add some gap
  */
-.flex-list.buttons {
+.sbx-body .flex-list.buttons {
     gap: var(--sbx-size-xs);
 }
 
@@ -217,7 +217,7 @@
 /**
  *  notification advanced settings buttons alignment fix
  */
-.actions-small-6 > nav > [data-perm-container] {
+.sbx-body .actions-small-6 > nav > [data-perm-container] {
     display: inline-flex;
     align-items: center;
 }
@@ -225,8 +225,8 @@
 /**
  * FullCalendar button hover border radius fix
  */
-.fc-event,
-.fc-event:hover {
+.sbx-body .fc-event,
+.sbx-body .fc-event:hover {
     border-radius: var(--sbx-config-field-roundness) !important;
 }
 
