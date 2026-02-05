@@ -462,7 +462,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 }
 
                 $errors = Carbon::getLastErrors();
-                if ($errors['warning_count']) {
+                if ($errors['warning_count'] ?? false) {
                     $this->warnings = $errors['warnings'];
                 }
 
