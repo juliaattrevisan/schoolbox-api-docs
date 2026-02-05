@@ -12,7 +12,6 @@ services:
   # In the dev environment, forwards requests to a `schoolbox-frankenphp`
   # container.
   caddy:
-    container_name: caddy
     restart: always
     build:
       context: ./caddy
@@ -34,7 +33,6 @@ services:
   # these are containers only in a development environment, they won't be on
   # staging or production envs.
   mariadb:
-    container_name: mariadb
     build:
       context: ./mariadb
       args:
@@ -53,7 +51,6 @@ services:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
 
   redis-storage:
-    container_name: redis-storage
     build:
       context: ./redis-storage
       args:
@@ -70,7 +67,6 @@ services:
       - "${REDIS_STORAGE_PUBLISHED_PORT}:6379"
 
   redis-cache:
-    container_name: redis-cache
     build:
       context: ./redis-cache
       args:
@@ -87,7 +83,6 @@ services:
       - "${REDIS_CACHE_PUBLISHED_PORT}:6379"
 
   rabbitmq:
-    container_name: rabbitmq
     build:
       context: ./rabbitmq
       args:
@@ -106,7 +101,6 @@ services:
   # Not-yet-essential services:
   # These will be implemented as separate containers (if they aren't already).
   schoolbox-digestd:
-    container_name: schoolbox-digestd
     pull_policy: never
     depends_on:
       mariadb:
@@ -142,7 +136,6 @@ services:
         target: /etc/schoolbox
 
   schoolbox-scheduled:
-    container_name: schoolbox-scheduled
     pull_policy: never
     depends_on:
       mariadb:
@@ -178,7 +171,6 @@ services:
         target: /etc/schoolbox
 
   schoolbox-mobiled:
-    container_name: schoolbox-mobiled
     pull_policy: never
     depends_on:
       mariadb:
@@ -216,7 +208,6 @@ services:
   # Second instance's notif daemons:
   # These are the same as above, but use the second instance ID instead.
   schoolbox2-digestd:
-    container_name: schoolbox2-digestd
     pull_policy: never
     depends_on:
       mariadb:
@@ -253,7 +244,6 @@ services:
         target: /etc/schoolbox
 
   schoolbox2-scheduled:
-    container_name: schoolbox2-scheduled
     pull_policy: never
     depends_on:
       mariadb:
@@ -290,7 +280,6 @@ services:
         target: /etc/schoolbox
 
   schoolbox2-mobiled:
-    container_name: schoolbox2-mobiled
     pull_policy: never
     depends_on:
       mariadb:
@@ -327,7 +316,6 @@ services:
         target: /etc/schoolbox
 
   schoolbox-socketd:
-    container_name: schoolbox-socketd
     pull_policy: never
     depends_on:
       mariadb:
@@ -365,7 +353,6 @@ services:
 
   # This has the devkit mounted
   devkit-lti1p3-nginx:
-    container_name: devkit-lti1p3-nginx
     depends_on:
       redis-cache:
         condition: service_healthy
@@ -385,7 +372,6 @@ services:
       - lti
 
   devkit-lti1p3-phpfpm:
-    container_name: devkit-lti1p3-phpfpm
     depends_on:
       redis-cache:
         condition: service_healthy
@@ -410,11 +396,9 @@ services:
       - host.docker.internal:host-gateway
 
   schoolbox-gotenberg:
-    container_name: schoolbox-gotenberg
     image: gotenberg/gotenberg:8
 
   schoolbox-etherpad:
-    container_name: schoolbox-etherpad
     depends_on:
       redis-storage:
         condition: service_healthy
@@ -425,12 +409,10 @@ services:
     env_file: ./schoolbox-etherpad/default.env
 
   presidio-analyzer:
-    container_name: presidio-analyzer
     build:
       context: ./presidio-analyzer
 
   presidio-anonymizer:
-    container_name: presidio-anonymizer
     image: mcr.microsoft.com/presidio-anonymizer
 
   clamav:
@@ -442,7 +424,6 @@ services:
 
   mailcatcher:
     image: schickling/mailcatcher
-    container_name: mailcatcher
     ports:
       - "${MAILCATCHER_UI_PUBLISHED_PORT}:1080"
     restart: always
