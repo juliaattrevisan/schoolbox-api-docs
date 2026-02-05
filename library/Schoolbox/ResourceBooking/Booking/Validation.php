@@ -1002,8 +1002,7 @@ class Validation
         bool $isClash,
         User $user,
         bool $overrideValidation = false
-    ): int
-    {
+    ): int {
         $resource = $booking->getResource();
 
         $bookingStartAt = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDatetime();
@@ -1060,8 +1059,7 @@ class Validation
         BookingModel $booking,
         User $user,
         bool $overrideValidation = false
-    ): int
-    {
+    ): int {
         $resource = $booking->getResource();
         $event = $booking->getEvent();
 
