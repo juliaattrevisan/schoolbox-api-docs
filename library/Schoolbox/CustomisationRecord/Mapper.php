@@ -118,6 +118,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('plan', '', 'pp')}
             AND (pp.is_dynamic = '{$staticPlan}' OR pp.is_dynamic = '{$customParticipantPlan}')
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            INNER JOIN userCampus sc ON u.id = sc.uid
             INNER JOIN assessment a ON pp.assessment_id = a.id AND a.deleted_at IS NULL
             LEFT JOIN (
                 SELECT p.assessment_id projectAssessmentId, pa.assessment_id
@@ -157,7 +158,7 @@ class Mapper extends BaseMapper
             $pb = $this->buildYearLevelPredicate($pb, $yearLevelIds);
         }
 
-        if (!empty($campusIds)) {
+        if (!empty($termIds)) {
             $pb = $this->buildTermPredicate($pb, $termIds);
         }
 
@@ -169,7 +170,7 @@ class Mapper extends BaseMapper
             $categoriesPlaceholders = Builder::getArrayPlaceholders($adjustmentCategories, 'adjustmentCategory');
             $pb = $pb->rawWhere("COALESCE(ac.id, :adjustment_categories_none_key) IN $categoriesPlaceholders", [
                 'adjustment_categories_none_key' => CustomisationRecord\AdjustmentCategory\KeyConverter::NONE_KEY_VALUE,
-                ...Builder::getArrayParameters($adjustmentCategories, 'adjustmentCategory')
+                ...Builder::getArrayParameters($adjustmentCategories, 'adjustmentCategory'),
             ]);
         }
 
@@ -177,7 +178,7 @@ class Mapper extends BaseMapper
             $levelsPlaceholders = Builder::getArrayPlaceholders($adjustmentLevels, 'adjustmentLevel');
             $pb = $pb->rawWhere("COALESCE(al.id, :adjustment_levels_none_key) IN $levelsPlaceholders", [
                 'adjustment_levels_none_key' => CustomisationRecord\AdjustmentLevel\KeyConverter::NONE_KEY_VALUE,
-                ...Builder::getArrayParameters($adjustmentLevels, 'adjustmentLevel')
+                ...Builder::getArrayParameters($adjustmentLevels, 'adjustmentLevel'),
             ]);
         }
 
@@ -236,7 +237,7 @@ class Mapper extends BaseMapper
         $yearlevelPlaceholders = Builder::getArrayPlaceholders($yearLevelIds, 'yearLevelId');
         $pb = $pb->rawWhere("COALESCE(u.year_id, :year_levels_none_key) IN $yearlevelPlaceholders", [
             'year_levels_none_key' => CustomisationRecord\YearLevel\KeyConverter::NONE_KEY_VALUE,
-            ...Builder::getArrayParameters($yearLevelIds, 'yearLevelId')
+            ...Builder::getArrayParameters($yearLevelIds, 'yearLevelId'),
         ]);
         return $pb;
     }
@@ -249,7 +250,26 @@ class Mapper extends BaseMapper
      */
     private function buildTermPredicate(Builder $pb, array $termIds): Builder
     {
-        $termPlaceholders = Builder::getArrayPlaceholders($termIds, 'termId');
+        $terms = \Schoolbox\Assessment\Term\Mapper::getInstance()->findByColumnList(
+            [
+                'id' => $termIds,
+            ],
+            [
+                'order' => ['start' => self::SORT_ORDER_ASC],
+            ]
+        );
+        $termPb = $this->getPredicateBuilder();
+        /** @var \Schoolbox\Assessment\Term\Model $term */
+        foreach ($terms as $term) {
+            $tempPb = $this->getPredicateBuilder()
+                ->greaterThanOrEqualTo('created_at', $term->getStart()->getDatabase());
+
+            if (null !== $term->getActualFinish()) {
+                $tempPb->lessThanOrEqualTo('created_at', $term->getActualFinish()->getDatabase());
+            }
+            $termPb->all($tempPb);
+        }
+        $pb->any($termPb);
         return $pb;
     }
 }

@@ -56,7 +56,7 @@ class Controller extends Base
             return;
         }
 
-        $page  = Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
+        $page  = Filter\Page\Model::PAGE_CUSTOMISATION_RECORD;
         $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
 
         $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
@@ -148,7 +148,7 @@ class Controller extends Base
             return;
         }
 
-        $page  = Filter\Page\Model::PAGE_DIFFERENTIATION_PROFILE;
+        $page  = Filter\Page\Model::PAGE_CUSTOMISATION_RECORD;
         $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
 
         $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
