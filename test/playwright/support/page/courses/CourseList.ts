@@ -13,7 +13,7 @@ export default class CourseList {
 
     static readonly SEARCH_FIELD = "#course-search";
 
-    static readonly ADD_BUTTON = "a.icon-add";
+    static readonly DATA_TEST_ADD_BUTTON = "course-list-icon-add";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -41,7 +41,7 @@ export default class CourseList {
      * click add button to create a new course
      */
     async clickAddCourse(): Promise<void> {
-        await this.page.locator(CourseList.ADD_BUTTON).click();
+        await this.page.getByTestId(CourseList.DATA_TEST_ADD_BUTTON).click();
         await this.tester.common.waitForPageLoad();
     }
 

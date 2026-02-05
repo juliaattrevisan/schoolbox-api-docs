@@ -151,7 +151,7 @@ export default class Common {
     /**
      * empty state when searching finds no results
      */
-    static readonly EMPTY_STATE = "div.empty-state";
+    static readonly DATA_TEST_EMPTY_STATE = "course-list-results-empty-state";
 
     constructor(page: Page) {
         this.page = page;
@@ -518,6 +518,6 @@ export default class Common {
      * checking the empty state is shown when no results are found
      */
     async verifyEmptyStateIsShown(): Promise<void> {
-        await expect(this.page.locator(Common.EMPTY_STATE)).toBeVisible();
+        await expect(this.page.getByTestId(Common.DATA_TEST_EMPTY_STATE)).toBeVisible();
     }
 }
