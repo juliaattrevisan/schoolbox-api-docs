@@ -37,8 +37,8 @@ abstract class BaseApp extends App
         $this->optionParser = new GetOpt\GetOpt()
             ->set(GetOpt\GetOpt::SETTING_STRICT_OPERANDS, true);
         $help = new Help()
-            ->set(Help::NAME, $this->getName())
-            ->set(Help::DESCRIPTION, $this->getDescription());
+            ->setName($this->getName())
+            ->setDescription($this->getDescription());
         $this->optionParser->setHelp($help);
 
         // Set up command-line options

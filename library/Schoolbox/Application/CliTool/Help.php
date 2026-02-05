@@ -17,17 +17,29 @@ use GetOpt\Help as BaseHelp;
  */
 class Help extends BaseHelp
 {
-    public const NAME = 'name';
+    /**
+     * Hard-coded indent width to match what the GetOpt library outputs by
+     * default.
+     */
+    private const int INDENT_WIDTH = 2;
 
-    private const DESCRIPTION_TEMPLATE = <<<TEMPLATE
+    /**
+     * Constant for the script's name.
+     */
+    private const string NAME_KEY = 'name';
+
+    /**
+     * Constant template for the tool's usage.
+     */
+    private const string USAGE_TEMPLATE = <<<TEMPLATE
         NAME:
-          {NAME}
+        {NAME}
 
         USAGE:
-          {USAGE}
+        {USAGE}
 
         DESCRIPTION:
-          {DESCRIPTION}
+        {DESCRIPTION}
         TEMPLATE;
 
     public function __construct(array $settings = [])
@@ -38,6 +50,18 @@ class Help extends BaseHelp
             'options-title'  => "OPTIONS:" . PHP_EOL,
             'commands-title' => "COMMANDS:" . PHP_EOL,
         ]);
+    }
+
+    public function setName(string $name): self
+    {
+        $this->set(self::NAME_KEY, $name);
+        return $this;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->set(self::DESCRIPTION, $description);
+        return $this;
     }
 
     /**
