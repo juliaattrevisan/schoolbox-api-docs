@@ -72,11 +72,16 @@ class Help extends BaseHelp
      */
     public function renderUsage(): string
     {
+        // Figure out how to indent?
         return strtr(
-            self::DESCRIPTION_TEMPLATE,
+            self::USAGE_TEMPLATE,
             [
-                '{NAME}'  => $this->getOpt->get(GetOpt::SETTING_SCRIPT_NAME) . ' - ' . ($this->settings[self::NAME] ?? ''),
-                '{USAGE}' => $this->getOpt->get(GetOpt::SETTING_SCRIPT_NAME)
+                '{NAME}'  => str_repeat(' ', self::INDENT_WIDTH) .
+                    $this->getOpt->get(GetOpt::SETTING_SCRIPT_NAME) .
+                    ' - ' .
+                    ($this->settings[self::NAME_KEY] ?? ''),
+                '{USAGE}' => str_repeat(' ', self::INDENT_WIDTH) .
+                    $this->getOpt->get(GetOpt::SETTING_SCRIPT_NAME)
                     . ' '
                     . $this->renderUsageCommand()
                     . $this->renderUsageOptions()

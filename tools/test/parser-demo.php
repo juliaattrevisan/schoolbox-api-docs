@@ -43,7 +43,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
         return <<<DESC
             Description of the test app.
 
-            Test content goes here
+            Test content goes here with a very long description, some of which may be relevant but is only for testing though it is uncertain exactly how it wraps.
             DESC;
     }
 
