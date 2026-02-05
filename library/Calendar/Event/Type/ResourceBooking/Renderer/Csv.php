@@ -25,6 +25,6 @@ class Csv extends Base
      */
     protected function getPurposeValue(): string
     {
-        return $this->event->getBooking()->getName();
+        return $this->event->getBooking()->getName() ?? '';
     }
 }
