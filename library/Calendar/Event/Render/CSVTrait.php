@@ -49,7 +49,7 @@ trait CSVTrait
                 ? $event->getPublishDate()->getLocalShort()
                 : '',
             $event->canAttend() ? 1 : 0,
-            $this->getPurposeValue(),
+            $this->getPurpose(),
         ];
 
         /**
@@ -79,7 +79,7 @@ trait CSVTrait
      *
      * @return string
      */
-    protected function getPurposeValue(): string
+    protected function getPurpose(): string
     {
         return '';
     }
