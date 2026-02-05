@@ -400,6 +400,7 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 
 .content-container {
     border: 1px solid var(--form-border-color);
+    border-radius: var(--sbx-config-field-roundness, 0);
     margin: auto;
     margin-top: 1rem;
 
