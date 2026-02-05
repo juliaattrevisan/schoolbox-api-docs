@@ -63,7 +63,7 @@
         "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-posix": "*",
-        "firebase/php-jwt": "^6.5.0",
+        "firebase/php-jwt": "^7.0.2",
         "ext-openssl": "*",
         "stomp-php/stomp-php": "^5.1.0",
         "cboden/ratchet": "^0.4.1",
