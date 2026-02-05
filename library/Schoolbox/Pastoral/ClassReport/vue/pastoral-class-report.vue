@@ -331,7 +331,7 @@ export default {
                     <li v-if="studentData.records.metadata.count > studentData.records.data.length">
                         <div class="component-action">
                             <section>
-                                <button @click.prevent="loadMore(studentIndex)">Show more</button>
+                                <button class="button" @click.prevent="loadMore(studentIndex)">Show more</button>
                             </section>
                         </div>
                     </li>
@@ -385,16 +385,6 @@ input[type="radio"]:not(.plain) + label.input-toggle {
 .component-action {
     section {
         border: none;
-    }
-
-    button {
-        padding: 0 1rem;
-    }
-
-    button:hover {
-        background-color: var(--content-ui-foreground);
-        color: white;
-        transition: all 0.2s cubic-bezier(0.5, 1, 0.89, 1);
     }
 }
 
