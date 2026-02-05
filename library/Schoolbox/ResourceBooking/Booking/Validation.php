@@ -242,28 +242,25 @@ class Validation
                 $postData['repeat'] ?? null,
                 $campus
             );
+            $validationResults = [];
             foreach ($dateParts as $check) {
                 /** @var Item\Model $thisResource */
                 [$thisResource, $thisStart, $thisEnd] = $check;
 
                 // Validate for matching the current term
                 if (!$override && $thisResource->getCurrentTermRestriction()) {
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
-                    );
+                    $validationResults[] = $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm());
                 }
 
                 // Validate for clashes even if $override is true.
                 // The clash validation results will allow us to find and reject the clashing bookings.
                 // See $this->validateBookingIgnoringClashesIfClashesAllowed().
-                $errors = array_merge_recursive(
-                    $errors,
-                    $this->validateForClashes($thisResource, $thisStart, $thisEnd)
-                );
+                $validationResults[] = $this->validateForClashes($thisResource, $thisStart, $thisEnd);
             }
+            $errors = array_merge_recursive($errors, ...$validationResults);
         } else {
             // existing booking: Validate related and recurrent bookings
+            $validationResults = [];
             foreach (
                 $series->getExistingSeries(
                     $existingBooking,
@@ -278,20 +275,15 @@ class Validation
 
                 // Validate for matching the current term
                 if (!$override && $thisResource->getCurrentTermRestriction()) {
-                    $errors = array_merge_recursive(
-                        $errors,
-                        $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm())
-                    );
+                    $validationResults[] = $this->validateCurrentTermRestriction($thisEnd, $this->getCurrentTerm());
                 }
 
                 // Validate for clashes even if $override is true.
                 // The clash validation results will allow us to find and reject the clashing bookings.
                 // See $this->validateBookingIgnoringClashesIfClashesAllowed().
-                $errors = array_merge_recursive(
-                    $errors,
-                    $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking)
-                );
+                $validationResults[] = $this->validateForClashes($thisResource, $thisStart, $thisEnd, $thisBooking);
             }
+            $errors = array_merge_recursive($errors, ...$validationResults);
         }
 
         return $errors;
