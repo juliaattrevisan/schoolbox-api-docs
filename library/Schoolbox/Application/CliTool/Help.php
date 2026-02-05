@@ -40,6 +40,8 @@ class Help extends BaseHelp
 
         DESCRIPTION:
         {DESCRIPTION}
+
+
         TEMPLATE;
 
     public function __construct(array $settings = [])
@@ -72,20 +74,22 @@ class Help extends BaseHelp
      */
     public function renderUsage(): string
     {
-        // Figure out how to indent?
+        $indent = str_repeat(' ', self::INDENT_WIDTH);
         return strtr(
             self::USAGE_TEMPLATE,
             [
-                '{NAME}'  => str_repeat(' ', self::INDENT_WIDTH) .
+                '{NAME}' => $this->wrapText(
                     $this->getOpt->get(GetOpt::SETTING_SCRIPT_NAME) .
                     ' - ' .
-                    ($this->settings[self::NAME_KEY] ?? ''),
-                '{USAGE}' => str_repeat(' ', self::INDENT_WIDTH) .
+                    ($this->settings[self::NAME_KEY] ?? '')
+                ),
+                '{USAGE}' => $this->wrapText(
                     $this->getOpt->get(GetOpt::SETTING_SCRIPT_NAME)
                     . ' '
                     . $this->renderUsageCommand()
                     . $this->renderUsageOptions()
-                    . $this->renderUsageOperands(),
+                    . $this->renderUsageOperands()
+                ),
                 '{DESCRIPTION}' => $this->wrapText($this->renderDescription()),
             ],
         );
@@ -103,28 +107,7 @@ class Help extends BaseHelp
         // Break on space or hyphen if possible:
         // if the next word would still be too long, don't break.
         $paragraphs = array_map($this->splitParagraph(...), $paragraphs);
-        return rtrim(implode(PHP_EOL, $paragraphs)) . PHP_EOL . PHP_EOL;
-//        foreach ($paragraphs as $paragraph) {
-//            if (mb_strlen($paragraph) > $maxWidth) {
-//
-//            }
-//        }
-
-
-//        $output = [];
-//        // First split by line-break
-//        $paragraphs = preg_split('/(\n)/', $text, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-//        foreach ($paragraphs as $paragraph) {
-//            // Then split by space or dash
-//            $col      = self::INDENT_WIDTH;
-//            $words    = preg_split('/([\s-])/', trim($paragraph), -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-//            $output[] = $indent;
-//            foreach ($words as $word) {
-//
-//            }
-//
-//            $output[] = PHP_EOL;
-//        }
+        return rtrim(implode(PHP_EOL, $paragraphs));
     }
 
     private function splitParagraph(string $paragraph, int $iteration = 1): string
