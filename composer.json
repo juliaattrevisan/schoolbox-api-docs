@@ -93,7 +93,7 @@
         "apple/apn-push": "^3.1",
         "symfony/mime": "^8.0.0",
         "symfony/mailer": "^8.0.0",
-        "symfony/yaml": "^7.1.0",
+        "symfony/yaml": "^8.0.1",
         "symfony/lock": "^8.0.0",
         "phpxmlrpc/phpxmlrpc": "^4.6",
         "psr/container": "^2.0.2",
