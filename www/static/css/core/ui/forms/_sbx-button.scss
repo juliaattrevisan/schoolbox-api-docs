@@ -64,7 +64,11 @@
 .sbx-body .sub-nav li a,
 .sbx-body .input-group a,
 .sbx-body .cursor-pagination button,
-.sbx-body .avatar-switch nav a {
+.sbx-body .avatar-switch nav a,
+.sbx-body .sub-nav li a,
+.sbx-body .sub-nav dd a,
+.sbx-body .sub-nav li.active a,
+.sbx-body .sub-nav dd.active a {
     background: var(--sbx-color-foreground-primary);
     border: var(--sbx-border-width-normal) solid var(--sbx-color-accent);
     border-radius: var(--sbx-config-field-roundness);
@@ -207,18 +211,6 @@
                 }
             }
         }
-    }
-}
-
-/**
- * Border radius for sub-nav links
- */
-.sub-nav {
-    li a,
-    dd a,
-    li.active a,
-    dd.active a {
-        border-radius: var(--sbx-config-field-roundness);
     }
 }
 
