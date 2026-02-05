@@ -77,7 +77,7 @@ window.Vue.onUnmounted(() => {
         data-test="unit-row-drag-handle"
         :class="{ isDragging: store.dragCurrentUnit === props.unit }"
     ></div>
-    <div class="no-print">
+    <div class="hide-on-print">
         <i v-if="dragStore.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
         <div>
             <a :href="props.unit.homepage" :data-test="`unit-planner-unit-link-${props.unit.id}`">
