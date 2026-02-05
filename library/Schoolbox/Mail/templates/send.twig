@@ -18,6 +18,10 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/clipboard/jquery.clipboard-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
+        // Overwrite the current history entry to remove POST semantics without altering back/forward behavior
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, null, window.location.href);
+        }
 
         // Disable iFrame embed on mail content
         /**

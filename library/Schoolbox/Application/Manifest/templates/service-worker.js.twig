@@ -79,8 +79,18 @@ self.addEventListener("fetch", (evt) => {
         return;
     }
 
+    // clicking the back button to navigate back to a POST request
+    // the service worker cannot handle this. Bypass such requests.
+    if (evt.request.cache === "only-if-cached" || evt.request.method !== "GET") {
+        return;
+    }
+
     evt.respondWith(
-        fetch(evt.request).catch(() => {
+        fetch(evt.request).catch((error) => {
+            {% if debug %}
+            {# only console the error if we are in debug mode... #}
+            console.log(error);
+            {% endif %}
             return caches.open(CACHE_NAME).then((cache) => {
                 return cache.match(OFFLINE_CACHE_PAGE);
             });
