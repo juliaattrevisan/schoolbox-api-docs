@@ -237,40 +237,34 @@ export default class PastoralReportDetails {
     }
 
     /**
-     * clicks each tab, sorts a column and checks the sorting works properly
-     * @param tabNames - The name of the tab: "List", "Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week",
-     * @param headerNames - The name of the header to sort: user, oct_2017, total, etc
-     * @param columnNames - The column name to check the expected data
-     * @param rowNumbers - The row to locate in the table: 1 for first row, 2 for second row, etc
-     * @param expectedTexts - The expected text in the first row after sorting
+     * clicks a header to sort the column
+     * @param headerName - The name of the header to sort: user, oct_2017, total, etc
+     */
+    async clickHeaderName(headerName: string): Promise<void> {
+        const sortButton = this.page.getByTestId(
+            PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", headerName),
+        );
+        await sortButton.click();
+    }
+
+    /**
+     * sorts a column and checks the sorting works properly
+     * @param headerName - The name of the header to sort: user, oct_2017, total, etc
+     * @param tableLocator - Object with trIndex (row number) and tdIndex (column number) to locate the cell
+     * @param tableLocator.trIndex - The row number in the table
+     * @param tableLocator.tdIndex - The column number in the table
+     * @param expectedText - The expected text in the specified cell after sorting
      */
     async sortColumnAndCheck(
-        tabNames: string[],
-        headerNames: string[],
-        columnNames: string[],
-        rowNumbers: number[],
-        expectedTexts: string[],
+        headerName: string,
+        tableLocator: { trIndex: number; tdIndex: number },
+        expectedText: string,
     ): Promise<void> {
-        for (let i = 0; i < tabNames.length; i += 1) {
-            const tabName = tabNames[i];
-            const headerName = headerNames[i];
-            const columnName = columnNames[i];
-            const rowNumber = rowNumbers[i];
-            const expectedText = expectedTexts[i];
-
-            const tabLocator = this.page.getByTestId(
-                PastoralReportDetails.DATA_TEST_PASTORAL_TAB.replace("{tabName}", tabName),
-            );
-            await tabLocator.click();
-            const sortButton = this.page.getByTestId(
-                PastoralReportDetails.DATA_TEST_SORT_BUTTON.replace("{headerName}", headerName),
-            );
-            await sortButton.click();
-
-            // finds the row and locate a cell column in that row - checks the correct number is presented
-            const row = this.page.locator(`table tbody tr:nth-child(${rowNumber})`);
-            await expect(row.getByTestId(`pr-table-data-cell-${columnName}`)).toHaveText(expectedText);
-        }
+        await this.clickHeaderName(headerName);
+        const tableCellLocator = this.page.locator(
+            `table tbody tr:nth-child(${tableLocator.trIndex}) td:nth-child(${tableLocator.tdIndex})`,
+        );
+        await expect(tableCellLocator).toHaveText(expectedText);
     }
 
     /**

@@ -81,35 +81,47 @@ test.describe("Pastoral Report Builder", () => {
 
             tester.isGoingTo("sort the columns and check it works properly");
 
-            await pastoralReportDetails.sortColumnAndCheck(
-                // Student by Type tab: sort by Name and check Sasha White the first row
-                // Type by Month tab: sort by Oct 2017 and check the 4 records number is in the row 9
-                // Type by Week tab: sort by Total Records and check the 1 record number is in the row 8
-                // Student by Month tab: sort by Oct 2017 and check the last row has number 3
-                // Student by Week tab: sort by 29 Oct - 4 Nov, 2017  and check Penelope Li is in the row 4
+            // Student by Type tab: sort by Name and check Sasha White is in row 2
+            await pastoralReportDetails.clickTab("Student by Type");
+            await pastoralReportDetails.sortColumnAndCheck("user", { trIndex: 2, tdIndex: 1 }, "White, Sasha");
 
-                ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
-                ["user", "oct_2017", "total", "oct_2017", "week_8"],
-                ["user-Sasha", "oct_2017-4", "total-1", "oct_2017-3", "user-Penelope"],
-                [2, 9, 8, 6, 3], // row numbers
-                ["White, Sasha", "4", "1", "3", "Li, Penelope"],
-            );
+            // Type by Month tab: sort by Oct 2017 and check the 4 records number is in row 9
+            await pastoralReportDetails.clickTab("Type by Month");
+            await pastoralReportDetails.sortColumnAndCheck("oct_2017", { trIndex: 9, tdIndex: 13 }, "4");
+
+            // Type by Week tab: sort by Total Records and check the 1 record number is in row 8
+            await pastoralReportDetails.clickTab("Type by Week");
+            await pastoralReportDetails.sortColumnAndCheck("total", { trIndex: 8, tdIndex: 2 }, "1");
+
+            // Student by Month tab: sort by Oct 2017 and check the last row (6) has number 3
+            await pastoralReportDetails.clickTab("Student by Month");
+            await pastoralReportDetails.sortColumnAndCheck("oct_2017", { trIndex: 6, tdIndex: 13 }, "3");
+
+            // Student by Week tab: sort by week 8 (29 Oct - 4 Nov, 2017) and check Penelope Li is in row 3
+            await pastoralReportDetails.clickTab("Student by Week");
+            await pastoralReportDetails.sortColumnAndCheck("week_8", { trIndex: 3, tdIndex: 1 }, "Li, Penelope");
 
             await pastoralReportDetails.clickRecordsOrPointsRadioButton("points");
 
-            await pastoralReportDetails.sortColumnAndCheck(
-                // Student by Type tab: sort by Name and check Sasha White the first row
-                // Type by Month tab: sort by Oct 2017 and check the 5 points number is in the row 9 for the oct column
-                // Type by Week tab: sort by Total Points and check the 5 points number is in the row 9 for the total column
-                // Student by Month tab: sort by Oct 2017 and check the last row has number 6 for the oct column
-                // Student by Week tab: sort by 29 Oct - 4 Nov, 2017  and check Penelope Li is in the row 3
+            // Student by Type tab: sort by Name and check Sasha White is in row 2
+            await pastoralReportDetails.clickTab("Student by Type");
+            await pastoralReportDetails.sortColumnAndCheck("user", { trIndex: 2, tdIndex: 1 }, "White, Sasha");
 
-                ["Student by Type", "Type by Month", "Type by Week", "Student by Month", "Student by Week"],
-                ["user", "oct_2017", "total", "oct_2017", "week_8"],
-                ["user-Sasha", "oct_2017-5", "total-5", "oct_2017-6", "user-Penelope"],
-                [2, 9, 9, 6, 3], // row numbers
-                ["White, Sasha", "5", "5", "6", "Li, Penelope"],
-            );
+            // Type by Month tab: sort by Oct 2017 and check the 5 points number is in row 9 for the oct column
+            await pastoralReportDetails.clickTab("Type by Month");
+            await pastoralReportDetails.sortColumnAndCheck("oct_2017", { trIndex: 9, tdIndex: 13 }, "5");
+
+            // Type by Week tab: sort by Total Points and check the 5 points number is in row 9 for the total column
+            await pastoralReportDetails.clickTab("Type by Week");
+            await pastoralReportDetails.sortColumnAndCheck("total", { trIndex: 9, tdIndex: 2 }, "5");
+
+            // Student by Month tab: sort by Oct 2017 and check the last row (6) has number 6 for the oct column
+            await pastoralReportDetails.clickTab("Student by Month");
+            await pastoralReportDetails.sortColumnAndCheck("oct_2017", { trIndex: 6, tdIndex: 13 }, "6");
+
+            // Student by Week tab: sort by week 8 (29 Oct - 4 Nov, 2017) and check Penelope Li is in row 3
+            await pastoralReportDetails.clickTab("Student by Week");
+            await pastoralReportDetails.sortColumnAndCheck("week_8", { trIndex: 3, tdIndex: 1 }, "Li, Penelope");
 
             tester.isGoingTo(
                 "modify the created report to exclude frequency tables and check that only the ones selected are presented in the report",
