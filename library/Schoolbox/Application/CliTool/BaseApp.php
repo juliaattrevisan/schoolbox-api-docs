@@ -12,7 +12,6 @@ namespace Schoolbox\Application\CliTool;
 use GetOpt;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Config\ConfigMapper;
 
 /**
  * New base CLI app, which uses a new library for setting command-line options
@@ -50,6 +49,11 @@ abstract class BaseApp extends App
                     ->setDescription('Perform mode')
             );
         }
+        $this->optionParser = $this->optionParser->addOption(
+            new GetOpt\Option('v', null, GetOpt\GetOpt::NO_ARGUMENT)
+                ->setDescription('Verbosity (up to 3 times)')
+        );
+
         $this->setOptions();
         return $this;
     }

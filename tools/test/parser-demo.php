@@ -40,7 +40,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
 
     protected function getDescription(): string
     {
-        return 'Description of the test app';
+        return <<<DESC
+            Description of the test app.
+
+            Test content goes here
+            DESC;
     }
 
     protected function setOptions(): CliTool\BaseApp
@@ -57,7 +61,14 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
                 'f',
                 'folder',
                 GetOpt\GetOpt::REQUIRED_ARGUMENT,
-            )->setDescription('Folder on which to operate')
+            )->setDescription('Folder on which to operate: a very long text output goes here but I do not know why, because it\'s only for testing whether text wraps')
+        );
+        $this->optionParser->addOption(
+            new GetOpt\Option(
+                null,
+                'dry-run',
+                GetOpt\GetOpt::OPTIONAL_ARGUMENT,
+            )->setDescription('Dry run?')
         );
         return $this;
     }
