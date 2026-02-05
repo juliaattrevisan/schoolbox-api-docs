@@ -148,6 +148,11 @@ export default class Common {
      */
     static readonly MODAL_DELETE_BUTTON = "button.button.submit";
 
+    /**
+     * empty state when searching finds no results
+     */
+    static readonly DATA_TEST_EMPTY_STATE = "course-list-results-empty-state";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -507,5 +512,12 @@ export default class Common {
         await this.page.getByTestId(filterOptionSelector).click();
         await this.page.getByTestId(filterDropdown).click();
         await this.page.getByTestId(Common.DATA_TEST_APPLY_FILTERS).click();
+    }
+
+    /**
+     * checking the empty state is shown when no results are found
+     */
+    async verifyEmptyStateIsShown(): Promise<void> {
+        await expect(this.page.getByTestId(Common.DATA_TEST_EMPTY_STATE)).toBeVisible();
     }
 }

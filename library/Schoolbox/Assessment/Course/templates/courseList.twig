@@ -72,7 +72,7 @@ Usage:
     </div>
     {% if hasAdd %}
         <nav>
-            <a href="{{ routeLookup('course.newCourse') }}" class="icon-add"></a>
+            <a href="{{ routeLookup('course.newCourse') }}" class="icon-add" data-test="course-list-icon-add"></a>
             {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
             {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
             {% if intellischoolCohortUrl %}
