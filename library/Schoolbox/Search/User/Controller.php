@@ -236,9 +236,9 @@ class Controller extends BaseController
                         return null;
                     }
 
-                    /* Return null if the differentiation profile is not populated
+                    /* Return null if the differentiation profile is not populated, expired or deleted
                      */
-                    if (!$profile->isPopulated()) {
+                    if (!$profile->isPopulated() || $profile->isExpired() || $profile->isDeleted()) {
                         return null;
                     }
 

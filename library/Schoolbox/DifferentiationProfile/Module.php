@@ -103,6 +103,11 @@ class Module extends BaseModule
                 if (!$profile->isPopulated()) {
                     throw new Unauthorized('Differentiation profile is not populated.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
                 }
+                /* Profile must not be expired to be viewed
+                 */
+                if ($profile->isExpired()) {
+                    throw new Unauthorized('Differentiation profile is expired.', ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                }
             }),
         );
 
