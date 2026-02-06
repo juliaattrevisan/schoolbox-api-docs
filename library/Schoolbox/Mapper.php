@@ -294,10 +294,10 @@ abstract class Mapper implements IMapper
     /** @var IMonitor */
     protected $monitor;
 
-    /** @var Propagator */
+    /** @var IPropagator */
     protected $propagator;
 
-    /** @var Propagator */
+    /** @var IPropagator */
     private $propagatorSuppressed;
 
     /**
