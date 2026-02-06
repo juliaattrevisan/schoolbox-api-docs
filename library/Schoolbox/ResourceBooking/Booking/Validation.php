@@ -846,17 +846,27 @@ class Validation
             $errors = [];
         }
 
-        // If we are bypassing validation rules, clear all the clash-related rules from the $errors array.
-        // The clash-related errors will have been left in to allow us to find the clash booking start dates as has
-        // been done above (see $this->validateBookingFromPostData()).
         if (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user)) {
-            $errorsStruct = array_filter(
-                $errorsStruct,
-                static function ($key) {
-                    return !in_array($key, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true);
-                },
-                ARRAY_FILTER_USE_KEY
-            );
+            // Since we are bypassing validation rules, clear all the clash-related rules from the $errors array.
+            // The clash-related errors will have been left in to allow us to find the clash booking start dates as has
+            // been done above (see $this->validateBookingFromPostData()).
+            $errorsStructFiltered = [];
+            foreach ($errorsStruct as $key => $errorsByDate) {
+                foreach ($errorsByDate as $date => $errors) {
+                    foreach ($errors as $error) {
+                        if (!in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                            if (!array_key_exists($key, $errorsStructFiltered)) {
+                                $errorsStructFiltered[$key] = [];
+                            }
+                            if (!array_key_exists($date, $errorsStructFiltered[$key])) {
+                                $errorsStructFiltered[$key][$date] = [];
+                            }
+                            $errorsStructFiltered[$key][$date][] = $error;
+                        }
+                    }
+                }
+            }
+            $errorsStruct = $errorsStructFiltered;
             // Only non-overridable errors will remain after removing the clash errors above.
         }
 
