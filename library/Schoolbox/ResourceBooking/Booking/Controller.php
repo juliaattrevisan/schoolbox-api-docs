@@ -377,7 +377,7 @@ class Controller extends Base
             );
 
             // Save the whole series
-            $bookingList = new Collection();
+            $bookingList = new GenericCollection(Model::class);
             foreach ($series as $booking) {
                 $event = $booking->getEvent();
                 // Role and campus currently need to be set to something.
@@ -413,18 +413,35 @@ class Controller extends Base
 
             if ($overrideValidation) {
                 // Find all clashing bookings and set their status to STATUS_REJECTED.
-                $bookingsToReject = new Collection();
+                $bookingsToReject = new GenericCollection(Model::class);
+                /** @var Model $booking */
                 foreach ($bookingList as $booking) {
-                    $startDatetime = $booking->getStartDatetime() ?? $booking->getEvent()->getStartDateTime();
-                    $endDatetime = $booking->getEndDatetime() ?? $booking->getEvent()->getEndDateTime();
-                    $bookingsInner = $validation->getConflictingBookings($booking->getResource(), $startDatetime, $endDatetime);
-                    foreach ($bookingsInner as $bookingInner) {
-                        $bookingInner->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
-                        $bookingsToReject->add($bookingInner);
+                    $startDatetime = $booking->getBookingStartAt() ?? $booking->getEvent()->getStartDateTime();
+                    $endDatetime = $booking->getBookingEndAt() ?? $booking->getEvent()->getEndDateTime();
+
+                    if ($startDatetime === null || $endDatetime === null) {
+                        // Handle this theoretical error case to prevent warnings below.
+                        continue;
+                    }
+
+                    $conflictingBookings = $validation->getConflictingBookings(
+                        $booking->getResource(),
+                        $startDatetime->getDateTimeObject(),
+                        $endDatetime->getDateTimeObject()
+                    );
+                    // Filter out the booking being updated from $conflictingBookings.
+                    $conflictingBookings = $conflictingBookings->filter(
+                        function (Model $bookingConflicted) use ($booking) {
+                            return $bookingConflicted->getId() !== $booking->getId();
+                        }
+                    );
+                    foreach ($conflictingBookings as $conflictingBooking) {
+                        $conflictingBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
+                        $bookingsToReject->add($conflictingBooking);
                     }
                 }
                 // Add them to the $bookingList so all modified bookings can be saved in one step below.
-                $bookingList->merge($bookingsToReject);
+                $bookingList = $bookingList->merge($bookingsToReject);
             }
 
             $this->bookingMapper->save($bookingList);
