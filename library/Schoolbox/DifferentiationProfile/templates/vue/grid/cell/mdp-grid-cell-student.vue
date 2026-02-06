@@ -51,6 +51,11 @@ function onGenerateSelected(): void {
                 </template>
                 <p v-if="props.user.yearLevel" class="meta">
                     {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}
+                    <template v-if="props.user.campuses && props.user.campuses.length">
+                        <span v-for="(campus, index) in props.user.campuses" :key="campus.id">
+                            {{ campus.name }} Student<span v-if="index < props.user.campuses.length - 1">, </span>
+                        </span>
+                    </template>
                 </p>
             </div>
         </div>
