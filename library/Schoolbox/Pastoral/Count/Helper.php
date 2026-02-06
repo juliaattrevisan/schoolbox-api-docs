@@ -301,8 +301,8 @@ class Helper
 
             /** @noinspection PhpUnhandledExceptionInspection */
             $destinationUrl = sprintf(
-                "%s?isFlag=true&typeId=%s&subtypeId=%s",
-                $this->routeGenerator->generate('differentiationProfiles.getLinkedPastoralRecords', ['studentId' => $student->getId()]),
+                "%s?type=%s&subtype=%s",
+                $this->routeGenerator->generate('pastoral.getFlag', ['studentId' => $student->getId()]),
                 $studentCount->getOffset('typeId'),
                 $studentCount->getOffset('subtypeId')
             );
