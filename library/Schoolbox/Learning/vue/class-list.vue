@@ -722,6 +722,7 @@ export default {
                                     <pastoral-flags
                                         v-if="pastoralFlags[student.id] && pastoralFlags[student.id].length > 0"
                                         :flags="pastoralFlags[student.id]"
+                                        :data-test="`class-list-pastoral-flags-${student.id}`"
                                     />
                                     <p class="meta inline-container f-no-margins">
                                         <slot name="student-meta" v-bind:student="student">

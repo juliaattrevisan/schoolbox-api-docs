@@ -43,7 +43,7 @@ function onFlagSelect(event: CustomEvent): void {
     <div class="l-flex-row l-gap-xs">
         <sbx-label
             v-for="flag in props.flags"
-            :key="`flag-${flag.typeId}-${flag.subtypeId}`"
+            :key="`flag-${flag.typeId}-${flag.subtypeId ?? 0}`"
             :title="flag.title"
             :text="flag.count.toString()"
             :icon="flag.icon"
@@ -51,6 +51,7 @@ function onFlagSelect(event: CustomEvent): void {
             :text-color="flag.fgColor"
             :href="flag.destinationUrl"
             :is-button="true"
+            :data-test="`pastoral-flags-${flag.typeId}-${flag.subtypeId ?? 0}`"
             @select="onFlagSelect"
         />
     </div>

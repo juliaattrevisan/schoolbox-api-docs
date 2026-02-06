@@ -120,6 +120,7 @@ function onOpenIncludeInExistingModal(): void {
                         pastoralFlags[props.participant.user.id] && pastoralFlags[props.participant.user.id].length > 0
                     "
                     :flags="props.pastoralFlags[props.participant.user.id]"
+                    :data-test="`cp-participant-pastoral-flags-${props.participant.user.id}`"
                 />
             </div>
         </td>
