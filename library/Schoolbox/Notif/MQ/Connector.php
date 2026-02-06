@@ -79,7 +79,7 @@ class Connector extends AMQPConnector
         // Connection doesn't exist: create it
         if (!$this->conn) {
             $connectionConfig = new AMQPConnectionConfig();
-            $connectionConfig->setIoType(AMQPConnectionConfig::IO_TYPE_SOCKET);
+            $connectionConfig->setIoType(AMQPConnectionConfig::IO_TYPE_STREAM);
             $connectionConfig->setHost($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HOST]);
             $connectionConfig->setPort($this->connectionOptions[self::AMQP_CONNECTION_OPTION_PORT]);
             $connectionConfig->setUser($this->connectionOptions[self::AMQP_CONNECTION_OPTION_USER]);
