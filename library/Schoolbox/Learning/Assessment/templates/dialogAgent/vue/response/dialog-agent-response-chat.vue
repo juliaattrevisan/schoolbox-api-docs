@@ -58,10 +58,44 @@ const timeLeft = window.Vue.computed<number>(() => {
     return Math.ceil((endAt - currentTimestamp.value) / 1000);
 });
 
-/** As soon as the first message has been sent, update startedAt so the duration timer will work */
-acPromptEventBus.on(() => {
+/**
+ * Re-fetch the latest response data from the server and update the currentResponse
+ * @returns the API response
+ */
+async function refetchResponseData(): Promise<ReturnType<typeof apiRequest<ApiDialogAgentActionResponse>>> {
+    if (!currentResponse.value._routes.status) {
+        throw new Error("unable to refresh response data, missing status route"); // shouldn't get here
+    }
+
+    isLoading.value = true;
+    const response = await apiRequest<ApiDialogAgentActionResponse>({
+        method: "GET",
+        url: currentResponse.value._routes.status,
+    });
+    isLoading.value = false;
+
+    if (response.success) {
+        currentResponse.value = response.data.response;
+    }
+
+    return response;
+}
+
+acPromptEventBus.on(({ guardrailTriggered }) => {
+    /** As soon as the first message has been sent, update startedAt so the duration timer will work */
     if (currentResponse.value.startedAt === null) {
         currentResponse.value.startedAt = getRfc3339String(window.dayjs.unix(currentTimestamp.value / 1000));
+    }
+
+    /** When a guardrail is triggered */
+    if (guardrailTriggered) {
+        // Assume that you can no longer message or request/resolve assistance
+        currentResponse.value._routes.message = null;
+        currentResponse.value._routes.assistanceRequest = null;
+        currentResponse.value._routes.assistanceResolve = null;
+
+        // Then refetch the actual response data to ensure we're fully up to date
+        void refetchResponseData();
     }
 });
 
@@ -91,19 +125,10 @@ async function changeHelpRequest(endpoint: string): Promise<void> {
          * When that occurs, attempt to find the latest response data to sync back up.
          */
         if (getApiProblemStatus(response) === 403 && currentResponse.value._routes.status) {
-            isLoading.value = true;
-            const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
-                method: "GET",
-                url: currentResponse.value._routes.status,
-            });
-            isLoading.value = false;
-
+            const statusResponse = await refetchResponseData();
             if (statusResponse.success) {
-                currentResponse.value = statusResponse.data.response;
                 return;
             }
-
-            errorMessage = statusResponse.message;
         }
 
         const requestRoute = currentResponse.value._routes[DialogAgentResponseAction.ACTION_ASSISTANCE_REQUEST];
@@ -166,16 +191,7 @@ async function openSubmitModal(): Promise<void> {
 
     /** If the feed isn't empty and we don't have a submit route yet, we might be out of date... try refetch first */
     if (acStore.feed.length > 0 && !currentResponse.value._routes.submit && currentResponse.value._routes.status) {
-        isLoading.value = true;
-        const statusResponse = await apiRequest<ApiDialogAgentActionResponse>({
-            method: "GET",
-            url: currentResponse.value._routes.status,
-        });
-        isLoading.value = false;
-
-        if (statusResponse.success) {
-            currentResponse.value = statusResponse.data.response;
-        }
+        await refetchResponseData();
     }
 }
 

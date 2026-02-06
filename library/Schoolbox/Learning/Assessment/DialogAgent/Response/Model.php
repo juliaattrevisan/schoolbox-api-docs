@@ -43,6 +43,12 @@ class Model extends AbstractResponse
     /**
      * @var \Alaress_Date_Format|null
      */
+    private ?\Alaress_Date_Format $lockedAt = null;
+
+
+    /**
+     * @var \Alaress_Date_Format|null
+     */
     private ?\Alaress_Date_Format $submittedAt = null;
 
 
@@ -65,6 +71,12 @@ class Model extends AbstractResponse
      */
     public function getCurrentStatus(): Status
     {
+        /* Locked: this overrides submitted and represents a response that was locked due to a guardrail breach
+         */
+        if (null !== $this->getLockedAt()) {
+            return Status::LOCKED;
+        }
+
         /* Submitted: disregard all other statuses
          */
         if (null !== $this->getSubmittedAt()) {
@@ -151,6 +163,26 @@ class Model extends AbstractResponse
     public function setStartedAt(?\Alaress_Date_Format $startedAt): self
     {
         $this->startedAt = $startedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return \Alaress_Date_Format|null
+     */
+    public function getLockedAt(): ?\Alaress_Date_Format
+    {
+        return $this->lockedAt;
+    }
+
+
+    /**
+     * @param \Alaress_Date_Format|null $lockedAt
+     * @return $this
+     */
+    public function setLockedAt(?\Alaress_Date_Format $lockedAt): self
+    {
+        $this->lockedAt = $lockedAt;
         return $this;
     }
 

@@ -34,7 +34,7 @@ class GuardrailFlagged extends SchoolboxException
     public function __construct(private Outcome $outcome, ICheck $check, string $information = '')
     {
         $message = \sprintf(
-            "The request failed to meet expected guidelines (%s)",
+            "The request failed to pass guardrail checks (%s)",
             $check::getName(),
         );
 

@@ -52,6 +52,23 @@ class NextRoutes
             ];
         }
 
+        /* Locked: this overrides submitted and represents a response that was locked due to a guardrail breach
+
+         * You can only view or reopen a locked response.
+         * The locked response can still be submitted if it wasn't already submitted when it got locked.
+         */
+        if (null !== $authoritativeResponse->getLockedAt()) {
+            return [
+                self::ACTION_VIEW => true,
+                self::ACTION_MESSAGE => false,
+                self::ACTION_SUBMIT => null === $authoritativeResponse->getSubmittedAt(),
+                self::ACTION_RESET => false,
+                self::ACTION_REOPEN => true,
+                self::ACTION_ASSISTANCE_REQUEST => false,
+                self::ACTION_ASSISTANCE_RESOLVE => false,
+            ];
+        }
+
         /* Submitted: disregard all other statuses
          */
         if (null !== $authoritativeResponse->getSubmittedAt()) {

@@ -643,6 +643,7 @@ class Controller extends Base
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $moderationClient,
             $agentConfig,
+            $this->dialogAgentResponseMapper,
             $this->dialogAgentResponseMessageMapper,
         );
 
@@ -732,6 +733,7 @@ class Controller extends Base
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
             $moderationClient,
             $agentConfig,
+            $this->dialogAgentResponseMapper,
             $this->dialogAgentResponseMessageMapper,
         );
 
@@ -824,6 +826,17 @@ class Controller extends Base
             ->setSubmittedOnBehalfOf($student)
             ->setSubmittedBy($this->getUser());
 
+        /**
+         * If the instructor submitted on behalf of the student, it's likely that the response
+         * should no longer count as "locked" if it were. Otherwise the response would remain "locked" unless reopened
+         *
+         * An instructor submitting a locked response indicates they have reviewed the reason for the lock
+         * and concluded that the student shouldn't continue
+         */
+        if ($this->access->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())) {
+            $response->setLockedAt(null);
+        }
+
         $this->dialogAgentResponseMapper->save($response);
 
         /** Set up and send off a task daemon job to generate the feedback for this response */
@@ -862,6 +875,7 @@ class Controller extends Base
     public function postReopen(Response $response): void
     {
         $response
+            ->setLockedAt(null) // in case it was locked, this is how you unlock it
             ->setSubmittedAt(null)
             ->setSubmittedBy(null);
 

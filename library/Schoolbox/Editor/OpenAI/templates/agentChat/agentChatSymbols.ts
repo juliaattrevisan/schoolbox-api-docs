@@ -8,4 +8,5 @@ import type { AgentChatFeedMessage, AgentChatMessageType } from "./agentChatType
 export const acPromptEventKey: EventBusKey<{
     scrollFeed?: boolean;
     retryRequest?: AgentChatFeedMessage<AgentChatMessageType.REQUEST>;
+    guardrailTriggered?: boolean;
 }> = Symbol("acPromptEventKey");
