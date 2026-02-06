@@ -16,7 +16,6 @@ use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Filter\Filters\CustomisationRecord;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use PDO;
 
@@ -94,18 +93,9 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
-        $staticPlan = PlanMapper::PLAN_TYPE_STATIC;
-        $customParticipantPlan = PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION;
-        $modifiedActivity = PlanMapper::CUSTOMISATION_TYPE_STATIC;
-        $newActivity = PlanMapper::CUSTOMISATION_TYPE_CUSTOM_PARTICIPATION;
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('plan', 'pp')},
-                   CASE
-                       WHEN pp.is_dynamic = {$staticPlan} THEN '{$modifiedActivity}'
-                       WHEN pp.is_dynamic = {$customParticipantPlan} THEN '{$newActivity}'
-                       ELSE NULL
-                   END AS customisation_type,
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},
                    {$this->getJoinColumnString('plan.assessment', 'oa')},
@@ -147,7 +137,6 @@ class Mapper extends BaseMapper
     }
 
     public function findByFilters(
-        User $viewer,
         ?array $nameSearch,
         ?array $yearLevelIds,
         ?array $campusIds,
@@ -191,6 +180,14 @@ class Mapper extends BaseMapper
             ]);
         }
 
+        if (!empty($cursorParams)) {
+            $pb = $this->applyCursor(
+                $pb,
+                $cursorParams,
+                $order ?? $this->getDefaultOrderByParams()
+            );
+        }
+
         $option = [];
 
         if (null !== $limit) {
@@ -232,6 +229,68 @@ class Mapper extends BaseMapper
                 }
             }
         }
+        return $pb;
+    }
+
+    /**
+     * Apply cursor predicates to the predicate builder based on the provided cursor params and order
+     *
+     * @param Builder $pb
+     * @param array $cursorParams
+     * @param array $order
+     * @return Builder
+     */
+    private function applyCursor(Builder $pb, $cursorParams, $order): Builder
+    {
+        /* Build up the cursor predicates
+         * This is synonymous to how we do it in Alaress\Database\Cursor\MapperCursor
+         */
+        $columnBuilders         = [];
+        $previousColumnBuilders = [];
+        foreach ($order as $column => $direction) {
+            $value = $cursorParams[$column] ?? null;
+            $parameterisedValue = ":cursor_" . str_replace('.', '_', $column);
+
+            if ($direction === self::SORT_ORDER_ASC) {
+                $thisBuilder = $pb->emptyClone()->rawWhere(
+                    "{$column} > :parameterisedValue",
+                    [
+                        "parameterisedValue" => $value,
+                    ]
+                );
+            } else if ($direction === self::SORT_ORDER_DESC) {
+                $thisBuilder = $pb->emptyClone()->rawWhere(
+                    "{$column} < :parameterisedValue",
+                    [
+                        "parameterisedValue" => $value,
+                    ]
+                );
+            } else {
+                continue;
+            }
+
+            $columnBuilder = $pb->emptyClone();
+            foreach ($previousColumnBuilders as $previousColumnBuilder) {
+                $columnBuilder = $columnBuilder->all($previousColumnBuilder);
+            }
+            $columnBuilders[] = $columnBuilder->all($thisBuilder);
+
+            $previousColumnBuilders[] = $pb->emptyClone()->rawWhere(
+                "{$column} = :parameterisedValue",
+                [
+                    "parameterisedValue" => $value,
+                ]
+            );
+        }
+
+        // Put each column builder into the main predicate builder
+        $subBuilder = $pb->emptyClone();
+        foreach ($columnBuilders as $columnBuilder) {
+            // All the builders in the column builder must match
+            $subBuilder = $subBuilder->all($columnBuilder);
+        }
+        // Any of the column builders may match
+        $pb = $pb->any($subBuilder);
         return $pb;
     }
 

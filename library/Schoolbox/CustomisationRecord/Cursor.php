@@ -23,10 +23,9 @@ class Cursor implements ICursor
     public const string CURSOR_ORDER_BY_CREATED_AT_COLUMN = 'created_at';
     public const string CURSOR_ORDER_BY_CLASS_NAME_COLUMN = 'f.name';
     public const string CURSOR_ORDER_BY_UNIT_NAME_COLUMN = 'cui.title';
-    public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN = 'customisation_type';
+    public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN = 'pp.is_dynamic';
 
     public function __construct(
-        private User $viewer,
         private Finder $finder,
         private array|Collection $completedFilters,
         private ?string $orderBy = self::CURSOR_DEFAULT_ORDER_BY,
@@ -44,7 +43,6 @@ class Cursor implements ICursor
         }
 
         return $this->finder->findCustomisationForStudentsByFilters(
-            $this->viewer,
             $this->completedFilters,
             $decoded ?? null,
             $this->order,
@@ -100,7 +98,7 @@ class Cursor implements ICursor
 
         if ($this->orderBy === self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE) {
             return $this->codec->encode([
-                self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $lastRecord->getPlan()->getCustomisationType(),
+                self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $lastRecord->getPlan()->getIsDynamic(),
                 self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
             ]);
         }
@@ -121,7 +119,6 @@ class Cursor implements ICursor
     public function retrieveResultCount(): ?int
     {
         return $this->finder->findCustomisationForStudentsByFilters(
-            $this->viewer,
             $this->completedFilters,
             null,
             null,
