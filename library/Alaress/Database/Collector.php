@@ -118,7 +118,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function collect()
+    public function collect(): array
     {
         $result = array(
             'nb_statements' => count($this->statements),
@@ -147,7 +147,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->widget_name;
     }
@@ -155,7 +155,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return array(
             $this->widget_name => array(
@@ -173,7 +173,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function getAssets()
+    public function getAssets(): array
     {
         return [
             'css' => 'widgets/sqlqueries/widget.css',
