@@ -80,6 +80,7 @@ class Connector extends AMQPConnector
         if (!$this->conn) {
             $connectionConfig = new AMQPConnectionConfig();
             $connectionConfig->setIoType(AMQPConnectionConfig::IO_TYPE_STREAM);
+            $connectionConfig->setIsLazy(true);
             $connectionConfig->setHost($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HOST]);
             $connectionConfig->setPort($this->connectionOptions[self::AMQP_CONNECTION_OPTION_PORT]);
             $connectionConfig->setUser($this->connectionOptions[self::AMQP_CONNECTION_OPTION_USER]);
