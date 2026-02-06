@@ -310,7 +310,7 @@ class Controller extends Base
                      *    - Dialog Agents (not summative; they're never marked)
                      *    - Any learning activities with the mark type "None" (not graded)
                      */
-                    if ($assessment instanceof Task || $assessment instanceof LessonPlan || $assessment instanceof DialogAgent || MarkType::SLUG_NONE === $assessment->getMarkType()?->getSlug()) {
+                    if ($assessment instanceof Task || $assessment instanceof LessonPlan || $assessment instanceof DialogAgent || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug()) {
                         continue;
                     }
 
