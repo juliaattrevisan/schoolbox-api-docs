@@ -5107,36 +5107,6 @@ parameters:
 			path: library/Schoolbox/Mapper.php
 
 		-
-			message: '#^Property Schoolbox\\Mapper\:\:\$propagator \(Schoolbox\\Realtime\\Schedule\\Trigger\\Propagator\) does not accept Schoolbox\\Realtime\\Schedule\\Trigger\\IPropagator\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: '#^Property Schoolbox\\Mapper\:\:\$propagator \(Schoolbox\\Realtime\\Schedule\\Trigger\\Propagator\) does not accept Schoolbox\\Realtime\\Schedule\\Trigger\\IPropagator\|null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: '#^Property Schoolbox\\Mapper\:\:\$propagator \(Schoolbox\\Realtime\\Schedule\\Trigger\\Propagator\) does not accept Schoolbox\\Realtime\\Schedule\\Trigger\\Test\\MockPropagator\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: '#^Property Schoolbox\\Mapper\:\:\$propagatorSuppressed \(Schoolbox\\Realtime\\Schedule\\Trigger\\Propagator\) does not accept Schoolbox\\Realtime\\Schedule\\Trigger\\IPropagator\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: '#^Property Schoolbox\\Mapper\:\:\$propagatorSuppressed \(Schoolbox\\Realtime\\Schedule\\Trigger\\Propagator\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: '#^Unsafe usage of new static\(\)\.$#'
 			identifier: new.static
 			count: 1

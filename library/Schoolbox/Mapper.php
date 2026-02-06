@@ -297,7 +297,7 @@ abstract class Mapper implements IMapper
     /** @var IPropagator */
     protected $propagator;
 
-    /** @var IPropagator */
+    /** @var IPropagator|null */
     private $propagatorSuppressed;
 
     /**
