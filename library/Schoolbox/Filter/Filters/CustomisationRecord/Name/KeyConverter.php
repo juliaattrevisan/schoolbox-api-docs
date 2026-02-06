@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @copyright Copyright 2026, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
@@ -13,7 +13,7 @@ use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
 
 /**
- * Key converter for the customsation record student name filter.
+ * Key converter for the customisation record student name filter.
  */
 class KeyConverter extends AbstractKeyConverter
 {

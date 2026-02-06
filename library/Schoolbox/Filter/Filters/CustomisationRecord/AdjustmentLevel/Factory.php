@@ -16,7 +16,7 @@ use Schoolbox\Filter\Selection;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels;
 
 /**
- * A factory for building 'FolderYearLevel' filter objects
+ * A factory for building 'Adjustment level' filter objects
  */
 class Factory extends Filter\AbstractFactory
 {

@@ -249,22 +249,11 @@ class Mapper extends BaseMapper
         $previousColumnBuilders = [];
         foreach ($order as $column => $direction) {
             $value = $cursorParams[$column] ?? null;
-            $parameterisedValue = ":cursor_" . str_replace('.', '_', $column);
 
             if ($direction === self::SORT_ORDER_ASC) {
-                $thisBuilder = $pb->emptyClone()->rawWhere(
-                    "{$column} > :parameterisedValue",
-                    [
-                        "parameterisedValue" => $value,
-                    ]
-                );
+                $thisBuilder = $pb->emptyClone()->greaterThan($column, $value);
             } else if ($direction === self::SORT_ORDER_DESC) {
-                $thisBuilder = $pb->emptyClone()->rawWhere(
-                    "{$column} < :parameterisedValue",
-                    [
-                        "parameterisedValue" => $value,
-                    ]
-                );
+                $thisBuilder = $pb->emptyClone()->lessThan($column, $value);
             } else {
                 continue;
             }
@@ -275,12 +264,7 @@ class Mapper extends BaseMapper
             }
             $columnBuilders[] = $columnBuilder->all($thisBuilder);
 
-            $previousColumnBuilders[] = $pb->emptyClone()->rawWhere(
-                "{$column} = :parameterisedValue",
-                [
-                    "parameterisedValue" => $value,
-                ]
-            );
+            $previousColumnBuilders[] = $pb->emptyClone()->equals($column, $value);
         }
 
         // Put each column builder into the main predicate builder

@@ -20,7 +20,7 @@ use Schoolbox\Filter\IFactory;
 use Schoolbox\User;
 
 /**
- * Factory class responsible for building differentiation profile filter factories.
+ * Factory class responsible for building customisation record filter factories.
  */
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
@@ -83,7 +83,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * Badges have nothing to do with folders, thus `$filters` is returned
+     * Customisation records have nothing to do with folders, thus `$filters` is returned
      * unchanged.
      *
      * @param array $filters
@@ -101,7 +101,6 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
      */
     private function getTermMapper(): TermMapper
     {
-        /** @var TermMapper $termMapper */
         $termMapper = $this->getMapperFactory()->get(TermMapper::class);
         return $termMapper;
     }

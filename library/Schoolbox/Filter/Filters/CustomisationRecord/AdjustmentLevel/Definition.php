@@ -16,7 +16,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\DifferentiationProfile\AdjustmentLevels\Model as AdjustmentLevel;
 
 /**
- * Definition for the adjustment category filter.
+ * Definition for the adjustment level filter.
  */
 class Definition extends AbstractDefinition
 {
@@ -117,7 +117,7 @@ class Definition extends AbstractDefinition
     {
         $options = $pageFilter->getOptions();
 
-        // Ensure it contains all YearLevels
+        // Ensure it contains all AdjustmentLevels
         foreach ($this->adjustmentLevels as $adjustmentLevel) {
             $abstractKey = (string)$adjustmentLevel->getId();
             if (!$options->offsetExists($abstractKey)) {

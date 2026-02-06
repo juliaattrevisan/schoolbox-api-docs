@@ -24,17 +24,17 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @var Collection|int[]
      */
-    private $adjustmentCategoryIds;
+    private $adjustmentLevelIds;
 
 
     /**
      * @param Filter\Model     $filter
-     * @param Collection|int[] $adjustmentCategoryIds
+     * @param Collection|int[] $adjustmentLevelIds
      */
-    public function __construct(Filter\Model $filter, Collection $adjustmentCategoryIds)
+    public function __construct(Filter\Model $filter, Collection $adjustmentLevelIds)
     {
         parent::__construct($filter);
-        $this->adjustmentCategoryIds = $adjustmentCategoryIds;
+        $this->adjustmentLevelIds = $adjustmentLevelIds;
     }
 
 
@@ -54,7 +54,7 @@ class KeyConverter extends AbstractKeyConverter
     public function possibleItemCount(): int
     {
         // +1 for KEY_NONE
-        return $this->adjustmentCategoryIds->count() + 1;
+        return $this->adjustmentLevelIds->count() + 1;
     }
 
 
@@ -63,7 +63,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if ($key !== Definition::KEY_NONE && !$this->adjustmentCategoryIds->keyExists($key)) {
+        if ($key !== Definition::KEY_NONE && !$this->adjustmentLevelIds->keyExists($key)) {
             throw new InvalidArgumentException("No AdjustmentLevel found for key: $key");
         }
     }
