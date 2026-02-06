@@ -39,6 +39,7 @@ class Module extends BaseModule
 
         $this->register(self::METHOD_GET, '/records', 'viewRecords', $staffWithViewPermission);
         $this->register(self::METHOD_GET, '/records/list', 'getListRecords', $staffWithViewPermission);
+        $this->register(self::METHOD_GET, '/records/export', 'exportRecordsToCsv', $staffWithViewPermission);
     }
 
     /**

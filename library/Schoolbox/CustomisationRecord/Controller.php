@@ -142,6 +142,7 @@ class Controller extends Base
                 'records' => $recordPayload,
                 'routes' => [
                     'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
+                    'exportCsv' => $this->getRouteIfAuthorized('customisationRecord.exportRecordsToCsv'),
                 ],
                 'filterPanel' => $filterPanel,
             ],
@@ -239,6 +240,53 @@ class Controller extends Base
         ];
         $this->response = $this->responseAsJson($recordPayload);
     }
+
+    public function exportRecordsToCsv(): void
+    {
+        $translator = new Translator\CsvModelToArray();
+
+        $request = $this->requestQuery['filter_selection'] ?? [];
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
+
+        $page  = Filter\Page\Model::PAGE_CUSTOMISATION_RECORD;
+        $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
+            $this->getUser(),
+            $page,
+        );
+
+        /** @var Filter\Filters\CustomisationRecord\Finder $finder */
+        $finder = Filter\Filters\CustomisationRecord\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        $cursor = new Cursor(
+            $finder,
+            $dynamicFilters,
+        );
+
+        $records = $cursor->retrieveResults(null);
+        $data = $records->map(fn($record) => call_user_func($translator, $record))->reindex();
+
+        $exporter = new \Report_Exporter('customisation_records.csv');
+
+        $headings = array_column($this->recordTableHeaders(), 'title', 'key');
+
+        $exporter->setHeadings($headings);
+
+        $exporter->setData($data, [$this, 'dataManipulator']);
+        $exporter->exportCSV();
+    }
+
+
 
     private function recordTableHeaders(): array
     {
