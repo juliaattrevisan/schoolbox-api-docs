@@ -2,6 +2,7 @@
  * Types for the AI usage log admin API
  * @see /library/Schoolbox/Admin/OpenAI/Usage/Controller.php
  */
+import type { DateRFC3339 } from "@js/util/dateUtils";
 import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { AgentChatLogEntry } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
@@ -27,17 +28,25 @@ export enum AiFeature {
  */
 export enum AiLogFormat {
     AGENT_CHAT = "agent_chat",
+    GUARDRAIL = "guardrail",
 }
 
 type AiLogFormatDataMap = {
     [AiLogFormat.AGENT_CHAT]: { input: AgentChatLogEntry; output: AgentChatLogEntry };
+    [AiLogFormat.GUARDRAIL]: {
+        input: { type: "request"; data: string; createdAt: DateRFC3339 };
+        output: { createdAt: DateRFC3339 } & (
+            | { type: "error"; data: string }
+            | { type: "guardrail"; data: { guardrail: string; flagged: boolean; metadata: object } }
+        );
+    };
 };
 
 /** @see /library/Schoolbox/Editor/OpenAI/Log/Translator/Session/ModelToArray.php */
 export type AiSessionLog = {
     id: number;
     sessionId: AiSessionId;
-    createdAt: string;
+    createdAt: DateRFC3339;
     createdBy?: UserAuthor;
     feature: AiFeature;
 } & (
@@ -51,7 +60,7 @@ export type AiSession<TLogFormat extends AiLogFormat = AiLogFormat, TFeature ext
     id: AiSessionId | null;
     feature: TFeature;
     logFormat: TLogFormat | null;
-    createdAt: string;
+    createdAt: DateRFC3339;
     createdBy?: UserAuthor;
     returnCode: number | null; // HTTP return code from OpenAI API
     _routes: {

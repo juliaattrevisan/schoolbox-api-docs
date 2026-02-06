@@ -105,6 +105,18 @@ interface IClient
     ): iterable;
 
     /**
+     * Call the create moderations API, and receive a standard HTTP response:
+     * * https://platform.openai.com/docs/api-reference/moderations/create
+     *
+     * @param array     $payload The request body to send.
+     * @param Log\Model $log     The log to write to: will be updated with the response data,
+     *                           so that this call may be identified in logs.
+     * @return ResponseInterface The response from the AI provider.
+     * @throws ClientExceptionInterface if something went wrong with the request
+     */
+    public function createModerations(array $payload, Log\Model $log): ResponseInterface;
+
+    /**
      * Create a log object, which will then be passed into this client's
      * `create*` methods.
      *

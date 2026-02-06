@@ -634,13 +634,23 @@ class Controller extends Base
             }
         }
 
+        // only provide the moderation client if enabled for this feature
+        $moderationClient = $aiConfig->isAiModerationEnabled($agentConfig)
+            ? $this->aiClientFactory->buildOpenAiModeration()
+            : null;
+
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $moderationClient,
             $agentConfig,
             $this->dialogAgentResponseMessageMapper,
         );
 
         try {
+            $response
+                ->setUpdatedBy($this->getUser()->getId())
+                ->setUpdatedAt(\Alaress_Date_Format::now());
+
             $stream = $agent->requestStream(
                 $this->getUser(),
                 $assessment,
@@ -655,9 +665,6 @@ class Controller extends Base
              * We must wait until now to save, as the log must exist
              * for the session ID foreign key constraint to be satisfied
              */
-            $response
-                ->setUpdatedBy($this->getUser()->getId())
-                ->setUpdatedAt(\Alaress_Date_Format::now());
             $this->dialogAgentResponseMapper->save($response);
 
             // The iterable response can just be passed straight to responseAsEventStream
@@ -671,6 +678,7 @@ class Controller extends Base
             // is output, which doesn't happen until after this method
             // returns.
             $problem = (new ApiProblem($e->getMessage()))
+                ->setDetail($e->getInformation())
                 ->setStatus($e->getCode())
                 ->asArray();
 
@@ -715,8 +723,14 @@ class Controller extends Base
             return;
         }
 
+        // only provide the moderation client if enabled for this feature
+        $moderationClient = $aiConfig->isAiModerationEnabled($agentConfig)
+            ? $this->aiClientFactory->buildOpenAiModeration()
+            : null;
+
         $agent = new OpenAI\Agent\DialogAgentChat(
             $this->aiClientFactory->buildForFeature(\Schoolbox\Editor\OpenAI\Helper::FEATURE_DIALOGAGENT),
+            $moderationClient,
             $agentConfig,
             $this->dialogAgentResponseMessageMapper,
         );
@@ -742,6 +756,7 @@ class Controller extends Base
             // is output, which doesn't happen until after this method
             // returns.
             $problem = (new ApiProblem($e->getMessage()))
+                ->setDetail($e->getInformation())
                 ->setStatus($e->getCode())
                 ->asArray();
 

@@ -73,7 +73,10 @@ const selectedSessionInfo = window.Vue.computed<AiSelectedSessionInfo | AiSelect
         return { session: sessionInfo };
     }
 
-    const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: logInfo };
+    // TODO: properly support sessions with multiple log formats, for now just filter out invalid logs
+    const filteredLog = logInfo.filter((entry) => entry.logFormat !== null && entry.data !== null);
+
+    const info = { logFormat: sessionInfo.logFormat, session: sessionInfo, log: filteredLog };
     return info satisfies Record<keyof AiSelectedSessionInfo, unknown> as AiSelectedSessionInfo;
 });
 
@@ -340,19 +343,22 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 <div class="clearfix"></div>
 
                 <div v-if="!('log' in selectedSessionInfo)" class="loader"></div>
+                <div v-else-if="selectedSessionInfo.log.length === 0" class="empty-state">
+                    <i class="icon-view-hollow"></i>
+                    <p>
+                        The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
+                        previews for this session.
+                    </p>
+                </div>
                 <div v-else class="l-mar-m">
                     <aul-agent-chat
-                        v-if="selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT"
+                        v-if="
+                            selectedSessionInfo.logFormat === AiLogFormat.AGENT_CHAT ||
+                            selectedSessionInfo.logFormat === AiLogFormat.GUARDRAIL
+                        "
                         :feature="selectedSessionInfo.session.feature"
                         :session-log="selectedSessionInfo.log"
                     />
-                    <div v-else class="empty-state">
-                        <i class="icon-view-hollow"></i>
-                        <p>
-                            The {{ props.features[selectedSessionInfo.session.feature].title }} feature does not support
-                            previews for this session.
-                        </p>
-                    </div>
                 </div>
             </section>
         </div>

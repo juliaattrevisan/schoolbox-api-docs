@@ -22,6 +22,7 @@ enum Status: string
     case Ok = 'ok';
     case Pending = 'pending';
     case Error = 'error';
+    case GuardrailFlagged = 'guardrail_flagged';
 
     /**
      * Create a status from a message's event type:
@@ -38,6 +39,7 @@ enum Status: string
             MessageEventType::COMPLETE                                                          => self::Ok,
             MessageEventType::CREATED, MessageEventType::PARTIAL_IMAGE, MessageEventType::DELTA => self::Pending,
             MessageEventType::ERROR                                                             => self::Error,
+            MessageEventType::GUARDRAIL_FLAGGED                                                 => self::GuardrailFlagged,
         };
     }
 }

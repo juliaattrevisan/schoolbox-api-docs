@@ -14,6 +14,10 @@ const props = defineProps<Props>();
 <template>
     <div class="ac-feed-alert" :class="`ac-feed-alert--${props.message.data.side}`">
         <p class="alert-box l-mar--0 l-pad-s" :class="props.message.data.severity">
+            <template v-if="props.message.data.title">
+                <strong>{{ props.message.data.title }}</strong>
+                <br />
+            </template>
             {{ props.message.data.message }}
         </p>
     </div>

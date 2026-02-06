@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Log\Translator\Format;
 
+use InvalidArgumentException;
 use Schoolbox\Editor\OpenAI\Log\LogFormat;
 
 /**
@@ -35,6 +36,8 @@ class StrategyFactory
         if (!\array_key_exists($key, $this->strategyCache)) {
             $this->strategyCache[$key] = match ($logFormat) {
                 AgentChat::getLogFormat() => new AgentChat(),
+                Guardrail::getLogFormat() => new Guardrail(),
+                default => throw new InvalidArgumentException("Unknown log format: {$logFormat->value}"),
             };
         }
         return $this->strategyCache[$key];
