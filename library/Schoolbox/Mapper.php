@@ -4362,7 +4362,7 @@ abstract class Mapper implements IMapper
             });
         } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
             trigger_error(
-                sprintf('Could not connect to AMQP instance: %s', $e->getMessage()),
+                sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
                 E_USER_WARNING,
             );
             return false;
