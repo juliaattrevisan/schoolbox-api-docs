@@ -506,6 +506,7 @@ class Controller extends BaseController
             Page\Model::PAGE_AWARD_LIST              => $labelBuilder->buildLabel(Page\Model::PAGE_AWARD_LIST),
             Page\Model::PAGE_CLASS_PASTORAL          => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_PASTORAL),
             Page\Model::PAGE_DIFFERENTIATION_PROFILE => $labelBuilder->buildLabel(Page\Model::PAGE_DIFFERENTIATION_PROFILE),
+            Page\Model::PAGE_CUSTOMISATION_RECORD    => $labelBuilder->buildLabel(Page\Model::PAGE_CUSTOMISATION_RECORD),
         ];
     }
 
@@ -524,7 +525,8 @@ class Controller extends BaseController
             'dueWorkCal',
             'grades',
             'pending',
-            'rubricMarkbook' => 'Lms',
+            'rubricMarkbook',
+            'customisationRecord'=> 'Lms',
             'badgeList',
             'awardList' => 'Badge',
             default => '',

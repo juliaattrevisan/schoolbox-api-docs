@@ -100,6 +100,7 @@ class AvailabilityChecker
             Model::PAGE_BADGE_LIST,
             Model::PAGE_AWARD_LIST,
             Model::PAGE_DIFFERENTIATION_PROFILE,
+            Model::PAGE_DIFFERENTIATION_PROFILE,
         ];
         foreach ($allFilters as $filter) {
             if ($this->isAvailable($filter)) {
