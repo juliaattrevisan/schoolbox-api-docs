@@ -4,6 +4,7 @@
  */
 
 import { sbProps } from "@js/util/sbx/pageUtils";
+import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
 import type { Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
@@ -39,7 +40,7 @@ function onGenerateSelected(): void {
     <div class="l-flex-col l-pad-s l-gap-m">
         <div class="l-flex-row l-flex--no-wrap l-gap-m">
             <user-photo :user="props.user" render="small" />
-            <div class="l-flex-col l-flex--justify-center f-no-margins">
+            <div class="l-flex-col l-flex--justify-center l-gap-s f-no-margins">
                 <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}
@@ -48,6 +49,9 @@ function onGenerateSelected(): void {
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}
                 </template>
+                <p v-if="props.user.yearLevel" class="meta">
+                    {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}
+                </p>
             </div>
         </div>
         <button
