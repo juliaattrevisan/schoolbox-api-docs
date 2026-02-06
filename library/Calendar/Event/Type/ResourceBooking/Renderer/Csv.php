@@ -19,4 +19,12 @@ class Csv extends Base
      * render()
      */
     use CSVTrait;
+
+    /**
+     * @return string
+     */
+    protected function getPurpose(): string
+    {
+        return $this->event->getBooking()->getName() ?? '';
+    }
 }

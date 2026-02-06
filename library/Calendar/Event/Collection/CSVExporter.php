@@ -40,6 +40,7 @@ class CSVExporter implements IExporter
             'event_type',
             'publish_date',
             'attendance',
+            'purpose',
         ];
 
         // Output base calendar, and output its start and end separately
