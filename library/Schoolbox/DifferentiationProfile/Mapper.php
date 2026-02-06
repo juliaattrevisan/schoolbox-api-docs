@@ -17,10 +17,13 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as PastoralModel;
 
 /**
  * Class Mapper
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = array())
  *
  * @package Schoolbox\DifferentiationProfile
  */
@@ -84,6 +87,8 @@ class Mapper extends BaseMapper
             $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
             $collection->add($model);
         }
+
+        $collection = $this->loadPastoralRecordsForCollection($collection);
 
         return $collection;
     }
@@ -418,11 +423,10 @@ class Mapper extends BaseMapper
             $model->setUpdatedBy($this->getJoinMapper('updatedBy')->hydrate($row, 'updatedBy'));
             $model->setAdjustmentCategory($this->getCollection(AdjustmentCategories\Mapper::getInstance(), $row['adjustment_category']));
             $model->setAdjustmentLevel($this->getCollection(AdjustmentLevels\Mapper::getInstance(), $row['adjustment_level']));
-            $model->setOutOfDate(isset($row['is_out_of_date']) && (bool)$row['is_out_of_date']);
-            $model->setExpired(isset($row['is_expired']) && (bool)$row['is_expired']);
             $collection->add($model);
         }
 
+        $collection = $this->loadPastoralRecordsForCollection($collection);
         return $collection;
     }
 
@@ -673,6 +677,49 @@ class Mapper extends BaseMapper
             Cursor::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => 0,
             default => "",
         };
+    }
+
+    /**
+     * Load pastoral records for the students in the collection and set to the differentiation profile
+     *
+     * @param GenericCollection $profiles
+     * @return GenericCollection
+     */
+    public function loadPastoralRecordsForCollection(GenericCollection $profiles): GenericCollection
+    {
+        /** No profiles in the collection, no need to query pastoral records
+         */
+        if ($profiles->count() === 0) {
+            return $profiles;
+        }
+
+        $studentIds = [];
+        foreach ($profiles as $profile) {
+            $studentIds[] = $profile->getStudent()->getId();
+        }
+
+        $pastoralMapper = PastoralMapper::getInstance();
+        $pb = $pastoralMapper->getPredicateBuilder();
+        $pb->in('student_id', $studentIds);
+        $pb->any(
+            $pb->emptyClone()
+               ->isTrue('t.contribute_differentiation_profile')
+               ->isTrue('c.contribute_differentiation_profile')
+        );
+        $pastoralRecords = $pastoralMapper
+            ->findByPredicates($pb)
+            ->groupByCallback(function (PastoralModel $v) {
+                return $v->getStudent()->getId();
+            });
+
+        foreach ($profiles as $profile) {
+            $studentId = $profile->getStudent()->getId();
+            if (isset($pastoralRecords[$studentId])) {
+                $profile->setPastoralRecords($pastoralRecords[$studentId]);
+            }
+        }
+
+        return $profiles;
     }
 
     /**

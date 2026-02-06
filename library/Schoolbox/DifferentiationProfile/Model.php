@@ -13,6 +13,7 @@ use Schoolbox\Sequential;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\User;
 use Schoolbox\DifferentiationProfile\Mapper as DPMapper;
+use Schoolbox\Pastoral\Model as PastoralModel;
 
 class Model implements ISoftDeletable
 {
@@ -31,8 +32,8 @@ class Model implements ISoftDeletable
     private ?string $needs_challenges = null;
     private ?string $strategies_adjustments = null;
     private ?string $goals = null;
-    private ?bool $expired = null;
-    private ?bool $out_of_date = null;
+
+    private ?GenericCollection $pastoral_records = null;
 
     /** @var User|null $created_by */
     private ?User $created_by = null;
@@ -45,6 +46,7 @@ class Model implements ISoftDeletable
     {
         $this->adjustment_category = new GenericCollection(AdjustmentCategories\Model::class);
         $this->adjustment_level = new GenericCollection(AdjustmentLevels\Model::class);
+        $this->pastoral_records = new GenericCollection(PastoralModel::class);
     }
 
     /**
@@ -260,6 +262,28 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Set pastoral records
+     *
+     * @param GenericCollection|null $pastoral_records
+     * @return self
+     */
+    public function setPastoralRecords(?GenericCollection $pastoral_records): self
+    {
+        $this->pastoral_records = $this->pastoral_records->replaceWith($pastoral_records);
+        return $this;
+    }
+
+    /**
+     * Get pastoral records
+     *
+     * @return GenericCollection|null
+     */
+    public function getPastoralRecords(): ?GenericCollection
+    {
+        return $this->pastoral_records;
+    }
+
+    /**
      * Set created by
      *
      * @param User|null $created_by
@@ -304,47 +328,50 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * Set expired
-     *
-     * @param bool|null $expired
-     * @return self
-     */
-    public function setExpired(?bool $expired): self
-    {
-        $this->expired = $expired;
-        return $this;
-    }
-
-    /**
-     * Get expired
+     * Check if the differentiation profile is expired
+     * by checking if all associated pastoral records are archived
      *
      * @return bool|null
      */
-    public function getExpired(): ?bool
+    public function isExpired(): ?bool
     {
-        return $this->expired;
+        /* No pastoral records exist, so expiration status is unknown
+         */
+        if ($this->getPastoralRecords()->count() === 0) {
+            return null;
+        }
+
+        /** @var PastoralModel $pastoralRecord */
+        foreach ($this->pastoral_records as $pastoralRecord) {
+            if (!$pastoralRecord->isArchived()) {
+                return false;
+            }
+        }
+        // All pastoral records are archived, so the profile is expired
+        return true;
     }
 
     /**
-     * Set out of date
-     *
-     * @param bool|null $out_of_date
-     * @return self
-     */
-    public function setOutOfDate(?bool $out_of_date): self
-    {
-        $this->out_of_date = $out_of_date;
-        return $this;
-    }
-
-    /**
-     * Get out of date
+     * Check if the differentiation profile is out-of-date
+     * by checking if any associated pastoral records have been updated since the profile was last updated
      *
      * @return bool|null
      */
-    public function getOutOfDate(): ?bool
+    public function isOutOfDate(): ?bool
     {
-        return $this->out_of_date;
+        /* No pastoral records exist, so out-of-date status is unknown
+         */
+        if ($this->getPastoralRecords()->count() === 0) {
+            return null;
+        }
+
+        /** @var PastoralModel $pastoralRecord */
+        foreach ($this->pastoral_records as $pastoralRecord) {
+            if ($pastoralRecord->getUpdatedAt() > ($this->getUpdatedAt() ?? \Alaress_Date_Format::now())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -375,6 +402,6 @@ class Model implements ISoftDeletable
      */
     public function isActive(): bool
     {
-        return !$this->getExpired() && !$this->getOutOfDate() && $this->isPopulated() && !$this->isDeleted();
+        return !$this->isExpired() && !$this->isOutOfDate() && $this->isPopulated() && !$this->isDeleted();
     }
 }

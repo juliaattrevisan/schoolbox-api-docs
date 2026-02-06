@@ -128,10 +128,10 @@ class ModelToArray
     {
         $status = [];
 
-        if ($model->getExpired()) {
+        if ($model->isExpired()) {
             $status[] = 'expired';
         }
-        if ($model->getOutOfDate()) {
+        if ($model->isOutOfDate()) {
             $status[] = 'outOfDate';
         }
         if (!$model->isPopulated()) {
