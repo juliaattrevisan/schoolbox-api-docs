@@ -11,6 +11,7 @@ namespace Schoolbox\CustomisationRecord;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Filter\IFactoryFactory;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Filter;
 
@@ -25,6 +26,7 @@ class Controller extends Base
         private IFactoryFactory $filterFactoryFactory,
         private \Schoolbox\Filter\Mapper $filterMapper,
         private \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper,
+        private RosettaStone $rosettaStone,
     ) {
         // Controller initialization code can go here
     }
@@ -255,13 +257,13 @@ class Controller extends Base
             ],
             [
                 'key' => 'class',
-                'title' => 'Class',
+                'title' => $this->rosettaStone->translate('class', false, true),
                 'type' => 'Basic',
                 'isSortable' => true,
             ],
             [
                 'key' => 'unit',
-                'title' => 'Unit',
+                'title' => $this->rosettaStone->translate('unit', false, true),
                 'type' => 'Basic',
                 'isSortable' => true,
             ],

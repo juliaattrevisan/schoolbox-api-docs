@@ -52,6 +52,7 @@ class Module extends BaseModule
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
+            $this->injector->get('l10n'),
         );
     }
 
