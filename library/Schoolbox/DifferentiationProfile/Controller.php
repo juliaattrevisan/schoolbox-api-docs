@@ -219,28 +219,64 @@ class Controller extends Base
             $this->getUser()
         );
 
+        $isFlag = $this->requestQuery->get('isFlag') === 'true' || $this->requestQuery->get('isFlag') === true;
+        $typeId = $this->requestQuery->get('typeId') !== null && is_numeric($this->requestQuery->get('typeId')) ? (int)$this->requestQuery->get('typeId') : null;
+        $subtypeId = $this->requestQuery->get('subtypeId') !== null && is_numeric($this->requestQuery->get('subtypeId')) ? (int)$this->requestQuery->get('subtypeId') : null;
+
         $where = '';
         if (\count($pb->getWhere())) {
             $where = 'AND ' . implode(' AND ', $pb->getWhere());
         }
 
-        $query = "
-            SELECT p.id
-            FROM pastoral p
-            LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
-            LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
-            LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
-            WHERE p.student_id = :studentId
-            AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
-            AND p.deleted_at IS NULL
-            AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
-            {$where}
-        ";
+        $params = ['studentId' => $studentId];
 
-        $params      = array_merge([
-            'studentId' => $studentId,
-        ], $pb->getParams());
+        if ($isFlag) {
+            /* When isFlag is true, filter by type_id and subtype_id instead of contribute_differentiation_profile
+             */
+            $typeConditions = [];
 
+            if (null !== $typeId) {
+                $typeConditions[] = 'p.type_id = :typeId';
+                $params['typeId'] = $typeId;
+            }
+
+            if (null !== $subtypeId) {
+                $typeConditions[] = 'p.subtype_id = :subtypeId';
+                $params['subtypeId'] = $subtypeId;
+            }
+
+            $typeFilter = !empty($typeConditions) ? 'AND (' . implode(' AND ', $typeConditions) . ')' : '';
+
+            $query = "
+                SELECT p.id
+                FROM pastoral p
+                LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
+                LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+                LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
+                WHERE p.student_id = :studentId
+                {$typeFilter}
+                AND p.deleted_at IS NULL
+                AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
+                {$where}
+            ";
+        } else {
+            /* Original query with contribute_differentiation_profile check
+             */
+            $query = "
+                SELECT p.id
+                FROM pastoral p
+                LEFT JOIN pastoral_access pa ON p.id = pa.pastoral_id
+                LEFT JOIN lu_pastoral_type lpt ON p.type_id = lpt.id
+                LEFT JOIN lu_pastoral_subtype lps ON p.subtype_id = lps.id
+                WHERE p.student_id = :studentId
+                AND (lpt.contribute_differentiation_profile OR lps.contribute_differentiation_profile)
+                AND p.deleted_at IS NULL
+                AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)
+                {$where}
+            ";
+        }
+
+        $params = array_merge($params, $pb->getParams());
 
         $pastoralIds = $this->pastoralMapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
 
