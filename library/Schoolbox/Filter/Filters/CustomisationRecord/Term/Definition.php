@@ -47,4 +47,16 @@ class Definition extends AssessmentTermFilter\Definition
     {
         return '@filterDefinitions/CustomisationRecord/Term/templates';
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
+    {
+        if (Page\Model::PAGE_CUSTOMISATION_RECORD === $page) {
+            return $key === self::KEY_CURRENT;
+        }
+        return false;
+    }
+
 }
