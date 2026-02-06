@@ -304,7 +304,12 @@ class Controller extends Base
 
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $a) {
-                    // Is Assessment a Task or has MarkType of 'None' ?
+                    /* Some learning activities don't contribute toward learning analytics:
+                     *    - Tasks (they're just misc stuff to do most of the time)
+                     *    - Lesson Plans (no interactions; they're a vehicle for staff to deliver content)
+                     *    - Dialog Agents (not summative; they're never marked)
+                     *    - Any learning activities with the mark type "None" (not graded)
+                     */
                     if ($a instanceof Task || $a instanceof LessonPlan || $a instanceof DialogAgent || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
                         continue;
                     }
