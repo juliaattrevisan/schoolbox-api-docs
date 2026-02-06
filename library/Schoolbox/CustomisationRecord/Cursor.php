@@ -65,7 +65,7 @@ class Cursor implements ICursor
             return null;
         }
 
-        /* Return differentiation profile collection if ordered by updated at
+        /* Return customisation record cursor when ordered by updated at
          */
         if ($this->orderBy === self::CURSOR_ORDER_BY_CREATED_AT) {
             return $this->codec->encode([
@@ -82,6 +82,8 @@ class Cursor implements ICursor
             $context = $lastRecord->getPlan()->getAssessment()->getContextProject()->getAssessmentModel()->getContextUnitImplementation();
         }
 
+        /* Return customisation record cursor when ordered by class name
+         */
         if ($this->orderBy === self::CURSOR_ORDER_BY_CLASS_NAME) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $context?->getTitle(),
@@ -89,6 +91,8 @@ class Cursor implements ICursor
             ]);
         }
 
+        /* Return customisation record cursor when ordered by unit name
+         */
         if ($this->orderBy === self::CURSOR_ORDER_BY_UNIT_NAME) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_UNIT_NAME_COLUMN => $context?->getFolder()?->getTitle(),
@@ -96,13 +100,15 @@ class Cursor implements ICursor
             ]);
         }
 
+        /* Return customisation record cursor when ordered by customisation type
+         */
         if ($this->orderBy === self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE) {
             return $this->codec->encode([
                 self::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $lastRecord->getPlan()->getIsDynamic(),
                 self::CURSOR_ORDER_BY_STUDENT_ID_COLUMN => $lastRecord->getUser()->getId(),
             ]);
         }
-        /* Return student collection if default order by is used
+        /* Encode cursor for default ordering (by student name)
          */
         return $this->codec->encode([
             'u.chosen_name' => $lastRecord->getUser()->getGivenName(),

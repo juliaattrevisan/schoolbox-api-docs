@@ -101,8 +101,8 @@ class Definition extends AbstractDefinition
         return array_merge(
             $this->getCustomKeys(),
             array_map(
-                static function (int $yearLevelId) {
-                    return (string)$yearLevelId;
+                static function (int $adjustmentCategoryId) {
+                    return (string)$adjustmentCategoryId;
                 },
                 $this->adjustmentCategories->keys()
             )
@@ -117,7 +117,7 @@ class Definition extends AbstractDefinition
     {
         $options = $pageFilter->getOptions();
 
-        // Ensure it contains all YearLevels
+        // Ensure it contains all Adjustment Categories
         foreach ($this->adjustmentCategories as $adjustmentCategory) {
             $abstractKey = (string)$adjustmentCategory->getId();
             if (!$options->offsetExists($abstractKey)) {

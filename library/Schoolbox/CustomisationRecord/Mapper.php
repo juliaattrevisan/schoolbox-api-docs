@@ -94,7 +94,7 @@ class Mapper extends BaseMapper
     protected function getSelectString(): string
     {
         return "
-            SELECT {$this->getColumnString()},
+            SELECT DISTINCT {$this->getColumnString()},
                    {$this->getJoinColumnString('plan', 'pp')},
                    {$this->getJoinColumnString('user', 'u')},
                    {$this->getJoinColumnString('plan.assessment', 'a')},

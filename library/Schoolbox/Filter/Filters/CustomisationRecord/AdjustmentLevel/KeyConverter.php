@@ -64,7 +64,7 @@ class KeyConverter extends AbstractKeyConverter
     protected function assertValidKey(string $key, User $user, string $page): void
     {
         if ($key !== Definition::KEY_NONE && !$this->adjustmentCategoryIds->keyExists($key)) {
-            throw new InvalidArgumentException("No YearLevel found for key: $key");
+            throw new InvalidArgumentException("No AdjustmentLevel found for key: $key");
         }
     }
 }

@@ -58,5 +58,4 @@ class Definition extends AssessmentTermFilter\Definition
         }
         return false;
     }
-
 }
