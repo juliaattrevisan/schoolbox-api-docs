@@ -64,7 +64,6 @@ class ModelToArray
             'customised_activity' => [
                 'id' => $plan->getId(),
                 'title' => $plan->getName() ?? $plan->getAssessment()->getTitle(),
-
                 '_links' => [
                     'view' => $customiseActivityView
                 ]
