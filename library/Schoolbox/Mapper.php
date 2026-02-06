@@ -4361,6 +4361,10 @@ abstract class Mapper implements IMapper
                 $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
             });
         } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
+            // The exceptions caught in `getEventPropagator` must be caught here
+            // as well, now that the queue is not connected to until actually
+            // propagating an event.
+            $this->propagator = new MockPropagator();
             trigger_error(
                 sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
                 E_USER_WARNING,
