@@ -49,8 +49,6 @@ class Broker implements IBroker
         private ClientInterface $redis,
         private ?IClient $stomp = null,
     ) {
-        // ensure the queue requested exists so we can publish to it (via the default exchange)
-        $amqp->declareQueue($this->queue);
     }
 
 
@@ -147,6 +145,12 @@ class Broker implements IBroker
         }
 
         $amqpPayload = $context ? json_encode([$storageKey, $context]) : $storageKey;
+
+        // ensure the queue requested exists so we can publish to it
+        // (via the default exchange):
+        // defer this check until the message is about to be published, so that
+        // an AMQP connection is created only when necessary.
+        $this->amqp->declareQueue($this->queue);
 
         // ...then advise AMQP to pick it up (on the default exchange)
         $this->amqp->publish(
