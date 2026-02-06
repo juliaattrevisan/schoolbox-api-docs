@@ -11,8 +11,6 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 
 use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Notification\Instance\Instance;
-use PhpAmqpLib\Exception\AMQPIOException;
-use PhpAmqpLib\Exception\AMQPRuntimeException;
 use ReflectionException;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
@@ -63,15 +61,7 @@ class Propagator implements IPropagator
     public function propagate(User $subject, $verb, $object, $mapper, ?array $diff = null)
     {
         // this event generation *should* be in a factory, but... ¯\_(ツ)_/¯
-        try {
-            return $this->propagateEvent(new Event($subject, $verb, $object, $mapper, $diff));
-        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
-            trigger_error(
-                sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
-                E_USER_WARNING,
-            );
-            return '';
-        }
+        return $this->propagateEvent(new Event($subject, $verb, $object, $mapper, $diff));
     }
 
 
