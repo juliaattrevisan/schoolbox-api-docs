@@ -164,16 +164,16 @@ export const getRecordScreenOptions = () => {
  */
 export const getRecordPhotoOptions = () => {
     const options = getDefaultVideojsRecordOptions();
-    (options.width = 720),
-        (options.height = 540),
+    (options.width = 1280),
+        (options.height = 960),
         (options.plugins = {
             record: {
                 imageOutputType: "dataURL",
                 imageOutputFormat: "image/jpeg",
                 imageOutputQuality: 0.8,
                 image: {
-                    width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
-                    height: { min: 240, ideal: 540, max: 920 },
+                    width: { min: 320, ideal: 1280, max: 1600 }, // video media constraints: set resolution of camera
+                    height: { min: 240, ideal: 960, max: 1200 },
                 },
                 debug: IS_DEBUG_MODE,
             },
