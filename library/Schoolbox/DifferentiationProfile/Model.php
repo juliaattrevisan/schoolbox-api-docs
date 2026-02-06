@@ -261,12 +261,23 @@ class Model implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * Set pastoral records
+     *
+     * @param GenericCollection|null $pastoral_records
+     * @return self
+     */
     public function setPastoralRecords(?GenericCollection $pastoral_records): self
     {
         $this->pastoral_records = $this->pastoral_records->replaceWith($pastoral_records);
         return $this;
     }
 
+    /**
+     * Get pastoral records
+     *
+     * @return GenericCollection|null
+     */
     public function getPastoralRecords(): ?GenericCollection
     {
         return $this->pastoral_records;
@@ -318,6 +329,7 @@ class Model implements ISoftDeletable
 
     /**
      * Check if the differentiation profile is expired
+     * by checking if all associated pastoral records are archived
      *
      * @return bool|null
      */
@@ -341,6 +353,7 @@ class Model implements ISoftDeletable
 
     /**
      * Check if the differentiation profile is out-of-date
+     * by checking if any associated pastoral records have been updated since the profile was last updated
      *
      * @return bool|null
      */

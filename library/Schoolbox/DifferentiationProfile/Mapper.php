@@ -679,8 +679,20 @@ class Mapper extends BaseMapper
         };
     }
 
+    /**
+     * Load pastoral records for the students in the collection and set to the differentiation profile
+     *
+     * @param GenericCollection $profiles
+     * @return GenericCollection
+     */
     public function loadPastoralRecordsForCollection(GenericCollection $profiles): GenericCollection
     {
+        /** No profiles in the collection, no need to query pastoral records
+         */
+        if ($profiles->count() === 0) {
+            return $profiles;
+        }
+
         $studentIds = [];
         foreach ($profiles as $profile) {
             $studentIds[] = $profile->getStudent()->getId();
