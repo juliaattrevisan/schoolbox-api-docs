@@ -7,7 +7,7 @@ import { sbProps } from "@js/util/sbx/pageUtils";
 import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import type { Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
+import { ProfileStatus, type Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../../store/mdpHeaderStore";
 import { useLinkedRecordsStore } from "../../store/mdpLinkedRecordsStore";
 import { useGenAiStore } from "../../store/mdpGenAiStore";
@@ -59,20 +59,22 @@ function onGenerateSelected(): void {
                 </p>
             </div>
         </div>
-        <button
-            v-if="props.profile._routes?.linkedRecords"
-            class="button f-no-margins"
-            @click="onLinkedRecordsSelected"
-        >
-            View Linked Records
-        </button>
-        <button
-            v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
-            class="button icon-ai f-no-margins"
-            @click="onGenerateSelected"
-        >
-            Extract with AI
-        </button>
+        <template v-if="!props.profile.status?.includes(ProfileStatus.EXPIRED)">
+            <button
+                v-if="props.profile._routes?.linkedRecords"
+                class="button f-no-margins"
+                @click="onLinkedRecordsSelected"
+            >
+                View Linked Records
+            </button>
+            <button
+                v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
+                class="button icon-ai f-no-margins"
+                @click="onGenerateSelected"
+            >
+                Extract with AI
+            </button>
+        </template>
     </div>
 </template>
 
