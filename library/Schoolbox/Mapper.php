@@ -4360,8 +4360,11 @@ abstract class Mapper implements IMapper
             $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
                 $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
             });
-        } catch (\ErrorException $e) {
-            //Unable to connect to notification system
+        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
+            trigger_error(
+                sprintf('Could not connect to AMQP instance: %s', $e->getMessage()),
+                E_USER_WARNING,
+            );
             return false;
         }
 
