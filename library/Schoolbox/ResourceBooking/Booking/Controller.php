@@ -411,7 +411,21 @@ class Controller extends Base
                 $bookingList->add($booking);
             }
 
-            // TODO: If $overrideValidation, add any clashing bookings whose status must be changed to 'rejected' to $bookingList before saving.
+            if ($overrideValidation) {
+                // Find all clashing bookings and set their status to STATUS_REJECTED.
+                $bookingsToReject = new Collection();
+                foreach ($bookingList as $booking) {
+                    $startDatetime = $booking->getStartDatetime() ?? $booking->getEvent()->getStartDateTime();
+                    $endDatetime = $booking->getEndDatetime() ?? $booking->getEvent()->getEndDateTime();
+                    $bookingsInner = $validation->getConflictingBookings($booking->getResource(), $startDatetime, $endDatetime);
+                    foreach ($bookingsInner as $bookingInner) {
+                        $bookingInner->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));
+                        $bookingsToReject->add($bookingInner);
+                    }
+                }
+                // Add them to the $bookingList so all modified bookings can be saved in one step below.
+                $bookingList->merge($bookingsToReject);
+            }
 
             $this->bookingMapper->save($bookingList);
 
