@@ -294,41 +294,15 @@ class Controller extends Base
     {
         $get = $this->requestQuery;
 
-        // Create an audit record of anyone viewing a student record
-        // Hydrate user with group membership
         $user = $this->getUser();
-
-        $auditRecord = $this->pastoralAuditMapper->createModel();
-        $auditRecord->setStudent($student);
-        $auditRecord->setUser($user);
-        $this->pastoralAuditMapper->save($auditRecord);
 
         $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
         $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
-        $showArchived = $get->getBool('showArchived', false);
 
-        // Limit the number of pastoral records to display on each page of pastoral records
-        $resultsPerPage = (int)$this->config->get('pastoral_page_size');
-
-        // Set the current page number
-        $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
-
-        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $subtypeId, $showArchived);
-
-        $maxPage = (int)ceil($recordCount / $resultsPerPage);
-        if ($maxPage < 1) {
-            $maxPage = 1;
-        }
-
-        if ($pageCurrent > $maxPage) {
-            $pageCurrent = $maxPage;
-        } elseif ($pageCurrent < 1) {
-            $pageCurrent = 1;
-        }
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null, $showArchived);
+        $records = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, null, null, null, false);
 
-        $data = $pageRecords->map($this->pastoralTranslator)->reindex();
+        $data = $records->map($this->pastoralTranslator)->reindex();
 
         $this->response = $this->responseAsJson([
             'data'     => [
