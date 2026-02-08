@@ -465,3 +465,5 @@ volumes:
 configs:
   caddy:
     file: ./caddy/config/Caddyfile
+  frankenphp-caddy:
+    file: ./base-images/php-frankenphp/config/frankenphp/Caddyfile

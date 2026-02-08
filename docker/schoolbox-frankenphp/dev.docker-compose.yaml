@@ -44,3 +44,6 @@ services:
         user: root
       - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker2/ www-data
         user: root
+    configs:
+      - source: frankenphp-caddy
+        target: /etc/frankenphp/Caddyfile

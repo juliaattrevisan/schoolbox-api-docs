@@ -81,6 +81,7 @@ COPY ./usr/local/bin/* /usr/local/bin/
 COPY ./config/php/*.ini /usr/local/etc/php/conf.d/
 COPY ./config/php/${ENV}/*.ini /usr/local/etc/php/conf.d/
 COPY ./config/php${PHP_MAJOR_VERSION}/*.ini /usr/local/etc/php/conf.d/
+# The below should no longer be required?
 COPY ./config/imagemagick/* /etc/ImageMagick-6/
 COPY ./config/frankenphp/* /etc/frankenphp/
 
