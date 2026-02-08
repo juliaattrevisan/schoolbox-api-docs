@@ -61,7 +61,7 @@ window.Vue.onMounted(() => {
     <template v-if="payload">
         <template v-for="(flags, studentId) in payload" :key="`flags-container-${studentId}`">
             <teleport :to="`#pastoral-flags-container-${studentId}`">
-                <pastoral-flags :flags="flags" />
+                <pastoral-flags :user-id="Number(studentId)" :flags="flags" />
             </teleport>
         </template>
     </template>

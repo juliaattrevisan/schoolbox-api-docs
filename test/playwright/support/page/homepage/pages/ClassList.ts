@@ -8,7 +8,7 @@ export default class ClassList {
 
     static readonly URL = "/learning/class/{classId}";
 
-    static readonly DATA_TEST_STUDENT_PROFILE_FLAGS = "class-list-pastoral-flags-{studentId}";
+    static readonly DATA_TEST_STUDENT_PROFILE_FLAGS = "pastoral-flags-{studentId}";
 
     static readonly DATA_TEST_PROFILE_FLAG = "pastoral-flags-{typeId}-{subtypeId}";
 

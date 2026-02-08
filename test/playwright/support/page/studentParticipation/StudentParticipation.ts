@@ -23,7 +23,7 @@ export default class StudentParticipation {
 
     static readonly DATA_TEST_MARKBOOK_CELL = "markbook-cell-{activityId}-{userId}";
 
-    static readonly DATA_TEST_STUDENT_PROFILE_FLAGS = "cp-participant-pastoral-flags-{studentId}";
+    static readonly DATA_TEST_STUDENT_PROFILE_FLAGS = "pastoral-flags-{studentId}";
 
     static readonly DATA_TEST_PROFILE_FLAG = "pastoral-flags-{typeId}-{subtypeId}";
 

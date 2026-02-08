@@ -201,6 +201,7 @@
                                                 <dt class="full-width">
                                                     <div id="pastoral-flags-container">
                                                         <pastoral-flags
+                                                            :user-id="{{ user.id }}"
                                                             :flags="{{ selectedField.value | json_encode }}"
                                                             :pastoral-config="{{ {
                                                                 pastoralPointEnabled: config.pastoral_point_enabled,

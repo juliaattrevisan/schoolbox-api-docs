@@ -8,6 +8,7 @@ import type { PastoralFlag } from "@schoolboxLibrary/Pastoral/types/PastoralFlag
 import PastoralRecordsModal from "@schoolboxLibrary/Pastoral/vue/pastoral-records-modal.vue";
 
 const props = defineProps<{
+    userId: number;
     flags: PastoralFlag[];
     pastoralConfig?: Config;
     pastoralRoutes?: Routes;
@@ -40,7 +41,7 @@ function onFlagSelect(event: CustomEvent): void {
 </script>
 
 <template>
-    <div class="l-flex-row l-gap-xs">
+    <div class="l-flex-row l-gap-xs" :data-test="`pastoral-flags-${props.userId}`">
         <sbx-label
             v-for="flag in props.flags"
             :key="`flag-${flag.typeId}-${flag.subtypeId ?? 0}`"
@@ -51,7 +52,7 @@ function onFlagSelect(event: CustomEvent): void {
             :text-color="flag.fgColor"
             :href="flag.destinationUrl"
             :is-button="true"
-            :data-test="`pastoral-flags-${flag.typeId}-${flag.subtypeId ?? 0}`"
+            v-bind="{ 'data-test': `pastoral-flags-${flag.typeId}-${flag.subtypeId ?? 0}` }"
             @select="onFlagSelect"
         />
     </div>
