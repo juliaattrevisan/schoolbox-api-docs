@@ -843,7 +843,7 @@ class Validation
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
             // Ignore errors since all were clashes and clashes are allowed.
-            $errors = [];
+            $errorsStruct = [];
         }
 
         if (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user)) {
