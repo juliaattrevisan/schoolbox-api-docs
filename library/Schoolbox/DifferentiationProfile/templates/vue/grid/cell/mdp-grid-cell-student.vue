@@ -49,8 +49,10 @@ function onGenerateSelected(): void {
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}
                 </template>
-                <p v-if="props.user.yearLevel" class="meta">
-                    {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}
+                <p v-if="props.user.yearLevel || (props.user.campuses && props.user.campuses.length)" class="meta">
+                    <template v-if="props.user.yearLevel">
+                        {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}</template
+                    >
                     <template v-if="props.user.campuses && props.user.campuses.length">
                         <span v-for="(campus, index) in props.user.campuses" :key="campus.id">
                             {{ campus.name }} Student<span v-if="index < props.user.campuses.length - 1">, </span>
@@ -59,6 +61,7 @@ function onGenerateSelected(): void {
                 </p>
             </div>
         </div>
+        <!-- if the profile is expired we don't want to provide access to linked records or AI extraction -->
         <template v-if="!props.profile.status?.includes(ProfileStatus.EXPIRED)">
             <button
                 v-if="props.profile._routes?.linkedRecords"
