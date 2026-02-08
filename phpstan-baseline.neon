@@ -3139,12 +3139,6 @@ parameters:
 			path: library/Schoolbox/Filter/AbstractIdFinder.php
 
 		-
-			message: '#^Method Schoolbox\\Filter\\BaseComponent\:\:toContext\(\) should return array\<Schoolbox\\Filter\\Selection\\Model\> but returns array\<string, array\|bool\|\(iterable\<Schoolbox\\Filter\\Selection\\Model\>&Schoolbox\\GenericCollection\)\|Schoolbox\\Filter\\IDefinition\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Filter/BaseComponent.php
-
-		-
 			message: '#^Property Schoolbox\\Filter\\Controller\:\:\$rosettaStone is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -3251,12 +3245,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Badge/CurriculumNode/Factory.php
-
-		-
-			message: '#^Method Schoolbox\\Filter\\Filters\\Badge\\Name\\Component\:\:toContext\(\) should return array\<Schoolbox\\Filter\\Selection\\Model\> but returns array\<Schoolbox\\Filter\\Selection\\Model\|string\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Badge/Name/Component.php
 
 		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
