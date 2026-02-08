@@ -833,41 +833,42 @@ class Validation
 
         // If clashes are allowed on the booking, and all validation errors are clash errors...
         $clashBookingStartDatesAsKeys = [];
-        if (
-            count($errorsStruct) > 0 && $item->getAllowClashBookings() &&
-            $this->validationErrorsAreAllClashes($errorsStruct)
-        ) {
+        if (count($errorsStruct) > 0) {
             // Remember the start dates of clash bookings.
             // Note clash errors always use the Validation::START_PERIOD_ERRORS key (see Validation->validateForClashes()).
             foreach ($errorsStruct[self::START_PERIOD_ERRORS] as $startDate => $errors) {
                 $clashBookingStartDatesAsKeys[$startDate] = null;
             }
-            // Ignore errors since all were clashes and clashes are allowed.
-            $errorsStruct = [];
-        }
 
-        if (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user)) {
-            // Since we are bypassing validation rules, clear all the clash-related rules from the $errors array.
-            // The clash-related errors will have been left in to allow us to find the clash booking start dates as has
-            // been done above (see $this->validateBookingFromPostData()).
-            $errorsStructFiltered = [];
-            foreach ($errorsStruct as $key => $errorsByDate) {
-                foreach ($errorsByDate as $date => $errors) {
-                    foreach ($errors as $error) {
-                        if (!in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
-                            if (!array_key_exists($key, $errorsStructFiltered)) {
-                                $errorsStructFiltered[$key] = [];
+            // If clash bookings are allowed, or
+            // a moderator user has ordered that all validation rules should be bypassed...
+            if (
+                $item->getAllowClashBookings() ||
+                (!empty($bookingDetailsForItem['override_validation']) && $item->canUserModerateThisItem($this->user))
+            ) {
+                // Clear all the clash-related errors from the $errorsStruct array,
+                // leaving only errors that cannot be overridden.
+                // The clash-related errors will have been left in by $this->validateBookingFromPostData()
+                // to allow us to find the start dates of clash bookings (as has been done above).
+                $errorsStructFiltered = [];
+                foreach ($errorsStruct as $key => $errorsByDate) {
+                    foreach ($errorsByDate as $date => $errors) {
+                        foreach ($errors as $error) {
+                            if (!in_array($error, [self::ERROR_CONFLICT, self::ERROR_TIMETABLED_CLASS], true)) {
+                                if (!array_key_exists($key, $errorsStructFiltered)) {
+                                    $errorsStructFiltered[$key] = [];
+                                }
+                                if (!array_key_exists($date, $errorsStructFiltered[$key])) {
+                                    $errorsStructFiltered[$key][$date] = [];
+                                }
+                                $errorsStructFiltered[$key][$date][] = $error;
                             }
-                            if (!array_key_exists($date, $errorsStructFiltered[$key])) {
-                                $errorsStructFiltered[$key][$date] = [];
-                            }
-                            $errorsStructFiltered[$key][$date][] = $error;
                         }
                     }
                 }
+                $errorsStruct = $errorsStructFiltered;
+                // Only non-overridable errors will remain after removing the clash errors above.
             }
-            $errorsStruct = $errorsStructFiltered;
-            // Only non-overridable errors will remain after removing the clash errors above.
         }
 
         return [$errorsStruct, $clashBookingStartDatesAsKeys];
