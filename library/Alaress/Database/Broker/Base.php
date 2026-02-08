@@ -145,17 +145,13 @@ abstract class Base implements IBroker
         } catch (PDOException $e) {
             Tracer::getDefaultTrace()->finishSpan(status: SpanStatus::internalError());
 
-            // Need to restore timeout both here and in normal control flow
-            ini_set('default_socket_timeout', $defaultSocketTimeout);
-
             // Something went wrong during connection
             throw new DatabaseException("Error connecting to database; check your connection details.\nPDO Error: {$e->getMessage()}");
+        } finally {
+            // Restore default socket timeout
+            ini_set('default_socket_timeout', $defaultSocketTimeout);
         }
         Tracer::getDefaultTrace()->finishSpan();
-
-        // Restore default socket timeout
-
-        ini_set('default_socket_timeout', $defaultSocketTimeout);
 
         // These will only get called if the child class overrides the values- don't *think*
         // we need these to be parameters as they're really just there to get the database in a
