@@ -161,6 +161,10 @@ class Factory
             return $this->spawnForLessonPlan($assessable);
         }
 
+        if ($assessable instanceof DialogAgent) {
+            return $this->spawnForDialogAgent($assessable);
+        }
+
         throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
     }
 
@@ -365,6 +369,18 @@ class Factory
     protected function spawnForLessonPlan(LessonPlan $lessonPlan)
     {
         return null;
+    }
+
+
+    /**
+     * This specifically returns a Marktype for learning analytics
+     *
+     * @param DialogAgent $dialogAgent
+     * @return None
+     */
+    protected function spawnForDialogAgent(DialogAgent $dialogAgent)
+    {
+        return new None();
     }
 
 

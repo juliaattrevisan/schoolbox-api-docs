@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
@@ -302,15 +303,20 @@ class Controller extends Base
             }
 
             foreach ($courseImpl->getUnits() as $unitImpl) {
-                foreach ($unitImpl->getAssessables() as $a) {
-                    // Is Assessment a Task or has MarkType of 'None' ?
-                    if ($a instanceof Task || $a instanceof LessonPlan || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
+                foreach ($unitImpl->getAssessables() as $assessment) {
+                    /* Some learning activities don't contribute toward learning analytics:
+                     *    - Tasks (they're just misc stuff to do most of the time)
+                     *    - Lesson Plans (no interactions; they're a vehicle for staff to deliver content)
+                     *    - Dialog Agents (not summative; they're never marked)
+                     *    - Any learning activities with the mark type "None" (not graded)
+                     */
+                    if ($assessment instanceof Task || $assessment instanceof LessonPlan || $assessment instanceof DialogAgent || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug()) {
                         continue;
                     }
 
                     foreach ($allTerms as $t) {
                         // Is this Assessment due in this Term?
-                        if ($t->getStart()->lte($a->getDueAt()) && (!$t->getActualFinish() || $t->getActualFinish()->gt($a->getDueAt()))) {
+                        if ($t->getStart()->lte($assessment->getDueAt()) && (!$t->getActualFinish() || $t->getActualFinish()->gt($assessment->getDueAt()))) {
                             $navigableTerms->setOffset($t->getId(), $t);
 
                             // Remove from available terms to avoid repeated traversals

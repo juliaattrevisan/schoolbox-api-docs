@@ -101,5 +101,6 @@ class DialogAgent implements IAssessmentTypeTranslator
         /* Used in the Grades page, even though this won't be marked
          */
         $domainObject->setMarkScheme(new None());
+        $domainObject->setMarktype(new \Schoolbox\Assessment\Component\SubmissionBox\MarkType());
     }
 }

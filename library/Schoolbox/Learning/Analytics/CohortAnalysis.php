@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Analytics;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
@@ -610,7 +611,13 @@ class CohortAnalysis
      */
     protected function isExcludedForGrades(IAssessable $assessment)
     {
-        return $assessment instanceof Task || $assessment instanceof LessonPlan || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug();
+        /* Some learning activities don't contribute toward learning analytics:
+         *    - Tasks (they're just misc stuff to do most of the time)
+         *    - Lesson Plans (no interactions; they're a vehicle for staff to deliver content)
+         *    - Dialog Agents (not summative; they're never marked)
+         *    - Any learning activities with the mark type "None" (not graded)
+         */
+        return ($assessment instanceof Task || $assessment instanceof LessonPlan || $assessment instanceof DialogAgent || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug());
     }
 
 
