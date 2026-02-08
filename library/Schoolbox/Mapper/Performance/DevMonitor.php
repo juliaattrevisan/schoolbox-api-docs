@@ -203,7 +203,7 @@ class DevMonitor extends AbstractLogger implements IMonitor
      */
     protected function getTimer()
     {
-        return $this->debugBar['time'];
+        return $this->debugBar->getCollector('time');
     }
 
 
@@ -212,7 +212,7 @@ class DevMonitor extends AbstractLogger implements IMonitor
      */
     protected function getLog()
     {
-        return $this->debugBar['messages'];
+        return $this->debugBar->getCollector('messages');
     }
 
 
