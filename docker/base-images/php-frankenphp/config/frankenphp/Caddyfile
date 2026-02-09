@@ -161,7 +161,7 @@
 
     handle_path /php-debugbar* {
         file_server
-        root * /usr/share/schoolbox/vendor/php-debugbar/php-debugbar/src/DebugBar/Resources
+        root * /usr/share/schoolbox/vendor/php-debugbar/php-debugbar/resources/
     }
     handle /static* {
         file_server
