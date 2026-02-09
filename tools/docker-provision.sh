@@ -13,13 +13,12 @@ declare EXTERNAL_DB
 declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
 declare INSTANCE_REGISTRY_URL
-declare INSTANCE_REGISTRY_API_KEY
 declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
-  INSTANCE_REGISTRY_URL INSTANCE_REGISTRY_API_KEY \
+  INSTANCE_REGISTRY_URL \
   ARTIFACT_SOURCE \
 )
 
@@ -103,15 +102,6 @@ function setup_aws_sso() {
   else
     log "Logged in to AWS: continuing"
   fi
-}
-
-function create_ir_config_file() {
-  log "Creating instance registry configuration";
-  echo -e \
-    "{\n" \
-    "  \"instance_registry_url_override\": \"${INSTANCE_REGISTRY_URL}\",\n" \
-    "  \"instance_registry_api_token\": \"${INSTANCE_REGISTRY_API_KEY}\"\n" \
-    "}" > /etc/schoolbox/instance-registry.json
 }
 
 function cleanup_cache_dir() {
@@ -479,8 +469,6 @@ function main() {
   fi
 
   if [[ $install_instance_only == "0" ]]; then
-    create_ir_config_file
-
     cleanup_cache_dir
     download_secrets
     download_certs
