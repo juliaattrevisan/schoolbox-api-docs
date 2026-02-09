@@ -7,10 +7,20 @@ function log() {
     echo "$@" >&2
 }
 
+# Return the timezone in config, otherwise determine it
+function determine_timezone() {
+    if [[ -z "${TIMEZONE}" ]]; then
+        echo "$(readlink /etc/localtime | sed 's/\/usr\/share\/zoneinfo\///')"
+    else
+        echo "${TIMEZONE}"
+    fi
+}
+
 # Load configuration from relevant sources
 function load_config() {
     source ./docker.default.env
     if [ -f ./docker.env ]; then
         source ./docker.env
     fi
+    TIMEZONE=$(determine_timezone)
 }

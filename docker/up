@@ -92,12 +92,6 @@ function create_dirs() {
     mkdir -p ./data/docker2/ssl
 }
 
-function determine_timezone() {
-    if [[ -z "${TIMEZONE}" ]]; then
-        TIMEZONE="$(readlink /etc/localtime | sed 's/\/usr\/share\/zoneinfo\///')"
-    fi
-}
-
 function login_to_aws() {
     # Preconfigure an AWS profile and SSO session, just for this script.
     # it's not possible to pass `aws configure sso` a region or start URL, so
@@ -356,7 +350,6 @@ function main() {
     output_help "$@"
     create_dirs
     load_config
-    determine_timezone
     login_to_aws
     login_to_container_registry
     build_image_names
