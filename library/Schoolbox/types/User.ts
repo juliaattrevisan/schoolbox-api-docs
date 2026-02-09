@@ -37,7 +37,7 @@ export type User = {
     pronoun: string | null;
     _links?: UserLinks;
     yearLevel?: UserYearLevel;
-    campuses?: UserCampus[];
+    campus?: UserCampus[];
 };
 
 /**

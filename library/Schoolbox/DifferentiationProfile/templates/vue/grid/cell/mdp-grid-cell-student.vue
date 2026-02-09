@@ -49,13 +49,13 @@ function onGenerateSelected(): void {
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}
                 </template>
-                <p v-if="props.user.yearLevel || (props.user.campuses && props.user.campuses.length)" class="meta">
+                <p v-if="props.user.yearLevel || (props.user.campus && props.user.campus.length)" class="meta">
                     <template v-if="props.user.yearLevel">
                         {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}</template
                     >
-                    <template v-if="props.user.campuses && props.user.campuses.length">
-                        <span v-for="(campus, index) in props.user.campuses" :key="campus.id">
-                            {{ campus.name }} Student<span v-if="index < props.user.campuses.length - 1">, </span>
+                    <template v-if="props.user.campus && props.user.campus.length">
+                        <span v-for="(campus, index) in props.user.campus" :key="campus.id">
+                            {{ campus.name }} Student<span v-if="index < props.user.campus.length - 1">, </span>
                         </span>
                     </template>
                 </p>
