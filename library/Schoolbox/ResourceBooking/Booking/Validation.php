@@ -999,16 +999,17 @@ class Validation
      * @param DateTime   $startDate
      * @param DateTime   $endDate
      * @param Model|null $existingBooking
-     * @return Collection<Model|EventInterface> or
+     * @return GenericCollection<EventInterface> or
      */
     public function getClashEvents(
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
         ?Model $existingBooking = null
-    ): Collection {
+    ): GenericCollection {
+        $conflictingBookings = new GenericCollection(EventInterface::class);
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
+        $conflictingBookings = $conflictingBookings->merge($this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking));
 
         if (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
