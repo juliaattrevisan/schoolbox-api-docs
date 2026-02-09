@@ -151,3 +151,9 @@ body.login input[type="checkbox"]:not(.plain) + label {
     margin: 0 !important;
     padding: 0 !important;
 }
+
+// Fix alignment of checklist filters when linked to a label on the left
+.sbx-body .filters .checklist {
+    align-items: center;
+    display: flex;
+}

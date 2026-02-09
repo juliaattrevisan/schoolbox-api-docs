@@ -250,3 +250,10 @@
 .sbx-body .fc-event:hover {
     border-radius: var(--sbx-config-field-roundness) !important;
 }
+
+/**
+ * Add some gap otherwise the checkbox and text within these buttons are too close together
+ */
+.sbx-body .search-result {
+    gap: var(--sbx-size-s);
+}
