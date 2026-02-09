@@ -36,6 +36,8 @@ declare MAILCATCHER_UI_PUBLISHED_PORT
 declare SECOND_INSTANCE_ENABLE
 declare SYNERGETIC_PASSWORD_ENCRYPTION_KEY
 declare SYNERGETIC_PASSWORD_ENCRYPTION_IV
+declare INSTANCE_REGISTRY_URL
+declare INSTANCE_REGISTRY_API_KEY
 
 declare private_container_registry
 declare base_php_image
@@ -207,6 +209,14 @@ function build_schoolbox_config_ini() {
     SENTRY_PROFILE_SAMPLE_RATE     = ${SENTRY_PROFILE_SAMPLE_RATE}" | sed -e 's/^[ \t]*//' > ./docker/schoolbox/config/config.ini
 }
 
+function build_instance_registry_json() {
+  echo -e \
+    "{\n" \
+    "  \"instance_registry_url_override\": \"${INSTANCE_REGISTRY_URL}\",\n" \
+    "  \"instance_registry_api_token\": \"${INSTANCE_REGISTRY_API_KEY}\"\n" \
+    "}" > ./docker/schoolbox/config/config.ini
+}
+
 function build_image_names() {
     # Determine base image tag from current branch:
     # assume master if nothing better known.
@@ -328,6 +338,7 @@ function main() {
     build_docker_compose_args "$@"
     build_docker_compose_env
     build_schoolbox_config_ini
+    build_instance_registry_json
     start_containers "$@"
 }
 
