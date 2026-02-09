@@ -55,3 +55,8 @@ services:
         user: root
       - command: /etc/init.d/cron start
         user: root
+    configs:
+      - source: frankenphp-php
+        target: /usr/local/etc/php/conf.d/
+      - source: schoolbox-cli-php
+        target: /usr/local/etc/php/conf.d/
