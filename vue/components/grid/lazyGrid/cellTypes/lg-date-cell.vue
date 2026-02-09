@@ -3,22 +3,23 @@
  * Display date
  */
 
-const props = defineProps<{
+interface Props {
     value: string | null;
-}>();
+}
+
+const props = defineProps<Props>();
 
 /**
  * Formats a date string into a short date format.
- * @param dateString The date string to format.
  * @returns The formatted date string or null if input is invalid.
  */
-function formatDateShort(dateString: string | null): string | null {
-    if (!dateString) {
+function formatDateShort(): string | null {
+    if (!props.value) {
         return null;
     }
 
-    return `${window.dayjs(dateString).format(window.dateDisplayFormats.dayjsDateShort)} ${window
-        .dayjs(dateString)
+    return `${window.dayjs(props.value).format(window.dateDisplayFormats.dayjsDateShort)} ${window
+        .dayjs(props.value)
         .format(window.dateDisplayFormats.dayjsTime)}`;
 }
 </script>
@@ -26,7 +27,7 @@ function formatDateShort(dateString: string | null): string | null {
 <template>
     <div class="l-pad-s l-gap-m">
         <span>
-            {{ formatDateShort(props.value) ?? "—" }}
+            {{ formatDateShort() }}
         </span>
     </div>
 </template>
