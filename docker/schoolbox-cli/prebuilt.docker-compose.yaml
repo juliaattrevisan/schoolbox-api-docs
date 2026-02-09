@@ -51,6 +51,8 @@ services:
         user: root
     configs:
       - source: frankenphp-php
-        target: /usr/local/etc/php/conf.d/
+        target: /usr/local/etc/php/conf.d/01-base-settings.ini
+      - source: frankenphp-php-env
+        target: /usr/local/etc/php/conf.d/02-env-settings.ini
       - source: schoolbox-cli-php
-        target: /usr/local/etc/php/conf.d/
+        target: /usr/local/etc/php/conf.d/03-cli-settings.ini
