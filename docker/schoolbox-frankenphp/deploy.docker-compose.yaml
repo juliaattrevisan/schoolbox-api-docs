@@ -43,4 +43,4 @@ services:
         user: root
     configs:
       - source: frankenphp-caddy
-        target: /etc/frankenphp/Caddyfile
+        target: /etc/frankenphp/

@@ -29,7 +29,7 @@ services:
           - docker.dev.schoolbox.cloud
     configs:
       - source: caddy
-        target: /etc/caddy/Caddyfile
+        target: /etc/caddy/
 
   # Database services:
   # these are containers only in a development environment, they won't be on
@@ -464,6 +464,6 @@ volumes:
 
 configs:
   caddy:
-    file: ./caddy/config/Caddyfile
+    file: ./caddy/config/
   frankenphp-caddy:
-    file: ./base-images/php-frankenphp/config/frankenphp/Caddyfile
+    file: ./base-images/php-frankenphp/config/frankenphp/
