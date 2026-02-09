@@ -518,6 +518,11 @@ volumes:
 configs:
   caddy:
     file: ./caddy/config/
+  schoolbox:
+    # Cron config should be built in docker/up, and timezone should come from
+    # docker.env or from host:
+    # readlink /etc/localtime | sed 's/\/usr\/share\/zoneinfo\///'
+    file: ./schoolbox/config
   frankenphp-caddy:
     file: ./base-images/php-frankenphp/config/frankenphp/
   frankenphp-php:
