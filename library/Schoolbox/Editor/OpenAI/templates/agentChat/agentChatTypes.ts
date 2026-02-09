@@ -3,6 +3,12 @@ import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { AgentChatApiPayload } from "./store/agentChatPayload";
 
+/**
+ * Aligned with the "CharacterLimit" guardrail, this prevents a learner from triggering the guardrail
+ * unless they edit the request and bypass the frontend logic themselves.
+ */
+export const AGENT_CHAT_MAX_PROMPT_CHARS = 5000;
+
 export enum AgentChatMessageType {
     REQUEST = "request",
     RESPONSE = "response",
