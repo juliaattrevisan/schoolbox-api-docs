@@ -37,3 +37,13 @@ export type Payload = {
 export type Routes = {
     getData: string;
 };
+
+/**
+ * The value for a basic cell, with optional link support.
+ */
+export type BasicType = {
+    title: string;
+    _links?: {
+        view?: string;
+    };
+};
