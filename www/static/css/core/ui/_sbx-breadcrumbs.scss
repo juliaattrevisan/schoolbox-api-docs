@@ -3,7 +3,7 @@
  * Scope: UI Uplift
  */
 .breadcrumb {
-    margin-inline-start: 1rem !important;
+    margin-left: 1rem !important;
 
     & li {
         &:not(.active) a::after {
@@ -13,7 +13,7 @@
             content: "";
             display: inline-block;
             height: 10px !important;
-            margin-inline-start: 1rem;
+            margin-left: 1rem;
             position: static;
             width: 10px !important;
         }
