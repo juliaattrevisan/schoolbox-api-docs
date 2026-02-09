@@ -1,53 +1,41 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
+{% set reportContentId = 'customisation-records-container' %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                document.dispatchEvent(new CustomEvent('customisation-records__onFilterChange', {
+                    detail: {
+                        selectedFilters
+                    }
+                }));
+            });
+        });
+    </script>
+{% endautoescape %}
+
+<div class="f-container">
+    <div class="l-flex-col l-gap-m">
+        <div class="f-no-margins">
             <h1>Customisation Records</h1>
         </div>
+        {# <div>
+            {% include '@filters/panel.twig' with {
+                contentId: reportContentId,
+                panel:     filterPanel,
+                quickload: false,
+            } only %}
+        </div> #}
+        <div id="{{ reportContentId }}" class="f-no-margins" data-test="customisation-records-container">
+            <customisation-records
+                :header="{{ header|json_encode }}"
+                :routes="{{ routes|json_encode }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/customisationRecords.js?v={{ config.site_version }}"></script>
     </div>
-    <table>
-        <thead>
-        <tr>
-            {% for head in header %}
-                <th>{{ head.title }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for record in records.data %}
-            <tr>
-                <td>
-                    {% set studentName = record.user.lastName ~ ', ' ~ (record.user.preferredName ?: record.user.firstName) %}
-                    <div>
-                        <img alt="{{ studentName }}" src="{{ record.user._links.avatar }}" />
-                    </div>
-                    <div>
-                        {{ studentName }}
-                    </div>
-                    <div class="meta">{{ record.user.id }}</div>
-                </td>
-                <td>{{ record.created_at|date("Y-m-d H:i") }}</td>
-                <td>{{ record.class.title }}</td>
-                <td>{{ record.unit.title }}</td>
-                <td>{{ record.customised_activity.type }}</td>
-                <td>
-                    <a href="{{ record.customised_activity._links.view }}">
-                        {{ record.customised_activity.title }}
-                    </a>
-                </td>
-                <td>
-                    <a href="{{ record.original_activity._links.view }}">
-                        {{ record.original_activity.title }}
-                    </a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">No customisation records found.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 </div>

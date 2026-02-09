@@ -10,7 +10,7 @@ import type { ColourPickerDocumentEventHandlerMap } from "@js/colour-picker/colo
 import type { ImageLightboxDocumentEventHandlerMap } from "@js/image-lightbox/imageLightboxEvent";
 import type { SwiperDocumentEventHandlerMap } from "@js/slideshow/slideshowEvent";
 import type { ActivityStatusPageDocumentEventHandlerMap } from "@schoolboxLibrary/Learning/Assessment/templates/status/activityStatusPageEvent";
-import type { FiltersChangeEventHandlerMap } from "@schoolboxLibrary/DifferentiationProfile/templates/js/MDPEvents";
+import type { FiltersChangeEventHandlerMap } from "@schoolboxVue/components/grid/lazyGrid/event/LazyGridEvent";
 import type { FilterEventHandlerMap } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 
 /**

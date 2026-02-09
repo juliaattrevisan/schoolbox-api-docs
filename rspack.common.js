@@ -164,6 +164,7 @@ module.exports = {
         activityStatusPage: "./library/Schoolbox/Learning/Assessment/templates/status/activityStatusPage.ts",
         viewDifferentiationProfile:
             "./library/Schoolbox/Search/User/templates/field/differentiationProfile/vue/viewDifferentiationProfile.ts",
+        customisationRecords: "./library/Schoolbox/CustomisationRecord/templates/vue/customisationRecords.ts",
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",

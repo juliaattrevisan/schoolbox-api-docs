@@ -15,6 +15,14 @@ type UserYearLevel = {
 };
 
 /**
+ * The user's campus
+ */
+type UserCampus = {
+    id: number;
+    name: string | null;
+};
+
+/**
  * SBX User type
  */
 export type User = {
@@ -29,6 +37,7 @@ export type User = {
     pronoun: string | null;
     _links?: UserLinks;
     yearLevel?: UserYearLevel;
+    campus?: UserCampus[];
 };
 
 /**

@@ -64,7 +64,7 @@ class ModelToArray
             'customised_activity' => [
                 'id' => $plan->getId(),
                 'title' => $plan->getName() ?? $plan->getAssessment()->getTitle(),
-                'type' => $plan->isCustomParticipation() ? 'New Activity' : 'Modified Activity',
+
                 '_links' => [
                     'view' => $customiseActivityView
                 ]
@@ -78,6 +78,9 @@ class ModelToArray
                         ['assessmentId' => $originalActivity->getId()],
                     )
                 ]
+            ],
+            'type' => [
+                'title' => $plan->isCustomParticipation() ? 'New Activity' : 'Modified Activity'
             ],
             'unit' => [
                 'title' => $context?->getTitle(),

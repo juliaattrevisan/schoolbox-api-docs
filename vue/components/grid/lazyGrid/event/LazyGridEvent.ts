@@ -1,10 +1,10 @@
 /**
- * The different events that can be dispatched for the manage differentiation profiles page
+ * The different events that can be dispatched for a lazy grid
  */
 
 import type { Nested } from "@js/util/queryUtils";
 
-export const ON_FILTER_CHANGE = "manage-differentiation-profiles__onFilterChange";
+export const ON_FILTER_CHANGE = "lazy-grid__onFilterChange";
 
 export type FiltersChangeEventDetail = {
     selectedFilters: Nested;
