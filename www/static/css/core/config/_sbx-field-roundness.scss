@@ -47,7 +47,8 @@
     .activity-feed .grade,
     .alert-box .close,
     .eotc-status .close,
-    .alert-box-icon .close {
+    .alert-box-icon .close,
+    .selected-item {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 }

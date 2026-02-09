@@ -6,7 +6,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..700;1,300..700&display=swap");
 
 :root {
-    --card-bg: #ffffff; // white card background
     --sbx-font-primary: "Figtree", sans-serif;
 }
 
@@ -44,8 +43,4 @@ body {
 // Meta styles
 .meta {
     font-style: normal;
-
-    & span:last-child a {
-        color: var(--sbx-color-text-primary);
-    }
 }

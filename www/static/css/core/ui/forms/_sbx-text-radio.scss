@@ -15,6 +15,7 @@
     cursor: pointer;
     display: inline-grid;
     height: 1.5rem !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
+    margin: 0;
     min-height: auto !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     opacity: 1 !important; // ^foundation-fixes^ - won't need !important once _forms.scss is removed
     place-content: center;
