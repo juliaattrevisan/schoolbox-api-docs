@@ -316,4 +316,23 @@ class Model implements ISoftDeletable
         $this->participants = $participants;
         return $this;
     }
+
+    /**
+     * Get the customisation type of the plan
+     * if not a customised plan, return null
+     *
+     * @return ?string
+     */
+    public function getCustomisationType(): ?string
+    {
+        if ($this->isCustomParticipation()) {
+            return Mapper::CUSTOMISATION_TYPE_CUSTOM_PARTICIPATION;
+        }
+
+        if ($this->getIsDynamic() === Mapper::PLAN_TYPE_STATIC) {
+            return Mapper::CUSTOMISATION_TYPE_STATIC;
+        }
+
+        return null;
+    }
 }

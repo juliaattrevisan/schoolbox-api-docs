@@ -79,6 +79,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_AWARD_LIST:
                 case Page\Model::PAGE_CLASS_PASTORAL:
                 case Page\Model::PAGE_DIFFERENTIATION_PROFILE:
+                case Page\Model::PAGE_CUSTOMISATION_RECORD:
                     return ['factoryFactory' => $this->injector->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }
@@ -96,7 +97,7 @@ class Module extends AlaressModule
         $this->register('POST', '/differentiation/{page:differentiationProfile}/pushDefaultSelections', 'postPushDefaultSelectionsDifferentiationProfile', $ruleDifferentiationProfile, $loadFactoryFactory);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
-        $pagesRegex = '(assessmentCal|classMarkbook|courseMarkbook|dueWorkCal|grades|pending|rubricMarkbook)';
+        $pagesRegex = '(assessmentCal|classMarkbook|courseMarkbook|dueWorkCal|grades|pending|rubricMarkbook|customisationRecord)';
         $this->register('GET', "/lms/{page:$pagesRegex}", 'getPageSettingsLms', $ruleLms, $loadFactoryFactory);
         $this->register('POST', "/lms/{page:$pagesRegex}", 'postSavePageSettingsLms', $ruleLms, $loadFactoryFactory);
         $this->register('POST', "/lms/{page:$pagesRegex}/pushDefaultSelections", 'postPushDefaultSelectionsLms', $ruleLms, $loadFactoryFactory);

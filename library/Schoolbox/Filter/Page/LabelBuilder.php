@@ -65,6 +65,9 @@ class LabelBuilder
             case Model::PAGE_DIFFERENTIATION_PROFILE:
                 return 'Differentiation';
 
+            case Model::PAGE_CUSTOMISATION_RECORD:
+                return 'Customisation Record';
+
             default:
                 return '';
         }

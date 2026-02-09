@@ -34,6 +34,7 @@ class Model
     public const string PAGE_AWARD_LIST          = 'awardList';
     public const string PAGE_CLASS_PASTORAL      = 'classPastoral';
     public const string PAGE_DIFFERENTIATION_PROFILE = 'differentiationProfile';
+    public const string PAGE_CUSTOMISATION_RECORD = 'customisationRecord';
 
 
     /**
@@ -124,6 +125,9 @@ class Model
                 Role::STAFF,
             ],
             self::PAGE_DIFFERENTIATION_PROFILE => [
+                Role::STAFF,
+            ],
+            self::PAGE_CUSTOMISATION_RECORD => [
                 Role::STAFF,
             ],
         ];

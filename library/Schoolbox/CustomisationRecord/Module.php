@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Participant\Mapper;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -49,7 +48,11 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
-            $this->injector->get('assessmentDataSource')
+            $this->injector->get('assessmentDataSource'),
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Filter\Selection\Mapper::class),
+            $this->injector->get('l10n'),
         );
     }
 

@@ -456,6 +456,13 @@ class Subnav
                         ),
                         'description' => 'Configure the default and available filter options on the course markbook.',
                     ],
+                    '/adminv2/filters/lms/customisationRecord' => [
+                        'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CUSTOMISATION_RECORD),
+                        'visible'     =>
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED) &&
+                            $this->configLoader->get(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION),
+                        'description' => 'Configure the fields and sections that appear on course customisation records.',
+                    ],
                     '/adminv2/filters/lms/grades' => [
                         'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES),
                         'visible'     => (

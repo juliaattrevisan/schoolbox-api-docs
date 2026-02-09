@@ -8,7 +8,7 @@
         $(function () {
             // Filtered content has been [re]loaded
             $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
-                document.dispatchEvent(new CustomEvent('customisation-records__onFilterChange', {
+                document.dispatchEvent(new CustomEvent('lazy-grid__onFilterChange', {
                     detail: {
                         selectedFilters
                     }
@@ -23,13 +23,13 @@
         <div class="f-no-margins">
             <h1>Customisation Records</h1>
         </div>
-        {# <div>
+        <div>
             {% include '@filters/panel.twig' with {
                 contentId: reportContentId,
                 panel:     filterPanel,
                 quickload: false,
             } only %}
-        </div> #}
+        </div>
         <div id="{{ reportContentId }}" class="f-no-margins" data-test="customisation-records-container">
             <customisation-records
                 :header="{{ header|json_encode }}"

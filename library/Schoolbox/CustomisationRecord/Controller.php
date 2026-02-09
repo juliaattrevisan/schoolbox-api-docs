@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\CustomisationRecord;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Participant\Mapper;
+use Schoolbox\Filter\IFactoryFactory;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Filter;
 
 class Controller extends Base
 {
@@ -19,8 +21,12 @@ class Controller extends Base
      * Controller constructor
      */
     public function __construct(
-        private Mapper $participantMapper,
+        private Mapper $mapper,
         private MapperProxy $assessmentMapperProxy,
+        private IFactoryFactory $filterFactoryFactory,
+        private \Schoolbox\Filter\Mapper $filterMapper,
+        private \Schoolbox\Filter\Selection\Mapper $filterSelectionMapper,
+        private RosettaStone $rosettaStone,
     ) {
         // Controller initialization code can go here
     }
@@ -28,7 +34,6 @@ class Controller extends Base
     public function viewRecords(): void
     {
         $pageTitle = 'Customisation Records';
-        $records = $this->participantMapper->findAllCustomisationRecords();
 
         $translator = new Translator\ModelToArray(
             $this->getRouter()->getGenerator(),
@@ -38,39 +43,114 @@ class Controller extends Base
             $this->assessmentMapperProxy
         );
 
-        $records = $records->map(fn($record) => call_user_func($translator, $record));
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            Filter\Page\Model::PAGE_CUSTOMISATION_RECORD,
+            null,
+            $this->getUser(),
+            [],
+            $this->requestQuery->getArrayCopy(),
+        );
 
-        $records = [
-            'data' => $records,
+        $request = $this->requestQuery['filter_selection'] ?? [];
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
+
+        $page  = Filter\Page\Model::PAGE_CUSTOMISATION_RECORD;
+        $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
+            $this->getUser(),
+            $page,
+        );
+
+        /** @var Filter\Filters\CustomisationRecord\Finder $finder */
+        $finder = Filter\Filters\CustomisationRecord\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            Cursor::CURSOR_ORDER_BY_CREATED_AT => [
+                Cursor::CURSOR_ORDER_BY_CREATED_AT_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CLASS_NAME => [
+                Cursor::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_UNIT_NAME => [
+                Cursor::CURSOR_ORDER_BY_UNIT_NAME_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE => [
+                Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            /* Default to sorting by user's name
+             */
+            default => [
+                'u.lastname'    => $order,
+                'u.chosen_name' => $order,
+                'participant.id'  => $order,
+            ]
+        };
+
+        $cursor = new Cursor(
+            $finder,
+            $dynamicFilters,
+            $orderBy,
+            $sortOrder,
+            $limit,
+        );
+
+        $records = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+
+        $data = $records->map(fn($record) => call_user_func($translator, $record))->reindex();
+
+        $recordPayload = [
+            'data' => $data,
             /* temporary cursor implementation
              */
             'metadata' => [
-                'count' => count($records),
+                'count' => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    "current" => null,
-                    "next" => null,
+                    "current" => $cursor->current($records),
+                    "next" => $cursor->next($records),
                 ]
             ],
         ];
 
         // Logic to view customisation records goes here
-        $this->response = $this->responseFromTemplate('@customisationRecord/list.twig', [
-            'allBreadcrumbs' => [
-                [$pageTitle],
-            ],
-            'header' => $this->recordTableHeaders(),
-            'records' => $records,
-            'routes' => [
-                'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
+        $this->response = $this->responseFromTemplate(
+            '@customisationRecord/list.twig',
+            [
+                'allBreadcrumbs' => [
+                    [$pageTitle],
+                ],
+                'header' => $this->recordTableHeaders(),
+                'records' => $recordPayload,
+                'routes' => [
+                    'getData' => $this->getRouteIfAuthorized('customisationRecord.getListRecords'),
+                ],
+                'filterPanel' => $filterPanel,
             ],
             $pageTitle,
-        ]);
+        );
     }
 
     public function getListRecords(): void
     {
-        $records = $this->participantMapper->findAllCustomisationRecords();
-
         $translator = new Translator\ModelToArray(
             $this->getRouter()->getGenerator(),
             $this->getAuthorizer(),
@@ -79,21 +159,85 @@ class Controller extends Base
             $this->assessmentMapperProxy
         );
 
-        $records = $records->map(fn($record) => call_user_func($translator, $record));
+        $request = $this->requestQuery['filter_selection'] ?? [];
+        if (!is_array($request)) {
+            $this->sendJsonError('Invalid filter selection format.', 400);
+            return;
+        }
 
-        $records = [
-            'data' => $records->reindex(),
+        $page  = Filter\Page\Model::PAGE_CUSTOMISATION_RECORD;
+        $codec = new Filter\Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        $limit = (int)$this->requestQuery->get('limit', $this->mapper::DEFAULT_LIMIT);
+
+        // Convert the request into a set of selections, and update them in the frontend
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Convert the set of selections into actual filters
+        $dynamicFilters = $this->filterFactoryFactory->convertSelectionsToFilters(
+            $selectionsPerFilter,
+            $this->getUser(),
+            $page,
+        );
+
+        /** @var Filter\Filters\CustomisationRecord\Finder $finder */
+        $finder = Filter\Filters\CustomisationRecord\Finder::getInstance($this->filterMapper, $this->mapper);
+
+        $orderBy = $this->requestQuery->get('sortBy', Cursor::CURSOR_DEFAULT_ORDER_BY);
+        $order = strtolower($this->requestQuery->get('order', $this->mapper::SORT_ORDER_ASC));
+
+        $sortOrder = match ($orderBy) {
+            Cursor::CURSOR_ORDER_BY_CREATED_AT => [
+                Cursor::CURSOR_ORDER_BY_CREATED_AT_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CLASS_NAME => [
+                Cursor::CURSOR_ORDER_BY_CLASS_NAME_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_UNIT_NAME => [
+                Cursor::CURSOR_ORDER_BY_UNIT_NAME_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE => [
+                Cursor::CURSOR_ORDER_BY_CUSTOMISATION_TYPE_COLUMN => $order,
+                'participant.id' => $order,
+            ],
+            /* Default to sorting by user's name
+             */
+            default => [
+                'u.lastname'    => $order,
+                'u.chosen_name' => $order,
+                'participant.id'  => $order,
+            ]
+        };
+
+        $cursor = new Cursor(
+            $finder,
+            $dynamicFilters,
+            $orderBy,
+            $sortOrder,
+            $limit,
+        );
+
+        $records = $cursor->retrieveResults($this->requestQuery['cursor'] ?? null);
+
+        $data = $records->map(fn($record) => call_user_func($translator, $record))->reindex();
+
+        $recordPayload = [
+            'data' => $data,
             /* temporary cursor implementation
              */
             'metadata' => [
-                'count' => count($records),
+                'count' => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    "current" => null,
-                    "next" => null,
+                    "current" => $cursor->current($records),
+                    "next" => $cursor->next($records),
                 ]
             ],
         ];
-        $this->response = $this->responseAsJson($records);
+        $this->response = $this->responseAsJson($recordPayload);
     }
 
     private function recordTableHeaders(): array
@@ -113,13 +257,13 @@ class Controller extends Base
             ],
             [
                 'key' => 'class',
-                'title' => 'Class',
+                'title' => $this->rosettaStone->translate('class', false, true),
                 'type' => 'Basic',
                 'isSortable' => true,
             ],
             [
                 'key' => 'unit',
-                'title' => 'Unit',
+                'title' => $this->rosettaStone->translate('unit', false, true),
                 'type' => 'Basic',
                 'isSortable' => true,
             ],

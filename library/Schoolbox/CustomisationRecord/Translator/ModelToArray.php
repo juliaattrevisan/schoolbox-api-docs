@@ -59,12 +59,11 @@ class ModelToArray
         }
 
         return [
-            'created_at' => $originalActivity->getCreatedAt(),
+            'created_at' => $participant->getCreatedAt()->toRfc3339String(),
             'user' => call_user_func($this->userTranslator, $participant->getUser()),
             'customised_activity' => [
                 'id' => $plan->getId(),
                 'title' => $plan->getName() ?? $plan->getAssessment()->getTitle(),
-
                 '_links' => [
                     'view' => $customiseActivityView
                 ]

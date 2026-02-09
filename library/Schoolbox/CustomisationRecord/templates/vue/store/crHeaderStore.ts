@@ -1,5 +1,6 @@
 /**
- * To hold the header data for the MDP editor
+ * To hold the header data for the Customisation Records,
+ * to make any display changes to the grid
  */
 
 import { defineStore } from "pinia";
