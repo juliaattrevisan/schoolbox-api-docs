@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
+# Variables which must be provided in docker-consts.sh
 declare SITE_ROOT
 declare CACHE_DIR
 declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 
+# Variables which must be provided directly via env vars
+declare CONFIG_DATE_TIMEZONE
 declare INSTANCE_ID
+declare REQUIRED_ENV_VARS=(CONFIG_DATE_TIMEZONE INSTANCE_ID)
+
+# Variables which must be provided in the config files
+# docker.env and docker.default.env
 declare DATA_SOURCE
 declare DATA_FILENAME
 declare CERTIFICATE_SOURCE
@@ -14,14 +21,12 @@ declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
 declare INSTANCE_REGISTRY_URL
 declare ARTIFACT_SOURCE
-declare TIMEZONE
 declare REQUIRED_CONFIGS=(\
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
   INSTANCE_REGISTRY_URL \
   ARTIFACT_SOURCE \
-  TIMEZONE \
 )
 
 function verify_args() {
@@ -60,7 +65,20 @@ function load_consts() {
   # SITE_ROOT is not yet defined, so assume this script is running in what will
   # eventually be SITE_ROOT
   source ./tools/docker-consts.sh
+}
 
+function verify_env_vars() {
+  log "Verifying env vars:"
+  local return=1
+  verify_args "${REQUIRED_ENV_VARS[@]}"
+  if [ $? -eq 0 ]; then
+    error "Not all required env vars defined: exiting"
+    exit 1
+  fi
+  echo ""
+}
+
+function verify_consts() {
   log "Verifying constants:"
   local return=1
   verify_args "${REQUIRED_CONSTS[@]}"
@@ -79,7 +97,7 @@ function load_consts() {
   echo ""
 }
 
-function load_config() {
+function load_and_verify_config() {
   # Global vars: load from .ini files
   source "${SITE_ROOT}/docker.default.env"
   if [ -f "${SITE_ROOT}/docker.env" ]; then
@@ -357,7 +375,7 @@ function install_instance() {
     --config eotc_enabled "'1'" \
     --config etherpad_host "'http://schoolbox-etherpad:9001'" \
     --config etherpad_api_token "'test'" \
-    --config date_timezone "'${TIMEZONE}'" \
+    --config date_timezone "'${CONFIG_DATE_TIMEZONE}'" \
     --config external_type "'$EXTERNAL_DB'" \
     --config external_db_db "'$EXTERNAL_DB_DB'" \
     --config external_db_host "'$EXTERNAL_DB_HOST'" \
@@ -435,7 +453,9 @@ function post_install() {
 
 function main() {
   load_consts
-  load_config
+  verify_env_vars
+  verify_consts
+  load_and_verify_config
   setup_aws_sso
 
   # Should the setup of everything be skipped?

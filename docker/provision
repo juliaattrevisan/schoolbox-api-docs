@@ -32,15 +32,17 @@ if [[ $errors == "1" ]]; then
     exit 1
 fi
 
+# Need to pass timezone as an env arg to provision
+env_args="-e CONFIG_DATE_TIMEZONE=${TIMEZONE}"
+
 # If _not_ debugging provisioning:
 # run all of these commands with an empty Xdebug config (no IDE key), so that
 # they do not trigger breakpoints.
-env_args=''
 case "${PROVISION_DEBUG_ENABLE}" in
     1 | true | yes | on)
         ;;
     *)
-        env_args='-e XDEBUG_CONFIG=""'
+        env_args+=' -e XDEBUG_CONFIG='
         ;;
 esac
 
