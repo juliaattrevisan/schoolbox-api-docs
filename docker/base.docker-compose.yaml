@@ -509,6 +509,6 @@ configs:
   frankenphp-php:
     file: ./base-images/php-frankenphp/config/php/01-base-settings.ini
   frankenphp-php-env:
-    file: ./base-images/php-frankenphp/config/php/${ENV}/02-settings.ini
-  frankenphp-php-cli:
-    file: ./base-images/php-frankenphp/config/php/03-cli-settings.ini
+    file: ./base-images/php-frankenphp/config/php/${ENV}/02-env-settings.ini
+  schoolbox-cli-php:
+    file: ./schoolbox-cli/config/php/03-cli-settings.ini
