@@ -215,7 +215,7 @@ class Controller extends Assessment\Controller
         ];
 
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
-        if (!$assessment->isSpecification()) {
+        if ($assessment->isImplementation()) {
             $twigData['aImpls'][$assessment->getId()] = [
                 'participantCount' => $participants->count(),
                 'participantCursor' => $participants->count(),

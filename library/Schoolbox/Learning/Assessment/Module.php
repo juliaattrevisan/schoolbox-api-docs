@@ -538,7 +538,7 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        if (!$courseAss->isSpecification()) {
+        if ($courseAss->isImplementation()) {
             //if not spec, error
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
