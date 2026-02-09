@@ -102,6 +102,20 @@ class Validation
     private \Schoolbox\External\Event\Mapper $eventMapper;
 
     /**
+     * cache key for $this->conflictingBookings
+     * Format:
+     * $resource->getId() _ $startDate->getTimestamp() _ $endDate->getTimestamp() _ ($existingBooking ? $existingBooking->getId() : '')
+     */
+    private const CONFLICTING_BOOKINGS_CACHE_KEY = "%s_%s_%s_%s";
+
+    /**
+     * cache array if we are calling the validation multiple times, to avoid multiple calls to the database for the same data
+     * we can always break the cache if needed
+     * @var array
+     */
+    private array $conflictingBookings = [];
+
+    /**
      * @param User                             $user
      * @param BookingMapper                    $bookingMapper
      * @param StatusMapper                     $statusMapper
@@ -455,7 +469,7 @@ class Validation
         $errors = [];
 
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking, true);
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
@@ -509,26 +523,34 @@ class Validation
     /**
      * Get all bookings for a resource in a window
      *
-     * @param Item\Model      $resource
+     * @param Item\Model $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
      * @param Model|null $existingBooking
+     * @param bool       $breakCache // should we hit the db to find all booking, or use the cached ones?
      * @return Collection|Model[]
      */
-    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null): Collection|array
+    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null, bool $breakCache = false): Collection|array
     {
-        // Only check approved bookings. Wow, the calendar population method
-        // can do exactly that!
-        // I do however want to allow a booking to start at the same time
-        // that the previous booking ended.
-        // (We may need to implement a down time between bookings.)
-        /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getBookingMapper()->findForResource(
-            [$resource->getId()],
-            $startDate->getTimestamp() + 1,
-            $endDate->getTimestamp() - 1,
-            [Status\Model::STATUS_APPROVED]
-        );
+        // booking cache is a sum of the data of the function params
+        $cacheKey = sprintf(self::CONFLICTING_BOOKINGS_CACHE_KEY, $resource->getId(), $startDate->getTimestamp(), $endDate->getTimestamp(), $existingBooking ? $existingBooking->getId() : '');
+
+        if (!isset($this->conflictingBookings[$cacheKey]) || $breakCache) {
+            // Only check approved bookings. Wow, the calendar population method
+            // can do exactly that!
+            // I do however want to allow a booking to start at the same time
+            // that the previous booking ended.
+            // (We may need to implement a down time between bookings.)
+            /** @var Collection|Model[] $conflictingBookings */
+            $this->conflictingBookings[$cacheKey] = $this->getBookingMapper()->findForResource(
+                [$resource->getId()],
+                $startDate->getTimestamp() + 1,
+                $endDate->getTimestamp() - 1,
+                [Status\Model::STATUS_APPROVED]
+            );
+        }
+
+        $conflictingBookings = $this->conflictingBookings[$cacheKey];
 
         // Conflicting bookings could include the existing booking.
         // Remove it, because a booking can't conflict with itself!
