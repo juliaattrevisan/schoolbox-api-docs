@@ -14,12 +14,14 @@ declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
 declare INSTANCE_REGISTRY_URL
 declare ARTIFACT_SOURCE
+declare TIMEZONE
 declare REQUIRED_CONFIGS=(\
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
   INSTANCE_REGISTRY_URL \
   ARTIFACT_SOURCE \
+  TIMEZONE \
 )
 
 function verify_args() {
@@ -355,6 +357,7 @@ function install_instance() {
     --config eotc_enabled "'1'" \
     --config etherpad_host "'http://schoolbox-etherpad:9001'" \
     --config etherpad_api_token "'test'" \
+    --config date_timezone "'${TIMEZONE}'" \
     --config external_type "'$EXTERNAL_DB'" \
     --config external_db_db "'$EXTERNAL_DB_DB'" \
     --config external_db_host "'$EXTERNAL_DB_HOST'" \
