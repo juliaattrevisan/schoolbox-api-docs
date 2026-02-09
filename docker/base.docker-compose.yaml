@@ -467,3 +467,8 @@ configs:
     file: ./caddy/config/
   frankenphp-caddy:
     file: ./base-images/php-frankenphp/config/frankenphp/
+  frankenphp-php:
+    file: ./base-images/php-frankenphp/config/php/
+  # is it possible to make files a folder?
+  schoolbox-cli-php:
+    file: ./schoolbox-cli/config/php/
