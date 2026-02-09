@@ -111,9 +111,9 @@ class Validation
     /**
      * cache array if we are calling the validation multiple times, to avoid multiple calls to the database for the same data
      * we can always break the cache if needed
-     * @var array
+     * @var Collection|Model[]
      */
-    private array $conflictingBookings = [];
+    private array|Collection $conflictingBookings = [];
 
     /**
      * @param User                             $user
@@ -541,7 +541,6 @@ class Validation
             // I do however want to allow a booking to start at the same time
             // that the previous booking ended.
             // (We may need to implement a down time between bookings.)
-            /** @var Collection|Model[] $conflictingBookings */
             $this->conflictingBookings[$cacheKey] = $this->getBookingMapper()->findForResource(
                 [$resource->getId()],
                 $startDate->getTimestamp() + 1,
