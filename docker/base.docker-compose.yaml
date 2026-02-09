@@ -497,12 +497,18 @@ volumes:
   # Volume for ClamAV signatures
   clamav-data:
 
+# Configs may be folders, but if they are they will override existing contents:
+# thus, PHP configs must be single files.
+# Config files are read from the argument to `--with-config-file-scan-dir`,
+# but this is provided at compile time: it can only be configured as an env.
 configs:
   caddy:
     file: ./caddy/config/
   frankenphp-caddy:
     file: ./base-images/php-frankenphp/config/frankenphp/
   frankenphp-php:
-    file: ./base-images/php-frankenphp/config/php/
-  schoolbox-cli-php:
-    file: ./schoolbox-cli/config/php/
+    file: ./base-images/php-frankenphp/config/php/01-base-settings.ini
+  frankenphp-php-env:
+    file: ./base-images/php-frankenphp/config/php/${ENV}/02-settings.ini
+  frankenphp-php-cli:
+    file: ./base-images/php-frankenphp/config/php/03-cli-settings.ini
