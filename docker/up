@@ -327,6 +327,14 @@ function start_containers() {
     # it is not guaranteed to run on docker/up
     docker exec -it schoolbox-cli sudo /etc/init.d/cron start
 
+    # Also rebuild cronjobs
+    docker exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker
+    case "${SECOND_INSTANCE_ENABLE}" in
+        1 | true | yes | on)
+            docker exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker2
+            ;;
+    esac
+
     # Create vhosts in rabbitmq container:
     # this can't be done in post_start, because the container's not healthy at
     # that time

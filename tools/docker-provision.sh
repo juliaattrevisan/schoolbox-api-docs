@@ -408,19 +408,6 @@ function install_instance() {
   log "Loading all demo data complete";
 }
 
-function create_cron_config_file() {
-  log "Creating cron configuration";
-  local timezone;
-  timezone=$("$SITE_ROOT"/tools/instance-mariadb.sh -NBe "select value from config where name = 'date_timezone'")
-  # Hardcode UPS run time to 22:00 for now, I suppose?
-  echo "${INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
-}
-
-function create_crontab_files() {
-  log "Creating crontab files";
-  cloud-rebuild-cronjobs --is-primary-host 1 --instance "${INSTANCE_ID}"
-}
-
 function post_install() {
   log "Removing system maintenance mode";
   if "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
@@ -485,8 +472,6 @@ function main() {
   add_rabbitmq_vhost
   create_data_dirs
   install_instance
-  create_cron_config_file
-  create_crontab_files
   post_install
 }
 
