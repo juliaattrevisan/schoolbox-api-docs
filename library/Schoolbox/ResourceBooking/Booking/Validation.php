@@ -999,7 +999,7 @@ class Validation
      * @param DateTime   $startDate
      * @param DateTime   $endDate
      * @param Model|null $existingBooking
-     * @return GenericCollection<EventInterface> or
+     * @return GenericCollection<EventInterface>
      */
     public function getClashEvents(
         Item\Model $resource,
@@ -1008,7 +1008,6 @@ class Validation
         ?Model $existingBooking = null
     ): GenericCollection {
         $conflictingBookings = new GenericCollection(EventInterface::class);
-        /** @var Collection|Model[] $conflictingBookings */
         $conflictingBookings = $conflictingBookings->merge($this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking));
 
         if (strlen($resource->getRoomCode() ?? '') > 0) {
