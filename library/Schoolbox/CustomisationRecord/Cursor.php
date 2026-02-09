@@ -19,7 +19,7 @@ class Cursor implements ICursor
     public const string CURSOR_ORDER_BY_UNIT_NAME = 'unit';
     public const string CURSOR_ORDER_BY_CUSTOMISATION_TYPE = 'type';
 
-    public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'user_id';
+    public const string CURSOR_ORDER_BY_STUDENT_ID_COLUMN = 'participant.id';
     public const string CURSOR_ORDER_BY_CREATED_AT_COLUMN = 'created_at';
     public const string CURSOR_ORDER_BY_CLASS_NAME_COLUMN = 'f.name';
     public const string CURSOR_ORDER_BY_UNIT_NAME_COLUMN = 'cui.title';
