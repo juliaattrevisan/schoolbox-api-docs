@@ -7,12 +7,11 @@
 @use "designTokens/sbx-colors";
 @use "designTokens/sbx-shadows";
 @use "designTokens/sbx-sizes";
-@use "designTokens/sbx-typography";
+@use "designTokens/sbx-type";
 
-/* Tafsol styles */
-@use "vendors/tafsol";
+@use "base/sbx-typography";
 
-/* SBX UI styles */
+@use "ui/sbx-core-menu";
 @use "ui/forms/sbx-form";
 @use "ui/forms/sbx-input-text";
 @use "ui/forms/sbx-text-radio";
@@ -21,5 +20,7 @@
 @use "ui/sbx-tabs";
 @use "ui/sbx-breadcrumbs";
 @use "ui/sbx-pagination";
+@use "ui/sbx-filters";
+@use "ui/sbx-calendar";
 @use "config/sbx-field-roundness";
 @use "config/sbx-box-roundness";

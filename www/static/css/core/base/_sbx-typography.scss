@@ -1,0 +1,51 @@
+/**
+ * Typography style tweaks
+ * Scope: UI Uplift
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..700;1,300..700&display=swap");
+
+:root {
+    --card-bg: #ffffff; // white card background
+    --sbx-font-primary: "Figtree", sans-serif;
+}
+
+body {
+    // Override body background to use lighter shade of accent color
+    background: var(--body-background);
+    --body-background: hsla(
+        var(--body-background-h),
+        var(--body-background-s),
+        var(--body-background-l),
+        var(--body-background-a)
+    );
+
+    --body-background-a: 1;
+    --body-background-h: 204;
+    --body-background-l: 96%;
+    --body-background-s: 49%;
+
+    font-family: var(--sbx-font-primary) !important;
+
+    // to prevent barcode/vjs/view file modal icons override
+    & *:not(.barcode-39, button.vjs-control, [class*=" lg-"]) {
+        font-family: var(--sbx-font-primary) !important;
+    }
+}
+
+// Subheader styles
+.subheader {
+    color: var(--sbx-color-text-primary);
+    font-family: var(--sbx-font-primary);
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+// Meta styles
+.meta {
+    font-style: normal;
+
+    & span:last-child a {
+        color: var(--sbx-color-text-primary);
+    }
+}

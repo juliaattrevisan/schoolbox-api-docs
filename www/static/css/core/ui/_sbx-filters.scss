@@ -1,0 +1,80 @@
+.row:has(> #filter_panel) {
+    background-color: #fff;
+    border: var(--border);
+    box-shadow: var(--sbx-shadow-m);
+    margin-bottom: 1rem;
+
+    & #filter_panel {
+        padding-inline: 0;
+
+        & .applied-filter-tab {
+            & .label,
+            & .selected-item {
+                padding-block: 1rem !important;
+            }
+
+            & .selected-item {
+                border-radius: calc(var(--sbx-border-radius-normal));
+            }
+        }
+
+        & .filter-dropdown.flex-list {
+            gap: 1rem;
+        }
+
+        & .filter-component {
+            border: 0 !important;
+        }
+
+        & .label.filter .close,
+        & .filter.fillgap .close {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        & section {
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+
+            & .no-pad {
+                border-bottom: var(--border);
+                border-top-left-radius: var(--sbx-border-radius-normal);
+                border-top-right-radius: var(--sbx-border-radius-normal);
+                padding: 1rem !important;
+            }
+        }
+    }
+
+    & + #report_content {
+        border: var(--border);
+        border-bottom-left-radius: var(--sbx-border-radius-normal);
+        border-bottom-right-radius: var(--sbx-border-radius-normal);
+        border-top: 0;
+        padding-inline: 0;
+
+        & .information-list {
+            & li:not(:last-child) {
+                margin-bottom: 0.5rem;
+            }
+
+            & .button[data-assessment-due-at-unix] {
+                background-color: transparent !important;
+                border: 1px solid var(--sbx-color-accent);
+                color: var(--sbx-color-accent) !important;
+            }
+        }
+
+        & .island {
+            padding-inline: 0;
+        }
+
+        & .subheader {
+            padding-inline: 1rem;
+        }
+
+        & section[data-assessment]:not(:last-child) {
+            border-bottom: var(--border);
+        }
+    }
+}

@@ -16,6 +16,7 @@
     .empty-state,
     .modal,
     .modal-content,
+    .reveal-modal,
     .tabs,
     .accordion,
     .accordion__item,
@@ -32,6 +33,7 @@
     .fc-event,
     .swiper-horizontal,
     .scrollable.show-for-medium-up,
+    .Schoolbox_Tile_Component_DashboardTileController .tileList .tile,
     .row:has(> #filter_panel) {
         border-radius: var(--sbx-config-box-roundness);
     }
@@ -56,9 +58,4 @@
     #hybrid-bar .tab-bar {
         border-radius: var(--sbx-config-box-roundness);
     }
-}
-
-// Dashboard tiles
-.Schoolbox_Tile_Component_DashboardTileController .tileList .tile {
-    border-radius: var(--sbx-config-box-roundness);
 }
