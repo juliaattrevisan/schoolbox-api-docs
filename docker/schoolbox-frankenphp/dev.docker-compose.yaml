@@ -31,7 +31,6 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
     # After building: create data dirs, and make mount writable by www-data
@@ -47,3 +46,5 @@ services:
     configs:
       - source: frankenphp-caddy
         target: /etc/frankenphp/
+      - source: schoolbox
+        target: /etc/schoolbox

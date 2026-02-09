@@ -30,7 +30,6 @@ services:
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
     post_start:
       - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
@@ -44,3 +43,5 @@ services:
     configs:
       - source: frankenphp-caddy
         target: /etc/frankenphp/
+      - source: schoolbox
+        target: /etc/schoolbox

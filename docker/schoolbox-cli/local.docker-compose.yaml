@@ -36,7 +36,6 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - storage2:/var/lib/schoolbox/docker2/storage
-      - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
     # Add host.docker.internal as an alias back to the host machine, so that
@@ -62,3 +61,5 @@ services:
         target: /usr/local/etc/php/conf.d/02-env-settings.ini
       - source: schoolbox-cli-php
         target: /usr/local/etc/php/conf.d/03-cli-settings.ini
+      - source: schoolbox
+        target: /etc/schoolbox
