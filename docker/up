@@ -323,10 +323,10 @@ function start_containers() {
     "$(dirname "$0")/compose" exec -it schoolbox-cli sudo /etc/init.d/cron start
 
     # Also rebuild cronjobs
-    docker exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker
+    "$(dirname "$0")/compose" exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker
     case "${SECOND_INSTANCE_ENABLE}" in
         1 | true | yes | on)
-            docker exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker2
+            "$(dirname "$0")/compose" exec -it schoolbox-cli sudo cloud-rebuild-cronjobs --is-primary-host 1 --instance docker2
             ;;
     esac
 
