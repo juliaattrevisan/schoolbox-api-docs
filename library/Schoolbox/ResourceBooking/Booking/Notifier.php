@@ -357,9 +357,6 @@ class Notifier extends AbstractModuleNotifier
             // fetch clash owners
             /** @var Model|EventInterface $clashEvent */
             foreach ($clashEvents as $clashEvent) {
-                if (!$isOwnerEffector) {
-                    $bob->setParam('owner', new UserParam($owner));
-                }
                 if ($clashEvent instanceof Model) {
                     // we can only notify the owner of other resource bookings, NOT timetable, they MAY not have an owner
                     $envelope->targetToUser($clashEvent->getEvent()->getOwner(), $bob->build());
