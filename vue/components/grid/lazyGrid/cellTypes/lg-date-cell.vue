@@ -6,7 +6,6 @@
 interface Props {
     value: string | null;
 }
-
 const props = defineProps<Props>();
 
 /**
@@ -17,7 +16,6 @@ function formatDateShort(): string | null {
     if (!props.value) {
         return null;
     }
-
     return `${window.dayjs(props.value).format(window.dateDisplayFormats.dayjsDateShort)} ${window
         .dayjs(props.value)
         .format(window.dateDisplayFormats.dayjsTime)}`;
@@ -25,7 +23,7 @@ function formatDateShort(): string | null {
 </script>
 
 <template>
-    <div class="l-pad-s l-gap-m">
+    <div class="l-pad-s">
         <span>
             {{ formatDateShort() }}
         </span>

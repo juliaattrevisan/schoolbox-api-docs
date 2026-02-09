@@ -8,7 +8,7 @@ import EmptyState from "@schoolboxVue/components/empty-state.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import LazyGrid from "@schoolboxVue/components/grid/lazyGrid/lazy-grid.vue";
-import type { Header, Routes } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
+import type { Header, Routes, BasicType } from "@schoolboxVue/components/grid/lazyGrid/types/lazyGridTypes";
 import LgUserCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-user-cell.vue";
 import LgDateCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-date-cell.vue";
 import LgBasicCell from "@schoolboxVue/components/grid/lazyGrid/cellTypes/lg-basic-cell.vue";
@@ -63,7 +63,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
                     <lg-date-cell :value="row[columnHeader.key] as string" />
                 </template>
                 <template #Basic="{ row, header: columnHeader }">
-                    <lg-basic-cell :value="row[columnHeader.key]" />
+                    <lg-basic-cell :value="row[columnHeader.key] as BasicType" />
                 </template>
             </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />

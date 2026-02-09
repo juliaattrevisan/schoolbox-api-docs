@@ -2,6 +2,7 @@
 /**
  * Display a basic cell value, with optional link support.
  */
+
 import type { BasicType } from "../types/lazyGridTypes";
 
 const props = defineProps<{
@@ -14,7 +15,6 @@ const props = defineProps<{
         <a v-if="props.value._links?.view" :href="props.value._links.view">
             {{ props.value.title }}
         </a>
-
         <span v-else>
             {{ props.value.title }}
         </span>
