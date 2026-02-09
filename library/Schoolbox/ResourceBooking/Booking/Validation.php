@@ -605,10 +605,8 @@ class Validation
         $timetableRoom = (new \Calendar_Api_EventType_SudsTimetable_Room(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->eventMapper, $roomCodes))
             ->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1);
 
-        $timetableRoom->merge((new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes))
+        return $timetableRoom->merge((new TimetableRoom(Calendar_Api_Config_Mapper::CONFIGURATION_NONE, $this->user, $this->user, $this->externalTimetableHandler, $roomCodes))
             ->getEvents($startDate->getTimestamp() + 1, $endDate->getTimestamp() - 1));
-
-        return $timetableRoom;
     }
 
     /**
