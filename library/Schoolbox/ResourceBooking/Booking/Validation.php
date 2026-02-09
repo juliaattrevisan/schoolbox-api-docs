@@ -454,46 +454,8 @@ class Validation
     ): array {
         $errors = [];
 
-        // Only check approved bookings. Wow, the calendar population method
-        // can do exactly that!
-        // I do however want to allow a booking to start at the same time
-        // that the previous booking ended.
-        // (We may need to implement a down time between bookings.)
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate);
-
-        // Conflicting bookings could include the existing booking.
-        // Remove it, because a booking can't conflict with itself!
-        // Also remove any items in the same series, because bookings can't
-        // conflict with bookings in the same series (they're all offset at the
-        // same time)
-        // There may be rare occurrences where they can (a booking that is so
-        // long it overlaps the next item in series!), but I'm not going to
-        // worry about those.
-        if ($existingBooking instanceof Model) {
-            $existingId = $existingBooking->getId();
-
-            if ($existingId) {
-                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
-                $conflictingBookings = $conflictingBookings->filter(
-                    /**
-                     * @param Model $item
-                     * @return bool
-                     */
-                    function ($item) use ($existingId, $existingSeriesId) {
-                        /** @var Model $item */
-                        if ($item->getId() == $existingId) {
-                            return false;
-                        }
-                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-            }
-        }
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
@@ -547,22 +509,61 @@ class Validation
     /**
      * Get all bookings for a resource in a window
      *
-     * @param Item\Model $resource
+     * @param Item\Model      $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
-     *
+     * @param Model|null $existingBooking
      * @return Collection|Model[]
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate)
+    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null): Collection|array
     {
-        return $this->getBookingMapper()->findForResource(
+        // Only check approved bookings. Wow, the calendar population method
+        // can do exactly that!
+        // I do however want to allow a booking to start at the same time
+        // that the previous booking ended.
+        // (We may need to implement a down time between bookings.)
+        /** @var Collection|Model[] $conflictingBookings */
+        $conflictingBookings = $this->getBookingMapper()->findForResource(
             [$resource->getId()],
             $startDate->getTimestamp() + 1,
             $endDate->getTimestamp() - 1,
             [Status\Model::STATUS_APPROVED]
         );
+
+        // Conflicting bookings could include the existing booking.
+        // Remove it, because a booking can't conflict with itself!
+        // Also remove any items in the same series, because bookings can't
+        // conflict with bookings in the same series (they're all offset at the
+        // same time)
+        // There may be rare occurrences where they can (a booking that is so
+        // long it overlaps the next item in series!), but I'm not going to
+        // worry about those.
+        if ($existingBooking instanceof Model) {
+            $existingId = $existingBooking->getId();
+
+            if ($existingId) {
+                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
+                $conflictingBookings = $conflictingBookings->filter(
+                /**
+                 * @param Model $item
+                 * @return bool
+                 */
+                    function ($item) use ($existingId, $existingSeriesId) {
+                        /** @var Model $item */
+                        if ($item->getId() == $existingId) {
+                            return false;
+                        }
+                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                );
+            }
+        }
+
+        return $conflictingBookings;
     }
 
     /**
@@ -987,46 +988,8 @@ class Validation
         DateTime $endDate,
         ?Model $existingBooking = null
     ): Collection {
-        // Only check approved bookings. Wow, the calendar population method
-        // can do exactly that!
-        // I do however want to allow a booking to start at the same time
-        // that the previous booking ended.
-        // (We may need to implement a down time between bookings.)
         /** @var Collection|Model[] $conflictingBookings */
-        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate);
-
-        // Conflicting bookings could include the existing booking.
-        // Remove it, because a booking can't conflict with itself!
-        // Also remove any items in the same series, because bookings can't
-        // conflict with bookings in the same series (they're all offset at the
-        // same time)
-        // There may be rare occurrences where they can (a booking that is so
-        // long it overlaps the next item in series!), but I'm not going to
-        // worry about those.
-        if ($existingBooking instanceof Model) {
-            $existingId = $existingBooking->getId();
-
-            if ($existingId) {
-                $existingSeriesId    = $existingBooking->getEvent()->getSeriesId();
-                $conflictingBookings = $conflictingBookings->filter(
-                /**
-                 * @param Model $item
-                 * @return bool
-                 */
-                    function ($item) use ($existingId, $existingSeriesId) {
-                        /** @var Model $item */
-                        if ($item->getId() == $existingId) {
-                            return false;
-                        }
-                        if (!empty($existingSeriesId) && $item->getEvent()->getSeriesId() == $existingSeriesId) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                );
-            }
-        }
+        $conflictingBookings = $this->getConflictingBookings($resource, $startDate, $endDate, $existingBooking);
 
         if (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
