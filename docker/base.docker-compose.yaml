@@ -416,7 +416,6 @@ services:
     image: mcr.microsoft.com/presidio-anonymizer
 
   clamav:
-    container_name: clamav
     build:
       context: ./clamav
     volumes:
