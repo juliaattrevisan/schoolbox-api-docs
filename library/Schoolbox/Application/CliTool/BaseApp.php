@@ -40,8 +40,9 @@ abstract class BaseApp extends App
     /**
      * Should log items be formatted for text file rather than terminal?
      *
-     * If set, causes field name to be prefixed to field value to enable logs to
-     * be parsable by scripts:
+     * If set, causes severity level (as per the values of the `\Monolog\Level`
+     * enum) to be prefixed to field value, so that logs may be made parsable by
+     * scripts:
      * * without: '[!][2019-02-26 00:29:22.72907][13746]'
      * * with:    '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'.
      */

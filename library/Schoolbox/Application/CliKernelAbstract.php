@@ -44,7 +44,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
     // Command line options common to all CLI Kernels
     public const OPT_LONG_PORCELAIN      = 'porcelain'; // Should log items be formatted for text file rather than TTL?
-                                                        // If set, causes field name to be prefixed to field value to enable logs to be parsable by scripts
+                                                        // If set, causes severity level to be prefixed to field value to enable logs to be parsable by scripts
                                                         // eg '[!][2019-02-26 00:29:22.72907][13746]' would become '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'
     public const OPT_SHORT_VERBOSITY     = 'v';         // What level of verbosity should be logged
 
