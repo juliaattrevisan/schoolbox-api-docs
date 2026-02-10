@@ -58,6 +58,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Pastoral\ClassReport\Cursor as Cursor;
 
 class Controller extends Base
 {
@@ -292,30 +293,56 @@ class Controller extends Base
      */
     public function getFlag(User $student): void
     {
-        $get = $this->requestQuery;
+        // $get = $this->requestQuery;
 
-        $user = $this->getUser();
+        // $user = $this->getUser();
 
-        $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
-        $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
+        // $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
+        // $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
 
-        // populate related records
-        $records = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, null, null, null, false);
+        // // populate related records
+        // $records = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, null, null, null, false);
 
-        $data = $records->map($this->pastoralTranslator)->reindex();
+        // $data = $records->map($this->pastoralTranslator)->reindex();
+
+        // $this->response = $this->responseAsJson([
+        //     'data'     => [
+        //         'results' => $data,
+        //     ],
+        //     // 'metadata' => [
+        //     //     'count'  => $count,
+        //     //     'cursor' => [
+        //     //         'next'    => $next,
+        //     //         'current' => $current,
+        //     //     ],
+        //     // ],
+        // ]);
+
+        $cursor  = new Cursor(
+            $this->pastoralDataSource,
+            $this->getUser(),
+            $student,
+            [],
+            'created',
+            10,
+        );
+
+        $records = $cursor->retrieveResults(null);
 
         $this->response = $this->responseAsJson([
             'data'     => [
-                'results' => $data,
+                'results' => $records->map($this->pastoralTranslator),
             ],
-            // 'metadata' => [
-            //     'count'  => $count,
-            //     'cursor' => [
-            //         'next'    => $next,
-            //         'current' => $current,
-            //     ],
-            // ],
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $cursor->current($records),
+                    'next'    => $cursor->next($records),
+                ],
+            ],
         ]);
+
+
     }
 
     /**
