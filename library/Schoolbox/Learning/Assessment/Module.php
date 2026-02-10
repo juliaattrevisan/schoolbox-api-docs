@@ -114,19 +114,19 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         // preloaders to use
-        $preloadContext                = function ($params) {
+        $preloadContext = function ($params) {
             return $this->preloadContext($params);
         };
-        $preloadAssessment             = function ($params) {
+        $preloadAssessment = function ($params) {
             return $this->preloadAssessment($params);
         };
-        $preloadCourseClassAssessment             = function ($params) {
+        $preloadCourseClassAssessment = function ($params) {
             return $this->preloadCourseClassAssessment($params);
         };
-        $preloadParticipant            = function ($params) {
+        $preloadParticipant = function ($params) {
             return $this->preloadAssessmentAndStudent($params);
         };
-        $preloadLessonPlanAPI           = function ($params) {
+        $preloadLessonPlanAPI = function ($params) {
             return $this->preloadLessonPlanAPI($params);
         };
         $preloadAssessmentForParticipant = function ($params) {
@@ -529,10 +529,7 @@ class Module extends BaseModule
         try {
             $classAss = $this->getAssessmentMapperProxy()->findById($params['classAssId']);
         } catch (MapperException\Deleted $e) {
-            throw new MapperException\Deleted(
-                'Sorry, the activity could not be updated. Please ensure the activity ' .
-                'still exists and contact your support if the problem persists.'
-            );
+            throw new MapperException\Deleted('Project was deleted');
         } catch (MapperException $e) {
             // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
