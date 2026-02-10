@@ -153,7 +153,7 @@ class Kernel extends CliKernelAbstract
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
-        $this->app->outputHelp();
+        $this->app->outputHelpIfOptionProvided();
         $this->app->run();
     }
 

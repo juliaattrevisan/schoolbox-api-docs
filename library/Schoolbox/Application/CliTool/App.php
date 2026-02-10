@@ -179,7 +179,7 @@ abstract class App
      *
      * @return void|never-return
      */
-    public function outputHelp(): void
+    public function outputHelpIfOptionProvided(): void
     {
     }
 

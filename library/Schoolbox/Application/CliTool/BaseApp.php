@@ -108,7 +108,7 @@ abstract class BaseApp extends App
      *
      * @return void|never-return
      */
-    public function outputHelp(): void
+    public function outputHelpIfOptionProvided(): void
     {
         if ($this->optionParser->getOption(self::OPT_SHORT_HELP)) {
             echo $this->optionParser->getHelpText();
