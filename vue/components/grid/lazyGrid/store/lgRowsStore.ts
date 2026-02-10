@@ -101,6 +101,17 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         url.value = newUrl.toString();
     }
 
+    /**
+     * Open a link that triggers a CSV export with the current filters applied
+     * @param $route - the route to trigger the CSV export from
+     */
+    function exportToCSV($route: string): void {
+        const newUrl = new URL($route, window.location.origin);
+        const searchParams = new URLSearchParams();
+        addFilterSearchParams(searchParams, filters.value);
+        window.location.href = `${newUrl.pathname}?${searchParams.toString()}`;
+    }
+
     return {
         url,
         limit,
@@ -115,5 +126,6 @@ export const useRowsStore = defineStore(`rowsStore`, () => {
         init,
         onPaginate,
         onSort,
+        exportToCSV,
     };
 });
