@@ -43,11 +43,15 @@ class Kernel extends CliKernelAbstract
      *             instead.
      */
     private const OPT_SHORT_ERR_STREAM = 'l:';
-    public const OPT_SHORT_PERFORM    = 'p';  // CLI option to indicate the App short be run in 'perform' mode
 
-    // By default, all apps run in 'dry-run' mode, unless either:
-    // 1. this option is supplied on the command line, or
-    // 2. the kernel is constructed from a script that instructs the kernel to 'forcePerform'
+    /**
+     * CLI option for whether this app should be run in perform mode.
+     *
+     * Apps should be developed to run in dry-run mode, unless this option is
+     * provided, or the app's `runApp` method is called with
+     * `forcePerform: true`.
+     */
+    public const OPT_SHORT_PERFORM = 'p';
     public const OPT_LONG_PERFORM = 'perform';
 
     /** @var App */
@@ -149,6 +153,7 @@ class Kernel extends CliKernelAbstract
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
+        $this->app->outputHelp();
         $this->app->run();
     }
 

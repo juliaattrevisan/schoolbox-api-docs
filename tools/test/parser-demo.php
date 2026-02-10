@@ -15,9 +15,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
     public function run(): void
     {
-        $this->optionParser->process();
         var_dump($this->optionParser->getOptions());
-        echo $this->optionParser->getHelpText();
     }
 
     /**

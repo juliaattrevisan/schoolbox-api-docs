@@ -75,17 +75,21 @@ abstract class BaseApp extends App
         $this->optionParser->setHelp($help);
 
         // Set up command-line options common to all scripts
-        $this->assignDeprecatedOptions();
+        $this->optionParser = $this->optionParser->addOption(
+            new GetOpt\Option(self::OPT_SHORT_HELP, self::OPT_LONG_HELP, GetOpt\GetOpt::NO_ARGUMENT)
+                ->setDescription('Display help text and exit')
+        );
         if ($this->hasPerformMode()) {
             $this->optionParser = $this->optionParser->addOption(
                 new GetOpt\Option(self::OPT_SHORT_PERFORM, self::OPT_LONG_PERFORM, GetOpt\GetOpt::NO_ARGUMENT)
-                    ->setDescription('Perform mode')
+                    ->setDescription('Perform mode: if not provided, no changes will be written')
             );
         }
         $this->optionParser = $this->optionParser->addOption(
             new GetOpt\Option(self::OPT_SHORT_VERBOSITY, null, GetOpt\GetOpt::NO_ARGUMENT)
                 ->setDescription('Verbosity (up to 3 times)')
         );
+        $this->assignDeprecatedOptions();
 
         // ... including an esoteric option I forgot existed
         $this->optionParser = $this->optionParser->addOption(
@@ -94,6 +98,7 @@ abstract class BaseApp extends App
         );
 
         $this->setOptions();
+        $this->optionParser->process();
         return $this;
     }
 

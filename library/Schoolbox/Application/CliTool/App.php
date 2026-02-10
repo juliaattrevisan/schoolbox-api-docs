@@ -172,6 +172,16 @@ abstract class App
         return $this;
     }
 
+    /**
+     * The standard app will never output help this way: it's always handled
+     * piecemeal in the app's `run` method. The new base app will output help in
+     * this method.
+     *
+     * @return void|never-return
+     */
+    public function outputHelp(): void
+    {
+    }
 
     /**
      * If this App must be run as a specific user, then this should return that user's name.
