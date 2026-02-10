@@ -1068,9 +1068,6 @@ class Validation
      * Return the status to be set for a new booking that does not clash with any existing booking.
      * Note bookings that clash with existing bookings should be given status 'pending'.
      *
-     * TODO: Modify this function so that no database operations are required.
-     *       This should be done because this function is called from within a loop.
-     *
      * @param BookingModel $booking
      * @param User $user
      * @return int
@@ -1088,6 +1085,10 @@ class Validation
         }
 
         if (
+            // TODO: Note the call to isUserModerator() involves a database query.
+            //       Modify either this function or that function so that no database operations are required,
+            //       or so that results of database queries are cached to speed up repeated calls.
+            //       This should be done because this function is called from within a loop.
             $resource->isUserModerator($user)
             && (int)$event->getAuthor()->getId() === (int)$user->getId()
         ) {
