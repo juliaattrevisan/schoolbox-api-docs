@@ -244,10 +244,10 @@ Data:
     {% if aImpls | length %}
     <div class="small-12 large-6 island">
         <h2 class="subheader">Students</h2>
-        {% set showGroups = assessment.baseContext is unitSpecification %}
+        {% set isSpecification = assessment.baseContext is unitSpecification %}
 
         {% for aImpl in aImpls %}
-            {% if showGroups %}
+            {% if isSpecification %}
             <div class="component-container">
                 <div class="row">
                     <div class="small-12 columns">
@@ -262,7 +262,7 @@ Data:
                                 </div>
                                 <nav>
                                     <a
-                                        {% if showGroups %}
+                                        {% if isSpecification %}
                                             data-data-loaded="false"
                                             data-click-load="{{ aImpl.assessment.id }}"
                                             data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}"
@@ -281,12 +281,14 @@ Data:
                 </div>
             </div>
             {% else %}
-                {% include '@learningAssessment/project/status/class.twig' %}
+                {% include '@learningAssessment/project/status/class.twig' with {assessment: assessment, aImpl: aImpl, isSpecification: isSpecification} only %}
             {% endif %}
         {% endfor %}
 
-        {% if showGroups %}
+        {% if isSpecification %}
             <script type="text/javascript">
+                // async fetch the next chunk of participants for a requested class,
+                // insert them after the current participant list, and if needed, re-enable the new load more button
                 function loadMoreParticipants(event) {
                     // hide the load more button
                     event.preventDefault();
@@ -299,33 +301,8 @@ Data:
 
                     // fetch the class status data
                     fetch(event.target.parentNode.dataset.classChunkHref, { credentials: 'same-origin' })
-                            .then(function(response) {
-                                if (!response.ok) {
-                                    // toaster
-                                    toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
-
-                                    // show the hidden things
-                                    $(event.target).show();
-                                    // show the loader
-                                    $(event.target.parentNode).find('[data-loader]').addClass('hide');
-                                    // exit
-                                    return;
-                                }
-                                return response.text();
-                            })
-                            .then(function(data) {
-                                var el = event.target.parentNode;
-                                if (el && data) {
-                                    // toaster
-                                    toast.toastTimeout({text: 'Loaded.', css: 'success'});
-                                    el.innerHTML = data;
-                                    $(el).find('[data-click-load-more]').click(loadMoreParticipants);
-                                } else {
-                                    // toaster
-                                    toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
-                                }
-                            })
-                            .catch(function() {
+                        .then(function(response) {
+                            if (!response.ok) {
                                 // toaster
                                 toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
 
@@ -333,13 +310,39 @@ Data:
                                 $(event.target).show();
                                 // show the loader
                                 $(event.target.parentNode).find('[data-loader]').addClass('hide');
-                            });
+                                // exit
+                                return;
+                            }
+                            return response.text();
+                        })
+                        .then(function(data) {
+                            var el = event.target.parentNode;
+                            if (el && data) {
+                                // toaster
+                                toast.toastTimeout({text: 'Loaded.', css: 'success'});
+                                el.innerHTML = data;
+                                // re-enable the load more button (if one exists. it may not...)
+                                $(el).find('[data-click-load-more]').click(loadMoreParticipants);
+                            } else {
+                                // toaster
+                                toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+                            }
+                        })
+                        .catch(function() {
+                            // toaster
+                            toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
+
+                            // show the hidden things
+                            $(event.target).show();
+                            // show the loader
+                            $(event.target.parentNode).find('[data-loader]').addClass('hide');
+                        });
                 }
 
                 // when a user clicks the text in data-click-load
                 // we should async fetch the participants and add it to the div
                 $('[data-click-load]').click(function (event) {
-                    //stop the scroll
+                    // stop the scroll
                     event.preventDefault();
                     // if data has been loaded, exit
                     if (event.target.dataset.dataLoaded === 'true') {

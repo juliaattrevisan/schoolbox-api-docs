@@ -50,6 +50,9 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 class Controller extends Assessment\Controller
 {
+    /**
+     * when asyncing project participant chunks, how many participants should we show in one chunk?
+     */
     private const PARTICIPANT_CHUNK_SIZE = 100;
 
     /**
@@ -433,6 +436,10 @@ class Controller extends Assessment\Controller
     private function getClassStudentInfo(IAssessable $courseAss, IAssessable $classAss): array
     {
         $assessments = new GenericCollection(IAssessable::class, [$classAss]);
+        // We are first loading and hydrating the participants into the assessments, so we know how many exist, for when we chunk them
+        // we chunk them later as the stats logic causes increased load and demand on the system.
+        // Looking through `loadParticipantsIntoAssessmentCollection` it was going to be too hard to try and fetch / hydrate only a specific chunk of participants.
+        // so we are loading and then throwing away data (yes, can be fixed later) but this is better than trying to load and use everything and run out of memory)
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         $twigData = [
@@ -457,6 +464,9 @@ class Controller extends Assessment\Controller
             if ($participantCursor < 0) {
                 $participantCursor = 0;
             }
+
+            // slice the participant list to a reduced set, `new Assessment\ParticipantStatistics` is expensive and when you are doing that for hundreds of humans
+            // it can cause memory and load issues, so we are chunking the participants and only doing the stats for the chunk we are showing
             $participants = $participants->slice($participantCursor, self::PARTICIPANT_CHUNK_SIZE);
 
             $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
