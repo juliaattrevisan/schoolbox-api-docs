@@ -677,6 +677,7 @@ class Module extends BaseModule
                     $this->getUnitSpecificationMapper(),
                     $this->injector->get('l10n'),
                     $projectResultCacheMapper,
+                    $bakery,
                     new \Schoolbox\Url\Factory($this->getConfig()),
                     (string)$this->getConfig()->get('learnosity_version'),
                     (string)$this->getConfig()->get('learnosity_consumer_key'),
