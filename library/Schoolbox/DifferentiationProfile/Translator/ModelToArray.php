@@ -74,7 +74,7 @@ class ModelToArray
                     'id'   => $student->getYear()->getId(),
                     'name' => $student->getYear()->getName(),
                 ] : null,
-                'campuses'    => $student->getCampusCollection()?->reduce(function (array $arr, $campus) {
+                'campus'    => $student->getCampusCollection()?->reduce(function (array $arr, $campus) {
                     $arr[] = [
                         'id'   => $campus->getId(),
                         'name' => $campus->getName(),
