@@ -68,6 +68,19 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
             </lazy-grid>
             <loading-table v-if="rowsStore.isMoreLoading" :rows="5" row-height="3rem" />
         </div>
+        <template v-if="props.routes.exportCsv">
+            <teleport to="#download-csv-container">
+                <a
+                    :href="props.routes.exportCsv"
+                    class="l-flex-row l-gap-s f-no-bkg f-no-margins"
+                    aria-label="Export to CSV"
+                    title="Export to CSV"
+                >
+                    <sbx-icon name="export" />
+                    Export to CSV
+                </a>
+            </teleport>
+        </template>
     </template>
 </template>
 

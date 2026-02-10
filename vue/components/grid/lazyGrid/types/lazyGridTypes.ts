@@ -36,6 +36,7 @@ export type Payload = {
  */
 export type Routes = {
     getData: string;
+    exportCsv?: string;
 };
 
 /**
