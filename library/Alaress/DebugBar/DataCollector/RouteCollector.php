@@ -36,7 +36,7 @@ class RouteCollector extends DataCollector implements Renderable
     /**
      * {@inheritDoc}
      */
-    public function collect()
+    public function collect(): array
     {
         return ['route' => $this->route];
     }
@@ -56,7 +56,7 @@ class RouteCollector extends DataCollector implements Renderable
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'route';
     }
@@ -64,7 +64,7 @@ class RouteCollector extends DataCollector implements Renderable
     /**
      * {@inheritDoc}
      */
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return [
             "route" => [

@@ -97,9 +97,9 @@ class Collector extends DataCollector implements Renderable, AssetProvider
 
         $statementSummary['connection'] = $this->broker->getDatabase();
         $statementSummary['duration'] = $duration;
-        $statementSummary['duration_str'] = $this->formatDuration($duration);
+        $statementSummary['duration_str'] = $this->getDataFormatter()->formatDuration($duration);
         $statementSummary['memory'] = $memory;
-        $statementSummary['memory_str'] = $this->formatBytes($memory);
+        $statementSummary['memory_str'] = $this->getDataFormatter()->formatBytes($memory);
 
         if ($queryException instanceof \Exception) {
             $statementSummary['error_code'] = $queryException->getCode();
@@ -118,7 +118,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function collect()
+    public function collect(): array
     {
         $result = array(
             'nb_statements' => count($this->statements),
@@ -138,8 +138,8 @@ class Collector extends DataCollector implements Renderable, AssetProvider
             }
         }
 
-        $result['accumulated_duration_str'] = $this->formatDuration($result['accumulated_duration']);
-        $result['peak_memory_usage_str'] = $this->formatBytes($result['peak_memory_usage']);
+        $result['accumulated_duration_str'] = $this->getDataFormatter()->formatDuration($result['accumulated_duration']);
+        $result['peak_memory_usage_str'] = $this->getDataFormatter()->formatBytes($result['peak_memory_usage']);
 
         return $result;
     }
@@ -147,7 +147,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->widget_name;
     }
@@ -155,7 +155,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function getWidgets()
+    public function getWidgets(): array
     {
         return array(
             $this->widget_name => array(
@@ -173,7 +173,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     /**
      * {@inheritDoc}
      */
-    public function getAssets()
+    public function getAssets(): array
     {
         return [
             'css' => 'widgets/sqlqueries/widget.css',

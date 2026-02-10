@@ -39,7 +39,7 @@ interface IComponent
      *
      * Intended to be called in twig includes
      *
-     * @return \Schoolbox\Filter\Selection\Model[]
+     * @return array
      */
     public function toContext();
 }

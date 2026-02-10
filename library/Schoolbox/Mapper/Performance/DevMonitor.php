@@ -124,14 +124,14 @@ class DevMonitor extends AbstractLogger implements IMonitor
                     : "Index match for $table($impl)"
                 ;
 
-                $this->getLog()->debug($msg);
+                $this->getLog()?->debug($msg);
                 continue;
             }
 
             // test for full overlap of single keys
             if (array_intersect_key($checks[$table], $this->indexByColumn[$table]) == $checks[$table]) {
                 $impl = implode(', ', $checks[$table]);
-                $this->getLog()->info("Matched all indices for $table($impl)");
+                $this->getLog()?->info("Matched all indices for $table($impl)");
                 continue;
             }
 
@@ -139,9 +139,9 @@ class DevMonitor extends AbstractLogger implements IMonitor
             foreach ($columns as $column) {
                 if (array_key_exists($column, $this->indexByColumn[$table])) {
                     $impl = implode(', ', $checks[$table]);
-                    $this->getLog()->warning("Partial index match for `$column` within $table($impl)");
+                    $this->getLog()?->warning("Partial index match for `$column` within $table($impl)");
                 } else {
-                    $this->getLog()->error("Searched on unindexed field: $table.$column");
+                    $this->getLog()?->error("Searched on unindexed field: $table.$column");
                 }
             }
         }
@@ -160,7 +160,7 @@ class DevMonitor extends AbstractLogger implements IMonitor
         $query = $this->deriveQuery($mapper, $predicateBuilder);
         $key   = sha1($query);
 
-        $this->getTimer()->startMeasure($key, $query);
+        $this->getTimer()?->startMeasure($key, $query);
     }
 
 
@@ -173,7 +173,7 @@ class DevMonitor extends AbstractLogger implements IMonitor
     {
         $key = sha1($this->deriveQuery($mapper, $predicateBuilder));
 
-        $this->getTimer()->stopMeasure($key);
+        $this->getTimer()?->stopMeasure($key);
     }
 
 
@@ -199,20 +199,22 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
 
     /**
-     * @return TimeDataCollector
+     * @return TimeDataCollector|null
      */
-    protected function getTimer()
+    protected function getTimer(): ?TimeDataCollector
     {
-        return $this->debugBar['time'];
+        $timer = $this->debugBar['time'];
+        return $timer instanceof TimeDataCollector ? $timer : null;
     }
 
 
     /**
-     * @return LoggerInterface
+     * @return LoggerInterface|null
      */
-    protected function getLog()
+    protected function getLog(): ?LoggerInterface
     {
-        return $this->debugBar['messages'];
+        $log = $this->debugBar['messages'];
+        return $log instanceof LoggerInterface ? $log : null;
     }
 
 
@@ -226,6 +228,6 @@ class DevMonitor extends AbstractLogger implements IMonitor
      */
     public function log($level, $message, array $context = []): void
     {
-        $this->getLog()->log($level, $message, $context);
+        $this->getLog()?->log($level, $message, $context);
     }
 }

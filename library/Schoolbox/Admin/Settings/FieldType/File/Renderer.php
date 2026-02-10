@@ -39,6 +39,7 @@ class Renderer extends AbstractRenderer
 
     /**
      * @inheritdoc
+     * @return array<array|string>
      * @throws \UnexpectedValueException
      */
     protected function getData(Config $config): array
@@ -57,9 +58,12 @@ class Renderer extends AbstractRenderer
         $zone->setModalTitle('Select ' . strtolower($config->getTitle()));
         $this->attachFiles($config, $zone);
 
-        return \array_merge(parent::getData($config), [
-            'attachzone' => $zone->getTwigContext(),
-        ]);
+        return \array_merge(
+            parent::getData($config),
+            [
+                'attachzone' => $zone->getTwigContext(),
+            ],
+        );
     }
 
 
