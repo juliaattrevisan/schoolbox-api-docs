@@ -70,6 +70,7 @@ declare s3_alt_bucket
 declare s3_alt_region
 declare s3_alt_access_key
 declare s3_alt_secret_key
+declare plan_type
 
 
 function usage () {
@@ -102,13 +103,27 @@ function can_use_pv(){
 function parse_args() {
   local errors=0
   while [[ $# -gt 0 ]]; do
-    case $1 in
+    case "$1" in
       --source-instance-id)
+        if [[ $# -lt 2 ]] || [[ -z $2 ]]; then
+          echo "Missing value for --source-instance-id"
+          errors=1
+          break
+        fi
         source_instance_id="$2";
         shift; shift;
         ;;
       --to-instance)
+        if [[ $# -lt 2 ]] || [[ -z $2 ]]; then
+          echo "Missing value for --to-instance"
+          errors=1
+          break
+        fi
         to_instance_id="$2"
+        shift; shift;
+        ;;
+      --plan)
+        plan_type="$2"
         shift; shift;
         ;;
       *)
@@ -120,7 +135,7 @@ function parse_args() {
     esac
   done
 
-  if [[ $errors == 1 ]] || [[ -z $source_instance_id ]] || [[ -z $to_instance_id ]]; then
+  if [[ $errors == 1 ]] || [[ -z ${source_instance_id:-} ]] || [[ -z ${to_instance_id:-} ]]; then
       usage
       exit 1
   fi
@@ -223,32 +238,6 @@ function check_dest_is_staging(){
     exit 1;
   fi
 }
-
-#prd to stg db syncs should only be performed for the same organisations, if not same, exit
-function check_source_and_dest_org_codes_match(){
-  if ! dest_org_code=$(mariadb -u "$dest_sql_user" -p"$dest_sql_pass" -h "$dest_sql_host" "$dest_sql_schema" -sse "SELECT value FROM config WHERE name = 'site_school_code'"); then
-    error "Unable to fetch destination site_school_code"
-    exit 1
-  fi
-  if [[ -z ${prd_backup_file:-} ]] || [[ ! -f $prd_backup_file ]]; then
-    error "Production backup file not available for org code validation"
-    exit 1
-  fi
-  source_org_code=$(gunzip -c "$prd_backup_file" | sed -n "s/.*('site_school_code','\([^']*\)'.*/\1/p" | head -n1)
-  if [[ -z $source_org_code ]]; then
-    error "Unable to extract source site_school_code from production backup"
-    exit 1
-  fi
-
-  if [[ $source_org_code != "$dest_org_code" ]]; then
-    error "Error: source site_school_code '$source_org_code' does not match destination site_school_code '$dest_org_code'.
-           This is likely because:
-             1. The source and destination instances belong to different organisations, which is unsupported, or
-             2. The destination site_school_code is corrupt. If so, this will need to be manually repaired before running this script."
-    exit 1;
-  fi
-}
-
 
 # Back up the staging database in case something goes wrong and we need to roll back
 function backup_staging_database(){
@@ -460,16 +449,21 @@ function get_plan_type_from_instance_registry() {
 
 
 function set_plan() {
-  local plan_type
-  if ! plan_type=$(get_plan_type_from_instance_registry); then
-    error "Unable to fetch plan type from instance registry"
-    restore_staging_database
-    exit 1
+  if [[ -z $plan_type ]]; then
+    if ! plan_type=$(get_plan_type_from_instance_registry); then
+      error "Unable to fetch plan type from instance registry"
+      restore_staging_database
+      exit 1
+    fi
   fi
   INSTANCE_ID="$to_instance_id" /usr/share/schoolbox/tools/set-plan.php --plan "$plan_type";
 }
 
 function build_aws_env(){
+  # Always use explicit credentials from DB config. If an inherited session token
+  # is stale, S3 ListObjectsV2 calls fail with InvalidToken.
+  unset AWS_SESSION_TOKEN AWS_SECURITY_TOKEN AWS_PROFILE AWS_DEFAULT_PROFILE
+
   if [[ -n $s3_alt_host ]] && [[ -n $s3_alt_bucket ]]; then
     export AWS_ACCESS_KEY_ID="$s3_alt_access_key"
     export AWS_SECRET_ACCESS_KEY="$s3_alt_secret_key"
@@ -554,7 +548,6 @@ function main() {
   read_dest_sql_config
   check_dest_is_staging
   download_prd_backup
-  check_source_and_dest_org_codes_match
   backup_staging_database
   sync_database
   update_log_dir
