@@ -71,10 +71,11 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl, minWidth, [
         <template v-if="props.routes.exportCsv">
             <teleport to="#download-csv-container">
                 <a
-                    :href="props.routes.exportCsv"
+                    href="#export-to-csv"
                     class="l-flex-row l-gap-s f-no-bkg f-no-margins"
                     aria-label="Export to CSV"
                     title="Export to CSV"
+                    @click.prevent="rowsStore.exportToCSV(props.routes.exportCsv)"
                 >
                     <sbx-icon name="export" />
                     Export to CSV
