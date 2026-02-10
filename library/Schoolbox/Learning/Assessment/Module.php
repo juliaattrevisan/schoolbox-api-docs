@@ -233,8 +233,8 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/modify", 'getUpdateAssessmentForm', $canModify, $preloadAssessment); // a || c
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment', $canDelete, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/status", 'getStatus', $canViewStatus, $preloadAssessment); // a || c
-        $this->register('GET', "$assRoute/status/{classAssId:\d+}", 'getClassStatus', $canViewStatus, $preloadCourseClassAssessment); // a || c
-        $this->register('GET', "$assRoute/status/{classAssId:\d+}/chunk", 'getClassStatusChunk', $canViewStatus, $preloadCourseClassAssessment); // a || c
+        $this->register('GET', "$assRoute/status/{classAssessmentId:\d+}", 'getClassStatus', $canViewStatus, $preloadCourseClassAssessment); // a || c
+        $this->register('GET', "$assRoute/status/{classAssessmentId:\d+}/chunk", 'getClassStatusChunk', $canViewStatus, $preloadCourseClassAssessment); // a || c
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
@@ -516,6 +516,10 @@ class Module extends BaseModule
 
 
     /**
+     * Preload the course assessment and associated class assessment
+     * If the course assessment isn't a spec, error
+     * If they are not connected, then error
+     *
      * @param array     $params
      * @param User|null $student
      * @return array
@@ -525,9 +529,9 @@ class Module extends BaseModule
      */
     protected function preloadCourseClassAssessment(array $params, ?User $student = null): array
     {
-        $courseAss  = $this->preloadAssessment($params, $student)['assessment'];
+        $courseAssessment  = $this->preloadAssessment($params, $student)['assessment'];
         try {
-            $classAss = $this->getAssessmentMapperProxy()->findById($params['classAssId']);
+            $classAssessment = $this->getAssessmentMapperProxy()->findById($params['classAssessmentId']);
         } catch (MapperException\Deleted $e) {
             throw new MapperException\Deleted('Project was deleted');
         } catch (MapperException $e) {
@@ -535,20 +539,20 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        if ($courseAss->isImplementation()) {
+        if ($courseAssessment->isImplementation()) {
             //if not spec, error
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         // check if the class assessment is a child of the course assessment
-        if ($classAss->getSpecificationAssessment()?->getId() !== $courseAss->getId()) {
+        if ($classAssessment->getSpecificationAssessment()?->getId() !== $courseAssessment->getId()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
-            'assessment' => $courseAss,
-            'courseAss' => $courseAss,
-            'classAss' => $classAss
+            'assessment' => $courseAssessment,
+            'courseAssessment' => $courseAssessment,
+            'classAssessment' => $classAssessment
         ];
     }
 

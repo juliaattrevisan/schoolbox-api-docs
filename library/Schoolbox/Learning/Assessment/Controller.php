@@ -1474,11 +1474,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * this is not chromed, so we can async it into the dom and it _should_ just work...
      *
      * @api GET /learning/assessments/{assessmentId}/status/{classAssId}
-     * @param IAssessable $courseAss
-     * @param IAssessable $classAss
+     * @param IAssessable $courseAssessment
+     * @param IAssessable $classAssessment
      * @return void
      */
-    public function getClassStatus(IAssessable $courseAss, IAssessable $classAss): void
+    public function getClassStatus(IAssessable $courseAssessment, IAssessable $classAssessment): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
@@ -1490,11 +1490,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * this is not chromed, so we can async it into the dom and it _should_ just work...
      *
      * @api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
-     * @param IAssessable $courseAss
-     * @param IAssessable $classAss
+     * @param IAssessable $courseAssessment
+     * @param IAssessable $classAssessment
      * @return void
      */
-    public function getClassStatusChunk(IAssessable $courseAss, IAssessable $classAss): void
+    public function getClassStatusChunk(IAssessable $courseAss, IAssessable $classAssessment): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }

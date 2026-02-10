@@ -391,17 +391,17 @@ class Controller extends Assessment\Controller
      * this is not chromed, so we can async it into the dom and it _should_ just work...
      *
      * @api GET /learning/assessments/{assessmentId}/status/{classAssId}
-     * @param IAssessable $courseAss
-     * @param IAssessable $classAss
+     * @param IAssessable $courseAssessment
+     * @param IAssessable $classAssessment
      * @return void
      * @throws Exception\NotFound
      * @throws \Twig\Error\Error
      */
-    public function getClassStatus(IAssessable $courseAss, IAssessable $classAss): void
+    public function getClassStatus(IAssessable $courseAssessment, IAssessable $classAssessment): void
     {
         $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/project/status/class.twig',
-            $this->getClassStudentInfo($courseAss, $classAss)
+            $this->getClassStudentInfo($courseAssessment, $classAssessment)
         );
     }
 
@@ -410,17 +410,17 @@ class Controller extends Assessment\Controller
      * this is not chromed, so we can async it into the dom and it _should_ just work... (chunked version)
      *
      * @api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
-     * @param IAssessable $courseAss
-     * @param IAssessable $classAss
+     * @param IAssessable $courseAssessment
+     * @param IAssessable $clasAssessment
      * @return void
      * @throws Exception\NotFound
      * @throws \Twig\Error\Error
      */
-    public function getClassStatusChunk(IAssessable $courseAss, IAssessable $classAss): void
+    public function getClassStatusChunk(IAssessable $courseAssessment, IAssessable $classAssessment): void
     {
         $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/project/status/classChunk.twig',
-            $this->getClassStudentInfo($courseAss, $classAss)
+            $this->getClassStudentInfo($courseAssessment, $classAssessment)
         );
     }
 
@@ -428,14 +428,14 @@ class Controller extends Assessment\Controller
      * fetch participants for a specific class assessment, that is part of the course assessment
      * this collates and may chunk the data as needed
      *
-     * @param IAssessable $courseAss
-     * @param IAssessable $classAss
+     * @param IAssessable $courseAssessment
+     * @param IAssessable $classAssessment
      * @return array
      * @throws Exception\NotFound
      */
-    private function getClassStudentInfo(IAssessable $courseAss, IAssessable $classAss): array
+    private function getClassStudentInfo(IAssessable $courseAssessment, IAssessable $classAssessment): array
     {
-        $assessments = new GenericCollection(IAssessable::class, [$classAss]);
+        $assessments = new GenericCollection(IAssessable::class, [$classAssessment]);
         // We are first loading and hydrating the participants into the assessments, so we know how many exist, for when we chunk them
         // we chunk them later as the stats logic causes increased load and demand on the system.
         // Looking through `loadParticipantsIntoAssessmentCollection` it was going to be too hard to try and fetch / hydrate only a specific chunk of participants.
@@ -443,8 +443,8 @@ class Controller extends Assessment\Controller
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         $twigData = [
-            'baseContext'      => $courseAss->getBaseContext(),
-            'assessment'       => $courseAss,
+            'baseContext'      => $courseAssessment->getBaseContext(),
+            'assessment'       => $courseAssessment,
             'aImpls'           => [],
             'showGroups'       => true,
             'returnUrl'        =>
