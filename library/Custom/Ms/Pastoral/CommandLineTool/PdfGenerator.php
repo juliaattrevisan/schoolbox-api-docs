@@ -113,11 +113,9 @@ $baseOptionHelp
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
-      $file 1> archive.zip
-      $file -o archive.zip
+      $file > archive.zip
  * Append log to export.log, output to archive.zip
       $file 2>> export.log 1> archive.zip
-      $file -l export.log -o archive.zip
 ";
         fwrite(STDOUT, $help);
     }

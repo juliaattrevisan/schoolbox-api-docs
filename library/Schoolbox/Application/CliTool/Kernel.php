@@ -24,14 +24,25 @@ use Schoolbox\Application\CliKernelAbstract;
  * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
  * * migration/update scripts
  * * jobs/tasks
- *
- * By default it will append logs to STDERR, unless a file is specified using the -l CLI option
  */
 class Kernel extends CliKernelAbstract
 {
     // Command line short options recognised by this kernel
-    private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
-    private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
+
+    /**
+     * CLI option to allow output to be written to a file, rather than STDOUT.
+     *
+     * @deprecated Use `> filename` to redirect stdout to a file instead.
+     */
+    private const OPT_SHORT_OUT_STREAM = 'o:';
+
+    /**
+     * CLI option to allow logs to be appended to a file, rather than STDERR.
+     *
+     * @deprecated Use `2>> filename` to redirect and append stderr to a file
+     *             instead.
+     */
+    private const OPT_SHORT_ERR_STREAM = 'l:';
     public const OPT_SHORT_PERFORM    = 'p';  // CLI option to indicate the App short be run in 'perform' mode
 
     // By default, all apps run in 'dry-run' mode, unless either:
