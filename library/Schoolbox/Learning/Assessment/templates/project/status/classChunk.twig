@@ -52,7 +52,13 @@
 {% endfor %}
 {% if isSpecification and (aImpl.participantCursor < aImpl.participantCount) %}
     {# there are more participants to show, we should show a load more (that triggers a new chunk, managed by `@learningAssessment/project/status/staff.twig::loadMoreParticipants` #}
-    <li data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}?participantCursor={{ aImpl.participantCursor }}">
+    <li data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+        courseAss: assessment,
+        classAss: aImpl.assessment,
+        classAssId: aImpl.assessment.id
+    })}}?participantCursor={{ aImpl.participantCursor }}">
         <a data-click-load-more class="button load-more expand" title="Load more">Load more</a>
         <div data-loader class="loader hide"></div>
     </li>

@@ -265,7 +265,13 @@ Data:
                                         {% if isSpecification %}
                                             data-data-loaded="false"
                                             data-click-load="{{ aImpl.assessment.id }}"
-                                            data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {assessmentId: assessment.id, assessment: assessment, courseAss: assessment, classAss: aImpl.assessment, classAssId: aImpl.assessment.id })}}"
+                                            data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {
+                                                assessmentId: assessment.id,
+                                                assessment: assessment,
+                                                courseAss: assessment,
+                                                classAss: aImpl.assessment,
+                                                classAssId: aImpl.assessment.id
+                                            })}}"
                                         {% endif %}
                                         data-collapser="collap-{{ aImpl.assessment.id }}"
                                         href="#"
@@ -397,7 +403,7 @@ Data:
 <div class="row">
     <div class="small-12 column">
         {% if returnUrl %}
-            <a href={{ returnUrl }} class="button submit">Return</a>
+            <a href="{{ returnUrl }}" class="button submit">Return</a>
         {% elseif baseContext is unitSpecification %}
             <a href="{{ routeLookup('course.modifyCourse', {id: baseContext.course.id })}}#{{ baseContext.id }}" class="button submit">Return to course</a>
         {% else %}
