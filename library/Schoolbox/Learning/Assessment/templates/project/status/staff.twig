@@ -268,9 +268,9 @@ Data:
                                             data-class-status-href="{{ routeLookup('learningAssessment.getClassStatus', {
                                                 assessmentId: assessment.id,
                                                 assessment: assessment,
-                                                courseAssessment: assessment,
-                                                classAssessment: aImpl.assessment,
-                                                classAssessmentId: aImpl.assessment.id
+                                                assessmentSpec: assessment,
+                                                assessmentImpl: aImpl.assessment,
+                                                assessmentImplId: aImpl.assessment.id
                                             })}}"
                                         {% endif %}
                                         data-collapser="collap-{{ aImpl.assessment.id }}"

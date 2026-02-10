@@ -1473,12 +1473,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * fetch and display the participants for a specific class assessment, that is part of the course assessment
      * this is not chromed, so we can async it into the dom and it _should_ just work...
      *
-     * @api GET /learning/assessments/{assessmentId}/status/{classAssId}
-     * @param IAssessable $courseAssessment
-     * @param IAssessable $classAssessment
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
      * @return void
      */
-    public function getClassStatus(IAssessable $courseAssessment, IAssessable $classAssessment): void
+    public function getClassStatus(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
@@ -1489,12 +1489,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * fetch and display the participants for a specific class assessment, that is part of the course assessment
      * this is not chromed, so we can async it into the dom and it _should_ just work...
      *
-     * @api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
-     * @param IAssessable $courseAssessment
-     * @param IAssessable $classAssessment
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}/chunk
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
      * @return void
      */
-    public function getClassStatusChunk(IAssessable $courseAss, IAssessable $classAssessment): void
+    public function getClassStatusChunk(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
     {
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }

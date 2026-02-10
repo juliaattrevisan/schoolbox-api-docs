@@ -233,8 +233,8 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/modify", 'getUpdateAssessmentForm', $canModify, $preloadAssessment); // a || c
         $this->register('POST', "$assRoute/delete", 'postDeleteAssessment', $canDelete, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/status", 'getStatus', $canViewStatus, $preloadAssessment); // a || c
-        $this->register('GET', "$assRoute/status/{classAssessmentId:\d+}", 'getClassStatus', $canViewStatus, $preloadCourseClassAssessment); // a || c
-        $this->register('GET', "$assRoute/status/{classAssessmentId:\d+}/chunk", 'getClassStatusChunk', $canViewStatus, $preloadCourseClassAssessment); // a || c
+        $this->register('GET', "$assRoute/status/{assessmentImplId:\d+}", 'getClassStatus', $canViewStatus, $preloadCourseClassAssessment); // a || c
+        $this->register('GET', "$assRoute/status/{assessmentImplId:\d+}/chunk", 'getClassStatusChunk', $canViewStatus, $preloadCourseClassAssessment); // a || c
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
@@ -529,9 +529,9 @@ class Module extends BaseModule
      */
     protected function preloadCourseClassAssessment(array $params, ?User $student = null): array
     {
-        $courseAssessment  = $this->preloadAssessment($params, $student)['assessment'];
+        $assessmentSpec  = $this->preloadAssessment($params, $student)['assessment'];
         try {
-            $classAssessment = $this->getAssessmentMapperProxy()->findById($params['classAssessmentId']);
+            $assessmentImpl = $this->getAssessmentMapperProxy()->findById($params['assessmentImplId']);
         } catch (MapperException\Deleted $e) {
             throw new MapperException\Deleted(
                 'Activity was deleted. Please ensure the activity ' .
@@ -542,20 +542,20 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
-        if ($courseAssessment->isImplementation()) {
+        if ($assessmentSpec->isImplementation()) {
             //if not spec, error
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         // check if the class assessment is a child of the course assessment
-        if ($classAssessment->getSpecificationAssessment()?->getId() !== $courseAssessment->getId()) {
+        if ($assessmentImpl->getSpecificationAssessment()?->getId() !== $assessmentSpec->getId()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
         return [
-            'assessment' => $courseAssessment,
-            'courseAssessment' => $courseAssessment,
-            'classAssessment' => $classAssessment
+            'assessment' => $assessmentSpec,
+            'assessmentSpec' => $assessmentSpec,
+            'assessmentImpl' => $assessmentImpl
         ];
     }
 

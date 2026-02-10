@@ -55,9 +55,9 @@
     <li data-class-chunk-href="{{ routeLookup('learningAssessment.getClassStatusChunk', {
         assessmentId: assessment.id,
         assessment: assessment,
-        courseAssessment: assessment,
-        classAssessment: aImpl.assessment,
-        classAssessmentId: aImpl.assessment.id
+        assessmentSpec: assessment,
+        assessmentImpl: aImpl.assessment,
+        assessmentImplId: aImpl.assessment.id
     })}}?participantCursor={{ aImpl.participantCursor }}">
         <a data-click-load-more class="button load-more expand" title="Load more">Load more</a>
         <div data-loader class="loader hide"></div>

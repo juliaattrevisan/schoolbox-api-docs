@@ -390,18 +390,18 @@ class Controller extends Assessment\Controller
      * fetch and display the participants for a specific class assessment, that is part of the course assessment
      * this is not chromed, so we can async it into the dom and it _should_ just work...
      *
-     * @api GET /learning/assessments/{assessmentId}/status/{classAssId}
-     * @param IAssessable $courseAssessment
-     * @param IAssessable $classAssessment
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
      * @return void
      * @throws Exception\NotFound
      * @throws \Twig\Error\Error
      */
-    public function getClassStatus(IAssessable $courseAssessment, IAssessable $classAssessment): void
+    public function getClassStatus(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
     {
         $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/project/status/class.twig',
-            $this->getClassStudentInfo($courseAssessment, $classAssessment)
+            $this->getClassStudentInfo($assessmentSpec, $assessmentImpl)
         );
     }
 
@@ -409,18 +409,18 @@ class Controller extends Assessment\Controller
      * fetch and display the participants for a specific class assessment, that is part of the course assessment
      * this is not chromed, so we can async it into the dom and it _should_ just work... (chunked version)
      *
-     * @api GET /learning/assessments/{assessmentId}/status/{classAssId}/chunk
-     * @param IAssessable $courseAssessment
-     * @param IAssessable $clasAssessment
+     * @api GET /learning/assessments/{assessmentId}/status/{assessmentImplId}/chunk
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
      * @return void
      * @throws Exception\NotFound
      * @throws \Twig\Error\Error
      */
-    public function getClassStatusChunk(IAssessable $courseAssessment, IAssessable $classAssessment): void
+    public function getClassStatusChunk(IAssessable $assessmentSpec, IAssessable $assessmentImpl): void
     {
         $this->response = $this->responseFromTemplateUnthemed(
             '@learningAssessment/project/status/classChunk.twig',
-            $this->getClassStudentInfo($courseAssessment, $classAssessment)
+            $this->getClassStudentInfo($assessmentSpec, $assessmentImpl)
         );
     }
 
@@ -428,14 +428,14 @@ class Controller extends Assessment\Controller
      * fetch participants for a specific class assessment, that is part of the course assessment
      * this collates and may chunk the data as needed
      *
-     * @param IAssessable $courseAssessment
-     * @param IAssessable $classAssessment
+     * @param IAssessable $assessmentSpec
+     * @param IAssessable $assessmentImpl
      * @return array
      * @throws Exception\NotFound
      */
-    private function getClassStudentInfo(IAssessable $courseAssessment, IAssessable $classAssessment): array
+    private function getClassStudentInfo(IAssessable $assessmentSpec, IAssessable $assessmentImpl): array
     {
-        $assessments = new GenericCollection(IAssessable::class, [$classAssessment]);
+        $assessments = new GenericCollection(IAssessable::class, [$assessmentImpl]);
         // We are first loading and hydrating the participants into the assessments, so we know how many exist, for when we chunk them
         // we chunk them later as the stats logic causes increased load and demand on the system.
         // Looking through `loadParticipantsIntoAssessmentCollection` it was going to be too hard to try and fetch / hydrate only a specific chunk of participants.
@@ -443,8 +443,8 @@ class Controller extends Assessment\Controller
         $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         $twigData = [
-            'baseContext'      => $courseAssessment->getBaseContext(),
-            'assessment'       => $courseAssessment,
+            'baseContext'      => $assessmentSpec->getBaseContext(),
+            'assessment'       => $assessmentSpec,
             'aImpls'           => [],
             'isSpecification'  => true,
             'returnUrl'        =>
