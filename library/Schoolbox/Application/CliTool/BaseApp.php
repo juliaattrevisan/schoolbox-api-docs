@@ -12,6 +12,7 @@ namespace Schoolbox\Application\CliTool;
 use GetOpt;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Application\CliKernelAbstract;
 
 /**
  * New base CLI app, which uses a new library for setting command-line options
@@ -19,6 +20,38 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseApp extends App
 {
+    // Command-line options common to all apps.
+
+    /**
+     * Long and short options for outputting help.
+     */
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP = 'help';
+
+    /**
+     * Long and short options for perform mode.
+     */
+    private const OPT_SHORT_PERFORM = 'p';
+    private const OPT_LONG_PERFORM = 'perform';
+
+    // Command line options handled at the kernel level, rather than at the app:
+    // duplicated here for help text.
+
+    /**
+     * Should log items be formatted for text file rather than terminal?
+     *
+     * If set, causes field name to be prefixed to field value to enable logs to
+     * be parsable by scripts:
+     * * without: '[!][2019-02-26 00:29:22.72907][13746]'
+     * * with:    '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'.
+     */
+    private const OPT_LONG_PORCELAIN = 'porcelain';
+
+    /**
+     * What level of verbosity should be output?
+     */
+    private const OPT_SHORT_VERBOSITY = 'v';
+
     /**
      * Command-line option parser
      */
@@ -41,21 +74,41 @@ abstract class BaseApp extends App
             ->setDescription($this->getDescription());
         $this->optionParser->setHelp($help);
 
-        // Set up command-line options
+        // Set up command-line options common to all scripts
         $this->assignDeprecatedOptions();
         if ($this->hasPerformMode()) {
             $this->optionParser = $this->optionParser->addOption(
-                new GetOpt\Option('p', 'perform', GetOpt\GetOpt::NO_ARGUMENT)
+                new GetOpt\Option(self::OPT_SHORT_PERFORM, self::OPT_LONG_PERFORM, GetOpt\GetOpt::NO_ARGUMENT)
                     ->setDescription('Perform mode')
             );
         }
         $this->optionParser = $this->optionParser->addOption(
-            new GetOpt\Option('v', null, GetOpt\GetOpt::NO_ARGUMENT)
+            new GetOpt\Option(self::OPT_SHORT_VERBOSITY, null, GetOpt\GetOpt::NO_ARGUMENT)
                 ->setDescription('Verbosity (up to 3 times)')
+        );
+
+        // ... including an esoteric option I forgot existed
+        $this->optionParser = $this->optionParser->addOption(
+            new GetOpt\Option(null, self::OPT_LONG_PORCELAIN, GetOpt\GetOpt::NO_ARGUMENT)
+                ->setDescription('Porcelain log output')
         );
 
         $this->setOptions();
         return $this;
+    }
+
+    /**
+     * Output help text and exit, if and only if the `-h` or `--help` options
+     * were provided.
+     *
+     * @return void|never-return
+     */
+    public function outputHelp(): void
+    {
+        if ($this->optionParser->getOption(self::OPT_SHORT_HELP)) {
+            echo $this->optionParser->getHelpText();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
     }
 
     /**
@@ -66,7 +119,7 @@ abstract class BaseApp extends App
     {
         // Extract app options, exc. help
         $shortOptions = $this->getShortOpts();
-        unset($shortOptions['h']);
+        unset($shortOptions[self::OPT_SHORT_HELP]);
         if (!empty($shortOptions)) {
             trigger_error(
                 'Setting options via getShortOpts is deprecated: all options should be set in setOptions instead',
@@ -87,7 +140,7 @@ abstract class BaseApp extends App
         }
 
         $longOptions = $this->getLongOpts();
-        unset($longOptions['help']);
+        unset($longOptions[self::OPT_LONG_HELP]);
         if (!empty($longOptions)) {
             trigger_error(
                 'Setting options via getLongOpts is deprecated: all options should be set in setOptions instead',
@@ -127,10 +180,9 @@ abstract class BaseApp extends App
     /**
      * Set this application's options, in addition to the following implicit
      * options:
-     * * -h, --help: show help and exit
-     * * -V:         show version and exit
-     * * -v:         verbosity (may be provided multiple times)
-     * * -p, --perform:
+     * * -h, --help:    show help and exit
+     * * -v:            verbosity (may be provided multiple times)
+     * * -p, --perform: perform mode
      *
      * @return self
      */
@@ -145,6 +197,11 @@ abstract class BaseApp extends App
      */
     abstract protected function hasPerformMode(): bool;
 
+    /**
+     * Overridden to look up from option parser.
+     *
+     * @return bool
+     */
     protected function perform(): bool
     {
         if (!$this->hasPerformMode()) {
