@@ -26,16 +26,17 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
         return null;
     }
 
-//    public function getShortOpts(): array
-//    {
-//        return ['x'];
-//    }
-
+    /**
+     * @inheritdoc
+     */
     protected function getName(): string
     {
         return 'Test app';
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function getDescription(): string
     {
         return <<<DESC
@@ -45,6 +46,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
             DESC;
     }
 
+    /**
+     * Add some test options relevant only to this app.
+     */
     protected function setOptions(): CliTool\BaseApp
     {
         $this->optionParser->addOption(
@@ -71,6 +75,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\BaseApp {
         return $this;
     }
 
+    /**
+     * This app has no perform mode support.
+     */
     protected function hasPerformMode(): bool
     {
         return false;

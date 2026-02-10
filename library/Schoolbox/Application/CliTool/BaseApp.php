@@ -49,7 +49,18 @@ abstract class BaseApp extends App
     private const OPT_LONG_PORCELAIN = 'porcelain';
 
     /**
-     * What level of verbosity should be output?
+     * What level of log messages should be output?
+     *
+     * May be provided more than once:
+     * * not provided: `\Monolog\Level::Error`
+     * * -v:           `\Monolog\Level::Notice`
+     * * -vv:          `\Monolog\Level::Info`
+     * * -vvv:         `\Monolog\Level::Debug`
+     *
+     * May be set to a minimum higher level by providing the
+     * `\Schoolbox\Application\CliKernelAbstract::OPTION_LEVEL` value
+     * (as a `\Monolog\Level` enum value) to the
+     * `\Schoolbox\Application\CliTool\Kernel` constructor.
      */
     private const OPT_SHORT_VERBOSITY = 'v';
 
