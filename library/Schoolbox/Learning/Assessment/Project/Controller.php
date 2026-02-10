@@ -446,7 +446,7 @@ class Controller extends Assessment\Controller
             'baseContext'      => $courseAssessment->getBaseContext(),
             'assessment'       => $courseAssessment,
             'aImpls'           => [],
-            'showGroups'       => true,
+            'isSpecification'  => true,
             'returnUrl'        =>
                 $this->requestQuery->get(Redirect::RETURN_URL)
                     ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
