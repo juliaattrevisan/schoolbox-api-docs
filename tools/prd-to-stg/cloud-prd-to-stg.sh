@@ -74,7 +74,7 @@ declare plan_type
 
 
 function usage () {
-  echo "Usage : $0 --source-instance-id [X] --to-instance [Y]";
+  echo "Usage: $0 --source-instance-id [X] --to-instance [Y] [--plan PLAN_TYPE]"
 }
 
 function log(){
@@ -123,6 +123,11 @@ function parse_args() {
         shift; shift;
         ;;
       --plan)
+        if [[ $# -lt 2 ]] || [[ -z $2 ]]; then
+          echo "Missing value for --plan"
+          errors=1
+          break
+        fi
         plan_type="$2"
         shift; shift;
         ;;
@@ -204,7 +209,7 @@ read_dest_sql_config() {
   done
   sql_command="SELECT password FROM user WHERE username = 'alaress' AND deleted_at IS NULL"
   if ! alaress_password=$(mariadb -u "$dest_sql_user" -p"$dest_sql_pass" -h "$dest_sql_host" "$dest_sql_schema" -BNe "$sql_command" 2>/dev/null); then
-    echo "Unable to fetch alaress password'" >&2
+    error "Unable to fetch alaress password"
     exit 1
   fi
 }
@@ -241,8 +246,13 @@ function check_dest_is_staging(){
 
 # Back up the staging database in case something goes wrong and we need to roll back
 function backup_staging_database(){
-  # Generate a unique filename
-  staging_backup_file="/var/lib/schoolbox/stg_""$dest_sql_schema""_""$(date -I)"".sql";
+  local backup_template
+  backup_template="/var/lib/schoolbox/stg_${dest_sql_schema}_$(date +%Y-%m-%dT%H-%M-%S)_XXXXXX.sql"
+  if ! staging_backup_file=$(mktemp "$backup_template"); then
+    error "Unable to create temporary backup file for staging database '$dest_sql_schema'"
+    exit 1;
+  fi
+
   log "Backing up staging database '$dest_sql_schema' to '$staging_backup_file'"
   if ! mariadb-dump --single-transaction --no-tablespaces --add-drop-table -h "$dest_sql_host" --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u "$dest_sql_user" -p"$dest_sql_pass" "$dest_sql_schema" > "$staging_backup_file"; then
     error "Unable to dump staging database '$dest_sql_schema'"
@@ -456,7 +466,11 @@ function set_plan() {
       exit 1
     fi
   fi
-  INSTANCE_ID="$to_instance_id" /usr/share/schoolbox/tools/set-plan.php --plan "$plan_type";
+  if ! INSTANCE_ID="$to_instance_id" /usr/share/schoolbox/tools/set-plan.php --plan "$plan_type"; then
+    error "Unable to set plan '$plan_type' for instance '$to_instance_id'"
+    restore_staging_database
+    exit 1
+  fi
 }
 
 function build_aws_env(){
@@ -558,7 +572,9 @@ function main() {
   upgrade_instance
   localise_instance
   set_plan
-  rm "$staging_backup_file"
+  if ! rm "$staging_backup_file"; then
+    warn "Unable to remove staging backup file '$staging_backup_file'"
+  fi
 }
 
 main "$@";
