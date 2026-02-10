@@ -70,7 +70,7 @@ declare s3_alt_bucket
 declare s3_alt_region
 declare s3_alt_access_key
 declare s3_alt_secret_key
-declare plan_type
+declare plan_type=''
 
 
 function usage () {
@@ -459,12 +459,17 @@ function get_plan_type_from_instance_registry() {
 
 
 function set_plan() {
-  if [[ -z $plan_type ]]; then
+  if [[ -z ${plan_type:-} ]]; then
     if ! plan_type=$(get_plan_type_from_instance_registry); then
       error "Unable to fetch plan type from instance registry"
       restore_staging_database
       exit 1
     fi
+  fi
+  if [[ -z ${plan_type:-} ]]; then
+    error "Plan type is empty for instance '$to_instance_id'"
+    restore_staging_database
+    exit 1
   fi
   if ! INSTANCE_ID="$to_instance_id" /usr/share/schoolbox/tools/set-plan.php --plan "$plan_type"; then
     error "Unable to set plan '$plan_type' for instance '$to_instance_id'"
