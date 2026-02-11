@@ -193,33 +193,33 @@ class Factory
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {
-//            $bus
-//                ->add(new TimetableCalendar\Prepare(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->eventMapper,
-//                    $this->classEntryMapper,
-//                    $this->classInvolvementMapper,
-//                    $this->classPeriodMapper,
-//                    $this->periodMapper,
-//                    $this->overridesMapper,
-//                    self::SOURCE_NAME
-//                ))
-//                ->add(new TimetableCalendar\Classes(
-//                    $this->log,
-//                    $this->perform,
-//                    $api,
-//                    $this->watchlist,
-//                    $this->eventMapper,
-//                    $this->overridesMapper,
-//                    $this->classEntryMapper,
-//                    $this->classInvolvementMapper,
-//                ))
-//                ->add(new TimetableCalendar\Cleanup(
-//                    $this->log,
-//                    $this->perform,
-//                    $this->eventMapper
-//                ));
+            $bus
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper,
+                    self::SOURCE_NAME
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->watchlist,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
         }
 
         /* Diagnostic manifest to interpret nodes in the xml
