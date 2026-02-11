@@ -552,23 +552,23 @@ class Mapper extends BaseMapper
         // otherwise, it's exactly the same as its parent.
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diffForNotification($object, $previous) : null;
 
-        // create a new event, and send it to the scheduler
-        try {
-            $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
+        // create a new event, and send it to the scheduler, but only when the
+        // transaction is done
+        $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
+            try {
                 $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
-            });
-        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
-            // The exceptions caught in `getEventPropagator` must be caught here
-            // as well, now that the queue is not connected to until actually
-            // propagating an event.
-            // Anyway: suppress notifications for now.
-            $this->suppressNotification();
-            trigger_error(
-                sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
-                E_USER_WARNING,
-            );
-            return false;
-        }
+            } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
+                // The exceptions caught in `getEventPropagator` must be caught here
+                // as well, now that the queue is not connected to until actually
+                // propagating an event.
+                // Anyway: suppress notifications for now.
+                $this->suppressNotification();
+                trigger_error(
+                    sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
+                    E_USER_WARNING,
+                );
+            }
+        });
 
         return true;
     }
