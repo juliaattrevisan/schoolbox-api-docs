@@ -13,6 +13,8 @@ namespace Schoolbox\Fixtures\Matchup;
 use OutOfBoundsException;
 use PDO;
 use PDOStatement;
+use PhpAmqpLib\Exception\AMQPIOException;
+use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -545,13 +547,26 @@ class Mapper extends BaseMapper
             return false;
         }
 
+        // The only difference in this method is the diff which is passed to
+        // `propagate`:
+        // otherwise, it's exactly the same as its parent.
         $diff = $previous && ($verb != self::METHOD_DELETE) ? $this->diffForNotification($object, $previous) : null;
 
         // create a new event, and send it to the scheduler
         try {
-            $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
-        } catch (\ErrorException $e) {
-            //Unable to connect to notification system
+            $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
+                $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
+            });
+        } catch (\ErrorException | AMQPIOException | AMQPRuntimeException $e) {
+            // The exceptions caught in `getEventPropagator` must be caught here
+            // as well, now that the queue is not connected to until actually
+            // propagating an event.
+            // Anyway: suppress notifications for now.
+            $this->suppressNotification();
+            trigger_error(
+                sprintf('Could not propagate event to AMQP instance: %s', $e->getMessage()),
+                E_USER_WARNING,
+            );
             return false;
         }
 
