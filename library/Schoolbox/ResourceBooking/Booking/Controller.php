@@ -427,7 +427,8 @@ class Controller extends Base
                     $conflictingBookings = $validation->getConflictingBookings(
                         $booking->getResource(),
                         $startDatetime->getDateTimeObject(),
-                        $endDatetime->getDateTimeObject()
+                        $endDatetime->getDateTimeObject(),
+                        $booking,
                     );
                     foreach ($conflictingBookings as $conflictingBooking) {
                         $conflictingBooking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_REJECTED));

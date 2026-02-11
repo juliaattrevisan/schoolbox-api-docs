@@ -542,7 +542,7 @@ class Validation
      * @param bool       $breakCache // should we hit the db to find all booking, or use the cached ones?
      * @return Collection|Model[]
      */
-    private function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null, bool $breakCache = false): Collection|array
+    public function getConflictingBookings(Item\Model $resource, DateTime $startDate, DateTime $endDate, ?Model $existingBooking = null, bool $breakCache = false): Collection|array
     {
         // booking cache is a sum of the data of the function params
         $cacheKey = sprintf(self::CONFLICTING_BOOKINGS_CACHE_KEY, $resource->getId(), $startDate->getTimestamp(), $endDate->getTimestamp(), $existingBooking ? $existingBooking->getId() : '');
