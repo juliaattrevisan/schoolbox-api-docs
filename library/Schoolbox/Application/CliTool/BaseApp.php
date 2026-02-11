@@ -226,4 +226,16 @@ abstract class BaseApp extends App
         }
         return $this->optionParser->get('p');
     }
+
+    /**
+     * Overrides `getOpt` to use new option parser instead.
+     *
+     * @param string $name
+     * @return array|bool|mixed|null
+     */
+    protected function getOpt(string $name)
+    {
+        // Old options might have the : suffix: if so, remove it
+        return $this->optionParser->getOption(rtrim($name, ':'));
+    }
 }
