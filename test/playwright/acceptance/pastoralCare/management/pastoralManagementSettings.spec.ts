@@ -132,7 +132,7 @@ test.describe("Pastoral Care - Management Settings", () => {
         await expect(page.locator("#pastoralRecords")).toContainText(pastoralTitle2);
     });
 
-    test.skip("set and check pastoral care management settings: sentiment, tip, general and confidential templates", async ({
+    test("set and check pastoral care management settings: sentiment, tip, general and confidential templates", async ({
         page,
         tester,
         db,
@@ -199,7 +199,7 @@ test.describe("Pastoral Care - Management Settings", () => {
     });
 
     // checks if the flags set in the management settings are presented in the pastoral profile and class list pages
-    test.skip("set and check pastoral care management settings: flag tests", async ({ page, tester, db }) => {
+    test("set and check pastoral care management settings: flag tests", async ({ page, tester, db }) => {
         pastoralRecordSettings = new PastoralExpiry(page, tester);
         common = new Common(page);
         createPastoralRecord = new CreatePastoralRecord(page);
