@@ -18,6 +18,7 @@
     display: inline-grid;
     height: 1.5rem;
     line-height: 1;
+    margin: 0;
     min-height: auto;
     opacity: 1;
     place-content: center;
@@ -126,10 +127,18 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
     display: none;
 }
 
+// Add vertical spacing between checkboxes
+.sbx-body .option-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sbx-size-s);
+    margin: 0 0 var(--sbx-size-s) 0; // add bottom margin to separate from next element
+}
+
 // Layout fixes for checkboxes inside option lists
 .sbx-body .option-list li {
-    display: flex;
     align-items: flex-start;
+    display: flex;
 }
 .sbx-body .option-list input[type="checkbox"] {
     align-self: center;
@@ -141,4 +150,10 @@ body.login input[type="checkbox"]:not(.plain) + label:before {
 body.login input[type="checkbox"]:not(.plain) + label {
     margin: 0 !important;
     padding: 0 !important;
+}
+
+// Fix alignment of checklist filters when linked to a label on the left
+.sbx-body .filters .checklist {
+    align-items: center;
+    display: flex;
 }

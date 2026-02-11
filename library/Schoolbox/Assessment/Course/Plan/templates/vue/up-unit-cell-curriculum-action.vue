@@ -76,6 +76,7 @@ async function onCreateSelected(): Promise<void> {
         <div v-if="component === null" class="component-action">
             <section>
                 <button
+                    class="button"
                     :data-test="`unit-planner-curriculum-create-${props.unit.folderId}`"
                     @click.prevent="onCreateSelected"
                 >

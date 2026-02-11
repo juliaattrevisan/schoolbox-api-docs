@@ -190,13 +190,33 @@
 }
 
 /**
- * Dropdown list buttons
- * These need to have a transparent background because action buttons inside dropdowns should have same style as other buttons
+ *  Dropdown separators
  */
-.sbx-body ul.f-dropdown li button {
-    background-color: transparent;
+.sbx-body #tab-control .separator,
+.sbx-body .f-dropdown .separator {
+    background-color: var(--sbx-color-foreground-primary);
+    color: var(--sbx-color-text-secondary);
+    font-weight: bold;
+    text-transform: capitalize;
 }
 
+/**
+ * Dropdown list buttons
+ */
+.sbx-body .f-dropdown,
+.sbx-body .f-dropdown li {
+    background-color: var(--sbx-color-foreground-primary);
+}
+
+//added to fix some styling issue
+.sbx-body.f-dropdown li :is(a, button),
+.sbx-body .f-dropdown li :is(a, button)::before {
+    color: var(--sbx-color-accent);
+}
+
+/**
+ *  Flatpickr button fixes
+ */
 .sbx-body {
     .flatpickr-current-month {
         .numInputWrapper {
@@ -229,4 +249,11 @@
 .sbx-body .fc-event,
 .sbx-body .fc-event:hover {
     border-radius: var(--sbx-config-field-roundness) !important;
+}
+
+/**
+ * Add some gap otherwise the checkbox and text within these buttons are too close together
+ */
+.sbx-body .search-result {
+    gap: var(--sbx-size-s);
 }

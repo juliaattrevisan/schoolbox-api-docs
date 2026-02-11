@@ -28,6 +28,9 @@
     .button-block,
     input[type="radio"] + .block,
     .dzone,
+    .filters label,
+    .tooltip,
+    .f-dropdown,
 
     // Labels
     .label,
@@ -40,7 +43,12 @@
     .selector label::after,
     .progress,
     input[type="radio"]:not(.plain) + label.input-toggle,
-    .progress .meter {
+    .progress .meter,
+    .activity-feed .grade,
+    .alert-box .close,
+    .eotc-status .close,
+    .alert-box-icon .close,
+    .selected-item {
         border-radius: var(--sbx-config-field-roundness) !important;
     }
 }
