@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Application\Exception;
 
-class Misconfigured extends Exception
+class Misconfigured extends \Alaress\Authorizer\Failure\Base
 {
     /**
      * Potentially 422 but that seems a bit uncommon for us

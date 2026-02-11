@@ -233,6 +233,7 @@ class Module extends BaseModule
          */
         $this->register('GET', "{$assRoute}/responses/view", 'getFirstParticipantResponse', new Rule\All(
             $canWrite,
+            $this->buildIsConfiguredAuthRule(),
             new IsImplementation(),
             new HasParticipant(),
         ), $preloadAssessment);
