@@ -74,6 +74,13 @@ class ModelToArray
                     'id'   => $student->getYear()->getId(),
                     'name' => $student->getYear()->getName(),
                 ] : null,
+                'campus'    => $student->getCampusCollection()?->reduce(function (array $arr, $campus) {
+                    $arr[] = [
+                        'id'   => $campus->getId(),
+                        'name' => $campus->getName(),
+                    ];
+                    return $arr;
+                }, []),
                 '_links'    => [
                     'profile' => $this->getRouteIfAuthorized(
                         'searchUser.getProfile',

@@ -4,9 +4,10 @@
  */
 
 import { sbProps } from "@js/util/sbx/pageUtils";
+import locale from "@js/terminology/rosettaStone";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/user/user-photo.vue";
-import type { Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
+import { ProfileStatus, type Profile } from "../../../js/types/manageDifferentiationProfilesTypes";
 import { useHeaderStore } from "../../store/mdpHeaderStore";
 import { useLinkedRecordsStore } from "../../store/mdpLinkedRecordsStore";
 import { useGenAiStore } from "../../store/mdpGenAiStore";
@@ -39,7 +40,7 @@ function onGenerateSelected(): void {
     <div class="l-flex-col l-pad-s l-gap-m">
         <div class="l-flex-row l-flex--no-wrap l-gap-m">
             <user-photo :user="props.user" render="small" />
-            <div class="l-flex-col l-flex--justify-center f-no-margins">
+            <div class="l-flex-col l-flex--justify-center l-gap-s f-no-margins">
                 <a v-if="props.user._links?.profile" :href="props.user._links!.profile" title="View Profile">
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}
@@ -48,22 +49,35 @@ function onGenerateSelected(): void {
                     {{ props.user.lastName }},
                     {{ props.user.givenName }}
                 </template>
+                <p v-if="props.user.yearLevel || (props.user.campus && props.user.campus.length)" class="meta">
+                    <template v-if="props.user.yearLevel">
+                        {{ locale.year.translate(false, true) }} {{ props.user.yearLevel.name }}</template
+                    >
+                    <template v-if="props.user.campus && props.user.campus.length">
+                        <span v-for="(campus, index) in props.user.campus" :key="campus.id">
+                            {{ campus.name }} Student<span v-if="index < props.user.campus.length - 1">, </span>
+                        </span>
+                    </template>
+                </p>
             </div>
         </div>
-        <button
-            v-if="props.profile._routes?.linkedRecords"
-            class="button f-no-margins"
-            @click="onLinkedRecordsSelected"
-        >
-            View Linked Records
-        </button>
-        <button
-            v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
-            class="button icon-ai f-no-margins"
-            @click="onGenerateSelected"
-        >
-            Extract with AI
-        </button>
+        <!-- if the profile is expired we don't want to provide access to linked records or AI extraction -->
+        <template v-if="!props.profile.status?.includes(ProfileStatus.EXPIRED)">
+            <button
+                v-if="props.profile._routes?.linkedRecords"
+                class="button f-no-margins"
+                @click="onLinkedRecordsSelected"
+            >
+                View Linked Records
+            </button>
+            <button
+                v-if="sbProps.aiFeatures.differentiation?.enabled && headerStore.hasEnabledTextFields"
+                class="button icon-ai f-no-margins"
+                @click="onGenerateSelected"
+            >
+                Extract with AI
+            </button>
+        </template>
     </div>
 </template>
 
