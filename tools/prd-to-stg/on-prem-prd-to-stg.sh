@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Restore a staging instance from a production host over SSH.
-# - Non-interactive only
+# - Supports interactive escalation approval (use --non-interactive to disable prompts)
 # - DB-only by default
 # - Full restore optionally syncs storage/files directories
 
@@ -276,10 +276,14 @@ function require_command() {
 function check_dependencies() {
   require_command ssh
   require_command scp
-  require_command rsync
   require_command mariadb
   require_command mariadb-dump
   require_command schoolbox-read-instances
+
+  if [[ $restore_mode == 'full' ]]; then
+    require_command rsync
+    require_command sudo
+  fi
 }
 
 function resolve_source_host() {
@@ -403,7 +407,7 @@ function dest_mariadb_server_exec() {
 
 function source_ssh_cmd() {
   local cmd="$1"
-  ssh -o BatchMode=yes "$source_host" "$cmd"
+  ssh -o BatchMode=yes -o ConnectTimeout=30 "$source_host" "$cmd"
 }
 
 function get_source_ini_option() {
@@ -593,7 +597,7 @@ function restore_staging_database() {
 
 function find_source_backup_file() {
   local selected_backup
-  if ! selected_backup=$(ssh -o BatchMode=yes "$source_host" bash -s -- "$source_data_dir" "$source_backup_dir" "$source_instance_id" "$backup_date" <<'EOF'
+  if ! selected_backup=$(ssh -o BatchMode=yes -o ConnectTimeout=30 "$source_host" bash -s -- "$source_data_dir" "$source_backup_dir" "$source_instance_id" "$backup_date" <<'EOF'
 set -eEuo pipefail
 
 source_data_dir="$1"
@@ -700,7 +704,7 @@ function download_source_backup() {
 
   prd_backup_file=$(mktemp "/tmp/${source_instance_id}_restore_XXXXXX${suffix}")
   log "Downloading source DB backup to '$prd_backup_file'"
-  if ! scp -q "$source_host:$source_backup_file" "$prd_backup_file"; then
+  if ! scp -q -o BatchMode=yes -o ConnectTimeout=30 -- "$source_host:$source_backup_file" "$prd_backup_file"; then
     error "Unable to copy source backup '$source_host:$source_backup_file' to '$prd_backup_file'"
     exit 1
   fi
@@ -770,13 +774,9 @@ function sync_remote_dir() {
   fi
 
   if [[ $invoking_user != 'root' ]]; then
-    if ! command -v sudo >/dev/null 2>&1; then
-      error "Unable to SSH as invoking user '$invoking_user' because sudo is unavailable."
-      exit 1
-    fi
-    rsync_rsh="sudo -n -u $invoking_user ssh"
+    rsync_rsh="sudo -n -u $invoking_user ssh -o BatchMode=yes -o ConnectTimeout=30"
   else
-    rsync_rsh='ssh'
+    rsync_rsh='ssh -o BatchMode=yes -o ConnectTimeout=30'
   fi
 
   if ! "${run_as_root[@]}" install -d -o www-data -g www-data "$dest_dir"; then
@@ -969,6 +969,9 @@ function cleanup_temp_files() {
   if [[ -n ${prd_backup_file:-} ]] && [[ -f $prd_backup_file ]]; then
     rm -f "$prd_backup_file" || warn "Unable to remove temp source backup '$prd_backup_file'"
   fi
+  if [[ -n ${staging_backup_file:-} ]] && [[ -f $staging_backup_file ]]; then
+    rm -f "$staging_backup_file" || warn "Unable to remove staging DB backup '$staging_backup_file'"
+  fi
 }
 
 function main() {
@@ -1005,10 +1008,6 @@ function main() {
   restore_sql_config
   localise_non_prod_defaults
   truncate_post_restore_tables
-
-  if [[ -n ${staging_backup_file:-} ]] && [[ -f $staging_backup_file ]]; then
-    rm -f "$staging_backup_file" || warn "Unable to remove staging DB backup '$staging_backup_file'"
-  fi
 
   log "Restore complete"
 }
