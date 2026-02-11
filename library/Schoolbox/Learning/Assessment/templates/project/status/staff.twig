@@ -302,7 +302,7 @@ Data:
                     // show the loader
                     $(event.target.parentNode).find('[data-loader]').removeClass('hide');
 
-                    var toast = $('#assessment-toast');
+                    let toast = $('#assessment-toast');
                     toast.toastActivate({text: 'Fetching participants...'});
 
                     // fetch the class status data
@@ -322,13 +322,13 @@ Data:
                             return response.text();
                         })
                         .then(function(data) {
-                            var el = event.target.parentNode;
+                            let el = event.target.parentNode;
                             if (el && data) {
                                 // toaster
                                 toast.toastTimeout({text: 'Loaded.', css: 'success'});
                                 el.innerHTML = data;
                                 // re-enable the load more button (if one exists. it may not...)
-                                $(el).find('[data-click-load-more]').click(loadMoreParticipants);
+                                $(el).find('[data-click-load-more]').on('click', loadMoreParticipants);
                             } else {
                                 // toaster
                                 toast.toastTimeout({text: 'Unable to load more participants.', css: 'alert'});
@@ -347,7 +347,7 @@ Data:
 
                 // when a user clicks the text in data-click-load
                 // we should async fetch the participants and add it to the div
-                $('[data-click-load]').click(function (event) {
+                $('[data-click-load]').on('click', function (event) {
                     // stop the scroll
                     event.preventDefault();
                     // if data has been loaded, exit
@@ -355,7 +355,7 @@ Data:
                         return;
                     }
 
-                    var toast = $('#assessment-toast');
+                    let toast = $('#assessment-toast');
                     toast.toastActivate({text: 'Fetching participants...'});
 
                     // swap out the class `icon-down-arrow` to `icon-up-arrow` before it loads
@@ -373,7 +373,7 @@ Data:
                             return response.text();
                         })
                         .then(function(data) {
-                            var el = document.getElementById('class-' + event.target.dataset.clickLoad);
+                            let el = document.getElementById('class-' + event.target.dataset.clickLoad);
                             if (el && data) {
                                 el.innerHTML = data;
 
@@ -381,7 +381,7 @@ Data:
                                 toast.toastTimeout({text: 'Loaded.', css: 'success'});
 
                                 // initialise the load more button if it exists
-                                $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').click(loadMoreParticipants);
+                                $('#class-' + event.target.dataset.clickLoad + ' [data-click-load-more]').on('click', loadMoreParticipants);
 
                                 // update data attribute once content has successfully loaded
                                 event.target.dataset.dataLoaded = 'true';
