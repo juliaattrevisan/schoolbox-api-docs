@@ -33,6 +33,8 @@ declare errors=0    # Any errors detected in CLI args?
 declare instance_id # If a specific instance provided, just rebuild for that instance. Otherwise all instances.
 declare verbose=0
 declare is_primary_host # Is this a primary (1) or secondary (0) host. If secondary, just delete the cron jobs.
+declare add_path=0 # If set: add the current PATH as the PATH for all crontabs
+declare shell      # If set: set this as the shell for all crontabs
 
 # Parse CLI args
 while [[ $# -gt 0 ]]; do
@@ -56,6 +58,15 @@ while [[ $# -gt 0 ]]; do
       errors=1
       shift
     fi
+    ;;
+  --add-path)
+    add_path=1
+    shift
+    ;;
+  --shell)
+    shell=$2
+    shift
+    shift
     ;;
   *)
     error "Unrecognised option: '$1'"
@@ -122,6 +133,14 @@ for i in ${instanceList[*]}; do
 MAILTO=\"$MAILTO\"
 MAILFROM=\"$MAILFROM\""
   } >"$instance_cron_file"
+
+  # Add shell and path if requested
+  if [[ ! -z $shell ]]; then
+    echo -e "SHELL=$shell" >> "$instance_cron_file"
+  fi
+  if [[ $add_path == '1' ]]; then
+    echo -e "PATH=${PATH:-/usr/bin:/bin}" >> "$instance_cron_file"
+  fi
 
   while IFS= read -r line; do
     # If not a comment or MAILTO or empty line
@@ -300,7 +319,16 @@ else
   debug "Package cron file present."
   if [[ $is_primary_host == "1" ]]; then
     debug "Host is primary. Deploying to /etc/cron.d/schoolbox..."
-    cp -v $package_cron_file /etc/cron.d/schoolbox
+    rm -f /etc/cron.d/schoolbox
+
+    # Prepend shell and path if requested
+    if [[ ! -z $shell ]]; then
+      echo -e "SHELL=$shell" > /etc/cron.d/schoolbox
+    fi
+    if [[ $add_path == '1' ]]; then
+      echo -e "PATH=${PATH:-/usr/bin:/bin}" >> /etc/cron.d/schoolbox
+    fi
+    cat $package_cron_file >> /etc/cron.d/schoolbox
   else
     debug "Host is non-primary. Deleting from /etc/cron.d/schoolbox..."
     rm -fv /etc/cron.d/schoolbox
