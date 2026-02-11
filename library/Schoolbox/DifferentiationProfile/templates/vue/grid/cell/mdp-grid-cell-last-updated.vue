@@ -18,7 +18,7 @@ function formatDateShort(dateString: string | null): string | null {
     if (!dateString) {
         return null;
     }
-    return window.dayjs(dateString).format(window.dateDisplayFormats.dayjsDateShort);
+    return `${window.dayjs(dateString).format(window.dateDisplayFormats.dayjsDateShort)} ${window.dayjs(dateString).format(window.dateDisplayFormats.dayjsTime)}`;
 }
 </script>
 
