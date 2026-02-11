@@ -20,13 +20,13 @@ class CycleUnroller
     /**
      * We care about stuff that happened this many weeks before today
      */
-    private const PAST_THRESHOLD = 1;
+    public const PAST_THRESHOLD = 1;
 
 
     /**
      * We care about stuff that happens this many weeks after today
      */
-    private const FUTURE_THRESHOLD = 6;
+    public const FUTURE_THRESHOLD = 6;
 
 
     /**
