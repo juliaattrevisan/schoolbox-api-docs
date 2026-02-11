@@ -59,7 +59,36 @@ class Manifest implements IStrategy
      */
     private function divisions(): void
     {
+        $headings = [
+            'id' => 'Division',
+            'name' => 'Name',
+            'count' => 'Count'
+        ];
 
+        /* Find the longest value for this column of data
+         */
+        $maxDivisionIdLength = strlen($headings['id']);
+        $maxNameLength = strlen($headings['name']);
+        $maxCountLength = strlen($headings['count']);
+
+        /* Find the existing divisions that schools have set up:
+         * TimetableAllocations will add (potentially subset) counts to this encompassing set
+         */
+        $data = [];
+
+        $existingDivisions = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision");
+
+        foreach ($existingDivisions as $division) {
+            $divisionId = trim((string)$division->xpath('@Id')[0]);
+            $name = trim((string)$division->xpath('Name')[0]);
+
+            $data[$divisionId] = [
+                'name' => $name,
+                'count' => 0
+            ];
+
+            $maxNameLength = max($maxNameLength, strlen($name));
+        }
 
         /* This is currently duped from the CycleUnroller for symmetry. This hasn't needed to change in a long time.
          *
@@ -84,50 +113,43 @@ class Manifest implements IStrategy
 
         $this->log->info('');
 
-        $headings = [
-            'divisionId' => 'Division',
-            'count' => 'Count'
-        ];
-
-        $data = [];
-
-        /* Find the longest value for this column of data
-         */
-        $maxDivisionIdLength = strlen($headings['divisionId']);
-        $maxCountLength = strlen($headings['count']);
-
         /* Find all TimetableAllocations within these bounds
          */
         $timetableAllocations = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TimetableManager/TimetableAllocations/TimetableAllocation[ISOYear = {$year} and Week >= {$pastThreshold} and Week <= {$futureThreshold}]");
 
         foreach ($timetableAllocations as $timetableAllocation) {
-            $divisionId = (string)$timetableAllocation->Division;
+            $divisionId = trim((string)$timetableAllocation->Division);
 
+            /* This should already have initialised via the SchoolDivisions prefill, but you never know
+             */
             if (!array_key_exists($divisionId, $data)) {
-                $data[$divisionId] = 0;
+                $data[$divisionId]['count'] = 0;
             }
 
-            $data[$divisionId]++;
+            $data[$divisionId]['count']++;
         }
 
         /* Extra padding for aesthetic reasons only
          */
         $maxDivisionIdLength += 5;
+        $maxNameLength += 5;
         $maxCountLength += 5;
 
         $this->log->info(sprintf(
-            '        %s%s',
-            str_pad($headings['divisionId'], $maxDivisionIdLength, ' ', STR_PAD_RIGHT),
+            '        %s%s%s',
+            str_pad($headings['id'], $maxDivisionIdLength, ' ', STR_PAD_RIGHT),
+            str_pad($headings['name'], $maxNameLength, ' ', STR_PAD_RIGHT),
             str_pad($headings['count'], $maxCountLength, ' ', STR_PAD_LEFT),
         ));
 
-        $this->log->info('        ' . str_pad('', $maxDivisionIdLength + $maxCountLength, '-'));
+        $this->log->info('        ' . str_pad('', $maxDivisionIdLength + $maxNameLength + $maxCountLength, '-'));
 
-        foreach ($data as $divisionId => $count) {
+        foreach ($data as $divisionId => $details) {
             $this->log->info(sprintf(
-                '        %s%s',
+                '        %s%s%s',
                 str_pad((string)$divisionId, $maxDivisionIdLength, ' ', STR_PAD_RIGHT),
-                str_pad((string)$count, $maxCountLength, ' ', STR_PAD_LEFT),
+                str_pad((string)$details['name'], $maxNameLength, ' ', STR_PAD_RIGHT),
+                str_pad((string)$details['count'], $maxCountLength, ' ', STR_PAD_LEFT),
             ));
         }
 
