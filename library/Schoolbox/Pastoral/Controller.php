@@ -296,7 +296,7 @@ class Controller extends Base
 
         /**
          * This is a quick pull to copy/paste based on getStudent,
-         * but it'll need to be done properly with the cursor in:
+         * but it'll need to be done properly with the cursor in: SA-21304
          */
 
         $get = $this->requestQuery;
@@ -325,7 +325,7 @@ class Controller extends Base
 
         /**
          * This was an initial attempt to use the class report cursor
-         * but I'm parking now as it'll be revisted in:
+         * but I'm parking now as it'll be revisited in: SA-21304
          */
 
         // $cursor  = new Cursor(
