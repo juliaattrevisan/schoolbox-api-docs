@@ -239,7 +239,7 @@ class Helper
 
             $series[$uniqueSeriesID]['name']  = $row['title'];
             $series[$uniqueSeriesID]['color'] = $row['fgColor'];
-            $series[$uniqueSeriesID]['url']   = $row['destinationUrl'];
+            $series[$uniqueSeriesID]['url']   = $row['url'];
 
             $summaryMonthLabel = (new Alaress_Date_Format())
                 ->setDay(1)
@@ -307,6 +307,15 @@ class Helper
                 $studentCount->getOffset('subtypeId')
             );
             $studentCount->setOffset('destinationUrl', $destinationUrl);
+
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $url = sprintf(
+                "%s?type=%s&subtype=%s",
+                $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $student->getId()]),
+                $studentCount->getOffset('typeId'),
+                $studentCount->getOffset('subtypeId')
+            );
+            $studentCount->setOffset('url', $url);
 
             /**
              * not all the types and subtypes will have a color provided
